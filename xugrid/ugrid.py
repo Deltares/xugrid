@@ -5,7 +5,9 @@ import numpy as np
 from cell_tree2d import *
 from typing import  Union
 
-
+#this class stores the topological data of a 2d unstructured grid. 
+#it contains a search tree for search operations, such as finding the face index in which a give point lies.
+#to avoid data duplication, it contains a method to remove topological data from a dataset
 class Ugrid:
 
     _topology_keys = ["node_dimension", "node_coordinates", "max_face_nodes_dimension","edge_node_connectivity", "edge_dimension",

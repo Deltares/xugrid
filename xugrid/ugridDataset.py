@@ -29,8 +29,10 @@ def dataset_wrapper(func, grid):
             return result
     return wrapped    
 
+
+
+#this class wraps an xarray dataArray. It is used to work with the dataArray in the context of an unstructured 2d grid. 
 class UgridDataArray:
-    """ This wraps a DataArray. """
    
     def __init__(self, obj: xr.DataArray, grid: Ugrid = None):
         self.obj = obj
@@ -62,9 +64,8 @@ class UgridDataArray:
         return UgridAccessor(self.obj, self.grid)
 
 
-
+#this class wraps an xarray Dataset. It is used to work with the Dataset in the context of an unstructured 2d grid. 
 class UgridDataset:
-    """ This wraps a Dataset. """
 
     def __init__(self, obj: xr.Dataset, grid: Ugrid = None):
         
@@ -105,20 +106,21 @@ class UgridDataset:
     def ugrid(self):
         return UgridAccessor(self.ds, self.grid)
 
-    
+#this class implements selection logic for use with xarray dataset and dataarray in the context of an unstructured 2d grid.      
 class UgridAccessor:
     def __init__(self, obj: Union[xr.Dataset, xr.DataArray], grid: Ugrid):
         self.obj = obj
         self.grid = grid
 
     def plot(self):
-        if self.grid._triangulation is None:
+        '''if self.grid._triangulation is None:
             self.grid.triangulation = mtri.Triangulation(
                 x=self.grid.nodes[:, 0],
                 y=self.grid.nodes[:, 1],
                 triangles=self.grid.faces,
             )
-        plt.tripcolor(self.grid.triangulation, self.obj.values.ravel())
+        plt.tripcolor(self.grid.triangulation, self.obj.values.ravel())'''
+        raise Exception('not implemented')
     
     def object_from_face_indices(self, face_indices):
         result = self.obj.isel(face=face_indices)
