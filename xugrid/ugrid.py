@@ -91,7 +91,7 @@ class Ugrid:
         return indices
 
 
-    def locate_faces_bb(self, xmin, xmax, ymin, ymax):
+    def locate_faces_bounding_box(self, xmin, xmax, ymin, ymax):
         maskx = (self.nodes_x >= xmin) & (self.nodes_x <= xmax)
         masky = (self.nodes_y >= ymin) & (self.nodes_y <= ymax )
         nodemask = maskx & masky

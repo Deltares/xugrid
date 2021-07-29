@@ -8,8 +8,7 @@ from xugrid import UgridDataset
 from xugrid import UgridDataArray
 import xarray as xr
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import pytest
 
 def test_createUgrid():
 
@@ -232,7 +231,7 @@ def test_boundingbox():
    ugds = UgridDataset(ds)    
    chained_slice = ugds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel(slice(1, 51), slice(2, 52))
 
-
+'''
 test_boundingbox()
 test_createUgrid()
 test_removeTopology()
@@ -252,7 +251,7 @@ test_dataarray_dataframe()
 test_dataarray_dataframe()
 test_create_time_series_from_dataArray_from_slices()
 test_create_time_series_from_dataset_from_slices()
-
+'''
 
    
    

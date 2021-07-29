@@ -153,7 +153,7 @@ class UgridAccessor:
             ycoords = [num for num in range( y.start, y.stop, y.step)]
             return self.sel_points(np.array(xcoords),np.array(ycoords))
         elif (x.step is None) & (y.step is None):
-            face_indices =  self.grid.locate_faces_bb(x.start, x.stop, y.start, y.stop)
+            face_indices =  self.grid.locate_faces_bounding_box(x.start, x.stop, y.start, y.stop)
             return self.object_from_face_indices(face_indices)
         else:
            raise Exception("slices should both have a stepsize, or neither should have a stepsize") 
