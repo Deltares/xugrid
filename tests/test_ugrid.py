@@ -230,28 +230,3 @@ def test_boundingbox():
    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    ugds = UgridDataset(ds)    
    chained_slice = ugds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel(slice(1, 51), slice(2, 52))
-
-'''
-test_boundingbox()
-test_createUgrid()
-test_removeTopology()
-test_createDataSet()
-test_DataSet_members_reachable()
-test_createDataArray()
-test_DataArray_members_reachable()
-test_create_time_series_from_dataset_from_points()
-test_create_time_series_from_dataset_from_arrays()
-test_create_time_series_from_dataArray_from_points()
-test_create_time_series_from_dataArray_from_arrays()
-test_create_time_series_from_dataArray_from_scalars()
-test_dataset_chaining()
-test_data_array_chaining()
-test_dataset_dataframe()
-test_dataarray_dataframe()
-test_dataarray_dataframe()
-test_create_time_series_from_dataArray_from_slices()
-test_create_time_series_from_dataset_from_slices()
-'''
-
-   
-   
