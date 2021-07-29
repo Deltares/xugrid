@@ -212,3 +212,10 @@ def test_create_time_series_from_dataset_from_slices(triangle_dataset):
 def test_boundingbox(triangle_dataset):
    ugds = UgridDataset(triangle_dataset)    
    chained_slice = ugds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel(slice(1, 51), slice(2, 52))
+   #test a few element numbers
+   assert len(chained_slice.ds.coords['face']) == 32
+   assert chained_slice.ds.coords['face'].values[0] == 30
+   assert chained_slice.ds.coords['face'].values[5] == 35
+   assert chained_slice.ds.coords['face'].values[6] == 50
+   assert chained_slice.ds.coords['face'].values[-1] == 197
+
