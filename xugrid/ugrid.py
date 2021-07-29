@@ -26,17 +26,14 @@ class Ugrid:
         self.connectivity_array = connectivity_array[0]
         self.nodes_x = node_coord_arrays[0]
         self.nodes_y = node_coord_arrays[1]
-
-        ds = ds.drop(connectivity_array_names)
-        ds = ds.drop(node_coord_array_names)
        
         self.build_celltree()
 
     def remove_topology(self, obj: Union[xr.Dataset, xr.DataArray]):
-       obj = obj.drop(self.connectivity_array.name, errors='ignore')
-       obj = obj.drop(self.nodes_x.name, errors='ignore')
-       obj = obj.drop(self.nodes_y.name, errors='ignore')
-       obj = obj.drop(self.mesh2d.name, errors='ignore')
+       obj = obj.drop_vars(self.connectivity_array.name, errors='ignore')
+       obj = obj.drop_vars(self.nodes_x.name, errors='ignore')
+       obj = obj.drop_vars(self.nodes_y.name, errors='ignore')
+       obj = obj.drop_vars(self.mesh2d.name, errors='ignore')
        return obj
 
     # returns the names of the arrays that have the specified role on the Mesh2D variable
