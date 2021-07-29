@@ -13,13 +13,13 @@ import matplotlib.pyplot as plt
 
 def test_createUgrid():
 
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    ugrid = Ugrid(ds)
    assert not ugrid._cell_tree is None 
 
 def test_removeTopology():
 
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    assert len(ds.coords) == 3 
    assert len(ds.variables) == 6
    ugrid = Ugrid(ds)
@@ -28,7 +28,7 @@ def test_removeTopology():
    assert len(ds.variables) == 2 #removed face_nodes, mesh2d, node_x and node_y
 
 def test_createDataSet():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     ugds = UgridDataset(ds)
     
     #verify topology was removed
@@ -46,7 +46,7 @@ def test_createDataSet():
     assert len(other_ugds2.ds.variables) == 2
 
 def test_createDataArray():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     da = ds.variables['data']
     ugds = UgridDataset(ds)
 
@@ -59,7 +59,7 @@ def test_createDataArray():
     assert((not ugda is None) & (not ugda2 is None))
 
 def test_DataSet_members_reachable():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     ugds = UgridDataset(ds)
     
     #check we can access dataset attributes on the UgridDataset
@@ -72,7 +72,7 @@ def test_DataSet_members_reachable():
     assert t1 == t2 
 
 def test_DataArray_members_reachable():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     da = ds.variables['data']
     ugds = UgridDataset(ds)
 
@@ -86,7 +86,7 @@ def test_DataArray_members_reachable():
     assert da.mean() == ugda.mean() 
 
 def test_create_time_series_from_dataset_from_points():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     points_x = np.array([5, 55,67], np.float64)
     points_y = np.array([25,34,78], np.float64)
 
@@ -96,7 +96,7 @@ def test_create_time_series_from_dataset_from_points():
     assert len(timeseries_data.ds.coords["face"]) ==3 
 
 def test_create_time_series_from_dataset_from_arrays():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
 
     uds = UgridDataset(ds)
     timeseries_data = uds.ugrid.sel(x=np.array([10,20,30]), y=np.array([11,21,31]))
@@ -104,7 +104,7 @@ def test_create_time_series_from_dataset_from_arrays():
     assert len(timeseries_data.ds.coords["face"]) ==9 
 
 def test_create_time_series_from_dataArray_from_points():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     da = ds.data_vars['data']
     ugds = UgridDataset(ds)
 
@@ -119,7 +119,7 @@ def test_create_time_series_from_dataArray_from_points():
 
 
 def test_create_time_series_from_dataArray_from_arrays():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
 
     uds = UgridDataset(ds)
     timeseries_data = uds.ugrid.sel(x=np.array([10,20,30]), y=np.array([11,21,31]))
@@ -127,7 +127,7 @@ def test_create_time_series_from_dataArray_from_arrays():
     assert len(timeseries_data.ds.coords["face"]) ==9 
 
 def test_create_time_series_from_dataArray_from_scalars():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
 
     uds = UgridDataset(ds)
     from_int_coords = uds.ugrid.sel(x=22, y=33) 
@@ -139,7 +139,7 @@ def test_create_time_series_from_dataArray_from_scalars():
 
 
 def test_dataset_chaining():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    uds = UgridDataset(ds)
    points_x = np.array([5, 55,67], np.float64)
    points_y = np.array([25,34,78], np.float64)
@@ -149,7 +149,7 @@ def test_dataset_chaining():
    assert chained.dims['face'] == 3 
 
 def test_data_array_chaining():
-    ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
     da = ds.data_vars['data']
     ugds = UgridDataset(ds)
 
@@ -163,7 +163,7 @@ def test_data_array_chaining():
     assert chained['face'].sizes['face'] == 3 
 
 def test_dataset_dataframe():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    uds = UgridDataset(ds)
    points_x = np.array([5, 55,67], np.float64)
    points_y = np.array([25,34,78], np.float64)  
@@ -179,7 +179,7 @@ time
    assert str(unstacked) == refresult
 
 def test_dataarray_dataframe():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    da = ds.data_vars['data']
    ugds = UgridDataset(ds)
 
@@ -199,7 +199,7 @@ face
 108    0.432133   0.662104   0.753665"""
    assert str(unstacked) == refresult 
 def test_create_time_series_from_dataArray_from_slices():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    da = ds.data_vars['data']
    ugds = UgridDataset(ds)
 
@@ -215,7 +215,7 @@ def test_create_time_series_from_dataArray_from_slices():
    assert chained_slice.obj.equals(chained_points.obj)
 
 def test_create_time_series_from_dataset_from_slices():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    ugds = UgridDataset(ds)
 
    #use slices with a step size in this example
@@ -228,7 +228,7 @@ def test_create_time_series_from_dataset_from_slices():
    assert chained_slice.ds.equals(chained_points.ds)
 
 def test_boundingbox():
-   ds = xr.open_dataset(r"D:\dev\imodPython_exampleFiles\tri-time-test1.nc")
+   ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
    ugds = UgridDataset(ds)    
    chained_slice = ugds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel(slice(1, 51), slice(2, 52))
 
