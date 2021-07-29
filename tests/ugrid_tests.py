@@ -1,8 +1,8 @@
 import sys
-  
+
 # append the path of the xugrid package
 sys.path.append("../xugrid")
-
+import textwrap
 from xugrid import Ugrid
 from xugrid import UgridDataset
 from xugrid import UgridDataArray
@@ -170,12 +170,12 @@ def test_dataset_dataframe():
    chained = uds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel_points(points_x, points_y)
    df = chained.to_dataframe()
    unstacked = df.unstack(0)
-   refresult= """                data                    
-face             54        194       108
-time                                    
-2018-01-01  0.641110  0.987178  0.432133
-2018-01-02  1.449409  1.695637  0.662104
-2018-01-03  2.416647  2.178768  0.753665"""
+   refresult= textwrap.dedent("""                   data                    
+   face             54        194       108
+   time                                    
+   2018-01-01  0.641110  0.987178  0.432133
+   2018-01-02  1.449409  1.695637  0.662104
+   2018-01-03  2.416647  2.178768  0.753665""")
    assert str(unstacked) == refresult
 
 def test_dataarray_dataframe():
@@ -191,12 +191,12 @@ def test_dataarray_dataframe():
    chained = ugda.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel_points(points_x, points_y)
    df = chained.to_dataframe()
    unstacked = df.unstack(0)
-   refresult= """           data                      
-time 2018-01-01 2018-01-02 2018-01-03
-face                                 
-54     0.641110   1.449409   2.416647
-194    0.987178   1.695637   2.178768
-108    0.432133   0.662104   0.753665"""
+   refresult= textwrap.dedent("""              data                      
+   time 2018-01-01 2018-01-02 2018-01-03
+   face                                 
+   54     0.641110   1.449409   2.416647
+   194    0.987178   1.695637   2.178768
+   108    0.432133   0.662104   0.753665""")
    assert str(unstacked) == refresult 
 def test_create_time_series_from_dataArray_from_slices():
    ds = xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
