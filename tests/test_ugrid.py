@@ -9,10 +9,11 @@ from xugrid import UgridDataArray
 import xarray as xr
 import numpy as np
 import pytest
+from create_test_datasets import create_trimesh_transient
 
 @pytest.fixture
 def triangle_dataset():
-    return xr.open_dataset(r"./tests/test_data/tri-time-test1.nc")
+    return create_trimesh_transient(10,10, 5)
 
 def test_createUgrid(triangle_dataset):
    ugrid = Ugrid(triangle_dataset)
@@ -44,7 +45,7 @@ def test_createDataSet(triangle_dataset):
     assert len(other_ugds2.ds.variables) == 2
 
 def test_createDataArray(triangle_dataset):
-    da = triangle_dataset.variables['data']
+    da = triangle_dataset.variables['data_transient']
     ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -68,7 +69,7 @@ def test_DataSet_members_reachable(triangle_dataset):
     assert t1 == t2 
 
 def test_DataArray_members_reachable(triangle_dataset):
-    da = triangle_dataset.variables['data']
+    da = triangle_dataset.variables['data_transient']
     ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -97,7 +98,7 @@ def test_create_time_series_from_dataset_from_arrays(triangle_dataset):
     assert len(timeseries_data.ds.coords["face"]) ==9 
 
 def test_create_time_series_from_dataArray_from_points(triangle_dataset):
-    da = triangle_dataset.data_vars['data']
+    da = triangle_dataset.data_vars['data_transient']
     ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -136,7 +137,7 @@ def test_dataset_chaining(triangle_dataset):
    assert chained.dims['face'] == 3 
 
 def test_data_array_chaining(triangle_dataset):
-    da = triangle_dataset.data_vars['data']
+    da = triangle_dataset.data_vars['data_transient']
     ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -155,16 +156,16 @@ def test_dataset_dataframe(triangle_dataset):
    chained = uds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel_points(points_x, points_y)
    df = chained.to_dataframe()
    unstacked = df.unstack(0)
-   refresult= textwrap.dedent("""                   data                    
-   face             54        194       108
-   time                                    
-   2018-01-01  0.641110  0.987178  0.432133
-   2018-01-02  1.449409  1.695637  0.662104
-   2018-01-03  2.416647  2.178768  0.753665""")
+   refresult= textwrap.dedent("""              data_transient                
+   face                  22      63      150
+   time                                     
+   2018-01-01           66.0   189.0   450.0
+   2018-01-02          198.0   567.0  1350.0
+   2018-01-03          396.0  1134.0  2700.0""")
    assert str(unstacked) == refresult
 
 def test_dataarray_dataframe(triangle_dataset):
-   da = triangle_dataset.data_vars['data']
+   da = triangle_dataset.data_vars['data_transient']
    ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -175,15 +176,15 @@ def test_dataarray_dataframe(triangle_dataset):
    chained = ugda.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel_points(points_x, points_y)
    df = chained.to_dataframe()
    unstacked = df.unstack(0)
-   refresult= textwrap.dedent("""              data                      
-   time 2018-01-01 2018-01-02 2018-01-03
-   face                                 
-   54     0.641110   1.449409   2.416647
-   194    0.987178   1.695637   2.178768
-   108    0.432133   0.662104   0.753665""")
+   refresult= textwrap.dedent('''        data_transient                      
+   time     2018-01-01 2018-01-02 2018-01-03
+   face                                     
+   22             66.0      198.0      396.0
+   63            189.0      567.0     1134.0
+   150           450.0     1350.0     2700.0''')
    assert str(unstacked) == refresult 
 def test_create_time_series_from_dataArray_from_slices(triangle_dataset):
-   da = triangle_dataset.data_vars['data']
+   da = triangle_dataset.data_vars['data_transient']
    ugds = UgridDataset(triangle_dataset)
 
     #create data array from xr.DataArray and grid
@@ -210,12 +211,14 @@ def test_create_time_series_from_dataset_from_slices(triangle_dataset):
    assert chained_slice.ds.equals(chained_points.ds)
 
 def test_boundingbox(triangle_dataset):
-   ugds = UgridDataset(triangle_dataset)    
+   ugds = UgridDataset(triangle_dataset)
+   triangle_dataset.to_netcdf("ttri-time-test.nc")    
    chained_slice = ugds.sel(time=slice("2018-01-01", "2018-01-03")).ugrid.sel(slice(1, 51), slice(2, 52))
    #test a few element numbers
-   assert len(chained_slice.ds.coords['face']) == 32
-   assert chained_slice.ds.coords['face'].values[0] == 30
-   assert chained_slice.ds.coords['face'].values[5] == 35
-   assert chained_slice.ds.coords['face'].values[6] == 50
-   assert chained_slice.ds.coords['face'].values[-1] == 197
+   chained_slice.ds.coords['face'].values   
+   assert len(chained_slice.ds.coords['face']) == 18
+   assert chained_slice.ds.coords['face'].values[0] == 14
+   assert chained_slice.ds.coords['face'].values[5] == 19
+   assert chained_slice.ds.coords['face'].values[6] == 24
+   assert chained_slice.ds.coords['face'].values[-1] == 53
 
