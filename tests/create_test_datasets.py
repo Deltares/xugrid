@@ -9,6 +9,57 @@ IntArray = np.ndarray
 FloatArray = np.ndarray
 
 
+def create_trimesh_steady_state(nx, ny):
+   '''
+   creates a xarray dataset containing an irregular grid geometry (triangles) with a single dataarray containing time-invariant data
+   associated to faces
+   '''
+   x = np.linspace(0.0, 100.0, nx)
+   y = np.linspace(0.0, 100.0, ny)
+   return _assign_data(triangular_dataset(x, y))
+    
+def create_trimesh_transient(nx, ny, ntime):
+   '''
+   creates a xarray dataset containing an irregular grid geometry (triangles) with a single dataarray containing transient data
+   associated to faces
+   '''
+   x = np.linspace(0.0, 100.0, nx)
+   y = np.linspace(0.0, 100.0, ny)
+   return _assign_time_data(triangular_dataset(x, y), ntime)
+    
+def create_quadmesh_steady_state(nx, ny):
+   '''
+   creates a xarray dataset containing an irregular grid geometry (quadrilaterals ) with a single dataarray containing  time-invariant data
+   associated to faces
+   '''
+   x = np.linspace(0.0, 100.0, nx)
+   y = np.linspace(0.0, 100.0, ny)
+   return _assign_data(quadrilateral_dataset(x, y))
+    
+def create_quadmesh_transient(nx, ny, ntime): 
+   '''
+   creates a xarray dataset containing an irregular grid geometry (quadrilaterals ) with a single dataarray containing  transient data
+   associated to faces
+   '''  
+   x = np.linspace(0.0, 100.0, nx)
+   y = np.linspace(0.0, 100.0, ny)
+   return _assign_time_data(quadrilateral_dataset(x, y), ntime)
+    
+def create_hexmesh_steady_state(m,n):
+   '''
+   creates a xarray dataset containing an irregular grid geometry (hexagons ) with a single dataarray containing  time-invariant data
+   associated to faces
+   '''  
+   return _assign_data(hexagonal_dataset(m, n))
+
+def  create_hexmesh_transient(m,n, ntime):
+   '''
+   creates a xarray dataset containing an irregular grid geometry (hexagons ) with a single dataarray containing  transient data
+   associated to faces
+   '''   
+   return _assign_time_data(hexagonal_dataset(m, n), ntime)
+
+
 def ugrid2d_dataset(
     node_x: FloatArray,
     node_y: FloatArray,
@@ -203,12 +254,8 @@ def _assign_data(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def assign_data(ds: xr.Dataset) -> xr.Dataset:
-    ds = _assign_data(ds)
-    return ds
 
-
-def assign_time_data(ds: xr.Dataset, ntime: int) -> xr.Dataset:
+def _assign_time_data(ds: xr.Dataset, ntime: int) -> xr.Dataset:
     ds = _assign_data(ds)
     times = pd.date_range(start="1/1/2018", periods=ntime, freq="D")
     da_ls = []
@@ -227,31 +274,4 @@ def assign_time_data(ds: xr.Dataset, ntime: int) -> xr.Dataset:
     ds = ds.drop_vars("data_time_invariant")
 
     return ds
-
-
-def create_trimesh_steady_state(nx, ny):
-   x = np.linspace(0.0, 100.0, nx)
-   y = np.linspace(0.0, 100.0, ny)
-   return assign_data(triangular_dataset(x, y))
-    
-def create_trimesh_transient(nx, ny, ntime):
-    x = np.linspace(0.0, 100.0, nx)
-    y = np.linspace(0.0, 100.0, ny)
-    return assign_time_data(triangular_dataset(x, y), ntime)
-    
-def create_quadmesh_steady_state(nx, ny):
-    x = np.linspace(0.0, 100.0, nx)
-    y = np.linspace(0.0, 100.0, ny)
-    return assign_data(quadrilateral_dataset(x, y))
-    
-def create_quadmesh_transient(nx, ny, ntime): 
-    x = np.linspace(0.0, 100.0, nx)
-    y = np.linspace(0.0, 100.0, ny)
-    return assign_time_data(quadrilateral_dataset(x, y), ntime)
-    
-def create_hexmesh_steady_state(m,n):
-   return assign_data(hexagonal_dataset(m, n))
-
-def  create_hexmesh_transient(m,n, ntime):
-  return assign_time_data(hexagonal_dataset(m, n), ntime)
 
