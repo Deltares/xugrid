@@ -4,7 +4,6 @@ from typing import Union
 
 import numpy as np
 import xarray as xr
-from numpy import float64
 
 from xugrid.ugrid import Ugrid
 
@@ -160,18 +159,19 @@ class UgridAccessor:
         returns subset of dataset or dataArray containing specific face indices
         """
         result = self.obj.isel(face=face_indices)
+        grid = self.grid.topology_subset(face_indices)
         result.coords["face"] = face_indices
         if isinstance(self.obj, xr.DataArray):
-            return UgridDataArray(result, self.grid)
+            return UgridDataArray(result, grid)
         elif isinstance(self.obj, xr.Dataset):
-            return UgridDataset(result, self.grid)
+            return UgridDataset(result, grid)
         else:
             raise TypeError("illegal type in _sel_points")
 
     def sel_points(self, points_x, points_y):
         """
         returns subset of dataset or dataArray containing specific face
-        indices. INput arguments are point coordinates.  The result dataset or
+        indices. Input arguments are point coordinates. The result dataset or
         dataArray contains only the faces containing these points.
         """
         if (points_x is None) or (points_y is None):
@@ -183,7 +183,9 @@ class UgridAccessor:
 
         points = np.column_stack([points_x, points_y])
         face_indices = self.grid.locate_faces(points)
-        return self.object_from_face_indices(face_indices)
+        result = self.obj.isel(face=face_indices)
+        result.coords["face"] = face_indices
+        return result
 
     def _sel_slices(self, x: slice, y: slice):
         if (
@@ -219,8 +221,28 @@ class UgridAccessor:
         elif (isinstance(x, float) or isinstance(x, int)) and (
             isinstance(y, float) or isinstance(y, int)
         ):
-            return self.sel_points(np.array([x], float64), np.array([y], float64))
+            return self.sel_points(np.array([x], np.float64), np.array([y], np.float64))
         elif isinstance(x, slice) and isinstance(y, slice):
             return self._sel_slices(x, y)
         else:
             raise ValueError("argument mismatch")
+
+    def rasterize(self, cellsize: float):
+        xmin = self.grid.nodes_x.min()
+        xmax = self.grid.nodes_x.max()
+        ymin = self.grid.nodes_y.min()
+        ymax = self.grid.nodes_y.max()
+        xmin = np.floor(xmin / cellsize) * cellsize
+        xmax = np.ceil(xmax / cellsize) * cellsize
+        ymin = np.floor(ymin / cellsize) * cellsize
+        ymax = np.ceil(ymax / cellsize) * cellsize
+        dx = cellsize
+        dy = -cellsize
+        x = np.arange(xmin + 0.5 * dx, xmax - 0.5 * dx, dx)
+        y = np.arange(ymax + 0.5 * dy, ymin - 0.5 * dy, dy)
+        return self.sel(x=x, y=y)
+
+    def rasterize_like(self, other):
+        x = other["x"].values
+        y = other["y"].values
+        return self.sel(x=x, y=y)

@@ -5,6 +5,11 @@ import numpy as np
 import xarray as xr
 from cell_tree2d import CellTree
 
+from . import connectivity
+
+IntArray = np.ndarray
+FloatArray = np.ndarray
+
 
 class Ugrid:
     """
@@ -44,17 +49,25 @@ class Ugrid:
         connectivity_array_names = self._get_topology_array_with_role(
             self.mesh_2d, "face_node_connectivity"
         )
+        self.fill_value = -1
 
         connectivity_array = self._get_data_arrays_by_name(ds, connectivity_array_names)
         node_coord_arrays = self._get_coordinate_arrays_by_name(
             ds, node_coord_array_names
         )
 
-        self.connectivity_array = connectivity_array[0]
+        self.connectivity_array = connectivity_array[0].astype(connectivity.INT_DTYPE)
         self.nodes_x = node_coord_arrays[0]
         self.nodes_y = node_coord_arrays[1]
-
         self.build_celltree()
+
+    def to_dataset(self):
+        ds = xr.Dataset()
+        ds["mesh2d"] = self.mesh_2d
+        ds["face_node_connectivity"] = self.connectivity_array
+        ds["node_x"] = self.nodes_x
+        ds["node_x"] = self.nodes_y
+        return ds
 
     def remove_topology(self, obj: Union[xr.Dataset, xr.DataArray]):
         """
@@ -128,27 +141,91 @@ class Ugrid:
         given a rectangular bounding box, this function returns the face
         indices which lie in it.
         """
-        maskx = (self.nodes_x >= xmin) & (self.nodes_x <= xmax)
-        masky = (self.nodes_y >= ymin) & (self.nodes_y <= ymax)
-        nodemask = maskx & masky
-        result = []
-
-        def cell_in_box(node_indices: xr.DataArray, nodeMask: xr.DataArray, missing):
-            """returns true if all the node indices are included in the mask (or missing)"""
-            result = True
-            for i in range(len(node_indices)):
-                index = int(node_indices.values[i])
-                if not index == missing:
-                    result = result and nodeMask[index]
-            return result
-
-        for i in range(len(self.connectivity_array)):
-            if cell_in_box(self.connectivity_array[i], nodemask, -999):
-                result.append(i)
-        return result
+        x = self.nodes_x.values
+        y = self.nodes_y.values
+        nodemask = (x >= xmin) & (x <= xmax) & (y >= ymin) & (y <= ymax)
+        node_face_connectivity = connectivity.invert_dense_to_sparse(
+            self.connectivity_array.values, self.fill_value
+        )
+        selected_faces = np.unique(node_face_connectivity[nodemask].indices)
+        return selected_faces
 
     def locate_cells(points):
         raise NotImplementedError()
 
     def locate_edges(points):
         raise NotImplementedError()
+
+    def triangulate(self):
+        raise NotImplementedError()
+
+    def matplotlib_triangulation(self):
+        return mtri.Triangulation(
+            x=self.nodes_x,
+            y=self.nodes_y,
+            triangles=self.connectivity_array,
+        )
+
+    @staticmethod
+    def topology_dataset(
+        node_x: FloatArray, node_y: FloatArray, face_node_connectivity: IntArray
+    ) -> xr.Dataset:
+        # TODO: parametrize dataset variable names (node, node_x, node_y, node, etc.)
+        # mesh2d variable could just be deep-copied in case of subset
+        ds = xr.Dataset()
+        ds["mesh2d"] = xr.DataArray(
+            data=0,
+            attrs={
+                "cf_role": "mesh_topology",
+                "long_name": "Topology data of 2D mesh",
+                "topology_dimension": 2,
+                "node_coordinates": "node_x node_y",
+                "face_node_connectivity": "face_nodes",
+                "edge_node_connectivity": "edge_nodes",
+            },
+        )
+        ds = ds.assign_coords(
+            node_x=xr.DataArray(
+                data=node_x,
+                dims=["node"],
+            )
+        )
+        ds = ds.assign_coords(
+            node_y=xr.DataArray(
+                data=node_y,
+                dims=["node"],
+            )
+        )
+        ds["face_nodes"] = xr.DataArray(
+            data=face_node_connectivity,
+            dims=["face", "nmax_face"],
+            attrs={
+                "cf_role": "face_node_connectivity",
+                "long_name": "Vertex nodes of mesh faces (counterclockwise)",
+                "start_index": 0,
+                "_FillValue": -1,
+            },
+        )
+        ds.attrs = {"Conventions": "CF-1.8 UGRID-1.0"}
+        return ds
+
+    def topology_subset(self, face_indices: IntArray):
+        """
+        Create a valid ugrid dataset describing the topology of a subset of
+        this unstructured mesh topology.
+        """
+        # If faces are repeated: not a valid mesh
+        # _, count = np.unique(face_indices, return_counts=True)
+        # assert count.max() <= 1?
+        # If no faces are repeated, and size is the same, it's the same mesh
+        if face_indices.size == len(self.connectivity_array):
+            return self
+        # Subset of faces, create new topology data
+        else:
+            face_selection = self.connectivity_array.values[face_indices]
+            node_indices = np.unique(face_selection.ravel())
+            face_node_connectivity = connectivity.renumber(face_selection)
+            node_x = self.nodes_x.values[node_indices]
+            node_y = self.nodes_y.values[node_indices]
+            ds = Ugrid.topology_dataset(node_x, node_y, face_node_connectivity)
+            return Ugrid(ds)
