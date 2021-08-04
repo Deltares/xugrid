@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from scipy import sparse
+
 from xugrid import connectivity
 
 
@@ -158,6 +159,23 @@ def test_renumber():
             [0, 1, 2],
             [3, 4, 5],
             [6, 7, 8],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+    a = np.array(
+        [
+            [0, 1, 2],
+            [10, 11, 2],
+            [30, 31, 2],
+        ]
+    )
+    actual = connectivity.renumber(a)
+    expected = np.array(
+        [
+            [0, 1, 2],
+            [3, 4, 2],
+            [5, 6, 2],
         ]
     )
     assert np.array_equal(actual, expected)

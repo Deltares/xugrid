@@ -101,4 +101,13 @@ def invert_sparse(conn: sparse.csr_matrix) -> sparse.csr_matrix:
 # Renumbering
 # -----------
 def renumber(a: IntArray) -> IntArray:
-    return np.argsort(a.ravel()).reshape(a.shape)
+    # Taken from https://github.com/scipy/scipy/blob/v1.7.1/scipy/stats/stats.py#L8631-L8737
+    # (scipy is BSD-3-Clause License)
+    arr = np.ravel(np.asarray(a))
+    sorter = np.argsort(arr, kind="quicksort")
+    inv = np.empty(sorter.size, dtype=INT_DTYPE)
+    inv[sorter] = np.arange(sorter.size, dtype=INT_DTYPE)
+    arr = arr[sorter]
+    obs = np.r_[True, arr[1:] != arr[:-1]]
+    dense = obs.cumsum()[inv] - 1
+    return dense.reshape(a.shape)
