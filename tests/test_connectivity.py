@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 from scipy import sparse
-
 from xugrid import connectivity
 
 
@@ -61,7 +60,7 @@ def test_ragged_index():
     n = 3
     m = 4
     m_per_row = np.array([1, 2, 3])
-    actual = connectivity._ragged_index(n, m, m_per_row)
+    actual = connectivity.ragged_index(n, m, m_per_row)
     expected = np.array(
         [
             [True, False, False, False],

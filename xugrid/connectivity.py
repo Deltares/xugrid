@@ -30,7 +30,7 @@ def _to_sparse(conn: IntArray, fill_value: int, invert: bool) -> sparse.csr_matr
     return coo_matrix.tocsr()
 
 
-def _ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
+def ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
     """
     Given an array of n rows by m columns, starting from left mark the values
     True such that the number of True values equals m_per_row.
@@ -72,9 +72,9 @@ def to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
         # e.g. all triangles or all quadrangles
         valid = slice(None)  # a[:] equals a[slice(None)]
     else:
-        valid = _ragged_index(n, m, m_per_row).ravel()
+        valid = ragged_index(n, m, m_per_row).ravel()
         flat_conn[~valid] = fill_value
-    flat_conn.ravel()[valid] = conn.indices
+    flat_conn[valid] = conn.indices
     return dense_conn
 
 
@@ -111,3 +111,58 @@ def renumber(a: IntArray) -> IntArray:
     obs = np.r_[True, arr[1:] != arr[:-1]]
     dense = obs.cumsum()[inv] - 1
     return dense.reshape(a.shape)
+
+
+# Derived connectivities
+# ----------------------
+def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArray:
+    # Wrap around and create closed polygon: put the first node at the end of the row
+    # In case of fill values, replace all fill values
+    n, m = face_node_connectivity.shape
+    closed = np.full((n, m + 1), fill_value, dtype=INT_DTYPE)
+    closed[:, :-1] = face_node_connectivity
+    first_node = face_node_connectivity[:, 0]
+    # Identify fill value, and replace by first node also
+    isfill = closed == fill_value
+    closed.ravel()[isfill.ravel()] = np.repeat(first_node, isfill.sum(axis=1))
+    return closed, isfill
+
+
+def edge_connectivity(
+    face_node_connectivity: IntArray, fill_value: int
+) -> Tuple[IntArray, IntArray]:
+    n, m = face_node_connectivity.shape
+    # Close the polygons: [0 1 2 3] -> [0 1 2 3 0]
+    closed, isfill = close_polygons(face_node_connectivity, fill_value)
+    # Allocate array for edge_node_connectivity: includes duplicate edges
+    edge_node_connectivity = np.empty((n * m, 2), dtype=INT_DTYPE)
+    edge_node_connectivity[:, 0] = closed[:, :-1].ravel()
+    edge_node_connectivity[:, 1] = closed[:, 1:].ravel()
+    # Cleanup: delete invalid edges (same node to same node)
+    edge_node_connectivity = edge_node_connectivity[
+        edge_node_connectivity[:, 0] != edge_node_connectivity[:, 1]
+    ]
+    # Now find the unique rows == unique edges
+    edge_node_connectivity.sort(axis=1)
+    edge_node_connectivity, inverse_indices = np.unique(
+        ar=edge_node_connectivity, return_inverse=True, axis=0
+    )
+    # Create face_edge_connectivity
+    face_edge_connectivity = np.full((n, m), fill_value, dtype=np.int64)
+    isnode = ~isfill[:, :-1]
+    face_edge_connectivity.ravel()[isnode.ravel()] = inverse_indices
+    return edge_node_connectivity, face_edge_connectivity
+
+
+def face_face_connectivity(
+    edge_face_connectivity: IntArray,
+    fill_value: int,
+) -> sparse.csr_matrix:
+    i = edge_face_connectivity[:, 0]
+    j = edge_face_connectivity[:, 1]
+    is_connection = j != fill_value
+    i = i[is_connection]
+    j = j[is_connection]
+    coo_content = (j, (i, j))
+    coo_matrix = sparse.coo_matrix(coo_content)
+    return coo_matrix.tocsr()
