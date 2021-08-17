@@ -32,28 +32,28 @@ def mixed_mesh():
 
 def test_to_ij(triangle_mesh, mixed_mesh):
     faces, fill_value = triangle_mesh
-    ac_i, ac_j = connectivity._to_ij(faces, fill_value, invert=False)
-    ex_i = [0, 0, 0, 1, 1, 1]
-    ex_j = [0, 1, 2, 1, 3, 2]
-    assert np.array_equal(ac_i, ex_i)
-    assert np.array_equal(ac_j, ex_j)
+    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=False)
+    expected_i = [0, 0, 0, 1, 1, 1]
+    expected_j = [0, 1, 2, 1, 3, 2]
+    assert np.array_equal(actual_i, expected_i)
+    assert np.array_equal(actual_j, expected_j)
 
     # Inverted
-    ac_i, ac_j = connectivity._to_ij(faces, fill_value, invert=True)
-    assert np.array_equal(ac_i, ex_j)
-    assert np.array_equal(ac_j, ex_i)
+    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=True)
+    assert np.array_equal(actual_i, expected_j)
+    assert np.array_equal(actual_j, expected_i)
 
     faces, fill_value = mixed_mesh
-    ac_i, ac_j = connectivity._to_ij(faces, fill_value, invert=False)
-    ex_i = [0, 0, 0, 1, 1, 1, 1]
-    ex_j = [0, 1, 2, 1, 3, 4, 2]
-    assert np.array_equal(ac_i, ex_i)
-    assert np.array_equal(ac_j, ex_j)
+    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=False)
+    expected_i = [0, 0, 0, 1, 1, 1, 1]
+    expected_j = [0, 1, 2, 1, 3, 4, 2]
+    assert np.array_equal(actual_i, expected_i)
+    assert np.array_equal(actual_j, expected_j)
 
     # Inverted
-    ac_i, ac_j = connectivity._to_ij(faces, fill_value, invert=True)
-    assert np.array_equal(ac_i, ex_j)
-    assert np.array_equal(ac_j, ex_i)
+    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=True)
+    assert np.array_equal(actual_i, expected_j)
+    assert np.array_equal(actual_j, expected_i)
 
 
 def test_ragged_index():
