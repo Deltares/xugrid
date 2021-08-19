@@ -2,30 +2,15 @@ import types
 from functools import wraps
 from typing import Union
 
+import geopandas as gpd
 import numpy as np
 import xarray as xr
 
-from xugrid.ugrid import Ugrid
+from xugrid.ugrid import Ugrid2d
+from .conversion import geodataframe_to_ugrid
 
 
-def dataarray_wrapper(func, grid):
-    """
-    runs a function, and if the result is an xarray dataset, it creates an
-    UgridDataset around it
-    """
-
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        result = func(*args, **kwargs)
-        if isinstance(result, xr.DataArray):
-            return UgridDataArray(result, grid)
-        else:
-            return result
-
-    return wrapped
-
-
-def dataset_wrapper(func, grid):
+def xarray_wrapper(func, grid):
     """
     runs a function, and if the result is an xarray dataset or an xarray
     dataArray, it creates an UgridDataset or an UgridDataArray around it
@@ -50,10 +35,10 @@ class UgridDataArray:
     in the context of an unstructured 2d grid.
     """
 
-    def __init__(self, obj: xr.DataArray, grid: Ugrid = None):
+    def __init__(self, obj: xr.DataArray, grid: Ugrid2d = None):
         self.obj = obj
         if grid is None:
-            grid = Ugrid(obj)
+            grid = Ugrid2d(obj)
         self.grid = grid
 
     def __getitem__(self, key):
@@ -80,7 +65,7 @@ class UgridDataArray:
         if isinstance(result, xr.DataArray):
             return UgridDataArray(result, self.grid)
         elif isinstance(result, types.MethodType):
-            return dataarray_wrapper(result, self.grid)
+            return xarray_wrapper(result, self.grid)
         else:
             return result
 
@@ -95,10 +80,10 @@ class UgridDataset:
     the context of an unstructured 2d grid.
     """
 
-    def __init__(self, obj: xr.Dataset, grid: Ugrid = None):
+    def __init__(self, obj: xr.Dataset, grid: Ugrid2d = None):
 
         if grid is None:
-            self.grid = Ugrid(obj)
+            self.grid = Ugrid2d(obj)
         else:
             self.grid = grid
         self.ds = self.grid.remove_topology(obj)
@@ -125,13 +110,18 @@ class UgridDataset:
         elif isinstance(result, xr.Dataset):
             return UgridDataset(result, self.grid)
         elif isinstance(result, types.MethodType):
-            return dataset_wrapper(result, self.grid)
+            return xarray_wrapper(result, self.grid)
         else:
             return result
 
     @property
     def ugrid(self):
         return UgridAccessor(self.ds, self.grid)
+
+    @staticmethod
+    def from_geodataframe(geodataframe) -> "UgridDataset":
+        ds, grid = geodataframe_to_ugrid(geodataframe)
+        return UgridDataset(ds, grid)
 
 
 class UgridAccessor:
@@ -140,7 +130,7 @@ class UgridAccessor:
     dataarray in the context of an unstructured 2d grid.
     """
 
-    def __init__(self, obj: Union[xr.Dataset, xr.DataArray], grid: Ugrid):
+    def __init__(self, obj: Union[xr.Dataset, xr.DataArray], grid: Ugrid2d):
         self.obj = obj
         self.grid = grid
 
@@ -228,10 +218,10 @@ class UgridAccessor:
             raise ValueError("argument mismatch")
 
     def rasterize(self, cellsize: float):
-        xmin = self.grid.nodes_x.min()
-        xmax = self.grid.nodes_x.max()
-        ymin = self.grid.nodes_y.min()
-        ymax = self.grid.nodes_y.max()
+        xmin = self.grid.node_x.min()
+        xmax = self.grid.node_x.max()
+        ymin = self.grid.node_y.min()
+        ymax = self.grid.node_y.max()
         xmin = np.floor(xmin / cellsize) * cellsize
         xmax = np.ceil(xmax / cellsize) * cellsize
         ymin = np.floor(ymin / cellsize) * cellsize
@@ -246,3 +236,36 @@ class UgridAccessor:
         x = other["x"].values
         y = other["y"].values
         return self.sel(x=x, y=y)
+    
+    def _dataset_obj(self) -> xr.Dataset:
+        if isinstance(self.obj, xr.DataArray):
+            ds = self.obj.to_dataset()
+        else:
+            ds = self.obj
+
+    def to_dataset(self) -> xr.Dataset:
+        """
+        Converts this UgridDataArray or UgridDataset into a standard
+        xarray.Dataset.
+
+        The UGRID topology information is added as standard data variables.
+        """
+        ds = self._dataset_obj()
+        return ds.merge(self.grid.dataset)
+    
+    def to_geodataframe(self, data_on: str) -> gpd.GeoDataFrame:
+        """
+        Parameters
+        ----------
+        data_on: str
+            One of {node, edge, face}
+        """
+        ds = self._dataset_obj()
+        variables = [da for da in ds.data_vars if data_on in da.dims]
+        # TODO deal with time-dependent data, etc.
+        # Basically requires checking which variables are static, which aren't.
+        # For non-static, requires repeating all geometries.
+        # Call reset_index on mult-index to generate them as regular columns.
+        df = ds[variables].to_dataframe()
+        geometry = self.grid.as_vector_geometry(data_on)
+        return gpd.GeoDataFrame(df, geometry=geometry)
