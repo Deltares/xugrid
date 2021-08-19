@@ -3,10 +3,7 @@ from typing import Tuple
 import numpy as np
 from scipy import sparse
 
-INT_DTYPE = np.int32
-FLOAT_DTYPE = np.float64
-IntArray = np.ndarray
-BoolArray = np.ndarray
+from .typing import BoolArray, IntArray, IntDType
 
 
 # Conversion between dense and sparse
@@ -65,7 +62,7 @@ def to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
     m_per_row = np.diff(conn.indptr)
     m = m_per_row.max()
     # Allocate 2D array and create a flat view of the dense connectivity
-    dense_conn = np.empty((n, m), dtype=INT_DTYPE)
+    dense_conn = np.empty((n, m), dtype=IntDType)
     flat_conn = dense_conn.ravel()
     if (n * m) == conn.nnz:
         # Shortcut if fill_value is not present, when all of same geom. type
