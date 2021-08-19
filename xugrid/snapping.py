@@ -28,6 +28,12 @@ def snap(
     vertex B, vertex B might lie close to vertex C, and so on. These points are
     grouped and merged into a single new vertex.
 
+    This function also return an inverse index array. In case of a connectivity
+    array, ``inverse`` can be used to index into, yielding the updated
+    numbers. E.g.:
+
+    ``updated_face_nodes = inverse[face_nodes]``
+
     Parameters
     ----------
     x: 1D nd array of floats of size N
@@ -36,13 +42,15 @@ def snap(
 
     Returns
     -------
-    inv_perm: 1D nd array of ints of size N
-        Inverse permutation: the new vertex number for every old vertex.
-        Is None when no vertices within max_distanceof each other.
+    inverse: 1D nd array of ints of size N
+        Inverse index array: the new vertex number for every old vertex. Is
+        None when no vertices within max_distance of each other.
     x_merged: 1D nd array of floats of size M
-        Returns x when no vertices within max_distanceof each other.
+        Returns a copy of ``x`` when no vertices within max_distance of each
+        other.
     y_merged: 1D nd array of floats of size M
-        Returns y when no vertices within max_distanceof each other.
+        Returns a copy of ``y`` when no vertices within max_distance of each
+        other.
     """
     # First, find all the points that lie within max_distance of each other
     coords = np.column_stack((x, y))
@@ -66,9 +74,9 @@ def snap(
         coo_content = (np.ones(i.size), (i, j))
         coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
         # Directed is true: this matrix is symmetrical
-        _, inv_perm = connected_components(coo_matrix, directed=True)
+        _, inverse = connected_components(coo_matrix, directed=True)
         new = (
-            pd.DataFrame({"label": inv_perm, "x": x, "y": y})
+            pd.DataFrame({"label": inverse, "x": x, "y": y})
             .groupby("label")
             .agg(
                 {
@@ -77,12 +85,9 @@ def snap(
                 }
             )
         )
-        # In case of a connectivity array, inv_perm can be used to index into,
-        # yielding the updated numbers. E.g.:
-        # updated_face_nodes = inv_perm[face_nodes]
-        return inv_perm, new["x"].values, new["y"].values
+        return inverse, new["x"].values, new["y"].values
     else:
-        return None, x, y
+        return None, x.copy(), y.copy()
 
 
 def snap_to(

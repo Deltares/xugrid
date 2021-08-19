@@ -87,3 +87,19 @@ def test_snap_to():
     expected_y = np.array([1.01, 2.002, 3.01])
     assert np.array_equal(snap_x, expected_x)
     assert np.array_equal(snap_y, expected_y)
+
+    # Exact ties
+    to_x = np.array([1.01, 2.002, 2.002, 3.01])
+    to_y = np.array([1.01, 2.002, 2.002, 3.01])
+    snap_x, snap_y = snap_to(x, y, to_x, to_y, 0.5, tiebreaker="nearest")
+    assert np.array_equal(snap_x, expected_x)
+    assert np.array_equal(snap_y, expected_y)
+
+    # Multiple ties
+    to_x = np.array([1.01, 2.01, 2.002, 3.002, 3.01])
+    to_y = np.array([1.01, 2.01, 2.002, 3.002, 3.01])
+    snap_x, snap_y = snap_to(x, y, to_x, to_y, 0.5, tiebreaker="nearest")
+    expected_x = np.array([1.01, 2.002, 3.002])
+    expected_y = np.array([1.01, 2.002, 3.002])
+    assert np.array_equal(snap_x, expected_x)
+    assert np.array_equal(snap_y, expected_y)
