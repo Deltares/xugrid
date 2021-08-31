@@ -8,6 +8,7 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
+import geopandas as gpd
 import imod
 import numba as nb
 import numpy as np
@@ -199,30 +200,6 @@ def dot_product(u: Vector, v: Vector) -> float:
     return u.x * v.x + u.y * v.y
 
 
-
-def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
-    nrow, ncol = active.shape
-    nodes = np.arange(nrow * ncol).reshape(nrow, ncol)
-    nodes[~active] = -1
-    left = nodes[:, :-1].ravel()
-    right = nodes[:, 1:].ravel()
-    front = nodes[:-1].ravel()
-    back = nodes[1:].ravel()
-    # valid x connection
-    valid = (left != -1) & (right != -1)
-    left = left[valid]
-    right = right[valid]
-    # valid y connection
-    valid = (front != -1) & (back != -1)
-    front = front[valid]
-    back = back[valid]
-    i = connectivity.renumber(np.concatenate([left, right, front, back]))
-    j = connectivity.renumber(np.concatenate([right, left, back, front]))
-    coo_content = (j, (i, j))
-    A = sparse.coo_matrix(coo_content).tocsr()
-    return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
-
-
 def structured_centroids(idomain: xr.DataArray) -> FloatArray:
     active = idomain.values != 0
     y = idomain["y"].values
@@ -262,7 +239,7 @@ def lines_intersect(a: Point, V: Vector, N: Vector, p: Point, q: Point) -> bool:
             return False
         if tu <= 0.0 or tu >= 1.0:
             return False
-    
+
         return True
     else:
         # parallel lines
@@ -292,14 +269,11 @@ def separated_faces(
         U = to_vector(p, q)
         N = Vector(-U.y, U.x)
 
-        start = face_face_connectivity.indptr[face]
-        end = face_face_connectivity.indptr[face + 1]
-        neighbors = face_face_connectivity[start: end]
-        for neighbor in neighbors:
+        for neighbor in connectivity.neighbors(face_face_connectivity, face):
             b = as_point(centroids[neighbor])
             V = to_vector(a, b)
             if lines_intersect(a, V, N, p, q):
-                face_to_face[count, 0] = face 
+                face_to_face[count, 0] = face
                 face_to_face[count, 1] = neighbor
                 segment_index[count] = segment
                 count += 1
@@ -311,14 +285,20 @@ def create_geometry(
     vertices: FloatArray, faces: IntArray, face_to_face: IntArray
 ) -> LineArray:
     face_to_face.sort(axis=1)
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces, -1)
-    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, fill_value=-1)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
+        faces, -1
+    )
+    edge_face_connectivity = connectivity.invert_dense(
+        face_edge_connectivity, fill_value=-1
+    )
 
-    df = pd.DataFrame({
-        "edge": np.arange(len(edge_face_connectivity)),
-        "face0": edge_face_connectivity[:, 0], 
-        "face1": edge_face_connectivity[:, 1],
-    }).set_index(["face0", "face1"])
+    df = pd.DataFrame(
+        {
+            "edge": np.arange(len(edge_face_connectivity)),
+            "face0": edge_face_connectivity[:, 0],
+            "face1": edge_face_connectivity[:, 1],
+        }
+    ).set_index(["face0", "face1"])
     idx = pd.MultiIndex.from_arrays([face_to_face[:, 0], face_to_face[:, 1]])
     edge_index = df.loc[idx, "edge"].values
 
@@ -327,8 +307,26 @@ def create_geometry(
     return pygeos.creation.linestrings(new_coords)
 
 
+def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
+    geometry = lines.geometry.values
+    first = geometry[0]
+    if not isinstance(first, pygeos.Geometry):
+        # might be shapely
+        try:
+            geometry = pygeos.from_shapely(geometry)
+        except TypeError:
+            raise TypeError(
+                "lines geometry should only contain either shapely or pygeos "
+                "geometries."
+            )
+    geom_type = pygeos.get_type_id(geometry)
+    if not (geom_type == 1).all():
+        raise ValueError("Geometry should contain only LineStrings")
+    return geometry
+
+
 def snap_to_grid(
-    lines: LineArray, idomain: xr.DataArray, return_geometry: bool = False
+    lines: gpd.GeoDataFrame, idomain: xr.DataArray, return_geometry: bool = False
 ) -> Tuple[IntArray, IntArray, LineArray]:
     # Collect data from grid
     active = idomain.values != 0
@@ -337,11 +335,12 @@ def snap_to_grid(
     faces = topology["face_nodes"].values[active.ravel()].astype(int)
     vertices = np.column_stack((topology["node_x"].values, topology["node_y"].values))
     face_to_cell = np.arange(nrow * ncol)[active.ravel()]
-    face_face_connectivity = structured_connectivity(active)
+    face_face_connectivity = connectivity.structured_connectivity(active)
     centroids = structured_centroids(idomain)
 
+    line_geometry = coerce_geometry(lines)
     line_coords, line_index = pygeos.get_coordinates(
-        pygeos.from_shapely(lines.geometry), return_index=True
+        pygeos.from_shapely(line_geometry), return_index=True
     )
     line_edges = lines_as_edges(line_coords, line_index)
 
@@ -364,6 +363,9 @@ def snap_to_grid(
 
     if return_geometry:
         geometry = create_geometry(vertices, faces, face_to_face)
-        return cell_to_cell, line_index, geometry
+        gdf = gpd.GeoDataFrame(
+            lines.drop(columns="geometry").iloc[line_index], geometry=geometry
+        )
+        return cell_to_cell, gdf
     else:
-        return cell_to_cell, line_index
+        return cell_to_cell

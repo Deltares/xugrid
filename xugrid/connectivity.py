@@ -13,6 +13,12 @@ class AdjacencyMatrix(NamedTuple):
     nnz: int
 
 
+def neighbors(A: AdjacencyMatrix, cell: int) -> IntArray:
+    start = A.indptr[cell]
+    end = A.indptr[cell + 1]
+    return A.indices[start:end]
+
+
 # Conversion between dense and sparse
 # -----------------------------------
 def _to_ij(conn: IntArray, fill_value: int, invert: bool) -> Tuple[IntArray, IntArray]:
@@ -109,8 +115,8 @@ def renumber(a: IntArray) -> IntArray:
     # (scipy is BSD-3-Clause License)
     arr = np.ravel(np.asarray(a))
     sorter = np.argsort(arr, kind="quicksort")
-    inv = np.empty(sorter.size, dtype=INT_DTYPE)
-    inv[sorter] = np.arange(sorter.size, dtype=INT_DTYPE)
+    inv = np.empty(sorter.size, dtype=IntDType)
+    inv[sorter] = np.arange(sorter.size, dtype=IntDType)
     arr = arr[sorter]
     obs = np.r_[True, arr[1:] != arr[:-1]]
     dense = obs.cumsum()[inv] - 1
@@ -123,7 +129,7 @@ def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArra
     # Wrap around and create closed polygon: put the first node at the end of the row
     # In case of fill values, replace all fill values
     n, m = face_node_connectivity.shape
-    closed = np.full((n, m + 1), fill_value, dtype=INT_DTYPE)
+    closed = np.full((n, m + 1), fill_value, dtype=IntDType)
     closed[:, :-1] = face_node_connectivity
     first_node = face_node_connectivity[:, 0]
     # Identify fill value, and replace by first node also
@@ -139,7 +145,7 @@ def edge_connectivity(
     # Close the polygons: [0 1 2 3] -> [0 1 2 3 0]
     closed, isfill = close_polygons(face_node_connectivity, fill_value)
     # Allocate array for edge_node_connectivity: includes duplicate edges
-    edge_node_connectivity = np.empty((n * m, 2), dtype=INT_DTYPE)
+    edge_node_connectivity = np.empty((n * m, 2), dtype=IntDType)
     edge_node_connectivity[:, 0] = closed[:, :-1].ravel()
     edge_node_connectivity[:, 1] = closed[:, 1:].ravel()
     # Cleanup: delete invalid edges (same node to same node)
@@ -170,3 +176,26 @@ def face_face_connectivity(
     coo_content = (j, (i, j))
     coo_matrix = sparse.coo_matrix(coo_content)
     return coo_matrix.tocsr()
+
+
+def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
+    nrow, ncol = active.shape
+    nodes = np.arange(nrow * ncol).reshape(nrow, ncol)
+    nodes[~active] = -1
+    left = nodes[:, :-1].ravel()
+    right = nodes[:, 1:].ravel()
+    front = nodes[:-1].ravel()
+    back = nodes[1:].ravel()
+    # valid x connection
+    valid = (left != -1) & (right != -1)
+    left = left[valid]
+    right = right[valid]
+    # valid y connection
+    valid = (front != -1) & (back != -1)
+    front = front[valid]
+    back = back[valid]
+    i = renumber(np.concatenate([left, right, front, back]))
+    j = renumber(np.concatenate([right, left, back, front]))
+    coo_content = (j, (i, j))
+    A = sparse.coo_matrix(coo_content).tocsr()
+    return AdjacencyMatrix(A.indices, A.indptr, A.nnz)

@@ -1,7 +1,10 @@
+import geopandas as gpd
 import numpy as np
 import pytest
+import shapely.geometry as sg
+import xarray as xr
 
-from xugrid.snapping import snap, snap_to
+from xugrid.snapping import snap, snap_to, snap_to_grid
 
 
 def test_snap__three_points():
@@ -103,3 +106,16 @@ def test_snap_to():
     expected_y = np.array([1.01, 2.002, 3.002])
     assert np.array_equal(snap_x, expected_x)
     assert np.array_equal(snap_y, expected_y)
+
+
+def test_snap_to_grid():
+    idomain = xr.DataArray(
+        data=[[1, 1], [1, 1]],
+        coords={"y": [1.5, 0.5], "x": [0.5, 1.5]},
+        dims=["y", "x"],
+    )
+    line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
+    line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geoometry=line)
+    cell_to_cell, gdf = snap_to_grid(line_gdf, idomain)
+    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3]])
+    assert np.allclose(gdf["resistance"], 100.0)

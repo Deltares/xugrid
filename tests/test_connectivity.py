@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from scipy import sparse
+
 from xugrid import connectivity
 
 
@@ -178,3 +179,22 @@ def test_renumber():
         ]
     )
     assert np.array_equal(actual, expected)
+
+
+def test_structured_connectivity():
+    active = np.array(
+        [
+            [True, True, False],
+            [True, True, True],
+            [True, False, True],
+        ]
+    )
+    A = connectivity.structured_connectivity(active)
+    assert A.nnz == 14
+    assert np.array_equal(connectivity.neighbors(A, 0), [1, 3])
+    assert np.array_equal(connectivity.neighbors(A, 1), [0, 4])
+    assert np.array_equal(connectivity.neighbors(A, 3), [0, 4, 6])
+    assert np.array_equal(connectivity.neighbors(A, 4), [1, 3, 5])
+    assert np.array_equal(connectivity.neighbors(A, 5), [4, 8])
+    assert np.array_equal(connectivity.neighbors(A, 6), [3])
+    assert np.array_equal(connectivity.neighbors(A, 8), [5])
