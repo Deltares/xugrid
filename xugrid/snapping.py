@@ -3,14 +3,27 @@ Snapes nodes at an arbitrary distance together.
 """
 from typing import Tuple
 
-import numpy as np
-import pandas as pd
-from numpy.lib.shape_base import column_stack
+from numba_celltree import CellTree2d
 from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
-from .typing import FloatArray, IntArray
+import imod
+import numba as nb
+import numpy as np
+import pandas as pd
+import pygeos
+import xarray as xr
+
+from .typing import (
+    FloatArray,
+    IntArray,
+    LineArray,
+    Point,
+    Vector,
+)
+from . import connectivity
+from .connectivity import AdjacencyMatrix
 
 
 def snap(
@@ -164,3 +177,193 @@ def snap_to(
             raise ValueError("Invalid tiebreaker")
 
     return xnew, ynew
+
+
+@nb.njit(inline="always")
+def to_vector(a: Point, b: Point) -> Vector:
+    return Vector(b.x - a.x, b.y - a.y)
+
+
+@nb.njit(inline="always")
+def as_point(a: FloatArray) -> Point:
+    return Point(a[0], a[1])
+
+
+@nb.njit(inline="always")
+def cross_product(u: Vector, v: Vector) -> float:
+    return u.x * v.y - u.y * v.x
+
+
+@nb.njit(inline="always")
+def dot_product(u: Vector, v: Vector) -> float:
+    return u.x * v.x + u.y * v.y
+
+
+
+def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
+    nrow, ncol = active.shape
+    nodes = np.arange(nrow * ncol).reshape(nrow, ncol)
+    nodes[~active] = -1
+    left = nodes[:, :-1].ravel()
+    right = nodes[:, 1:].ravel()
+    front = nodes[:-1].ravel()
+    back = nodes[1:].ravel()
+    # valid x connection
+    valid = (left != -1) & (right != -1)
+    left = left[valid]
+    right = right[valid]
+    # valid y connection
+    valid = (front != -1) & (back != -1)
+    front = front[valid]
+    back = back[valid]
+    i = connectivity.renumber(np.concatenate([left, right, front, back]))
+    j = connectivity.renumber(np.concatenate([right, left, back, front]))
+    coo_content = (j, (i, j))
+    A = sparse.coo_matrix(coo_content).tocsr()
+    return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+
+
+def structured_centroids(idomain: xr.DataArray) -> FloatArray:
+    active = idomain.values != 0
+    y = idomain["y"].values
+    x = idomain["x"].values
+    yy, xx = np.meshgrid(y, x, indexing="ij")
+    active = idomain.values != 0
+    centroids = np.column_stack((xx[active], yy[active]))
+    return centroids
+
+
+def lines_as_edges(line_coords, line_index) -> FloatArray:
+    edges = np.empty((len(line_coords) - 1, 2, 2))
+    edges[:, 0, :] = line_coords[:-1]
+    edges[:, 1, :] = line_coords[1:]
+    return edges[np.diff(line_index) == 0]
+
+
+@nb.njit(inline="always")
+def lines_intersect(a: Point, V: Vector, N: Vector, p: Point, q: Point) -> bool:
+    # V: a -> b
+    # N: norm of U: p -> q
+    # r, N form clipping plane
+    W = Vector(p.x - a.x, p.y - a.y)
+    nw = dot_product(N, W)
+    nv = dot_product(N, V)
+    if nv != 0:
+        tv = nw / nv
+        if tv <= 0.0 or tv >= 1.0:
+            return False
+
+        U = Vector(q.x - p.x, q.y - p.y)
+        if U.x != 0:
+            tu = (tv * V.x - W.x) / U.x
+        elif U.y != 0:
+            tu = (tv * V.x - W.x) / U.x
+        else:  # no dx, no dy: just a point
+            return False
+        if tu <= 0.0 or tu >= 1.0:
+            return False
+    
+        return True
+    else:
+        # parallel lines
+        return False
+
+
+@nb.njit
+def separated_faces(
+    segment_indices: IntArray,
+    face_indices: IntArray,
+    intersection_edges: FloatArray,
+    face_face_connectivity: AdjacencyMatrix,
+    centroids: FloatArray,
+) -> Tuple[IntArray, IntArray]:
+    # a line can only snap to two edges of a quad
+    max_n_new_edges = len(face_indices) * 2
+    face_to_face = np.empty((max_n_new_edges, 2), dtype=np.intp)
+    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
+
+    count = 0
+    for i in range(len(segment_indices)):
+        segment = segment_indices[i]
+        face = face_indices[i]
+        a = as_point(centroids[face])
+        p = as_point(intersection_edges[i, 0])
+        q = as_point(intersection_edges[i, 1])
+        U = to_vector(p, q)
+        N = Vector(-U.y, U.x)
+
+        start = face_face_connectivity.indptr[face]
+        end = face_face_connectivity.indptr[face + 1]
+        neighbors = face_face_connectivity[start: end]
+        for neighbor in neighbors:
+            b = as_point(centroids[neighbor])
+            V = to_vector(a, b)
+            if lines_intersect(a, V, N, p, q):
+                face_to_face[count, 0] = face 
+                face_to_face[count, 1] = neighbor
+                segment_index[count] = segment
+                count += 1
+
+    return face_to_face[:count], segment_index[:count]
+
+
+def create_geometry(
+    vertices: FloatArray, faces: IntArray, face_to_face: IntArray
+) -> LineArray:
+    face_to_face.sort(axis=1)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces, -1)
+    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, fill_value=-1)
+
+    df = pd.DataFrame({
+        "edge": np.arange(len(edge_face_connectivity)),
+        "face0": edge_face_connectivity[:, 0], 
+        "face1": edge_face_connectivity[:, 1],
+    }).set_index(["face0", "face1"])
+    idx = pd.MultiIndex.from_arrays([face_to_face[:, 0], face_to_face[:, 1]])
+    edge_index = df.loc[idx, "edge"].values
+
+    new_edges = edge_node_connectivity[edge_index]
+    new_coords = vertices[new_edges]
+    return pygeos.creation.linestrings(new_coords)
+
+
+def snap_to_grid(
+    lines: LineArray, idomain: xr.DataArray, return_geometry: bool = False
+) -> Tuple[IntArray, IntArray, LineArray]:
+    # Collect data from grid
+    active = idomain.values != 0
+    nrow, ncol = active.shape
+    topology = imod.util.ugrid2d_topology(idomain)
+    faces = topology["face_nodes"].values[active.ravel()].astype(int)
+    vertices = np.column_stack((topology["node_x"].values, topology["node_y"].values))
+    face_to_cell = np.arange(nrow * ncol)[active.ravel()]
+    face_face_connectivity = structured_connectivity(active)
+    centroids = structured_centroids(idomain)
+
+    line_coords, line_index = pygeos.get_coordinates(
+        pygeos.from_shapely(lines.geometry), return_index=True
+    )
+    line_edges = lines_as_edges(line_coords, line_index)
+
+    celltree = CellTree2d(vertices, faces, -1)
+    segment_indices, face_indices, intersection_edges = celltree.intersect_edges(
+        line_edges
+    )
+    face_to_face, segment_index = separated_faces(
+        segment_indices,
+        face_indices,
+        intersection_edges,
+        face_face_connectivity,
+        centroids,
+    )
+    # Remove duplicate separations
+    face_to_face, sorter = np.unique(face_to_face, axis=0, return_index=True)
+    segment_index = segment_index[sorter]
+    line_index = line_index[segment_index]
+    cell_to_cell = face_to_cell[face_to_face]
+
+    if return_geometry:
+        geometry = create_geometry(vertices, faces, face_to_face)
+        return cell_to_cell, line_index, geometry
+    else:
+        return cell_to_cell, line_index

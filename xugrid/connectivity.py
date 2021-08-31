@@ -1,9 +1,16 @@
-from typing import Tuple
+from typing import NamedTuple, Tuple
 
 import numpy as np
+import numba as nb
 from scipy import sparse
 
 from .typing import BoolArray, IntArray, IntDType
+
+
+class AdjacencyMatrix(NamedTuple):
+    indices: IntArray
+    indptr: IntArray
+    nnz: int
 
 
 # Conversion between dense and sparse
