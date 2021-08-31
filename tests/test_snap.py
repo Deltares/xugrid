@@ -1,5 +1,6 @@
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
@@ -116,6 +117,12 @@ def test_snap_to_grid():
     )
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geoometry=line)
-    cell_to_cell, gdf = snap_to_grid(line_gdf, idomain)
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain)
     assert np.array_equal(cell_to_cell, [[0, 1], [2, 3]])
-    assert np.allclose(gdf["resistance"], 100.0)
+    assert isinstance(df, pd.DataFrame)
+    assert np.allclose(df["resistance"], 100.0)
+
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, return_geometry=True)
+    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3]])
+    assert isinstance(df, gpd.GeoDataFrame)
+    assert np.allclose(df["resistance"], 100.0)

@@ -1,7 +1,7 @@
 """
 Snapes nodes at an arbitrary distance together.
 """
-from typing import Tuple
+from typing import Tuple, Union
 
 from numba_celltree import CellTree2d
 from scipy import sparse
@@ -200,12 +200,12 @@ def dot_product(u: Vector, v: Vector) -> float:
     return u.x * v.x + u.y * v.y
 
 
-def structured_centroids(idomain: xr.DataArray) -> FloatArray:
-    active = idomain.values != 0
-    y = idomain["y"].values
-    x = idomain["x"].values
+def structured_centroids(grid: xr.DataArray) -> FloatArray:
+    active = grid.values != 0
+    y = grid["y"].values
+    x = grid["x"].values
     yy, xx = np.meshgrid(y, x, indexing="ij")
-    active = idomain.values != 0
+    active = grid.values != 0
     centroids = np.column_stack((xx[active], yy[active]))
     return centroids
 
@@ -326,17 +326,47 @@ def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
 
 
 def snap_to_grid(
-    lines: gpd.GeoDataFrame, idomain: xr.DataArray, return_geometry: bool = False
-) -> Tuple[IntArray, IntArray, LineArray]:
-    # Collect data from grid
-    active = idomain.values != 0
+    lines: gpd.GeoDataFrame, grid: xr.DataArray, return_geometry: bool = False
+) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
+    """
+    Snap a collection of lines to a grid.
+    
+    A line is included and snapped to a grid edge when the line separates when
+    it separates the cell in which it is located from the centroid of a
+    neighboring cell.
+    
+    When a line is located in a cell, but does not separate the cell centroid
+    from any neighbor, it is not included: the line is not snapped to e.g.
+    exterior boundaries.
+    
+    Parameters
+    ----------
+    lines: gpd.GeoDataFrame
+        Line data. Geometry colum should contain exclusively LineStrings.
+    grid: xr.DataArray of integers
+        Grid of cells to snap lines to. Cells with a value of 0 are not
+        included.
+    return_geometry: bool, optional. Default: False.
+        Whether to return geometry. In this case a GeoDataFrame is returned
+        with the snapped line segments, rather than a DataFrame without
+        geometry.
+    
+    Returns
+    -------
+    cell_to_cell: ndarray of integers with shape ``(N, 2)``
+        Cells whose centroids are separated from each other by a line.
+    segment_data: pd.DataFrame or gpd.DataFrame
+        Data for every segment. GeoDataFrame if ``return_geometry`` is
+        ``True``.
+    """
+    active = grid.values != 0
     nrow, ncol = active.shape
-    topology = imod.util.ugrid2d_topology(idomain)
+    topology = imod.util.ugrid2d_topology(grid)
     faces = topology["face_nodes"].values[active.ravel()].astype(int)
     vertices = np.column_stack((topology["node_x"].values, topology["node_y"].values))
     face_to_cell = np.arange(nrow * ncol)[active.ravel()]
     face_face_connectivity = connectivity.structured_connectivity(active)
-    centroids = structured_centroids(idomain)
+    centroids = structured_centroids(grid)
 
     line_geometry = coerce_geometry(lines)
     line_coords, line_index = pygeos.get_coordinates(
@@ -355,9 +385,6 @@ def snap_to_grid(
         face_face_connectivity,
         centroids,
     )
-    # Remove duplicate separations
-    face_to_face, sorter = np.unique(face_to_face, axis=0, return_index=True)
-    segment_index = segment_index[sorter]
     line_index = line_index[segment_index]
     cell_to_cell = face_to_cell[face_to_face]
 
@@ -368,4 +395,5 @@ def snap_to_grid(
         )
         return cell_to_cell, gdf
     else:
-        return cell_to_cell
+        df = lines.drop(columns="geometry").iloc[line_index]
+        return cell_to_cell, df
