@@ -27,7 +27,7 @@ from . import connectivity
 from .connectivity import AdjacencyMatrix
 
 
-def snap(
+def snap_nodes(
     x: FloatArray, y: FloatArray, max_distance: float
 ) -> Tuple[FloatArray, FloatArray, IntArray]:
     """
@@ -104,7 +104,7 @@ def snap(
         return None, x.copy(), y.copy()
 
 
-def snap_to(
+def snap_to_nodes(
     x: FloatArray,
     y: FloatArray,
     to_x: FloatArray,
@@ -237,74 +237,13 @@ def lines_intersect(a: Point, V: Vector, N: Vector, p: Point, q: Point) -> bool:
             tu = (tv * V.x - W.x) / U.x
         else:  # no dx, no dy: just a point
             return False
-        if tu <= 0.0 or tu >= 1.0:
+        if tu < 0.0 or tu >= 1.0:
             return False
 
         return True
     else:
         # parallel lines
         return False
-
-
-@nb.njit
-def separated_faces(
-    segment_indices: IntArray,
-    face_indices: IntArray,
-    intersection_edges: FloatArray,
-    face_face_connectivity: AdjacencyMatrix,
-    centroids: FloatArray,
-) -> Tuple[IntArray, IntArray]:
-    # a line can only snap to two edges of a quad
-    max_n_new_edges = len(face_indices) * 2
-    face_to_face = np.empty((max_n_new_edges, 2), dtype=np.intp)
-    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
-
-    count = 0
-    for i in range(len(segment_indices)):
-        segment = segment_indices[i]
-        face = face_indices[i]
-        a = as_point(centroids[face])
-        p = as_point(intersection_edges[i, 0])
-        q = as_point(intersection_edges[i, 1])
-        U = to_vector(p, q)
-        N = Vector(-U.y, U.x)
-
-        for neighbor in connectivity.neighbors(face_face_connectivity, face):
-            b = as_point(centroids[neighbor])
-            V = to_vector(a, b)
-            if lines_intersect(a, V, N, p, q):
-                face_to_face[count, 0] = face
-                face_to_face[count, 1] = neighbor
-                segment_index[count] = segment
-                count += 1
-
-    return face_to_face[:count], segment_index[:count]
-
-
-def create_geometry(
-    vertices: FloatArray, faces: IntArray, face_to_face: IntArray
-) -> LineArray:
-    face_to_face.sort(axis=1)
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
-    edge_face_connectivity = connectivity.invert_dense(
-        face_edge_connectivity, fill_value=-1
-    )
-
-    df = pd.DataFrame(
-        {
-            "edge": np.arange(len(edge_face_connectivity)),
-            "face0": edge_face_connectivity[:, 0],
-            "face1": edge_face_connectivity[:, 1],
-        }
-    ).set_index(["face0", "face1"])
-    idx = pd.MultiIndex.from_arrays([face_to_face[:, 0], face_to_face[:, 1]])
-    edge_index = df.loc[idx, "edge"].values
-
-    new_edges = edge_node_connectivity[edge_index]
-    new_coords = vertices[new_edges]
-    return pygeos.creation.linestrings(new_coords)
 
 
 def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
@@ -325,20 +264,54 @@ def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
     return geometry
 
 
+@nb.njit
+def snap_to_edges(
+    segment_indices: IntArray,
+    face_indices: IntArray,
+    intersection_edges: FloatArray,
+    face_edge_connectivity: AdjacencyMatrix,
+    centroids: FloatArray,
+    edge_centroids: FloatArray,
+) -> Tuple[IntArray, IntArray]:
+    # a line can only snap to two edges of a quad
+    max_n_new_edges = len(face_indices) * 2
+    edges = np.empty(max_n_new_edges, dtype=np.intp)
+    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
+
+    count = 0
+    for i in range(len(segment_indices)):
+        segment = segment_indices[i]
+        face = face_indices[i]
+        a = as_point(centroids[face])
+        p = as_point(intersection_edges[i, 0])
+        q = as_point(intersection_edges[i, 1])
+        U = to_vector(p, q)
+        N = Vector(-U.y, U.x)
+
+        for edge in connectivity.neighbors(face_edge_connectivity, face):
+            b = as_point(edge_centroids[edge])
+            V = to_vector(a, b)
+            if lines_intersect(a, V, N, p, q):
+                edges[count] = edge
+                segment_index[count] = segment
+                count += 1
+
+    return edges[:count], segment_index[:count]
+
+
 def snap_to_grid(
     lines: gpd.GeoDataFrame, grid: xr.DataArray, return_geometry: bool = False
 ) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
     """
     Snap a collection of lines to a grid.
-    
-    A line is included and snapped to a grid edge when the line separates when
-    it separates the cell in which it is located from the centroid of a
-    neighboring cell.
-    
-    When a line is located in a cell, but does not separate the cell centroid
-    from any neighbor, it is not included: the line is not snapped to e.g.
-    exterior boundaries.
-    
+
+    A line is included and snapped to a grid edge when the line separates
+    the centroid of the cell with the centroid of the edge.
+
+    When a line in a cell is snapped to an edge that is shared with another
+    cell, this is denoted with a value of -1 in the second column of
+    ``cell_to_cell``.
+
     Parameters
     ----------
     lines: gpd.GeoDataFrame
@@ -350,7 +323,7 @@ def snap_to_grid(
         Whether to return geometry. In this case a GeoDataFrame is returned
         with the snapped line segments, rather than a DataFrame without
         geometry.
-    
+
     Returns
     -------
     cell_to_cell: ndarray of integers with shape ``(N, 2)``
@@ -359,37 +332,59 @@ def snap_to_grid(
         Data for every segment. GeoDataFrame if ``return_geometry`` is
         ``True``.
     """
-    active = grid.values != 0
-    nrow, ncol = active.shape
-    topology = imod.util.ugrid2d_topology(grid)
-    faces = topology["face_nodes"].values[active.ravel()].astype(int)
-    vertices = np.column_stack((topology["node_x"].values, topology["node_y"].values))
-    face_to_cell = np.arange(nrow * ncol)[active.ravel()]
-    face_face_connectivity = connectivity.structured_connectivity(active)
-    centroids = structured_centroids(grid)
+    if isinstance(grid, xr.DataArray):
+        active = grid.values != 0
+        # Convert structured to unstructured representation
+        topology = imod.util.ugrid2d_topology(grid)
+        faces = topology["face_nodes"].values[active.ravel()].astype(int)
+        nrow, ncol = active.shape
+        face_to_cell = np.arange(nrow * ncol)[active.ravel()]
+        vertices = np.column_stack(
+            (topology["node_x"].values, topology["node_y"].values)
+        )
+    else:
+        raise NotImplementedError
 
-    line_geometry = coerce_geometry(lines)
-    line_coords, line_index = pygeos.get_coordinates(
-        pygeos.from_shapely(line_geometry), return_index=True
+    # Derive connectivity
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
+        faces, -1
     )
+    A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
+    edge_face_connectivity = connectivity.to_dense(
+        connectivity.invert_sparse(A), fill_value=-1
+    )
+    face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+
+    # Create geometric data
+    centroids = structured_centroids(grid)
+    edge_centroids = vertices[edge_node_connectivity].mean(axis=1)
+    line_geometry = coerce_geometry(lines)
+    line_coords, line_index = pygeos.get_coordinates(line_geometry, return_index=True)
     line_edges = lines_as_edges(line_coords, line_index)
 
+    # Search for intersections
     celltree = CellTree2d(vertices, faces, -1)
     segment_indices, face_indices, intersection_edges = celltree.intersect_edges(
         line_edges
     )
-    face_to_face, segment_index = separated_faces(
+
+    # Create edges from the intersected lines
+    edges, segment_index = snap_to_edges(
         segment_indices,
         face_indices,
         intersection_edges,
-        face_face_connectivity,
+        face_edge_connectivity,
         centroids,
+        edge_centroids,
     )
     line_index = line_index[segment_index]
+    face_to_face = edge_face_connectivity[edges]
     cell_to_cell = face_to_cell[face_to_face]
+    cell_to_cell[face_to_face == -1] = -1
 
     if return_geometry:
-        geometry = create_geometry(vertices, faces, face_to_face)
+        edge_vertices = vertices[edge_node_connectivity[edges]]
+        geometry = pygeos.creation.linestrings(edge_vertices)
         gdf = gpd.GeoDataFrame(
             lines.drop(columns="geometry").iloc[line_index], geometry=geometry
         )
