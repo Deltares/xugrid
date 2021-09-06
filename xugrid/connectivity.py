@@ -13,6 +13,7 @@ class AdjacencyMatrix(NamedTuple):
     nnz: int
 
 
+@nb.njit(inline="always")
 def neighbors(A: AdjacencyMatrix, cell: int) -> IntArray:
     start = A.indptr[cell]
     end = A.indptr[cell + 1]
