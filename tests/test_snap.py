@@ -4,7 +4,8 @@ import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
-from xugrid.snapping import snap_nodes, snap_to_nodes, snap_to_grid
+
+from xugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
 
 
 def test_snap__three_points():
@@ -117,13 +118,13 @@ def test_snap_to_grid():
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
     cell_to_cell, df = snap_to_grid(line_gdf, idomain)
-    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3]])
+    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3], [2, -1]])
     assert isinstance(df, pd.DataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
     # Return geometry
     cell_to_cell, df = snap_to_grid(line_gdf, idomain, return_geometry=True)
-    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3]])
+    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3], [2, -1]])
     assert isinstance(df, gpd.GeoDataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
@@ -135,7 +136,7 @@ def test_snap_to_grid():
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
     cell_to_cell, df = snap_to_grid(line_gdf, idomain)
 
-    assert np.array_equal(cell_to_cell, [[2, 3], [0, 1]])
+    assert np.array_equal(cell_to_cell, [[2, -1], [2, 3], [0, 1]])
     assert isinstance(df, pd.DataFrame)
     assert np.allclose(df["resistance"], 100.0)
 

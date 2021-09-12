@@ -3,11 +3,6 @@ Snapes nodes at an arbitrary distance together.
 """
 from typing import Tuple, Union
 
-from numba_celltree import CellTree2d
-from scipy import sparse
-from scipy.sparse.csgraph import connected_components
-from scipy.spatial import cKDTree
-
 import geopandas as gpd
 import imod
 import numba as nb
@@ -15,16 +10,14 @@ import numpy as np
 import pandas as pd
 import pygeos
 import xarray as xr
+from numba_celltree import CellTree2d
+from scipy import sparse
+from scipy.sparse.csgraph import connected_components
+from scipy.spatial import cKDTree
 
-from .typing import (
-    FloatArray,
-    IntArray,
-    LineArray,
-    Point,
-    Vector,
-)
 from . import connectivity
 from .connectivity import AdjacencyMatrix
+from .typing import FloatArray, IntArray, LineArray, Point, Vector
 
 
 def snap_nodes(
@@ -218,32 +211,11 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
 
 
 @nb.njit(inline="always")
-def lines_intersect(a: Point, V: Vector, N: Vector, p: Point, q: Point) -> bool:
-    # V: a -> b
-    # N: norm of U: p -> q
-    # r, N form clipping plane
-    W = Vector(p.x - a.x, p.y - a.y)
-    nw = dot_product(N, W)
-    nv = dot_product(N, V)
-    if nv != 0:
-        tv = nw / nv
-        if tv <= 0.0 or tv >= 1.0:
-            return False
-
-        U = Vector(q.x - p.x, q.y - p.y)
-        if U.x != 0:
-            tu = (tv * V.x - W.x) / U.x
-        elif U.y != 0:
-            tu = (tv * V.x - W.x) / U.x
-        else:  # no dx, no dy: just a point
-            return False
-        if tu < 0.0 or tu >= 1.0:
-            return False
-
-        return True
-    else:
-        # parallel lines
-        return False
+def left_of(a: Point, p: Point, U: Vector):
+    # Whether point a is left of vector U
+    # U: p -> q direction vector
+    # TODO: maybe add epsilon for floating point
+    return U.x * (a.y - p.y) > U.y * (a.x - p.x)
 
 
 def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
@@ -286,15 +258,21 @@ def snap_to_edges(
         p = as_point(intersection_edges[i, 0])
         q = as_point(intersection_edges[i, 1])
         U = to_vector(p, q)
-        N = Vector(-U.y, U.x)
+        a_left = left_of(a, p, U)
+        U_dot_U = dot_product(U, U)
+        if U_dot_U == 0:
+            continue
 
         for edge in connectivity.neighbors(face_edge_connectivity, face):
             b = as_point(edge_centroids[edge])
-            V = to_vector(a, b)
-            if lines_intersect(a, V, N, p, q):
-                edges[count] = edge
-                segment_index[count] = segment
-                count += 1
+            b_left = left_of(b, p, U)
+            if a_left != b_left:
+                V = to_vector(p, b)
+                t = dot_product(U, V) / U_dot_U
+                if 0 <= t < 1:
+                    edges[count] = edge
+                    segment_index[count] = segment
+                    count += 1
 
     return edges[:count], segment_index[:count]
 
