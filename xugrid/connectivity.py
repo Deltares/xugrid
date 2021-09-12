@@ -1,10 +1,10 @@
 from typing import NamedTuple, Tuple
 
-import numpy as np
 import numba as nb
+import numpy as np
 from scipy import sparse
 
-from .typing import BoolArray, IntArray, IntDType
+from .typing import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
 
 
 class AdjacencyMatrix(NamedTuple):
@@ -71,9 +71,9 @@ def to_sparse(conn: IntArray, fill_value: int) -> sparse.csr_matrix:
     return _to_sparse(conn, fill_value, invert=False)
 
 
-def to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
+def to_dense(conn: sparse.coo_matrix, fill_value: int) -> IntArray:
     n, _ = conn.shape
-    m_per_row = np.diff(conn.indptr)
+    m_per_row = conn.getnnz(axis=1)
     m = m_per_row.max()
     # Allocate 2D array and create a flat view of the dense connectivity
     dense_conn = np.empty((n, m), dtype=IntDType)
@@ -85,7 +85,13 @@ def to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
     else:
         valid = ragged_index(n, m, m_per_row).ravel()
         flat_conn[~valid] = fill_value
-    flat_conn[valid] = conn.indices
+
+    if isinstance(conn, sparse.csr_matrix):
+        flat_conn[valid] = conn.indices
+    elif isinstance(conn, sparse.coo_matrix):
+        flat_conn[valid] = conn.col
+    else:
+        raise TypeError("Can only invert coo or csr matrix")
     return dense_conn
 
 
@@ -107,6 +113,11 @@ def invert_sparse(conn: sparse.csr_matrix) -> sparse.csr_matrix:
     coo_content = (j, (i, j))
     inverted = sparse.coo_matrix(coo_content)
     return inverted.tocsr()
+
+
+def invert_sparse_to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
+    inverted = invert_sparse(conn)
+    return to_dense(inverted, fill_value)
 
 
 # Renumbering
@@ -169,6 +180,10 @@ def face_face_connectivity(
     edge_face_connectivity: IntArray,
     fill_value: int,
 ) -> sparse.csr_matrix:
+    """
+    An edge can be shared by two faces at most. If this is the case, they are
+    neighbors.
+    """
     i = edge_face_connectivity[:, 0]
     j = edge_face_connectivity[:, 1]
     is_connection = j != fill_value
@@ -200,3 +215,97 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     coo_content = (j, (i, j))
     A = sparse.coo_matrix(coo_content).tocsr()
     return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+
+
+def centroids(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+) -> FloatArray:
+    n_face, n_max_node = face_node_connectivity.shape
+    nodes = np.column_stack([node_x, node_y])
+    # Check if it's fully triangular
+    if n_max_node == 3:
+        # Since it's triangular, computing the average of the vertices suffices
+        coordinates = nodes[face_node_connectivity]
+        coordinates[face_node_connectivity == fill_value] = np.nan
+        return np.nanmean(coordinates, axis=1)
+    else:
+        # This is mathematically equivalent to triangulating, computing triangle centroids
+        # and computing the area weighted average of those centroids
+        centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
+        coordinates = nodes[close_polygons(face_node_connectivity, fill_value)]
+        a = coordinates[:, :-1]
+        b = coordinates[:, 1:]
+        c = a + b
+        determinant = np.cross_product(a, b)
+        area_weight = 1.0 / (3.0 * determinant.sum(axis=1))
+        centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
+        centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
+        return centroid_coordinates
+
+
+@nb.njit
+def _triangulate_dense(faces: IntArray, fill_value: int, triangles: IntArray) -> None:
+    n_face, n_max = faces.shape
+    count = 0
+    for i in range(n_face):
+        first = faces[i, j]
+        second = faces[i, j + 1]
+        for j in range(2, n_max):
+            third = faces[i, j]
+            if third == fill_value:
+                break
+            triangles[count, 0] = first
+            triangles[count, 1] = second
+            triangles[count, 2] = third
+            second = third
+            count += 1
+    return
+
+
+@nb.njit
+def _triangulate_coo(
+    i: IntArray, j: IntArray, n_face: int, triangles: IntArray
+) -> None:
+    n = i.size
+    face_i = 0
+    count = 0
+    while face_i < (n - 2):
+        face = i[face_i]
+        first = j[face_i]
+        second = j[face_i + 1]
+        face_i += 2
+        while face_i < n and i[face_i] == face:
+            third = j[face_i]
+            triangles[count, 0] = first
+            triangles[count, 1] = second
+            triangles[count, 2] = third
+            second = third
+            face_i += 1
+            count += 1
+    return
+
+
+def triangulate(face_node_connectivity, fill_value: int = None):
+    if isinstance(face_node_connectivity, IntArray):
+        if face_node_connectivity.shape[1] == 3:
+            return face_node_connectivity.copy()
+        if fill_value is None:
+            raise ValueError("fill_value is required for dense connectivity")
+        valid = face_node_connectivity != fill_value
+        n_face = (valid.sum(axis=1) - 2).sum()
+        triangles = np.empty((n_face, 3), IntDType)
+        _triangulate_dense(face_node_connectivity, fill_value, triangles)
+    elif isinstance(face_node_connectivity, sparse.coo_matrix):
+        ncol_per_row = face_node_connectivity.getnnz(axis=1)
+        if ncol_per_row.max() == 3:
+            return face_node_connectivity.copy()
+        n_face = (ncol_per_row - 2).sum()
+        triangles = np.empty((n_face, 3), IntDType)
+        coo = face_node_connectivity
+        _triangulate_coo(coo.row, coo.col, n_face, triangles)
+    else:
+        raise TypeError("connectivity must be ndarray or sparse matrix")
+    return triangles
