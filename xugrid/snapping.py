@@ -17,7 +17,7 @@ from scipy.spatial import cKDTree
 
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import FloatArray, IntArray, LineArray, Point, Vector
+from .typing import X_OFFSET, FloatArray, IntArray, LineArray, Point, Vector, X_EPSILON
 
 
 def snap_nodes(
@@ -211,7 +211,14 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
 
 
 @nb.njit(inline="always")
-def left_of(a: Point, p: Point, U: Vector):
+def point_close(a: Point, b: Point) -> bool:
+    dx = abs(b.x - a.x)
+    dy = abs(b.y - a.y)
+    return dx < X_EPSILON and dy < X_EPSILON
+
+
+@nb.njit(inline="always")
+def left_of(a: Point, p: Point, U: Vector) -> bool:
     # Whether point a is left of vector U
     # U: p -> q direction vector
     # TODO: maybe add epsilon for floating point
@@ -257,6 +264,16 @@ def snap_to_edges(
         a = as_point(centroids[face])
         p = as_point(intersection_edges[i, 0])
         q = as_point(intersection_edges[i, 1])
+        
+        # Check for edge cases first
+        # Shift by a tiny amount to break ties
+        for edge in connectivity.neighbors(face_edge_connectivity, face):
+            b = as_point(edge_centroids[edge])
+            if point_close(p, b):
+                p = Point(p.x + X_OFFSET, p.y + X_OFFSET)
+            if point_close(q, b):
+                q = Point(q.x + X_OFFSET, q.y + X_OFFSET)
+
         U = to_vector(p, q)
         a_left = left_of(a, p, U)
         U_dot_U = dot_product(U, U)
