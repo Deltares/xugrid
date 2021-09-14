@@ -36,3 +36,4 @@ class Vector(NamedTuple):
 # np.spacing(4e7) == 7.45E-9 ~= 1E-8 
 X_EPSILON = 1.0e-8
 X_OFFSET = 1.0e-8
+T_OFFSET = 1.0e-6

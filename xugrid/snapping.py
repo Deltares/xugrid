@@ -17,7 +17,7 @@ from scipy.spatial import cKDTree
 
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import X_OFFSET, FloatArray, IntArray, LineArray, Point, Vector, X_EPSILON
+from .typing import T_OFFSET, FloatArray, IntArray, LineArray, Point, Vector, X_EPSILON
 
 
 def snap_nodes(
@@ -264,22 +264,23 @@ def snap_to_edges(
         a = as_point(centroids[face])
         p = as_point(intersection_edges[i, 0])
         q = as_point(intersection_edges[i, 1])
+        U = to_vector(p, q)
+        U_dot_U = dot_product(U, U)
+        if U_dot_U == 0:
+            continue
         
         # Check for edge cases first
         # Shift by a tiny amount to break ties
         for edge in connectivity.neighbors(face_edge_connectivity, face):
             b = as_point(edge_centroids[edge])
             if point_close(p, b):
-                p = Point(p.x + X_OFFSET, p.y + X_OFFSET)
+                p = Point(p.x - T_OFFSET * U.x, p.y - T_OFFSET * U.y)
             if point_close(q, b):
-                q = Point(q.x + X_OFFSET, q.y + X_OFFSET)
+                q = Point(q.x + T_OFFSET * U.x, q.y + T_OFFSET * U.y)
 
         U = to_vector(p, q)
         a_left = left_of(a, p, U)
         U_dot_U = dot_product(U, U)
-        if U_dot_U == 0:
-            continue
-
         for edge in connectivity.neighbors(face_edge_connectivity, face):
             b = as_point(edge_centroids[edge])
             b_left = left_of(b, p, U)
