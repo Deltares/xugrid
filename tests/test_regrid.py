@@ -1,4 +1,5 @@
 import numpy as np
+
 from xugrid.regrid.intersection import intersect_coordinates_1d
 
 
