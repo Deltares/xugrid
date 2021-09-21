@@ -47,4 +47,4 @@ def voronoi_topology(
     # Get rid of excess vertices
     valid_nodes = np.unique(face_i)
     vertices = centroids[valid_nodes]
-    return vertices, face_node_connectivity
+    return vertices, face_node_connectivity, valid_nodes
