@@ -33,7 +33,7 @@ class Vector(NamedTuple):
 # Spatial coordinate epsilon for floating point comparison
 # Assuming world coordinates in meters: 40 000 m along equator:
 # 40 000 000 = 4e7 mm
-# np.spacing(4e7) == 7.45E-9 ~= 1E-8 
+# np.spacing(4e7) == 7.45E-9 ~= 1E-8
 X_EPSILON = 1.0e-8
 X_OFFSET = 1.0e-8
 T_OFFSET = 1.0e-6
