@@ -4,7 +4,7 @@ import numba as nb
 import numpy as np
 from scipy import sparse
 
-from .typing import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
+from .typing import BoolArray, FloatArray, IntArray, IntDType
 
 
 class AdjacencyMatrix(NamedTuple):
@@ -288,24 +288,49 @@ def _triangulate_coo(
     return
 
 
-def triangulate(face_node_connectivity, fill_value: int = None):
+def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
+    """
+    Convert polygons into its constituent triangles.
+
+    Triangulation runs from the first node of every face:
+
+    * first, second, third,
+    * first, third, fourth,
+    * and so forth ...
+
+    If the grid is already triangular, a copy is returned.
+
+    Returns
+    -------
+    triangles: ndarray of integers with shape ``(n_triangle, 3)``
+    triangle_face_connectivity: ndarray of integers with shape ``(n_triangle,)``
+    """
     if isinstance(face_node_connectivity, IntArray):
         if face_node_connectivity.shape[1] == 3:
-            return face_node_connectivity.copy()
+            triangles = face_node_connectivity.copy()
+            return triangles, np.arange(len(triangles))
         if fill_value is None:
             raise ValueError("fill_value is required for dense connectivity")
         valid = face_node_connectivity != fill_value
-        n_face = (valid.sum(axis=1) - 2).sum()
-        triangles = np.empty((n_face, 3), IntDType)
+        n_triangle_per_row = valid.sum(axis=1) - 2
+        n_triangle = n_triangle_per_row.sum()
+        triangles = np.empty((n_triangle, 3), IntDType)
         _triangulate_dense(face_node_connectivity, fill_value, triangles)
     elif isinstance(face_node_connectivity, sparse.coo_matrix):
         ncol_per_row = face_node_connectivity.getnnz(axis=1)
+        n_triangle_per_row = ncol_per_row - 2
         if ncol_per_row.max() == 3:
-            return face_node_connectivity.copy()
-        n_face = (ncol_per_row - 2).sum()
-        triangles = np.empty((n_face, 3), IntDType)
+            triangles = face_node_connectivity.row.copy().reshape((-1, 3))
+            return triangles, np.arange(len(triangles))
+        n_triangle = n_triangle_per_row.sum()
+        triangles = np.empty((n_triangle, 3), IntDType)
         coo = face_node_connectivity
-        _triangulate_coo(coo.row, coo.col, n_face, triangles)
+        _triangulate_coo(coo.row, coo.col, n_triangle, triangles)
     else:
         raise TypeError("connectivity must be ndarray or sparse matrix")
-    return triangles
+
+    n_face = face_node_connectivity.shape[0]
+    triangle_face_connectivity = np.repeat(
+        np.arange(n_face), repeats=n_triangle_per_row
+    )
+    return triangles, triangle_face_connectivity
