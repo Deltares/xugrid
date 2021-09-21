@@ -268,7 +268,7 @@ def snap_to_edges(
         U_dot_U = dot_product(U, U)
         if U_dot_U == 0:
             continue
-        
+
         # Check for edge cases first
         # Shift by a tiny amount to break ties
         for edge in connectivity.neighbors(face_edge_connectivity, face):
