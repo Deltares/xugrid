@@ -14,7 +14,6 @@ import xarray as xr
 
 from .connectivity import ragged_index
 from .typing import IntDType
-from .ugrid import Ugrid1d, Ugrid2d
 
 FloatArray = np.ndarray
 IntArray = np.ndarray
@@ -98,57 +97,3 @@ def polygons_to_faces(
         flat_conn[~valid] = fill_value
     flat_conn[valid] = inverse
     return *contiguous_xy(unique), conn, fill_value
-
-
-def geodataframe_to_ugrid1d(geodataframe: gpd.GeoDataFrame):
-    ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1)).rename_dims(
-        {"index": "edge"}
-    )
-    coords, edge_node_connectivity = linestrings_to_edges(geodataframe.geometry.values)
-    grid = Ugrid1d(Ugrid1d.topology_dataset(coords, edge_node_connectivity))
-    return ds, grid
-
-
-def geodataframe_to_ugrid2d(geodataframe: gpd.GeoDataFrame):
-    ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1)).rename_dims(
-        {"index": "face"}
-    )
-    coords, face_node_connectivity = polygons_to_faces(geodataframe.geometry.values)
-    grid = Ugrid2d(Ugrid2d.topology_dataset(coords, face_node_connectivity))
-    return ds, grid
-
-
-def geodataframe_to_ugrid(geodataframe: gpd.GeoDataFrame):
-    """
-    Convert a geodataframe into the appropriate Ugrid topology and dataset.
-
-    Parameters
-    ----------
-    geodataframe: gpd.GeoDataFrame
-
-    Returns
-    -------
-    grid: UgridTopology
-    dataset: xr.Dataset
-        Contains the data of the columns.
-    """
-    gdf = geodataframe
-    if not isinstance(gdf, gpd.GeoDataFrame):
-        raise TypeError(f"Cannot convert a {type(gdf)}, expected a GeoDataFrame")
-
-    geom_types = gdf.geom_type.unique()
-    if len(geom_types) == 0:
-        raise ValueError("geodataframe contains no geometry")
-    elif len(geom_types) > 1:
-        message = ", ".join(geom_types)
-        raise ValueError(f"Multiple geometry types detected: {message}")
-
-    geom_type = geom_types[0]
-    if geom_type == "Linestring":
-        return geodataframe_to_ugrid1d(gdf)
-    elif geom_type == "Polygon":
-        return geodataframe_to_ugrid2d(gdf)
-    else:
-        raise ValueError(
-            f"Invalid geometry type: {geom_type}. Expected Linestring or Polygon."
-        )
