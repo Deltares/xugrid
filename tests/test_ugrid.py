@@ -3,9 +3,9 @@ import textwrap
 import numpy as np
 import pytest
 import xarray as xr
-from xugrid import Ugrid, UgridDataArray, UgridDataset
-
 from create_test_datasets import create_hexmesh_steady_state, create_trimesh_transient
+
+from xugrid import Ugrid2d, UgridDataArray, UgridDataset
 
 
 @pytest.fixture
@@ -19,14 +19,14 @@ def hexmesh_invariant_dataset():
 
 
 def test_createUgrid(triangle_transient_dataset):
-    ugrid = Ugrid(triangle_transient_dataset)
+    ugrid = Ugrid2d(triangle_transient_dataset)
     assert not ugrid._cell_tree is None
 
 
 def test_removeTopology(triangle_transient_dataset):
     assert len(triangle_transient_dataset.coords) == 3
     assert len(triangle_transient_dataset.variables) == 6
-    ugrid = Ugrid(triangle_transient_dataset)
+    ugrid = Ugrid2d(triangle_transient_dataset)
     triangle_transient_dataset = ugrid.remove_topology(triangle_transient_dataset)
     assert len(triangle_transient_dataset.coords) == 1  # removed node_x and node_y
     assert (
