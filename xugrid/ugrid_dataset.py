@@ -6,8 +6,9 @@ import geopandas as gpd
 import numpy as np
 import xarray as xr
 
-from xugrid.ugrid import Ugrid2d
-from .conversion import geodataframe_to_ugrid
+from xarray.core.utils import UncachedAccessor
+from xugrid.ugrid import Ugrid1d, Ugrid2d
+from .plot import _PlotMethods
 
 
 def xarray_wrapper(func, grid):
@@ -119,8 +120,44 @@ class UgridDataset:
         return UgridAccessor(self.ds, self.grid)
 
     @staticmethod
-    def from_geodataframe(geodataframe) -> "UgridDataset":
-        ds, grid = geodataframe_to_ugrid(geodataframe)
+    def from_geodataframe(geodataframe: gpd.GeoDataFrame):
+        """
+        Convert a geodataframe into the appropriate Ugrid topology and dataset.
+
+        Parameters
+        ----------
+        geodataframe: gpd.GeoDataFrame
+
+        Returns
+        -------
+        grid: UgridTopology
+        dataset: xr.Dataset
+            Contains the data of the columns.
+        """
+        gdf = geodataframe
+        if not isinstance(gdf, gpd.GeoDataFrame):
+            raise TypeError(f"Cannot convert a {type(gdf)}, expected a GeoDataFrame")
+
+        geom_types = gdf.geom_type.unique()
+        if len(geom_types) == 0:
+            raise ValueError("geodataframe contains no geometry")
+        elif len(geom_types) > 1:
+            message = ", ".join(geom_types)
+            raise ValueError(f"Multiple geometry types detected: {message}")
+
+        geom_type = geom_types[0]
+        if geom_type == "Linestring":
+            grid = Ugrid1d.from_geodataframe(gdf)
+        elif geom_type == "Polygon":
+            grid = Ugrid2d.from_geodataframe(gdf)
+        else:
+            raise ValueError(
+                f"Invalid geometry type: {geom_type}. Expected Linestring or Polygon."
+            )
+
+        ds = xr.Dataset.from_dataframe(
+            geodataframe.drop("geometry", axis=1)
+        ).rename_dims({"index": "edge"})
         return UgridDataset(ds, grid)
 
 
@@ -134,15 +171,7 @@ class UgridAccessor:
         self.obj = obj
         self.grid = grid
 
-    def plot(self):
-        """if self.grid._triangulation is None:
-            self.grid.triangulation = mtri.Triangulation(
-                x=self.grid.nodes[:, 0],
-                y=self.grid.nodes[:, 1],
-                triangles=self.grid.faces,
-            )
-        plt.tripcolor(self.grid.triangulation, self.obj.values.ravel())"""
-        raise NotImplementedError()
+    plot = UncachedAccessor(_PlotMethods)
 
     def object_from_face_indices(self, face_indices):
         """
@@ -217,26 +246,22 @@ class UgridAccessor:
         else:
             raise ValueError("argument mismatch")
 
-    def rasterize(self, cellsize: float):
-        xmin = self.grid.node_x.min()
-        xmax = self.grid.node_x.max()
-        ymin = self.grid.node_y.min()
-        ymax = self.grid.node_y.max()
-        xmin = np.floor(xmin / cellsize) * cellsize
-        xmax = np.ceil(xmax / cellsize) * cellsize
-        ymin = np.floor(ymin / cellsize) * cellsize
-        ymax = np.ceil(ymax / cellsize) * cellsize
-        dx = cellsize
-        dy = -cellsize
-        x = np.arange(xmin + 0.5 * dx, xmax - 0.5 * dx, dx)
-        y = np.arange(ymax + 0.5 * dy, ymin - 0.5 * dy, dy)
-        return self.sel(x=x, y=y)
+    def rasterize(self, resolution: float):
+        x, y, index = self.grid.rasterize(resolution)
+        data = self.isel(face=index).astype(float)
+        data[index == -1] = np.nan
+        out = xr.DataArray(
+            data=data,
+            coords={"y": y, "x": x},
+            dims=["y", "x"],
+        )
+        return out
 
-    def rasterize_like(self, other):
+    def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]):
         x = other["x"].values
         y = other["y"].values
         return self.sel(x=x, y=y)
-    
+
     def _dataset_obj(self) -> xr.Dataset:
         if isinstance(self.obj, xr.DataArray):
             ds = self.obj.to_dataset()
@@ -252,7 +277,7 @@ class UgridAccessor:
         """
         ds = self._dataset_obj()
         return ds.merge(self.grid.dataset)
-    
+
     def to_geodataframe(self, data_on: str) -> gpd.GeoDataFrame:
         """
         Parameters
