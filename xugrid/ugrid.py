@@ -371,6 +371,12 @@ class Ugrid2d:
                 self.node_face_connectivity,
                 self.nodes,
                 self.centroids,
+                self.edge_face_connectivity,
+                self.edge_node_connectivity,
+                self.node_edge_connectivity,
+                self.fill_value,
+                True,
+                False,
             )
             self._voronoi_topology = vertices, faces, face_index
         return self._voronoi_topology
@@ -413,11 +419,21 @@ class Ugrid2d:
             self._ymax,
         )
 
+    @property
     def exterior_edges(self) -> IntArray:
         """
         Get all exterior edges, i.e. edges with no other face.
         """
         return np.argwhere(self.edge_face_connectivity[:, 1] == self.fill_value)
+    
+    @property
+    def exterior_faces(self) -> IntArray:
+        """
+        Get all exterior faces, i.e. faces with an unshared edge.
+        """
+        exterior_edges = self.exterior_edges
+        exterior_faces = self.edge_face_connectivity[exterior_edges].ravel()
+        return np.unique(exterior_faces[exterior_faces != self.fill_value])
 
     def build_celltree(self):
         """
