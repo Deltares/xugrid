@@ -246,46 +246,63 @@ def centroids(
         return centroid_coordinates
 
 
-@nb.njit
-def _triangulate_dense(faces: IntArray, fill_value: int, triangles: IntArray) -> None:
-    n_face, n_max = faces.shape
-    count = 0
-    for i in range(n_face):
-        first = faces[i, j]
-        second = faces[i, j + 1]
-        for j in range(2, n_max):
-            third = faces[i, j]
-            if third == fill_value:
-                break
-            triangles[count, 0] = first
-            triangles[count, 1] = second
-            triangles[count, 2] = third
-            second = third
-            count += 1
-    return
+def _triangulate(i: IntArray, j: IntArray, n_triangle_per_row: IntArray) -> IntArray:
+    n_triangle = n_triangle_per_row.sum()
+    n_face = len(i)
+    index_first = np.argwhere(np.diff(i, prepend=-1) != 0)
+    index_second = index_first + 1
+    index_last = np.argwhere(np.diff(i, append=-1) != 0)
+
+    first = np.full(n_face, False)
+    first[index_first] = True
+    second = np.full(n_face, True) & ~first
+    second[index_last] = False
+    third = np.full(n_face, True) & ~first
+    third[index_second] = False
+
+    triangles = np.empty((n_triangle, 3), IntDType)
+    triangles[:, 0] = np.repeat(j[first], n_triangle_per_row)
+    triangles[:, 1] = j[second]
+    triangles[:, 2] = j[third]
+    return triangles
 
 
-@nb.njit
-def _triangulate_coo(
-    i: IntArray, j: IntArray, n_face: int, triangles: IntArray
-) -> None:
-    n = i.size
-    face_i = 0
-    count = 0
-    while face_i < (n - 2):
-        face = i[face_i]
-        first = j[face_i]
-        second = j[face_i + 1]
-        face_i += 2
-        while face_i < n and i[face_i] == face:
-            third = j[face_i]
-            triangles[count, 0] = first
-            triangles[count, 1] = second
-            triangles[count, 2] = third
-            second = third
-            face_i += 1
-            count += 1
-    return
+def triangulate_dense(face_node_connectivity: IntArray, fill_value: int) -> None:
+    n_face, n_max = face_node_connectivity.shape
+
+    if n_max == 3:
+        triangles = face_node_connectivity.copy()
+        return triangles, np.arange(n_face)
+
+    valid = face_node_connectivity != fill_value
+    n_triangle_per_row = valid.sum(axis=1) - 2
+    i = np.arange(n_face, n_triangle_per_row)
+    j = face_node_connectivity.ravel()[valid.ravel()]
+    triangles = _triangulate(i, j, n_triangle_per_row)
+
+    triangle_face_connectivity = np.repeat(
+        np.arange(n_face), repeats=n_triangle_per_row
+    )
+    return triangles, triangle_face_connectivity
+
+
+def triangulate_coo(face_node_connectivity: sparse.coo_matrix) -> IntArray:
+    ncol_per_row = face_node_connectivity.getnnz(axis=1)
+
+    if ncol_per_row.max() == 3:
+        triangles = face_node_connectivity.row.copy().reshape((-1, 3))
+        return triangles, np.arange(len(triangles))
+
+    n_triangle_per_row = ncol_per_row - 2
+    i = face_node_connectivity.row
+    j = face_node_connectivity.col
+    triangles = _triangulate(i, j, n_triangle_per_row)
+
+    n_face = face_node_connectivity.shape[0]
+    triangle_face_connectivity = np.repeat(
+        np.arange(n_face), repeats=n_triangle_per_row
+    )
+    return triangles, triangle_face_connectivity
 
 
 def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
@@ -306,31 +323,10 @@ def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
     triangle_face_connectivity: ndarray of integers with shape ``(n_triangle,)``
     """
     if isinstance(face_node_connectivity, IntArray):
-        if face_node_connectivity.shape[1] == 3:
-            triangles = face_node_connectivity.copy()
-            return triangles, np.arange(len(triangles))
         if fill_value is None:
             raise ValueError("fill_value is required for dense connectivity")
-        valid = face_node_connectivity != fill_value
-        n_triangle_per_row = valid.sum(axis=1) - 2
-        n_triangle = n_triangle_per_row.sum()
-        triangles = np.empty((n_triangle, 3), IntDType)
-        _triangulate_dense(face_node_connectivity, fill_value, triangles)
+        return triangulate_dense(face_node_connectivity, fill_value)
     elif isinstance(face_node_connectivity, sparse.coo_matrix):
-        ncol_per_row = face_node_connectivity.getnnz(axis=1)
-        n_triangle_per_row = ncol_per_row - 2
-        if ncol_per_row.max() == 3:
-            triangles = face_node_connectivity.row.copy().reshape((-1, 3))
-            return triangles, np.arange(len(triangles))
-        n_triangle = n_triangle_per_row.sum()
-        triangles = np.empty((n_triangle, 3), IntDType)
-        coo = face_node_connectivity
-        _triangulate_coo(coo.row, coo.col, n_triangle, triangles)
+        return triangulate_coo(face_node_connectivity)
     else:
         raise TypeError("connectivity must be ndarray or sparse matrix")
-
-    n_face = face_node_connectivity.shape[0]
-    triangle_face_connectivity = np.repeat(
-        np.arange(n_face), repeats=n_triangle_per_row
-    )
-    return triangles, triangle_face_connectivity
