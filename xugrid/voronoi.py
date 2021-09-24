@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import numpy as np
+import pandas as pd
 from scipy import sparse
 
 from .typing import BoolArray, FloatDType, IntArray, FloatArray
@@ -11,6 +12,7 @@ def exterior_topology(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
     node_edge_connectivity: sparse.csr_matrix,
+    node_face_connectivity: sparse.csr_matrix,
     fill_value: int,
     vertices: FloatArray,
     centroids: FloatArray,
@@ -33,6 +35,14 @@ def exterior_topology(
     face_i = edge_face_connectivity[assoc_edges[is_interior]].ravel()
     ij = np.column_stack([centroid_nodes, face_i])
     centroid_nodes, face_i = np.unique(ij, axis=0).T
+
+    # Find exterior nodes NOT associated with any interior edge
+    is_exterior_only = node_face_connectivity.getnnz(axis=1) == 1
+    exterior_face_i = node_face_connectivity[is_exterior_only].indices
+    exterior_centroid_nodes = np.arange(len(vertices))[is_exterior_only]
+    # Add these to the arrays
+    centroid_nodes = np.concatenate([centroid_nodes, exterior_centroid_nodes])
+    face_i = np.concatenate([face_i, exterior_face_i])
     
     # For every exterior node, project the centroids to exterior edges
     edge_vertices = vertices[exterior_nodes]
@@ -50,22 +60,45 @@ def exterior_topology(
     # Their values are unique since the edges are unique.
     # The associated face for these projected vertices are those of face_i.
     
-    # Add the new vertices to the centroids, which will become the vertices of
-    # the voronoi polygons.
-    n_vertex = len(centroids)
-    n_new = len(projected_vertices)
-    # Create the numbering pointing to these new vertices
-    new_numbers = np.repeat(np.arange(n_vertex, n_vertex + n_new), 2)
-    new_vertices = np.concatenate([centroids, projected_vertices])
-    face_index = np.concatenate([np.arange(len(centroids)), selected_faces])
+    if concave:
+        # Add the new vertices to the centroids, which will become the vertices of
+        # the voronoi polygons.
+        n_vertex = len(centroids)
+        n_new = len(projected_vertices)
+        node_vertices = edge_vertices.reshape((-1, 2))
+        n = len(node_vertices)
+        # Create the numbering pointing to these new vertices
+        new_numbers = np.repeat(np.arange(n_vertex, n_vertex + n_new), 2)
+        n_vertex = n_vertex + n_new
+        node_numbers = np.arange(n_vertex, n_vertex + n)
+        new_vertices = np.concatenate([centroids, projected_vertices, node_vertices])
+        face_index = np.concatenate([np.arange(len(centroids)), selected_faces, np.full(n, -1)])
 
-    # Summing duplicates gets rid of duplicate entries.
-    i = np.concatenate([centroid_nodes, exterior_nodes.ravel()])
-    j = np.concatenate([face_i, new_numbers])
+        i = np.concatenate([centroid_nodes, exterior_nodes.ravel(), exterior_nodes.ravel()])
+        j = np.concatenate([face_i, new_numbers, node_numbers])
+        voronoi_vertices = new_vertices[j]
+
+        # Create new centroids 
+        grouped = pd.DataFrame({"i": i, "x": voronoi_vertices[:, 0], "y": voronoi_vertices[:, 1]}).groupby("i").mean()
+        centroid_xy = np.column_stack([grouped["x"].values, grouped["y"].values])
+        voronoi_centroids = centroid_xy[renumber(i)]
+
+    else:
+        # Add the new vertices to the centroids, which will become the vertices of
+        # the voronoi polygons.
+        n_vertex = len(centroids)
+        n_new = len(projected_vertices)
+        # Create the numbering pointing to these new vertices
+        new_numbers = np.repeat(np.arange(n_vertex, n_vertex + n_new), 2)
+        new_vertices = np.concatenate([centroids, projected_vertices])
+        face_index = np.concatenate([np.arange(len(centroids)), selected_faces])
+
+        i = np.concatenate([centroid_nodes, exterior_nodes.ravel()])
+        j = np.concatenate([face_i, new_numbers])
+        voronoi_vertices = new_vertices[j]
+        voronoi_centroids = vertices[i]
 
     # Now form valid counter-clockwise polygons 
-    voronoi_vertices = new_vertices[j]
-    voronoi_centroids = vertices[i]
     x = voronoi_vertices[:, 0] - voronoi_centroids[:, 0]
     y = voronoi_vertices[:, 1] - voronoi_centroids[:, 1]
     angle = np.arctan2(y, x)
@@ -110,7 +143,19 @@ def voronoi_topology(
     # Select only the nodes with a finite voronoi polygon: at least trilateral.
     # TODO: maybe extend 1- or 2-connected nodes with a boundary edge.
     ncol_per_row = node_face_connectivity.getnnz(axis=1)
-    valid = np.repeat(ncol_per_row >= 3, ncol_per_row)
+
+    # Avoid overlapping polygons: if exterior is included, the exterior
+    # algorithm will construct those polygons. If exterior is not included, we
+    # take any valid internal polygon we can construct: at least a triangle.
+    if exterior:
+        is_exterior = edge_face_connectivity[:, 1] == fill_value
+        exterior_nodes = edge_node_connectivity[is_exterior]
+        valid = np.full(len(vertices), True)
+        valid[exterior_nodes.ravel()] = False
+        valid = np.repeat(valid, ncol_per_row)
+    else:
+        valid = np.repeat(ncol_per_row >= 3, ncol_per_row)
+
     # Grab the centroids for all these faces.
     coo = node_face_connectivity.tocoo()
     node_i = coo.row[valid]
@@ -130,12 +175,14 @@ def voronoi_topology(
             edge_face_connectivity,
             edge_node_connectivity,
             node_edge_connectivity,
+            node_face_connectivity,
             fill_value,
             vertices,
             centroids,
             concave,
         )     
-        i = np.concatenate([node_i, exterior_i + node_i.max() + 1])
+        offset = node_i.max() + 1 if len(node_i > 0) else 0
+        i = np.concatenate([node_i, exterior_i + offset])
         j = np.concatenate([j, exterior_j])
     else:
         face_i = np.unique(face_i)
