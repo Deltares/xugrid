@@ -373,7 +373,6 @@ class Ugrid2d:
                 self.centroids,
                 self.edge_face_connectivity,
                 self.edge_node_connectivity,
-                self.node_edge_connectivity,
                 self.fill_value,
                 True,
                 False,
@@ -425,7 +424,7 @@ class Ugrid2d:
         Get all exterior edges, i.e. edges with no other face.
         """
         return np.argwhere(self.edge_face_connectivity[:, 1] == self.fill_value)
-    
+
     @property
     def exterior_faces(self) -> IntArray:
         """
