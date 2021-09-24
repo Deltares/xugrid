@@ -1,3 +1,42 @@
+"""
+The functions in this module take an existing mesh of (convex!) cells and
+compute its centroidal voronoi tesselation (CVT). This is done purely on the
+basis of existing vertices and connectivity information.
+
+There are a number of subtleties to note. If the exterior boundary of the mesh
+forms a concave polygon, this will result in some concave voronoi cells as
+well. Since concave cells are often undesirable, the main function has three
+ways options for dealing with the exterior boundary:
+
+* if add_exterior==True and add_vertices==True, a true centroidal voronoi
+  tesselation is performed. Infinite voronoi rays (projections) are intersected
+  at exterior edges and all exterior vertices are included. If the mesh exterior
+  forms a concave polygon, the resulting tesselation will contain concave cells
+  as well.
+* if add_exterior==True and add_vertices==False, the infinite voronoi rays are
+  intersected, but no exterior vertices are included. This will always result
+  in concave voronoi cells.
+* if add_exterior==False and add_vertices==False, no vertices on the exterior
+  edges are considered. Only centroids of the original mesh are considered.
+
+One of the uses of these voronoi diagrams is for plotting unstructured data,
+where the cell centroid is the representative location for the data, rather
+than the vertices. This is generally the case for Finite Difference and Finite
+Volume Meshes, but not for Finite Elements (where the data are located on the
+vertices).
+
+To this end, the main function here also returns an index to the original face.
+With this index, the data on the faces of the original mesh can be related to
+the vertices of the voronoi mesh. This voronoi mesh can then be triangulated,
+and the triangulated voronoi mesh can be directly used for plotting.
+
+A direct correspondence exists between the voronoi vertices and the original
+faces, except in the case of the true CVT (add_exterior=True,
+add_vertices=True): this tesselation included vertices of the original mesh,
+which therefore correspond to multiple faces of the original mesh. These
+vertices are marked by a face_index of -1, denoting they do not correspond
+to a single face of the original mesh.
+"""
 from typing import Tuple
 
 import numpy as np
@@ -163,6 +202,15 @@ def voronoi_topology(
     node_face_connectivity : csr matrix
     vertices: ndarray of floats with shape ``(n_vertex, 2)``
     centroids: ndarray of floats with shape ``(n_centroid, 2)``
+    edge_face_connectivity: ndarray of integers with shape ``(n_edge, 2)``, optional
+    edge_node_connectivity: ndarray of integers with shape ``(n_edge, 2)``, optional
+    fill_value: int, optional
+        Fill value for edge_face_connectivity.
+    add_exterior: bool, optional
+        Whether to place new vertices on the exterior. The exterior edges are
+        ignored if False.
+    add_vertices: bool, optional
+        Whether to use existing exterior vertices.
 
     Returns
     -------
@@ -172,9 +220,15 @@ def voronoi_topology(
         Connects the nodes of the voronoi topology to the faces of the original
         grid.
     """
-    # if exterior:
-    #    if any(arg is None for arg in [edge_face_connectivity, edge_node_connectivity, node_edge_connectivity, fill_value]):
-    #        raise ValueError()
+    if add_exterior:
+        if any(
+            arg is None
+            for arg in [edge_face_connectivity, edge_node_connectivity, fill_value]
+        ):
+            raise ValueError(
+                "edge_face_connectivity, edge_node_connectivity, fill_value "
+                "must be provided if add_exterior is True."
+            )
 
     # Avoid overlapping polygons: if exterior is included, the exterior
     # algorithm will construct those polygons. If exterior is not included, we
