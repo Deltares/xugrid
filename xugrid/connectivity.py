@@ -172,7 +172,7 @@ def edge_connectivity(
     # Create face_edge_connectivity
     face_edge_connectivity = np.full((n, m), fill_value, dtype=np.int64)
     isnode = ~isfill[:, :-1]
-    face_edge_connectivity.ravel()[isnode.ravel()] = inverse_indices
+    face_edge_connectivity[isnode] = inverse_indices
     return edge_node_connectivity, face_edge_connectivity
 
 
@@ -232,6 +232,7 @@ def centroids(
         coordinates[face_node_connectivity == fill_value] = np.nan
         return np.nanmean(coordinates, axis=1)
     else:
+        # TODO: convex might be simpler
         # This is mathematically equivalent to triangulating, computing triangle centroids
         # and computing the area weighted average of those centroids
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
@@ -275,8 +276,9 @@ def triangulate_dense(face_node_connectivity: IntArray, fill_value: int) -> None
         return triangles, np.arange(n_face)
 
     valid = face_node_connectivity != fill_value
-    n_triangle_per_row = valid.sum(axis=1) - 2
-    i = np.arange(n_face, n_triangle_per_row)
+    n_per_row = valid.sum(axis=1)
+    n_triangle_per_row = n_per_row - 2
+    i = np.repeat(np.arange(n_face), n_per_row)
     j = face_node_connectivity.ravel()[valid.ravel()]
     triangles = _triangulate(i, j, n_triangle_per_row)
 

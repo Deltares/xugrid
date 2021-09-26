@@ -1,50 +1,50 @@
 """
-The functions in this module take an existing mesh of (convex!) cells and
-compute its centroidal voronoi tesselation (CVT). This is done purely on the
-basis of existing vertices and connectivity information.
+Module to compute centroidal voronoi tesselation mesh from an existing mesh of
+convex cells.
 
-There are a number of subtleties to note. If the exterior boundary of the mesh
-forms a concave polygon, this will result in some concave voronoi cells as
-well. Since concave cells are often undesirable, the main function has three
-ways options for dealing with the exterior boundary:
+In principle, this is easy to compute:
 
-* if add_exterior==True and add_vertices==True, a true centroidal voronoi
-  tesselation is performed. Infinite voronoi rays (projections) are intersected
-  at exterior edges and all exterior vertices are included. If the mesh exterior
-  forms a concave polygon, the resulting tesselation will contain concave cells
-  as well.
-* if add_exterior==True and add_vertices==False, the infinite voronoi rays are
-  intersected, but no exterior vertices are included. This will always result
-  in concave voronoi cells.
-* if add_exterior==False and add_vertices==False, no vertices on the exterior
-  edges are considered. Only centroids of the original mesh are considered.
+* Compute the centroids of the cells.
+* Invert the face_node_connectivity index array.
+* For every node, find the connected faces.
+* Use the connected faces to find the centroids.
+* Order the centroids around the vertex in a counter-clockwise manner.
 
-One of the uses of these voronoi diagrams is for plotting unstructured data,
-where the cell centroid is the representative location for the data, rather
-than the vertices. This is generally the case for Finite Difference and Finite
-Volume Meshes, but not for Finite Elements (where the data are located on the
-vertices).
-
-To this end, the main function here also returns an index to the original face.
-With this index, the data on the faces of the original mesh can be related to
-the vertices of the voronoi mesh. This voronoi mesh can then be triangulated,
-and the triangulated voronoi mesh can be directly used for plotting.
-
-A direct correspondence exists between the voronoi vertices and the original
-faces, except in the case of the true CVT (add_exterior=True,
-add_vertices=True): this tesselation included vertices of the original mesh,
-which therefore correspond to multiple faces of the original mesh. These
-vertices are marked by a face_index of -1, denoting they do not correspond
-to a single face of the original mesh.
+Dealing with the mesh exterior (beyond which no centroids are located) is the
+tricky part. Refer to the docstrings and especially the visual examples in the
+developer documentation.
 """
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
 from scipy import sparse
 
 from .typing import IntArray, FloatArray
 from .connectivity import renumber
+
+
+def dot_product2d(U: FloatArray, V: FloatArray):
+    return U[:, 1] * V[:, 1] + U[:, 0] * V[:, 0]
+
+
+def compute_centroid(i: IntArray, x: FloatArray, y: FloatArray):
+    try:
+        import pandas as pd
+
+        grouped = pd.DataFrame({"i": i, "x": x, "y": y}).groupby("i").mean()
+        x_centroid = grouped["x"].values
+        y_centroid = grouped["y"].values
+
+    except ImportError:
+        j = np.arange(len(i))
+        coo_content = (x, (i, j))
+        mat = sparse.coo_matrix(coo_content)
+        n = mat.getnnz(axis=1)
+        x_centroid = mat.sum(axis=1).flat / n
+        mat.data = y
+        y_centroid = mat.sum(axis=1).flat / n
+
+    return x_centroid, y_centroid
 
 
 def exterior_centroids(node_face_connectivity: sparse.csr_matrix):
@@ -64,7 +64,7 @@ def interior_centroids(
 ):
     # Find exterior nodes associated with interior edges
     is_exterior = edge_face_connectivity[:, 1] == fill_value
-    exterior_nodes = edge_node_connectivity[is_exterior].ravel()
+    exterior_nodes = np.unique(edge_node_connectivity[is_exterior].ravel())
     m_per_node = node_face_connectivity.getnnz(axis=1)
     is_interior_only = m_per_node > 1
 
@@ -77,7 +77,7 @@ def interior_centroids(
     return i, j
 
 
-def project_vertices(
+def exterior_vertices(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
     fill_value: int,
@@ -89,17 +89,14 @@ def project_vertices(
     exterior_nodes = edge_node_connectivity[is_exterior]
     # For every exterior node, project the centroids to exterior edges
     edge_vertices = vertices[exterior_nodes]
-    selected_faces = edge_face_connectivity[is_exterior, 0]
-    centroid_vertices = centroids[selected_faces]
+    face_i = edge_face_connectivity[is_exterior, 0]
+    centroid_vertices = centroids[face_i]
     a = edge_vertices[:, 0, :]
     b = edge_vertices[:, 1, :]
-    U = b - a
-    V = b - centroid_vertices
-    norm = np.linalg.norm(U, axis=1)
+    V = b - a
+    U = centroid_vertices - a
     # np.dot(U, V) doesn't do the desired thing here
-    projected_vertices = (
-        a + ((U[:, 0] * V[:, 0] + U[:, 1] * V[:, 1]) / norm ** 2 * U.T).T
-    )
+    projected_vertices = a + ((dot_product2d(U, V) / dot_product2d(V, V)) * V.T).T
 
     # Create the numbering pointing to these new vertices
     n_new = len(projected_vertices)
@@ -119,8 +116,12 @@ def project_vertices(
         i = np.concatenate([i, i[order][::2]])
         j = np.concatenate([j, np.arange(n, n + n_interpolated)])
         projected_vertices = np.concatenate([projected_vertices, interpolated])
+        # Create face index: the face of the original mesh associated with every
+        # voronoi vertex is a centroid. The exterior vertices are an exception to
+        # this: these are associated with two faces. So we set a value of -1 here.
+        face_i = np.concatenate([face_i, np.full(n_interpolated, -1)])
 
-    return i, j, projected_vertices, n_interpolated
+    return i, j, projected_vertices, face_i, n_interpolated
 
 
 def exterior_topology(
@@ -132,6 +133,41 @@ def exterior_topology(
     centroids: FloatArray,
     add_vertices: bool,
 ):
+    """
+    The exterior topology of this voronoi tesselation consists of three kinds
+    of vertices:
+
+    * Centroids of faces that have a vertex located on the exterior, but have
+      no exterior edges. These centroids are used twice in the resulting
+      voronoi mesh topology.
+    * Centroids of faces that have an exterior edge. These centroids are used
+      once.
+    * Vertices of the intersection of (infinite) rays with the mesh exterior.
+      These vertices are used twice; these intersections are close to the
+      orthogonal projection of the centroid of the face on its exterior edges;
+      the orthogonal projection can be guaranteed for every exterior edge, the
+      true voronoi ray cannot.
+    * Original vertices of the mesh exterior. These vertices are used once, and
+      are always located in between the projected vertices.
+
+    The last ones are trickiest, as they may create concave angles; with a
+    concave angle in a polygon, we cannot easily compute the counter clockwise
+    order of the vertices to form a polygon. However, since these vertices are
+    always located in between the projected vertices, we can introduce a
+    subsitute: a linear interpolation of the two projected vertices. We
+    can then utilize this interpolated vertex to compute the counter clockwise
+    order, and then replace it by the original vertex -- which then may
+    introduce a concave angle.
+
+    A note on the index arrays:
+
+    * i refers to the node number of the original mesh.
+    * In principle, j refers to the face number (and associated centroids) of
+    the original mesh; exterior vertices require new numbers.
+
+    Finally, in the resulting new (voronoi) face_node_connectivity, i becomes
+    the face number, and j becomes the node number.
+    """
     i0, j0 = interior_centroids(
         node_face_connectivity,
         edge_face_connectivity,
@@ -139,7 +175,7 @@ def exterior_topology(
         fill_value,
     )
     i1, j1 = exterior_centroids(node_face_connectivity)
-    i2, j2, projected_vertices, n_interpolated = project_vertices(
+    i2, j2, projected_vertices, face_i, n_interpolated = exterior_vertices(
         edge_face_connectivity,
         edge_node_connectivity,
         fill_value,
@@ -150,32 +186,25 @@ def exterior_topology(
 
     i = np.concatenate([i0, i1, i2])
     j = np.concatenate([j0, j1, j2])
+    _, n_face = node_face_connectivity.shape
     vor_vertices = np.concatenate([centroids, projected_vertices])
+    face_i = np.concatenate([np.arange(n_face), face_i])
     orig_vertices = vertices[i][-n_interpolated:]
-
-    # Create face index: the face of the original mesh associated with every
-    # voronoi vertex is a centroid. The exterior vertices are an exception to
-    # this: these are associated with two faces. So we set a value of -1 here.
-    face_index = j.copy()
-    face_index[-n_interpolated:] = -1
 
     # Now form valid counter-clockwise polygons
     voronoi_vertices = vor_vertices[j]
-    voronoi_centroids = (
-        pd.DataFrame({"i": i, "x": voronoi_vertices[:, 0], "y": voronoi_vertices[:, 1]})
-        .groupby("i")
-        .mean()
-    )
+    x = voronoi_vertices[:, 0]
+    y = voronoi_vertices[:, 1]
+    centroid_x, centroid_y = compute_centroid(i, x, y)
     renumbered_i = renumber(i)
-    x = voronoi_vertices[:, 0] - voronoi_centroids["x"].values[renumbered_i]
-    y = voronoi_vertices[:, 1] - voronoi_centroids["y"].values[renumbered_i]
-    angle = np.arctan2(y, x)
+    dx = x - centroid_x[renumbered_i]
+    dy = y - centroid_y[renumbered_i]
+    angle = np.arctan2(dy, dx)
     # Sort to create a counter clockwise oriented polygon.
     # Use a lexsort to make sure nodes are grouped together.
     order = np.lexsort((angle, i))
     i = i[order]
     j = j[order]
-    face_index = face_index[order]
 
     # If add_vertices is True, we have substituted interpolated points before
     # to generate the proper ordering. We overwrite those substituted points
@@ -183,7 +212,7 @@ def exterior_topology(
     if add_vertices:
         vor_vertices[-n_interpolated:] = orig_vertices
 
-    return vor_vertices, i, j, face_index
+    return vor_vertices, i, j, face_i
 
 
 def voronoi_topology(
@@ -197,6 +226,33 @@ def voronoi_topology(
     add_vertices: bool = False,
 ) -> Tuple[FloatArray, sparse.csr_matrix]:
     """
+    Compute the centroidal voronoi tesslation (CVT) of an existing mesh of
+    (convex!) cells using connectivity index arrays.
+
+    If the exterior boundary of the mesh forms a concave polygon, this will
+    result in some concave voronoi cells as well. Since concave cells are often
+    undesirable, there are three options for dealing with the exterior
+    boundary:
+
+    * if ``add_exterior=True`` and ``add_vertices=True``, infinite voronoi rays
+      (projections) are intersected at exterior edges and all exterior vertices
+      are included. If the mesh exterior forms a concave polygon, the resulting
+      tesselation will contain concave cells as well.
+    * if ``add_exterior=True`` and ``add_vertices=False``, the infinite voronoi
+      rays are intersected, but no exterior vertices are included. This will
+      always result in convex voronoi cells if the original cells are convex.
+    * if ``add_exterior=False`` and ``add_vertices=False``, no vertices on the
+      exterior edges are considered. Only centroids of the original mesh are
+      considered. This will always result in convex voronoi cells if the
+      original cells are convex.
+
+    A direct correspondence exists between the voronoi vertices and the
+    original faces: the vertices of the voronoi polygons are the centroids of
+    the original faces; and the intersected rays "belong" to a single face too.
+    This is not the case when all exterior vertices are included: these may
+    correspond to multiple faces of the original mesh. These vertices are
+    marked by a face_index of -1.
+
     Parameters
     ----------
     node_face_connectivity : csr matrix
@@ -207,8 +263,8 @@ def voronoi_topology(
     fill_value: int, optional
         Fill value for edge_face_connectivity.
     add_exterior: bool, optional
-        Whether to place new vertices on the exterior. The exterior edges are
-        ignored if False.
+        Whether to consider exterior edges of the original mesh, or to consider
+        exclusively centroids.
     add_vertices: bool, optional
         Whether to use existing exterior vertices.
 
@@ -218,7 +274,8 @@ def voronoi_topology(
     face_node_connectivity: scipy.sparse.csr_matrix
     face_index: ndarray of ints with shape ``(n_vertex,)``
         Connects the nodes of the voronoi topology to the faces of the original
-        grid.
+        grid. Exterior vertices (when ``add_vertices=True``) are given an index
+        of -1.
     """
     if add_exterior:
         if any(
@@ -272,7 +329,7 @@ def voronoi_topology(
         i = np.concatenate([node_i, exterior_i + offset])
         j = np.concatenate([j, exterior_j])
     else:
-        face_i = np.arange(face_i.max())
+        face_i = np.arange(face_i.max() + 1)
         vor_vertices = centroids.copy()
         i = node_i
         j = renumber(j)
