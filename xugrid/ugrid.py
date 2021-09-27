@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import geopandas as gpd
 import matplotlib.tri as mtri
@@ -6,7 +6,7 @@ import meshkernel as mk
 import numpy as np
 import shapely.geometry as sg
 import xarray as xr
-from cell_tree2d import CellTree
+from numba_celltree import CellTree2d
 from meshkernel.meshkernel import MeshKernel
 from meshkernel.py_structures import Mesh2d
 from scipy.sparse.csr import csr_matrix
@@ -396,12 +396,12 @@ class Ugrid2d:
 
     @property
     def bounds(self) -> Tuple[float, float, float, float]:
-        if any(
+        if any([
             self._xmin is None,
             self._ymin is None,
             self._xmax is None,
             self._ymax is None,
-        ):
+        ]):
             self._xmin = self.node_x.min()
             self._ymin = self.node_y.min()
             self._xmax = self.node_x.max()
@@ -434,7 +434,7 @@ class Ugrid2d:
         initializes the celltree, a search structure for spatial lookups in 2d grids
         """
         nodes = np.column_stack([self.node_x, self.node_y])
-        self._cell_tree = CellTree(nodes, self.face_node_connectivity)
+        self._cell_tree = CellTree2d(nodes, self.face_node_connectivity, self.fill_value)
 
     def locate_faces(self, points):
         """
@@ -479,10 +479,10 @@ class Ugrid2d:
         ymin = np.floor(ymin / d) * d
         ymax = np.ceil(ymax / d) * d
         x = np.arange(xmin + 0.5 * d, xmax, d)
-        y = np.linspace(ymax - 0.5 * d, ymin, -d)
+        y = np.arange(ymax - 0.5 * d, ymin, -d)
         yy, xx = np.meshgrid(y, x, indexing="ij")
         nodes = np.column_stack([xx.ravel(), yy.ravel()])
-        index = self._cell_tree.locate_faces(nodes).reshape((y.size, x.size))
+        index = self._cell_tree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
 
     def locate_cells(points):

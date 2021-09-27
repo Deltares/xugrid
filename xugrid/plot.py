@@ -7,23 +7,20 @@ from typing import Tuple
 import numpy as np
 import xarray as xr
 from matplotlib.collections import LineCollection, PolyCollection
+import matplotlib as mpl
+from xarray.core.utils import UncachedAccessor
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
     _ensure_plottable,
-    _infer_xy_labels,
     _process_cmap_cbar_kwargs,
-    _rescale_imshow_rgb,
-    _resolve_intervals_2dplot,
     _update_axes,
     get_axis,
     import_matplotlib_pyplot,
     label_from_attrs,
 )
-from xarray.core.utils import UncachedAccessor
 
-from .typing import IntArray, FloatArray, FloatDType
-
+from .typing import FloatArray, FloatDType, IntArray
 
 Triangulation = Tuple[Tuple[FloatArray, FloatArray], IntArray]
 
@@ -67,8 +64,6 @@ def _plot2d(plotfunc):
         If passed, make column faceted plots on this dimension name.
     col_wrap : int, optional
         Use together with ``col`` to wrap faceted plots.
-    xscale, yscale : {'linear', 'symlog', 'log', 'logit'}, optional
-        Specifies scaling for the *x*- and *y*-axis, respectively.
     xticks, yticks : array-like, optional
         Specify tick locations for *x*- and *y*-axis.
     xlim, ylim : array-like, optional
@@ -162,7 +157,7 @@ def _plot2d(plotfunc):
     @functools.wraps(plotfunc)
     def newplotfunc(
         topology,
-        darray,
+        darray=None,
         figsize=None,
         size=None,
         aspect=None,
@@ -181,13 +176,10 @@ def _plot2d(plotfunc):
         robust=False,
         extend=None,
         levels=None,
-        infer_intervals=None,
         colors=None,
         subplot_kws=None,
         cbar_ax=None,
         cbar_kwargs=None,
-        xscale=None,
-        yscale=None,
         xticks=None,
         yticks=None,
         xlim=None,
@@ -201,21 +193,12 @@ def _plot2d(plotfunc):
         # Decide on a default for the colorbar before facetgrids
         if add_colorbar is None:
             add_colorbar = True
-            if plotfunc.__name__ == "contour" or (
-                plotfunc.__name__ == "surface" and cmap is None
+            if (
+                darray is None
+                or plotfunc.__name__ == "contour"
+                or (plotfunc.__name__ == "surface" and cmap is None)
             ):
                 add_colorbar = False
-        imshow_rgb = plotfunc.__name__ == "imshow" and darray.ndim == (
-            3 + (row is not None) + (col is not None)
-        )
-        if imshow_rgb:
-            # Don't add a colorbar when showing an image with explicit colors
-            add_colorbar = False
-            # Matplotlib does not support normalising RGB data, so do it here.
-            # See eg. https://github.com/matplotlib/matplotlib/pull/10220
-            if robust or vmax is not None or vmin is not None:
-                darray = _rescale_imshow_rgb(darray, vmin, vmax, robust)
-                vmin, vmax, robust = None, None, False
 
         if subplot_kws is None:
             subplot_kws = dict()
@@ -238,6 +221,10 @@ def _plot2d(plotfunc):
 
         # Handle facetgrids first
         if row or col:
+            if darray is None:
+                raise ValueError(
+                    "Cannot create facetgrid with only topology and no data."
+                )
             allargs = locals().copy()
             del allargs["darray"]
             del allargs["imshow_rgb"]
@@ -248,6 +235,7 @@ def _plot2d(plotfunc):
 
         plt = import_matplotlib_pyplot()
 
+        # For 3d plot, ensure given ax is a Axes3D object
         if (
             plotfunc.__name__ == "surface"
             and not kwargs.get("_is_facetgrid", False)
@@ -261,14 +249,18 @@ def _plot2d(plotfunc):
                     'projection="3d"'
                 )
 
-        _ensure_plottable(darray.values)
-
-        cmap_params, cbar_kwargs = _process_cmap_cbar_kwargs(
-            plotfunc,
-            darray,
-            **locals(),
-            _is_facetgrid=kwargs.pop("_is_facetgrid", False),
-        )
+        # darray may be None when plotting just edges (the mesh)
+        if darray is not None:
+            _ensure_plottable(darray.values)
+            cmap_params, cbar_kwargs = _process_cmap_cbar_kwargs(
+                plotfunc,
+                darray,
+                **locals(),
+                _is_facetgrid=kwargs.pop("_is_facetgrid", False),
+            )
+        else:
+            cmap_params = dict()
+            cbar_kwargs = dict()
 
         if "contour" in plotfunc.__name__:
             # extend is a keyword argument only for contour and contourf, but
@@ -279,39 +271,51 @@ def _plot2d(plotfunc):
             # if colors == a single color, matplotlib draws dashed negative
             # contours. we lose this feature if we pass cmap and not colors
             if isinstance(colors, str):
-                cmap_params["cmap"] = None
+                cmap_params["cmap"] = dict()
                 kwargs["colors"] = colors
-
-        # TODO: tripcolor
-        # if "pcolormesh" == plotfunc.__name__:
-        #    kwargs["infer_intervals"] = infer_intervals
-        #    kwargs["xscale"] = xscale
-        #    kwargs["yscale"] = yscale
 
         if "imshow" == plotfunc.__name__ and isinstance(aspect, str):
             # forbid usage of mpl strings
             raise ValueError("plt.imshow's `aspect` kwarg is not available in xarray")
 
-        ax = get_axis(figsize, size, aspect, ax, **subplot_kws)
+        for key in ["cmap", "vmin", "vmax", "norm"]:
+            kwargs[key] = cmap_params.get(key)
 
+        ax = get_axis(figsize, size, aspect, ax, **subplot_kws)
         primitive = plotfunc(
             topology,
             darray,
             ax=ax,
-            # cmap=cmap_params["cmap"],
-            # vmin=cmap_params["vmin"],
-            # vmax=cmap_params["vmax"],
-            # norm=cmap_params["norm"],
             **kwargs,
         )
+        
+        # Try to get a 1:1 ratio between x and y coordinates by default. If
+        # colorbar is present, we need to make room for it in the x-direction.
+        # 1.26 is the magic number; the colorbar takes up 26% additional space
+        # by default.
+        if aspect is None:
+            if add_colorbar:
+                aspect = 1.26
+            else:
+                aspect = 1.0
+
+        # Preserve height, adjust width if needed; Do not call
+        # ax.set_aspect: this shrinks or grows the ax relative to the
+        # colobar
+        if size is None:
+            _, size = ax.figure.get_size_inches()
+
+        figsize = (size * aspect, size)
+        ax.figure.set_size_inches(figsize)
 
         # Label the plot with metadata
-        # if add_labels:
-        #    ax.set_xlabel(label_from_attrs(darray[xlab], xlab_extra))
-        #    ax.set_ylabel(label_from_attrs(darray[ylab], ylab_extra))
-        #    ax.set_title(darray._title_for_slice())
-        #    if plotfunc.__name__ == "surface":
-        #        ax.set_zlabel(label_from_attrs(darray))
+        if darray is not None and add_labels:
+            # TODO: grab x and y information from topology?
+            # ax.set_xlabel(label_from_attrs(darray[xlab], xlab_extra))
+            # ax.set_ylabel(label_from_attrs(darray[ylab], ylab_extra))
+            ax.set_title(darray._title_for_slice())
+            if plotfunc.__name__ == "surface":
+                ax.set_zlabel(label_from_attrs(darray))
 
         if add_colorbar:
             if add_labels and "label" not in cbar_kwargs:
@@ -327,6 +331,9 @@ def _plot2d(plotfunc):
         if "origin" in kwargs:
             yincrease = None
 
+        # Spatial x and y coordinates: no need for e.g. logarithm axes.
+        xscale = None
+        yscale = None
         _update_axes(
             ax, xincrease, yincrease, xscale, yscale, xticks, yticks, xlim, ylim
         )
@@ -357,7 +364,6 @@ def _plot2d(plotfunc):
         robust=False,
         extend=None,
         levels=None,
-        infer_intervals=None,
         subplot_kws=None,
         cbar_ax=None,
         cbar_kwargs=None,
@@ -408,10 +414,26 @@ def line(grid, z, ax, **kwargs):
     edge_coords[:, 0, 1] = grid.node_y[node_0]
     edge_coords[:, 1, 0] = grid.node_x[node_1]
     edge_coords[:, 1, 1] = grid.node_y[node_1]
+
+    norm = kwargs.pop("norm", None)
+    vmin = kwargs.pop("vmin", None)
+    vmax = kwargs.pop("vmax", None)
+
     collection = LineCollection(edge_coords, **kwargs)
-    collection.set_array(z)
-    primitive = ax.add_collection(collection)
-    ax.autoscale()
+
+    if z is not None:
+        dim = z.dims[0]
+        attrs = grid.mesh_topology.attrs
+        if dim == attrs.get("edge_dimension", "edge"):
+            collection.set_array(z.values)
+            collection._scale_norm(norm, vmin, vmax)
+
+    primitive = ax.add_collection(collection, autolim=False)
+    
+    xmin, ymin, xmax, ymax = grid.bounds
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    
     return primitive
 
 
@@ -421,27 +443,31 @@ def imshow(grid, z, ax, **kwargs):
     Image plot of 2D DataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.imshow`.
 
-    This rasterizes the grid before plotting.
+    This rasterizes the grid before plotting. Pass a ``resolution`` keyword to
+    control the rasterization resolution.
     """
     if "extent" not in kwargs:
         xmin, ymin, xmax, ymax = grid.bounds
+        kwargs["extent"] = xmin, xmax, ymin, ymax
     else:
-        if kwargs.get("orogin", None) == "upper":
+        if kwargs.get("origin", None) == "upper":
             xmin, xmax, ymin, ymax = kwargs["extent"]
         else:
             xmin, xmax, ymax, ymin = kwargs["extent"]
-
+    
     dx = xmax - xmin
     dy = ymax - ymin
-    resolution = min(dx, dy) / 500
-    x, y, index = grid.rasterize(resolution)
+    
+    # Check if a rasterization resolution is passed; Default to 500 raster
+    # cells otherwise for the smallest axis.
+    resolution = kwargs.get("resolution", None)
+    if resolution is None:
+        resolution = min(dx, dy) / 500
+
+    _, _, index = grid.rasterize(resolution)
     img = z.values[index].astype(float)
     img[index == -1] = np.nan
     primitive = ax.imshow(img, **kwargs)
-    for axis, v in [("x", x), ("y", y)]:
-        if np.issubdtype(v.dtype, str):
-            getattr(ax, f"set_{axis}ticks")(np.arange(len(v)))
-            getattr(ax, f"set_{axis}ticklabels")(v)
     return primitive
 
 
@@ -476,10 +502,23 @@ def pcolormesh(grid, z, ax, **kwargs):
     vertices = nodes[faces]
     # Replace fill value; PolyCollection ignores NaN.
     vertices[faces == -1] = np.nan
+    
+    norm = kwargs.pop("norm", None)
+    vmin = kwargs.pop("vmin", None)
+    vmax = kwargs.pop("vmax", None)
+
     collection = PolyCollection(vertices, **kwargs)
     collection.set_array(z.values.ravel())
-    primitive = ax.add_collection(collection)
-    ax.autoscale()
+    collection._scale_norm(norm, vmin, vmax)
+    primitive = ax.add_collection(collection, autolim=False)
+
+    xmin, ymin, xmax, ymax = grid.bounds
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+
+    corners = (xmin, ymin), (xmax, ymax)
+    ax.update_datalim(corners)
+
     return primitive
 
 
@@ -494,8 +533,8 @@ def surface(triangulation, z, ax, **kwargs):
 
 
 def plot(
-    darray,
     grid,
+    darray,
     ax=None,
     **kwargs,
 ):
@@ -530,7 +569,7 @@ def plot(
     else:
         raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
     kwargs["ax"] = ax
-    return plotfunc(darray, grid, **kwargs)
+    return plotfunc(grid, darray, **kwargs)
 
 
 class _EdgePlot:
@@ -541,8 +580,12 @@ class _EdgePlot:
         self._da = obj._da
 
     def __call__(self, **kwargs):
-        n_edge = len(self._grid.edge_node_connectivity)
-        z = xr.DataArray(np.ones(n_edge))
+        dim = self._da.dims[0]
+        attrs = self._grid.mesh_topology.attrs
+        if dim == attrs.get("edge_dimension", "edge"):
+            z = self._da
+        else:
+            z = None
         return line(self._grid, z, **kwargs)
 
     @functools.wraps(line)
@@ -559,6 +602,10 @@ class _FacePlot:
 
     def __call__(self, **kwargs):
         return pcolormesh(self._grid, self._da, **kwargs)
+
+    @functools.wraps(imshow)
+    def pcolormesh(self, *args, **kwargs):
+        return pcolormesh(self._grid, self._da, *args, **kwargs)
 
     @functools.wraps(imshow)
     def imshow(self, *args, **kwargs):
@@ -635,7 +682,6 @@ class _PlotMethods:
 
     __slots__ = ("_grid", "_da")
 
-    #    def __init__(self, grid, darray):
     def __init__(self, obj):
         darray = obj.obj
         grid = obj.grid
@@ -656,4 +702,4 @@ class _PlotMethods:
     node = UncachedAccessor(_NodePlot)
 
     def __call__(self, **kwargs):
-        return plot(self._da, self._grid, **kwargs)
+        return plot(self._grid, self._da, **kwargs)
