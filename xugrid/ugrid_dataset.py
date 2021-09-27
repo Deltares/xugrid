@@ -5,9 +5,11 @@ from typing import Union
 import geopandas as gpd
 import numpy as np
 import xarray as xr
-
+from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 from xarray.core.utils import UncachedAccessor
+
 from xugrid.ugrid import Ugrid1d, Ugrid2d
+
 from .plot import _PlotMethods
 
 
@@ -294,3 +296,55 @@ class UgridAccessor:
         df = ds[variables].to_dataframe()
         geometry = self.grid.as_vector_geometry(data_on)
         return gpd.GeoDataFrame(df, geometry=geometry)
+
+
+# Wrapped IO methods
+# ------------------
+
+
+def open_dataset(*args, **kwargs):
+    ds = xr.open_dataset(*args, **kwargs)
+    return UgridDataset(ds)
+
+
+def open_dataarray(*args, **kwargs):
+    ds = xr.open_dataset(*args, **kwargs)
+    dataset = UgridDataset(ds)
+
+    if len(dataset.data_vars) != 1:
+        raise ValueError(
+            "Given file dataset contains more than one data "
+            "variable. Please read with xarray.open_dataset and "
+            "then select the variable you want."
+        )
+    else:
+        (data_array,) = dataset.data_vars.values()
+
+    data_array.set_close(dataset._close)
+
+    # Reset names if they were changed during saving
+    # to ensure that we can 'roundtrip' perfectly
+    if DATAARRAY_NAME in dataset.attrs:
+        data_array.name = dataset.attrs[DATAARRAY_NAME]
+        del dataset.attrs[DATAARRAY_NAME]
+
+    if data_array.name == DATAARRAY_VARIABLE:
+        data_array.name = None
+
+    return data_array
+
+
+def open_mfdataset(*args, **kwargs):
+    ds = xr.open_mfdataset(*args, **kwargs)
+    return UgridDataset(ds)
+
+
+def open_zarr(*args, **kwargs):
+    ds = xr.open_zarr(*args, **kwargs)
+    return UgridDataset(ds)
+
+
+open_dataset.__doc__ = xr.open_dataset.__doc__
+open_dataarray.__doc__ = xr.open_dataarray.__doc__
+open_mfdataset.__doc__ = xr.open_mfdataset.__doc__
+open_zarr.__doc__ = xr.open_zarr.__doc__
