@@ -1,14 +1,17 @@
-from typing import Tuple, Union
+import abc
+import copy
+from typing import Any, Tuple, Union
 
 import geopandas as gpd
 import matplotlib.tri as mtri
 import meshkernel as mk
 import numpy as np
+import pyproj
 import shapely.geometry as sg
 import xarray as xr
-from numba_celltree import CellTree2d
 from meshkernel.meshkernel import MeshKernel
 from meshkernel.py_structures import Mesh2d
+from numba_celltree import CellTree2d
 from scipy.sparse.csr import csr_matrix
 
 from . import connectivity, conversion
@@ -18,21 +21,226 @@ from .typing import FloatArray, IntArray, IntDType
 from .voronoi import voronoi_topology
 
 
-class Ugrid1d:
+class AbstractUgrid(abc.ABC):
+    @abc.abstractproperty
+    def topology_dimension(self):
+        return
+
+    @abc.abstractstaticmethod
+    def from_dataset():
+        return
+
+    @abc.abstractmethod
+    def topology_dataset(self):
+        return
+
+    @abc.abstractmethod
+    def topology_subset(self):
+        return
+
+    @abc.abstractmethod
+    def _clear_geometry_properties(self):
+        return
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+    @property
+    def node_coordinates(self) -> FloatArray:
+        return np.column_stack([self.node_x, self.node_y])
+
+    @property
+    def edge_x(self):
+        if self._edge_x is None:
+            self._edge_x = self.node_x[self.edge_node_connectivity].mean(axis=0)
+        return self._edge_x
+
+    @property
+    def edge_y(self):
+        if self._edge_y is None:
+            self._edge_y = self.node_y[self.edge_node_connectivity].mean(axis=0)
+        return self._edge_y
+
+    @property
+    def edge_coordinates(self) -> FloatArray:
+        return np.column_stack([self.edge_x, self.edge_y])
+
+    @property
+    def bounds(self) -> Tuple[float, float, float, float]:
+        if any(
+            [
+                self._xmin is None,
+                self._ymin is None,
+                self._xmax is None,
+                self._ymax is None,
+            ]
+        ):
+            self._xmin = self.node_x.min()
+            self._ymin = self.node_y.min()
+            self._xmax = self.node_x.max()
+            self._ymax = self.node_y.max()
+        return (
+            self._xmin,
+            self._ymin,
+            self._xmax,
+            self._ymax,
+        )
+
+    @property
+    def node_edge_connectivity(self) -> csr_matrix:
+        if self._node_edge_connectivity is None:
+            self._node_edge_connectivity = connectivity.invert_dense_to_sparse(
+                self.edge_node_connectivity, self.fill_value
+            )
+        return self._node_edge_connectivity
+
+    def set_crs(self, crs=None, epsg=None, allow_override=False):
+        if crs is not None:
+            crs = pyproj.CRS.from_user_input(crs)
+        elif epsg is not None:
+            crs = pyproj.CRS.from_epsg(epsg)
+        else:
+            raise ValueError("Must pass either crs or epsg.")
+
+        if not allow_override and self.crs is not None and not self.crs == crs:
+            raise ValueError(
+                "The Ugrid already has a CRS which is not equal to the passed "
+                "CRS. Specify 'allow_override=True' to allow replacing the existing "
+                "CRS without doing any transformation. If you actually want to "
+                "transform the geometries, use '.to_crs' instead."
+            )
+
+    def to_crs(
+        self,
+        crs: Union[pyproj.CRS, str] = None,
+        epsg: int = None,
+        inplace: bool = False,
+    ):
+        """
+        Transform geometries to a new coordinate reference system.
+        Transform all geometries in an active geometry column to a different coordinate
+        reference system. The ``crs`` attribute on the current Ugrid must
+        be set. Either ``crs`` or ``epsg`` may be specified for output.
+
+        This method will transform all points in all objects. It has no notion
+        of projecting the cells. All segments joining points are assumed to be
+        lines in the current projection, not geodesics. Objects crossing the
+        dateline (or other projection boundary) will have undesirable behavior.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying output projection.
+        inplace : bool, optional, default: False
+            Whether to return a new Ugrid or do the transformation in place.
+        """
+        if self.crs is None:
+            raise ValueError(
+                "Cannot transform naive geometries.  "
+                "Please set a crs on the object first."
+            )
+        if crs is not None:
+            crs = pyproj.CRS.from_user_input(crs)
+        elif epsg is not None:
+            crs = pyproj.CRS.from_epsg(epsg)
+        else:
+            raise ValueError("Must pass either crs or epsg.")
+
+        if inplace:
+            grid = self
+        else:
+            grid = self.copy()
+
+        transformer = pyproj.Transformer.from_crs(
+            crs=self.crs, crs_to=crs, always_xy=True
+        )
+        node_x, node_y = transformer.transform(xx=grid.node_x, yy=grid.node_y)
+        grid.node_x = node_x
+        grid.node_y = node_y
+        grid._clear_geometry_properties()
+        grid.crs = crs
+
+        if not inplace:
+            return grid
+
+
+class Ugrid1d(AbstractUgrid):
     """
-    Stores the topological data of a "1D unstructured mesh": a collection of
-    connected line elements, such as a river network.
+    This class stores the topological data of a "1-D unstructured grid": a
+    collection of connected line elements, such as a river network.
+
+    Parameters
+    ----------
+    node_x: ndarray of floats
+    node_y: ndarray of floats
+    fill_value: int
+    edge_node_connectivity: ndarray of integers
+    node_dimension: str, optional, default "node"
+    edge_dimension: str, optional, default "edge"
+    dataset: xr.Dataset, optional
+    crs: Any, optional
+        Coordinate Reference System of the geometry objects. Can be anything accepted by
+        :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+        such as an authority string (eg "EPSG:4326") or a WKT string.
     """
 
-    _topology_keys = [
-        "edge_coordinates ",
-        "edge_dimension",
-        "node_coordinates",
-        "node_dimension",
-        "edge_node_connectivity",
-    ]
+    def __init__(
+        self,
+        node_x: FloatArray,
+        node_y: FloatArray,
+        fill_value: int,
+        edge_node_connectivity: IntArray = None,
+        node_dimension: str = "node",
+        edge_dimension: str = "edge",
+        dataset: xr.Dataset = None,
+        crs: Any = None,
+    ):
+        self.node_x = node_x
+        self.node_y = node_y
+        self.fill_value = fill_value
+        self.edge_node_connectivity = edge_node_connectivity
+        self.node_dimension = node_dimension
+        self.edge_dimension = edge_dimension
+        self.dataset = dataset
 
-    def __init__(self, dataset: xr.Dataset):
+        # Optional attributes, deferred initialization
+        # Meshkernel
+        self._mesh = None
+        self._meshkernel = None
+        # Celltree
+        self._celltree = None
+        # Bounds
+        self._xmin = None
+        self._xmax = None
+        self._ymin = None
+        self._ymax = None
+        # Edges
+        self._edge_dimension = None
+        self._edge_x = None
+        self._edge_y = None
+        # Connectivity
+        self._node_edge_connectivity = None
+        # crs
+        self.crs = pyproj.CRS.from_user_input(crs)
+
+    @staticmethod
+    def from_dataset(dataset: xr.Dataset):
+        """
+        Extract the 1D UGRID topology information from an xarray Dataset.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+            Dataset containing topology information stored according to UGRID conventions.
+
+        Returns
+        -------
+        grid: Ugrid1d
+        """
         ds = dataset
         if not isinstance(ds, xr.Dataset):
             raise TypeError(
@@ -43,45 +251,80 @@ class Ugrid1d:
         mesh_1d_variables = ugrid_io.get_values_with_attribute(
             ds, "cf_role", "mesh_topology"
         )
-        assert len(mesh_1d_variables) == 1
-        self.mesh_topology = mesh_1d_variables[0]
+        if len(mesh_1d_variables) > 1:
+            raise ValueError("dataset may only contain a single mesh topology variable")
 
+        mesh_topology = mesh_1d_variables[0]
         node_coord_array_names = ugrid_io.get_topology_array_with_role(
-            self.mesh_topology, "node_coordinates", variables
+            mesh_topology, "node_coordinates", variables
         )
         edge_nodes_array_names = ugrid_io.get_topology_array_with_role(
-            self.mesh_topology, "edge_node_connectivity", variables
+            mesh_topology, "edge_node_connectivity", variables
         )
-        self.fill_value = -1
 
         node_coord_arrays = ugrid_io.get_coordinate_arrays_by_name(
             ds, node_coord_array_names
         )
         edge_nodes_array = ugrid_io.get_data_arrays_by_name(ds, edge_nodes_array_names)
-        self.edge_nodes = edge_nodes_array[0].astype(connectivity.IntDType)
-        self.node_x = node_coord_arrays[0]
-        self.node_y = node_coord_arrays[1]
-        self.dataset = ds
+        edge_nodes = edge_nodes_array[0]
+
+        # Get dimension names
+        edge_dimension = mesh_topology.attrs.get("edge_dimension", edge_nodes.dims[0])
+        node_dimension = mesh_topology.attrs.get(
+            "node_dimension", node_coord_arrays[0].dims[0]
+        )
+
+        # Collect values
+        edge_node_connectivity = edge_nodes.values.astype(IntDType)
+        fill_value = -1  # TODO: coerce fill value
+        node_x = node_coord_arrays[0].values
+        node_y = node_coord_arrays[1].values
+
+        return Ugrid1d(
+            node_x,
+            node_y,
+            fill_value,
+            edge_node_connectivity,
+            node_dimension,
+            edge_dimension,
+            dataset,
+        )
+
+    def topology_dataset(self):
+        """
+        Store the UGRID topology information in an xarray Dataset according to
+        the UGRID conventions.
+        """
+        return ugrid_io.ugrid1d_dataset(
+            self.node_x,
+            self.node_y,
+            self.fill_value,
+            self.edge_node_connectivity,
+            self.node_dimension,
+            self.edge_dimension,
+        )
+
+    def _clear_geometry_properties(self):
+        """Clear all properties that may have been invalidated"""
+        # Meshkernel
         self._mesh = None
         self._meshkernel = None
+        # Celltree
+        self._celltree = None
+        # Bounds
+        self._xmin = None
+        self._xmax = None
+        self._ymin = None
+        self._ymax = None
+        # Edges
+        self._edge_x = None
+        self._edge_y = None
 
     # These are all optional UGRID attributes. They are not computed by
     # default, only when called upon.
     @property
-    def edge_x(self):
-        if self._edge_x is None:
-            self._edge_x = xr.DatArray(
-                data=self.node_x[self.edge_node_connectivity],
-                dims=[self.edge_dim],
-            )
-
-    @property
-    def edge_y(self):
-        if self._edge_y is None:
-            self._edge_y = xr.DatArray(
-                data=self.node_y[self.edge_node_connectivity],
-                dims=[self.edge_dim],
-            )
+    def topology_dimension(self):
+        return 1
 
     @property
     def mesh(self):
@@ -99,12 +342,6 @@ class Ugrid1d:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh1d_set(self.mesh)
         return self._meshkernel
-
-    @staticmethod
-    def topology_dataset(
-        node_x: FloatArray, node_y: FloatArray, edge_node_connectivity: IntArray
-    ) -> xr.Dataset:
-        return ugrid_io.ugrid1d_dataset(node_x, node_y, edge_node_connectivity)
 
     def as_vector_geometry(self, data_on: str):
         if data_on == "node":
@@ -124,33 +361,118 @@ class Ugrid1d:
         coords, edge_node_connectivity = conversion.linestrings_to_edges(
             geodataframe.geometry
         )
-        return Ugrid1d(Ugrid1d.topology_dataset(coords, edge_node_connectivity))
+        return Ugrid1d(coords[:, 0], coords[:, 1], -1, edge_node_connectivity)
 
 
-class Ugrid2d:
+class Ugrid2d(AbstractUgrid):
     """
-    this class stores the topological data of a 2d unstructured grid.  it
-    contains a search tree for search operations, such as finding the face
-    index in which a give point lies.  to avoid data duplication, it contains a
-    method to remove topological data from a dataset
+    This class stores the topological data of a 2-D unstructured grid.
+
+    Parameters
+    ----------
+    node_x: ndarray of floats
+    node_y: ndarray of floats
+    fill_value: int
+    face_node_connectivity: ndarray of integers
+    edge_node_connectivity: ndarray of integers, optional
+    node_dimension: str, optional, default "node"
+    face_dimension: str, optional, default "face"
+    edge_dimension: str, optional, default "edge"
+    dataset: xr.Dataset, optional
+    crs: Any, optional
+        Coordinate Reference System of the geometry objects. Can be anything accepted by
+        :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+        such as an authority string (eg "EPSG:4326") or a WKT string.
     """
 
-    _topology_keys = [
-        "node_dimension",
-        "node_coordinates",
-        "max_face_nodes_dimension",
-        "edge_node_connectivity",
-        "edge_dimension",
-        "edge_coordinates ",
-        "face_node_connectivity",
-        "face_dimension",
-        "edge_face_connectivity",
-        "face_coordinates",
-    ]
+    def __init__(
+        self,
+        node_x: FloatArray,
+        node_y: FloatArray,
+        fill_value: int,
+        face_node_connectivity: IntArray,
+        edge_node_connectivity: IntArray = None,
+        node_dimension: str = "node",
+        face_dimension: str = "face",
+        edge_dimension: str = "edge",
+        dataset: xr.Dataset = None,
+        crs: Any = None,
+    ):
+        self.node_x = node_x
+        self.node_y = node_y
+        self.face_node_connectivity = face_node_connectivity
+        self.fill_value = fill_value
+        self.node_dimension = node_dimension
+        self.face_dimension = face_dimension
+        self.edge_dimension = edge_dimension
+        self.dataset = dataset
 
-    def __init__(self, dataset: xr.Dataset):
+        # Optional attributes, deferred initialization
+        # Meshkernel
+        self._mesh = None
+        self._meshkernel = None
+        # Celltree
+        self._celltree = None
+        # Centroids
+        self._centroids = None
+        # Bounds
+        self._xmin = None
+        self._xmax = None
+        self._ymin = None
+        self._ymax = None
+        # Edges
+        self._edge_dimension = None
+        self._edge_x = None
+        self._edge_y = None
+        # Connectivity
+        self._edge_node_connectivity = edge_node_connectivity
+        self._edge_face_connectivity = None
+        self._face_face_connectivity = None
+        self._face_edge_connectivity = None
+        self._node_edge_connectivity = None
+        self._node_face_connectivity = None
+        # Derived topology
+        self._triangulation = None
+        self._voronoi_topology = None
+        self._centroid_triangulation = None
+        # crs
+        self.crs = pyproj.CRS.from_user_input(crs)
+
+    def _clear_geometry_properties(self):
+        """Clear all properties that may have been invalidated"""
+        # Meshkernel
+        self._mesh = None
+        self._meshkernel = None
+        # Celltree
+        self._celltree = None
+        # Centroids
+        self._centroids = None
+        # Bounds
+        self._xmin = None
+        self._xmax = None
+        self._ymin = None
+        self._ymax = None
+        # Edges
+        self._edge_x = None
+        self._edge_y = None
+        # Derived topology
+        self._triangulation = None
+        self._voronoi_topology = None
+        self._centroid_triangulation = None
+
+    @staticmethod
+    def from_dataset(dataset: xr.Dataset):
         """
-        Initialize Ugrid object from the topology data in an xarray Dataset
+        Extract the 2D UGRID topology information from an xarray Dataset.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+            Dataset containing topology information stored according to UGRID conventions.
+
+        Returns
+        -------
+        grid: Ugrid2d
         """
         ds = dataset
         if not isinstance(ds, xr.Dataset):
@@ -161,39 +483,38 @@ class Ugrid2d:
 
         # Get topology information variable
         variables = tuple(ds.variables.keys())
-        mesh_2d_variables = ugrid_io.get_values_with_attribute(
+
+        mesh_2d_variables = ugrid_io.get_variable_with_attribute(
             ds, "cf_role", "mesh_topology"
         )
-        assert len(mesh_2d_variables) == 1
-        self.mesh_topology = mesh_2d_variables[0]
+        if len(mesh_2d_variables) > 1:
+            raise ValueError("dataset may only contain a single mesh topology variable")
+        mesh_topology = mesh_2d_variables[0]
 
-        # Collect topology variable names
+        # Collect names
         node_coord_array_names = ugrid_io.get_topology_array_with_role(
-            self.mesh_topology, "node_coordinates", variables
+            mesh_topology, "node_coordinates", variables
         )
         connectivity_array_names = ugrid_io.get_topology_array_with_role(
-            self.mesh_topology, "face_node_connectivity", variables
+            mesh_topology, "face_node_connectivity", variables
         )
         edge_nodes_array_names = ugrid_io.get_topology_array_with_role(
-            self.mesh_topology, "edge_node_connectivity", variables
+            mesh_topology, "edge_node_connectivity", variables
         )
 
-        # Extract the values of the arrays, store in object.
+        # Collect values
         node_coord_arrays = ugrid_io.get_coordinate_arrays_by_name(
             ds, node_coord_array_names
         )
-        self.node_x = node_coord_arrays[0].values
-        self.node_y = node_coord_arrays[1].values
-
+        node_x = node_coord_arrays[0].values
+        node_y = node_coord_arrays[1].values
         face_nodes = ugrid_io.get_data_arrays_by_name(ds, connectivity_array_names)[0]
-        self.face_node_connectivity = face_nodes.values.astype(connectivity.IntDType)
-        self.fill_value = -1
+        face_node_connectivity = face_nodes.values.astype(IntDType)
+        fill_value = -1  # TODO: coerce fill_value
 
         # Get dimension names
-        self.face_dimension = self.mesh_topology.attrs.get(
-            "face_dimension", face_nodes.dims[0]
-        )
-        self.node_dimension = self.mesh_topology.attrs.get(
+        face_dimension = mesh_topology.attrs.get("face_dimension", face_nodes.dims[0])
+        node_dimension = mesh_topology.attrs.get(
             "node_dimension", node_coord_arrays[0].dims[0]
         )
 
@@ -202,21 +523,25 @@ class Ugrid2d:
                 ds, edge_nodes_array_names
             )
             edge_nodes = edge_nodes_array[0]
-            self._edge_node_connectivity = edge_nodes.values.astype(
-                connectivity.IntDType
-            )
-            self.edge_dimension = self.mesh_topology.attrs.get(
+            edge_node_connectivity = edge_nodes.values.astype(connectivity.IntDType)
+            edge_dimension = mesh_topology.attrs.get(
                 "edge_dimension", edge_nodes.dims[0]
             )
         else:
-            self._edge_node_connectivity = None
-            self.edge_dimension = f"{self.mesh_topology.name}_edge"
+            edge_node_connectivity = None
+            edge_dimension = f"{mesh_topology.name}_edge"
 
-        # Misc.
-        self.build_celltree()
-        self.dataset = ds
-        # Optional attributes
-        self._init_optional_attrs()
+        return Ugrid2d(
+            node_x,
+            node_y,
+            fill_value,
+            face_node_connectivity,
+            edge_node_connectivity,
+            node_dimension,
+            face_dimension,
+            edge_dimension,
+            mesh_topology,
+        )
 
     def remove_topology(self, obj: Union[xr.Dataset, xr.DataArray]):
         """
@@ -232,38 +557,24 @@ class Ugrid2d:
         obj = obj.drop_vars(self.mesh_topology.name, errors="ignore")
         return obj
 
-    def _init_optional_attrs(self):
-        # Optional attributes, deferred initialization
-        # Meshkernel
-        self._mesh = None
-        self._meshkernel = None
-        # Centroids
-        self._centroids = None
-        # Bounds
-        self._xmin = None
-        self._xmax = None
-        self._ymin = None
-        self._ymax = None
-        # Edges
-        self._edge_dimension = None
-        self._edge_x = None
-        self._edge_y = None
-        # Connectivity
-        self._edge_face_connectivity = None
-        self._face_face_connectivity = None
-        self._face_edge_connectivity = None
-        self._node_edge_connectivity = None
-        self._node_face_connectivity = None
-        # Derived topology
-        self._triangulation = None
-        self._voronoi_topology = None
-        self._centroid_triangulation = None
+    def topology_dataset(self):
+        return ugrid_io.ugrid2d_dataset(
+            self.node_x,
+            self.node_y,
+            self.fill_value,
+            self.face_node_connectivity,
+            self._edge_node_connectivity,
+            self.node_dimension,
+            self.face_dimension,
+            self.edge_dimension,
+        )
 
-    @staticmethod
-    def from_topology(vertices: FloatArray, face_node_connectivity: IntArray):
-        # TODO: switch around with __init__?
-        # and call this from_dataset?
-        raise NotImplementedError
+    # These are all optional/derived UGRID attributes. They are not computed by
+    # default, only when called upon.
+
+    @property
+    def topology_dimension(self):
+        return 2
 
     def _edge_connectivity(self):
         (
@@ -274,8 +585,6 @@ class Ugrid2d:
             self.fill_value,
         )
 
-    # These are all optional/derived UGRID attributes. They are not computed by
-    # default, only when called upon.
     @property
     def edge_node_connectivity(self) -> FloatArray:
         if self._edge_node_connectivity is None:
@@ -289,24 +598,27 @@ class Ugrid2d:
         return self._face_edge_connectivity
 
     @property
-    def edge_x(self) -> FloatArray:
-        if self._edge_x is None:
-            self._edge_x = self.node_x[self.edge_node_connectivity]
-        return self._edge_x
-
-    @property
-    def edge_y(self):
-        if self._edge_y is None:
-            self._edge_y = self.node_y[self.edge_node_connectivity]
-        return self._edge_y
-
-    @property
-    def node_edge_connectivity(self) -> csr_matrix:
-        if self._node_edge_connectivity is None:
-            self._node_edge_connectivity = connectivity.invert_dense_to_sparse(
-                self.edge_node_connectivity, self.fill_value
+    def centroids(self) -> FloatArray:
+        if self._centroids is None:
+            self._centroids = connectivity.centroids(
+                self.face_node_connectivity,
+                self.fill_value,
+                self.node_x,
+                self.node_y,
             )
-        return self._node_edge_connectivity
+        return self._centroids
+
+    @property
+    def face_x(self):
+        return self.centroids[:, 0]
+
+    @property
+    def face_y(self):
+        return self.centroids[:, 1]
+
+    @property
+    def face_coordinates(self) -> FloatArray:
+        return self.centroids
 
     @property
     def edge_face_connectivity(self) -> IntArray:
@@ -333,10 +645,6 @@ class Ugrid2d:
         return self._node_face_connectivity
 
     @property
-    def nodes(self) -> FloatArray:
-        return np.column_stack([self.node_x, self.node_y])
-
-    @property
     def mesh(self):
         if self._mesh is None:
             self._mesh = mk.Mesh1d(
@@ -352,17 +660,6 @@ class Ugrid2d:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh2d_set(self.mesh)
         return self._meshkernel
-
-    @property
-    def centroids(self) -> FloatArray:
-        if self._centroids is None:
-            self._centroids = connectivity.centroids(
-                self.face_node_connectivity,
-                self.fill_value,
-                self.node_x,
-                self.node_y,
-            )
-        return self._centroids
 
     @property
     def voronoi_topology(self):
@@ -395,25 +692,6 @@ class Ugrid2d:
         return self._triangulation
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
-        if any([
-            self._xmin is None,
-            self._ymin is None,
-            self._xmax is None,
-            self._ymax is None,
-        ]):
-            self._xmin = self.node_x.min()
-            self._ymin = self.node_y.min()
-            self._xmax = self.node_x.max()
-            self._ymax = self.node_y.max()
-        return (
-            self._xmin,
-            self._ymin,
-            self._xmax,
-            self._ymax,
-        )
-
-    @property
     def exterior_edges(self) -> IntArray:
         """
         Get all exterior edges, i.e. edges with no other face.
@@ -434,16 +712,16 @@ class Ugrid2d:
         initializes the celltree, a search structure for spatial lookups in 2d grids
         """
         nodes = np.column_stack([self.node_x, self.node_y])
-        self._cell_tree = CellTree2d(nodes, self.face_node_connectivity, self.fill_value)
+        self._celltree = CellTree2d(nodes, self.face_node_connectivity, self.fill_value)
 
     def locate_faces(self, points):
         """
         returns the face indices in which the points lie. The points should be
         provided as an (N,2) array. The result is an (N) array
         """
-        if self._cell_tree is None:
+        if self._celltree is None:
             self.build_celltree()
-        indices = self._cell_tree.locate(points)
+        indices = self._celltree.locate(points)
         return indices
 
     def locate_faces_bounding_box(self, xmin, xmax, ymin, ymax):
@@ -482,14 +760,8 @@ class Ugrid2d:
         y = np.arange(ymax - 0.5 * d, ymin, -d)
         yy, xx = np.meshgrid(y, x, indexing="ij")
         nodes = np.column_stack([xx.ravel(), yy.ravel()])
-        index = self._cell_tree.locate_points(nodes).reshape((y.size, x.size))
+        index = self._celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
-
-    def locate_cells(points):
-        raise NotImplementedError()
-
-    def locate_edges(points):
-        raise NotImplementedError()
 
     @staticmethod
     def topology_dataset(
@@ -532,8 +804,7 @@ class Ugrid2d:
             face_node_connectivity = connectivity.renumber(face_selection)
             node_x = self.node_x[node_indices]
             node_y = self.node_y[node_indices]
-            ds = Ugrid2d.topology_dataset(node_x, node_y, face_node_connectivity)
-            return Ugrid2d(ds)
+            return Ugrid2d(node_x, node_y, self.fill_value, face_node_connectivity)
 
     def refine_polygon(
         self,
