@@ -332,3 +332,43 @@ def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
         return triangulate_coo(face_node_connectivity)
     else:
         raise TypeError("connectivity must be ndarray or sparse matrix")
+
+
+def _binary_iterate(
+    connectivity: sparse.csr_matrix,
+    input: BoolArray,
+    value: bool,
+    iterations: int,
+) -> BoolArray:
+    if input.dtype != np.bool_:
+        raise TypeError("input dtype should be bool")
+
+    coo = connectivity.tocoo()
+    i = coo.row
+    j = coo.col
+    output = input.copy()
+
+    for _ in range(iterations):
+        a = output[i]
+        b = output[j]
+        mutate = a != b
+        output[i[mutate]] = value
+        output[j[mutate]] = value
+
+    return output
+
+
+def binary_erosion(
+    connectivity: sparse.csr_matrix,
+    input: BoolArray,
+    iterations: int = 1,
+) -> BoolArray:
+    return _binary_iterate(connectivity, input, False, iterations)
+
+
+def binary_dilation(
+    connectivity: sparse.csr_matrix,
+    input: BoolArray,
+    iterations: int = 1,
+) -> BoolArray:
+    return _binary_iterate(connectivity, input, True, iterations)
