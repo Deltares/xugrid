@@ -1,18 +1,15 @@
 """
 Functions to load sample data.
 """
-import pkg_resources
-
 import numpy as np
+import pkg_resources
 import pooch
-
-import xugrid
 
 REGISTRY = pooch.create(
     path=pooch.os_cache("xugrid"),
-    base_url="https://github.com/deltares/xugrid/raw/{version}/data",
+    base_url="https://github.com/deltares/xugrid/raw/main/data/",
     version=None,
-    version_dev=None,
+    version_dev="main",
     env="XUGRID_DATA_DIR",
 )
 with pkg_resources.resource_stream("xugrid.data", "registry.txt") as registry_file:
