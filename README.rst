@@ -1,5 +1,5 @@
 
-.. image:: https://github.com/deltares/xugrid/raw/main/doc/_static/xugrid.svg
+.. image:: https://github.com/deltares/xugrid/raw/main/docs/_static/xugrid.svg
   :target: https://github.com/deltares/xugrid
 
 Xugrid
