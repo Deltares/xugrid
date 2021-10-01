@@ -7,7 +7,6 @@ from typing import Tuple
 import numpy as np
 import xarray as xr
 from matplotlib.collections import LineCollection, PolyCollection
-import matplotlib as mpl
 from xarray.core.utils import UncachedAccessor
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
@@ -288,25 +287,24 @@ def _plot2d(plotfunc):
             ax=ax,
             **kwargs,
         )
-        
-        # Try to get a 1:1 ratio between x and y coordinates by default. If
-        # colorbar is present, we need to make room for it in the x-direction.
-        # 1.26 is the magic number; the colorbar takes up 26% additional space
-        # by default.
-        if aspect is None:
-            if add_colorbar:
-                aspect = 1.26
-            else:
-                aspect = 1.0
 
-        # Preserve height, adjust width if needed; Do not call
-        # ax.set_aspect: this shrinks or grows the ax relative to the
-        # colobar
-        if size is None:
-            _, size = ax.figure.get_size_inches()
+        if size is not None:
+            # Try to get a 1:1 ratio between x and y coordinates by default. If
+            # colorbar is present, we need to make room for it in the
+            # x-direction.  1.26 is the magic number; the colorbar takes up 26%
+            # additional space by default.
+            if aspect is None:
+                xmin, xmax = ax.get_xlim()
+                ymin, ymax = ax.get_ylim()
+                aspect = (xmax - xmin) / (ymax - ymin)
+                if add_colorbar:
+                    aspect *= 1.26
 
-        figsize = (size * aspect, size)
-        ax.figure.set_size_inches(figsize)
+            # Preserve height, adjust width if needed; Do not call
+            # ax.set_aspect: this shrinks or grows the ax relative to the
+            # colobar
+            figsize = (size * aspect, size)
+            ax.figure.set_size_inches(figsize)
 
         # Label the plot with metadata
         if darray is not None and add_labels:
@@ -429,11 +427,11 @@ def line(grid, z, ax, **kwargs):
             collection._scale_norm(norm, vmin, vmax)
 
     primitive = ax.add_collection(collection, autolim=False)
-    
+
     xmin, ymin, xmax, ymax = grid.bounds
     ax.set_xlim(xmin, xmax)
     ax.set_ylim(ymin, ymax)
-    
+
     return primitive
 
 
@@ -454,10 +452,10 @@ def imshow(grid, z, ax, **kwargs):
             xmin, xmax, ymin, ymax = kwargs["extent"]
         else:
             xmin, xmax, ymax, ymin = kwargs["extent"]
-    
+
     dx = xmax - xmin
     dy = ymax - ymin
-    
+
     # Check if a rasterization resolution is passed; Default to 500 raster
     # cells otherwise for the smallest axis.
     resolution = kwargs.get("resolution", None)
@@ -502,7 +500,7 @@ def pcolormesh(grid, z, ax, **kwargs):
     vertices = nodes[faces]
     # Replace fill value; PolyCollection ignores NaN.
     vertices[faces == -1] = np.nan
-    
+
     norm = kwargs.pop("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)

@@ -436,7 +436,10 @@ class Ugrid2d(AbstractUgrid):
         self._voronoi_topology = None
         self._centroid_triangulation = None
         # crs
-        self.crs = pyproj.CRS.from_user_input(crs)
+        if crs is None:
+            self.crs = None
+        else:
+            self.crs = pyproj.CRS.from_user_input(crs)
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
