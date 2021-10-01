@@ -1,5 +1,5 @@
-Xugrid
-------
+API Reference
+=============
 
 .. automodule:: xugrid
     :members:
