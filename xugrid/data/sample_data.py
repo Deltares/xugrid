@@ -5,6 +5,8 @@ import numpy as np
 import pkg_resources
 import pooch
 
+import xugrid
+
 REGISTRY = pooch.create(
     path=pooch.os_cache("xugrid"),
     base_url="https://github.com/deltares/xugrid/raw/main/data/",
@@ -24,4 +26,10 @@ def xoxo():
     fname_triangles = REGISTRY.fetch("xoxo_triangles.txt")
     vertices = np.loadtxt(fname_vertices, dtype=float)
     triangles = np.loadtxt(fname_triangles, dtype=int)
-    return vertices, triangles
+    grid = xugrid.Ugrid2d(
+        node_x=vertices[:, 0],
+        node_y=vertices[:, 1],
+        fill_value=-1,
+        face_node_connectivity=triangles,
+    )
+    return grid

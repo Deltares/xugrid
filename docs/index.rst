@@ -1,7 +1,3 @@
-
-.. image:: https://github.com/deltares/xugrid/raw/main/doc/_static/xugrid.svg
-  :target: https://github.com/deltares/xugrid
-
 Xugrid
 ======
 
@@ -28,10 +24,19 @@ of Xugrid (pronounced "kiss you grid" by `visionaries
     sections.plot(ax=as0)
     section_data.plot.line(ax=ax1)
 
-
+   
 Installation
 ------------
 
 .. code:: console
 
    pip install xugrid
+
+.. toctree::
+   :titlesonly:
+   :hidden:
+
+   sample_data/index.rst
+   examples/index.rst
+   examples-dev/index.rst
+   api.rst

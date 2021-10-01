@@ -1,6 +1,6 @@
 """
-Two Part Synthetic Unstructured Grid
-====================================
+Xoxo
+====
 
 This is a small unstructured grid consisting of two unconnected parts. This is
 downloaded via `xugrid.data.xoxo()`. The toplogy data is downloaded to a local
@@ -10,13 +10,7 @@ import matplotlib.pyplot as plt
 
 import xugrid
 
-vertices, triangles = xugrid.data.xoxo()
-grid = xugrid.Ugrid2d(
-    node_x=vertices[:, 0],
-    node_y=vertices[:, 1],
-    fill_value=-1,
-    face_node_connectivity=triangles,
-)
+grid = xugrid.data.xoxo()
 
 fig, ax = plt.subplots()
 xugrid.plot.line(grid, ax=ax, color="#bd0d1f")
