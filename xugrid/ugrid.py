@@ -739,7 +739,7 @@ class Ugrid2d(AbstractUgrid):
         returns the face indices in which the points lie. The points should be
         provided as an (N,2) array. The result is an (N) array
         """
-        return self.celltree.locate(points)
+        return self.celltree.locate_points(points)
 
     def locate_faces_bounding_box(self, xmin, xmax, ymin, ymax):
         """

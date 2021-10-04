@@ -309,8 +309,8 @@ def _plot2d(plotfunc):
         # Label the plot with metadata
         if darray is not None and add_labels:
             # TODO: grab x and y information from topology?
-            # ax.set_xlabel(label_from_attrs(darray[xlab], xlab_extra))
-            # ax.set_ylabel(label_from_attrs(darray[ylab], ylab_extra))
+            ax.set_xlabel("x")
+            ax.set_ylabel("y")
             ax.set_title(darray._title_for_slice())
             if plotfunc.__name__ == "surface":
                 ax.set_zlabel(label_from_attrs(darray))
@@ -390,8 +390,8 @@ def _plot2d(plotfunc):
 
 @_plot2d
 def scatter(xy, z, ax, **kwargs):
-    x, y = xy
-    primitive = ax.scatter(x, y, z.values.ravel(), **kwargs)
+    x, y = xy.T
+    primitive = ax.scatter(x, y, c=z.values.ravel(), **kwargs)
     return primitive
 
 
@@ -588,7 +588,15 @@ class _EdgePlot:
 
     @functools.wraps(line)
     def line(self, *args, **kwargs):
-        return line(self._grid, self._da, *args, **kwargs)
+        if self._da.dims[0] == self._da.attrs.get("edge_dimension", "edge"):
+            z = self._da
+        else:
+            z = None
+        return line(self._grid, z, *args, **kwargs)
+
+    @functools.wraps(scatter)
+    def scatter(self, *args, **kwargs):
+        return scatter(self._grid.edge_coordinates, self._da, *args, **kwargs)
 
 
 class _FacePlot:
@@ -623,10 +631,7 @@ class _FacePlot:
 
     @functools.wraps(scatter)
     def scatter(self, *args, **kwargs):
-        centroids = self._grid.centroids
-        x = centroids[:, 0]
-        y = centroids[:, 1]
-        return scatter(x, y, self._da, *args, **kwargs)
+        return scatter(self._grid.centroids, self._da, *args, **kwargs)
 
     @functools.wraps(surface)
     def surface(self, *args, **kwargs):
@@ -652,9 +657,7 @@ class _NodePlot:
 
     @functools.wraps(scatter)
     def scatter(self, *args, **kwargs):
-        x = self._grid.node_x
-        y = self._grid.node_y
-        return scatter(x, y, self._da, *args, **kwargs)
+        return scatter(self._grid.node_coordinates, self._da, *args, **kwargs)
 
     @functools.wraps(contour)
     def contour(self, *args, **kwargs):
@@ -664,7 +667,7 @@ class _NodePlot:
     @functools.wraps(contourf)
     def contourf(self, *args, **kwargs):
         triangulation, _ = self._grid.triangulation
-        return contour(triangulation, self._da, *args, **kwargs)
+        return contourf(triangulation, self._da, *args, **kwargs)
 
     @functools.wraps(surface)
     def surface(self, *args, **kwargs):
