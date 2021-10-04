@@ -23,7 +23,7 @@ of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
     
     fig, (ax0, ax1) = plt.subplots(ncols=2)
     uda.plot(ax=ax0, cmap="terrain")
-    sections.plot(ax=as0)
+    sections.plot(ax=ax0)
     section_data.plot.line(ax=ax1)
 
    

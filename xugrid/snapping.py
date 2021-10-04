@@ -4,7 +4,6 @@ Snapes nodes at an arbitrary distance together.
 from typing import Tuple, Union
 
 import geopandas as gpd
-import imod
 import numba as nb
 import numpy as np
 import pandas as pd
@@ -15,9 +14,11 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
+from xugrid.ugrid import Ugrid2d
+
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import T_OFFSET, FloatArray, IntArray, LineArray, Point, Vector, X_EPSILON
+from .typing import T_OFFSET, X_EPSILON, FloatArray, IntArray, LineArray, Point, Vector
 
 
 def snap_nodes(
@@ -331,13 +332,11 @@ def snap_to_grid(
     if isinstance(grid, xr.DataArray):
         active = grid.values != 0
         # Convert structured to unstructured representation
-        topology = imod.util.ugrid2d_topology(grid)
-        faces = topology["face_nodes"].values[active.ravel()].astype(int)
+        topology = Ugrid2d.from_structured(grid)
+        vertices = topology.node_coordinates
+        faces = topology.face_node_connectivity
         nrow, ncol = active.shape
         face_to_cell = np.arange(nrow * ncol)[active.ravel()]
-        vertices = np.column_stack(
-            (topology["node_x"].values, topology["node_y"].values)
-        )
     else:
         raise NotImplementedError
 

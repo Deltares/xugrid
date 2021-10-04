@@ -6,23 +6,27 @@ structured. ``xugrid`` contains a few additional plotting functions to easily
 make spatial plots of unstructured grids.
 """
 import matplotlib.pyplot as plt
-import xarray as xr
 
-import xugrid as xu
+import xugrid
 
-ds = xr.open_dataset("Dommel-tops-bottoms.nc")
-uds = xu.UgridDataset(ds)
-uda = uds["top_layer_1"]
+ds = xugrid.data.disk()
+uda = ds["face_z"]
 
-xmin, xmax = 130_000.0, 140_000.0
-ymin, ymax = 380_000.0, 390_000.0
+uda.ugrid.plot()
+uda.ugrid.plot.face()
+uda.ugrid.plot.face.pcolormesh()
+uda.ugrid.plot.face.contour()
+uda.ugrid.plot.face.contourf()
+uda.ugrid.plot.face.imshow()
 
-selection = uda.ugrid.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
-tri = selection.ugrid.grid.matplotlib_triangulation()
-fig, ax = plt.subplots()
-ax.triplot(tri)
 
 fig, ax = plt.subplots()
+uda.ugrid.plot(ax=ax)
+
+uda.ugrid.plot.edge(color="black", linewidth=1.0)
+
+# ax.triplot(triangulation)
+# selection.ugrid.plot.edge(ax=ax)
 
 # uda.ugrid.plot()
 #

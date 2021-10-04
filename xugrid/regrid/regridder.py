@@ -1,6 +1,5 @@
 from typing import Union
 
-import imod
 import numpy as np
 import pandas as pd
 import pyproj

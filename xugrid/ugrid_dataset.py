@@ -8,9 +8,9 @@ import xarray as xr
 from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 from xarray.core.utils import UncachedAccessor
 
-from xugrid.ugrid import Ugrid1d, Ugrid2d
-
+from .connectivity import binary_dilation, binary_erosion
 from .plot import _PlotMethods
+from .ugrid import Ugrid1d, Ugrid2d
 
 
 def xarray_wrapper(func, grid):
@@ -41,7 +41,7 @@ class UgridDataArray:
     def __init__(self, obj: xr.DataArray, grid: Ugrid2d = None):
         self.obj = obj
         if grid is None:
-            grid = Ugrid2d(obj)
+            grid = Ugrid2d.from_dataset(obj)
         self.grid = grid
 
     def __getitem__(self, key):
@@ -84,9 +84,9 @@ class UgridDataset:
     """
 
     def __init__(self, obj: xr.Dataset, grid: Ugrid2d = None):
-
         if grid is None:
-            self.grid = Ugrid2d(obj)
+            # TODO: find out whether it's 1D or 2D topology
+            self.grid = Ugrid2d.from_dataset(obj)
         else:
             self.grid = grid
         self.ds = self.grid.remove_topology(obj)
@@ -296,6 +296,27 @@ class UgridAccessor:
         df = ds[variables].to_dataframe()
         geometry = self.grid.as_vector_geometry(data_on)
         return gpd.GeoDataFrame(df, geometry=geometry)
+
+    def _binary_op(self, iterations: int, func):
+        obj = self.object
+        if isinstance(obj, xr.DataArray):
+            output = func(
+                self.grid.face_face_connectivity,
+                self.object.values,
+                iterations,
+            )
+            da = obj.copy(data=output)
+            return UgridDataArray(da, self.grid.copy())
+        elif isinstance(obj, xr.Dataset):
+            raise NotImplementedError
+        else:
+            raise ValueError("object should be a xr.DataArray")
+
+    def binary_dilation(self, iterations: int = 1):
+        return self._binary_op(iterations, func=binary_dilation)
+
+    def binary_erosion(self, iterations: int = 1):
+        return self._binary_op(iterations, func=binary_erosion)
 
 
 # Wrapped IO methods

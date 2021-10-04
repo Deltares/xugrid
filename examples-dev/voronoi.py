@@ -19,10 +19,10 @@ For simplicity this example will only deal with (bare) ``numpy`` and
 modules, should you not want to rely on more complex dependencies such as
 ``xugrid`` and ``xarray``.
 """
-import meshzoo
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
+import meshzoo
+import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 
 ###############################################################################
@@ -117,7 +117,7 @@ voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 # * Left the original mesh, with centroids colored red
 # * The new mesh, overlaid on the original mesh.
 # * Right the new mesh, with its centroids -- the original vertices -- colored
-# black.
+#   black.
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 

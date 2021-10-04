@@ -27,15 +27,17 @@ def transform(vertices, minx, maxx, miny):
 def disk():
     def function_z(x, y):
         """
-        from https://matplotlib.org/stable/gallery/images_contours_and_fields/tricontour_smooth_user.html 
+        from https://matplotlib.org/stable/gallery/images_contours_and_fields/tricontour_smooth_user.html
         """
-        r1 = np.sqrt((0.5 - x)**2 + (0.5 - y)**2)
+        r1 = np.sqrt((0.5 - x) ** 2 + (0.5 - y) ** 2)
         theta1 = np.arctan2(0.5 - x, 0.5 - y)
-        r2 = np.sqrt((-x - 0.2)**2 + (-y - 0.2)**2)
+        r2 = np.sqrt((-x - 0.2) ** 2 + (-y - 0.2) ** 2)
         theta2 = np.arctan2(-x - 0.2, -y - 0.2)
-        z = -(2 * (np.exp((r1 / 10)**2) - 1) * 30. * np.cos(7. * theta1) +
-              (np.exp((r2 / 10)**2) - 1) * 30. * np.cos(11. * theta2) +
-              0.7 * (x**2 + y**2))
+        z = -(
+            2 * (np.exp((r1 / 10) ** 2) - 1) * 30.0 * np.cos(7.0 * theta1)
+            + (np.exp((r2 / 10) ** 2) - 1) * 30.0 * np.cos(11.0 * theta2)
+            + 0.7 * (x ** 2 + y ** 2)
+        )
         zmin = z.min()
         zmax = z.max()
         return (zmax - z) / (zmax - zmin) * 10.0
@@ -47,7 +49,7 @@ def disk():
         fill_value=-1,
         face_node_connectivity=triangles,
     )
-    
+
     ds = xr.Dataset()
     ds["node_z"] = xr.DataArray(
         data=function_z(*grid.node_coordinates.T),

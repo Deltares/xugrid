@@ -558,16 +558,16 @@ def plot(
     """
     dim = darray.dims[0]
     attrs = grid.mesh_topology.attrs
+    kwargs["ax"] = ax
     if dim == attrs.get("face_dimension", "face"):
-        plotfunc = pcolormesh
+        return pcolormesh(grid, darray, **kwargs)
     elif dim == attrs.get("node_dimension", "node"):
-        plotfunc = tripcolor
+        triangulation, _ = grid.triangulation
+        return tripcolor(triangulation, darray, **kwargs)
     elif dim == attrs.get("edge_dimension", "edge"):
-        plotfunc = line
+        return line(grid, darray, **kwargs)
     else:
         raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
-    kwargs["ax"] = ax
-    return plotfunc(grid, darray, **kwargs)
 
 
 class _EdgePlot:

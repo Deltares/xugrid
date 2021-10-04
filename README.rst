@@ -22,12 +22,12 @@ of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
 
     uda = xugrid.data.elevation_nl()
     sections = xugrid.data.cross_sections_nl()
-    
+
     section_data = uda.along_line(sections)
-    
+
     fig, (ax0, ax1) = plt.subplots(ncols=2)
     uda.plot(ax=ax0, cmap="terrain")
-    sections.plot(ax=as0)
+    sections.plot(ax=ax0)
     section_data.plot.line(ax=ax1)
 
 

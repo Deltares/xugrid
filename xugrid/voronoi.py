@@ -19,8 +19,8 @@ from typing import Tuple
 import numpy as np
 from scipy import sparse
 
-from .typing import IntArray, FloatArray
 from .connectivity import renumber
+from .typing import FloatArray, IntArray
 
 
 def dot_product2d(U: FloatArray, V: FloatArray):

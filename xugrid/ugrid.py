@@ -52,13 +52,13 @@ class AbstractUgrid(abc.ABC):
     @property
     def edge_x(self):
         if self._edge_x is None:
-            self._edge_x = self.node_x[self.edge_node_connectivity].mean(axis=0)
+            self._edge_x = self.node_x[self.edge_node_connectivity].mean(axis=1)
         return self._edge_x
 
     @property
     def edge_y(self):
         if self._edge_y is None:
-            self._edge_y = self.node_y[self.edge_node_connectivity].mean(axis=0)
+            self._edge_y = self.node_y[self.edge_node_connectivity].mean(axis=1)
         return self._edge_y
 
     @property
@@ -396,6 +396,7 @@ class Ugrid2d(AbstractUgrid):
         face_dimension: str = "face",
         edge_dimension: str = "edge",
         dataset: xr.Dataset = None,
+        mesh_topology: str = None,
         crs: Any = None,
     ):
         self.node_x = node_x
@@ -405,7 +406,6 @@ class Ugrid2d(AbstractUgrid):
         self.node_dimension = node_dimension
         self.face_dimension = face_dimension
         self.edge_dimension = edge_dimension
-        self.dataset = dataset
 
         # Optional attributes, deferred initialization
         # Meshkernel
@@ -440,6 +440,17 @@ class Ugrid2d(AbstractUgrid):
             self.crs = None
         else:
             self.crs = pyproj.CRS.from_user_input(crs)
+        # Gather things in a dataset
+        if (dataset is None) ^ (mesh_topology is None):
+            raise ValueError(
+                "Either both dataset and mesh topology must be provided or neither."
+            )
+        elif dataset is None:
+            self.dataset = self.topology_dataset()
+            self.mesh_topology = self.dataset["mesh2d"]
+        else:
+            self.dataset = dataset
+            self.mesh_topology = mesh_topology
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
@@ -543,6 +554,7 @@ class Ugrid2d(AbstractUgrid):
             node_dimension,
             face_dimension,
             edge_dimension,
+            ds,
             mesh_topology,
         )
 
@@ -551,6 +563,7 @@ class Ugrid2d(AbstractUgrid):
         removes the grid topology data from a dataset. Use after creating an
         Ugrid object from the dataset
         """
+        return obj
         obj = obj.drop_vars(
             self.mesh_topology.attrs["face_node_connectivity"], errors="ignore"
         )
@@ -669,7 +682,7 @@ class Ugrid2d(AbstractUgrid):
         if self._voronoi_topology is None:
             vertices, faces, face_index = voronoi_topology(
                 self.node_face_connectivity,
-                self.nodes,
+                self.node_coordinates,
                 self.centroids,
             )
             self._voronoi_topology = vertices, faces, face_index
@@ -710,22 +723,23 @@ class Ugrid2d(AbstractUgrid):
         exterior_faces = self.edge_face_connectivity[exterior_edges].ravel()
         return np.unique(exterior_faces[exterior_faces != self.fill_value])
 
-    def build_celltree(self):
+    @property
+    def celltree(self):
         """
         initializes the celltree, a search structure for spatial lookups in 2d grids
         """
-        nodes = np.column_stack([self.node_x, self.node_y])
-        self._celltree = CellTree2d(nodes, self.face_node_connectivity, self.fill_value)
+        if self._celltree is None:
+            self._celltree = CellTree2d(
+                self.node_coordinates, self.face_node_connectivity, self.fill_value
+            )
+        return self._celltree
 
     def locate_faces(self, points):
         """
         returns the face indices in which the points lie. The points should be
         provided as an (N,2) array. The result is an (N) array
         """
-        if self._celltree is None:
-            self.build_celltree()
-        indices = self._celltree.locate(points)
-        return indices
+        return self.celltree.locate(points)
 
     def locate_faces_bounding_box(self, xmin, xmax, ymin, ymax):
         """
@@ -763,14 +777,8 @@ class Ugrid2d(AbstractUgrid):
         y = np.arange(ymax - 0.5 * d, ymin, -d)
         yy, xx = np.meshgrid(y, x, indexing="ij")
         nodes = np.column_stack([xx.ravel(), yy.ravel()])
-        index = self._celltree.locate_points(nodes).reshape((y.size, x.size))
+        index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
-
-    @staticmethod
-    def topology_dataset(
-        node_x: FloatArray, node_y: FloatArray, face_node_connectivity: IntArray
-    ) -> xr.Dataset:
-        return ugrid_io.ugrid2d_dataset(node_x, node_y, face_node_connectivity)
 
     def as_vector_geometry(self, data_on: str):
         if data_on == "node":
@@ -874,3 +882,63 @@ class Ugrid2d(AbstractUgrid):
             geodataframe.geometry.values
         )
         return Ugrid2d(Ugrid2d.topology_dataset(coords, face_node_connectivity))
+
+    @staticmethod
+    def from_structured(data: Union[xr.DataArray, xr.Dataset]) -> "Ugrid2d":
+        """
+        Derive the 2D-UGRID quadrilateral mesh topology from a structured DataArray
+        or Dataset, with (2D-dimensions) "y" and "x".
+
+        Parameters
+        ----------
+        data: Union[xr.DataArray, xr.Dataset]
+            Structured data from which the "x" and "y" coordinate will be used to
+            define the UGRID-2D topology.
+
+        Returns
+        -------
+        ugrid_topology: Ugrid2d
+        """
+
+        def _coord(da, dim):
+            """
+            Transform N xarray midpoints into N + 1 vertex edges
+            """
+            dxs = np.diff(da[dim].values)
+            dx = dxs[0]
+            atolx = abs(1.0e-4 * dx)
+            if not np.allclose(dxs, dx, atolx):
+                raise ValueError(
+                    f"DataArray has to be equidistant along {dim}, or cellsizes"
+                    " must be provided as a coordinate."
+                )
+            dxs = np.full(da[dim].size, dx)
+            dxs = np.abs(dxs)
+            x = da[dim].values
+            if not da.indexes[dim].is_monotonic_increasing:
+                x = x[::-1]
+                dxs = dxs[::-1]
+            # This assumes the coordinate to be monotonic increasing
+            x0 = x[0] - 0.5 * dxs[0]
+            x = np.full(dxs.size + 1, x0)
+            x[1:] += np.cumsum(dxs)
+            return x
+
+        # Transform midpoints into vertices
+        # These are always returned monotonically increasing
+        xcoord = _coord(data, "x")
+        ycoord = _coord(data, "y")
+        # Compute all vertices, these are the ugrid nodes
+        node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
+        linear_index = np.arange(node_x.size, dtype=np.int).reshape(
+            ycoord.size, xcoord.size
+        )
+        # Allocate face_node_connectivity
+        nfaces = (ycoord.size - 1) * (xcoord.size - 1)
+        face_nodes = np.empty((nfaces, 4))
+        # Set connectivity in counterclockwise manner
+        face_nodes[:, 0] = linear_index[:-1, 1:].ravel()  # upper right
+        face_nodes[:, 1] = linear_index[:-1, :-1].ravel()  # upper left
+        face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
+        face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
+        return Ugrid2d(node_x, node_y, -1, face_nodes)
