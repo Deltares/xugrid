@@ -21,24 +21,26 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.9
-      
-    - name: install mamba
-      uses: mamba-org/provision-with-micromamba@main
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+        
+      - name: install mamba
+        uses: mamba-org/provision-with-micromamba@main
 
-    - name: Test and build with tox
-      run: |
-        pip install tox
-        tox -e build
-    - uses: codecov/codecov-action@v1
-      if: ${{ matrix.python-version == '3.9' }}
+      - name: Test and build with tox
+        run: |
+          pip install tox
+          tox -e build
+      - uses: codecov/codecov-action@v1
+        if: ${{ matrix.python-version == '3.9' }}
 
-    - name: Deploy to github pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./tox/docs_out/
+      - name: Deploy to github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./tox/docs_out/
