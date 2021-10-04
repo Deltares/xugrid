@@ -46,8 +46,16 @@ extensions = [
 ]
 
 sphinx_gallery_conf = {
-    "examples_dirs": ["../examples", "../examples-dev", "../data/examples"],  # path to your example scripts
-    "gallery_dirs": ["examples", "examples-dev", "sample_data"],  # path to where to save gallery generated output
+    "examples_dirs": [
+        "../examples",
+        "../examples-dev",
+        "../data/examples",
+    ],  # path to your example scripts
+    "gallery_dirs": [
+        "examples",
+        "examples-dev",
+        "sample_data",
+    ],  # path to where to save gallery generated output
     "filename_pattern": ".py",
     "abort_on_example_error": True,
     "download_all_examples": False,
@@ -156,9 +164,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "xugrid", "Xugrid Documentation", [author], 1)
-]
+man_pages = [(master_doc, "xugrid", "Xugrid Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
