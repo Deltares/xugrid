@@ -2,8 +2,10 @@
 Functions to load sample data.
 """
 import numpy as np
+import pandas as pd
 import pkg_resources
 import pooch
+import xarray as xr
 
 import xugrid
 
@@ -33,3 +35,13 @@ def xoxo():
         face_node_connectivity=triangles,
     )
     return grid
+
+
+def adh_san_diego():
+    """
+    Fetch time varying output of a hydraulic simulation.
+    """
+    fname = REGISTRY.fetch("ADH_SanDiego.nc")
+    ds = xr.open_dataset(fname)
+    grid = xugrid.Ugrid2d.from_dataset(ds)
+    return xugrid.UgridDataset(ds, grid)
