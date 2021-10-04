@@ -11,8 +11,8 @@ Like Xarray's focus for plotting is the DataArray, Xugrid's focus is the
 UgridDataArray; like Xarray, if your (extracted) data fits into a pandas
 DataFrame, you're better of using pandas tools instead.
 
-Like every other method in Xugrid, any logic involving the unstructured
-topology is accessed via the `.ugrid` accessor on the DataArrays and Datasets;
+As every other method in Xugrid, any logic involving the unstructured topology
+is accessed via the ``.ugrid`` accessor on the DataArrays and Datasets;
 UgridDatasets and UgridDataArrays behave the same as ordinary Xarray DataArrays
 and Datasets otherwise.
 
@@ -73,7 +73,7 @@ ds["edge_z"].ugrid.plot()
 #
 # We can put them side by side to illustrate the differences:
 
-fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(15, 4), sharex=True, sharey=True)
+fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(11, 3), sharex=True, sharey=True)
 ds["face_z"].ugrid.plot(ax=ax0)
 ds["edge_z"].ugrid.plot(ax=ax1)
 ds["node_z"].ugrid.plot(ax=ax2)
@@ -93,6 +93,7 @@ ds["face_z"].ugrid.plot.edge.line(color="black")
 
 ###############################################################################
 # In general, there has to be data associated with the mesh topology before a
+# =============== ===========================
 # plot can be made. ``plot.edge.line()`` forms an exception to this rule, as
 # the location of the edges is meaningful on its own: for this reason
 # ``plot.edge.line`` does not error in the example above.
@@ -100,46 +101,47 @@ ds["face_z"].ugrid.plot.edge.line(color="black")
 # Other types of plot
 # -------------------
 #
-# The available plotting methods per topology dimension are listed here:
+# The available plotting methods per topology dimension are listed here.
 #
-# =============== ===========================
-# Dimension       Plotting function
-# =============== ===========================
-# Face            :py:func:`xugrid.plot.pcolormesh,`
-#                 :py:func:`xugrid.plot.pcolormesh`
-#                 :py:func:`xugrid.plot.contour`
-#                 :py:func:`xugrid.plot.contourf`
-#                 :py:func:`xugrid.plot.imshow`
-#                 :py:func:`xugrid.plot.scatter`
-#                 :py:func:`xugrid.plot.surface`
-# =============== ===========================
-# Edge            :py:func:`xugrid.plot.line`
-#                 :py:func:`xugrid.plot.scatter`
-# =============== ===========================
-# Node            :py:func:`xugrid.plot.tripcolor`
-#                 :py:func:`xugrid.plot.contour`
-#                 :py:func:`xugrid.plot.contourf`
-#                 :py:func:`xugrid.plot.scatter`
-#                 :py:func:`xugrid.plot.surface`
-# =============== ===========================
+# For the **face** dimension:
+#
+# * :py:func:`xugrid.plot.pcolormesh`
+# * :py:func:`xugrid.plot.contour`
+# * :py:func:`xugrid.plot.contourf`
+# * :py:func:`xugrid.plot.imshow`
+# * :py:func:`xugrid.plot.scatter`
+# * :py:func:`xugrid.plot.surface`
+#
+# For the **edge** dimension:
+#
+# * :py:func:`xugrid.plot.line`
+# * :py:func:`xugrid.plot.scatter`
+#
+# For the **node** dimension:
+#
+# * :py:func:`xugrid.plot.tripcolor`
+# * :py:func:`xugrid.plot.contour`
+# * :py:func:`xugrid.plot.contourf`
+# * :py:func:`xugrid.plot.scatter`
+# * :py:func:`xugrid.plot.surface`
 #
 # All these (2D) plots are illustrated here for completeness' sake:
 
-fig, axes = plt.subplots(nrows=3, ncols=5, figsize=(30, 15))
+fig, axes = plt.subplots(nrows=5, ncols=3, figsize=(10, 15))
 
 ds["face_z"].ugrid.plot.face.pcolormesh(ax=axes[0, 0])
-ds["face_z"].ugrid.plot.face.contour(ax=axes[0, 1])
-ds["face_z"].ugrid.plot.face.contourf(ax=axes[0, 2])
-ds["face_z"].ugrid.plot.face.imshow(ax=axes[0, 3])
-ds["face_z"].ugrid.plot.face.scatter(ax=axes[0, 4])
+ds["face_z"].ugrid.plot.face.contour(ax=axes[1, 0])
+ds["face_z"].ugrid.plot.face.contourf(ax=axes[2, 0])
+ds["face_z"].ugrid.plot.face.imshow(ax=axes[3, 0])
+ds["face_z"].ugrid.plot.face.scatter(ax=axes[4, 0])
 
-ds["edge_z"].ugrid.plot.edge.line(ax=axes[1, 0])
-ds["edge_z"].ugrid.plot.edge.scatter(ax=axes[1, 4])
+ds["edge_z"].ugrid.plot.edge.line(ax=axes[0, 1])
+ds["edge_z"].ugrid.plot.edge.scatter(ax=axes[4, 1])
 
-ds["node_z"].ugrid.plot.node.tripcolor(ax=axes[2, 0])
-ds["node_z"].ugrid.plot.node.contour(ax=axes[2, 1])
+ds["node_z"].ugrid.plot.node.tripcolor(ax=axes[0, 2])
+ds["node_z"].ugrid.plot.node.contour(ax=axes[1, 2])
 ds["node_z"].ugrid.plot.node.contourf(ax=axes[2, 2])
-ds["node_z"].ugrid.plot.node.scatter(ax=axes[2, 4])
+ds["node_z"].ugrid.plot.node.scatter(ax=axes[4, 2])
 
 ###############################################################################
 # The ``surface`` methods generate 3D surface plots:
