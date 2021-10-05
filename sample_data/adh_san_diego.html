@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Xoxo &#8212; Xugrid 0.1 documentation</title>
+    <title>ADH San Diego &#8212; Xugrid 0.1 documentation</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -39,8 +39,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ADH San Diego" href="adh_san_diego.html" />
-    <link rel="prev" title="Sample Data" href="index.html" />
+    <link rel="next" title="Disk" href="disk.html" />
+    <link rel="prev" title="Xoxo" href="xoxo.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
     
@@ -111,13 +111,13 @@
    </i>
   </label>
   <ul class="current">
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="xoxo.html">
      Xoxo
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="adh_san_diego.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      ADH San Diego
     </a>
    </li>
@@ -176,34 +176,49 @@
                 
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-sample-data-xoxo-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-sample-data-adh-san-diego-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="xoxo">
-<span id="sphx-glr-sample-data-xoxo-py"></span><h1>Xoxo<a class="headerlink" href="#xoxo" title="Permalink to this headline">¶</a></h1>
-<p>This is a small unstructured grid consisting of two unconnected parts. This is
-downloaded via <cite>xugrid.data.xoxo()</cite>. The topology data is downloaded to a local
-directory if it’s not there already.</p>
-<img src="../_images/sphx_glr_xoxo_001.png" srcset="../_images/sphx_glr_xoxo_001.png" alt="xoxo" class = "sphx-glr-single-img"/><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<section class="sphx-glr-example-title" id="adh-san-diego">
+<span id="sphx-glr-sample-data-adh-san-diego-py"></span><h1>ADH San Diego<a class="headerlink" href="#adh-san-diego" title="Permalink to this headline">¶</a></h1>
+<p>This is small dataset containing the output of a hydraulic simulation.</p>
+<p>It contains a static dataset (bed elevation) and a time varying dataset
+(water depth).</p>
+<img src="../_images/sphx_glr_adh_san_diego_001.png" srcset="../_images/sphx_glr_adh_san_diego_001.png" alt="time = 0 days 00:00:00" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/xugrid/xugrid/.tox/build/lib/python3.9/site-packages/xugrid/ugrid_io.py:32: UserWarning: Topology variable with role edge_node_connectivity specified under name edge_node_connectivity specified, but variable edge_node_connectivity not found in dataset.
+  warnings.warn(
+
+&lt;matplotlib.collections.PolyCollection object at 0x7f36e520b700&gt;
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">xugrid</span>
 
-<span class="n">grid</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">xoxo</span><span class="p">()</span>
+<span class="n">uds</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">adh_san_diego</span><span class="p">()</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#bd0d1f&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">85.0</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">uds</span><span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax0</span><span class="p">,</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu&quot;</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">uds</span><span class="p">[</span><span class="s2">&quot;depth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">20.0</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.104 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-sample-data-xoxo-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.511 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-sample-data-adh-san-diego-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/f79d3ac2c49cdc21b1e8b3fd8ffc2da6/xoxo.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">xoxo.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/f9e9e463f3e22b0197ebf7dcd362ca28/adh_san_diego.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">adh_san_diego.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/e58b48ea6142c07792ef4f969043fbbe/xoxo.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">xoxo.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/3e46f58294b1a2d61e2cf90e3a750fee/adh_san_diego.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">adh_san_diego.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -215,17 +230,17 @@ directory if it’s not there already.</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="xoxo.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Sample Data</p>
+            <p class="prev-next-title">Xoxo</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="adh_san_diego.html" title="next page">
+    <a class='right-next' id="next-link" href="disk.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">ADH San Diego</p>
+        <p class="prev-next-title">Disk</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

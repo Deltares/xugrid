@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Development" href="dev_docs.html" />
-    <link rel="prev" title="Plot unstructured mesh data" href="examples/plotting.html" />
+    <link rel="prev" title="Connectivity" href="examples/connectivity.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
     
@@ -404,6 +404,11 @@ Ugrid object from the dataset</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="xugrid.Ugrid2d.tesselate_centroidal_voronoi">
+<span class="sig-name descname"><span class="pre">tesselate_centroidal_voronoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add_exterior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid.html#Ugrid2d.tesselate_centroidal_voronoi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.tesselate_centroidal_voronoi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xugrid.Ugrid2d.topology_dataset">
 <span class="sig-name descname"><span class="pre">topology_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid.html#Ugrid2d.topology_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.topology_dataset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -419,6 +424,11 @@ Ugrid object from the dataset</p>
 <dd><p>Create a valid ugrid dataset describing the topology of a subset of
 this unstructured mesh topology.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xugrid.Ugrid2d.triangulate">
+<span class="sig-name descname"><span class="pre">triangulate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid.html#Ugrid2d.triangulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.triangulate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="xugrid.Ugrid2d.triangulation">
@@ -440,12 +450,17 @@ this unstructured mesh topology.</p>
 dataarray in the context of an unstructured 2d grid.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.UgridAccessor.binary_dilation">
-<span class="sig-name descname"><span class="pre">binary_dilation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid_dataset.html#UgridAccessor.binary_dilation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridAccessor.binary_dilation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">binary_dilation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid_dataset.html#UgridAccessor.binary_dilation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridAccessor.binary_dilation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.UgridAccessor.binary_erosion">
-<span class="sig-name descname"><span class="pre">binary_erosion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid_dataset.html#UgridAccessor.binary_erosion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridAccessor.binary_erosion" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">binary_erosion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid_dataset.html#UgridAccessor.binary_erosion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridAccessor.binary_erosion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xugrid.UgridAccessor.connected_components">
+<span class="sig-name descname"><span class="pre">connected_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xugrid/ugrid_dataset.html#UgridAccessor.connected_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridAccessor.connected_components" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -984,11 +999,11 @@ raise an error.</p></li>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="examples/plotting.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="examples/connectivity.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Plot unstructured mesh data</p>
+            <p class="prev-next-title">Connectivity</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="dev_docs.html" title="next page">

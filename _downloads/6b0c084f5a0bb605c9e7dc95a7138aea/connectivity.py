@@ -1,0 +1,147 @@
+"""
+Connectivity
+============
+
+A fundamental difference between structured and unstructured grids lies in the
+connectivity. This is true for cell to cell connectivity, but also for vertex
+(node) connectivity (which set of vertices make up an individual cell). In
+structured grids, connectivity is implicit and can be directly derived from row
+and column numbers; unstructured grids require explicit connectivity lists.
+
+Xugrid provides a number of methods to derive and extract different kinds of
+connectivities, as well as a number of operations which require connectivity
+information. These methods and there interrelations are briefly introduced here.
+
+For 2D meshes, the fundamental topological information consists of:
+
+* A list of nodes (vertices): (x, y) coordinate pairs forming points.
+* A list of faces (polygons): for every face, a list of index values indicating
+  which vertices form its exterior.
+  
+Imports
+-------
+
+The following imports suffice for the examples.
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
+
+import xugrid
+
+###############################################################################
+# Connectivity arrays
+# -------------------
+#
+# From the fundamental face node connectivity, all other connectivities can be
+# derived. These are accessible via the ``grid`` attribute of a XugridDataArray
+# or XugridDataset. The are the available (derived) connectivity arrays are
+# listed below. Depending on the (ir)regularity of the connectivity, the arrays
+# are returned as either (dense) numpy arrays of integers, or as
+# ``scipy.sparse.csr_matrix``.
+#
+# * ``face_node_connectivity``: dense ``(n_face, n_max_per_face)``
+# * ``edge_node_connectivity``: dense ``(n_edge, 2)``
+# * ``edge_face_connectivity``: dense ``(n_edge, 2)``
+# * ``face_face_connectivity``: sparse
+# * ``face_edge_connectivity``: sparse
+# * ``node_edge_connectivity``: sparse
+# * ``node_face_connectivity``: sparse
+#
+# Binary erosion and dilation
+# ---------------------------
+#
+# Binary erosion and dilation are useful operations to e.g. locate boundary
+# cells, or to "shrink" some collection of cells.
+#
+# By default, the border value for binary erosion is set to ``False``. This
+# means the erosion erodes inwards from the boundaries.
+
+ds = xugrid.data.disk()
+uda = xugrid.UgridDataArray(
+    xr.full_like(ds["face_z"].ugrid.obj, True, dtype=bool),
+    ds.grid,
+)
+iter2 = uda.ugrid.binary_erosion(iterations=2)
+iter5 = uda.ugrid.binary_erosion(iterations=5)
+
+fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+iter2.ugrid.plot(ax=ax0)
+iter5.ugrid.plot(ax=ax1)
+
+###############################################################################
+# By default, the border value for binary dilation is **also** set to
+# ``False``. This means boundary does not dilate inwards by default.
+
+uda = xugrid.UgridDataArray(
+    xr.full_like(ds["face_z"].ugrid.obj, False, dtype=bool),
+    ds.grid,
+)
+uda.values[0] = True
+
+iter1 = uda.ugrid.binary_dilation(iterations=1)
+iter1_boundary = uda.ugrid.binary_dilation(iterations=1, border_value=True)
+
+fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+iter1.ugrid.plot(ax=ax0)
+iter1_boundary.ugrid.plot(ax=ax1)
+
+###############################################################################
+# Connected Components
+# --------------------
+#
+# Xugrid also wraps `:py:func:scipy.sparse.csgraph.connected_components:` to
+# analyse connected parts of the mesh.
+
+grid = xugrid.data.xoxo()
+uda = xugrid.UgridDataArray(
+    xr.DataArray(np.ones(grid.node_face_connectivity.shape[0]), dims=["face"]), grid
+)
+labeled = uda.ugrid.connected_components()
+labeled.ugrid.plot(cmap="RdBu")
+
+###############################################################################
+# Centroidal Voronoi Tesselation
+# ------------------------------
+#
+# We can also use connectivity information to derive a centroidal Voronoi
+# Tesselation.
+
+voronoi_grid = grid.tesselate_centroidal_voronoi()
+xugrid.plot.line(voronoi_grid, color="black")
+
+###############################################################################
+# There are two alternative flavors to consider. We can fully ignore the
+# exterior and consider only the (interior) centroids. Alternatively, we can
+# include intersections of the voronoi edges with the mesh exterior, but
+# ignore the original nodes.
+#
+# Both methods have the benefit of guaranteeing convex Voronoi polygons as
+# their output -- provided the input mesh is convex as well! However, neither
+# preserves the exterior exactly: the resulting mesh has smaller bounds than
+# the original.
+
+centroid_only = grid.tesselate_centroidal_voronoi(add_exterior=False)
+convex_exterior = grid.tesselate_centroidal_voronoi(
+    add_exterior=True, add_vertices=False
+)
+
+fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+xugrid.plot.line(centroid_only, ax=ax0, color="black")
+xugrid.plot.line(convex_exterior, ax=ax1, color="black")
+
+###############################################################################
+# Triangulation
+# -------------
+#
+# Triangulation is a commonly required operation: every polygon can be split
+# into triangles and triangles are the simplest geometric primitive. This makes
+# them very attractive for e.g. visualization.
+#
+# We can break down one of the Voronoi tesselations from above into triangles:
+
+triangulation = convex_exterior.triangulate()
+fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+xugrid.plot.line(convex_exterior, ax=ax0, color="black")
+xugrid.plot.line(triangulation, ax=ax1, color="black")

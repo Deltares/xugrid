@@ -2,7 +2,7 @@
 Disk
 ====
 
-This is a small synthetic unstructured XugridDataset with toplogy in the shape
+This is a small synthetic unstructured XugridDataset with topology in the shape
 of a disk. It contains data on the nodes, faces, and edges.
 """
 import matplotlib.pyplot as plt

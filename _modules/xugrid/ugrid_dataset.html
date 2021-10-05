@@ -125,9 +125,12 @@
 
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">xarray.backends.api</span> <span class="kn">import</span> <span class="n">DATAARRAY_NAME</span><span class="p">,</span> <span class="n">DATAARRAY_VARIABLE</span>
 <span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">UncachedAccessor</span>
+
+<span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
 
 <span class="kn">from</span> <span class="nn">.connectivity</span> <span class="kn">import</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">binary_erosion</span>
 <span class="kn">from</span> <span class="nn">.plot</span> <span class="kn">import</span> <span class="n">_PlotMethods</span>
@@ -418,13 +421,24 @@
         <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">as_vector_geometry</span><span class="p">(</span><span class="n">data_on</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_binary_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span>
+    <span class="k">def</span> <span class="nf">_binary_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">border_value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">border_value</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">exterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">exterior_faces</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exterior</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">_binary_iterate</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">value</span><span class="p">,</span>
                 <span class="n">iterations</span><span class="p">,</span>
+                <span class="n">mask</span><span class="p">,</span>
+                <span class="n">exterior</span><span class="p">,</span>
+                <span class="n">border_value</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">da</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
@@ -433,11 +447,30 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;object should be a xr.DataArray&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="UgridAccessor.binary_dilation"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_dilation">[docs]</a>    <span class="k">def</span> <span class="nf">binary_dilation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">binary_dilation</span><span class="p">)</span></div>
+<div class="viewcode-block" id="UgridAccessor.binary_dilation"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_dilation">[docs]</a>    <span class="k">def</span> <span class="nf">binary_dilation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">border_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UgridAccessor.binary_erosion"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_erosion">[docs]</a>    <span class="k">def</span> <span class="nf">binary_erosion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">binary_erosion</span><span class="p">)</span></div></div>
+<div class="viewcode-block" id="UgridAccessor.binary_erosion"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_erosion">[docs]</a>    <span class="k">def</span> <span class="nf">binary_erosion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">border_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.connected_components"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.connected_components">[docs]</a>    <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csgraph</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 
 
 <span class="c1"># Wrapped IO methods</span>

@@ -938,6 +938,33 @@
             <span class="n">node_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">node_indices</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Ugrid2d.triangulate"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.triangulate">[docs]</a>    <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">triangles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">add_exterior</span><span class="p">:</span>
+            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
+            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi_topology</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_face_connectivity</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
+            <span class="n">edge_face_connectivity</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">add_exterior</span><span class="p">,</span>
+            <span class="n">add_vertices</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Ugrid2d.refine_polygon"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.refine_polygon">[docs]</a>    <span class="k">def</span> <span class="nf">refine_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">polygon</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span>
