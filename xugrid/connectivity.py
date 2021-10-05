@@ -189,7 +189,9 @@ def face_face_connectivity(
     is_connection = j != fill_value
     i = i[is_connection]
     j = j[is_connection]
-    coo_content = (j, (i, j))
+    ij = np.concatenate([i, j])
+    ji = np.concatenate([j, i])
+    coo_content = (ji, (ij, ji))
     coo_matrix = sparse.coo_matrix(coo_content)
     return coo_matrix.tocsr()
 
@@ -334,11 +336,25 @@ def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
         raise TypeError("connectivity must be ndarray or sparse matrix")
 
 
+def _mutate(output: BoolArray, i: IntArray, j: IntArray, value: bool, mask: BoolArray):
+    a = output[i]
+    b = output[j]
+    mutate = a != b
+    output[i[mutate]] = value
+    output[j[mutate]] = value
+    if mask is not None:
+        output[mask] = not value
+    return None
+
+
 def _binary_iterate(
     connectivity: sparse.csr_matrix,
     input: BoolArray,
     value: bool,
     iterations: int,
+    mask: BoolArray,
+    exterior: IntArray,
+    border_value: bool,
 ) -> BoolArray:
     if input.dtype != np.bool_:
         raise TypeError("input dtype should be bool")
@@ -348,12 +364,14 @@ def _binary_iterate(
     j = coo.col
     output = input.copy()
 
-    for _ in range(iterations):
-        a = output[i]
-        b = output[j]
-        mutate = a != b
-        output[i[mutate]] = value
-        output[j[mutate]] = value
+    # First iteration, mutate borders.
+    _mutate(output, i, j, value, mask)
+    if exterior is not None and value == border_value:
+        output[exterior] = value
+
+    # Subsequent iterations, disregard border.
+    for _ in range(iterations - 1):
+        _mutate(output, i, j, value, mask)
 
     return output
 
@@ -362,13 +380,23 @@ def binary_erosion(
     connectivity: sparse.csr_matrix,
     input: BoolArray,
     iterations: int = 1,
+    mask: BoolArray = None,
+    exterior: IntArray = None,
+    border_value: bool = False,
 ) -> BoolArray:
-    return _binary_iterate(connectivity, input, False, iterations)
+    return _binary_iterate(
+        connectivity, input, False, iterations, mask, border_value, exterior
+    )
 
 
 def binary_dilation(
     connectivity: sparse.csr_matrix,
     input: BoolArray,
     iterations: int = 1,
+    mask: BoolArray = None,
+    exterior: IntArray = None,
+    border_value: bool = False,
 ) -> BoolArray:
-    return _binary_iterate(connectivity, input, True, iterations)
+    return _binary_iterate(
+        connectivity, input, True, iterations, mask, border_value, exterior
+    )
