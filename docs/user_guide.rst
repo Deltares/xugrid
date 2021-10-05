@@ -7,3 +7,4 @@ User Guide
 
    sample_data/index.rst
    examples/plotting.rst
+   examples/connectivity.rst
