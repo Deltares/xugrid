@@ -817,6 +817,33 @@ class Ugrid2d(AbstractUgrid):
             node_y = self.node_y[node_indices]
             return Ugrid2d(node_x, node_y, self.fill_value, face_node_connectivity)
 
+    def triangulate(self):
+        triangles, _ = connectivity.triangulate(
+            self.face_node_connectivity, self.fill_value
+        )
+        return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
+
+    def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
+        if add_exterior:
+            edge_face_connectivity = self.edge_face_connectivity
+            edge_node_connectivity = self.edge_node_connectivity
+        else:
+            edge_face_connectivity = None
+            edge_node_connectivity = None
+
+        vertices, faces, _ = voronoi_topology(
+            self.node_face_connectivity,
+            self.node_coordinates,
+            self.centroids,
+            edge_face_connectivity,
+            edge_node_connectivity,
+            self.fill_value,
+            add_exterior,
+            add_vertices,
+        )
+        faces = connectivity.to_dense(faces, self.fill_value)
+        return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
+
     def refine_polygon(
         self,
         polygon: sg.Polygon,
