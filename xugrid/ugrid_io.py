@@ -17,7 +17,7 @@ def get_topology_array_with_role(
 ):
     """
     returns the names of the arrays that have the specified role on the
-    Mesh toplogy variable
+    Mesh topology variable
     """
     topology_array_names = []
     for variable_name in mesh_variable.attrs:

@@ -3,7 +3,7 @@ Xoxo
 ====
 
 This is a small unstructured grid consisting of two unconnected parts. This is
-downloaded via `xugrid.data.xoxo()`. The toplogy data is downloaded to a local
+downloaded via `xugrid.data.xoxo()`. The topology data is downloaded to a local
 directory if it's not there already.
 """
 import matplotlib.pyplot as plt

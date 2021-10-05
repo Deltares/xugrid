@@ -93,7 +93,6 @@ ds["face_z"].ugrid.plot.edge.line(color="black")
 
 ###############################################################################
 # In general, there has to be data associated with the mesh topology before a
-# =============== ===========================
 # plot can be made. ``plot.edge.line()`` forms an exception to this rule, as
 # the location of the edges is meaningful on its own: for this reason
 # ``plot.edge.line`` does not error in the example above.
