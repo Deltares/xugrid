@@ -4,9 +4,12 @@ from typing import Union
 
 import geopandas as gpd
 import numpy as np
+import scipy.sparse
 import xarray as xr
 from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 from xarray.core.utils import UncachedAccessor
+
+from xugrid import connectivity
 
 from .connectivity import binary_dilation, binary_erosion
 from .plot import _PlotMethods
@@ -297,13 +300,24 @@ class UgridAccessor:
         geometry = self.grid.as_vector_geometry(data_on)
         return gpd.GeoDataFrame(df, geometry=geometry)
 
-    def _binary_op(self, iterations: int, func):
-        obj = self.object
+    def _binary_op(self, iterations: int, mask, value, border_value):
+        if border_value == value:
+            exterior = self.grid.exterior_faces
+        else:
+            exterior = None
+        if mask is not None:
+            mask = mask.values
+
+        obj = self.obj
         if isinstance(obj, xr.DataArray):
-            output = func(
+            output = connectivity._binary_iterate(
                 self.grid.face_face_connectivity,
-                self.object.values,
+                obj.values,
+                value,
                 iterations,
+                mask,
+                exterior,
+                border_value,
             )
             da = obj.copy(data=output)
             return UgridDataArray(da, self.grid.copy())
@@ -312,11 +326,30 @@ class UgridAccessor:
         else:
             raise ValueError("object should be a xr.DataArray")
 
-    def binary_dilation(self, iterations: int = 1):
-        return self._binary_op(iterations, func=binary_dilation)
+    def binary_dilation(
+        self,
+        iterations: int = 1,
+        mask=None,
+        border_value=False,
+    ):
+        return self._binary_op(iterations, mask, True, border_value)
 
-    def binary_erosion(self, iterations: int = 1):
-        return self._binary_op(iterations, func=binary_erosion)
+    def binary_erosion(
+        self,
+        iterations: int = 1,
+        mask=None,
+        border_value=False,
+    ):
+        return self._binary_op(iterations, mask, False, border_value)
+
+    def connected_components(self):
+        _, labels = scipy.sparse.csgraph.connected_components(
+            self.grid.face_face_connectivity
+        )
+        return UgridDataArray(
+            xr.DataArray(labels, dims=[self.grid.face_dimension]),
+            self.grid,
+        )
 
 
 # Wrapped IO methods
