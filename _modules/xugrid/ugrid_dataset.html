@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xugrid.ugrid_dataset &#8212; Xugrid 0.1 documentation</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+  <nav class="navbar navbar-dark navbar-expand-lg bg-deltares fixed-top bd-navbar shadow" id="navbar-main"><div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    <p style="color:#fff;font-size:25px;" class="title">Xugrid</p>
+    </a>
+
+    <a class="navbar-brand" href="../../index.html">
+    <img src="../../_static/xugrid-low-res.svg" class="logo" alt="logo" />
+    </a>
+  
+    <div id="navbar-menu" class="collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../user_guide.html">User Guide</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../api.html">API Reference</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../dev_docs.html">Development</a>
+        </li>
+        
+      </ul>
+    </div>
+
+    <a class="navbar-brand" href="https://www.deltares.nl/en/">
+    <img src="../../_static/deltares-white.svg" class="logo" alt="logo" />
+    </a>
+
+</div>
+  </nav>
+
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for xugrid.ugrid_dataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">xarray.backends.api</span> <span class="kn">import</span> <span class="n">DATAARRAY_NAME</span><span class="p">,</span> <span class="n">DATAARRAY_VARIABLE</span>
+<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">UncachedAccessor</span>
+
+<span class="kn">from</span> <span class="nn">.connectivity</span> <span class="kn">import</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">binary_erosion</span>
+<span class="kn">from</span> <span class="nn">.plot</span> <span class="kn">import</span> <span class="n">_PlotMethods</span>
+<span class="kn">from</span> <span class="nn">.ugrid</span> <span class="kn">import</span> <span class="n">Ugrid1d</span><span class="p">,</span> <span class="n">Ugrid2d</span>
+
+
+<span class="k">def</span> <span class="nf">xarray_wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">grid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a function, and if the result is an xarray dataset or an xarray</span>
+<span class="sd">    dataArray, it creates an UgridDataset or an UgridDataArray around it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">wrapped</span>
+
+
+<div class="viewcode-block" id="UgridDataArray"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray">[docs]</a><span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this class wraps an xarray dataArray. It is used to work with the dataArray</span>
+<span class="sd">    in the context of an unstructured 2d grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">Ugrid2d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        forward getters to  xr.DataArray. Wrap result if necessary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        forward setters to  xr.DataArray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appropriately wrap result if necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">xarray_wrapper</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UgridAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDataset"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataset">[docs]</a><span class="k">class</span> <span class="nc">UgridDataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this class wraps an xarray Dataset. It is used to work with the Dataset in</span>
+<span class="sd">    the context of an unstructured 2d grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">Ugrid2d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># TODO: find out whether it&#39;s 1D or 2D topology</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">remove_topology</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appropriately wrap result if necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">xarray_wrapper</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UgridAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UgridDataset.from_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataset.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a geodataframe into the appropriate Ugrid topology and dataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geodataframe: gpd.GeoDataFrame</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grid: UgridTopology</span>
+<span class="sd">        dataset: xr.Dataset</span>
+<span class="sd">            Contains the data of the columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">geodataframe</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot convert a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected a GeoDataFrame&quot;</span><span class="p">)</span>
+
+        <span class="n">geom_types</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;geodataframe contains no geometry&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple geometry types detected: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">geom_type</span> <span class="o">=</span> <span class="n">geom_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Linestring&quot;</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid1d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid geometry type: </span><span class="si">{</span><span class="n">geom_type</span><span class="si">}</span><span class="s2">. Expected Linestring or Polygon.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
+            <span class="n">geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">rename_dims</span><span class="p">({</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;edge&quot;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UgridAccessor"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor">[docs]</a><span class="k">class</span> <span class="nc">UgridAccessor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this class implements selection logic for use with xarray dataset and</span>
+<span class="sd">    dataarray in the context of an unstructured 2d grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">],</span> <span class="n">grid</span><span class="p">:</span> <span class="n">Ugrid2d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
+
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">UncachedAccessor</span><span class="p">(</span><span class="n">_PlotMethods</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UgridAccessor.object_from_face_indices"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.object_from_face_indices">[docs]</a>    <span class="k">def</span> <span class="nf">object_from_face_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face_indices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns subset of dataset or dataArray containing specific face indices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">face</span><span class="o">=</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">face_indices</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;illegal type in _sel_points&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.sel_points"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.sel_points">[docs]</a>    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points_x</span><span class="p">,</span> <span class="n">points_y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns subset of dataset or dataArray containing specific face</span>
+<span class="sd">        indices. Input arguments are point coordinates. The result dataset or</span>
+<span class="sd">        dataArray contains only the faces containing these points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">points_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">points_y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coordinate arrays cannot be empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">points_x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">points_y</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coordinate arrays size does not match&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">points_x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;coordinate arrays must be 1d&quot;</span><span class="p">)</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">points_x</span><span class="p">,</span> <span class="n">points_y</span><span class="p">])</span>
+        <span class="n">face_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">locate_faces</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">face</span><span class="o">=</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;face&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">face_indices</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="k">def</span> <span class="nf">_sel_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;slice start and stop should not be None&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">stop</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;slice start should be smaller than its stop&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">y</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">xcoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+            <span class="n">ycoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="n">xcoords</span><span class="p">,</span> <span class="n">ycoords</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">face_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">locate_faces_bounding_box</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">stop</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_from_face_indices</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;slices should both have a stepsize, or neither should have a stepsize&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="UgridAccessor.sel"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns subset of dataset or dataArray based on spatial selection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">xv</span><span class="p">,</span> <span class="n">yv</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">yv</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_slices</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;argument mismatch&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.rasterize"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.rasterize">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">face</span><span class="o">=</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">},</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.rasterize_like"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.rasterize_like">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_dataset_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+
+<div class="viewcode-block" id="UgridAccessor.to_dataset"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.to_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts this UgridDataArray or UgridDataset into a standard</span>
+<span class="sd">        xarray.Dataset.</span>
+
+<span class="sd">        The UGRID topology information is added as standard data variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_obj</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.to_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_on: str</span>
+<span class="sd">            One of {node, edge, face}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_obj</span><span class="p">()</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">data_on</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
+        <span class="c1"># TODO deal with time-dependent data, etc.</span>
+        <span class="c1"># Basically requires checking which variables are static, which aren&#39;t.</span>
+        <span class="c1"># For non-static, requires repeating all geometries.</span>
+        <span class="c1"># Call reset_index on mult-index to generate them as regular columns.</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">as_vector_geometry</span><span class="p">(</span><span class="n">data_on</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_binary_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">iterations</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;object should be a xr.DataArray&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UgridAccessor.binary_dilation"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_dilation">[docs]</a>    <span class="k">def</span> <span class="nf">binary_dilation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">binary_dilation</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.binary_erosion"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_erosion">[docs]</a>    <span class="k">def</span> <span class="nf">binary_erosion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">binary_erosion</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># Wrapped IO methods</span>
+<span class="c1"># ------------------</span>
+
+
+<div class="viewcode-block" id="open_dataset"><a class="viewcode-back" href="../../api.html#xugrid.open_dataset">[docs]</a><span class="k">def</span> <span class="nf">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="open_dataarray"><a class="viewcode-back" href="../../api.html#xugrid.open_dataarray">[docs]</a><span class="k">def</span> <span class="nf">open_dataarray</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Given file dataset contains more than one data &quot;</span>
+            <span class="s2">&quot;variable. Please read with xarray.open_dataset and &quot;</span>
+            <span class="s2">&quot;then select the variable you want.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">data_array</span><span class="p">,)</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="n">data_array</span><span class="o">.</span><span class="n">set_close</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">_close</span><span class="p">)</span>
+
+    <span class="c1"># Reset names if they were changed during saving</span>
+    <span class="c1"># to ensure that we can &#39;roundtrip&#39; perfectly</span>
+    <span class="k">if</span> <span class="n">DATAARRAY_NAME</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+        <span class="n">data_array</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">DATAARRAY_NAME</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">DATAARRAY_NAME</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">data_array</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">DATAARRAY_VARIABLE</span><span class="p">:</span>
+        <span class="n">data_array</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">data_array</span></div>
+
+
+<div class="viewcode-block" id="open_mfdataset"><a class="viewcode-back" href="../../api.html#xugrid.open_mfdataset">[docs]</a><span class="k">def</span> <span class="nf">open_mfdataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="open_zarr"><a class="viewcode-back" href="../../api.html#xugrid.open_zarr">[docs]</a><span class="k">def</span> <span class="nf">open_zarr</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+<span class="n">open_dataset</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="o">.</span><span class="vm">__doc__</span>
+<span class="n">open_dataarray</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataarray</span><span class="o">.</span><span class="vm">__doc__</span>
+<span class="n">open_mfdataset</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="o">.</span><span class="vm">__doc__</span>
+<span class="n">open_zarr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="o">.</span><span class="vm">__doc__</span>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Deltares.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
