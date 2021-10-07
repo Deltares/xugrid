@@ -2,9 +2,9 @@ User Guide
 ==========
 
 .. toctree::
-   :maxdepth: 3
-   :hidden:
+   :maxdepth: 2
 
+   terminology.rst
    sample_data/index.rst
    examples/plotting.rst
    examples/connectivity.rst
