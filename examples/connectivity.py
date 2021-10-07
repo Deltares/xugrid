@@ -60,10 +60,12 @@ import xugrid
 # ---------------------------
 #
 # Binary erosion and dilation are useful operations to e.g. locate boundary
-# cells, or to "shrink" some collection of cells.
+# cells, or to "shrink" some collection of cells. In this example, we start
+# with a grid in which all cells are given a value of ``True`` (equal to
+# ``1``).
 #
-# By default, the border value for binary erosion is set to ``False``. This
-# means the erosion erodes inwards from the boundaries.
+# By default, the border value for binary erosion is set to ``False`` (equal to
+# ``0``). This means the erosion erodes inwards from the boundaries.
 
 ds = xugrid.data.disk()
 uda = xugrid.UgridDataArray(
@@ -79,13 +81,19 @@ iter5.ugrid.plot(ax=ax1)
 
 ###############################################################################
 # By default, the border value for binary dilation is **also** set to
-# ``False``. This means boundary does not dilate inwards by default.
+# ``False``. This means boundary does not dilate inwards by default.  We'll
+# start by setting a single value in the center of the grid to ``True``.
 
 uda = xugrid.UgridDataArray(
     xr.full_like(ds["face_z"].ugrid.obj, False, dtype=bool),
     ds.grid,
 )
 uda.values[0] = True
+uda.plot()
+
+###############################################################################
+# Now let's run two dilations: one with the default border, and one with the
+# alternative border value:
 
 iter1 = uda.ugrid.binary_dilation(iterations=1)
 iter1_boundary = uda.ugrid.binary_dilation(iterations=1, border_value=True)
