@@ -41,13 +41,20 @@ import xugrid
 # are returned as either (dense) numpy arrays of integers, or as
 # ``scipy.sparse.csr_matrix``.
 #
-# * ``face_node_connectivity``: dense ``(n_face, n_max_per_face)``
+# * ``face_node_connectivity``: dense ``(n_face, n_max_nodes_per_face)``
 # * ``edge_node_connectivity``: dense ``(n_edge, 2)``
 # * ``edge_face_connectivity``: dense ``(n_edge, 2)``
 # * ``face_face_connectivity``: sparse
 # * ``face_edge_connectivity``: sparse
 # * ``node_edge_connectivity``: sparse
 # * ``node_face_connectivity``: sparse
+#
+# Some connectivity arrays are returned in dense form, some in sparse. The
+# ``node_edge_connectivity`` is the inverse of the ``edge_node_connectivity``.
+# While the edge node connectivity array is very regular -- every edge is
+# associated with just two nodes, the node edge connectivity is irregular: a
+# node may be associated with just one edge or many and this requires many fill
+# values in dense form. 
 #
 # Binary erosion and dilation
 # ---------------------------
