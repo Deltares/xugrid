@@ -54,7 +54,7 @@ import xugrid
 # While the edge node connectivity array is very regular -- every edge is
 # associated with just two nodes, the node edge connectivity is irregular: a
 # node may be associated with just one edge or many and this requires many fill
-# values in dense form. 
+# values in dense form.
 #
 # Binary erosion and dilation
 # ---------------------------
@@ -89,7 +89,7 @@ uda = xugrid.UgridDataArray(
     ds.grid,
 )
 uda.values[0] = True
-uda.plot()
+uda.ugrid.plot()
 
 ###############################################################################
 # Now let's run two dilations: one with the default border, and one with the
@@ -106,7 +106,7 @@ iter1_boundary.ugrid.plot(ax=ax1)
 # Connected Components
 # --------------------
 #
-# Xugrid also wraps `:py:func:scipy.sparse.csgraph.connected_components:` to
+# Xugrid also wraps :py:func:`scipy.sparse.csgraph.connected_components` to
 # analyse connected parts of the mesh.
 
 grid = xugrid.data.xoxo()
@@ -160,3 +160,70 @@ triangulation = convex_exterior.triangulate()
 fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
 xugrid.plot.line(convex_exterior, ax=ax0, color="black")
 xugrid.plot.line(triangulation, ax=ax1, color="black")
+
+###############################################################################
+# Laplace interpolation
+# ---------------------
+#
+# Laplace interpolation is a simple but powerful method to fill holes in a
+# grid. Laplace's equation describes potential flow, such as e.g. steady-state
+# heat conduction or steady-state groundwater flow. In this method, we solve
+# Laplace's equation for the nodata gaps, with data values functioning as fixed
+# potential boundary conditions.
+#
+# Let's setup a mesh with data exclusively on the left- and rightmost faces of
+# the upper and lower parts:
+
+grid = xugrid.data.xoxo()
+
+da = xr.DataArray(
+    np.full(283, np.nan),
+    dims=[
+        "face",
+    ],
+)
+da.data[2] = 0.0
+da.data[12] = 0.0
+da.data[77] = 10.0
+da.data[132] = 10.0
+
+uda = xugrid.UgridDataArray(da, grid)
+
+fig, ax = plt.subplots()
+uda.ugrid.plot(ax=ax)
+uda.ugrid.plot.edge(ax=ax, color="black")
+
+###############################################################################
+# We can now use Laplace interpolation to fill the gaps in the grid.
+
+filled = uda.ugrid.laplace_interpolate(direct_solve=True)
+filled.ugrid.plot(cmap="gist_rainbow", vmin=2.5, vmax=7.5)
+
+###############################################################################
+# Reverse-Cuthill McKee
+# ---------------------
+#
+# For numerical solutions, low "bandwidth" is desirable as this increases
+# performance due to more efficient memory access. Xugrid wraps
+# :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee` to reorder
+# grids for bandwith reduction.
+#
+# To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
+
+grid = xugrid.data.xoxo()
+connectivity = grid.face_face_connectivity.toarray() != 0
+
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.imshow(connectivity, cmap="Greys")
+
+###############################################################################
+# The bandwidth of this matrix is poor. Connections are all over the place: low
+# numbered cells are connected to high numbered cells (and vice versa). The
+# bandwidth of the reordered grid is much smaller and has much better data
+# locality:
+
+renumbered_grid, _ = grid.reverse_cuthill_mckee()
+connectivity = renumbered_grid.face_face_connectivity.toarray() != 0
+
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.imshow(connectivity, cmap="Greys")

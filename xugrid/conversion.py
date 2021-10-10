@@ -5,7 +5,7 @@ Conversion from and to other data structures:
 * Structured data (e.g. rasters)
 
 """
-from typing import Tuple
+from typing import Any, Tuple
 
 import geopandas as gpd
 import numpy as np
@@ -52,11 +52,27 @@ def faces_to_polygons(
     return pygeos.polygons(rings)
 
 
+def _to_pygeos(geometry: Any):
+    first = geometry[0]
+    if not isinstance(first, pygeos.Geometry):
+        # might be shapely
+        try:
+            geometry = pygeos.from_shapely(geometry)
+        except:
+            raise TypeError(
+                "geometry should be pygeos or shapely type. "
+                f"Received instead {type(first)}"
+            )
+    return geometry
+
+
 def points_to_nodes(points: PointArray) -> Tuple[FloatArray, FloatArray]:
+    points = _to_pygeos(points)
     return contiguous_xy(pygeos.get_coordinates(points))
 
 
 def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntArray]:
+    edges = _to_pygeos(edges)
     xy = pygeos.get_coordinates(edges)
     unique, inverse = np.unique(xy, axis=0, return_inverse=True)
     return *contiguous_xy(unique), inverse.reshape((-1, 2))
@@ -77,6 +93,7 @@ def _remove_last_vertex(xy: FloatArray, indices: IntArray):
 def polygons_to_faces(
     polygons: PolygonArray,
 ) -> Tuple[FloatArray, FloatArray, IntArray, int]:
+    polygons = _to_pygeos(polygons)
     xy, indices = _remove_last_vertex(
         *pygeos.get_coordinates(polygons, return_index=True)
     )

@@ -3,7 +3,6 @@ import copy
 from typing import Any, Tuple, Union
 
 import geopandas as gpd
-import matplotlib.tri as mtri
 import meshkernel as mk
 import numpy as np
 import pyproj
@@ -12,6 +11,7 @@ import xarray as xr
 from meshkernel.meshkernel import MeshKernel
 from meshkernel.py_structures import Mesh2d
 from numba_celltree import CellTree2d
+from scipy.sparse.csgraph import reverse_cuthill_mckee
 from scipy.sparse.csr import csr_matrix
 
 from . import connectivity, conversion
@@ -166,6 +166,32 @@ class AbstractUgrid(abc.ABC):
 
         if not inplace:
             return grid
+
+    def to_pygeos(self, dim):
+        attrs = self.mesh_topology.attrs
+        if dim == attrs.get("face_dimension", "face"):
+            return conversion.faces_to_polygons(
+                self.node_x,
+                self.node_y,
+                self.face_node_connectivity,
+                self.fill_value,
+            )
+        elif dim == attrs.get("node_dimension", "node"):
+            return conversion.nodes_to_points(
+                self.node_x,
+                self.node_y,
+            )
+        elif dim == attrs.get("edge_dimension", "edge"):
+            return conversion.edges_to_linestrings(
+                self.node_x,
+                self.node_y,
+                self.edge_node_connectivity,
+            )
+        else:
+            raise ValueError(
+                f"Dimension {dim} is not a face, node, or edge dimension of the"
+                " Ugrid topology."
+            )
 
 
 class Ugrid1d(AbstractUgrid):
@@ -343,25 +369,12 @@ class Ugrid1d(AbstractUgrid):
             self._meshkernel.mesh1d_set(self.mesh)
         return self._meshkernel
 
-    def as_vector_geometry(self, data_on: str):
-        if data_on == "node":
-            return conversion.nodes_to_points(self.node_x, self.node_y)
-        elif data_on == "edge":
-            return conversion.edges_to_linestrings(
-                self.node_x, self.node_y, self.node_edge_connectivity
-            )
-        else:
-            raise ValueError(
-                "data_on for Ugrid2d should be one of {node, edge}. "
-                f"Received instead {data_on}"
-            )
-
     @staticmethod
     def from_geodataframe(geodataframe: gpd.GeoDataFrame) -> "Ugrid1d":
-        coords, edge_node_connectivity = conversion.linestrings_to_edges(
+        x, y, edge_node_connectivity, fill_value = conversion.linestrings_to_edges(
             geodataframe.geometry
         )
-        return Ugrid1d(coords[:, 0], coords[:, 1], -1, edge_node_connectivity)
+        return Ugrid1d(x, y, fill_value, edge_node_connectivity)
 
 
 class Ugrid2d(AbstractUgrid):
@@ -844,6 +857,20 @@ class Ugrid2d(AbstractUgrid):
         faces = connectivity.to_dense(faces, self.fill_value)
         return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
 
+    def reverse_cuthill_mckee(self, dimension=None):
+        # Todo: dispatch on dimension
+        reordering = reverse_cuthill_mckee(
+            graph=self.face_face_connectivity,
+            symmetric_mode=True,
+        )
+        reordered_grid = Ugrid2d(
+            self.node_x,
+            self.node_y,
+            self.fill_value,
+            self.face_node_connectivity[reordering],
+        )
+        return reordered_grid, reordering
+
     def refine_polygon(
         self,
         polygon: sg.Polygon,
@@ -905,10 +932,10 @@ class Ugrid2d(AbstractUgrid):
 
     @staticmethod
     def from_geodataframe(geodataframe: gpd.GeoDataFrame):
-        coords, face_node_connectivity = conversion.polygons_to_faces(
+        x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
             geodataframe.geometry.values
         )
-        return Ugrid2d(Ugrid2d.topology_dataset(coords, face_node_connectivity))
+        return Ugrid2d(x, y, fill_value, face_node_connectivity)
 
     @staticmethod
     def from_structured(data: Union[xr.DataArray, xr.Dataset]) -> "Ugrid2d":
@@ -969,3 +996,27 @@ class Ugrid2d(AbstractUgrid):
         face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
         face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
         return Ugrid2d(node_x, node_y, -1, face_nodes)
+
+
+def grid_from_geodataframe(geodataframe):
+    gdf = geodataframe
+    if not isinstance(gdf, gpd.GeoDataFrame):
+        raise TypeError(f"Cannot convert a {type(gdf)}, expected a GeoDataFrame")
+
+    geom_types = gdf.geom_type.unique()
+    if len(geom_types) == 0:
+        raise ValueError("geodataframe contains no geometry")
+    elif len(geom_types) > 1:
+        message = ", ".join(geom_types)
+        raise ValueError(f"Multiple geometry types detected: {message}")
+
+    geom_type = geom_types[0]
+    if geom_type == "Linestring":
+        grid = Ugrid1d.from_geodataframe(gdf)
+    elif geom_type == "Polygon":
+        grid = Ugrid2d.from_geodataframe(gdf)
+    else:
+        raise ValueError(
+            f"Invalid geometry type: {geom_type}. Expected Linestring or Polygon."
+        )
+    return grid
