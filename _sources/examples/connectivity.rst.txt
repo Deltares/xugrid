@@ -60,7 +60,7 @@ The following imports suffice for the examples.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-60
+.. GENERATED FROM PYTHON SOURCE LINES 34-69
 
 Connectivity arrays
 -------------------
@@ -72,7 +72,7 @@ listed below. Depending on the (ir)regularity of the connectivity, the arrays
 are returned as either (dense) numpy arrays of integers, or as
 ``scipy.sparse.csr_matrix``.
 
-* ``face_node_connectivity``: dense ``(n_face, n_max_per_face)``
+* ``face_node_connectivity``: dense ``(n_face, n_max_nodes_per_face)``
 * ``edge_node_connectivity``: dense ``(n_edge, 2)``
 * ``edge_face_connectivity``: dense ``(n_edge, 2)``
 * ``face_face_connectivity``: sparse
@@ -80,16 +80,25 @@ are returned as either (dense) numpy arrays of integers, or as
 * ``node_edge_connectivity``: sparse
 * ``node_face_connectivity``: sparse
 
+Some connectivity arrays are returned in dense form, some in sparse. The
+``node_edge_connectivity`` is the inverse of the ``edge_node_connectivity``.
+While the edge node connectivity array is very regular -- every edge is
+associated with just two nodes, the node edge connectivity is irregular: a
+node may be associated with just one edge or many and this requires many fill
+values in dense form.
+
 Binary erosion and dilation
 ---------------------------
 
 Binary erosion and dilation are useful operations to e.g. locate boundary
-cells, or to "shrink" some collection of cells.
+cells, or to "shrink" some collection of cells. In this example, we start
+with a grid in which all cells are given a value of ``True`` (equal to
+``1``).
 
-By default, the border value for binary erosion is set to ``False``. This
-means the erosion erodes inwards from the boundaries.
+By default, the border value for binary erosion is set to ``False`` (equal to
+``0``). This means the erosion erodes inwards from the boundaries.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-73
+.. GENERATED FROM PYTHON SOURCE LINES 69-82
 
 .. code-block:: default
 
@@ -122,16 +131,17 @@ means the erosion erodes inwards from the boundaries.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f36da5886d0>
+    <matplotlib.collections.PolyCollection object at 0x7f6c58b93040>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-76
+.. GENERATED FROM PYTHON SOURCE LINES 83-86
 
 By default, the border value for binary dilation is **also** set to
-``False``. This means boundary does not dilate inwards by default.
+``False``. This means boundary does not dilate inwards by default.  We'll
+start by setting a single value in the center of the grid to ``True``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-90
+.. GENERATED FROM PYTHON SOURCE LINES 86-94
 
 .. code-block:: default
 
@@ -141,13 +151,7 @@ By default, the border value for binary dilation is **also** set to
         ds.grid,
     )
     uda.values[0] = True
-
-    iter1 = uda.ugrid.binary_dilation(iterations=1)
-    iter1_boundary = uda.ugrid.binary_dilation(iterations=1, border_value=True)
-
-    fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
-    iter1.ugrid.plot(ax=ax0)
-    iter1_boundary.ugrid.plot(ax=ax1)
+    uda.ugrid.plot()
 
 
 
@@ -165,29 +169,26 @@ By default, the border value for binary dilation is **also** set to
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f36e53b0400>
+    <matplotlib.collections.PolyCollection object at 0x7f6c5b8e1850>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-96
+.. GENERATED FROM PYTHON SOURCE LINES 95-97
 
-Connected Components
---------------------
+Now let's run two dilations: one with the default border, and one with the
+alternative border value:
 
-Xugrid also wraps `:py:func:scipy.sparse.csgraph.connected_components:` to
-analyse connected parts of the mesh.
-
-.. GENERATED FROM PYTHON SOURCE LINES 96-104
+.. GENERATED FROM PYTHON SOURCE LINES 97-105
 
 .. code-block:: default
 
 
-    grid = xugrid.data.xoxo()
-    uda = xugrid.UgridDataArray(
-        xr.DataArray(np.ones(grid.node_face_connectivity.shape[0]), dims=["face"]), grid
-    )
-    labeled = uda.ugrid.connected_components()
-    labeled.ugrid.plot(cmap="RdBu")
+    iter1 = uda.ugrid.binary_dilation(iterations=1)
+    iter1_boundary = uda.ugrid.binary_dilation(iterations=1, border_value=True)
+
+    fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+    iter1.ugrid.plot(ax=ax0)
+    iter1_boundary.ugrid.plot(ax=ax1)
 
 
 
@@ -205,25 +206,29 @@ analyse connected parts of the mesh.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f36e54833a0>
+    <matplotlib.collections.PolyCollection object at 0x7f6c58a6dd00>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-110
+.. GENERATED FROM PYTHON SOURCE LINES 106-111
 
-Centroidal Voronoi Tesselation
-------------------------------
+Connected Components
+--------------------
 
-We can also use connectivity information to derive a centroidal Voronoi
-Tesselation.
+Xugrid also wraps :py:func:`scipy.sparse.csgraph.connected_components` to
+analyse connected parts of the mesh.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-114
+.. GENERATED FROM PYTHON SOURCE LINES 111-119
 
 .. code-block:: default
 
 
-    voronoi_grid = grid.tesselate_centroidal_voronoi()
-    xugrid.plot.line(voronoi_grid, color="black")
+    grid = xugrid.data.xoxo()
+    uda = xugrid.UgridDataArray(
+        xr.DataArray(np.ones(grid.node_face_connectivity.shape[0]), dims=["face"]), grid
+    )
+    labeled = uda.ugrid.connected_components()
+    labeled.ugrid.plot(cmap="RdBu")
 
 
 
@@ -241,35 +246,25 @@ Tesselation.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f36e4033fa0>
+    <matplotlib.collections.PolyCollection object at 0x7f6c58af0760>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-124
+.. GENERATED FROM PYTHON SOURCE LINES 120-125
 
-There are two alternative flavors to consider. We can fully ignore the
-exterior and consider only the (interior) centroids. Alternatively, we can
-include intersections of the voronoi edges with the mesh exterior, but
-ignore the original nodes.
+Centroidal Voronoi Tesselation
+------------------------------
 
-Both methods have the benefit of guaranteeing convex Voronoi polygons as
-their output -- provided the input mesh is convex as well! However, neither
-preserves the exterior exactly: the resulting mesh has smaller bounds than
-the original.
+We can also use connectivity information to derive a centroidal Voronoi
+Tesselation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-134
+.. GENERATED FROM PYTHON SOURCE LINES 125-129
 
 .. code-block:: default
 
 
-    centroid_only = grid.tesselate_centroidal_voronoi(add_exterior=False)
-    convex_exterior = grid.tesselate_centroidal_voronoi(
-        add_exterior=True, add_vertices=False
-    )
-
-    fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
-    xugrid.plot.line(centroid_only, ax=ax0, color="black")
-    xugrid.plot.line(convex_exterior, ax=ax1, color="black")
+    voronoi_grid = grid.tesselate_centroidal_voronoi()
+    xugrid.plot.line(voronoi_grid, color="black")
 
 
 
@@ -287,30 +282,36 @@ the original.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f36e52c3fd0>
+    <matplotlib.collections.LineCollection object at 0x7f6c5ba2d220>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-143
+.. GENERATED FROM PYTHON SOURCE LINES 130-139
 
-Triangulation
--------------
+There are two alternative flavors to consider. We can fully ignore the
+exterior and consider only the (interior) centroids. Alternatively, we can
+include intersections of the voronoi edges with the mesh exterior, but
+ignore the original nodes.
 
-Triangulation is a commonly required operation: every polygon can be split
-into triangles and triangles are the simplest geometric primitive. This makes
-them very attractive for e.g. visualization.
+Both methods have the benefit of guaranteeing convex Voronoi polygons as
+their output -- provided the input mesh is convex as well! However, neither
+preserves the exterior exactly: the resulting mesh has smaller bounds than
+the original.
 
-We can break down one of the Voronoi tesselations from above into triangles:
-
-.. GENERATED FROM PYTHON SOURCE LINES 143-148
+.. GENERATED FROM PYTHON SOURCE LINES 139-149
 
 .. code-block:: default
 
 
-    triangulation = convex_exterior.triangulate()
+    centroid_only = grid.tesselate_centroidal_voronoi(add_exterior=False)
+    convex_exterior = grid.tesselate_centroidal_voronoi(
+        add_exterior=True, add_vertices=False
+    )
+
     fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
-    xugrid.plot.line(convex_exterior, ax=ax0, color="black")
-    xugrid.plot.line(triangulation, ax=ax1, color="black")
+    xugrid.plot.line(centroid_only, ax=ax0, color="black")
+    xugrid.plot.line(convex_exterior, ax=ax1, color="black")
+
 
 
 
@@ -327,14 +328,225 @@ We can break down one of the Voronoi tesselations from above into triangles:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f36da52a6a0>
+    <matplotlib.collections.LineCollection object at 0x7f6c5bd6d460>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 150-158
+
+Triangulation
+-------------
+
+Triangulation is a commonly required operation: every polygon can be split
+into triangles and triangles are the simplest geometric primitive. This makes
+them very attractive for e.g. visualization.
+
+We can break down one of the Voronoi tesselations from above into triangles:
+
+.. GENERATED FROM PYTHON SOURCE LINES 158-164
+
+.. code-block:: default
+
+
+    triangulation = convex_exterior.triangulate()
+    fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
+    xugrid.plot.line(convex_exterior, ax=ax0, color="black")
+    xugrid.plot.line(triangulation, ax=ax1, color="black")
+
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_007.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_007.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.LineCollection object at 0x7f6c5bafd550>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 165-176
+
+Laplace interpolation
+---------------------
+
+Laplace interpolation is a simple but powerful method to fill holes in a
+grid. Laplace's equation describes potential flow, such as e.g. steady-state
+heat conduction or steady-state groundwater flow. In this method, we solve
+Laplace's equation for the nodata gaps, with data values functioning as fixed
+potential boundary conditions.
+
+Let's setup a mesh with data exclusively on the left- and rightmost faces of
+the upper and lower parts:
+
+.. GENERATED FROM PYTHON SOURCE LINES 176-196
+
+.. code-block:: default
+
+
+    grid = xugrid.data.xoxo()
+
+    da = xr.DataArray(
+        np.full(283, np.nan),
+        dims=[
+            "face",
+        ],
+    )
+    da.data[2] = 0.0
+    da.data[12] = 0.0
+    da.data[77] = 10.0
+    da.data[132] = 10.0
+
+    uda = xugrid.UgridDataArray(da, grid)
+
+    fig, ax = plt.subplots()
+    uda.ugrid.plot(ax=ax)
+    uda.ugrid.plot.edge(ax=ax, color="black")
+
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_008.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_008.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.LineCollection object at 0x7f6c5ba016a0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 197-198
+
+We can now use Laplace interpolation to fill the gaps in the grid.
+
+.. GENERATED FROM PYTHON SOURCE LINES 198-202
+
+.. code-block:: default
+
+
+    filled = uda.ugrid.laplace_interpolate(direct_solve=True)
+    filled.ugrid.plot(cmap="gist_rainbow", vmin=2.5, vmax=7.5)
+
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_009.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_009.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.PolyCollection object at 0x7f6c5883e8e0>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 203-212
+
+Reverse-Cuthill McKee
+---------------------
+
+For numerical solutions, low "bandwidth" is desirable as this increases
+performance due to more efficient memory access. Xugrid wraps
+:py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee` to reorder
+grids for bandwith reduction.
+
+To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
+
+.. GENERATED FROM PYTHON SOURCE LINES 212-219
+
+.. code-block:: default
+
+
+    grid = xugrid.data.xoxo()
+    connectivity = grid.face_face_connectivity.toarray() != 0
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(connectivity, cmap="Greys")
+
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_010.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_010.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.image.AxesImage object at 0x7f6c58c64340>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 220-224
+
+The bandwidth of this matrix is poor. Connections are all over the place: low
+numbered cells are connected to high numbered cells (and vice versa). The
+bandwidth of the reordered grid is much smaller and has much better data
+locality:
+
+.. GENERATED FROM PYTHON SOURCE LINES 224-230
+
+.. code-block:: default
+
+
+    renumbered_grid, _ = grid.reverse_cuthill_mckee()
+    connectivity = renumbered_grid.face_face_connectivity.toarray() != 0
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(connectivity, cmap="Greys")
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_011.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_011.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.image.AxesImage object at 0x7f6c58a2e1f0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.873 seconds)
+   **Total running time of the script:** ( 0 minutes  2.893 seconds)
 
 
 .. _sphx_glr_download_examples_connectivity.py:

@@ -124,7 +124,6 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.tri</span> <span class="k">as</span> <span class="nn">mtri</span>
 <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
@@ -133,6 +132,7 @@
 <span class="kn">from</span> <span class="nn">meshkernel.meshkernel</span> <span class="kn">import</span> <span class="n">MeshKernel</span>
 <span class="kn">from</span> <span class="nn">meshkernel.py_structures</span> <span class="kn">import</span> <span class="n">Mesh2d</span>
 <span class="kn">from</span> <span class="nn">numba_celltree</span> <span class="kn">import</span> <span class="n">CellTree2d</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">reverse_cuthill_mckee</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse.csr</span> <span class="kn">import</span> <span class="n">csr_matrix</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conversion</span>
@@ -287,6 +287,32 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">grid</span>
+
+    <span class="k">def</span> <span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_topology</span><span class="o">.</span><span class="n">attrs</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;face&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">faces_to_polygons</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;node_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;node&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">nodes_to_points</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;edge&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">edges_to_linestrings</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> is not a face, node, or edge dimension of the&quot;</span>
+                <span class="s2">&quot; Ugrid topology.&quot;</span>
+            <span class="p">)</span>
 
 
 <div class="viewcode-block" id="Ugrid1d"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid1d">[docs]</a><span class="k">class</span> <span class="nc">Ugrid1d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
@@ -464,25 +490,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span><span class="o">.</span><span class="n">mesh1d_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span>
 
-<div class="viewcode-block" id="Ugrid1d.as_vector_geometry"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid1d.as_vector_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">as_vector_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">data_on</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">nodes_to_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">data_on</span> <span class="o">==</span> <span class="s2">&quot;edge&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">edges_to_linestrings</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_edge_connectivity</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;data_on for Ugrid2d should be one of {node, edge}. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Received instead </span><span class="si">{</span><span class="n">data_on</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span></div>
-
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
-        <span class="n">coords</span><span class="p">,</span> <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">linestrings_to_edges</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">fill_value</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">linestrings_to_edges</span><span class="p">(</span>
             <span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Ugrid2d"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d">[docs]</a><span class="k">class</span> <span class="nc">Ugrid2d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
@@ -965,6 +978,20 @@
         <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Ugrid2d.reverse_cuthill_mckee"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Todo: dispatch on dimension</span>
+        <span class="n">reordering</span> <span class="o">=</span> <span class="n">reverse_cuthill_mckee</span><span class="p">(</span>
+            <span class="n">graph</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span>
+            <span class="n">symmetric_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">reordered_grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">reordering</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">reordered_grid</span><span class="p">,</span> <span class="n">reordering</span></div>
+
 <div class="viewcode-block" id="Ugrid2d.refine_polygon"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.refine_polygon">[docs]</a>    <span class="k">def</span> <span class="nf">refine_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">polygon</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span>
@@ -1026,10 +1053,10 @@
 
 <div class="viewcode-block" id="Ugrid2d.from_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
-        <span class="n">coords</span><span class="p">,</span> <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">polygons_to_faces</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">fill_value</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">polygons_to_faces</span><span class="p">(</span>
             <span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">values</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">topology_dataset</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.from_structured"><a class="viewcode-back" href="../../api.html#xugrid.Ugrid2d.from_structured">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
@@ -1090,6 +1117,30 @@
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>  <span class="c1"># lower left</span>
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>  <span class="c1"># lower right</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">grid_from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">):</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">geodataframe</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot convert a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected a GeoDataFrame&quot;</span><span class="p">)</span>
+
+    <span class="n">geom_types</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;geodataframe contains no geometry&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple geometry types detected: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">geom_type</span> <span class="o">=</span> <span class="n">geom_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Linestring&quot;</span><span class="p">:</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid1d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">:</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid geometry type: </span><span class="si">{</span><span class="n">geom_type</span><span class="si">}</span><span class="s2">. Expected Linestring or Polygon.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span>
 </pre></div>
 
               </div>

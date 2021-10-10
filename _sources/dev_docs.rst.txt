@@ -2,7 +2,6 @@ Development
 ===========
 
 .. toctree::
-   :maxdepth: 3
-   :hidden:
+   :maxdepth: 2
 
    examples-dev/voronoi.rst

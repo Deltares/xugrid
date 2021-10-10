@@ -121,20 +121,20 @@
   <h1>Source code for xugrid.ugrid_dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">xarray.backends.api</span> <span class="kn">import</span> <span class="n">DATAARRAY_NAME</span><span class="p">,</span> <span class="n">DATAARRAY_VARIABLE</span>
+<span class="kn">from</span> <span class="nn">xarray.core._typed_ops</span> <span class="kn">import</span> <span class="n">DataArrayOpsMixin</span>
 <span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">UncachedAccessor</span>
 
-<span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
-
-<span class="kn">from</span> <span class="nn">.connectivity</span> <span class="kn">import</span> <span class="n">binary_dilation</span><span class="p">,</span> <span class="n">binary_erosion</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">connectivity</span>
+<span class="kn">from</span> <span class="nn">.interpolate</span> <span class="kn">import</span> <span class="n">laplace_interpolate</span>
 <span class="kn">from</span> <span class="nn">.plot</span> <span class="kn">import</span> <span class="n">_PlotMethods</span>
-<span class="kn">from</span> <span class="nn">.ugrid</span> <span class="kn">import</span> <span class="n">Ugrid1d</span><span class="p">,</span> <span class="n">Ugrid2d</span>
+<span class="kn">from</span> <span class="nn">.ugrid</span> <span class="kn">import</span> <span class="n">Ugrid1d</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">grid_from_geodataframe</span>
 
 
 <span class="k">def</span> <span class="nf">xarray_wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">grid</span><span class="p">):</span>
@@ -156,7 +156,7 @@
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<div class="viewcode-block" id="UgridDataArray"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray">[docs]</a><span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">:</span>
+<div class="viewcode-block" id="UgridDataArray"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray">[docs]</a><span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">(</span><span class="n">DataArrayOpsMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    this class wraps an xarray dataArray. It is used to work with the dataArray</span>
 <span class="sd">    in the context of an unstructured 2d grid.</span>
@@ -196,9 +196,39 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">result</span>
 
+    <span class="k">def</span> <span class="nf">_binary_op</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">,</span>
+        <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">reflexive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reflexive</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_inplace_binary_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">_inplace_binary_op</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UgridAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">UgridAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UgridDataArray.to_geoseries"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray.to_geoseries">[docs]</a>    <span class="k">def</span> <span class="nf">to_geoseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridDataArray.to_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dim_order</span><span class="p">)</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridDataArray.from_geoseries"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataArray.from_geoseries">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_geoseries</span><span class="p">(</span><span class="n">geoseries</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geoseries</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot convert a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">geoseries</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected a GeoSeries&quot;</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geoseries</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">grid_from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_series</span><span class="p">(</span><span class="n">geoseries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="UgridDataset"><a class="viewcode-back" href="../../api.html#xugrid.UgridDataset">[docs]</a><span class="k">class</span> <span class="nc">UgridDataset</span><span class="p">:</span>
@@ -207,13 +237,18 @@
 <span class="sd">    the context of an unstructured 2d grid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">Ugrid2d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">Ugrid2d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least either obj or grid is required&quot;</span><span class="p">)</span>
             <span class="c1"># TODO: find out whether it&#39;s 1D or 2D topology</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">remove_topology</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">remove_topology</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -225,7 +260,11 @@
             <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c1"># TODO: check with topology</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">obj</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -256,34 +295,10 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        grid: UgridTopology</span>
-<span class="sd">        dataset: xr.Dataset</span>
-<span class="sd">            Contains the data of the columns.</span>
+<span class="sd">        dataset: UGridDataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">geodataframe</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot convert a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected a GeoDataFrame&quot;</span><span class="p">)</span>
-
-        <span class="n">geom_types</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;geodataframe contains no geometry&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">geom_types</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple geometry types detected: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">geom_type</span> <span class="o">=</span> <span class="n">geom_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Linestring&quot;</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid1d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">geom_type</span> <span class="o">==</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid geometry type: </span><span class="si">{</span><span class="n">geom_type</span><span class="si">}</span><span class="s2">. Expected Linestring or Polygon.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
-            <span class="n">geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">rename_dims</span><span class="p">({</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;edge&quot;</span><span class="p">})</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">grid_from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div></div>
 
 
@@ -404,24 +419,23 @@
         <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_obj</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UgridAccessor.to_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="UgridAccessor.to_geodataframe"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        data_on: str</span>
-<span class="sd">            One of {node, edge, face}</span>
+<span class="sd">        dim: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_obj</span><span class="p">()</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">data_on</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
         <span class="c1"># TODO deal with time-dependent data, etc.</span>
         <span class="c1"># Basically requires checking which variables are static, which aren&#39;t.</span>
         <span class="c1"># For non-static, requires repeating all geometries.</span>
         <span class="c1"># Call reset_index on mult-index to generate them as regular columns.</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variables</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
-        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">as_vector_geometry</span><span class="p">(</span><span class="n">data_on</span><span class="p">)</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_pygeos</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_binary_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">border_value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_binary_iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">border_value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">border_value</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">exterior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">exterior_faces</span>
         <span class="k">else</span><span class="p">:</span>
@@ -453,7 +467,7 @@
         <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">border_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_iterate</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="UgridAccessor.binary_erosion"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.binary_erosion">[docs]</a>    <span class="k">def</span> <span class="nf">binary_erosion</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -461,7 +475,7 @@
         <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">border_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_op</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_iterate</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">border_value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="UgridAccessor.connected_components"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.connected_components">[docs]</a>    <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csgraph</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span>
@@ -470,7 +484,107 @@
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span>
             <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">]),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.reverse_cuthill_mckee"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.reverse_cuthill_mckee">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">attrs</span>
+        <span class="c1"># TODO: Dispatch on dimension</span>
+        <span class="n">face_dim</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;face&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">face_dim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">reordered_grid</span><span class="p">,</span> <span class="n">reordering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">reverse_cuthill_mckee</span><span class="p">()</span>
+        <span class="n">reordered_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">reordering</span><span class="p">]</span>
+        <span class="c1"># TODO: this might not work properly if e.g. centroids are stored in obj.</span>
+        <span class="c1"># Not all metadata would be reordered.</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">reordered_data</span><span class="p">),</span>
+            <span class="n">reordered_grid</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridAccessor.laplace_interpolate"><a class="viewcode-back" href="../../api.html#xugrid.UgridAccessor.laplace_interpolate">[docs]</a>    <span class="k">def</span> <span class="nf">laplace_interpolate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">direct_solve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">drop_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fill_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">drop_rule</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">,</span>
+        <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">250</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.</span>
+
+<span class="sd">        This solves Laplace&#39;s equation where where there is no data, with data</span>
+<span class="sd">        values functioning as fixed potential boundary conditions.</span>
+
+<span class="sd">        Note that an iterative solver method will be required for large grids.</span>
+<span class="sd">        In this case, some experimentation with the solver settings may be</span>
+<span class="sd">        required to find a converging solution of sufficient accuracy. Refer to</span>
+<span class="sd">        the documentation of :py:func:`scipy.sparse.linalg.spilu` and</span>
+<span class="sd">        :py:func:`scipy.sparse.linalg.cg`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xy_weights: bool, default False.</span>
+<span class="sd">            Wether to use the inverse of the centroid to centroid distance in</span>
+<span class="sd">            the coefficient matrix. If ``False``, defaults to uniform</span>
+<span class="sd">            coefficients of 1 so that each face connection has equal weight.</span>
+<span class="sd">        direct_solve: bool, optional, default ``False``</span>
+<span class="sd">            Whether to use a direct or an iterative solver or a conjugate gradient</span>
+<span class="sd">            solver. Direct method provides an exact answer, but are unsuitable</span>
+<span class="sd">            for large problems.</span>
+<span class="sd">        drop_tol: float, optional, default None.</span>
+<span class="sd">            Drop tolerance for ``scipy.sparse.linalg.spilu`` which functions as a</span>
+<span class="sd">            preconditioner for the conjugate gradient solver.</span>
+<span class="sd">        fill_factor: float, optional, default None.</span>
+<span class="sd">            Fill factor for ``scipy.sparse.linalg.spilu``.</span>
+<span class="sd">        drop_rule: str, optional default None.</span>
+<span class="sd">            Drop rule for ``scipy.sparse.linalg.spilu``.</span>
+<span class="sd">        options: dict, optional, default None.</span>
+<span class="sd">            Remaining other options for ``scipy.sparse.linalg.spilu``.</span>
+<span class="sd">        tol: float, optional, default 1.0e-5.</span>
+<span class="sd">            Convergence tolerance for ``scipy.sparse.linalg.cg``.</span>
+<span class="sd">        maxiter: int, default 250.</span>
+<span class="sd">            Maximum number of iterations for ``scipy.sparse.linalg.cg``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        filled: UgridDataArray of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">mesh_topology</span><span class="o">.</span><span class="n">attrs</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;face&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">xy_weights</span><span class="p">:</span>
+            <span class="n">xy</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">centroids</span>
+            <span class="n">coo</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">coo</span><span class="o">.</span><span class="n">row</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">coo</span><span class="o">.</span><span class="n">col</span>
+            <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">xy</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">filled</span> <span class="o">=</span> <span class="n">laplace_interpolate</span><span class="p">(</span>
+            <span class="n">connectivity</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">use_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">,</span>
+            <span class="n">direct_solve</span><span class="o">=</span><span class="n">direct_solve</span><span class="p">,</span>
+            <span class="n">drop_tol</span><span class="o">=</span><span class="n">drop_tol</span><span class="p">,</span>
+            <span class="n">fill_factor</span><span class="o">=</span><span class="n">fill_factor</span><span class="p">,</span>
+            <span class="n">drop_rule</span><span class="o">=</span><span class="n">drop_rule</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+            <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">filled</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da_filled</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div></div>
 
 
 <span class="c1"># Wrapped IO methods</span>
