@@ -37,11 +37,14 @@ def xoxo():
     return grid
 
 
-def adh_san_diego():
+def adh_san_diego(xarray=False):
     """
     Fetch time varying output of a hydraulic simulation.
     """
     fname = REGISTRY.fetch("ADH_SanDiego.nc")
     ds = xr.open_dataset(fname)
-    grid = xugrid.Ugrid2d.from_dataset(ds)
-    return xugrid.UgridDataset(ds, grid)
+    if xarray:
+        return ds
+    else:
+        grid = xugrid.Ugrid2d.from_dataset(ds)
+        return xugrid.UgridDataset(ds, grid)
