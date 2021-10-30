@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse
 import xarray as xr
 from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
-from xarray.core._typed_ops import DataArrayOpsMixin
+from xarray.core._typed_ops import DataArrayOpsMixin, DatasetOpsMixin
 from xarray.core.utils import UncachedAccessor
 
 from . import connectivity
@@ -35,17 +35,35 @@ def xarray_wrapper(func, grid):
     return wrapped
 
 
-class UgridDataArray(DataArrayOpsMixin):
+class DunderForwardMixin:
+    """
+    These methods are not present in the xarray OpsMixin classes.
+    """
+
+    def __bool__(self):
+        return bool(self.obj)
+
+    def __contains__(self, key: Any):
+        return key in self.obj
+
+    def __int__(self):
+        return int(self.obj)
+
+    def __float__(self):
+        return float(self.obj)
+
+
+class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
     """
     this class wraps an xarray dataArray. It is used to work with the dataArray
     in the context of an unstructured 2d grid.
     """
 
     def __init__(self, obj: xr.DataArray, grid: Ugrid2d = None):
-        self.obj = obj
         if grid is None:
             grid = Ugrid2d.from_dataset(obj)
         self.grid = grid
+        self.obj = obj.assign_coords(self.grid.topology_coords(obj))
 
     def __getitem__(self, key):
         """
@@ -109,8 +127,24 @@ class UgridDataArray(DataArrayOpsMixin):
         da = xr.DataArray.from_series(geoseries)
         return UgridDataArray(da, grid)
 
+    @staticmethod
+    def from_structured(da: xr.DataArray):
+        if da.dims[-2:] != ("y", "x"):
+            raise ValueError('Last two dimensions of da must be ("y", "x")')
+        grid = Ugrid2d.from_structured(da)
+        dims = da.dims[:-2]
+        coords = {k: da.coords[k] for k in dims}
+        coords[grid.face_dimension] = np.arange(da["y"].size * da["x"].size)
+        face_da = xr.DataArray(
+            da.data.reshape(*da.shape[:-2], -1),
+            coords=coords,
+            dims=[*dims, "face"],
+            name=da.name,
+        )
+        return UgridDataArray(face_da, grid)
 
-class UgridDataset:
+
+class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
     """
     this class wraps an xarray Dataset. It is used to work with the Dataset in
     the context of an unstructured 2d grid.
@@ -124,13 +158,18 @@ class UgridDataset:
             self.grid = Ugrid2d.from_dataset(obj)
         else:
             self.grid = grid
+
         if obj is None:
-            self.ds = xr.Dataset()
+            ds = xr.Dataset()
         else:
-            self.ds = self.grid.remove_topology(obj)
+            ds = self.grid.remove_topology(obj)
+        self.obj = ds.assign_coords(self.grid.topology_coords(ds))
+
+    def __contains__(self, key: Any):
+        return key in self.obj
 
     def __getitem__(self, key):
-        result = self.ds[key]
+        result = self.obj[key]
         if isinstance(result, xr.DataArray):
             return UgridDataArray(result, self.grid)
         elif isinstance(result, xr.Dataset):
@@ -141,15 +180,15 @@ class UgridDataset:
     def __setitem__(self, key, value):
         # TODO: check with topology
         if isinstance(value, UgridDataArray):
-            self.ds[key] = value.obj
+            self.obj[key] = value.obj
         else:
-            self.ds[key] = value
+            self.obj[key] = value
 
     def __getattr__(self, attr):
         """
         Appropriately wrap result if necessary.
         """
-        result = getattr(self.ds, attr)
+        result = getattr(self.obj, attr)
         if isinstance(result, xr.DataArray):
             return UgridDataArray(result, self.grid)
         elif isinstance(result, xr.Dataset):
@@ -161,7 +200,7 @@ class UgridDataset:
 
     @property
     def ugrid(self):
-        return UgridAccessor(self.ds, self.grid)
+        return UgridAccessor(self.obj, self.grid)
 
     @staticmethod
     def from_geodataframe(geodataframe: gpd.GeoDataFrame):
@@ -297,6 +336,10 @@ class UgridAccessor:
         """
         ds = self._dataset_obj()
         return ds.merge(self.grid.dataset)
+
+    @property
+    def crs(self):
+        return self.grid.crs
 
     def to_geodataframe(self, dim: str) -> gpd.GeoDataFrame:
         """
@@ -435,7 +478,7 @@ class UgridAccessor:
         filled: UgridDataArray of floats
         """
         grid = self.grid
-        attrs = grid.mesh_topology.attrs
+        attrs = grid.topology_attrs
         da = self.obj
         if isinstance(da, xr.Dataset):
             raise NotImplementedError
@@ -464,6 +507,15 @@ class UgridAccessor:
         )
         da_filled = da.copy(data=filled)
         return UgridDataArray(da_filled, grid)
+
+    def to_dataset(self):
+        return self.grid.dataset.merge(self.obj)
+
+    def to_netcdf(self, *args, **kwargs):
+        self.to_dataset().to_netcdf(*args, **kwargs)
+
+    def to_zarr(self, *args, **kwargs):
+        self.to_dataset().to_zarr(*args, **kwargs)
 
 
 # Wrapped IO methods
@@ -516,3 +568,22 @@ open_dataset.__doc__ = xr.open_dataset.__doc__
 open_dataarray.__doc__ = xr.open_dataarray.__doc__
 open_mfdataset.__doc__ = xr.open_mfdataset.__doc__
 open_zarr.__doc__ = xr.open_zarr.__doc__
+
+
+# Other utilities
+# ---------------
+
+
+def wrap_func_like(func):
+    @wraps(func)
+    def _like(other, *args, **kwargs):
+        obj = func(other.obj, *args, **kwargs)
+        return type(other)(obj, other.grid)
+
+    _like.__doc__ = func.__doc__
+    return _like
+
+
+full_like = wrap_func_like(xr.full_like)
+zeros_like = wrap_func_like(xr.zeros_like)
+ones_like = wrap_func_like(xr.ones_like)
