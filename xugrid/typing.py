@@ -1,6 +1,7 @@
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 import numpy as np
+from scipy.sparse import coo_matrix, csr_matrix
 
 # import numpy.typing as npt
 
@@ -19,6 +20,7 @@ BoolArray = np.ndarray
 PointArray = np.ndarray
 LineArray = np.ndarray
 PolygonArray = np.ndarray
+SparseMatrix = Union[coo_matrix, csr_matrix]
 
 
 class Point(NamedTuple):
