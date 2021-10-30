@@ -4,7 +4,7 @@ import numba as nb
 import numpy as np
 from scipy import sparse
 
-from .typing import BoolArray, FloatArray, IntArray, IntDType
+from .typing import X_EPSILON, BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
 
 
 class AdjacencyMatrix(NamedTuple):
@@ -71,7 +71,7 @@ def to_sparse(conn: IntArray, fill_value: int) -> sparse.csr_matrix:
     return _to_sparse(conn, fill_value, invert=False)
 
 
-def to_dense(conn: sparse.coo_matrix, fill_value: int) -> IntArray:
+def to_dense(conn: SparseMatrix, fill_value: int) -> IntArray:
     n, _ = conn.shape
     m_per_row = conn.getnnz(axis=1)
     m = m_per_row.max()
@@ -135,8 +135,6 @@ def renumber(a: IntArray) -> IntArray:
     return dense.reshape(a.shape)
 
 
-# Derived connectivities
-# ----------------------
 def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArray:
     # Wrap around and create closed polygon: put the first node at the end of the row
     # In case of fill values, replace all fill values
@@ -150,6 +148,51 @@ def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArra
     return closed, isfill
 
 
+def reverse_orientation(face_node_connectivity: IntArray, fill_value: int):
+    # We cannot simply reverse the rows with [:, ::-1], since there may be fill
+    # values present.
+    reversed_orientation = face_node_connectivity.copy()
+    in_reverse = face_node_connectivity[:, ::-1]
+    in_reverse = in_reverse[in_reverse != fill_value]
+    replace = face_node_connectivity != fill_value
+    reversed_orientation[replace] = in_reverse
+    return reversed_orientation
+
+
+def counterclockwise(
+    face_node_connectivity: IntArray, fill_value: int, nodes: FloatArray
+) -> IntArray:
+    # In principle, we need only compute the cross product of the first three
+    # vertices to determine whether a polygon is ordered clockwise (cw) or ccw.
+    # However, this fails if there are hanging nodes amongst the first few.
+    # First, we try with just first triangles.
+    p = nodes[face_node_connectivity[:, :3]]
+    dxy = np.diff(p, axis=1)
+    normal = np.cross(dxy[:, 0], dxy[:, 1])
+    reverse = normal < 0
+
+    # Check whether there are any hanging nodes
+    hanging = np.abs(normal) < X_EPSILON
+    if hanging.any():
+        # For these rows, go through the entire polygon
+        n = hanging.sum()
+        m = face_node_connectivity.shape[1]
+        closed = close_polygons(face_node_connectivity[hanging], fill_value)
+        p = nodes[closed]
+        dxy = np.diff(p, axis=1)
+        normal = np.empty((n, m))
+        for i in range(m):
+            normal[i] = np.cross(dxy[:, i], dxy[:, i + 1])
+        reverse[hanging] = normal.sum(axis=1) < 0
+
+    ccw = face_node_connectivity.copy()
+    if reverse.any():
+        ccw[reverse] = reverse_orientation(face_node_connectivity[reverse], fill_value)
+    return ccw
+
+
+# Derived connectivities
+# ----------------------
 def edge_connectivity(
     face_node_connectivity: IntArray, fill_value: int
 ) -> Tuple[IntArray, IntArray]:
