@@ -6,10 +6,13 @@ from .ugrid_dataset import (
     UgridAccessor,
     UgridDataArray,
     UgridDataset,
+    full_like,
+    ones_like,
     open_dataarray,
     open_dataset,
     open_mfdataset,
     open_zarr,
+    zeros_like,
 )
 
 try:
