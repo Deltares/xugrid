@@ -421,8 +421,7 @@ def line(grid, z, ax, **kwargs):
 
     if z is not None:
         dim = z.dims[0]
-        attrs = grid.mesh_topology.attrs
-        if dim == attrs.get("edge_dimension", "edge"):
+        if dim == grid.edge_dimension:
             collection.set_array(z.values)
             collection._scale_norm(norm, vmin, vmax)
 
@@ -557,14 +556,13 @@ def plot(
         Additional keyword arguments for Matplotlib.
     """
     dim = darray.dims[0]
-    attrs = grid.mesh_topology.attrs
     kwargs["ax"] = ax
-    if dim == attrs.get("face_dimension", "face"):
+    if dim == grid.face_dimension:
         return pcolormesh(grid, darray, **kwargs)
-    elif dim == attrs.get("node_dimension", "node"):
+    elif dim == grid.node_dimension:
         triangulation, _ = grid.triangulation
         return tripcolor(triangulation, darray, **kwargs)
-    elif dim == attrs.get("edge_dimension", "edge"):
+    elif dim == grid.edge_dimension:
         return line(grid, darray, **kwargs)
     else:
         raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
@@ -579,7 +577,7 @@ class _EdgePlot:
 
     def __call__(self, **kwargs):
         dim = self._da.dims[0]
-        attrs = self._grid.mesh_topology.attrs
+        attrs = self._grid.topology_attrs
         if dim == attrs.get("edge_dimension", "edge"):
             z = self._da
         else:
