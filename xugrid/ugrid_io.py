@@ -42,6 +42,56 @@ UGRID2D_TOPOLOGY_VARIABLES = UgridTopologyAttributes(
 )
 
 
+class UGrid:
+    # TODO: to be replaced by https://github.com/Deltares/UGridPy UGrid class
+    @staticmethod
+    def network1d_get_attributes(name: str):
+        """Get a dictionary of network1d default attribute names and the corresponding default values.
+        Args:
+            name (str): The network1d name.
+        Returns:
+            dict: A dictionary containing the attribute names and the corresponding default values.
+        """
+
+        return {
+            "cf_role": "mesh_topology",
+            "long_name": "Topology data of 1D network",
+            "topology_dimension": 1,
+            "node_dimension": f"{name}_nNodes",
+            "node_coordinates": f"{name}_node_x {name}_node_y",
+            "node_id": f"{name}_node_id",
+            "node_long_name": f"{name}_node_long_name",
+            "edge_dimension": f"{name}_nEdges",
+            "edge_node_connectivity": f"{name}_edge_nodes",
+            "edge_length": f"{name}_edge_length",
+            "edge_id": f"{name}_edge_id",
+            "edge_long_name": f"{name}_edge_long_name",
+            "edge_geometry": f"{name}_edge_geometry",
+        }
+
+    @staticmethod
+    def mesh2d_get_attributes(name: str):
+        """Get a dictionary of mesh2d default attribute names.
+        Args:
+            name (str): The mesh2d name.
+        Returns:
+            dict: A dictionary containing the attribute names and the corresponding default values.
+        """
+        return {
+            "cf_role": "mesh_topology",
+            "long_name": "Topology data of 2D mesh",
+            "topology_dimension": 2,
+            "node_dimension": f"{name}_nNodes",
+            "node_coordinates": f"{name}_node_x {name}_node_y",
+            "edge_dimension": f"{name}_nNodes",
+            "edge_node_connectivity": f"{name}_edge_nodes",
+            "face_dimension": f"{name}_nFaces",
+            "face_node_connectivity": f"{name}_face_nodes",
+            "max_face_nodes_dimension": f"{name}_nMax_face_nodes",
+            "face_coordinates": f"{name}_face_x {name}_face_y",
+        }
+
+
 def default_ugrid1d_attrs(prefix: str) -> Dict[str, str]:
     return {
         "cf_role": "mesh_topology",
@@ -150,12 +200,9 @@ def ugrid1d_dataset(
 ) -> xr.Dataset:
     if name is None:
         name = UGRID1D_DEFAULT_NAME
-        prefix = ""
-    else:
-        prefix = f"{name}_"
 
     if attrs is None:
-        attrs = default_ugrid1d_attrs(prefix)
+        attrs = UGrid.network1d_get_attributes(name)
 
     node_dimension = attrs["node_dimension"]
     edge_dimension = attrs["edge_dimension"]
@@ -208,12 +255,9 @@ def ugrid2d_dataset(
 ) -> xr.Dataset:
     if name is None:
         name = UGRID2D_DEFAULT_NAME
-        prefix = ""
-    else:
-        prefix = f"{name}_"
 
     if attrs is None:
-        attrs = default_ugrid2d_attrs(prefix)
+        attrs = UGrid.mesh2d_get_attributes(name)
 
     node_dimension = attrs["node_dimension"]
     face_dimension = attrs["face_dimension"]
