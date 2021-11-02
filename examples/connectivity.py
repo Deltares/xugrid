@@ -30,7 +30,7 @@ import xarray as xr
 
 import xugrid
 
-###############################################################################
+# %%
 # Connectivity arrays
 # -------------------
 #
@@ -79,7 +79,7 @@ fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
 iter2.ugrid.plot(ax=ax0)
 iter5.ugrid.plot(ax=ax1)
 
-###############################################################################
+# %%
 # By default, the border value for binary dilation is **also** set to
 # ``False``. This means boundary does not dilate inwards by default.  We'll
 # start by setting a single value in the center of the grid to ``True``.
@@ -91,7 +91,7 @@ uda = xugrid.UgridDataArray(
 uda.values[0] = True
 uda.ugrid.plot()
 
-###############################################################################
+# %%
 # Now let's run two dilations: one with the default border, and one with the
 # alternative border value:
 
@@ -102,7 +102,7 @@ fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
 iter1.ugrid.plot(ax=ax0)
 iter1_boundary.ugrid.plot(ax=ax1)
 
-###############################################################################
+# %%
 # Connected Components
 # --------------------
 #
@@ -116,7 +116,7 @@ uda = xugrid.UgridDataArray(
 labeled = uda.ugrid.connected_components()
 labeled.ugrid.plot(cmap="RdBu")
 
-###############################################################################
+# %%
 # Centroidal Voronoi Tesselation
 # ------------------------------
 #
@@ -126,7 +126,7 @@ labeled.ugrid.plot(cmap="RdBu")
 voronoi_grid = grid.tesselate_centroidal_voronoi()
 xugrid.plot.line(voronoi_grid, color="black")
 
-###############################################################################
+# %%
 # There are two alternative flavors to consider. We can fully ignore the
 # exterior and consider only the (interior) centroids. Alternatively, we can
 # include intersections of the voronoi edges with the mesh exterior, but
@@ -146,7 +146,7 @@ fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
 xugrid.plot.line(centroid_only, ax=ax0, color="black")
 xugrid.plot.line(convex_exterior, ax=ax1, color="black")
 
-###############################################################################
+# %%
 # Triangulation
 # -------------
 #
@@ -161,7 +161,7 @@ fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
 xugrid.plot.line(convex_exterior, ax=ax0, color="black")
 xugrid.plot.line(triangulation, ax=ax1, color="black")
 
-###############################################################################
+# %%
 # Laplace interpolation
 # ---------------------
 #
@@ -193,13 +193,13 @@ fig, ax = plt.subplots()
 uda.ugrid.plot(ax=ax)
 uda.ugrid.plot.edge(ax=ax, color="black")
 
-###############################################################################
+# %%
 # We can now use Laplace interpolation to fill the gaps in the grid.
 
 filled = uda.ugrid.laplace_interpolate(direct_solve=True)
 filled.ugrid.plot(cmap="gist_rainbow", vmin=2.5, vmax=7.5)
 
-###############################################################################
+# %%
 # Reverse-Cuthill McKee
 # ---------------------
 #
@@ -216,7 +216,7 @@ connectivity = grid.face_face_connectivity.toarray() != 0
 fig, ax = plt.subplots(figsize=(8, 8))
 ax.imshow(connectivity, cmap="Greys")
 
-###############################################################################
+# %%
 # The bandwidth of this matrix is poor. Connections are all over the place: low
 # numbered cells are connected to high numbered cells (and vice versa). The
 # bandwidth of the reordered grid is much smaller and has much better data

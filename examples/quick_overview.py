@@ -7,13 +7,14 @@ detailed explanation can be found in the rest of the documentation.
 
 We'll start by importing a few essential packages.
 """
+# %%
 
 import numpy as np
 import xarray as xr
 
 import xugrid as xu
 
-###############################################################################
+# %%
 # Create a UgridDataArray
 # -----------------------
 #
@@ -30,7 +31,7 @@ import xugrid as xu
 ds = xu.data.adh_san_diego(xarray=True)
 ds
 
-###############################################################################
+# %%
 # There are a number of topology coordinates and variables: ``node_x`` and
 # ``node_y``, ``mesh2d`` and ``face_node_connectivity``. We can convert this
 # dataset to a UgridDataset which will separate the variables:
@@ -38,13 +39,13 @@ ds
 uds = xu.UgridDataset(ds)
 uds
 
-###############################################################################
+# %%
 # We can then grab one of the data variables as usual for xarray:
 
 elev = uds["elevation"]
 elev
 
-###############################################################################
+# %%
 # Alternatively, we can build a Ugrid topology object first from vertices and
 # connectivity numpy arrays. There are many ways to construct such arrays,
 # typically via mesh generators or Delaunay triangulation, but we will
@@ -57,14 +58,12 @@ fill_value = -1
 grid = xu.Ugrid2d(nodes[:, 0], nodes[:, 1], fill_value, faces)
 da = xr.DataArray(
     data=[1.0, 2.0],
-    dims=[
-        "face",
-    ],
+    dims=[grid.face_dimension],
 )
 uda = xu.UgridDataArray(da, grid)
 uda
 
-###############################################################################
+# %%
 # py:func:`xugrid.open_dataset` is demonstrated in the last section of this
 # guide, but its use is straightforward: internally it uses xarray to open a
 # dataset and converts it as seen in the first example.
@@ -74,7 +73,7 @@ uda
 
 elev.ugrid.plot(cmap="viridis")
 
-###############################################################################
+# %%
 # Data selection
 # --------------
 #
@@ -82,13 +81,13 @@ elev.ugrid.plot(cmap="viridis")
 
 uds["depth"].isel(node=0)
 
-###############################################################################
+# %%
 # To select based on the topology, use the ``.ugrid`` attribute:
 
 # subset = elev.ugrid.sel(x=slice(480_000.0, 490_000.0), y=slice(3_605_000.0, 3_625_000.0))
 # subset
 
-###############################################################################
+# %%
 # Computation
 # -----------
 #
@@ -96,7 +95,7 @@ uds["depth"].isel(node=0)
 
 uda + 10.0
 
-###############################################################################
+# %%
 # Geopandas
 # ---------
 #
@@ -109,12 +108,12 @@ uda + 10.0
 gdf = uda.to_geodataframe(name="test")
 gdf
 
-###############################################################################
+# %%
 # Conversion from Geopandas is easy too:
 
 xu.UgridDataset.from_geodataframe(gdf)
 
-###############################################################################
+# %%
 # XugridDatasets
 # --------------
 #
@@ -125,20 +124,20 @@ xu.UgridDataset.from_geodataframe(gdf)
 
 xu.data.disk()
 
-###############################################################################
+# %%
 # A UgridDataset may be initialized without data variables, but this requires
 # a grid object:
 
 new_uds = xu.UgridDataset(grid=uds.ugrid.grid)
 new_uds
 
-###############################################################################
+# %%
 # We can then add variables one-by-one, as we might with an xarray Dataset:
 
 new_uds["elevation"] = elev
 new_uds
 
-###############################################################################
+# %%
 # Write netCDF files
 # ------------------
 #
@@ -147,5 +146,5 @@ new_uds
 # conventions and merges it with the main dataset containing the data variables
 # before writing.
 
-uds.to_netcdf("example-ugrid.nc")
+uds.ugrid.to_netcdf("example-ugrid2.nc")
 xu.open_dataset("example-ugrid.nc")

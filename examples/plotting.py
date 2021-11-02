@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 import xugrid
 
-###############################################################################
+# %%
 # We'll use a simple synthetic example. This dataset contains data for all
 # topological attributes of a two dimensional mesh:
 #
@@ -39,7 +39,7 @@ import xugrid
 ds = xugrid.data.disk()
 ds
 
-###############################################################################
+# %%
 # UgridDataArray
 # --------------
 #
@@ -49,7 +49,7 @@ ds
 uda = ds["face_z"]
 uda.ugrid.plot()
 
-###############################################################################
+# %%
 # Like Xarray, the axes and the colorbar are labeled automatically using the
 # available information.
 #
@@ -60,7 +60,7 @@ uda.ugrid.plot()
 
 ds["edge_z"].ugrid.plot()
 
-###############################################################################
+# %%
 # The method called by default depends on the type of the data:
 #
 # =============== ===========================
@@ -78,20 +78,20 @@ ds["face_z"].ugrid.plot(ax=ax0)
 ds["edge_z"].ugrid.plot(ax=ax1)
 ds["node_z"].ugrid.plot(ax=ax2)
 
-###############################################################################
+# %%
 # We can also exactly control the type of plot we want. For example, to plot
 # filled contours for data associated with the face dimension:
 
 ds["face_z"].ugrid.plot.face.contourf()
 
-###############################################################################
+# %%
 # We can also overlay this data with the edges:
 
 fig, ax = plt.subplots()
 ds["face_z"].ugrid.plot.face.contourf()
 ds["face_z"].ugrid.plot.edge.line(color="black")
 
-###############################################################################
+# %%
 # In general, there has to be data associated with the mesh topology before a
 # plot can be made. ``plot.edge.line()`` forms an exception to this rule, as
 # the location of the edges is meaningful on its own: for this reason
@@ -142,7 +142,7 @@ ds["node_z"].ugrid.plot.node.contour(ax=axes[1, 2])
 ds["node_z"].ugrid.plot.node.contourf(ax=axes[2, 2])
 ds["node_z"].ugrid.plot.node.scatter(ax=axes[4, 2])
 
-###############################################################################
+# %%
 # The ``surface`` methods generate 3D surface plots:
 
 fig = plt.figure(figsize=plt.figaspect(0.5))
@@ -151,7 +151,7 @@ ax1 = fig.add_subplot(1, 2, 2, projection="3d")
 ds["face_z"].ugrid.plot.face.surface(ax=ax0)
 ds["node_z"].ugrid.plot.node.surface(ax=ax1)
 
-###############################################################################
+# %%
 # Additional Arguments
 # --------------------
 #
@@ -161,7 +161,7 @@ ds["node_z"].ugrid.plot.node.surface(ax=ax1)
 
 ds["face_z"].ugrid.plot.face(cmap="RdBu", levels=8, yincrease=False)
 
-###############################################################################
+# %%
 # Xarray DataArray plots
 # ----------------------
 #

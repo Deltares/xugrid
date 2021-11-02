@@ -25,7 +25,7 @@ import meshzoo
 import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 
-###############################################################################
+# %%
 # From xugrid, we need only import the ``connectivity`` and ``voronoi``
 # modules. The functions in these modules depend only on ``numpy``` and
 # ``scipy.sparse``.
@@ -92,7 +92,7 @@ def comparison_plot(
     return fig
 
 
-###############################################################################
+# %%
 # Let's start by generating a simple unstructured mesh and use only its
 # centroids to generate a voronoi tesselation.
 #
@@ -111,7 +111,7 @@ voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
 )
 voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
-###############################################################################
+# %%
 # We can compare the two meshes:
 #
 # * Left the original mesh, with centroids colored red
@@ -121,7 +121,7 @@ voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
-###############################################################################
+# %%
 # It should be clear that the new voronoi mesh is not space filling: since it
 # uses only the centroids, we do not preserve the exterior.
 #
@@ -146,7 +146,7 @@ voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
-###############################################################################
+# %%
 # A potential downside of including the full exterior only becomes clear when
 # we apply it to a mesh with a more complex exterior.
 #
@@ -180,7 +180,7 @@ voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
-###############################################################################
+# %%
 # The voronoi cell in the center of the disk has now become concave. This will
 # generally render the mesh unsuitable for finite volume or control volume
 # finite difference simulations.
@@ -208,7 +208,7 @@ voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
-###############################################################################
+# %%
 # This will (obviously) result in a mesh that does not preserve the exterior
 # exactly.
 #
@@ -264,7 +264,7 @@ for ax, e, v in zip(axes, all_edges, all_nodes):
     ax.scatter(*centroids.T, color="red")
     ax.scatter(*vertices.T, color="black")
 
-###############################################################################
+# %%
 # Plotting
 # --------
 # One of the uses of a voronoi tesselation is to visualize data that is located
@@ -277,7 +277,7 @@ for ax, e, v in zip(axes, all_edges, all_nodes):
 
 data = centroids[:, 0] + centroids[:, 1]
 
-###############################################################################
+# %%
 # Before we can send the data of an unstructured mesh off to a plotting library
 # such as ``matplotlib``, we'll generally need to triangulate the mesh. We can
 # directly use the first two options, since the generated voronoi vertices
@@ -320,7 +320,7 @@ edge_plot(vertices, edge_node_connectivity, ax3, colors="black")
 ax0.set_xlim(-1.05, 1.05)
 ax0.set_ylim(-1.05, 1.05)
 
-###############################################################################
+# %%
 # While the second option fills a greater proportion than the first option --
 # which is confined to the area between the centroids -- it's clear this
 # approach results in artifacts in the exterior voronoi cells.
