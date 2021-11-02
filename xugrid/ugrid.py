@@ -26,6 +26,10 @@ class AbstractUgrid(abc.ABC):
     def topology_dimension(self):
         return
 
+    @abc.abstractmethod
+    def _get_dimension(self):
+        return
+
     @abc.abstractstaticmethod
     def from_dataset():
         return
@@ -55,11 +59,11 @@ class AbstractUgrid(abc.ABC):
 
     @property
     def node_dimension(self):
-        return self.topology_attrs["node_dimension"]
+        return self._get_dimension("node")
 
     @property
     def edge_dimension(self):
-        return self.topology_attrs["edge_dimension"]
+        return self._get_dimension("edge")
 
     @property
     def node_coordinates(self) -> FloatArray:
@@ -101,15 +105,6 @@ class AbstractUgrid(abc.ABC):
             self._xmax,
             self._ymax,
         )
-
-    def _set_dataset(self, name: str, dataset: xr.Dataset) -> None:
-        if dataset is None:
-            dataset = self.topology_dataset()
-        topology_name = ugrid_io.get_topology_variable(dataset).name
-        if name is not None:
-            dataset = dataset.rename({topology_name: name})
-        self.dataset = dataset
-        self.topology_attrs = dataset[topology_name].attrs
 
     def _topology_subset(self, indices: IntArray, connectivity: IntArray):
         # If faces are repeated: not a valid mesh
@@ -289,8 +284,9 @@ class Ugrid1d(AbstractUgrid):
         self.node_y = node_y
         self.fill_value = fill_value
         self.edge_node_connectivity = edge_node_connectivity
+        if name is None:
+            name = ugrid_io.UGRID1D_DEFAULT_NAME
         self.name = name
-        self.topology_attrs = None
 
         # Optional attributes, deferred initialization
         # Meshkernel
@@ -314,7 +310,10 @@ class Ugrid1d(AbstractUgrid):
         else:
             self.crs = pyproj.CRS.from_user_input(crs)
         # Store dataset
-        self._set_dataset(dataset, name)
+        if dataset is None:
+            dataset = self.topology_dataset()
+        self.dataset = dataset
+        self.topology_attrs = dataset[self.name].attrs
 
     @staticmethod
     def from_dataset(dataset: xr.Dataset):
@@ -370,14 +369,23 @@ class Ugrid1d(AbstractUgrid):
     def topology_coords(self, obj: Union[xr.DataArray, xr.Dataset]) -> dict:
         coords = {}
         dims = obj.dims
+        attrs = self.topology_attrs
         edgedim = self.edge_dimension
         nodedim = self.node_dimension
         if edgedim in dims:
-            coords[f"{edgedim}_x"] = (edgedim, self.edge_x)
-            coords[f"{edgedim}_y"] = (edgedim, self.edge_y)
+            # It's not a required attribute.
+            if "edge_coordinates" in attrs:
+                name_x, name_y = attrs["edge_coordinates"].split()
+            else:
+                name_x = f"{self.name}_edge_x"
+                name_y = f"{self.name}_edge_y"
+            coords[name_x] = (edgedim, self.edge_x)
+            coords[name_y] = (edgedim, self.edge_y)
+            attrs["edge_coordinates"] = f"{name_x} {name_y}"
         if nodedim in dims:
-            coords[f"{nodedim}_x"] = (nodedim, self.node_x)
-            coords[f"{nodedim}_y"] = (nodedim, self.node_y)
+            name_x, name_y = attrs["node_coordinates"].split()
+            coords[name_x] = (nodedim, self.node_x)
+            coords[name_y] = (nodedim, self.node_y)
         return coords
 
     def topology_dataset(self):
@@ -415,6 +423,14 @@ class Ugrid1d(AbstractUgrid):
     @property
     def topology_dimension(self):
         return 1
+
+    def _get_dimension(self, dim):
+        key = f"{dim}_dimension"
+        if key not in self.topology_attrs:
+            self.topology_attrs[key] = ugrid_io.UGrid.mesh1d_get_attributes(self.name)[
+                key
+            ]
+        return self.topology_attrs[key]
 
     @property
     def mesh(self):
@@ -493,6 +509,8 @@ class Ugrid2d(AbstractUgrid):
         self.face_node_connectivity = connectivity.counterclockwise(
             face_node_connectivity, self.fill_value, self.node_coordinates
         )
+        if name is None:
+            name = ugrid_io.UGRID2D_DEFAULT_NAME
         self.name = name
         self.topology_attrs = None
 
@@ -529,7 +547,10 @@ class Ugrid2d(AbstractUgrid):
         else:
             self.crs = pyproj.CRS.from_user_input(crs)
         # Store dataset
-        self._set_dataset(dataset, name)
+        if dataset is None:
+            dataset = self.topology_dataset()
+        self.dataset = dataset
+        self.topology_attrs = dataset[self.name].attrs
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
@@ -595,12 +616,15 @@ class Ugrid2d(AbstractUgrid):
 
         # Set back to their original names
         topology_ds = ugrid_ds.rename({v: k for k, v in ugrid_roles.items()})
+        node_x = ugrid_roles["node_x"]
+        node_y = ugrid_roles["node_y"]
+        face_node_connectivity = ugrid_roles["face_node_connectivity"]
 
         return Ugrid2d(
-            ugrid_ds["node_x"].values,
-            ugrid_ds["node_y"].values,
+            ugrid_ds[node_x].values,
+            ugrid_ds[node_y].values,
             fill_value,
-            ugrid_ds["face_node_connectivity"].values,
+            ugrid_ds[face_node_connectivity].values,
             edge_node_connectivity,
             topology_ds,
             mesh_topology.name,
@@ -628,15 +652,35 @@ class Ugrid2d(AbstractUgrid):
         facedim = self.face_dimension
         edgedim = self.edge_dimension
         nodedim = self.node_dimension
+        attrs = self.topology_attrs
+
         if facedim in dims:
-            coords[f"{facedim}_x"] = (facedim, self.face_x)
-            coords[f"{facedim}_y"] = (facedim, self.face_y)
+            # It's not a required attribute.
+            if "face_coordinates" in attrs:
+                name_x, name_y = attrs["face_coordinates"].split()
+            else:
+                name_x = f"{self.name}_face_x"
+                name_y = f"{self.name}_face_y"
+            coords[name_x] = (facedim, self.face_x)
+            coords[name_y] = (facedim, self.face_y)
+            attrs["face-coordinates"] = f"{name_x} {name_y}"
+
         if edgedim in dims:
-            coords[f"{edgedim}_x"] = (edgedim, self.edge_x)
-            coords[f"{edgedim}_y"] = (edgedim, self.edge_y)
+            # It's not a required attribute.
+            if "edge_coordinates" in attrs:
+                name_x, name_y = attrs["edge_coordinates"].split()
+            else:
+                name_x = f"{self.name}_edge_x"
+                name_y = f"{self.name}_edge_y"
+            coords[name_x] = (edgedim, self.edge_x)
+            coords[name_y] = (edgedim, self.edge_y)
+            attrs["edge_coordinates"] = f"{name_x} {name_y}"
+
         if nodedim in dims:
-            coords[f"{nodedim}_x"] = (nodedim, self.node_x)
-            coords[f"{nodedim}_y"] = (nodedim, self.node_y)
+            name_x, name_y = attrs["node_coordinates"].split()
+            coords[name_x] = (nodedim, self.node_x)
+            coords[name_y] = (nodedim, self.node_y)
+
         return coords
 
     # These are all optional/derived UGRID attributes. They are not computed by
@@ -646,9 +690,17 @@ class Ugrid2d(AbstractUgrid):
     def topology_dimension(self):
         return 2
 
+    def _get_dimension(self, dim):
+        key = f"{dim}_dimension"
+        if key not in self.topology_attrs:
+            self.topology_attrs[key] = ugrid_io.UGrid.mesh2d_get_attributes(self.name)[
+                key
+            ]
+        return self.topology_attrs[key]
+
     @property
     def face_dimension(self):
-        return self.topology_attrs["face_dimension"]
+        return self._get_dimension("face")
 
     def _edge_connectivity(self):
         (

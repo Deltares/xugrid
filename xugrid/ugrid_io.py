@@ -7,6 +7,7 @@ C API.
 import warnings
 from typing import Dict, NamedTuple, Tuple, Union
 
+import numpy as np
 import xarray as xr
 
 from .typing import FloatArray, IntArray
@@ -16,21 +17,21 @@ from .typing import FloatArray, IntArray
 
 class UgridTopologyAttributes(NamedTuple):
     coordinates: Tuple[str]
-    metadata: Tuple[str]
+    dimensions: Tuple[str]
     connectivity: Tuple[str]
 
 
 UGRID1D_DEFAULT_NAME = "network1d"
 UGRID1D_TOPOLOGY_VARIABLES = UgridTopologyAttributes(
     coordinates=("node_coordinates", "edge_coordinates"),
-    metadata=("node_dimension", "edge_dimension"),
+    dimensions=("node_dimension", "edge_dimension"),
     connectivity=("edge_node_connectivity",),
 )
 
 UGRID2D_DEFAULT_NAME = "mesh2d"
 UGRID2D_TOPOLOGY_VARIABLES = UgridTopologyAttributes(
     coordinates=("node_coordinates", "face_coordinates", "edge_coordinates"),
-    metadata=("node_dimension", "face_dimension", "edge_dimension"),
+    dimensions=("node_dimension", "face_dimension", "edge_dimension"),
     connectivity=(
         "face_node_connectivity",
         "edge_node_connectivity",
@@ -83,40 +84,13 @@ class UGrid:
             "topology_dimension": 2,
             "node_dimension": f"{name}_nNodes",
             "node_coordinates": f"{name}_node_x {name}_node_y",
-            "edge_dimension": f"{name}_nNodes",
+            "edge_dimension": f"{name}_nEdges",
             "edge_node_connectivity": f"{name}_edge_nodes",
             "face_dimension": f"{name}_nFaces",
             "face_node_connectivity": f"{name}_face_nodes",
             "max_face_nodes_dimension": f"{name}_nMax_face_nodes",
             "face_coordinates": f"{name}_face_x {name}_face_y",
         }
-
-
-def default_ugrid1d_attrs(prefix: str) -> Dict[str, str]:
-    return {
-        "cf_role": "mesh_topology",
-        "long_name": "Topology data of 1D network",
-        "topology_dimension": 1,
-        "node_coordinates": f"{prefix}node_x {prefix}node_y",
-        "edge_node_connectivity": f"{prefix}edge_node_connectivity",
-        "node_dimension": f"{prefix}node",
-        "edge_dimension": f"{prefix}edge",
-    }
-
-
-def default_ugrid2d_attrs(prefix: str) -> Dict[str, str]:
-    return {
-        "cf_role": "mesh_topology",
-        "long_name": "Topology data of 2D mesh",
-        "topology_dimension": 2,
-        "node_coordinates": f"{prefix}node_x {prefix}node_y",
-        "edge_node_connectivity": f"{prefix}edge_node_connectivity",
-        "node_dimension": f"{prefix}node",
-        "face_dimension": f"{prefix}face",
-        "edge_dimension": f"{prefix}edge",
-        "face_node_connectivity": f"{prefix}face_node_connectivity",
-        "edge_node_connectivity": f"{prefix}edge_node_connectivity",
-    }
 
 
 # Reading / parsing:
@@ -131,41 +105,95 @@ def get_topology_variable(dataset):
     return variables[0]
 
 
-def set_name(variables, dataset, name, role):
-    if name in dataset:
-        variables[name] = role
-    else:
+def _extract_topology_variables(
+    dataset, mesh_topology, ugrid_attrs: UgridTopologyAttributes
+) -> dict[str, str]:
+    """
+    This standardizes the names of the UGRID attributes as variable names in
+    the dataset.
+
+    Their original names are preserved in the original attrs associated with
+    the dataset.
+    """
+
+    def warn(role, name):
         warnings.warn(
             f"Topology variable with role {role} specified under name "
             f"{name} specified, but variable {name} not found in dataset.",
             UserWarning,
         )
 
+    def check_dim(attrs, dimrole, varname):
+        if dimrole in attrs and attrs[dimrole] != dimname:
+            warnings.warn(
+                f"{dimrole} of attributes does not match with dimension of "
+                f"variable: {attrs[dimrole]} in attrs versus {dimname} in "
+                f"variable {varname}"
+            )
+            return False
+        return True
 
-def _extract_topology_variables(
-    dataset, mesh_topology, ugrid_attrs: UgridTopologyAttributes
-):
     attrs = mesh_topology.attrs
     variables = {mesh_topology.name: "mesh_topology"}
     for role in ugrid_attrs.connectivity:
         name = attrs.get(role)
-        set_name(variables, dataset, name, role)
+        if name:
+            if name in dataset:
+                variables[name] = role
+                # Also set the dimension names here.
+                dim = role.split("_")[0]
+                dimname = dataset[name].dims[0]
+                dimrole = f"{dim}_dimension"
+                variables[dimname] = dimrole
+                check_dim(attrs, dimrole, name)
+                attrs[dimrole] = dimname
+            else:
+                warn(role, name)
+
     for role in ugrid_attrs.coordinates:
         name = attrs.get(role)
         if name:
             name_x, name_y = name.split()
-            set_name(variables, dataset, name_x, role)
-            set_name(variables, dataset, name_y, role)
+            dim = role.split("_")[0]
+            dimrole = f"{dim}_dimension"
+            dimname_x = dataset[name_x].dims[0]
+            dimname_y = dataset[name_y].dims[0]
+
+            if name_x in dataset:
+                variables[name_x] = f"{dim}_x"
+            else:
+                warn(role, name_x)
+            if name_y in dataset:
+                variables[name_y] = f"{dim}_y"
+            else:
+                warn(role, name_y)
+
+            if dimname_x != dimname_y:
+                raise ValueError(
+                    f"dimensions of {name_x} and {name_y} do not match:"
+                    f"{dimname_x} versus {dimname_y}"
+                )
+
+            if dimrole in attrs:
+                if attrs[dimrole] != dimname_x:
+                    raise ValueError(
+                        f"{dimrole} from connectivity does not match dimension "
+                        f"{name_x}: {attrs[dimrole]} versus {dimname_x}"
+                    )
+            else:
+                variables[dimname_x] = dimrole
+                attrs[dimrole] = dimname_x
+
     return variables
 
 
-def get_ugrid1d_variables(dataset, mesh_topology):
+def get_ugrid1d_variables(dataset, mesh_topology) -> dict[str, str]:
     return _extract_topology_variables(
         dataset, mesh_topology, UGRID1D_TOPOLOGY_VARIABLES
     )
 
 
-def get_ugrid2d_variables(dataset, mesh_topology):
+def get_ugrid2d_variables(dataset, mesh_topology) -> dict[str, str]:
     return _extract_topology_variables(
         dataset, mesh_topology, UGRID2D_TOPOLOGY_VARIABLES
     )
@@ -175,14 +203,12 @@ def cast(da: xr.DataArray, fill_value: Union[float, int], dtype: type) -> xr.Dat
     """
     Set the appropriate fill value and cast to dtype.
     """
-    old_fill_value = da.attrs["_FillValue"]
     data = da.values
-    # This returns a copy.
-    if np.isnan(old_fill):
-        is_fill = np.isnan(data)
-    else:
-        is_fill = data == old_fill_value
+    # Note: Xarray always returns an array as floating type with NaNs for the
+    # fill value if _FillValue is set!
+    is_fill = np.isnan(data)
     data[is_fill] = fill_value
+    # This returns a copy.
     data = data.astype(dtype, copy=True)
     return da.copy(data=data)
 
@@ -299,7 +325,7 @@ def ugrid2d_dataset(
     )
     if edge_node_connectivity is not None:
         ds[edge_node_name] = xr.DataArray(
-            data=face_node_connectivity,
+            data=edge_node_connectivity,
             dims=[edge_dimension, "two"],
             attrs={
                 "cf_role": "edge_node_connectivity",
