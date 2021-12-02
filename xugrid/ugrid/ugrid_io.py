@@ -10,7 +10,7 @@ from typing import Dict, NamedTuple, Tuple, Union
 import numpy as np
 import xarray as xr
 
-from .typing import FloatArray, IntArray
+from ..typing import FloatArray, IntArray
 
 # Ugrid convention data:
 

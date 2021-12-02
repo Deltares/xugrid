@@ -19,7 +19,7 @@ from xarray.plot.utils import (
     label_from_attrs,
 )
 
-from .typing import FloatArray, FloatDType, IntArray
+from ..typing import FloatArray, FloatDType, IntArray
 
 Triangulation = Tuple[Tuple[FloatArray, FloatArray], IntArray]
 
