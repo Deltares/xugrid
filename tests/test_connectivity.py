@@ -31,6 +31,16 @@ def mixed_mesh():
     return faces, fill_value
 
 
+def test_neighbors():
+    i = [0, 0, 0, 1, 1, 1]
+    j = [0, 1, 2, 1, 3, 2]
+    coo_content = (j, (i, j))
+    A = sparse.coo_matrix(coo_content).tocsr()
+    A = connectivity.AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+    assert np.array_equal(connectivity.neighbors(A, 0), [0, 1, 2])
+    assert np.array_equal(connectivity.neighbors(A, 1), [1, 2, 3])
+
+
 def test_to_ij(triangle_mesh, mixed_mesh):
     faces, fill_value = triangle_mesh
     actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=False)
@@ -181,6 +191,127 @@ def test_renumber():
     assert np.array_equal(actual, expected)
 
 
+def test_close_polygons(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    closed, isfill = connectivity.close_polygons(faces, fill_value)
+    expected = np.array(
+        [
+            [0, 1, 2, 0, 0],
+            [1, 3, 4, 2, 1],
+        ]
+    )
+    expected_isfill = np.full((2, 5), False)
+    expected_isfill[0, -2:] = True
+    expected_isfill[1, -1] = True
+    assert np.array_equal(closed, expected)
+    assert np.array_equal(isfill, expected_isfill)
+
+
+def test_reverse_orientation(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    reverse = connectivity.reverse_orientation(faces, fill_value)
+    expected = np.array(
+        [
+            [2, 1, 0, fill_value],
+            [2, 4, 3, 1],
+        ]
+    )
+    assert np.array_equal(reverse, expected)
+
+
+def test_counterclockwise():
+    nodes = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [2.0, 0.0],
+            [0.0, 2.0],
+        ]
+    )
+    fill_value = -1
+
+    # Already ccw, nothing should be changed.
+    faces = np.array([[0, 2, 3, -1]])
+    actual = connectivity.counterclockwise(faces, fill_value, nodes)
+    assert np.array_equal(actual, faces)
+
+    # Clockwise with a fill value, reverse.
+    faces_cw = np.array([[3, 2, 0, -1]])
+    actual = connectivity.counterclockwise(faces_cw, fill_value, nodes)
+    assert np.array_equal(actual, faces)
+
+    # Including a hanging node, ccw, nothing changed.
+    hanging_ccw = np.array([[0, 1, 2, 3, -1]])
+    actual = connectivity.counterclockwise(hanging_ccw, fill_value, nodes)
+    assert np.array_equal(actual, hanging_ccw)
+
+    # Including a hanging node, reverse.
+    hanging_cw = np.array([[3, 2, 1, 0, -1]])
+    actual = connectivity.counterclockwise(hanging_cw, fill_value, nodes)
+    assert np.array_equal(actual, hanging_ccw)
+
+
+def test_edge_connectivity(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    edge_nodes, face_edges = connectivity.edge_connectivity(faces, fill_value)
+    expected_edge_nodes = np.array(
+        [
+            [0, 1],
+            [0, 2],
+            [1, 2],
+            [1, 3],
+            [2, 4],
+            [3, 4],
+        ]
+    )
+    expected_face_edges = np.array(
+        [
+            [0, 2, 1, -1],
+            [3, 5, 4, 2],
+        ]
+    )
+    assert np.array_equal(edge_nodes, expected_edge_nodes)
+    assert np.array_equal(face_edges, expected_face_edges)
+
+
+def test_face_face_connectivity():
+    edge_faces = np.array(
+        [
+            [0, -1],
+            [0, -1],
+            [0, 1],
+            [1, -1],
+            [1, -1],
+            [1, -1],
+        ]
+    )
+    face_face = connectivity.face_face_connectivity(edge_faces, fill_value=-1)
+    assert isinstance(face_face, sparse.csr_matrix)
+    assert np.array_equal(face_face.indices, [1, 0])
+    assert np.array_equal(face_face.indptr, [0, 1, 2])
+
+
+def test_centroids(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    nodes = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 0.0],
+            [2.0, 1.0],
+        ]
+    )
+    actual = connectivity.centroids(faces, fill_value, nodes[:, 0], nodes[:, 1])
+    expected = np.array(
+        [
+            [2.0 / 3.0, 1.0 / 3.0],
+            [1.5, 0.5],
+        ]
+    )
+    assert np.allclose(actual, expected)
+
+
 def test_structured_connectivity():
     active = np.array(
         [
@@ -198,3 +329,23 @@ def test_structured_connectivity():
     assert np.array_equal(connectivity.neighbors(A, 4), [3, 6])
     assert np.array_equal(connectivity.neighbors(A, 5), [2])
     assert np.array_equal(connectivity.neighbors(A, 6), [4])
+
+
+def test_triangulate(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    actual_triangles, actual_faces = connectivity.triangulate_dense(faces, fill_value)
+    expected_triangles = np.array(
+        [
+            [0, 1, 2],
+            [1, 3, 4],
+            [1, 4, 2],
+        ]
+    )
+    expected_faces = np.array([0, 1, 1])
+    assert np.array_equal(actual_triangles, expected_triangles)
+    assert np.array_equal(actual_faces, expected_faces)
+
+    sparse_faces = connectivity.to_sparse(faces, -1).tocoo()
+    actual_triangles, actual_faces = connectivity.triangulate_coo(sparse_faces)
+    assert np.array_equal(actual_triangles, expected_triangles)
+    assert np.array_equal(actual_faces, expected_faces)

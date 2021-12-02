@@ -177,12 +177,12 @@ def counterclockwise(
         # For these rows, go through the entire polygon
         n = hanging.sum()
         m = face_node_connectivity.shape[1]
-        closed = close_polygons(face_node_connectivity[hanging], fill_value)
+        closed, _ = close_polygons(face_node_connectivity[hanging], fill_value)
         p = nodes[closed]
         dxy = np.diff(p, axis=1)
         normal = np.empty((n, m))
-        for i in range(m):
-            normal[i] = np.cross(dxy[:, i], dxy[:, i + 1])
+        for i in range(m - 1):
+            normal[:, i] = np.cross(dxy[:, i], dxy[:, i + 1])
         reverse[hanging] = normal.sum(axis=1) < 0
 
     ccw = face_node_connectivity.copy()
@@ -281,11 +281,12 @@ def centroids(
         # This is mathematically equivalent to triangulating, computing triangle centroids
         # and computing the area weighted average of those centroids
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
-        coordinates = nodes[close_polygons(face_node_connectivity, fill_value)]
+        closed, _ = close_polygons(face_node_connectivity, fill_value)
+        coordinates = nodes[closed]
         a = coordinates[:, :-1]
         b = coordinates[:, 1:]
         c = a + b
-        determinant = np.cross_product(a, b)
+        determinant = np.cross(a, b)
         area_weight = 1.0 / (3.0 * determinant.sum(axis=1))
         centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
         centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
