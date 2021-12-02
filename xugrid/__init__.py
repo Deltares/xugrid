@@ -1,6 +1,7 @@
 import pkg_resources
 
 from . import data
+from .plot import plot
 from .ugrid import Ugrid1d, Ugrid2d
 from .ugrid_dataset import (
     UgridAccessor,

@@ -12,7 +12,9 @@ from xarray.core.utils import UncachedAccessor
 
 from . import connectivity
 from .interpolate import laplace_interpolate
-from .plot import _PlotMethods
+from .plot.plot import _PlotMethods
+
+# from .plot.pyvista import to_pyvista_grid
 from .ugrid import Ugrid1d, Ugrid2d, grid_from_geodataframe
 
 
