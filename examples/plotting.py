@@ -1,6 +1,7 @@
 """
 Plot unstructured mesh data
 ===========================
+
 The labels that are present in xarray's data structures allow for easy creation
 of informative plots: think of dates on the x-axis, or geospatial coordinates.
 Xarray provides a convenient way of plotting your data provided it is
@@ -21,6 +22,8 @@ Imports
 
 The following imports suffice for the examples.
 """
+
+# %%
 import matplotlib.pyplot as plt
 
 import xugrid
@@ -82,14 +85,14 @@ ds["node_z"].ugrid.plot(ax=ax2)
 # We can also exactly control the type of plot we want. For example, to plot
 # filled contours for data associated with the face dimension:
 
-ds["face_z"].ugrid.plot.face.contourf()
+ds["face_z"].ugrid.plot.contourf()
 
 # %%
 # We can also overlay this data with the edges:
 
 fig, ax = plt.subplots()
-ds["face_z"].ugrid.plot.face.contourf()
-ds["face_z"].ugrid.plot.edge.line(color="black")
+ds["face_z"].ugrid.plot.contourf()
+ds["face_z"].ugrid.plot.line(color="black")
 
 # %%
 # In general, there has to be data associated with the mesh topology before a
@@ -104,10 +107,10 @@ ds["face_z"].ugrid.plot.edge.line(color="black")
 #
 # For the **face** dimension:
 #
-# * :py:func:`xugrid.plot.pcolormesh`
 # * :py:func:`xugrid.plot.contour`
 # * :py:func:`xugrid.plot.contourf`
 # * :py:func:`xugrid.plot.imshow`
+# * :py:func:`xugrid.plot.pcolormesh`
 # * :py:func:`xugrid.plot.scatter`
 # * :py:func:`xugrid.plot.surface`
 #
@@ -118,29 +121,29 @@ ds["face_z"].ugrid.plot.edge.line(color="black")
 #
 # For the **node** dimension:
 #
-# * :py:func:`xugrid.plot.tripcolor`
 # * :py:func:`xugrid.plot.contour`
 # * :py:func:`xugrid.plot.contourf`
 # * :py:func:`xugrid.plot.scatter`
 # * :py:func:`xugrid.plot.surface`
+# * :py:func:`xugrid.plot.tripcolor`
 #
 # All these (2D) plots are illustrated here for completeness' sake:
 
 fig, axes = plt.subplots(nrows=5, ncols=3, figsize=(10, 15))
 
-ds["face_z"].ugrid.plot.face.pcolormesh(ax=axes[0, 0])
-ds["face_z"].ugrid.plot.face.contour(ax=axes[1, 0])
-ds["face_z"].ugrid.plot.face.contourf(ax=axes[2, 0])
-ds["face_z"].ugrid.plot.face.imshow(ax=axes[3, 0])
-ds["face_z"].ugrid.plot.face.scatter(ax=axes[4, 0])
+ds["face_z"].ugrid.plot.pcolormesh(ax=axes[0, 0])
+ds["face_z"].ugrid.plot.contour(ax=axes[1, 0])
+ds["face_z"].ugrid.plot.contourf(ax=axes[2, 0])
+ds["face_z"].ugrid.plot.imshow(ax=axes[3, 0])
+ds["face_z"].ugrid.plot.scatter(ax=axes[4, 0])
 
-ds["edge_z"].ugrid.plot.edge.line(ax=axes[0, 1])
-ds["edge_z"].ugrid.plot.edge.scatter(ax=axes[4, 1])
+ds["edge_z"].ugrid.plot.line(ax=axes[0, 1])
+ds["edge_z"].ugrid.plot.scatter(ax=axes[4, 1])
 
-ds["node_z"].ugrid.plot.node.tripcolor(ax=axes[0, 2])
-ds["node_z"].ugrid.plot.node.contour(ax=axes[1, 2])
-ds["node_z"].ugrid.plot.node.contourf(ax=axes[2, 2])
-ds["node_z"].ugrid.plot.node.scatter(ax=axes[4, 2])
+ds["node_z"].ugrid.plot.tripcolor(ax=axes[0, 2])
+ds["node_z"].ugrid.plot.contour(ax=axes[1, 2])
+ds["node_z"].ugrid.plot.contourf(ax=axes[2, 2])
+ds["node_z"].ugrid.plot.scatter(ax=axes[4, 2])
 
 # %%
 # The ``surface`` methods generate 3D surface plots:
@@ -148,8 +151,8 @@ ds["node_z"].ugrid.plot.node.scatter(ax=axes[4, 2])
 fig = plt.figure(figsize=plt.figaspect(0.5))
 ax0 = fig.add_subplot(1, 2, 1, projection="3d")
 ax1 = fig.add_subplot(1, 2, 2, projection="3d")
-ds["face_z"].ugrid.plot.face.surface(ax=ax0)
-ds["node_z"].ugrid.plot.node.surface(ax=ax1)
+ds["face_z"].ugrid.plot.surface(ax=ax0)
+ds["node_z"].ugrid.plot.surface(ax=ax1)
 
 # %%
 # Additional Arguments
@@ -159,7 +162,7 @@ ds["node_z"].ugrid.plot.node.surface(ax=ax1)
 # matplotlib function and the additional arguments supported by Xarray can be
 # used:
 
-ds["face_z"].ugrid.plot.face(cmap="RdBu", levels=8, yincrease=False)
+ds["face_z"].ugrid.plot(cmap="RdBu", levels=8, yincrease=False)
 
 # %%
 # Xarray DataArray plots
