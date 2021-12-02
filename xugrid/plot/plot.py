@@ -2,12 +2,10 @@
 This module is strongly inspired by / copied from xarray/plot/plot.py.
 """
 import functools
-from typing import Tuple
 
 import numpy as np
 import xarray as xr
 from matplotlib.collections import LineCollection, PolyCollection
-from xarray.core.utils import UncachedAccessor
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
@@ -19,9 +17,31 @@ from xarray.plot.utils import (
     label_from_attrs,
 )
 
-from ..typing import FloatArray, FloatDType, IntArray
+from ..typing import FloatDType
 
-Triangulation = Tuple[Tuple[FloatArray, FloatArray], IntArray]
+NODE = 0
+EDGE = 1
+FACE = 2
+COORDS = [
+    "node_coordinates",
+    "edge_coordinates",
+    "face_coordinates",
+]
+
+
+def get_ugrid_dim(grid, da) -> int:
+    dim = da.dims[0]
+    if dim == grid.node_dimension:
+        return NODE
+    elif dim == grid.edge_dimension:
+        return EDGE
+    elif dim == grid.face_dimension:
+        return FACE
+    else:
+        allowed_dims = [grid.node_dimension, grid.edge_dimension, grid.face_dimension]
+        raise ValueError(
+            f"Not a valid UGRID dimension: {dim}," f"should be one of: {allowed_dims}"
+        )
 
 
 def override_signature(f):
@@ -389,20 +409,32 @@ def _plot2d(plotfunc):
 
 
 @_plot2d
-def scatter(xy, z, ax, **kwargs):
-    x, y = xy.T
-    primitive = ax.scatter(x, y, c=z.values.ravel(), **kwargs)
+def scatter(grid, da, ax, **kwargs):
+    dim = get_ugrid_dim(grid, da)
+    x, y = getattr(grid, COORDS[dim]).T
+    primitive = ax.scatter(x, y, c=da.values.ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
-def tripcolor(triangulation, z, ax, **kwargs):
-    primitive = ax.tripcolor(*triangulation, z.values.ravel(), **kwargs)
+def tripcolor(grid, da, ax, **kwargs):
+    dim = get_ugrid_dim(grid, da)
+    if dim != NODE:
+        raise ValueError("tripcolor only supported for data on nodes")
+    (x, y, triangles), _ = grid.triangulation
+    primitive = ax.tripcolor(x, y, triangles, da.values.ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
-def line(grid, z, ax, **kwargs):
+def line(grid, da, ax, **kwargs):
+    if da is not None:
+        dim = get_ugrid_dim(grid, da)
+        if dim != EDGE:
+            raise ValueError("line only supported for edges")
+    else:
+        dim = None
+
     edge_nodes = grid.edge_node_connectivity
     n_edge = len(edge_nodes)
     edge_coords = np.empty((n_edge, 2, 2), dtype=FloatDType)
@@ -419,11 +451,9 @@ def line(grid, z, ax, **kwargs):
 
     collection = LineCollection(edge_coords, **kwargs)
 
-    if z is not None:
-        dim = z.dims[0]
-        if dim == grid.edge_dimension:
-            collection.set_array(z.values)
-            collection._scale_norm(norm, vmin, vmax)
+    if dim == EDGE:
+        collection.set_array(da.values)
+        collection._scale_norm(norm, vmin, vmax)
 
     primitive = ax.add_collection(collection, autolim=False)
 
@@ -435,7 +465,7 @@ def line(grid, z, ax, **kwargs):
 
 
 @_plot2d
-def imshow(grid, z, ax, **kwargs):
+def imshow(grid, da, ax, **kwargs):
     """
     Image plot of 2D DataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.imshow`.
@@ -443,6 +473,10 @@ def imshow(grid, z, ax, **kwargs):
     This rasterizes the grid before plotting. Pass a ``resolution`` keyword to
     control the rasterization resolution.
     """
+    dim = get_ugrid_dim(grid, da)
+    if dim != FACE:
+        raise ValueError("imshow only supported for data on faces")
+
     if "extent" not in kwargs:
         xmin, ymin, xmax, ymax = grid.bounds
         kwargs["extent"] = xmin, xmax, ymin, ymax
@@ -462,39 +496,63 @@ def imshow(grid, z, ax, **kwargs):
         resolution = min(dx, dy) / 500
 
     _, _, index = grid.rasterize(resolution)
-    img = z.values[index].astype(float)
+    img = da.values[index].astype(float)
     img[index == -1] = np.nan
     primitive = ax.imshow(img, **kwargs)
     return primitive
 
 
 @_plot2d
-def contour(triangulation, z, ax, **kwargs):
+def contour(grid, da, ax, **kwargs):
     """
     Filled contour plot of 2D UgridDataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontour`.
     """
-    primitive = ax.tricontour(*triangulation, z.values.ravel(), **kwargs)
+    dim = get_ugrid_dim(grid, da)
+    if dim == NODE:
+        (x, y, triangles), _ = grid.triangulation
+        z = da
+    elif dim == FACE:
+        (x, y, triangles), index = grid.centroid_triangulation
+        z = da.isel({grid.face_dimension: index})
+    else:
+        raise ValueError("contour only supports data on nodes or faces")
+
+    primitive = ax.tricontour(x, y, triangles, z.values.ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
-def contourf(triangulation, z, ax, **kwargs):
+def contourf(grid, da, ax, **kwargs):
     """
     Filled contour plot of 2D UgridDataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontourf`.
     """
-    primitive = ax.tricontourf(*triangulation, z.values.ravel(), **kwargs)
+    dim = get_ugrid_dim(grid, da)
+    if dim == NODE:
+        (x, y, triangles), _ = grid.triangulation
+        z = da
+    elif dim == FACE:
+        (x, y, triangles), index = grid.centroid_triangulation
+        z = da.isel({grid.face_dimension: index})
+    else:
+        raise ValueError("contour only supports data on nodes or faces")
+
+    primitive = ax.tricontourf(x, y, triangles, z.values.ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
-def pcolormesh(grid, z, ax, **kwargs):
+def pcolormesh(grid, da, ax, **kwargs):
     """
     Pseudocolor plot of 2D UgridDataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.
     """
-    nodes = np.column_stack([grid.node_x, grid.node_y])
+    dim = get_ugrid_dim(grid, da)
+    if dim != FACE:
+        raise ValueError("pcolormesh only supports data on faces")
+
+    nodes = grid.node_coordinates
     faces = grid.face_node_connectivity
     vertices = nodes[faces]
     # Replace fill value; PolyCollection ignores NaN.
@@ -505,7 +563,7 @@ def pcolormesh(grid, z, ax, **kwargs):
     vmax = kwargs.pop("vmax", None)
 
     collection = PolyCollection(vertices, **kwargs)
-    collection.set_array(z.values.ravel())
+    collection.set_array(da.values.ravel())
     collection._scale_norm(norm, vmin, vmax)
     primitive = ax.add_collection(collection, autolim=False)
 
@@ -520,12 +578,22 @@ def pcolormesh(grid, z, ax, **kwargs):
 
 
 @_plot2d
-def surface(triangulation, z, ax, **kwargs):
+def surface(grid, da, ax, **kwargs):
     """
     Surface plot of x-y UgridDataArray.
     Wraps :py:func:`matplotlib:mplot3d:plot_trisurf`.
     """
-    primitive = ax.plot_trisurf(*triangulation, z.values.ravel(), **kwargs)
+    dim = get_ugrid_dim(grid, da)
+    if dim == NODE:
+        (x, y, triangles), _ = grid.triangulation
+        z = da
+    elif dim == FACE:
+        (x, y, triangles), index = grid.centroid_triangulation
+        z = da.isel({grid.face_dimension: index})
+    else:
+        raise ValueError("surface only supports data on nodes or faces")
+
+    primitive = ax.plot_trisurf(x, y, triangles, z.values.ravel(), **kwargs)
     return primitive
 
 
@@ -560,126 +628,20 @@ def plot(
     if dim == grid.face_dimension:
         return pcolormesh(grid, darray, **kwargs)
     elif dim == grid.node_dimension:
-        triangulation, _ = grid.triangulation
-        return tripcolor(triangulation, darray, **kwargs)
+        return tripcolor(grid, darray, **kwargs)
     elif dim == grid.edge_dimension:
         return line(grid, darray, **kwargs)
     else:
         raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
 
 
-class _EdgePlot:
-    __slots__ = ("_grid", "_da")
-
-    def __init__(self, obj):
-        self._grid = obj._grid
-        self._da = obj._da
-
-    def __call__(self, **kwargs):
-        dim = self._da.dims[0]
-        attrs = self._grid.topology_attrs
-        if dim == attrs.get("edge_dimension", "edge"):
-            z = self._da
-        else:
-            z = None
-        return line(self._grid, z, **kwargs)
-
-    @functools.wraps(line)
-    def line(self, *args, **kwargs):
-        if self._da.dims[0] == self._da.attrs.get("edge_dimension", "edge"):
-            z = self._da
-        else:
-            z = None
-        return line(self._grid, z, *args, **kwargs)
-
-    @functools.wraps(scatter)
-    def scatter(self, *args, **kwargs):
-        return scatter(self._grid.edge_coordinates, self._da, *args, **kwargs)
-
-
-class _FacePlot:
-    __slots__ = ("_grid", "_da")
-
-    def __init__(self, obj):
-        self._grid = obj._grid
-        self._da = obj._da
-
-    def __call__(self, **kwargs):
-        return pcolormesh(self._grid, self._da, **kwargs)
-
-    @functools.wraps(imshow)
-    def pcolormesh(self, *args, **kwargs):
-        return pcolormesh(self._grid, self._da, *args, **kwargs)
-
-    @functools.wraps(imshow)
-    def imshow(self, *args, **kwargs):
-        return imshow(self._grid, self._da, *args, **kwargs)
-
-    @functools.wraps(contour)
-    def contour(self, *args, **kwargs):
-        triangulation, index = self._grid.centroid_triangulation
-        z = self._da.isel(face=index)
-        return contour(triangulation, z, *args, **kwargs)
-
-    @functools.wraps(contourf)
-    def contourf(self, *args, **kwargs):
-        triangulation, index = self._grid.centroid_triangulation
-        z = self._da.isel(face=index)
-        return contourf(triangulation, z, *args, **kwargs)
-
-    @functools.wraps(scatter)
-    def scatter(self, *args, **kwargs):
-        return scatter(self._grid.centroids, self._da, *args, **kwargs)
-
-    @functools.wraps(surface)
-    def surface(self, *args, **kwargs):
-        triangulation, index = self._grid.centroid_triangulation
-        z = self._da.isel(face=index)
-        return surface(triangulation, z, *args, **kwargs)
-
-
-class _NodePlot:
-    __slots__ = ("_grid", "_da")
-
-    def __init__(self, obj):
-        self._grid = obj._grid
-        self._da = obj._da
-
-    def __call__(self, **kwargs):
-        return tripcolor(self._grid, self._da, **kwargs)
-
-    @functools.wraps(tripcolor)
-    def tripcolor(self, *args, **kwargs):
-        triangulation, _ = self._grid.triangulation
-        return tripcolor(triangulation, self._da, *args, **kwargs)
-
-    @functools.wraps(scatter)
-    def scatter(self, *args, **kwargs):
-        return scatter(self._grid.node_coordinates, self._da, *args, **kwargs)
-
-    @functools.wraps(contour)
-    def contour(self, *args, **kwargs):
-        triangulation, _ = self._grid.triangulation
-        return contour(triangulation, self._da, *args, **kwargs)
-
-    @functools.wraps(contourf)
-    def contourf(self, *args, **kwargs):
-        triangulation, _ = self._grid.triangulation
-        return contourf(triangulation, self._da, *args, **kwargs)
-
-    @functools.wraps(surface)
-    def surface(self, *args, **kwargs):
-        triangulation, _ = self._grid.triangulation
-        return surface(triangulation, self._da, *args, **kwargs)
-
-
 class _PlotMethods:
     """
     Enables use of plot functions as attributes.
-    For example UgridDataArray.plot.face.pcolormesh()
+    For example UgridDataArray.ugrid.plot.face.pcolormesh()
     """
 
-    __slots__ = ("_grid", "_da")
+    __slots__ = ("grid", "darray")
 
     def __init__(self, obj):
         darray = obj.obj
@@ -693,12 +655,44 @@ class _PlotMethods:
                 f"(face, node, edge): {', '.join(darray.dims)}"
             )
             raise ValueError(msg)
-        self._grid = grid
-        self._da = darray
-
-    face = UncachedAccessor(_FacePlot)
-    edge = UncachedAccessor(_EdgePlot)
-    node = UncachedAccessor(_NodePlot)
+        self.grid = grid
+        self.darray = darray
 
     def __call__(self, **kwargs):
-        return plot(self._grid, self._da, **kwargs)
+        return plot(self.grid, self.darray, **kwargs)
+
+    @functools.wraps(contour)
+    def contour(self, *args, **kwargs):
+        return contour(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(contourf)
+    def contourf(self, *args, **kwargs):
+        return contourf(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(imshow)
+    def imshow(self, *args, **kwargs):
+        return imshow(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(line)
+    def line(self, *args, **kwargs):
+        if self.darray.dims[0] == self.grid.edge_dimension:
+            z = self.darray
+        else:
+            z = None
+        return line(self.grid, z, *args, **kwargs)
+
+    @functools.wraps(pcolormesh)
+    def pcolormesh(self, *args, **kwargs):
+        return pcolormesh(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(scatter)
+    def scatter(self, *args, **kwargs):
+        return scatter(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(surface)
+    def surface(self, *args, **kwargs):
+        return surface(self.grid, self.darray, *args, **kwargs)
+
+    @functools.wraps(tripcolor)
+    def tripcolor(self, *args, **kwargs):
+        return tripcolor(self.grid, self.darray, *args, **kwargs)
