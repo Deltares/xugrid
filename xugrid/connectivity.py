@@ -34,11 +34,21 @@ def _to_ij(conn: IntArray, fill_value: int, invert: bool) -> Tuple[IntArray, Int
         return i, j
 
 
-def _to_sparse(conn: IntArray, fill_value: int, invert: bool) -> sparse.csr_matrix:
+def _to_sparse(
+    conn: IntArray, fill_value: int, invert: bool, sort_indices: bool
+) -> sparse.csr_matrix:
     i, j = _to_ij(conn, fill_value, invert)
     coo_content = (j, (i, j))
     coo_matrix = sparse.coo_matrix(coo_content)
-    return coo_matrix.tocsr()
+    csr_matrix = coo_matrix.tocsr()
+    # Conversion to csr format results in a sorting of indices. We require
+    # only sorting of i, not j, as this would e.g. mess up the order for
+    # counter clockwise vertex orientation, e.g.
+    if not sort_indices:
+        order = np.argsort(i)
+        csr_matrix.indices = j[order]
+        csr_matrix.has_sorted_indices = False
+    return csr_matrix
 
 
 def ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
@@ -67,8 +77,10 @@ def ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
     return (column_number.T < m_per_row).T
 
 
-def to_sparse(conn: IntArray, fill_value: int) -> sparse.csr_matrix:
-    return _to_sparse(conn, fill_value, invert=False)
+def to_sparse(
+    conn: IntArray, fill_value: int, sort_indices: bool = True
+) -> sparse.csr_matrix:
+    return _to_sparse(conn, fill_value, invert=False, sort_indices=sort_indices)
 
 
 def to_dense(conn: SparseMatrix, fill_value: int) -> IntArray:
@@ -97,12 +109,18 @@ def to_dense(conn: SparseMatrix, fill_value: int) -> IntArray:
 
 # Inverting connectivities
 # ------------------------
-def invert_dense_to_sparse(conn: IntArray, fill_value: int) -> sparse.csr_matrix:
-    return _to_sparse(conn, fill_value, invert=True)
+def invert_dense_to_sparse(
+    conn: IntArray, fill_value: int, sort_indices: bool = True
+) -> sparse.csr_matrix:
+    return _to_sparse(conn, fill_value, invert=True, sort_indices=sort_indices)
 
 
-def invert_dense(conn: IntArray, fill_value: int) -> IntArray:
-    sparse_inverted = _to_sparse(conn, fill_value, invert=True)
+def invert_dense(
+    conn: IntArray, fill_value: int, sort_indices: bool = True
+) -> IntArray:
+    sparse_inverted = _to_sparse(
+        conn, fill_value, invert=True, sort_indices=sort_indices
+    )
     return to_dense(sparse_inverted, fill_value)
 
 
@@ -428,8 +446,17 @@ def binary_erosion(
     exterior: IntArray = None,
     border_value: bool = False,
 ) -> BoolArray:
+    """
+    By default, erodes inwards from the exterior.
+    """
     return _binary_iterate(
-        connectivity, input, False, iterations, mask, border_value, exterior
+        connectivity=connectivity,
+        input=input,
+        value=False,
+        iterations=iterations,
+        mask=mask,
+        exterior=exterior,
+        border_value=border_value,
     )
 
 
@@ -441,6 +468,15 @@ def binary_dilation(
     exterior: IntArray = None,
     border_value: bool = False,
 ) -> BoolArray:
+    """
+    By default, does not dilate inward from the exterior.
+    """
     return _binary_iterate(
-        connectivity, input, True, iterations, mask, border_value, exterior
+        connectivity=connectivity,
+        input=input,
+        value=True,
+        iterations=iterations,
+        mask=mask,
+        exterior=exterior,
+        border_value=border_value,
     )

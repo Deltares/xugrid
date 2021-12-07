@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from numpy.core.fromnumeric import sort
 from scipy import sparse
 
 from xugrid import connectivity
@@ -65,6 +66,19 @@ def test_to_ij(triangle_mesh, mixed_mesh):
     actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=True)
     assert np.array_equal(actual_i, expected_j)
     assert np.array_equal(actual_j, expected_i)
+
+
+def test_to_sparse(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    csr = connectivity._to_sparse(faces, fill_value, invert=False, sort_indices=True)
+    expected_j = np.array([0, 1, 2, 1, 2, 3, 4])
+    assert np.array_equal(csr.indices, expected_j)
+    assert csr.has_sorted_indices
+
+    csr = connectivity._to_sparse(faces, fill_value, invert=False, sort_indices=False)
+    expected_j = np.array([0, 1, 2, 1, 3, 4, 2])
+    assert np.array_equal(csr.indices, expected_j)
+    assert not csr.has_sorted_indices
 
 
 def test_ragged_index():
@@ -345,7 +359,77 @@ def test_triangulate(mixed_mesh):
     assert np.array_equal(actual_triangles, expected_triangles)
     assert np.array_equal(actual_faces, expected_faces)
 
-    sparse_faces = connectivity.to_sparse(faces, -1).tocoo()
+    sparse_faces = connectivity.to_sparse(faces, -1, sort_indices=False).tocoo()
     actual_triangles, actual_faces = connectivity.triangulate_coo(sparse_faces)
     assert np.array_equal(actual_triangles, expected_triangles)
     assert np.array_equal(actual_faces, expected_faces)
+
+
+def test_binary_erosion():
+    i = np.array([0, 1, 1, 2, 2, 3, 3])
+    j = np.array([1, 0, 2, 1, 3, 2, 4])
+    coo_content = (j, (i, j))
+    con = sparse.coo_matrix(coo_content).tocsr()
+    a = np.full(5, True)
+
+    actual = connectivity.binary_erosion(con, a)
+    assert actual.all()
+
+    exterior = np.array([0, 4])
+    actual = connectivity.binary_erosion(con, a, exterior=exterior)
+    expected = np.array([False, True, True, True, False])
+    assert np.array_equal(actual, expected)
+    # Check for mutation
+    assert a.all()
+
+    actual = connectivity.binary_erosion(con, a, exterior=exterior, iterations=3)
+    assert (~actual).all()
+
+    mask = np.array([False, False, False, True, True])
+    actual = connectivity.binary_erosion(
+        con, a, exterior=exterior, iterations=3, mask=mask
+    )
+    assert np.array_equal(actual, mask)
+
+    a = np.array([False, True, True, True, False])
+    actual = connectivity.binary_erosion(con, a)
+    expected = np.array([False, False, True, False, False])
+    assert np.array_equal(actual, expected)
+
+
+def test_binary_dilation():
+    i = np.array([0, 1, 1, 2, 2, 3, 3])
+    j = np.array([1, 0, 2, 1, 3, 2, 4])
+    coo_content = (j, (i, j))
+    con = sparse.coo_matrix(coo_content).tocsr()
+    a = np.full(5, False)
+
+    # No change
+    actual = connectivity.binary_dilation(con, a)
+    assert (~actual).all()
+
+    exterior = np.array([0, 4])
+    actual = connectivity.binary_dilation(con, a, exterior=exterior)
+    assert (~actual).all()
+
+    actual = connectivity.binary_dilation(con, a, exterior=exterior, border_value=True)
+    expected = np.array([True, False, False, False, True])
+    assert np.array_equal(actual, expected)
+    # Check for mutation
+    assert (~a).all()
+
+    actual = connectivity.binary_dilation(
+        con, a, exterior=exterior, iterations=3, border_value=True
+    )
+    assert actual.all()
+
+    mask = np.array([False, False, False, True, True])
+    actual = connectivity.binary_dilation(
+        con, a, exterior=exterior, iterations=3, mask=mask, border_value=True
+    )
+    assert np.array_equal(actual, ~mask)
+
+    a = np.array([False, False, True, False, False])
+    actual = connectivity.binary_dilation(con, a)
+    expected = np.array([False, True, True, True, False])
+    assert np.array_equal(actual, expected)
