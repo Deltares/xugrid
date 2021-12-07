@@ -623,7 +623,7 @@ class Ugrid2d(AbstractUgrid):
         ycoord = _coord(data, "y")
         # Compute all vertices, these are the ugrid nodes
         node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
-        linear_index = np.arange(node_x.size, dtype=np.int).reshape(
+        linear_index = np.arange(node_x.size, dtype=np.intp).reshape(
             ycoord.size, xcoord.size
         )
         # Allocate face_node_connectivity
