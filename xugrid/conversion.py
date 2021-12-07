@@ -7,10 +7,8 @@ Conversion from and to other data structures:
 """
 from typing import Any, Tuple
 
-import geopandas as gpd
 import numpy as np
 import pygeos
-import xarray as xr
 
 from .connectivity import ragged_index
 from .typing import IntDType
