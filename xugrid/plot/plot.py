@@ -420,7 +420,7 @@ def scatter(grid, da, ax, **kwargs):
 def tripcolor(grid, da, ax, **kwargs):
     dim = get_ugrid_dim(grid, da)
     if dim != NODE:
-        raise ValueError("tripcolor only supported for data on nodes")
+        raise ValueError("tripcolor only supports data on nodes")
     (x, y, triangles), _ = grid.triangulation
     primitive = ax.tripcolor(x, y, triangles, da.values.ravel(), **kwargs)
     return primitive
@@ -431,7 +431,7 @@ def line(grid, da, ax, **kwargs):
     if da is not None:
         dim = get_ugrid_dim(grid, da)
         if dim != EDGE:
-            raise ValueError("line only supported for edges")
+            raise ValueError("line only supports data on edges")
     else:
         dim = None
 
@@ -475,7 +475,7 @@ def imshow(grid, da, ax, **kwargs):
     """
     dim = get_ugrid_dim(grid, da)
     if dim != FACE:
-        raise ValueError("imshow only supported for data on faces")
+        raise ValueError("imshow only supports data on faces")
 
     if "extent" not in kwargs:
         xmin, ymin, xmax, ymax = grid.bounds
@@ -536,7 +536,7 @@ def contourf(grid, da, ax, **kwargs):
         (x, y, triangles), index = grid.centroid_triangulation
         z = da.isel({grid.face_dimension: index})
     else:
-        raise ValueError("contour only supports data on nodes or faces")
+        raise ValueError("contourf only supports data on nodes or faces")
 
     primitive = ax.tricontourf(x, y, triangles, z.values.ravel(), **kwargs)
     return primitive
@@ -638,7 +638,7 @@ def plot(
 class _PlotMethods:
     """
     Enables use of plot functions as attributes.
-    For example UgridDataArray.ugrid.plot.face.pcolormesh()
+    For example UgridDataArray.ugrid.plot.pcolormesh()
     """
 
     __slots__ = ("grid", "darray")

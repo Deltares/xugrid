@@ -1,3 +1,7 @@
+import os
+
+os.environ["NUMBA_DISABLE_JIT"] = "1"
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -117,14 +121,14 @@ def test_snap_to_grid():
     )
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_grid(line_gdf, idomain)
-    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3], [2, -1]])
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0)
+    assert np.array_equal(cell_to_cell, [[0, -1], [0, 2], [2, 3]])
     assert isinstance(df, pd.DataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
     # Return geometry
-    cell_to_cell, df = snap_to_grid(line_gdf, idomain, return_geometry=True)
-    assert np.array_equal(cell_to_cell, [[0, 1], [2, 3], [2, -1]])
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
+    assert np.array_equal(cell_to_cell, [[0, -1], [0, 2], [2, 3]])
     assert isinstance(df, gpd.GeoDataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
@@ -134,14 +138,14 @@ def test_snap_to_grid():
     # 2. Line starts and stops right below and above cell centroids.
     line = sg.LineString([[0.5, 0.0], [0.75, 0.5], [1.0, 1.0], [1.25, 1.5], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_grid(line_gdf, idomain)
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
 
-    assert np.array_equal(cell_to_cell, [[2, -1], [2, 3], [0, 1]])
+    assert np.array_equal(cell_to_cell, [[0, -1], [0, 1], [2, 3]])
     assert isinstance(df, pd.DataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
     # Now the same case, but with line rotated to horizontal
     line = sg.LineString([[0.0, 0.5], [0.5, 0.75], [1.0, 1.0], [1.5, 1.25], [2.0, 1.5]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_grid(line_gdf, idomain)
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
     assert np.array_equal(cell_to_cell, [[0, 2], [1, 3]])
