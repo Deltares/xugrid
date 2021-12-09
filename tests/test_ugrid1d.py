@@ -2,8 +2,10 @@ import geopandas as gpd
 import meshkernel as mk
 import numpy as np
 import pygeos
+import pyproj
 import pytest
 import xarray as xr
+from scipy import sparse
 
 import xugrid
 
@@ -27,6 +29,73 @@ def test_ugrid1d_init():
     grid = grid1d()
     assert grid.name == NAME
     assert isinstance(grid.dataset, xr.Dataset)
+
+
+def test_ugrid1d_properties():
+    # These are defined in the base class
+    grid = grid1d()
+    assert grid.node_dimension == "network1d_nNodes"
+    assert grid.edge_dimension == "network1d_nEdges"
+    expected_coords = np.array([[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]])
+    assert np.allclose(grid.node_coordinates, expected_coords)
+    assert np.allclose(grid.edge_x, [0.5, 1.5])
+    assert np.allclose(grid.edge_y, [0.5, 1.5])
+    assert np.allclose(grid.edge_coordinates, np.column_stack([[0.5, 1.5], [0.5, 1.5]]))
+    assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
+    node_edges = grid.node_edge_connectivity
+    assert isinstance(node_edges, sparse.csr_matrix)
+
+
+def test_set_crs():
+    grid = grid1d()
+
+    with pytest.raises(ValueError, match="Must pass either"):
+        grid.set_crs()
+
+    grid.set_crs("epsg:28992")
+    assert grid.crs == pyproj.CRS.from_epsg(28992)
+
+    # This is allowed
+    grid.set_crs("epsg:28992")
+    assert grid.crs == pyproj.CRS.from_epsg(28992)
+
+    # This is not allowed ...
+    with pytest.raises(ValueError, match="The Ugrid already has a CRS"):
+        grid.set_crs("epsg:4326")
+
+    # Unless explicitly set with allow_override
+    grid.set_crs("epsg:4326", allow_override=True)
+    assert grid.crs == pyproj.CRS.from_epsg(4326)
+
+    # Test espg alternative arg
+    grid.crs = None
+    grid.set_crs(epsg=28992)
+    assert grid.crs == pyproj.CRS.from_epsg(28992)
+
+
+def test_to_crs():
+    grid = grid1d()
+
+    with pytest.raises(ValueError, match="Cannot transform naive geometries"):
+        grid.to_crs("epsg:28992")
+
+    grid.set_crs("epsg:4326")
+
+    # Skip reprojection
+    same = grid.to_crs("epsg:4326")
+    assert np.allclose(same.node_coordinates, grid.node_coordinates)
+
+    reprojected = grid.to_crs("epsg:28992")
+    assert reprojected.crs == pyproj.CRS.from_epsg(28992)
+    assert (~(grid.node_coordinates == reprojected.node_coordinates)).all()
+
+    # Test inplace
+    grid.to_crs("epsg:28992", inplace=True)
+    assert np.allclose(reprojected.node_coordinates, grid.node_coordinates)
+
+    # Test epsg alternative arg
+    grid.to_crs(epsg=4326, inplace=True)
+    assert grid.crs == pyproj.CRS.from_epsg(4326)
 
 
 def test_ugrid1d_from_dataset():
@@ -115,6 +184,16 @@ def test_from_geodataframe():
     gdf = gpd.GeoDataFrame(geometry=[pygeos.creation.linestrings(x, y)])
     grid = xugrid.Ugrid1d.from_geodataframe(gdf)
     assert isinstance(grid, xugrid.Ugrid1d)
+
+
+def test_to_pygeos():
+    grid = grid1d()
+
+    points = grid.to_pygeos("network1d_nNodes")
+    assert isinstance(points[0], pygeos.Geometry)
+
+    lines = grid.to_pygeos("network1d_nEdges")
+    assert isinstance(lines[0], pygeos.Geometry)
 
 
 def test_topology_subset():

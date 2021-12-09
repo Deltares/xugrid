@@ -635,3 +635,28 @@ class Ugrid2d(AbstractUgrid):
         face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
         face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
         return Ugrid2d(node_x, node_y, -1, face_nodes)
+
+    def to_pygeos(self, dim):
+        if dim == self.face_dimension:
+            return conversion.faces_to_polygons(
+                self.node_x,
+                self.node_y,
+                self.face_node_connectivity,
+                self.fill_value,
+            )
+        elif dim == self.node_dimension:
+            return conversion.nodes_to_points(
+                self.node_x,
+                self.node_y,
+            )
+        elif dim == self.edge_dimension:
+            return conversion.edges_to_linestrings(
+                self.node_x,
+                self.node_y,
+                self.edge_node_connectivity,
+            )
+        else:
+            raise ValueError(
+                f"Dimension {dim} is not a face, node, or edge dimension of the"
+                " Ugrid2d topology."
+            )

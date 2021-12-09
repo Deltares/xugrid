@@ -7,7 +7,7 @@ import pyproj
 import xarray as xr
 from scipy.sparse import csr_matrix
 
-from .. import connectivity, conversion
+from .. import connectivity
 from ..typing import FloatArray, IntArray
 from . import ugrid_io
 
@@ -15,35 +15,35 @@ from . import ugrid_io
 class AbstractUgrid(abc.ABC):
     @abc.abstractproperty
     def topology_dimension(self):
-        return
+        """ """
 
     @abc.abstractmethod
     def _get_dimension(self):
-        return
+        """ """
 
     @abc.abstractstaticmethod
     def from_dataset():
-        return
+        """ """
 
     @abc.abstractmethod
     def topology_dataset(self):
-        return
+        """ """
 
     @abc.abstractmethod
     def topology_subset(self):
-        return
+        """ """
 
     @abc.abstractmethod
     def remove_topology(self):
-        return
+        """ """
 
     @abc.abstractmethod
     def topology_coords(self):
-        return
+        """ """
 
     @abc.abstractmethod
     def _clear_geometry_properties(self):
-        return
+        """ """
 
     def copy(self):
         return copy.deepcopy(self)
@@ -142,7 +142,12 @@ class AbstractUgrid(abc.ABC):
             )
         return self._node_edge_connectivity
 
-    def set_crs(self, crs=None, epsg=None, allow_override=False):
+    def set_crs(
+        self,
+        crs: Union[pyproj.CRS, str] = None,
+        epsg: int = None,
+        allow_override: bool = False,
+    ) -> None:
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)
         elif epsg is not None:
@@ -157,6 +162,7 @@ class AbstractUgrid(abc.ABC):
                 "CRS without doing any transformation. If you actually want to "
                 "transform the geometries, use '.to_crs' instead."
             )
+        self.crs = crs
 
     def to_crs(
         self,
@@ -208,8 +214,14 @@ class AbstractUgrid(abc.ABC):
         else:
             grid = self.copy()
 
+        if self.crs.is_exact_same(crs):
+            if inplace:
+                return
+            else:
+                return grid
+
         transformer = pyproj.Transformer.from_crs(
-            crs=self.crs, crs_to=crs, always_xy=True
+            crs_from=self.crs, crs_to=crs, always_xy=True
         )
         node_x, node_y = transformer.transform(xx=grid.node_x, yy=grid.node_y)
         grid.node_x = node_x
@@ -219,28 +231,3 @@ class AbstractUgrid(abc.ABC):
 
         if not inplace:
             return grid
-
-    def to_pygeos(self, dim):
-        if dim == self.face_dimension:
-            return conversion.faces_to_polygons(
-                self.node_x,
-                self.node_y,
-                self.face_node_connectivity,
-                self.fill_value,
-            )
-        elif dim == self.node_dimension:
-            return conversion.nodes_to_points(
-                self.node_x,
-                self.node_y,
-            )
-        elif dim == self.edge_dimension:
-            return conversion.edges_to_linestrings(
-                self.node_x,
-                self.node_y,
-                self.edge_node_connectivity,
-            )
-        else:
-            raise ValueError(
-                f"Dimension {dim} is not a face, node, or edge dimension of the"
-                " Ugrid topology."
-            )

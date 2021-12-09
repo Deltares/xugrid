@@ -226,5 +226,23 @@ class Ugrid1d(AbstractUgrid):
         fill_value = -1
         return Ugrid1d(x, y, fill_value, edge_node_connectivity)
 
+    def to_pygeos(self, dim):
+        if dim == self.node_dimension:
+            return conversion.nodes_to_points(
+                self.node_x,
+                self.node_y,
+            )
+        elif dim == self.edge_dimension:
+            return conversion.edges_to_linestrings(
+                self.node_x,
+                self.node_y,
+                self.edge_node_connectivity,
+            )
+        else:
+            raise ValueError(
+                f"Dimension {dim} is not a node or edge dimension of the"
+                " Ugrid1d topology."
+            )
+
     def topology_subset(self, edge_indices: IntArray):
         return self._topology_subset(edge_indices, self.edge_node_connectivity)
