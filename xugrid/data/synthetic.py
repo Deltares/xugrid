@@ -21,7 +21,7 @@ def transform(vertices, minx, maxx, miny):
     new_dy = dy / dx * new_dx
     x = x - xmin * new_dx / dx + minx
     y = y - ymin * new_dy / dy + miny
-    return np.column_stack(x, y)
+    return np.column_stack([x, y])
 
 
 def disk():
@@ -43,6 +43,7 @@ def disk():
         return (zmax - z) / (zmax - zmin) * 10.0
 
     vertices, triangles = meshzoo.disk(6, 8)
+    vertices = transform(vertices, 0.0, 10.0, 0.0)
     grid = xugrid.Ugrid2d(
         node_x=vertices[:, 0],
         node_y=vertices[:, 1],

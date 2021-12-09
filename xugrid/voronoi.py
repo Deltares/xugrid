@@ -17,6 +17,7 @@ developer documentation.
 from typing import Tuple
 
 import numpy as np
+import pandas as pd
 from scipy import sparse
 
 from .connectivity import renumber
@@ -27,24 +28,26 @@ def dot_product2d(U: FloatArray, V: FloatArray):
     return U[:, 1] * V[:, 1] + U[:, 0] * V[:, 0]
 
 
-def compute_centroid(i: IntArray, x: FloatArray, y: FloatArray):
-    try:
-        import pandas as pd
-
-        grouped = pd.DataFrame({"i": i, "x": x, "y": y}).groupby("i").mean()
-        x_centroid = grouped["x"].values
-        y_centroid = grouped["y"].values
-
-    except ImportError:
-        j = np.arange(len(i))
-        coo_content = (x, (i, j))
-        mat = sparse.coo_matrix(coo_content)
-        n = mat.getnnz(axis=1)
-        x_centroid = mat.sum(axis=1).flat / n
-        mat.data = y
-        y_centroid = mat.sum(axis=1).flat / n
-
+def _centroid_pandas(i: IntArray, x: FloatArray, y: FloatArray):
+    grouped = pd.DataFrame({"i": i, "x": x, "y": y}).groupby("i").mean()
+    x_centroid = grouped["x"].values
+    y_centroid = grouped["y"].values
     return x_centroid, y_centroid
+
+
+def _centroid_scipy(i: IntArray, x: FloatArray, y: FloatArray):
+    j = np.arange(len(i))
+    coo_content = (x, (i, j))
+    mat = sparse.coo_matrix(coo_content)
+    n = mat.getnnz(axis=1)
+    x_centroid = mat.sum(axis=1).flat / n
+    mat.data = y
+    y_centroid = mat.sum(axis=1).flat / n
+    return x_centroid, y_centroid
+
+
+def compute_centroid(i: IntArray, x: FloatArray, y: FloatArray):
+    return _centroid_pandas(i, x, y)
 
 
 def exterior_centroids(node_face_connectivity: sparse.csr_matrix):
@@ -143,10 +146,8 @@ def exterior_topology(
     * Centroids of faces that have an exterior edge. These centroids are used
       once.
     * Vertices of the intersection of (infinite) rays with the mesh exterior.
-      These vertices are used twice; these intersections are close to the
-      orthogonal projection of the centroid of the face on its exterior edges;
-      the orthogonal projection can be guaranteed for every exterior edge, the
-      true voronoi ray cannot.
+      These vertices are used twice; these intersections are the orthogonal
+      projection of the centroid of the face on its exterior edges.
     * Original vertices of the mesh exterior. These vertices are used once, and
       are always located in between the projected vertices.
 
