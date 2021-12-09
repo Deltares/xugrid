@@ -1,7 +1,7 @@
 """
 Helper functions for parsing and composing UGRID files
 
-Most of these functions will be replaced by a centralized UGRID library with a
+Most of these functions could be replaced by a centralized UGRID library with a
 C API.
 """
 import warnings
@@ -100,9 +100,26 @@ def get_topology_variable(dataset):
     variables = [
         da for da in dataset.values() if da.attrs.get("cf_role") == "mesh_topology"
     ]
-    if len(variables) > 1:
-        raise ValueError("dataset may only contain a single mesh topology variable")
+    n = len(variables)
+    if n == 0:
+        raise ValueError("dataset does not contain a mesh topology variable")
+    elif n != 1:
+        names = [v.name for v in variables]
+        raise NotImplementedError(
+            f"dataset should contain a single mesh topology variable, contains: {names}"
+        )
     return variables[0]
+
+
+def check_dim(attrs, dimrole, dimname, varname):
+    if dimrole in attrs and attrs[dimrole] != dimname:
+        warnings.warn(
+            f"{dimrole} of attributes does not match with dimension of "
+            f"variable: {attrs[dimrole]} in attrs versus {dimname} in "
+            f"variable {varname}"
+        )
+        return False
+    return True
 
 
 def _extract_topology_variables(
@@ -116,39 +133,19 @@ def _extract_topology_variables(
     the dataset.
     """
 
-    def warn(role, name):
-        warnings.warn(
-            f"Topology variable with role {role} specified under name "
-            f"{name} specified, but variable {name} not found in dataset.",
-            UserWarning,
-        )
-
-    def check_dim(attrs, dimrole, varname):
-        if dimrole in attrs and attrs[dimrole] != dimname:
-            warnings.warn(
-                f"{dimrole} of attributes does not match with dimension of "
-                f"variable: {attrs[dimrole]} in attrs versus {dimname} in "
-                f"variable {varname}"
-            )
-            return False
-        return True
-
     attrs = mesh_topology.attrs
     variables = {mesh_topology.name: "mesh_topology"}
     for role in ugrid_attrs.connectivity:
         name = attrs.get(role)
-        if name:
-            if name in dataset:
-                variables[name] = role
-                # Also set the dimension names here.
-                dim = role.split("_")[0]
-                dimname = dataset[name].dims[0]
-                dimrole = f"{dim}_dimension"
-                variables[dimname] = dimrole
-                check_dim(attrs, dimrole, name)
-                attrs[dimrole] = dimname
-            else:
-                warn(role, name)
+        if name and name in dataset:
+            variables[name] = role
+            # Also set the dimension names here.
+            dim = role.split("_")[0]
+            dimname = dataset[name].dims[0]
+            dimrole = f"{dim}_dimension"
+            variables[dimname] = dimrole
+            check_dim(attrs, dimrole, dimname, name)
+            attrs[dimrole] = dimname
 
     for role in ugrid_attrs.coordinates:
         name = attrs.get(role)
@@ -156,33 +153,33 @@ def _extract_topology_variables(
             name_x, name_y = name.split()
             dim = role.split("_")[0]
             dimrole = f"{dim}_dimension"
-            dimname_x = dataset[name_x].dims[0]
-            dimname_y = dataset[name_y].dims[0]
 
-            if name_x in dataset:
+            has_x = name_x in dataset
+            has_y = name_y in dataset
+
+            if has_x:
                 variables[name_x] = f"{dim}_x"
-            else:
-                warn(role, name_x)
-            if name_y in dataset:
+            if has_y:
                 variables[name_y] = f"{dim}_y"
-            else:
-                warn(role, name_y)
 
-            if dimname_x != dimname_y:
-                raise ValueError(
-                    f"dimensions of {name_x} and {name_y} do not match:"
-                    f"{dimname_x} versus {dimname_y}"
-                )
-
-            if dimrole in attrs:
-                if attrs[dimrole] != dimname_x:
+            if has_x and has_y:
+                dimname_x = dataset[name_x].dims[0]
+                dimname_y = dataset[name_y].dims[0]
+                if dimname_x != dimname_y:
                     raise ValueError(
-                        f"{dimrole} from connectivity does not match dimension "
-                        f"{name_x}: {attrs[dimrole]} versus {dimname_x}"
+                        f"dimensions of {name_x} and {name_y} do not match:"
+                        f"{dimname_x} versus {dimname_y}"
                     )
-            else:
-                variables[dimname_x] = dimrole
-                attrs[dimrole] = dimname_x
+
+                if dimrole in attrs:
+                    if attrs[dimrole] != dimname_x:
+                        raise ValueError(
+                            f"{dimrole} from connectivity does not match dimension "
+                            f"{name_x}: {attrs[dimrole]} versus {dimname_x}"
+                        )
+                else:
+                    variables[dimname_x] = dimrole
+                    attrs[dimrole] = dimname_x
 
     return variables
 
@@ -224,6 +221,13 @@ def ugrid1d_dataset(
     name: str = None,
     attrs: Dict[str, str] = None,
 ) -> xr.Dataset:
+    """
+    This creates a new dataset to hold all the UGRID variables for a network
+    ("1D").
+
+    If an attrs dictionary is provided, its names will be used to label the
+    variables; if an attrs dict is not provide, default names are provided.
+    """
     if name is None:
         name = UGRID1D_DEFAULT_NAME
 
@@ -279,6 +283,12 @@ def ugrid2d_dataset(
     name: str = None,
     attrs: Dict[str, str] = None,
 ) -> xr.Dataset:
+    """
+    This creates a new dataset to hold all the UGRID variables for a 2D mesh.
+
+    If an attrs dictionary is provided, its names will be used to label the
+    variables; if an attrs dict is not provide, default names are provided.
+    """
     if name is None:
         name = UGRID2D_DEFAULT_NAME
 
