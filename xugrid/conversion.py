@@ -71,9 +71,13 @@ def points_to_nodes(points: PointArray) -> Tuple[FloatArray, FloatArray]:
 
 def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntArray]:
     edges = _to_pygeos(edges)
-    xy = pygeos.get_coordinates(edges)
-    unique, inverse = np.unique(xy, axis=0, return_inverse=True)
-    return *contiguous_xy(unique), inverse.reshape((-1, 2))
+    xy, index = pygeos.get_coordinates(edges, return_index=True)
+    linear_index = np.arange(index.size)
+    segments = np.column_stack([linear_index[:-1], linear_index[1:]])
+    segments = segments[np.diff(index) == 0]
+    unique, inverse = np.unique(xy, return_inverse=True, axis=0)
+    segments = inverse[segments]
+    return *contiguous_xy(unique), segments
 
 
 def _remove_last_vertex(xy: FloatArray, indices: IntArray):

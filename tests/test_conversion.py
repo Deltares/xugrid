@@ -1,4 +1,6 @@
+import geopandas as gpd
 import numpy as np
+import pygeos
 import pytest
 
 from xugrid import conversion as cv
@@ -15,6 +17,14 @@ def line():
         ]
     )
     return x, y, edge_node_connectivity
+
+
+@pytest.fixture(scope="function")
+def line_gdf():
+    x = np.array([0.0, 1.0, 2.0])
+    y = np.array([0.0, 0.0, 0.0])
+    gdf = gpd.GeoDataFrame(geometry=[pygeos.creation.linestrings(x, y)])
+    return gdf
 
 
 @pytest.fixture(scope="function")
@@ -55,6 +65,13 @@ def test_nodes_geos_roundtrip(line):
     assert np.array_equal(x, x_back)
     assert np.array_equal(y, y_back)
     assert np.array_equal(actual, points_back)
+
+
+def test_linestrings_to_edges(line_gdf):
+    x, y, segments = cv.linestrings_to_edges(line_gdf.geometry.values)
+    assert np.allclose(x, [0.0, 1.0, 2.0])
+    assert np.allclose(y, [0.0, 0.0, 0.0])
+    assert np.array_equal(segments, [[0, 1], [1, 2]])
 
 
 def test_edges_geos_roundtrip(line):

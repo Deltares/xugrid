@@ -48,6 +48,7 @@ class Ugrid1d(AbstractUgrid):
         if name is None:
             name = ugrid_io.UGRID1D_DEFAULT_NAME
         self.name = name
+        self.topology_attrs = None
 
         # Optional attributes, deferred initialization
         # Meshkernel
@@ -125,9 +126,16 @@ class Ugrid1d(AbstractUgrid):
     def remove_topology(
         self, obj: Union[xr.DataArray, xr.Dataset]
     ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Remove UGRID specific variables from the object.
+        """
         return self._remove_topology(obj, ugrid_io.UGRID1D_TOPOLOGY_VARIABLES)
 
     def topology_coords(self, obj: Union[xr.DataArray, xr.Dataset]) -> dict:
+        """
+        Return a dictionary with the coordinates required for the dimension of
+        the object.
+        """
         coords = {}
         dims = obj.dims
         attrs = self.topology_attrs
@@ -199,7 +207,7 @@ class Ugrid1d(AbstractUgrid):
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
                 node_y=self.node_y,
-                edge_nodes=self.edge_nodes.ravel(),
+                edge_nodes=self.edge_node_connectivity.ravel(),
             )
         return self._mesh
 

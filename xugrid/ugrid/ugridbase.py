@@ -97,16 +97,16 @@ class AbstractUgrid(abc.ABC):
             self._ymax,
         )
 
-    def _topology_subset(self, indices: IntArray, connectivity: IntArray):
+    def _topology_subset(self, indices: IntArray, node_connectivity: IntArray):
         # If faces are repeated: not a valid mesh
         # _, count = np.unique(face_indices, return_counts=True)
         # assert count.max() <= 1?
         # If no faces are repeated, and size is the same, it's the same mesh
-        if indices.size == len(connectivity):
+        if indices.size == len(node_connectivity):
             return self
         # Subset of faces, create new topology data
         else:
-            subset = connectivity[indices]
+            subset = node_connectivity[indices]
             node_indices = np.unique(subset.ravel())
             new_connectivity = connectivity.renumber(subset)
             node_x = self.node_x[node_indices]
@@ -119,8 +119,8 @@ class AbstractUgrid(abc.ABC):
         topology_variables: ugrid_io.UgridTopologyAttributes,
     ) -> Union[xr.Dataset, xr.DataArray]:
         """
-        removes the grid topology data from a dataset. Use after creating an
-        Ugrid object from the dataset
+        Removes the grid topology data from a dataset. Use after creating an
+        Ugrid object from the dataset.
         """
         attrs = self.topology_attrs
         names = []
