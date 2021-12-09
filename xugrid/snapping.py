@@ -194,28 +194,11 @@ def dot_product(u: Vector, v: Vector) -> float:
     return u.x * v.x + u.y * v.y
 
 
-def structured_centroids(grid: xr.DataArray) -> FloatArray:
-    active = grid.values != 0
-    y = grid["y"].values
-    x = grid["x"].values
-    yy, xx = np.meshgrid(y, x, indexing="ij")
-    active = grid.values != 0
-    centroids = np.column_stack((xx[active], yy[active]))
-    return centroids
-
-
 def lines_as_edges(line_coords, line_index) -> FloatArray:
     edges = np.empty((len(line_coords) - 1, 2, 2))
     edges[:, 0, :] = line_coords[:-1]
     edges[:, 1, :] = line_coords[1:]
     return edges[np.diff(line_index) == 0]
-
-
-@nb.njit(inline="always")
-def point_close(a: Point, b: Point) -> bool:
-    dx = abs(b.x - a.x)
-    dy = abs(b.y - a.y)
-    return dx < X_EPSILON and dy < X_EPSILON
 
 
 @nb.njit(inline="always")
@@ -270,15 +253,6 @@ def snap_to_edges(
         if U_dot_U == 0:
             continue
 
-        # Check for edge cases first
-        # Shift by a tiny amount to break ties
-        for edge in connectivity.neighbors(face_edge_connectivity, face):
-            b = as_point(edge_centroids[edge])
-            if point_close(p, b):
-                p = Point(p.x - T_OFFSET * U.x, p.y - T_OFFSET * U.y)
-            if point_close(q, b):
-                q = Point(q.x + T_OFFSET * U.x, q.y + T_OFFSET * U.y)
-
         U = to_vector(p, q)
         a_left = left_of(a, p, U)
         U_dot_U = dot_product(U, U)
@@ -288,7 +262,7 @@ def snap_to_edges(
             if a_left != b_left:
                 V = to_vector(p, b)
                 t = dot_product(U, V) / U_dot_U
-                if 0 <= t < 1:
+                if 0 <= t <= 1:
                     edges[count] = edge
                     segment_index[count] = segment
                     count += 1
@@ -296,8 +270,11 @@ def snap_to_edges(
     return edges[:count], segment_index[:count]
 
 
-def snap_to_grid(
-    lines: gpd.GeoDataFrame, grid: xr.DataArray, return_geometry: bool = False
+def snap_to_structured_grid(
+    lines: gpd.GeoDataFrame,
+    grid: xr.DataArray,
+    max_snap_distance: float,
+    return_geometry: bool = False,
 ) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
     """
     Snap a collection of lines to a grid.
@@ -316,6 +293,7 @@ def snap_to_grid(
     grid: xr.DataArray of integers
         Grid of cells to snap lines to. Cells with a value of 0 are not
         included.
+    max_snap_distance: float
     return_geometry: bool, optional. Default: False.
         Whether to return geometry. In this case a GeoDataFrame is returned
         with the snapped line segments, rather than a DataFrame without
@@ -351,11 +329,14 @@ def snap_to_grid(
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz)
 
     # Create geometric data
-    centroids = structured_centroids(grid)
     edge_centroids = vertices[edge_node_connectivity].mean(axis=1)
     line_geometry = coerce_geometry(lines)
     line_coords, line_index = pygeos.get_coordinates(line_geometry, return_index=True)
-    line_edges = lines_as_edges(line_coords, line_index)
+    # Snap line_coords to grid
+    x, y = snap_to_nodes(
+        *line_coords.T, *vertices.T, max_snap_distance, tiebreaker="nearest"
+    )
+    line_edges = lines_as_edges(np.column_stack([x, y]), line_index)
 
     # Search for intersections
     celltree = CellTree2d(vertices, faces, -1)
@@ -369,7 +350,7 @@ def snap_to_grid(
         face_indices,
         intersection_edges,
         face_edge_connectivity,
-        centroids,
+        topology.centroids,
         edge_centroids,
     )
     line_index = line_index[segment_index]
