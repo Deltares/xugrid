@@ -491,7 +491,7 @@ def imshow(grid, da, ax, **kwargs):
 
     # Check if a rasterization resolution is passed; Default to 500 raster
     # cells otherwise for the smallest axis.
-    resolution = kwargs.get("resolution", None)
+    resolution = kwargs.pop("resolution", None)
     if resolution is None:
         resolution = min(dx, dy) / 500
 

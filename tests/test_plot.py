@@ -67,8 +67,11 @@ class TestPlot:
         with pytest.raises(ValueError, match="imshow only supports"):
             self.node.ugrid.plot.imshow()
 
-        assert isinstance(plot.imshow(self.grid, self.face_da), AxesImage)
-        assert isinstance(self.face.ugrid.plot.imshow(), AxesImage)
+        # Reduce resolution for non-JITed test runs (e.g. for coverage)
+        assert isinstance(
+            plot.imshow(self.grid, self.face_da, resolution=1.0), AxesImage
+        )
+        assert isinstance(self.face.ugrid.plot.imshow(resolution=1.0), AxesImage)
 
     def test_plot_line(self):
         with pytest.raises(ValueError, match="line only supports"):
