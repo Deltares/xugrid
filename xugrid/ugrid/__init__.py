@@ -7,7 +7,9 @@ from .ugrid2d import Ugrid2d
 def grid_from_geodataframe(geodataframe: gpd.GeoDataFrame):
     gdf = geodataframe
     if not isinstance(gdf, gpd.GeoDataFrame):
-        raise TypeError(f"Cannot convert a {type(gdf)}, expected a GeoDataFrame")
+        raise TypeError(
+            f"Cannot convert a {type(gdf).__name__}, expected a GeoDataFrame"
+        )
 
     geom_types = gdf.geom_type.unique()
     if len(geom_types) == 0:

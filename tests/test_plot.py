@@ -45,6 +45,9 @@ class TestPlot:
         assert isinstance(plot.contour(self.grid, self.face_da), TriContourSet)
         assert isinstance(self.face.ugrid.plot.contour(), TriContourSet)
 
+        # Check whether line is dashed or not?
+        assert isinstance(self.face.ugrid.plot.contour(colors="black"), TriContourSet)
+
     def test_plot_contourf(self):
         with pytest.raises(ValueError, match="contourf only supports"):
             plot.contourf(self.grid, self.edge_da)
@@ -72,6 +75,30 @@ class TestPlot:
             plot.imshow(self.grid, self.face_da, resolution=1.0), AxesImage
         )
         assert isinstance(self.face.ugrid.plot.imshow(resolution=1.0), AxesImage)
+
+        with pytest.raises(ValueError, match="kwarg is not available in xugrid"):
+            self.face.ugrid.plot.imshow(resolution=1.0, size=4, aspect="equal")
+
+        actual = plot.imshow(
+            self.grid, self.face_da, resolution=1.0, extent=(0.0, 1.0, 0.0, 1.0)
+        )
+        assert isinstance(actual, AxesImage)
+        actual = plot.imshow(
+            self.grid,
+            self.face_da,
+            resolution=1.0,
+            extent=(0.0, 1.0, 0.0, 1.0),
+            origin="upper",
+        )
+        assert isinstance(actual, AxesImage)
+        actual = plot.imshow(
+            self.grid,
+            self.face_da,
+            resolution=1.0,
+            extent=(0.0, 1.0, 1.0, 0.0),
+            origin="lower",
+        )
+        assert isinstance(actual, AxesImage)
 
     def test_plot_line(self):
         with pytest.raises(ValueError, match="line only supports"):
@@ -110,6 +137,14 @@ class TestPlot:
         assert isinstance(self.node.ugrid.plot.surface(), PolyCollection)
         assert isinstance(self.face.ugrid.plot.surface(), PolyCollection)
 
+        with pytest.raises(ValueError, match="If ax is passed to surface()"):
+            _, ax = plt.subplots()
+            self.face.ugrid.plot.surface(ax=ax)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection="3d")
+        assert isinstance(self.face.ugrid.plot.surface(ax=ax), PolyCollection)
+
     def test_plot_scatter(self):
         assert isinstance(plot.scatter(self.grid, self.node_da), PathCollection)
         assert isinstance(plot.scatter(self.grid, self.edge_da), PathCollection)
@@ -136,3 +171,25 @@ class TestPlot:
         assert isinstance(self.node.ugrid.plot(), PolyCollection)
         assert isinstance(self.edge.ugrid.plot(), LineCollection)
         assert isinstance(self.face.ugrid.plot(), PolyCollection)
+
+    def test_add_colorbar_exception(self):
+        with pytest.raises(ValueError, match="cbar_ax and cbar_kwargs"):
+            cbar_kwargs = {"location": "top"}
+            self.face.ugrid.plot(add_colorbar=False, cbar_kwargs=cbar_kwargs)
+
+    def test_default_size(self):
+        with pytest.raises(ValueError, match="cannot provide both `size` and `ax`"):
+            _, ax = plt.subplots()
+            self.face.ugrid.plot(ax=ax, size=10)
+
+        self.face.ugrid.plot(size=10, add_colorbar=False)
+        fig = plt.gca().figure
+        h = fig.get_figheight()
+        w = fig.get_figwidth()
+        assert np.allclose(w / h, 1.0)
+
+        self.face.ugrid.plot(size=10)
+        fig = plt.gca().figure
+        h = fig.get_figheight()
+        w = fig.get_figwidth()
+        assert np.allclose(w / h, 1.26)

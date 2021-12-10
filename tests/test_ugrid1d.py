@@ -13,9 +13,16 @@ NAME = xugrid.ugrid.ugrid_io.UGRID1D_DEFAULT_NAME
 
 
 def grid1d(dataset=None, name=None, crs=None):
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+        ]
+    )
     grid = xugrid.Ugrid1d(
-        node_x=np.array([0.0, 1.0, 2.0]),
-        node_y=np.array([0.0, 1.0, 2.0]),
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
         fill_value=-1,
         edge_node_connectivity=np.array([[0, 1], [1, 2]]),
         dataset=dataset,
@@ -29,13 +36,17 @@ def test_ugrid1d_init():
     grid = grid1d()
     assert grid.name == NAME
     assert isinstance(grid.dataset, xr.Dataset)
+    assert grid.node_x.flags["C_CONTIGUOUS"]
+    assert grid.node_y.flags["C_CONTIGUOUS"]
 
 
 def test_ugrid1d_properties():
     # These are defined in the base class
     grid = grid1d()
-    assert grid.node_dimension == "network1d_nNodes"
-    assert grid.edge_dimension == "network1d_nEdges"
+    assert grid.node_dimension == f"{NAME}_nNodes"
+    assert grid.edge_dimension == f"{NAME}_nEdges"
+    assert grid.n_node == 3
+    assert grid.n_edge == 2
     expected_coords = np.array([[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]])
     assert np.allclose(grid.node_coordinates, expected_coords)
     assert np.allclose(grid.edge_x, [0.5, 1.5])
@@ -105,6 +116,7 @@ def test_ugrid1d_from_dataset():
 
 
 def test_remove_topology():
+
     grid = grid1d()
     ds = grid.dataset.copy()
     ds["a"] = xr.DataArray(0)
@@ -116,30 +128,29 @@ def test_remove_topology():
 def test_topology_coords():
     grid = grid1d()
     ds = xr.Dataset()
-    ds["a"] = xr.DataArray([1, 2, 3], dims=["network1d_nNodes"])
-    ds["b"] = xr.DataArray([1, 2], dims=["network1d_nEdges"])
+    ds["a"] = xr.DataArray([1, 2, 3], dims=[f"{NAME}_nNodes"])
+    ds["b"] = xr.DataArray([1, 2], dims=[f"{NAME}_nEdges"])
     coords = grid.topology_coords(ds)
     assert isinstance(coords, dict)
-    assert "network1d_edge_x" in coords
-    assert "network1d_edge_y" in coords
-    assert "network1d_node_x" in coords
-    assert "network1d_node_y" in coords
+    assert f"{NAME}_edge_x" in coords
+    assert f"{NAME}_edge_y" in coords
+    assert f"{NAME}_node_x" in coords
+    assert f"{NAME}_node_y" in coords
 
 
 def test_topology_dataset():
     grid = grid1d()
     ds = grid.topology_dataset()
     assert isinstance(ds, xr.Dataset)
-    name = NAME
-    assert f"{name}" in ds
-    assert f"{name}_nNodes" in ds.dims
-    assert f"{name}_nEdges" in ds.dims
-    assert f"{name}_node_x" in ds.coords
-    assert f"{name}_node_y" in ds.coords
-    assert f"{name}_edge_nodes" in ds
+    assert f"{NAME}" in ds
+    assert f"{NAME}_nNodes" in ds.dims
+    assert f"{NAME}_nEdges" in ds.dims
+    assert f"{NAME}_node_x" in ds.coords
+    assert f"{NAME}_node_y" in ds.coords
+    assert f"{NAME}_edge_nodes" in ds
 
 
-def test_topology_dataset():
+def test_clear_geometry_properties():
     grid = grid1d()
     for attr in [
         "_mesh",
@@ -164,8 +175,14 @@ def test_topology_dimension():
 
 def test_get_dimension():
     grid = grid1d()
-    assert grid._get_dimension("node") == "network1d_nNodes"
-    assert grid._get_dimension("edge") == "network1d_nEdges"
+    assert grid._get_dimension("node") == f"{NAME}_nNodes"
+    assert grid._get_dimension("edge") == f"{NAME}_nEdges"
+
+
+def test_dimensions():
+    grid = grid1d()
+    assert grid.node_dimension == f"{NAME}_nNodes"
+    assert grid.edge_dimension == f"{NAME}_nEdges"
 
 
 def test_mesh():
@@ -189,10 +206,10 @@ def test_from_geodataframe():
 def test_to_pygeos():
     grid = grid1d()
 
-    points = grid.to_pygeos("network1d_nNodes")
+    points = grid.to_pygeos(f"{NAME}_nNodes")
     assert isinstance(points[0], pygeos.Geometry)
 
-    lines = grid.to_pygeos("network1d_nEdges")
+    lines = grid.to_pygeos(f"{NAME}_nEdges")
     assert isinstance(lines[0], pygeos.Geometry)
 
 

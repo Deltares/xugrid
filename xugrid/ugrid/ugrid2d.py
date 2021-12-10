@@ -50,8 +50,8 @@ class Ugrid2d(AbstractUgrid):
         name: str = None,
         crs: Any = None,
     ):
-        self.node_x = node_x
-        self.node_y = node_y
+        self.node_x = np.ascontiguousarray(node_x)
+        self.node_y = np.ascontiguousarray(node_y)
 
         if isinstance(face_node_connectivity, np.ndarray):
             face_node_connectivity = face_node_connectivity
@@ -158,7 +158,8 @@ class Ugrid2d(AbstractUgrid):
         mesh_topology = ugrid_io.get_topology_variable(ds)
         ugrid_roles = ugrid_io.get_ugrid2d_variables(dataset, mesh_topology)
         # Rename the arrays to their standard UGRID roles
-        ugrid_ds = ds[set(ugrid_roles.keys())].rename(ugrid_roles)
+        topology_ds = ds[set(ugrid_roles.keys())]
+        ugrid_ds = topology_ds.rename(ugrid_roles)
         # Coerce type and fill value
         ugrid_ds["node_x"] = ugrid_ds["node_x"].astype(FloatDType)
         ugrid_ds["node_y"] = ugrid_ds["node_y"].astype(FloatDType)
@@ -173,17 +174,11 @@ class Ugrid2d(AbstractUgrid):
         else:
             edge_node_connectivity = None
 
-        # Set back to their original names
-        topology_ds = ugrid_ds.rename({v: k for k, v in ugrid_roles.items()})
-        node_x = ugrid_roles["node_x"]
-        node_y = ugrid_roles["node_y"]
-        face_node_connectivity = ugrid_roles["face_node_connectivity"]
-
         return Ugrid2d(
-            ugrid_ds[node_x].values,
-            ugrid_ds[node_y].values,
+            ugrid_ds["node_x"].values,
+            ugrid_ds["node_y"].values,
             fill_value,
-            ugrid_ds[face_node_connectivity].values,
+            ugrid_ds["face_node_connectivity"].values,
             edge_node_connectivity,
             topology_ds,
             mesh_topology.name,
@@ -195,7 +190,7 @@ class Ugrid2d(AbstractUgrid):
             self.node_y,
             self.fill_value,
             self.face_node_connectivity,
-            self.edge_node_connectivity,
+            self._edge_node_connectivity,
             self.name,
             self.topology_attrs,
         )
@@ -244,6 +239,9 @@ class Ugrid2d(AbstractUgrid):
 
     # These are all optional/derived UGRID attributes. They are not computed by
     # default, only when called upon.
+    @property
+    def n_face(self):
+        return self.face_node_connectivity.shape[0]
 
     @property
     def topology_dimension(self):
@@ -332,10 +330,10 @@ class Ugrid2d(AbstractUgrid):
     @property
     def mesh(self):
         if self._mesh is None:
-            self._mesh = mk.Mesh1d(
+            self._mesh = mk.Mesh2d(
                 node_x=self.node_x,
                 node_y=self.node_y,
-                edge_nodes=self.edge_nodes.ravel(),
+                edge_nodes=self.edge_node_connectivity.flatten().astype(np.int32),
             )
         return self._mesh
 
@@ -381,7 +379,8 @@ class Ugrid2d(AbstractUgrid):
         """
         Get all exterior edges, i.e. edges with no other face.
         """
-        return np.argwhere(self.edge_face_connectivity[:, 1] == self.fill_value)
+        # Numpy argwhere doesn't return a 1D array
+        return np.nonzero(self.edge_face_connectivity[:, 1] == self.fill_value)[0]
 
     @property
     def exterior_faces(self) -> IntArray:
@@ -424,17 +423,6 @@ class Ugrid2d(AbstractUgrid):
         selected_faces = np.unique(node_face_connectivity[nodemask].indices)
         return selected_faces
 
-    def locate_faces_polygon(self, polygon: sg.Polygon):
-        geometry_list = mku.to_geometry_list(polygon)
-        node_indices = self._meshkernel.mesh2d_get_nodes_in_polygons(
-            geometry_list, inside=True
-        )
-        node_face_connectivity = connectivity.invert_dense_to_sparse(
-            self.face_node_connectivity, self.fill_value
-        )
-        selected_faces = np.unique(node_face_connectivity[node_indices].indices)
-        return selected_faces
-
     def rasterize(self, resolution: float) -> Tuple[FloatArray, FloatArray, IntArray]:
         xmin, ymin, xmax, ymax = self.bounds
         d = abs(resolution)
@@ -449,31 +437,8 @@ class Ugrid2d(AbstractUgrid):
         index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
 
-    def as_vector_geometry(self, data_on: str):
-        if data_on == "node":
-            return conversion.nodes_to_points(self.node_x, self.node_y)
-        elif data_on == "edge":
-            return conversion.edges_to_linestrings(
-                self.node_x, self.node_y, self.node_edge_connectivity
-            )
-        elif data_on == "face":
-            return conversion.faces_to_polygons(
-                self.node_x, self.node_y, self.face_edge_connectivity
-            )
-        else:
-            raise ValueError(
-                "data_on for Ugrid2d should be one of {node, edge, face}. "
-                f"Received instead {data_on}"
-            )
-
     def topology_subset(self, face_indices: IntArray):
         return self._topology_subset(face_indices, self.face_node_connectivity)
-
-    def triangulate(self):
-        triangles, _ = connectivity.triangulate(
-            self.face_node_connectivity, self.fill_value
-        )
-        return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
 
     def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
         if add_exterior:
@@ -497,7 +462,7 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
 
     def reverse_cuthill_mckee(self, dimension=None):
-        # Todo: dispatch on dimension
+        # TODO: dispatch on dimension?
         reordering = reverse_cuthill_mckee(
             graph=self.face_face_connectivity,
             symmetric_mode=True,

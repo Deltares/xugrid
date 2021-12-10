@@ -170,7 +170,7 @@ def _plot2d(plotfunc):
     # and variable names. newplotfunc also explicitly lists most kwargs, so we
     # need to shorten it
     def signature(topology, darray, **kwargs):
-        pass
+        pass  # pragma: no-cover
 
     @override_signature(signature)
     @functools.wraps(plotfunc)
@@ -290,12 +290,15 @@ def _plot2d(plotfunc):
             # if colors == a single color, matplotlib draws dashed negative
             # contours. we lose this feature if we pass cmap and not colors
             if isinstance(colors, str):
-                cmap_params["cmap"] = dict()
+                cmap_params["cmap"] = None
                 kwargs["colors"] = colors
 
         if "imshow" == plotfunc.__name__ and isinstance(aspect, str):
             # forbid usage of mpl strings
-            raise ValueError("plt.imshow's `aspect` kwarg is not available in xarray")
+            raise ValueError(
+                "plt.imshow's `aspect` string kwarg is not available in xugrid. "
+                "Use a float instead."
+            )
 
         for key in ["cmap", "vmin", "vmax", "norm"]:
             kwargs[key] = cmap_params.get(key)
@@ -357,53 +360,6 @@ def _plot2d(plotfunc):
         )
 
         return primitive
-
-    # For use as DataArray.plot.plotmethod
-    @functools.wraps(newplotfunc)
-    def plotmethod(
-        topology,
-        darray,
-        figsize=None,
-        size=None,
-        aspect=None,
-        ax=None,
-        row=None,
-        col=None,
-        col_wrap=None,
-        xincrease=True,
-        yincrease=True,
-        add_colorbar=None,
-        add_labels=True,
-        vmin=None,
-        vmax=None,
-        cmap=None,
-        colors=None,
-        center=None,
-        robust=False,
-        extend=None,
-        levels=None,
-        subplot_kws=None,
-        cbar_ax=None,
-        cbar_kwargs=None,
-        xscale=None,
-        yscale=None,
-        xticks=None,
-        yticks=None,
-        xlim=None,
-        ylim=None,
-        norm=None,
-        **kwargs,
-    ):
-        """
-        The method should have the same signature as the function.
-        This just makes the method work on Plotmethods objects,
-        and passes all the other arguments straight through.
-        """
-        allargs = locals()
-        allargs.update(kwargs)
-        for arg in ["_PlotMethods_obj", "newplotfunc", "kwargs"]:
-            del allargs[arg]
-        return newplotfunc(**allargs)
 
     return newplotfunc
 

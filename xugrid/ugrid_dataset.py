@@ -69,7 +69,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
 
     def __getitem__(self, key):
         """
-        forward getters to  xr.DataArray. Wrap result if necessary
+        forward getters to xr.DataArray. Wrap result if necessary
         """
         result = self.obj[key]
         if isinstance(result, xr.DataArray):
@@ -110,24 +110,10 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
     def ugrid(self):
         return UgridAccessor(self.obj, self.grid)
 
-    def to_geoseries(self):
-        series = self.obj.to_series()
-        geometry = self.grid.to_pygeos(self.dims[-1])
-        return gpd.GeoSeries(series, geometry=geometry)
-
     def to_geodataframe(self, name=None, dim_order=None):
         df = self.obj.to_dataframe(name, dim_order)
         geometry = self.grid.to_pygeos(self.dims[-1])
         return gpd.GeoDataFrame(df, geometry=geometry)
-
-    @staticmethod
-    def from_geoseries(geoseries):
-        if not isinstance(geoseries, gpd.GeoSeries):
-            raise TypeError(f"Cannot convert a {type(geoseries)}, expected a GeoSeries")
-        gdf = gpd.GeoDataFrame(geoseries)
-        grid = grid_from_geodataframe(gdf)
-        da = xr.DataArray.from_series(geoseries)
-        return UgridDataArray(da, grid)
 
     @staticmethod
     def from_structured(da: xr.DataArray):
@@ -140,7 +126,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         face_da = xr.DataArray(
             da.data.reshape(*da.shape[:-2], -1),
             coords=coords,
-            dims=[*dims, "face"],
+            dims=[*dims, grid.face_dimension],
             name=da.name,
         )
         return UgridDataArray(face_da, grid)
@@ -323,22 +309,6 @@ class UgridAccessor:
         y = other["y"].values
         return self.sel(x=x, y=y)
 
-    def _dataset_obj(self) -> xr.Dataset:
-        if isinstance(self.obj, xr.DataArray):
-            ds = self.obj.to_dataset()
-        else:
-            ds = self.obj
-
-    def to_dataset(self) -> xr.Dataset:
-        """
-        Converts this UgridDataArray or UgridDataset into a standard
-        xarray.Dataset.
-
-        The UGRID topology information is added as standard data variables.
-        """
-        ds = self._dataset_obj()
-        return ds.merge(self.grid.dataset)
-
     @property
     def crs(self):
         return self.grid.crs
@@ -349,7 +319,10 @@ class UgridAccessor:
         ----------
         dim: str
         """
-        ds = self._dataset_obj()
+        if isinstance(self.obj, xr.DataArray):
+            ds = self.obj.to_dataset()
+        else:
+            ds = self.obj
         variables = [da for da in ds.data_vars if dim in da.dims]
         # TODO deal with time-dependent data, etc.
         # Basically requires checking which variables are static, which aren't.
@@ -511,6 +484,12 @@ class UgridAccessor:
         return UgridDataArray(da_filled, grid)
 
     def to_dataset(self):
+        """
+        Converts this UgridDataArray or UgridDataset into a standard
+        xarray.Dataset.
+
+        The UGRID topology information is added as standard data variables.
+        """
         return self.grid.dataset.merge(self.obj)
 
     def to_netcdf(self, *args, **kwargs):
@@ -557,6 +536,9 @@ def open_dataarray(*args, **kwargs):
 
 
 def open_mfdataset(*args, **kwargs):
+    if "data_vars" in kwargs:
+        raise ValueError("data_vars kwargs is not supported in xugrid.open_mfdataset")
+    kwargs["data_vars"] = "minimal"
     ds = xr.open_mfdataset(*args, **kwargs)
     return UgridDataset(ds)
 

@@ -2,6 +2,7 @@ from typing import Any, Union
 
 import geopandas as gpd
 import meshkernel as mk
+import numpy as np
 import xarray as xr
 
 from .. import conversion
@@ -40,8 +41,8 @@ class Ugrid1d(AbstractUgrid):
         name: str = None,
         crs: Any = None,
     ):
-        self.node_x = node_x
-        self.node_y = node_y
+        self.node_x = np.ascontiguousarray(node_x)
+        self.node_y = np.ascontiguousarray(node_y)
         self.fill_value = fill_value
         self.edge_node_connectivity = edge_node_connectivity
         if name is None:
@@ -103,7 +104,8 @@ class Ugrid1d(AbstractUgrid):
         mesh_topology = ugrid_io.get_topology_variable(ds)
         ugrid_roles = ugrid_io.get_ugrid2d_variables(dataset, mesh_topology)
         # Rename the arrays to their standard UGRID roles
-        ugrid_ds = ds[set(ugrid_roles.keys())].rename(ugrid_roles)
+        topology_ds = ds[set(ugrid_roles.keys())]
+        ugrid_ds = topology_ds.rename(ugrid_roles)
         # Coerce type and fill value
         ugrid_ds["node_x"] = ugrid_ds["node_x"].astype(FloatDType)
         ugrid_ds["node_y"] = ugrid_ds["node_y"].astype(FloatDType)
@@ -111,9 +113,6 @@ class Ugrid1d(AbstractUgrid):
         ugrid_ds["edge_node_connectivity"] = ugrid_ds["edge_node_connectivity"].astype(
             IntDType
         )
-
-        # Set back to their original names
-        topology_ds = ugrid_ds.rename({v: k for k, v in ugrid_roles.items()})
 
         return Ugrid1d(
             ugrid_ds["node_x"].values,

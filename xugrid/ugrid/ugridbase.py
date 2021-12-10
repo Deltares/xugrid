@@ -60,6 +60,14 @@ class AbstractUgrid(abc.ABC):
         return np.column_stack([self.node_x, self.node_y])
 
     @property
+    def n_node(self) -> int:
+        return self.node_x.size
+
+    @property
+    def n_edge(self) -> int:
+        return self.edge_node_connectivity.shape[0]
+
+    @property
     def edge_x(self):
         if self._edge_x is None:
             self._edge_x = self.node_x[self.edge_node_connectivity].mean(axis=1)
