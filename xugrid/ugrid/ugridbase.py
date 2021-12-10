@@ -3,7 +3,6 @@ import copy
 from typing import Tuple, Union
 
 import numpy as np
-import pyproj
 import xarray as xr
 from scipy.sparse import csr_matrix
 
@@ -144,10 +143,12 @@ class AbstractUgrid(abc.ABC):
 
     def set_crs(
         self,
-        crs: Union[pyproj.CRS, str] = None,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
         allow_override: bool = False,
     ) -> None:
+        import pyproj
+
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)
         elif epsg is not None:
@@ -166,7 +167,7 @@ class AbstractUgrid(abc.ABC):
 
     def to_crs(
         self,
-        crs: Union[pyproj.CRS, str] = None,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
         inplace: bool = False,
     ):
@@ -192,10 +193,7 @@ class AbstractUgrid(abc.ABC):
         inplace : bool, optional, default: False
             Whether to return a new Ugrid or do the transformation in place.
         """
-        try:
-            import pyproj
-        except ImportError:
-            raise ImportError("pyproj must be installed to use to_crs")
+        import pyproj
 
         if self.crs is None:
             raise ValueError(

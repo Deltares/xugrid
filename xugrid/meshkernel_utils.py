@@ -6,7 +6,10 @@ from typing import Union
 
 import meshkernel
 import numpy as np
+import pygeos
 import shapely.geometry as sg
+
+from .conversion import _to_pygeos
 
 
 def either_string_or_enum(value: Union[str, IntEnum], enum_class: EnumMeta) -> IntEnum:
@@ -28,10 +31,9 @@ def either_string_or_enum(value: Union[str, IntEnum], enum_class: EnumMeta) -> I
     return value
 
 
-def to_geometry_list(polygon: sg.Polygon) -> meshkernel.GeometryList:
-    if not isinstance(polygon, sg.Polygon):
-        raise TypeError(
-            "polygon must be a shapely.Polygon, received instead: " f"{type(polygon)}"
-        )
-    x, y = polygon.exterior.xy
-    return meshkernel.GeometryList(np.array(x), np.array(y))
+def to_geometry_list(polygon: Union[sg.Polygon, pygeos.Geometry]) -> "meshkernel.GeometryList":  # type: ignore # noqa
+    import meshkernel
+
+    polygon = _to_pygeos([polygon])[0]
+    xy = pygeos.get_coordinates(pygeos.get_exterior_ring(polygon))
+    return meshkernel.GeometryList(np.array(xy[:, 0]), np.array(xy[:, 1]))

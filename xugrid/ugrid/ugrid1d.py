@@ -2,7 +2,6 @@ from typing import Any, Union
 
 import geopandas as gpd
 import meshkernel as mk
-import pyproj
 import xarray as xr
 
 from .. import conversion
@@ -70,6 +69,8 @@ class Ugrid1d(AbstractUgrid):
         if crs is None:
             self.crs = None
         else:
+            import pyproj
+
             self.crs = pyproj.CRS.from_user_input(crs)
         # Store dataset
         if dataset is None:
