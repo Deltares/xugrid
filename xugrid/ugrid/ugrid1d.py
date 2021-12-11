@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 import geopandas as gpd
 import meshkernel as mk
@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 from .. import conversion
-from ..typing import FloatArray, FloatDType, IntArray, IntDType
+from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType
 from . import ugrid_io
 from .ugridbase import AbstractUgrid
 
@@ -244,5 +244,26 @@ class Ugrid1d(AbstractUgrid):
                 " Ugrid1d topology."
             )
 
-    def topology_subset(self, edge_indices: IntArray):
-        return self._topology_subset(edge_indices, self.edge_node_connectivity)
+    def _validate_indexer(self, indexer) -> Tuple[float, float]:
+        if isinstance(indexer, slice):
+            if indexer.step is not None:
+                raise ValueError("Ugrid1d does not support steps in slices")
+            if indexer.start >= indexer.stop:
+                raise ValueError("slice start should be smaller than slice stop")
+        else:
+            raise ValueError("Ugrid1d only supports slice indexing")
+        return indexer.start, indexer.stop
+
+    def sel(self, x, y) -> Tuple[str, bool, IntArray, dict]:
+        xmin, xmax = self._validate_indexer(x)
+        ymin, ymax = self._validate_indexer(y)
+        index = np.nonzero(
+            (self.edge_x >= xmin)
+            & (self.edge_x < xmax)
+            & (self.edge_y >= ymin)
+            & (self.edge_y < ymax)
+        )
+        return self.edge_dimension, True, index, {}
+
+    def topology_subset(self, edge_index: Union[BoolArray, IntArray]):
+        return self._topology_subset(edge_index, self.edge_node_connectivity)

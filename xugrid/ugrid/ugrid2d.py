@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Callable, Tuple, Union
 
 import geopandas as gpd
 import meshkernel as mk
@@ -14,10 +14,28 @@ from scipy.sparse.csgraph import reverse_cuthill_mckee
 
 from .. import connectivity, conversion
 from .. import meshkernel_utils as mku
-from ..typing import FloatArray, FloatDType, IntArray, IntDType, SparseMatrix
+from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType, SparseMatrix
 from ..voronoi import voronoi_topology
 from . import ugrid_io
 from .ugridbase import AbstractUgrid
+
+
+def section_coordinates(xy: FloatArray, dim: str) -> dict:
+    # TODO: add boundaries xy[:, 0] and xy[:, 1]
+    xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
+    s = np.linalg.norm(xy_mid - xy[0, 0], axis=2)
+    return {
+        "x": (dim, xy_mid[:, 0]),
+        "y": (dim, xy_mid[:, 1]),
+        "s": (dim, s),
+    }
+
+
+def numeric_bound(v, sign):
+    if v is None:
+        return np.inf * sign
+    else:
+        return v
 
 
 class Ugrid2d(AbstractUgrid):
@@ -402,26 +420,64 @@ class Ugrid2d(AbstractUgrid):
             )
         return self._celltree
 
-    def locate_faces(self, points):
+    def locate_points(self, points: FloatArray):
         """
-        returns the face indices in which the points lie. The points should be
-        provided as an (N,2) array. The result is an (N) array
+        Find in which face points are located.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+
+        Returns
+        -------
+        face_index: ndarray of integers with shape ``(n_points,)``
         """
         return self.celltree.locate_points(points)
 
-    def locate_faces_bounding_box(self, xmin, xmax, ymin, ymax):
+    def locate_edges(self, edges: FloatArray):
         """
-        given a rectangular bounding box, this function returns the face
-        indices which lie in it.
+        Find in which face edges are located and compute the intersection with
+        the face edges.
+
+        Parameters
+        ----------
+        edges: ndarray of floats with shape ``(n_edge, 2, 2)``
+            The first dimensions represents the different edges.
+            The second dimensions represents the start and end of every edge.
+            The third dimensions reresent the x and y coordinate of every vertex.
+
+        Returns
+        -------
+        edge_index: ndarray of integers with shape ``(n_intersection,)``
+        face_index: ndarray of integers with shape ``(n_intersection,)``
+        intersections: ndarray of float with shape ``(n_intersection, 2, 2)``
         """
-        x = self.node_x
-        y = self.node_y
-        nodemask = (x >= xmin) & (x <= xmax) & (y >= ymin) & (y <= ymax)
-        node_face_connectivity = connectivity.invert_dense_to_sparse(
-            self.face_node_connectivity, self.fill_value
+        return self.celltree.locate_edges(edges)
+
+    def locate_bounding_box(
+        self, xmin: float, ymin: float, xmax: float, ymax: float
+    ) -> IntArray:
+        """
+        Find which faces are located in the bounding box. The centroids of the
+        faces are used.
+
+        Parameters
+        ----------
+        xmin: float,
+        ymin: float,
+        xmax: float,
+        ymax: float
+
+        Returns
+        -------
+        face_index: ndarray of bools with shape ``(n_face,)``
+        """
+        return np.nonzero(
+            (self.face_x >= xmin)
+            & (self.face_x < xmax)
+            & (self.face_y >= ymin)
+            & (self.face_y < ymax)
         )
-        selected_faces = np.unique(node_face_connectivity[nodemask].indices)
-        return selected_faces
 
     def rasterize(self, resolution: float) -> Tuple[FloatArray, FloatArray, IntArray]:
         xmin, ymin, xmax, ymax = self.bounds
@@ -437,8 +493,105 @@ class Ugrid2d(AbstractUgrid):
         index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
 
-    def topology_subset(self, face_indices: IntArray):
-        return self._topology_subset(face_indices, self.face_node_connectivity)
+    def _validate_indexer(self, indexer) -> Union[slice, np.ndarray]:
+        if isinstance(indexer, slice):
+            s = indexer
+            if s.start is not None and s.stop is not None:
+                if s.start >= s.stop:
+                    raise ValueError(
+                        "slice stop should be larger than slice start, received: "
+                        f"start: {s.start}, stop: {s.stop}"
+                    )
+                if s.step is not None:
+                    indexer = np.arange(s.start, s.stop, s.step)
+            elif s.start is None or s.stop is None:
+                if s.step is not None:
+                    raise ValueError(
+                        "step should be None if slice start or stop is None"
+                    )
+
+        else:  # Convert it into a 1d numpy array
+            if isinstance(indexer, xr.DataArray):
+                indexer = indexer.values
+            if isinstance(indexer, (list, np.ndarray, int, float)):
+                indexer = np.atleast_1d(indexer)
+            else:
+                raise TypeError(
+                    f"Invalid indexer type: {type(indexer).__name__} ,"
+                    "allowed types: integer, float, list, numpy array, xarray DataArray"
+                )
+            if indexer.ndim > 1:
+                raise ValueError("index should be 0d or 1d")
+
+        return indexer
+
+    def sel_points(self, x: FloatArray, y: FloatArray):
+        x = np.atleast_1d(x)
+        y = np.atleast_1d(y)
+        if x.shape != y.shape:
+            raise ValueError("shape of x does not match shape of y")
+        if x.ndim != 1:
+            raise ValueError("x and y must be 1d")
+        dim = self.face_dimension
+        xy = np.column_stack([x, y])
+        index = self.locate_points(xy)
+        valid = index != -1
+        index = index[valid]
+        coords = {
+            "x": (dim, xy[valid, 0]),
+            "y": (dim, xy[valid, 1]),
+        }
+        return dim, False, index, coords
+
+    def sel(self, x=slice(None, None), y=slice(None, None)):
+        x = self._validate_indexer(x)
+        y = self._validate_indexer(y)
+        dim = self.face_dimension
+        as_ugrid = False
+        if isinstance(x, slice) and isinstance(y, slice):
+            # Bounding box selection
+            # Fill None values by infinite
+            bounds = [
+                numeric_bound(x.start, 1),
+                numeric_bound(y.start, 1),
+                numeric_bound(x.stop, -1),
+                numeric_bound(y.stop, -1),
+            ]
+            as_ugrid = True
+            coords = {}
+            index = self.locate_bounding_box(*bounds)
+        elif isinstance(x, slice) and isinstance(y, np.ndarray):
+            if y.size != 1:
+                raise ValueError(
+                    "If x is a slice with steps, y should be a single value"
+                )
+            y = [0]
+            edges = np.array([[[x.start, y], [x.stop, y]]])
+            _, index, xy = self.locate_edges(edges)
+            xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
+            coords = section_coordinates(xy, dim)
+        elif isinstance(x, np.ndarray) and isinstance(y, slice):
+            if x.size != 1:
+                raise ValueError(
+                    "If y is a slice with steps, x should be a single value"
+                )
+            x = x[0]
+            edges = np.array([[[x, y.start], [x, y.stop]]])
+            _, index, xy = self.locate_edges(edges)
+            xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
+            coords = section_coordinates(xy, dim)
+        elif isinstance(x, np.ndarray) and isinstance(y, np.darray):
+            # Orthogonal points
+            yy, xx = np.meshgrid(y, x, indexing="ij")
+            return self.sel_points(self, xx.ravel(), yy.ravel())
+        else:
+            raise TypeError(
+                f"Unexpected index types: {type(x).__name__}, and {type(y).__name__}"
+            )
+        return dim, as_ugrid, index, coords
+
+    def topology_subset(self, index: Union[BoolArray, IntArray]):
+        return self._topology_subset(index, self.face_node_connectivity)
 
     def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
         if add_exterior:

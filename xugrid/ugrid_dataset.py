@@ -95,16 +95,26 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         else:
             return result
 
+    def _unary_op(
+        self,
+        f: Callable,
+    ):
+        return UgridDataArray(self.obj._unary_op(f), self.grid)
+
     def _binary_op(
         self,
         other,
         f: Callable,
         reflexive: bool = False,
     ):
-        return self.obj._binary_op(other, f, reflexive)
+        if isinstance(other, (UgridDataArray, UgridDataset)):
+            other = other.obj
+        return UgridDataArray(self.obj._binary_op(other, f, reflexive), self.grid)
 
     def _inplace_binary_op(self, other, f: Callable):
-        return self.obj._inplace_binary_op(other, f)
+        if isinstance(other, (UgridDataArray, UgridDataset)):
+            other = other.obj
+        return UgridDataArray(self.obj._inplace_binary_op(other, f), self.grid)
 
     @property
     def ugrid(self):
@@ -186,6 +196,27 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         else:
             return result
 
+    def _unary_op(
+        self,
+        f: Callable,
+    ):
+        return UgridDataset(self.obj._unary_op(f), self.grid)
+
+    def _binary_op(
+        self,
+        other,
+        f: Callable,
+        reflexive: bool = False,
+    ):
+        if isinstance(other, (UgridDataArray, UgridDataset)):
+            other = other.obj
+        return UgridDataset(self.obj._binary_op(other, f, reflexive), self.grid)
+
+    def _inplace_binary_op(self, other, f: Callable):
+        if isinstance(other, (UgridDataArray, UgridDataset)):
+            other = other.obj
+        return UgridDataset(self.obj._inplace_binary_op(other, f), self.grid)
+
     @property
     def ugrid(self):
         return UgridAccessor(self.obj, self.grid)
@@ -220,78 +251,70 @@ class UgridAccessor:
 
     plot = UncachedAccessor(_PlotMethods)
 
-    def object_from_face_indices(self, face_indices):
+    def isel(self, indexer):
         """
-        returns subset of dataset or dataArray containing specific face indices
+        Returns a new object with arrays indexed along edges or faces.
+
+        Parameters
+        ----------
+        indexer
+
+        Returns
+        -------
+        indexed: Union[UgridDataArray, UgridDataset]
         """
-        result = self.obj.isel(face=face_indices)
-        grid = self.grid.topology_subset(face_indices)
-        result.coords["face"] = face_indices
+        if self.grid.topology_dimension == 1:
+            dim = self.grid.edge_dimension
+        elif self.grid.topology_dimension == 2:
+            dim = self.grid.face_dimension
+        else:
+            raise NotImplementedError
+
+        result = self.obj.isel({dim: indexer})
+        indices = result[dim].values
+        result = result.assign_coords({f"{dim}_index": (dim, indices)})
+        grid = self.grid.topology_subset(indices)
         if isinstance(self.obj, xr.DataArray):
             return UgridDataArray(result, grid)
         elif isinstance(self.obj, xr.Dataset):
             return UgridDataset(result, grid)
         else:
-            raise TypeError("illegal type in _sel_points")
+            raise TypeError(
+                f"Expected UgridDataArray or UgridDataset, got {type(result).__name__}"
+            )
 
-    def sel_points(self, points_x, points_y):
+    def sel(self, x, y):
+        # TODO: also do vectorized indexing like xarray?
+        # Might not be worth it, as orthogonal and vectorized indexing are
+        # quite confusing.
+        index, dim, ugrid, coords = self.grid.sel(x=x, y=y)
+        result = self.obj.isel({dim: index})
+        indices = result[dim].values
+
+        if not ugrid:
+            return result.assign_coords(coords)
+
+        grid = self.grid.topology_subset(indices)
+        if isinstance(self.obj, xr.DataArray):
+            return UgridDataArray(result, grid)
+        elif isinstance(self.obj, xr.Dataset):
+            return UgridDataset(result, grid)
+        else:
+            raise TypeError(
+                f"Expected UgridDataArray or UgridDataset, got {type(result).__name__}"
+            )
+
+    def sel_points(self, x, y):
         """
         returns subset of dataset or dataArray containing specific face
         indices. Input arguments are point coordinates. The result dataset or
         dataArray contains only the faces containing these points.
         """
-        if (points_x is None) or (points_y is None):
-            raise ValueError("coordinate arrays cannot be empty")
-        if points_x.shape != points_y.shape:
-            raise ValueError("coordinate arrays size does not match")
-        if points_x.ndim != 1:
-            raise ValueError("coordinate arrays must be 1d")
-
-        points = np.column_stack([points_x, points_y])
-        face_indices = self.grid.locate_faces(points)
-        result = self.obj.isel(face=face_indices)
-        result.coords["face"] = face_indices
-        return result
-
-    def _sel_slices(self, x: slice, y: slice):
-        if (
-            (x.start is None)
-            or (x.stop is None)
-            or (y.start is None)
-            or (y.stop is None)
-        ):
-            raise Exception("slice start and stop should not be None")
-        elif (x.start > x.stop) or (y.start > y.stop):
-            raise Exception("slice start should be smaller than its stop")
-        elif (not x.step is None) and (not y.step is None):
-            xcoords = np.arange(x.start, x.stop, x.step)
-            ycoords = np.arange(y.start, y.stop, y.step)
-            return self.sel_points(xcoords, ycoords)
-        elif (x.step is None) and (y.step is None):
-            face_indices = self.grid.locate_faces_bounding_box(
-                x.start, x.stop, y.start, y.stop
-            )
-            return self.object_from_face_indices(face_indices)
-        else:
-            raise ValueError(
-                "slices should both have a stepsize, or neither should have a stepsize"
-            )
-
-    def sel(self, x=None, y=None):
-        """
-        returns subset of dataset or dataArray based on spatial selection
-        """
-        if isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
-            xv, yv = (a.ravel() for a in np.meshgrid(x, y, indexing="ij"))
-            return self.sel_points(xv, yv)
-        elif (isinstance(x, float) or isinstance(x, int)) and (
-            isinstance(y, float) or isinstance(y, int)
-        ):
-            return self.sel_points(np.array([x], np.float64), np.array([y], np.float64))
-        elif isinstance(x, slice) and isinstance(y, slice):
-            return self._sel_slices(x, y)
-        else:
-            raise ValueError("argument mismatch")
+        if self.grid.topology_dimension != 2:
+            raise NotImplementedError
+        dim, _, index, coords = self.grid.select_points(x, y)
+        result = self.obj.isel({dim: index})
+        return result.assign_coords(coords)
 
     def rasterize(self, resolution: float):
         x, y, index = self.grid.rasterize(resolution)
@@ -457,7 +480,9 @@ class UgridAccessor:
         da = self.obj
         if isinstance(da, xr.Dataset):
             raise NotImplementedError
-        if len(da.dims) > 1 or da.dims[0] != attrs.get("face_dimension", "face"):
+        if grid.topology_dimension != 2:
+            raise NotImplementedError
+        if len(da.dims) > 1 or da.dims[0] != grid.face_dimension:
             raise NotImplementedError
 
         connectivity = grid.face_face_connectivity.copy()

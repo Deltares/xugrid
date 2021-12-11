@@ -122,7 +122,7 @@ def test_remove_topology():
     ds["a"] = xr.DataArray(0)
     actual = grid.remove_topology(ds)
     print(actual)
-    assert set(actual.data_vars) == set(["a", NAME])
+    assert set(actual.data_vars) == set(["a"])
 
 
 def test_topology_coords():
@@ -211,6 +211,21 @@ def test_to_pygeos():
 
     lines = grid.to_pygeos(f"{NAME}_nEdges")
     assert isinstance(lines[0], pygeos.Geometry)
+
+
+def test_sel():
+    grid = grid1d()
+    with pytest.raises(ValueError, match="Ugrid1d only supports slice indexing"):
+        grid.sel(x=1.0, y=1.0)
+    with pytest.raises(ValueError, match="Ugrid1d does not support steps"):
+        grid.sel(x=slice(0, 2, 1), y=slice(0, 2, 1))
+    with pytest.raises(ValueError, match="slice start should be smaller"):
+        grid.sel(x=slice(2, 0), y=slice(0, 2))
+    dim, as_ugrid, index, coords = grid.sel(x=slice(0, 1), y=slice(0, 1))
+    assert dim == f"{NAME}_nEdges"
+    assert as_ugrid
+    assert np.allclose(index, [0])
+    assert coords == {}
 
 
 def test_topology_subset():

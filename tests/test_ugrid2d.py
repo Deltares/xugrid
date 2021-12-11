@@ -138,7 +138,7 @@ def test_remove_topology():
     ds["a"] = xr.DataArray(0)
     actual = grid.remove_topology(ds)
     print(actual)
-    assert set(actual.data_vars) == set(["a", NAME])
+    assert set(actual.data_vars) == set(["a"])
 
 
 def test_topology_coords():
@@ -304,15 +304,15 @@ def test_celltree():
     assert isinstance(tree, numba_celltree.CellTree2d)
 
 
-def test_locate_faces():
+def test_locate_points():
     grid = grid2d()
-    assert np.array_equal(grid.locate_faces(CENTROIDS), [0, 1, 2, 3])
+    assert np.array_equal(grid.locate_points(CENTROIDS), [0, 1, 2, 3])
 
 
-def test_locate_faces_bounding_box():
+def test_locate_bounding_box():
     grid = grid2d()
-    faces = grid.locate_faces_bounding_box(1.5, 2.5, 0.5, 1.5)
-    assert np.array_equal(faces, [1, 3])
+    faces = grid.locate_bounding_box(1.25, 0.25, 2.5, 1.5)
+    assert np.allclose(faces, [1, 3])
 
 
 def test_rasterize():
@@ -331,6 +331,90 @@ def test_rasterize():
     assert np.array_equal(index, expected_index)
 
 
+def test_sel_points():
+    grid = grid2d()
+    x = [0.5, 1.5]
+    y = [0.5, 1.25]
+
+    with pytest.raises(ValueError, match="shape of x does not match shape of y"):
+        grid.sel_points(x=[0.5, 1.5], y=[0.5])
+    with pytest.raises(ValueError, match="x and y must be 1d"):
+        grid.sel_points(x=[x], y=[y])
+
+    dim, as_ugrid, index, coords = grid.sel_points(x=x, y=y)
+    assert dim == f"{NAME}_nFaces"
+    assert not as_ugrid
+    assert np.array_equal(index, [0, 3])
+    assert coords["x"][0] == dim
+    assert coords["y"][0] == dim
+    assert np.array_equal(coords["x"][1], x)
+    assert np.array_equal(coords["y"][1], y)
+
+
+def test_validate_indexer():
+    grid = grid2d()
+    with pytest.raises(ValueError, match="slice stop should be larger than"):
+        grid._validate_indexer(slice(2, 0))
+    with pytest.raises(ValueError, match="step should be None"):
+        grid._validate_indexer(slice(None, 2, 1))
+    with pytest.raises(ValueError, match="step should be None"):
+        grid._validate_indexer(slice(0, None, 1))
+
+    expected = np.arange(0.0, 2.0, 0.5)
+    assert np.allclose(grid._validate_indexer(slice(0, 2, 0.5)), expected)
+    assert grid._validate_indexer(slice(None, 2)) == slice(None, 2)
+    assert grid._validate_indexer(slice(0, None)) == slice(0, None)
+
+    with pytest.raises(TypeError, match="Invalid indexer type"):
+        grid._validate_indexer((0, 1, 2))
+
+    # list
+    actual = grid._validate_indexer([0.0, 1.0, 2.0])
+    assert isinstance(actual, np.ndarray)
+    assert np.allclose(actual, [0.0, 1.0, 2.0])
+
+    # numpy array
+    actual = grid._validate_indexer(np.array([0.0, 1.0, 2.0]))
+    assert isinstance(actual, np.ndarray)
+    assert np.allclose(actual, [0.0, 1.0, 2.0])
+
+    # xarray DataArray
+    indexer = xr.DataArray([0.0, 1.0, 2.0], {"x": [0, 1, 2]}, ["x"])
+    actual = grid._validate_indexer(indexer)
+    assert isinstance(actual, np.ndarray)
+    assert np.allclose(actual, [0.0, 1.0, 2.0])
+
+    # float
+    actual = grid._validate_indexer(1.0)
+    assert isinstance(actual, np.ndarray)
+    assert np.allclose(actual, [1.0])
+
+    # int
+    actual = grid._validate_indexer(1)
+    assert isinstance(actual, np.ndarray)
+    assert np.allclose(actual, [1])
+
+
+def test_sel():
+    grid = grid2d()
+
+    dim, as_ugrid, index, coords = grid.sel(x=slice(0.0, 2.0), y=slice(0.0, 1.0))
+    assert dim == f"{NAME}_nFaces"
+    assert as_ugrid
+    assert np.allclose(index, [0, 1])
+    assert coords == {}
+
+    # _, _, index, _ = grid.sel(x=slice(None, None), y=slice(None, 1.0))
+    # assert np.allclose(index, [0, 1])
+
+    _, _, index, _ = grid.sel(x=slice(0.0, 1.0), y=slice(0.0, 2.0))
+    assert np.allclose(index, [0, 2])
+    assert coords == {}
+
+    # _, _, index, _ = grid.sel(x=slice(None, 1.0), y=slice(None, None))
+    # assert np.allclose(index, [0, 2])
+
+
 def test_topology_subset():
     grid = grid2d()
     edge_indices = np.array([1])
@@ -338,6 +422,17 @@ def test_topology_subset():
     assert np.array_equal(actual.face_node_connectivity, [[0, 1, 3, 2]])
     assert np.array_equal(actual.node_x, [1.0, 2.0, 1.0, 2.0])
     assert np.array_equal(actual.node_y, [0.0, 0.0, 1.0, 1.0])
+
+    edge_indices = np.array([False, True, False, False])
+    actual = grid.topology_subset(edge_indices)
+    assert np.array_equal(actual.face_node_connectivity, [[0, 1, 3, 2]])
+    assert np.array_equal(actual.node_x, [1.0, 2.0, 1.0, 2.0])
+    assert np.array_equal(actual.node_y, [0.0, 0.0, 1.0, 1.0])
+
+    # Entire mesh
+    edge_indices = np.array([0, 1, 2, 3])
+    actual = grid.topology_subset(edge_indices)
+    assert actual is grid
 
 
 def test_tesselate_centroidal_voronoi():

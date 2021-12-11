@@ -102,6 +102,51 @@ class TestUgridDataArray:
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
 
+    def test_unary_op(self):
+        alltrue = self.uda.astype(bool)
+        allfalse = alltrue.copy()
+        allfalse[:] = False
+        assert (~allfalse).all()
+        assert isinstance(~allfalse, xugrid.UgridDataArray)
+
+    def test_binary_op(self):
+        alltrue = self.uda.astype(bool)
+        allfalse = alltrue.copy()
+        allfalse[:] = False
+        assert isinstance(alltrue | allfalse, xugrid.UgridDataArray)
+        assert (alltrue | allfalse).all()
+        assert (alltrue ^ allfalse).all()
+        assert not (alltrue & allfalse).any()
+        # inplace op
+        alltrue &= allfalse
+        assert isinstance(alltrue, xugrid.UgridDataArray)
+        assert not (alltrue).any()
+
+    def test_math(self):
+        actual = self.uda + 0
+        assert isinstance(actual, xugrid.UgridDataArray)
+
+    def test_np_ops(self):
+        actual = np.abs(self.uda)
+        assert isinstance(actual, xugrid.UgridDataArray)
+
+    # Accessor tests
+    def test_isel(self):
+        actual = self.uda.ugrid.isel([0, 1])
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert actual.shape == (2,)
+        assert actual.ugrid.grid.n_face == 2
+        assert "mesh2d_nFaces_index" in actual.coords
+
+    # def test_sel_points(self):
+    #    with pytest.raises(ValueError, match="coordinate arrays must be 1d"):
+    #        self.uda.ugrid.sel_points(x=[[0., 1.]], y=[[0., 1.]])
+    #    with pytest.raises(ValueError, match="coordinate arrays size does not match"):
+    #        self.uda.ugrid.sel_points(x=[0.], y=[0., 1.])
+    #    actual = self.uda.ugrid.sel_points(x=[0.5, 0.5], y=[0.5, 1.25])
+    #    assert isinstance(actual, xr.DataArray)
+    #    assert actual.shape == (2,)
+
 
 class TestUgridDataset:
     @pytest.fixture(autouse=True)
@@ -151,6 +196,21 @@ class TestUgridDataset:
         assert tuple(self.uds.dims) == ("mesh2d_nFaces",)
         assert isinstance(self.uds.a, xugrid.UgridDataArray)
         assert isinstance(self.uds.mean(), xugrid.UgridDataset)
+
+    def test_unary_op(self):
+        alltrue = self.uds.astype(bool)
+        assert isinstance(~alltrue, xugrid.UgridDataset)
+
+    def test_binary_op(self):
+        alltrue = self.uds.astype(bool)
+        assert isinstance(alltrue ^ alltrue, xugrid.UgridDataset)
+        # inplace op
+        alltrue &= alltrue
+        assert isinstance(alltrue, xugrid.UgridDataset)
+
+    def test_math(self):
+        actual = self.uds + 0
+        assert isinstance(actual, xugrid.UgridDataset)
 
     def test_ugrid_accessor(self):
         assert isinstance(self.uds.ugrid, xugrid.ugrid_dataset.UgridAccessor)

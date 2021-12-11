@@ -7,7 +7,7 @@ import xarray as xr
 from scipy.sparse import csr_matrix
 
 from .. import connectivity
-from ..typing import FloatArray, IntArray
+from ..typing import BoolArray, FloatArray, IntArray
 from . import ugrid_io
 
 
@@ -22,6 +22,10 @@ class AbstractUgrid(abc.ABC):
 
     @abc.abstractstaticmethod
     def from_dataset():
+        """ """
+
+    @abc.abstractmethod
+    def sel(self):
         """ """
 
     @abc.abstractmethod
@@ -104,12 +108,17 @@ class AbstractUgrid(abc.ABC):
             self._ymax,
         )
 
-    def _topology_subset(self, indices: IntArray, node_connectivity: IntArray):
-        # If faces are repeated: not a valid mesh
-        # _, count = np.unique(face_indices, return_counts=True)
-        # assert count.max() <= 1?
-        # If no faces are repeated, and size is the same, it's the same mesh
-        if indices.size == len(node_connectivity):
+    def _topology_subset(
+        self, indices: Union[BoolArray, IntArray], node_connectivity: IntArray
+    ):
+        is_same = False
+        if np.issubdtype(indices.dtype, np.bool_):
+            is_same = indices.all()
+        else:
+            # TODO: check for unique indices if integer?
+            is_same = np.array_equal(indices, np.arange(node_connectivity.shape[0]))
+
+        if is_same:
             return self
         # Subset of faces, create new topology data
         else:
@@ -131,6 +140,8 @@ class AbstractUgrid(abc.ABC):
         """
         attrs = self.topology_attrs
         names = []
+        if self.name in obj:
+            names.append(self.name)
         for topology_attr in topology_variables.coordinates:
             varname = attrs.get(topology_attr)
             if varname and varname in obj:
