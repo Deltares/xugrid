@@ -287,7 +287,7 @@ class UgridAccessor:
         # TODO: also do vectorized indexing like xarray?
         # Might not be worth it, as orthogonal and vectorized indexing are
         # quite confusing.
-        index, dim, ugrid, coords = self.grid.sel(x=x, y=y)
+        dim, ugrid, index, coords = self.grid.sel(x=x, y=y)
         result = self.obj.isel({dim: index})
         indices = result[dim].values
 
@@ -312,25 +312,31 @@ class UgridAccessor:
         """
         if self.grid.topology_dimension != 2:
             raise NotImplementedError
-        dim, _, index, coords = self.grid.select_points(x, y)
+        dim, _, index, coords = self.grid.sel_points(x, y)
         result = self.obj.isel({dim: index})
         return result.assign_coords(coords)
 
-    def rasterize(self, resolution: float):
-        x, y, index = self.grid.rasterize(resolution)
-        data = self.isel(face=index).astype(float)
+    def _raster(self, x, y, index) -> xr.DataArray:
+        index = index.ravel()
+        data = self.obj.isel({self.grid.face_dimension: index}).astype(float).values
         data[index == -1] = np.nan
         out = xr.DataArray(
-            data=data,
+            data=data.reshape(y.size, x.size),
             coords={"y": y, "x": x},
             dims=["y", "x"],
         )
         return out
 
+    def rasterize(self, resolution: float):
+        x, y, index = self.grid.rasterize(resolution)
+        return self._raster(x, y, index)
+
     def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]):
-        x = other["x"].values
-        y = other["y"].values
-        return self.sel(x=x, y=y)
+        x, y, index = self.grid.rasterize_like(
+            x=other["x"].values,
+            y=other["y"].values,
+        )
+        return self._raster(x, y, index)
 
     @property
     def crs(self):
@@ -346,7 +352,7 @@ class UgridAccessor:
             ds = self.obj.to_dataset()
         else:
             ds = self.obj
-        variables = [da for da in ds.data_vars if dim in da.dims]
+        variables = [var for var in ds.data_vars if dim in ds[var].dims]
         # TODO deal with time-dependent data, etc.
         # Basically requires checking which variables are static, which aren't.
         # For non-static, requires repeating all geometries.
@@ -408,21 +414,22 @@ class UgridAccessor:
 
     def reverse_cuthill_mckee(self):
         grid = self.grid
-        attrs = grid.attrs
-        # TODO: Dispatch on dimension
-        face_dim = attrs.get("face_dimension", "face")
-        if isinstance(self.obj, xr.Dataset):
-            raise NotImplementedError
-        if self.obj.dims[-1] != face_dim:
-            raise NotImplementedError
         reordered_grid, reordering = self.grid.reverse_cuthill_mckee()
-        reordered_data = self.obj.data[..., reordering]
+        reordered_data = self.obj.isel({grid.face_dimension: reordering})
         # TODO: this might not work properly if e.g. centroids are stored in obj.
         # Not all metadata would be reordered.
-        return UgridDataArray(
-            self.obj.copy(data=reordered_data),
-            reordered_grid,
-        )
+        if isinstance(self.obj, xr.DataArray):
+            return UgridDataArray(
+                reordered_data,
+                reordered_grid,
+            )
+        elif isinstance(self.obj, xr.Dataset):
+            return UgridDataset(
+                reordered_data,
+                reordered_grid,
+            )
+        else:
+            raise ValueError("object should be a xr.DataArray")
 
     def laplace_interpolate(
         self,
@@ -476,7 +483,6 @@ class UgridAccessor:
         filled: UgridDataArray of floats
         """
         grid = self.grid
-        attrs = grid.topology_attrs
         da = self.obj
         if isinstance(da, xr.Dataset):
             raise NotImplementedError

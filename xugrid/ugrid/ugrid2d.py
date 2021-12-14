@@ -20,20 +20,24 @@ from . import ugrid_io
 from .ugridbase import AbstractUgrid
 
 
-def section_coordinates(xy: FloatArray, dim: str) -> dict:
+def section_coordinates(
+    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray
+) -> Tuple[IntArray, dict]:
     # TODO: add boundaries xy[:, 0] and xy[:, 1]
     xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
-    s = np.linalg.norm(xy_mid - xy[0, 0], axis=2)
-    return {
-        "x": (dim, xy_mid[:, 0]),
-        "y": (dim, xy_mid[:, 1]),
-        "s": (dim, s),
+    s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
+    order = np.argsort(s)
+    coords = {
+        "x": (dim, xy_mid[order, 0]),
+        "y": (dim, xy_mid[order, 1]),
+        "s": (dim, s[order]),
     }
+    return coords, index[order]
 
 
-def numeric_bound(v, sign):
+def numeric_bound(v: Union[float, None], other: float):
     if v is None:
-        return np.inf * sign
+        return other
     else:
         return v
 
@@ -434,7 +438,7 @@ class Ugrid2d(AbstractUgrid):
         """
         return self.celltree.locate_points(points)
 
-    def locate_edges(self, edges: FloatArray):
+    def intersect_edges(self, edges: FloatArray):
         """
         Find in which face edges are located and compute the intersection with
         the face edges.
@@ -452,7 +456,7 @@ class Ugrid2d(AbstractUgrid):
         face_index: ndarray of integers with shape ``(n_intersection,)``
         intersections: ndarray of float with shape ``(n_intersection, 2, 2)``
         """
-        return self.celltree.locate_edges(edges)
+        return self.celltree.intersect_edges(edges)
 
     def locate_bounding_box(
         self, xmin: float, ymin: float, xmax: float, ymax: float
@@ -477,7 +481,15 @@ class Ugrid2d(AbstractUgrid):
             & (self.face_x < xmax)
             & (self.face_y >= ymin)
             & (self.face_y < ymax)
-        )
+        )[0]
+
+    def rasterize_like(
+        self, x: FloatArray, y: FloatArray
+    ) -> Tuple[FloatArray, FloatArray, IntArray]:
+        yy, xx = np.meshgrid(y, x, indexing="ij")
+        nodes = np.column_stack([xx.ravel(), yy.ravel()])
+        index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
+        return x, y, index
 
     def rasterize(self, resolution: float) -> Tuple[FloatArray, FloatArray, IntArray]:
         xmin, ymin, xmax, ymax = self.bounds
@@ -488,10 +500,7 @@ class Ugrid2d(AbstractUgrid):
         ymax = np.ceil(ymax / d) * d
         x = np.arange(xmin + 0.5 * d, xmax, d)
         y = np.arange(ymax - 0.5 * d, ymin, -d)
-        yy, xx = np.meshgrid(y, x, indexing="ij")
-        nodes = np.column_stack([xx.ravel(), yy.ravel()])
-        index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
-        return x, y, index
+        return self.rasterize_like(x, y)
 
     def _validate_indexer(self, indexer) -> Union[slice, np.ndarray]:
         if isinstance(indexer, slice):
@@ -517,7 +526,7 @@ class Ugrid2d(AbstractUgrid):
                 indexer = np.atleast_1d(indexer)
             else:
                 raise TypeError(
-                    f"Invalid indexer type: {type(indexer).__name__} ,"
+                    f"Invalid indexer type: {type(indexer).__name__}, "
                     "allowed types: integer, float, list, numpy array, xarray DataArray"
                 )
             if indexer.ndim > 1:
@@ -543,19 +552,25 @@ class Ugrid2d(AbstractUgrid):
         }
         return dim, False, index, coords
 
-    def sel(self, x=slice(None, None), y=slice(None, None)):
+    def sel(self, x=None, y=None):
+        if x is None:
+            x = slice(None, None)
+        if y is None:
+            y = slice(None, None)
+
         x = self._validate_indexer(x)
         y = self._validate_indexer(y)
         dim = self.face_dimension
         as_ugrid = False
+        xmin, ymin, xmax, ymax = self.bounds
         if isinstance(x, slice) and isinstance(y, slice):
             # Bounding box selection
             # Fill None values by infinite
             bounds = [
-                numeric_bound(x.start, 1),
-                numeric_bound(y.start, 1),
-                numeric_bound(x.stop, -1),
-                numeric_bound(y.stop, -1),
+                numeric_bound(x.start, xmin),
+                numeric_bound(y.start, ymin),
+                numeric_bound(x.stop, xmax),
+                numeric_bound(y.stop, ymax),
             ]
             as_ugrid = True
             coords = {}
@@ -563,30 +578,35 @@ class Ugrid2d(AbstractUgrid):
         elif isinstance(x, slice) and isinstance(y, np.ndarray):
             if y.size != 1:
                 raise ValueError(
-                    "If x is a slice with steps, y should be a single value"
+                    "If x is a slice without steps, y should be a single value"
                 )
-            y = [0]
-            edges = np.array([[[x.start, y], [x.stop, y]]])
-            _, index, xy = self.locate_edges(edges)
-            xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
-            coords = section_coordinates(xy, dim)
+            y = y[0]
+            xstart = numeric_bound(x.start, xmin)
+            xstop = numeric_bound(x.stop, xmax)
+            edges = np.array([[[xstart, y], [xstop, y]]])
+            _, index, xy = self.intersect_edges(edges)
+            coords, index = section_coordinates(edges, xy, dim, index)
+
         elif isinstance(x, np.ndarray) and isinstance(y, slice):
             if x.size != 1:
                 raise ValueError(
-                    "If y is a slice with steps, x should be a single value"
+                    "If y is a slice without steps, x should be a single value"
                 )
             x = x[0]
-            edges = np.array([[[x, y.start], [x, y.stop]]])
-            _, index, xy = self.locate_edges(edges)
-            xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
-            coords = section_coordinates(xy, dim)
-        elif isinstance(x, np.ndarray) and isinstance(y, np.darray):
+            ystart = numeric_bound(y.start, ymin)
+            ystop = numeric_bound(y.stop, ymax)
+            edges = np.array([[[x, ystart], [x, ystop]]])
+            _, index, xy = self.intersect_edges(edges)
+            coords, index = section_coordinates(edges, xy, dim, index)
+
+        elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
             # Orthogonal points
             yy, xx = np.meshgrid(y, x, indexing="ij")
-            return self.sel_points(self, xx.ravel(), yy.ravel())
+            return self.sel_points(xx.ravel(), yy.ravel())
+
         else:
             raise TypeError(
-                f"Unexpected index types: {type(x).__name__}, and {type(y).__name__}"
+                f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
             )
         return dim, as_ugrid, index, coords
 

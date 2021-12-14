@@ -395,24 +395,108 @@ def test_validate_indexer():
     assert np.allclose(actual, [1])
 
 
-def test_sel():
+def test_sel__bounding_box():
     grid = grid2d()
 
+    def check_output(dim, as_ugrid, index, coords, expected_index):
+        assert dim == f"{NAME}_nFaces"
+        assert as_ugrid
+        assert isinstance(index, np.ndarray)
+        assert np.allclose(index, expected_index)
+        assert coords == {}
+
     dim, as_ugrid, index, coords = grid.sel(x=slice(0.0, 2.0), y=slice(0.0, 1.0))
+    check_output(dim, as_ugrid, index, coords, [0, 1])
+
+    dim, as_ugrid, index, coords = grid.sel(x=slice(None, None), y=slice(None, 1.0))
+    check_output(dim, as_ugrid, index, coords, [0, 1])
+
+    dim, as_ugrid, index, coords = grid.sel(x=slice(0.0, 1.0), y=slice(0.0, 2.0))
+    check_output(dim, as_ugrid, index, coords, [0, 2])
+
+    dim, as_ugrid, index, coords = grid.sel(x=slice(None, 1.0), y=slice(None, None))
+    check_output(dim, as_ugrid, index, coords, [0, 2])
+
+    for x, y in zip([None, None, slice(0, 2)], [None, slice(0, 2), None]):
+        dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
+        check_output(dim, as_ugrid, index, coords, [0, 1, 2, 3])
+
+    # Check default arguments, should return entire grid
+    dim, as_ugrid, index, coords = grid.sel()
+    check_output(dim, as_ugrid, index, coords, [0, 1, 2, 3])
+
+
+def test_sel__points_from_scalar():
+    grid = grid2d()
+
+    def check_output(dim, as_ugrid, index, coords):
+        assert dim == f"{NAME}_nFaces"
+        assert not as_ugrid
+        assert np.allclose(index, [0])
+        assert coords["x"][0] == dim
+        assert coords["y"][0] == dim
+        assert np.allclose(coords["x"][1], [0.5])
+        assert np.allclose(coords["y"][1], [0.5])
+
+    dim, as_ugrid, index, coords = grid.sel(x=0.5, y=0.5)
+    check_output(dim, as_ugrid, index, coords)
+
+    dim, as_ugrid, index, coords = grid.sel(x=[0.5], y=[0.5])
+    check_output(dim, as_ugrid, index, coords)
+
+    with pytest.raises(TypeError, match="Invalid indexer type"):
+        grid.sel(x=(0.5,), y=[0.5])
+
+
+def test_sel__points_from_arrays_and_slice():
+    grid = grid2d()
+
+    def check_output(dim, as_ugrid, index, coords):
+        assert dim == f"{NAME}_nFaces"
+        assert not as_ugrid
+        assert coords["x"][0] == dim
+        assert coords["y"][0] == dim
+        assert np.allclose(index, [0, 0, 1, 2, 2, 3])
+        assert np.allclose(coords["x"][1], [0.4, 0.8, 1.2, 0.4, 0.8, 1.2])
+        assert np.allclose(coords["y"][1], [0.5, 0.5, 0.5, 1.1, 1.1, 1.1])
+
+    x = [0.4, 0.8, 1.2]
+    y = [0.5, 1.1]
+    dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
+    check_output(dim, as_ugrid, index, coords)
+
+    x = slice(0.4, 1.5, 0.4)  # Evaluates to: [0.4, 0.8, 1.2]
+    dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
+    check_output(dim, as_ugrid, index, coords)
+
+
+def test_sel__edges_from_slice():
+    grid = grid2d()
+
+    with pytest.raises(ValueError, match="If x is a slice without steps"):
+        grid.sel(x=slice(None, None), y=[0.25, 0.75])
+    with pytest.raises(ValueError, match="If x is a slice without steps"):
+        grid.sel(x=slice(None, None), y=slice(0.25, 1.0, 0.25))
+    with pytest.raises(ValueError, match="If y is a slice without steps"):
+        grid.sel(x=[0.25, 0.75], y=slice(None, None))
+
+    dim, as_ugrid, index, coords = grid.sel(x=slice(None, None), y=0.5)
     assert dim == f"{NAME}_nFaces"
-    assert as_ugrid
+    assert not as_ugrid
+    assert coords["x"][0] == dim
+    assert coords["y"][0] == dim
     assert np.allclose(index, [0, 1])
-    assert coords == {}
+    assert np.allclose(coords["x"][1], [0.5, 1.5])
+    assert np.allclose(coords["y"][1], [0.5, 0.5])
 
-    # _, _, index, _ = grid.sel(x=slice(None, None), y=slice(None, 1.0))
-    # assert np.allclose(index, [0, 1])
-
-    _, _, index, _ = grid.sel(x=slice(0.0, 1.0), y=slice(0.0, 2.0))
+    dim, as_ugrid, index, coords = grid.sel(x=0.5, y=slice(None, None))
+    assert dim == f"{NAME}_nFaces"
+    assert not as_ugrid
+    assert coords["x"][0] == dim
+    assert coords["y"][0] == dim
     assert np.allclose(index, [0, 2])
-    assert coords == {}
-
-    # _, _, index, _ = grid.sel(x=slice(None, 1.0), y=slice(None, None))
-    # assert np.allclose(index, [0, 2])
+    assert np.allclose(coords["x"][1], [0.5, 0.5])
+    assert np.allclose(coords["y"][1], [0.5, 1.25])
 
 
 def test_topology_subset():

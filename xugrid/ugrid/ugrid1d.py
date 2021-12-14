@@ -262,7 +262,7 @@ class Ugrid1d(AbstractUgrid):
             & (self.edge_x < xmax)
             & (self.edge_y >= ymin)
             & (self.edge_y < ymax)
-        )
+        )[0]
         return self.edge_dimension, True, index, {}
 
     def topology_subset(self, edge_index: Union[BoolArray, IntArray]):

@@ -138,14 +138,111 @@ class TestUgridDataArray:
         assert actual.ugrid.grid.n_face == 2
         assert "mesh2d_nFaces_index" in actual.coords
 
-    # def test_sel_points(self):
-    #    with pytest.raises(ValueError, match="coordinate arrays must be 1d"):
-    #        self.uda.ugrid.sel_points(x=[[0., 1.]], y=[[0., 1.]])
-    #    with pytest.raises(ValueError, match="coordinate arrays size does not match"):
-    #        self.uda.ugrid.sel_points(x=[0.], y=[0., 1.])
-    #    actual = self.uda.ugrid.sel_points(x=[0.5, 0.5], y=[0.5, 1.25])
-    #    assert isinstance(actual, xr.DataArray)
-    #    assert actual.shape == (2,)
+    def test_sel_points(self):
+        with pytest.raises(ValueError, match="x and y must be 1d"):
+            self.uda.ugrid.sel_points(x=[[0.0, 1.0]], y=[[0.0, 1.0]])
+        with pytest.raises(ValueError, match="shape of x does not match shape of y"):
+            self.uda.ugrid.sel_points(x=[0.0], y=[0.0, 1.0])
+        actual = self.uda.ugrid.sel_points(x=[0.5, 0.5], y=[0.5, 1.25])
+        assert isinstance(actual, xr.DataArray)
+        assert actual.shape == (2,)
+
+    def test_sel(self):
+        # Ugrid2d already tests most
+        # Orthogonal points
+        x = [0.4, 0.8, 1.2]
+        y = [0.25, 0.75]
+        actual = self.uda.ugrid.sel(x=x, y=y)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.shape == (6,)
+
+        actual = self.uda.ugrid.sel(x=slice(0.4, 1.3, 0.4), y=0.25)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.shape == (3,)
+
+        actual = self.uda.ugrid.sel(x=slice(0, 1), y=slice(0, 2))
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert actual.shape == (2,)
+        assert actual.ugrid.grid.n_face == 2
+
+        actual = self.uda.ugrid.sel(x=slice(0, 1), y=slice(1, None))
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert actual.shape == (1,)
+        assert actual.ugrid.grid.n_face == 1
+
+    def test_rasterize(self):
+        actual = self.uda.ugrid.rasterize(resolution=0.5)
+        x = [0.25, 0.75, 1.25, 1.75]
+        y = [1.75, 1.25, 0.75, 0.25]
+        assert isinstance(actual, xr.DataArray)
+        assert actual.shape == (4, 4)
+        assert np.allclose(actual["x"], x)
+        assert np.allclose(actual["y"], y)
+
+        da = xr.DataArray(np.empty((4, 4)), {"y": y, "x": x}, ["y", "x"])
+        actual = self.uda.ugrid.rasterize_like(other=da)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.shape == (4, 4)
+        assert np.allclose(actual["x"], x)
+        assert np.allclose(actual["y"], y)
+
+    def test_crs(self):
+        assert self.uda.ugrid.crs is None
+
+    def test_to_geodataframe(self):
+        with pytest.raises(ValueError, match="unable to convert unnamed"):
+            self.uda.ugrid.to_geodataframe("mesh2d_nFaces")
+        uda2 = self.uda.copy()
+        uda2.ugrid.obj.name = "test"
+        gdf = uda2.ugrid.to_geodataframe("mesh2d_nFaces")
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert (gdf.geometry.geom_type == "Polygon").all()
+
+    def test_binary_dilation(self):
+        a = self.uda > 0
+        actual = a.ugrid.binary_dilation()
+        assert isinstance(actual, xugrid.UgridDataArray)
+
+    def test_binary_dilation(self):
+        a = self.uda > 0
+        actual = a.ugrid.binary_erosion()
+        assert isinstance(actual, xugrid.UgridDataArray)
+
+    def test_connected_components(self):
+        actual = self.uda.ugrid.connected_components()
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 0)
+
+    def test_reverse_cuthill_mckee(self):
+        actual = self.uda.ugrid.reverse_cuthill_mckee()
+        assert isinstance(actual, xugrid.UgridDataArray)
+
+    def test_laplace_interpolate(self):
+        uda2 = self.uda.copy()
+        uda2.obj[:-2] = np.nan
+        actual = uda2.ugrid.laplace_interpolate(direct_solve=True)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+
+    def test_to_dataset(self):
+        uda2 = self.uda.copy()
+        uda2.ugrid.obj.name = "test"
+        actual = uda2.to_dataset()
+        assert isinstance(actual, xugrid.UgridDataset)
+
+    def test_to_dataset(self, tmp_path):
+        uda2 = self.uda.copy()
+        uda2.ugrid.obj.name = "test"
+        path = tmp_path / "uda-test.nc"
+        uda2.ugrid.to_netcdf(path)
+        assert path.exists()
+
+    def test_to_dataset(self, tmp_path):
+        uda2 = self.uda.copy()
+        uda2.ugrid.obj.name = "test"
+        path = tmp_path / "uda-test.zarr"
+        uda2.ugrid.to_zarr(path)
+        assert path.exists()
 
 
 class TestUgridDataset:
@@ -231,6 +328,73 @@ class TestUgridDataset:
         assert isinstance(uds, xugrid.UgridDataset)
         assert "a" in uds
         assert "b" in uds
+
+    # Accessor tests
+    def test_isel(self):
+        actual = self.uds.ugrid.isel([0, 1])
+        assert isinstance(actual, xugrid.UgridDataset)
+        assert actual.ugrid.grid.n_face == 2
+        assert "mesh2d_nFaces_index" in actual.coords
+        assert actual["a"].shape == (2,)
+        assert actual["b"].shape == (2,)
+
+    def test_sel_points(self):
+        with pytest.raises(ValueError, match="x and y must be 1d"):
+            self.uds.ugrid.sel_points(x=[[0.0, 1.0]], y=[[0.0, 1.0]])
+        with pytest.raises(ValueError, match="shape of x does not match shape of y"):
+            self.uds.ugrid.sel_points(x=[0.0], y=[0.0, 1.0])
+        actual = self.uds.ugrid.sel_points(x=[0.5, 0.5], y=[0.5, 1.25])
+        assert isinstance(actual, xr.Dataset)
+        assert actual["a"].shape == (2,)
+        assert actual["b"].shape == (2,)
+
+    def test_sel(self):
+        # Ugrid2d already tests most
+        # Orthogonal points
+        x = [0.4, 0.8, 1.2]
+        y = [0.25, 0.75]
+        actual = self.uds.ugrid.sel(x=x, y=y)
+        assert isinstance(actual, xr.Dataset)
+        assert actual["a"].shape == (6,)
+        assert actual["b"].shape == (6,)
+
+        actual = self.uds.ugrid.sel(x=slice(0.4, 1.3, 0.4), y=0.25)
+        assert isinstance(actual, xr.Dataset)
+        assert actual["a"].shape == (3,)
+        assert actual["b"].shape == (3,)
+
+        actual = self.uds.ugrid.sel(x=slice(0, 1), y=slice(0, 2))
+        assert isinstance(actual, xugrid.UgridDataset)
+        assert actual["a"].shape == (2,)
+        assert actual["b"].shape == (2,)
+        assert actual.ugrid.grid.n_face == 2
+
+        actual = self.uds.ugrid.sel(x=slice(0, 1), y=slice(1, None))
+        assert isinstance(actual, xugrid.UgridDataset)
+        assert actual["a"].shape == (1,)
+        assert actual["b"].shape == (1,)
+        assert actual.ugrid.grid.n_face == 1
+
+    def test_crs(self):
+        assert self.uds.ugrid.crs is None
+
+    def test_to_geodataframe(self):
+        gdf = self.uds.ugrid.to_geodataframe("mesh2d_nFaces")
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert (gdf.geometry.geom_type == "Polygon").all()
+
+    def test_connected_components(self):
+        actual = self.uds.ugrid.connected_components()
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 0)
+
+    def test_reverse_cuthill_mckee(self):
+        actual = self.uds.ugrid.reverse_cuthill_mckee()
+        assert isinstance(actual, xugrid.UgridDataset)
+
+    def test_laplace_interpolate(self):
+        with pytest.raises(NotImplementedError):
+            self.uds.ugrid.laplace_interpolate(direct_solve=True)
 
 
 def test_to_dataset():
