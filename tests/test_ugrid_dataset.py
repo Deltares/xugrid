@@ -79,12 +79,6 @@ class TestUgridDataArray:
     def test_ugrid_accessor(self):
         assert isinstance(self.uda.ugrid, xugrid.ugrid_dataset.UgridAccessor)
 
-    def test_to_geodataframe(self):
-        gdf = self.uda.to_geodataframe(name="facedata", dim_order=["mesh2d_nFaces"])
-        assert isinstance(gdf, gpd.GeoDataFrame)
-        assert len(gdf) == self.uda["mesh2d_nFaces"].size
-        assert (gdf.geometry.geom_type == "Polygon").all()
-
     def test_from_structured(self):
         da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
         with pytest.raises(ValueError, match="Last two dimensions of da"):
@@ -198,12 +192,17 @@ class TestUgridDataArray:
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
 
+        gdf = self.uda.to_geodataframe(name="facedata", dim_order=["mesh2d_nFaces"])
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) == self.uda["mesh2d_nFaces"].size
+        assert (gdf.geometry.geom_type == "Polygon").all()
+
     def test_binary_dilation(self):
         a = self.uda > 0
         actual = a.ugrid.binary_dilation()
         assert isinstance(actual, xugrid.UgridDataArray)
 
-    def test_binary_dilation(self):
+    def test_binary_erosion(self):
         a = self.uda > 0
         actual = a.ugrid.binary_erosion()
         assert isinstance(actual, xugrid.UgridDataArray)
@@ -230,14 +229,14 @@ class TestUgridDataArray:
         actual = uda2.to_dataset()
         assert isinstance(actual, xugrid.UgridDataset)
 
-    def test_to_dataset(self, tmp_path):
+    def test_to_netcdf(self, tmp_path):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
         path = tmp_path / "uda-test.nc"
         uda2.ugrid.to_netcdf(path)
         assert path.exists()
 
-    def test_to_dataset(self, tmp_path):
+    def test_to_zarr(self, tmp_path):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
         path = tmp_path / "uda-test.zarr"
@@ -275,8 +274,6 @@ class TestUgridDataset:
         assert "a" in self.uds
         assert "b" in self.uds
         assert "mesh2d_face_x" in self.uds
-
-    def test_getitem(self):
         assert isinstance(self.uds["a"], xugrid.UgridDataArray)
         assert isinstance(self.uds[["a", "b"]], xugrid.UgridDataset)
 

@@ -2,7 +2,6 @@
 Functions to load sample data.
 """
 import numpy as np
-import pandas as pd
 import pkg_resources
 import pooch
 import xarray as xr

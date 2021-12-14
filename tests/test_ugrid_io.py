@@ -185,9 +185,9 @@ def test_ugrid2d_dataset():
         "node_coordinates": "vertex_x vertex_y",
         "edge_dimension": "branch",
         "edge_node_connectivity": "branch_vertices",
-        "face_dimension": f"cell",
-        "face_node_connectivity": f"cell_vertices",
-        "max_face_nodes_dimension": f"node_nmax",
+        "face_dimension": "cell",
+        "face_node_connectivity": "cell_vertices",
+        "max_face_nodes_dimension": "node_nmax",
     }
     ds = ugrid_io.ugrid2d_dataset(
         node_x=np.array([0.0, 1.0, 0.0]),

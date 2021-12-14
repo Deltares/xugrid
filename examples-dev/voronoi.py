@@ -12,7 +12,7 @@ of convex cells is easy:
 * Order the centroids around the vertex in a counter-clockwise manner.
 
 Dealing with the mesh exterior (beyond which no centroids are located) is the
-tricky part. 
+tricky part.
 
 For simplicity this example will only deal with (bare) ``numpy`` and
 ``scipy.sparse`` arrays. This example therefore also shows how to use these

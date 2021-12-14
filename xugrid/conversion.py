@@ -56,7 +56,7 @@ def _to_pygeos(geometry: Any):
         # might be shapely
         try:
             geometry = pygeos.from_shapely(geometry)
-        except:
+        except TypeError:
             raise TypeError(
                 "geometry should be pygeos or shapely type. "
                 f"Received instead {type(first)}"

@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from numpy.core.fromnumeric import sort
 from scipy import sparse
 
 from xugrid import connectivity

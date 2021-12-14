@@ -1,4 +1,4 @@
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Tuple, Union
 
 import geopandas as gpd
 import meshkernel as mk
@@ -6,8 +6,6 @@ import numpy as np
 import pyproj
 import shapely.geometry as sg
 import xarray as xr
-from meshkernel.meshkernel import MeshKernel
-from meshkernel.py_structures import Mesh2d
 from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee

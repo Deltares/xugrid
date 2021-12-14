@@ -61,7 +61,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
     in the context of an unstructured 2d grid.
     """
 
-    def __init__(self, obj: xr.DataArray, grid: Ugrid2d = None):
+    def __init__(self, obj: xr.DataArray, grid: Union[Ugrid1d, Ugrid2d] = None):
         if grid is None:
             grid = Ugrid2d.from_dataset(obj)
         self.grid = grid

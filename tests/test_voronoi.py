@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from scipy import sparse
 
 from xugrid import connectivity, voronoi
 

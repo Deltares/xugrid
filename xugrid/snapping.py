@@ -18,7 +18,7 @@ from xugrid.ugrid import Ugrid2d
 
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import T_OFFSET, X_EPSILON, FloatArray, IntArray, LineArray, Point, Vector
+from .typing import FloatArray, IntArray, LineArray, Point, Vector
 
 
 def snap_nodes(
