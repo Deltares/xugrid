@@ -17,7 +17,7 @@ For 2D meshes, the fundamental topological information consists of:
 * A list of nodes (vertices): (x, y) coordinate pairs forming points.
 * A list of faces (polygons): for every face, a list of index values indicating
   which vertices form its exterior.
-  
+
 Imports
 -------
 
