@@ -25,6 +25,10 @@ import xugrid as xu
 # * From a xugrid Ugrid object and an xarray DataArray containing the data.
 # * From a UGRID netCDF file, via :py:func:`xugrid.open_dataset`.
 #
+#
+# From xarray Dataset
+# ~~~~~~~~~~~~~~~~~~~
+#
 # xugrid will automatically find the UGRID topological variables, and separate
 # them from the main data variables. We'll start by fetching a dataset:
 
@@ -46,6 +50,9 @@ elev = uds["elevation"]
 elev
 
 # %%
+# From Ugrid and DataArray
+# ~~~~~~~~~~~~~~~~~~~~~~~~
+#
 # Alternatively, we can build a Ugrid topology object first from vertices and
 # connectivity numpy arrays. There are many ways to construct such arrays,
 # typically via mesh generators or Delaunay triangulation, but we will
@@ -64,7 +71,10 @@ uda = xu.UgridDataArray(da, grid)
 uda
 
 # %%
-# py:func:`xugrid.open_dataset` is demonstrated in the last section of this
+# From netCDF file
+# ~~~~~~~~~~~~~~~~
+#
+# :py:func:`xugrid.open_dataset` is demonstrated in the last section of this
 # guide, but its use is straightforward: internally it uses xarray to open a
 # dataset and converts it as seen in the first example.
 #
@@ -110,7 +120,7 @@ uda + 10.0
 # :py:meth:`xugrid.UgridDataset.from_geodataframe`. Note that storing large
 # grids as GeoDataFrames can be very inefficient.
 
-gdf = uda.to_geodataframe(name="test")
+gdf = uda.ugrid.to_geodataframe(name="test")
 gdf
 
 # %%

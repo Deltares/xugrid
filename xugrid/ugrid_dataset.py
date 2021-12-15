@@ -57,8 +57,7 @@ class DunderForwardMixin:
 
 class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
     """
-    this class wraps an xarray dataArray. It is used to work with the dataArray
-    in the context of an unstructured 2d grid.
+    Wraps an xarray DataArray, adding UGRID topology.
     """
 
     def __init__(self, obj: xr.DataArray, grid: Union[Ugrid1d, Ugrid2d] = None):
@@ -118,15 +117,28 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
 
     @property
     def ugrid(self):
+        """
+        UGRID Accessor. This "accessor" makes operations using the UGRID
+        topology available.
+        """
         return UgridAccessor(self.obj, self.grid)
-
-    def to_geodataframe(self, name=None, dim_order=None):
-        df = self.obj.to_dataframe(name, dim_order)
-        geometry = self.grid.to_pygeos(self.dims[-1])
-        return gpd.GeoDataFrame(df, geometry=geometry)
 
     @staticmethod
     def from_structured(da: xr.DataArray):
+        """
+        Create a UgridDataArray from a (structured) xarray DataArray.
+
+        The spatial dimensions are flattened into a single UGRID face dimension.
+
+        Parameters
+        ----------
+        da: xr.DataArray
+            Last two dimensions must be ``("y", "x")``.
+
+        Returns
+        -------
+        unstructured: UgridDataArray
+        """
         if da.dims[-2:] != ("y", "x"):
             raise ValueError('Last two dimensions of da must be ("y", "x")')
         grid = Ugrid2d.from_structured(da)
@@ -144,8 +156,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
 
 class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
     """
-    this class wraps an xarray Dataset. It is used to work with the Dataset in
-    the context of an unstructured 2d grid.
+    Wraps an xarray Dataset, adding UGRID topology.
     """
 
     def __init__(self, obj: xr.Dataset = None, grid: Ugrid2d = None):
@@ -219,6 +230,10 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
 
     @property
     def ugrid(self):
+        """
+        UGRID Accessor. This "accessor" makes operations using the UGRID
+        topology available.
+        """
         return UgridAccessor(self.obj, self.grid)
 
     @staticmethod
@@ -241,8 +256,8 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
 
 class UgridAccessor:
     """
-    this class implements selection logic for use with xarray dataset and
-    dataarray in the context of an unstructured 2d grid.
+    This "accessor" makes operations using the UGRID topology available via the
+    ``.ugrid`` attribute for UgridDataArrays and UgridDatasets.
     """
 
     def __init__(self, obj: Union[xr.Dataset, xr.DataArray], grid: Ugrid2d):
@@ -257,7 +272,7 @@ class UgridAccessor:
 
         Parameters
         ----------
-        indexer
+        indexer: 1d array of integer or bool
 
         Returns
         -------
@@ -283,6 +298,34 @@ class UgridAccessor:
             )
 
     def sel(self, x=None, y=None):
+        """
+        Returns a new object, a subselection in the UGRID x and y coordinates.
+
+        The indexing for x and y always occurs orthogonally, i.e.:
+        ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For
+        vectorized indexing (equal to ``zip``ing through x and y), see
+        ``.sel_points``.
+
+        Depending on the nature of the x and y indexers, a xugrid or xarray
+        object is returned:
+
+        * slice without step: ``x=slice(-100, 100)``: returns xugrid object, a
+          part of the unstructured grid.
+        * slice with step: ``x=slice(-100, 100, 10)``: returns xarray object, a
+          series of points (x=[-100, -90, -80, ..., 90, 100]).
+        * a scalar: ``x=5.0``: returns xarray object, a point.
+        * an array: ``x=[1.0, 15.0, 17.0]``: returns xarray object, a series of
+          points.
+
+        Parameters
+        ----------
+        x: float, 1d array, slice
+        y: float, 1d array, slice
+
+        Returns
+        -------
+        selection: Union[UgridDataArray, UgridDataset, xr.DataArray, xr.Dataset]
+        """
         # TODO: also do vectorized indexing like xarray?
         # Might not be worth it, as orthogonal and vectorized indexing are
         # quite confusing.
@@ -304,9 +347,16 @@ class UgridAccessor:
 
     def sel_points(self, x, y):
         """
-        returns subset of dataset or dataArray containing specific face
-        indices. Input arguments are point coordinates. The result dataset or
-        dataArray contains only the faces containing these points.
+        Select points in the unstructured grid.
+
+        Parameters
+        ----------
+        x: ndarray of floats with shape ``(n_points,)``
+        y: ndarray of floats with shape ``(n_points,)``
+
+        Returns
+        -------
+        points: Union[xr.DataArray, xr.Dataset]
         """
         if self.grid.topology_dimension != 2:
             raise NotImplementedError
@@ -326,10 +376,37 @@ class UgridAccessor:
         return out
 
     def rasterize(self, resolution: float):
+        """
+        Rasterize unstructured grid by sampling.
+
+        Parameters
+        ----------
+        resolution: float
+            Spacing in x and y.
+
+        Returns
+        -------
+        rasterized: Union[xr.DataArray, xr.Dataset]
+        """
         x, y, index = self.grid.rasterize(resolution)
         return self._raster(x, y, index)
 
     def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]):
+        """
+        Rasterize unstructured grid by sampling on the x and y coordinates
+        of ``other``.
+
+        Parameters
+        ----------
+        resolution: float
+            Spacing in x and y.
+        other: Union[xr.DataArray, xr.Dataset]
+            Object to take x and y coordinates from.
+
+        Returns
+        -------
+        rasterized: Union[xr.DataArray, xr.Dataset]
+        """
         x, y, index = self.grid.rasterize_like(
             x=other["x"].values,
             y=other["y"].values,
@@ -338,16 +415,51 @@ class UgridAccessor:
 
     @property
     def crs(self):
+        """
+        The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.
+
+        Returns None if the CRS is not set.
+        """
         return self.grid.crs
 
-    def to_geodataframe(self, dim: str) -> gpd.GeoDataFrame:
+    def to_geodataframe(
+        self, dim: str = None, name: str = None, dim_order=None
+    ) -> gpd.GeoDataFrame:
         """
+        Convert data and topology of one facet (node, edge, face) of the grid
+        to a geopandas GeoDataFrame. This also determines the geometry type of
+        the geodataframe:
+
+        * node: point
+        * edge: line
+        * face: polygon
+
         Parameters
         ----------
         dim: str
+            node, edge, or face dimension. Inferred for DataArray.
+        name: str
+            Name to give to the array (required if unnamed).
+        dim_order:
+            Hierarchical dimension order for the resulting dataframe. Array content is
+            transposed to this order and then written out as flat vectors in contiguous
+            order, so the last dimension in this list will be contiguous in the resulting
+            DataFrame. This has a major influence on which operations are efficient on the
+            resulting dataframe.
+
+            If provided, must include all dimensions of this DataArray. By default,
+            dimensions are sorted according to the DataArray dimensions order.
+
+        Returns
+        -------
+        geodataframe: gpd.GeoDataFrame
         """
         if isinstance(self.obj, xr.DataArray):
-            ds = self.obj.to_dataset()
+            dim = self.obj.dims[-1]
+            if self.obj.name is None:
+                ds = self.obj.to_dataset(name=name)
+            else:
+                ds = self.obj.to_dataset()
         else:
             ds = self.obj
         variables = [var for var in ds.data_vars if dim in ds[var].dims]
@@ -355,7 +467,7 @@ class UgridAccessor:
         # Basically requires checking which variables are static, which aren't.
         # For non-static, requires repeating all geometries.
         # Call reset_index on mult-index to generate them as regular columns.
-        df = ds[variables].to_dataframe()
+        df = ds[variables].to_dataframe(dim_order=dim_order)
         geometry = self.grid.to_pygeos(dim)
         return gpd.GeoDataFrame(df, geometry=geometry)
 
@@ -391,6 +503,22 @@ class UgridAccessor:
         mask=None,
         border_value=False,
     ):
+        """
+        Binary dilation can be used on a boolean array to expand the "shape" of
+        features.
+
+        Compare with :py:func:`scipy.ndimage.binary_dilation`.
+
+        Parameters
+        ----------
+        iterations: int, default: 1
+        mask: 1d array of bool, optional
+        border_value: bool, default value: False
+
+        Returns
+        -------
+        dilated: UgridDataArray
+        """
         return self._binary_iterate(iterations, mask, True, border_value)
 
     def binary_erosion(
@@ -399,9 +527,35 @@ class UgridAccessor:
         mask=None,
         border_value=False,
     ):
+        """
+        Binary erosion can be used on a boolean array to shrink the "shape" of
+        features.
+
+        Compare with :py:func:`scipy.ndimage.binary_erosion`.
+
+        Parameters
+        ----------
+        iterations: int, default: 1
+        mask: 1d array of bool, optional
+        border_value: bool, default value: False
+
+        Returns
+        -------
+        eroded: UgridDataArray
+        """
         return self._binary_iterate(iterations, mask, False, border_value)
 
     def connected_components(self):
+        """
+        Every edge or face is given a component number. If all are connected,
+        all will have the same number.
+
+        Wraps :py:func:`scipy.sparse.csgraph.connected_components``.
+
+        Returns
+        -------
+        labelled: UgridDataArray
+        """
         _, labels = scipy.sparse.csgraph.connected_components(
             self.grid.face_face_connectivity
         )
@@ -411,6 +565,15 @@ class UgridAccessor:
         )
 
     def reverse_cuthill_mckee(self):
+        """
+        Reduces bandwith of the connectivity matrix.
+
+        Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.
+
+        Returns
+        -------
+        reordered: Union[UgridDataArray, UgridDataset]
+        """
         grid = self.grid
         reordered_grid, reordering = self.grid.reverse_cuthill_mckee()
         reordered_data = self.obj.isel({grid.face_dimension: reordering})
@@ -518,13 +681,35 @@ class UgridAccessor:
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
+
+        Returns
+        -------
+        dataset: UgridDataset
         """
         return self.grid.dataset.merge(self.obj)
 
     def to_netcdf(self, *args, **kwargs):
+        """
+        Write dataset contents to a UGRID compliant netCDF file.
+
+        This function wraps :py:meth:`xr.Dataset.to_netcdf`; it adds the UGRID
+        variables and coordinates to a standard xarray Dataset, then writes the
+        result to a netCDF.
+
+        All arguments are forwarded to :py:meth:`xr.Dataset.to_netcdf`.
+        """
         self.to_dataset().to_netcdf(*args, **kwargs)
 
     def to_zarr(self, *args, **kwargs):
+        """
+        Write dataset contents to a UGRID compliant Zarr file.
+
+        This function wraps :py:meth:`xr.Dataset.to_zarr`; it adds the UGRID
+        variables and coordinates to a standard xarray Dataset, then writes the
+        result to a Zarr file.
+
+        All arguments are forwarded to :py:meth:`xr.Dataset.to_zarr`.
+        """
         self.to_dataset().to_zarr(*args, **kwargs)
 
 

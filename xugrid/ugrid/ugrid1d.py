@@ -128,6 +128,14 @@ class Ugrid1d(AbstractUgrid):
     ) -> Union[xr.DataArray, xr.Dataset]:
         """
         Remove UGRID specific variables from the object.
+
+        Parameters
+        ----------
+        obj: Union[xr.DataArray, xr.Dataset]
+
+        Returns
+        -------
+        sanitized: Union[xr.DataArray, xr.Dataset]
         """
         return self._remove_topology(obj, ugrid_io.UGRID1D_TOPOLOGY_VARIABLES)
 
@@ -135,6 +143,14 @@ class Ugrid1d(AbstractUgrid):
         """
         Return a dictionary with the coordinates required for the dimension of
         the object.
+
+        Parameters
+        ----------
+        obj: Union[xr.DataArray, xr.Dataset]
+
+        Returns
+        -------
+        coords: dict
         """
         coords = {}
         dims = obj.dims
@@ -161,6 +177,10 @@ class Ugrid1d(AbstractUgrid):
         """
         Store the UGRID topology information in an xarray Dataset according to
         the UGRID conventions.
+
+        Returns
+        -------
+        ugrid_topology: xr.Dataset
         """
         return ugrid_io.ugrid1d_dataset(
             self.node_x,
@@ -191,6 +211,7 @@ class Ugrid1d(AbstractUgrid):
     # default, only when called upon.
     @property
     def topology_dimension(self):
+        """Highest dimensionality of the geometric elements: 1"""
         return 1
 
     def _get_dimension(self, dim):
@@ -203,6 +224,13 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def mesh(self):
+        """
+        Create if needed, and return meshkernel Mesh1d object.
+
+        Returns
+        -------
+        mesh: meshkernel.Mesh1d
+        """
         if self._mesh is None:
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
@@ -213,6 +241,13 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def meshkernel(self):
+        """
+        Create if needed, and return meshkernel MeshKernel instance.
+
+        Returns
+        -------
+        meshkernel: meshkernel.MeshKernel
+        """
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh1d_set(self.mesh)
@@ -220,6 +255,17 @@ class Ugrid1d(AbstractUgrid):
 
     @staticmethod
     def from_geodataframe(geodataframe: gpd.GeoDataFrame) -> "Ugrid1d":
+        """
+        Convert geodataframe of linestrings into a UGRID1D topology.
+
+        Parameters
+        ----------
+        geodataframe: gpd.GeoDataFrame
+
+        Returns
+        -------
+        topology: Ugrid1d
+        """
         x, y, edge_node_connectivity = conversion.linestrings_to_edges(
             geodataframe.geometry
         )
@@ -227,6 +273,21 @@ class Ugrid1d(AbstractUgrid):
         return Ugrid1d(x, y, fill_value, edge_node_connectivity)
 
     def to_pygeos(self, dim):
+        """
+        Convert UGRID topology to pygeos objects:
+
+        * nodes: points
+        * edges: linestrings
+
+        Parameters
+        ----------
+        dim: str
+            Node or edge dimension.
+
+        Returns
+        -------
+        geometry: ndarray of pygeos.Geometry
+        """
         if dim == self.node_dimension:
             return conversion.nodes_to_points(
                 self.node_x,
@@ -255,6 +316,21 @@ class Ugrid1d(AbstractUgrid):
         return indexer.start, indexer.stop
 
     def sel(self, x, y) -> Tuple[str, bool, IntArray, dict]:
+        """
+        Select a selection of edges, based on edge centroids.
+
+        Parameters
+        ----------
+        x: slice
+        y: slice
+
+        Returns
+        -------
+        dimension: str
+        as_ugrid: bool
+        index: 1d array of integers
+        coords: dict
+        """
         xmin, xmax = self._validate_indexer(x)
         ymin, ymax = self._validate_indexer(y)
         index = np.nonzero(
@@ -266,4 +342,17 @@ class Ugrid1d(AbstractUgrid):
         return self.edge_dimension, True, index, {}
 
     def topology_subset(self, edge_index: Union[BoolArray, IntArray]):
+        """
+        Create a new UGRID1D topology for a subset of this topology.
+
+        Parameters
+        ----------
+        edge_index: 1d array of integers or bool
+            Edges of the subset.
+
+        Returns
+        -------
+        subset: Ugrid1d
+        """
+        edge_index = np.atleast_1d(edge_index)
         return self._topology_subset(edge_index, self.edge_node_connectivity)

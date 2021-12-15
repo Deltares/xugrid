@@ -49,46 +49,56 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     def copy(self):
+        """Creates deepcopy"""
         return copy.deepcopy(self)
 
     @property
     def node_dimension(self):
+        """Name of node dimension"""
         return self._get_dimension("node")
 
     @property
     def edge_dimension(self):
+        """Name of edge dimension"""
         return self._get_dimension("edge")
 
     @property
     def node_coordinates(self) -> FloatArray:
+        """Coordinates (x, y) of the nodes (vertices)"""
         return np.column_stack([self.node_x, self.node_y])
 
     @property
     def n_node(self) -> int:
+        """Number of nodes (vertices) in the UGRID topology"""
         return self.node_x.size
 
     @property
     def n_edge(self) -> int:
+        """Number of edges in the UGRID topology"""
         return self.edge_node_connectivity.shape[0]
 
     @property
     def edge_x(self):
+        """x-coordinate of every edge in the UGRID topology"""
         if self._edge_x is None:
             self._edge_x = self.node_x[self.edge_node_connectivity].mean(axis=1)
         return self._edge_x
 
     @property
     def edge_y(self):
+        """y-coordinate of every edge in the UGRID topology"""
         if self._edge_y is None:
             self._edge_y = self.node_y[self.edge_node_connectivity].mean(axis=1)
         return self._edge_y
 
     @property
     def edge_coordinates(self) -> FloatArray:
+        """Centroid (x,y) coordinates of every edge in the UGRID topology"""
         return np.column_stack([self.edge_x, self.edge_y])
 
     @property
     def bounds(self) -> Tuple[float, float, float, float]:
+        """Returns a tuple with the node bounds: xmin, ymin, xmax, ymax"""
         if any(
             [
                 self._xmin is None,
@@ -154,6 +164,13 @@ class AbstractUgrid(abc.ABC):
 
     @property
     def node_edge_connectivity(self) -> csr_matrix:
+        """
+        Node to edge connectivity.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
         if self._node_edge_connectivity is None:
             self._node_edge_connectivity = connectivity.invert_dense_to_sparse(
                 self.edge_node_connectivity, self.fill_value
@@ -165,7 +182,29 @@ class AbstractUgrid(abc.ABC):
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
         allow_override: bool = False,
-    ) -> None:
+    ):
+        """
+        Set the Coordinate Reference System (CRS) of a UGRID topology.
+
+        NOTE: The underlying geometries are not transformed to this CRS. To
+        transform the geometries to a new CRS, use the ``to_crs`` method.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying the projection.
+        inplace : bool, default False
+            If True, the CRS of the UGRID topology will be changed in place
+            (while still returning the result) instead of making a copy of the
+            GeoSeries.
+        allow_override : bool, default False
+            If the the UGRID topology already has a CRS, allow to replace the
+            existing CRS, even when both are not equal.
+        """
         import pyproj
 
         if crs is not None:

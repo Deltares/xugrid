@@ -112,10 +112,10 @@ class Ugrid2d(AbstractUgrid):
         # Connectivity
         self._edge_node_connectivity = edge_node_connectivity
         self._edge_face_connectivity = None
-        self._face_face_connectivity = None
-        self._face_edge_connectivity = None
         self._node_edge_connectivity = None
         self._node_face_connectivity = None
+        self._face_edge_connectivity = None
+        self._face_face_connectivity = None
         # Derived topology
         self._triangulation = None
         self._voronoi_topology = None
@@ -205,6 +205,14 @@ class Ugrid2d(AbstractUgrid):
         )
 
     def topology_dataset(self):
+        """
+        Store the UGRID topology information in an xarray Dataset according to
+        the UGRID conventions.
+
+        Returns
+        -------
+        ugrid_topology: xr.Dataset
+        """
         return ugrid_io.ugrid2d_dataset(
             self.node_x,
             self.node_y,
@@ -218,9 +226,32 @@ class Ugrid2d(AbstractUgrid):
     def remove_topology(
         self, obj: Union[xr.DataArray, xr.Dataset]
     ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Remove UGRID specific variables from the object.
+
+        Parameters
+        ----------
+        obj: Union[xr.DataArray, xr.Dataset]
+
+        Returns
+        -------
+        sanitized: Union[xr.DataArray, xr.Dataset]
+        """
         return self._remove_topology(obj, ugrid_io.UGRID2D_TOPOLOGY_VARIABLES)
 
     def topology_coords(self, obj: Union[xr.DataArray, xr.Dataset]) -> dict:
+        """
+        Return a dictionary with the coordinates required for the dimension of
+        the object.
+
+        Parameters
+        ----------
+        obj: Union[xr.DataArray, xr.Dataset]
+
+        Returns
+        -------
+        coords: dict
+        """
         coords = {}
         dims = obj.dims
         facedim = self.face_dimension
@@ -261,10 +292,14 @@ class Ugrid2d(AbstractUgrid):
     # default, only when called upon.
     @property
     def n_face(self):
+        """
+        Return the number of faces in the UGRID2D topology.
+        """
         return self.face_node_connectivity.shape[0]
 
     @property
     def topology_dimension(self):
+        """Highest dimensionality of the geometric elements: 2"""
         return 2
 
     def _get_dimension(self, dim):
@@ -277,6 +312,9 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def face_dimension(self):
+        """
+        Return the name of the face dimension.
+        """
         return self._get_dimension("face")
 
     def _edge_connectivity(self):
@@ -289,19 +327,41 @@ class Ugrid2d(AbstractUgrid):
         )
 
     @property
-    def edge_node_connectivity(self) -> FloatArray:
+    def edge_node_connectivity(self) -> IntArray:
+        """
+        Edge to node connectivity. Every edge consists of a connection between
+        two nodes.
+
+        Returns
+        -------
+        connectivity: ndarray of integers with shape ``(n_edge, 2)``.
+        """
         if self._edge_node_connectivity is None:
             self._edge_connectivity()
         return self._edge_node_connectivity
 
     @property
-    def face_edge_connectivity(self) -> FloatArray:
+    def face_edge_connectivity(self) -> csr_matrix:
+        """
+        Face to edge connectivity.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
         if self._face_edge_connectivity is None:
             self._edge_connectivity()
         return self._face_edge_connectivity
 
     @property
     def centroids(self) -> FloatArray:
+        """
+        Centroid (x, y) of every face.
+
+        Returns
+        -------
+        centroids: ndarray of floats with shape ``(n_face, 2)``
+        """
         if self._centroids is None:
             self._centroids = connectivity.centroids(
                 self.face_node_connectivity,
@@ -313,18 +373,37 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def face_x(self):
+        """x-coordinate of centroid of every face"""
         return self.centroids[:, 0]
 
     @property
     def face_y(self):
+        """y-coordinate of centroid of every face"""
         return self.centroids[:, 1]
 
     @property
     def face_coordinates(self) -> FloatArray:
+        """
+        Centroid (x, y) of every face.
+
+        Returns
+        -------
+        centroids: ndarray of floats with shape ``(n_face, 2)``
+        """
         return self.centroids
 
     @property
     def edge_face_connectivity(self) -> IntArray:
+        """
+        Edge to face connectivity. An edge may belong to a single face
+        (exterior edge), or it may be shared by two faces (interior edge).
+
+        An exterior edge will contain a ``fill_value`` for the second column.
+
+        Returns
+        -------
+        connectivity: ndarray of integers with shape ``(n_edge, 2)``.
+        """
         if self._edge_face_connectivity is None:
             self._edge_face_connectivity = connectivity.invert_dense(
                 self.face_edge_connectivity, self.fill_value
@@ -333,6 +412,13 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def face_face_connectivity(self) -> csr_matrix:
+        """
+        Face to face connectivity. Derived from shared edges.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
         if self._face_face_connectivity is None:
             self._face_face_connectivity = connectivity.face_face_connectivity(
                 self.edge_face_connectivity, self.fill_value
@@ -341,6 +427,13 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def node_face_connectivity(self):
+        """
+        Node to face connectivity. Inverted from face node connectivity.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
         if self._node_face_connectivity is None:
             self._node_face_connectivity = connectivity.invert_dense_to_sparse(
                 self.face_node_connectivity, self.fill_value
@@ -349,6 +442,13 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def mesh(self):
+        """
+        Create if needed, and return meshkernel Mesh2d object.
+
+        Returns
+        -------
+        mesh: meshkernel.Mesh2d
+        """
         if self._mesh is None:
             self._mesh = mk.Mesh2d(
                 node_x=self.node_x,
@@ -359,6 +459,13 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def meshkernel(self) -> mk.MeshKernel:
+        """
+        Create if needed, and return meshkernel MeshKernel instance.
+
+        Returns
+        -------
+        meshkernel: meshkernel.MeshKernel
+        """
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh2d_set(self.mesh)
@@ -366,6 +473,16 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def voronoi_topology(self):
+        """
+        Centroidal Voronoi tesselation of this UGRID2D topology.
+
+        Returns
+        -------
+        vertices: ndarray of floats with shape ``(n_centroids, 2)``
+        face_node_connectivity: csr_matrix
+            Describes face node connectivity of voronoi topology.
+        face_index: 1d array of integers
+        """
         if self._voronoi_topology is None:
             vertices, faces, face_index = voronoi_topology(
                 self.node_face_connectivity,
@@ -377,6 +494,19 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def centroid_triangulation(self):
+        """
+        Triangulation of centroidal voronoi tesselation.
+
+        Required for e.g. contouring face data, which takes triangles and
+        associated values at the triangle vertices.
+
+        Returns
+        -------
+        vertices: ndarray of floats with shape ``(n_centroids, 2)``
+        face_node_connectivity: ndarray of integers with shape ``(n_triangle, 3)``
+            Describes face node connectivity of triangle topology.
+        face_index: 1d array of integers
+        """
         if self._centroid_triangulation is None:
             nodes, faces, face_index = self.voronoi_topology
             triangles, _ = connectivity.triangulate(faces, self.fill_value)
@@ -386,6 +516,16 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def triangulation(self):
+        """
+        Triangulation of the UGRID2D topology.
+
+        Returns
+        -------
+        triangulation: tuple
+            Contains node_x, node_y, triangle face_node_connectivity.
+        triangle_face_connectivity: 1d array of integers
+            Identifies the original face for every triangle.
+        """
         if self._triangulation is None:
             triangles, triangle_face_connectivity = connectivity.triangulate(
                 self.face_node_connectivity, self.fill_value
@@ -398,6 +538,10 @@ class Ugrid2d(AbstractUgrid):
     def exterior_edges(self) -> IntArray:
         """
         Get all exterior edges, i.e. edges with no other face.
+
+        Returns
+        -------
+        edge_index: 1d array of integers
         """
         # Numpy argwhere doesn't return a 1D array
         return np.nonzero(self.edge_face_connectivity[:, 1] == self.fill_value)[0]
@@ -406,6 +550,10 @@ class Ugrid2d(AbstractUgrid):
     def exterior_faces(self) -> IntArray:
         """
         Get all exterior faces, i.e. faces with an unshared edge.
+
+        Returns
+        -------
+        face_index: 1d array of integers
         """
         exterior_edges = self.exterior_edges
         exterior_faces = self.edge_face_connectivity[exterior_edges].ravel()
@@ -414,7 +562,9 @@ class Ugrid2d(AbstractUgrid):
     @property
     def celltree(self):
         """
-        initializes the celltree, a search structure for spatial lookups in 2d grids
+        Initializes the celltree if needed, and returns celltree.
+
+        A celltree is a search structure for spatial lookups in unstructured grids.
         """
         if self._celltree is None:
             self._celltree = CellTree2d(
@@ -484,12 +634,43 @@ class Ugrid2d(AbstractUgrid):
     def rasterize_like(
         self, x: FloatArray, y: FloatArray
     ) -> Tuple[FloatArray, FloatArray, IntArray]:
+        """
+        Rasterize unstructured grid by sampling on the x and y coordinates.
+
+        Parameters
+        ----------
+        x: 1d array of floats with shape ``(ncol,)``
+        y: 1d array of floats with shape ``(nrow,)``
+
+        Returns
+        -------
+        x: 1d array of floats with shape ``(ncol,)``
+        y: 1d array of floats with shape ``(nrow,)``
+        face_index: 1d array of integers with shape ``(nrow * ncol,)``
+        """
         yy, xx = np.meshgrid(y, x, indexing="ij")
         nodes = np.column_stack([xx.ravel(), yy.ravel()])
         index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
 
     def rasterize(self, resolution: float) -> Tuple[FloatArray, FloatArray, IntArray]:
+        """
+        Rasterize unstructured grid by sampling.
+
+        x and y coordinates are generated from the bounds of the UGRID2D
+        topology and the provided resolution.
+
+        Parameters
+        ----------
+        resolution: float
+            Spacing in x and y.
+
+        Returns
+        -------
+        x: 1d array of floats with shape ``(ncol,)``
+        y: 1d array of floats with shape ``(nrow,)``
+        face_index: 1d array of integers with shape ``(nrow * ncol,)``
+        """
         xmin, ymin, xmax, ymax = self.bounds
         d = abs(resolution)
         xmin = np.floor(xmin / d) * d
@@ -533,6 +714,21 @@ class Ugrid2d(AbstractUgrid):
         return indexer
 
     def sel_points(self, x: FloatArray, y: FloatArray):
+        """
+        Select points in the unstructured grid.
+
+        Parameters
+        ----------
+        x: 1d array of floats with shape ``(n_points,)``
+        y: 1d array of floats with shape ``(n_points,)``
+
+        Returns
+        -------
+        dimension: str
+        as_ugrid: bool
+        index: 1d array of integers
+        coords: dict
+        """
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
         if x.shape != y.shape:
@@ -551,6 +747,27 @@ class Ugrid2d(AbstractUgrid):
         return dim, False, index, coords
 
     def sel(self, x=None, y=None):
+        """
+        Find selection in the UGRID x and y coordinates.
+
+        The indexing for x and y always occurs orthogonally, i.e.:
+        ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For
+        vectorized indexing (equal to ``zip``ing through x and y), see
+        ``.sel_points``.
+
+        Parameters
+        ----------
+        x: float, 1d array, slice
+        y: float, 1d array, slice
+
+        Returns
+        -------
+        dimension: str
+        as_ugrid: bool
+        index: 1d array of integers
+        coords: dict
+        """
+
         if x is None:
             x = slice(None, None)
         if y is None:
@@ -609,16 +826,52 @@ class Ugrid2d(AbstractUgrid):
         return dim, as_ugrid, index, coords
 
     def topology_subset(self, index: Union[BoolArray, IntArray]):
+        """
+        Create a new UGRID1D topology for a subset of this topology.
+
+        Parameters
+        ----------
+        face_index: 1d array of integers or bool
+            Edges of the subset.
+
+        Returns
+        -------
+        subset: Ugrid2d
+        """
         index = np.atleast_1d(index)
         return self._topology_subset(index, self.face_node_connectivity)
 
     def triangulate(self):
+        """
+        Triangulate this UGRID2D topology, breaks more complex polygons down
+        into triangles.
+
+        Returns
+        -------
+        triangles: Ugrid2d
+        """
         triangles, _ = connectivity.triangulate(
             self.face_node_connectivity, self.fill_value
         )
         return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
 
     def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
+        """
+        Create a centroidal Voronoi tesselation of this UGRID2D topology.
+
+        Such a tesselation is not guaranteed to produce convex cells. To ensure
+        convexity, set ``add_vertices=False`` -- this will result in a
+        different exterior, however.
+
+        Parameters
+        ----------
+        add_exterior: bool, default: True
+        add_vertices: bool, default: True
+
+        Returns
+        -------
+        tesselation: Ugrid2d
+        """
         if add_exterior:
             edge_face_connectivity = self.edge_face_connectivity
             edge_node_connectivity = self.edge_node_connectivity
@@ -640,6 +893,15 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
 
     def reverse_cuthill_mckee(self, dimension=None):
+        """
+        Reduces bandwith of the connectivity matrix.
+
+        Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.
+
+        Returns
+        -------
+        reordered: Ugrid2d
+        """
         # TODO: dispatch on dimension?
         reordering = reverse_cuthill_mckee(
             graph=self.face_face_connectivity,
@@ -714,6 +976,13 @@ class Ugrid2d(AbstractUgrid):
 
     @staticmethod
     def from_geodataframe(geodataframe: gpd.GeoDataFrame):
+        """
+        Convert a geodataframe of polygons to UGRID2D topology.
+
+        Returns
+        -------
+        topology: Ugrid2d
+        """
         x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
             geodataframe.geometry.values
         )
@@ -780,6 +1049,22 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(node_x, node_y, -1, face_nodes)
 
     def to_pygeos(self, dim):
+        """
+        Convert UGRID topology to pygeos objects:
+
+        * nodes: points
+        * edges: linestrings
+        * faces: polygons
+
+        Parameters
+        ----------
+        dim: str
+            Node, edge, or face dimension.
+
+        Returns
+        -------
+        geometry: ndarray of pygeos.Geometry
+        """
         if dim == self.face_dimension:
             return conversion.faces_to_polygons(
                 self.node_x,

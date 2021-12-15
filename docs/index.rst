@@ -38,6 +38,6 @@ Installation
    :titlesonly:
    :hidden:
 
-   user_guide.rst
-   api.rst
-   dev_docs.rst
+   user_guide
+   api
+   dev_docs
