@@ -611,6 +611,12 @@ class Ugrid2d(AbstractUgrid):
     def topology_subset(self, index: Union[BoolArray, IntArray]):
         return self._topology_subset(index, self.face_node_connectivity)
 
+    def triangulate(self):
+        triangles, _ = connectivity.triangulate(
+            self.face_node_connectivity, self.fill_value
+        )
+        return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
+
     def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
         if add_exterior:
             edge_face_connectivity = self.edge_face_connectivity

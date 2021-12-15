@@ -146,5 +146,7 @@ new_uds
 # conventions and merges it with the main dataset containing the data variables
 # before writing.
 
-uds.ugrid.to_netcdf("example-ugrid2.nc")
+uds.ugrid.to_netcdf("example-ugrid.nc")
 xu.open_dataset("example-ugrid.nc")
+
+# %%

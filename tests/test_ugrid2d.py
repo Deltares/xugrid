@@ -519,6 +519,13 @@ def test_topology_subset():
     assert actual is grid
 
 
+def test_triangulate():
+    grid = grid2d()
+    actual = grid.triangulate()
+    assert isinstance(actual, xugrid.Ugrid2d)
+    assert actual.n_face == 6
+
+
 def test_tesselate_centroidal_voronoi():
     grid = grid2d()
 

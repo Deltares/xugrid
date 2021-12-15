@@ -23,6 +23,7 @@ Imports
 
 The following imports suffice for the examples.
 """
+# %%
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -178,9 +179,7 @@ grid = xugrid.data.xoxo()
 
 da = xr.DataArray(
     np.full(283, np.nan),
-    dims=[
-        "face",
-    ],
+    dims=[grid.face_dimension],
 )
 da.data[2] = 0.0
 da.data[12] = 0.0
@@ -191,7 +190,7 @@ uda = xugrid.UgridDataArray(da, grid)
 
 fig, ax = plt.subplots()
 uda.ugrid.plot(ax=ax)
-uda.ugrid.plot.edge(ax=ax, color="black")
+uda.ugrid.plot.line(ax=ax, color="black")
 
 # %%
 # We can now use Laplace interpolation to fill the gaps in the grid.
@@ -227,3 +226,5 @@ connectivity = renumbered_grid.face_face_connectivity.toarray() != 0
 
 fig, ax = plt.subplots(figsize=(8, 8))
 ax.imshow(connectivity, cmap="Greys")
+
+# %%

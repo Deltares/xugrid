@@ -184,13 +184,13 @@ def _extract_topology_variables(
     return variables
 
 
-def get_ugrid1d_variables(dataset, mesh_topology) -> dict[str, str]:
+def get_ugrid1d_variables(dataset, mesh_topology) -> Dict[str, str]:
     return _extract_topology_variables(
         dataset, mesh_topology, UGRID1D_TOPOLOGY_VARIABLES
     )
 
 
-def get_ugrid2d_variables(dataset, mesh_topology) -> dict[str, str]:
+def get_ugrid2d_variables(dataset, mesh_topology) -> Dict[str, str]:
     return _extract_topology_variables(
         dataset, mesh_topology, UGRID2D_TOPOLOGY_VARIABLES
     )
