@@ -124,7 +124,7 @@ def check_dim(attrs, dimrole, dimname, varname):
 
 def _extract_topology_variables(
     dataset, mesh_topology, ugrid_attrs: UgridTopologyAttributes
-) -> dict[str, str]:
+) -> Dict[str, str]:
     """
     This standardizes the names of the UGRID attributes as variable names in
     the dataset.
