@@ -19,8 +19,8 @@ def transform(vertices, minx, maxx, miny):
     dy = ymax - ymin
     new_dx = maxx - minx
     new_dy = dy / dx * new_dx
-    x = x - xmin * new_dx / dx + minx
-    y = y - ymin * new_dy / dy + miny
+    x = (x - xmin) * new_dx / dx + minx
+    y = (y - ymin) * new_dy / dy + miny
     return np.column_stack([x, y])
 
 

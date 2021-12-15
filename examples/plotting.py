@@ -47,7 +47,7 @@ ds
 # --------------
 #
 # Just like Xarray, we can create a plot by selecting a DataArray from the
-# Dataset and calling the :py:func:`UgridDataArray.ugrid.plot()` method.
+# Dataset and calling the :py:meth:`UgridDataArray.ugrid.plot()` method.
 
 uda = ds["face_z"]
 uda.ugrid.plot()
@@ -56,10 +56,10 @@ uda.ugrid.plot()
 # Like Xarray, the axes and the colorbar are labeled automatically using the
 # available information.
 #
-# The convenience method :py:meth:`xugrid.UgridDataset.ugrid.plot` dispatches
-# on the topological dimension of the variable. In this case, the data is
-# associated with the face dimension of the topology. Data located on the
-# edges results in a different kind of plot:
+# The convenience function :py:meth:`xugrid.UgridDataArray.ugrid.plot()`
+# dispatches on the topological dimension of the variable. In this case, the
+# data is associated with the face dimension of the topology. Data located on
+# the edges results in a different kind of plot:
 
 ds["edge_z"].ugrid.plot()
 
@@ -96,9 +96,9 @@ ds["face_z"].ugrid.plot.line(color="black")
 
 # %%
 # In general, there has to be data associated with the mesh topology before a
-# plot can be made. ``plot.edge.line()`` forms an exception to this rule, as
-# the location of the edges is meaningful on its own: for this reason
-# ``plot.edge.line`` does not error in the example above.
+# plot can be made. ``plot.line()`` forms an exception to this rule, as the
+# location of the edges is meaningful on its own: for this reason
+# ``plot.line()`` does not error in the example above.
 #
 # Other types of plot
 # -------------------
@@ -165,6 +165,18 @@ ds["node_z"].ugrid.plot.surface(ax=ax1)
 ds["face_z"].ugrid.plot(cmap="RdBu", levels=8, yincrease=False)
 
 # %%
+# As a function
+# -------------
+#
+# The plotting methods can also be called as a function, in which case they
+# take an xarray DataArray and a xugrid grid as arguments.
+
+grid = ds.ugrid.grid
+da = ds["face_z"].ugrid.obj
+
+xugrid.plot.pcolormesh(grid, da)
+
+# %%
 # Xarray DataArray plots
 # ----------------------
 #
@@ -175,3 +187,5 @@ ds["face_z"].ugrid.plot(cmap="RdBu", levels=8, yincrease=False)
 ds = xugrid.data.adh_san_diego()
 depth = ds["depth"]
 depth.isel(node=1000).plot()
+
+# %%

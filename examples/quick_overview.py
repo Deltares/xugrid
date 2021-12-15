@@ -23,7 +23,7 @@ import xugrid as xu
 # * From an xarray Dataset containing the grid topology stored according to the
 #   UGRID conventions.
 # * From a xugrid Ugrid object and an xarray DataArray containing the data.
-# * From a UGRID netCDF file, via py:func:`xugrid.open_dataset`.
+# * From a UGRID netCDF file, via :py:func:`xugrid.open_dataset`.
 #
 # xugrid will automatically find the UGRID topological variables, and separate
 # them from the main data variables. We'll start by fetching a dataset:
@@ -79,15 +79,21 @@ elev.ugrid.plot(cmap="viridis")
 #
 # A UgridDataArray behaves identical to an xarray DataArray:
 
-uds["depth"].isel(node=0)
+whole = xu.data.disk()["face_z"]
 
 # %%
 # To select based on the topology, use the ``.ugrid`` attribute:
 
-# subset = elev.ugrid.sel(x=slice(480_000.0, 490_000.0), y=slice(3_605_000.0, 3_625_000.0))
-# subset
+subset = whole.ugrid.sel(y=slice(5.0, None))
+subset.ugrid.plot()
 
 # %%
+# .. note::
+#
+#   ``ugrid.sel()`` currently only supports data on the faces for 2D
+#   topologies, and data on edges for 1D topologies. More flexibility
+#   will be added soon.
+#
 # Computation
 # -----------
 #
@@ -100,9 +106,8 @@ uda + 10.0
 # ---------
 #
 # Xugrid objects provide a number of conversion functions from and to geopandas
-# GeoDataFrames using :py:meth:`~xugrid.UgridDataArray.to_geoseries`,
-# :py:meth:`~xugrid.UgridDataArray.to_geodataframe`, and
-# :py:meth:`~xugrid.UgridDataArray.from_geodataframe`. Note that storing large
+# GeoDataFrames using :py:meth:`xugrid.UgridDataArray.to_geodataframe`, and
+# :py:meth:`xugrid.UgridDataset.from_geodataframe`. Note that storing large
 # grids as GeoDataFrames can be very inefficient.
 
 gdf = uda.to_geodataframe(name="test")

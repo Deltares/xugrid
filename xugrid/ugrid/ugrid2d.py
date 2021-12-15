@@ -609,6 +609,7 @@ class Ugrid2d(AbstractUgrid):
         return dim, as_ugrid, index, coords
 
     def topology_subset(self, index: Union[BoolArray, IntArray]):
+        index = np.atleast_1d(index)
         return self._topology_subset(index, self.face_node_connectivity)
 
     def triangulate(self):

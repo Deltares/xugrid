@@ -271,9 +271,8 @@ class UgridAccessor:
             raise NotImplementedError
 
         result = self.obj.isel({dim: indexer})
-        indices = result[dim].values
-        result = result.assign_coords({f"{dim}_index": (dim, indices)})
-        grid = self.grid.topology_subset(indices)
+        result = result.assign_coords({f"{dim}_index": (dim, indexer)})
+        grid = self.grid.topology_subset(indexer)
         if isinstance(self.obj, xr.DataArray):
             return UgridDataArray(result, grid)
         elif isinstance(self.obj, xr.Dataset):
@@ -283,18 +282,17 @@ class UgridAccessor:
                 f"Expected UgridDataArray or UgridDataset, got {type(result).__name__}"
             )
 
-    def sel(self, x, y):
+    def sel(self, x=None, y=None):
         # TODO: also do vectorized indexing like xarray?
         # Might not be worth it, as orthogonal and vectorized indexing are
         # quite confusing.
         dim, ugrid, index, coords = self.grid.sel(x=x, y=y)
         result = self.obj.isel({dim: index})
-        indices = result[dim].values
 
         if not ugrid:
             return result.assign_coords(coords)
 
-        grid = self.grid.topology_subset(indices)
+        grid = self.grid.topology_subset(index)
         if isinstance(self.obj, xr.DataArray):
             return UgridDataArray(result, grid)
         elif isinstance(self.obj, xr.Dataset):
