@@ -1050,7 +1050,7 @@ class Ugrid2d(AbstractUgrid):
 
     def to_pygeos(self, dim):
         """
-        Convert UGRID topology to pygeos objects:
+        Convert UGRID topology to pygeos objects.
 
         * nodes: points
         * edges: linestrings

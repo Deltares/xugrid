@@ -192,11 +192,6 @@ class TestUgridDataArray:
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
 
-        gdf = self.uda.to_geodataframe(name="facedata", dim_order=["mesh2d_nFaces"])
-        assert isinstance(gdf, gpd.GeoDataFrame)
-        assert len(gdf) == self.uda["mesh2d_nFaces"].size
-        assert (gdf.geometry.geom_type == "Polygon").all()
-
     def test_binary_dilation(self):
         a = self.uda > 0
         actual = a.ugrid.binary_dilation()

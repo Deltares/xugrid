@@ -1,5 +1,3 @@
-.. dev-examples-index:
-
 Developer Examples
 ==================
 

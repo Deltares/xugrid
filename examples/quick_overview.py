@@ -30,15 +30,30 @@ import xugrid as xu
 # ~~~~~~~~~~~~~~~~~~~
 #
 # xugrid will automatically find the UGRID topological variables, and separate
-# them from the main data variables. We'll start by fetching a dataset:
+# them from the main data variables.
+#
+# Details on the required variables can be found in the `UGRID conventions`_.
+# For 1D and 2D UGRID topologies, the required variables are:
+#
+# * x-coordinates of the nodes
+# * y-coordinates of the nodes
+# * edge node connectivity (1D) or face node connectivity (2D)
+# * a "dummy" variable storing the names of the above variables in its
+#   attributes
+#
+# We'll start by fetching a dataset:
 
 ds = xu.data.adh_san_diego(xarray=True)
 ds
 
 # %%
 # There are a number of topology coordinates and variables: ``node_x`` and
-# ``node_y``, ``mesh2d`` and ``face_node_connectivity``. We can convert this
-# dataset to a UgridDataset which will separate the variables:
+# ``node_y``, ``mesh2d`` and ``face_node_connectivity``. The dummy variable
+# is ``mesh2d`` contains only a 0 for data; its attributes contain a mapping of
+# UGRID roles to dataset variables.
+#
+# We can convert this dataset to a UgridDataset which will automatically
+# separate the variables:
 
 uds = xu.UgridDataset(ds)
 uds
@@ -54,9 +69,13 @@ elev
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Alternatively, we can build a Ugrid topology object first from vertices and
-# connectivity numpy arrays. There are many ways to construct such arrays,
-# typically via mesh generators or Delaunay triangulation, but we will
-# construct two simple triangles and some data by hand here:
+# connectivity numpy arrays, for example when using the topology data generated
+# by a mesh generator (at which stage there is no data asssociated with the
+# nodes, edges, or faces).
+#
+# There are many ways to construct such arrays, typically via mesh generators
+# or Delaunay triangulation, but we will construct two simple triangles and
+# some data by hand here:
 
 nodes = np.array([[0, 0], [0, 1.1], [1, 0], [1, 1]])
 faces = np.array([[2, 3, 0], [3, 1, 0]])
@@ -75,8 +94,8 @@ uda
 # ~~~~~~~~~~~~~~~~
 #
 # :py:func:`xugrid.open_dataset` is demonstrated in the last section of this
-# guide, but its use is straightforward: internally it uses xarray to open a
-# dataset and converts it as seen in the first example.
+# guide. Internally, it opens the netCDF as a regular dataset, then converts it
+# as seen in the first example.
 #
 # Plotting
 # --------
@@ -165,3 +184,4 @@ uds.ugrid.to_netcdf("example-ugrid.nc")
 xu.open_dataset("example-ugrid.nc")
 
 # %%
+# .. _UGRID Conventions: https://ugrid-conventions.github.io/ugrid-conventions
