@@ -1,2 +1,2 @@
-from .sample_data import adh_san_diego, xoxo, elevation_nl
+from .sample_data import adh_san_diego, elevation_nl, xoxo
 from .synthetic import disk
