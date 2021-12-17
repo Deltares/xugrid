@@ -1,6 +1,13 @@
 Xugrid
 ======
 
+.. image:: https://img.shields.io/github/workflow/status/deltares/xugrid/ci?style=flat-square
+   :target: https://github.com/deltares/xugrid/actions?query=workflows%3Aci
+.. image:: https://img.shields.io/codecov/c/github/deltares/xugrid.svg?style=flat-square
+   :target: https://app.codecov.io/gh/deltares/xugrid
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square
+   :target: https://github.com/psf/black
+
 **This is a work in progress.**
 
 Xarray extension to work with 2D unstructured grids, for data and topology

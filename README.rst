@@ -5,14 +5,21 @@
 Xugrid
 ======
 
+.. image:: https://img.shields.io/github/workflow/status/deltares/xugrid/ci?style=flat-square
+   :target: https://github.com/deltares/xugrid/actions?query=workflows%3Aci
+.. image:: https://img.shields.io/codecov/c/github/deltares/xugrid.svg?style=flat-square
+   :target: https://app.codecov.io/gh/deltares/xugrid
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square
+   :target: https://github.com/psf/black
+
 **This is a work in progress.** `See documentation <https://deltares.github.io/xugrid/>`_.
 
 Xarray extension to work with 2D unstructured grids, for data and topology
 stored according to `UGRID conventions
 <https://ugrid-conventions.github.io/ugrid-conventions>`_.
 
-Processing structured data with xarray is convenient and efficient. The goal
-of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
+Processing structured data with xarray is convenient and efficient. The goal of
+Xugrid (pronounced "kiss you grid" by `visionaries 🗢
 <https://github.com/visr>`_ ) is to extend this ease to unstructured grids.
 
 .. code:: python
@@ -41,4 +48,10 @@ Installation
 
 .. code:: console
 
-   pip install xugrid
+  pip install xugrid
+
+Documentation
+-------------
+
+.. image:: https://img.shields.io/github/workflow/status/deltares/xugrid/ci?style=flat-square
+  :target: https://deltares.github.io/xugrid/
