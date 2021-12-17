@@ -17,19 +17,24 @@ of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
 
 .. code:: python
 
-    import matplotlib.pyplot as plt
-    import xugrid
+  import matplotlib.pyplot as plt
+  import xugrid
 
-    uda = xugrid.data.elevation_nl()
-    sections = xugrid.data.cross_sections_nl()
+  # Get some sample data as a xugrid UgridDataArray
+  elevation_nl = xugrid.data.elevation_nl()
 
-    section_data = uda.along_line(sections)
+  # Get a cross-section
+  section_y = 475_000.0
+  section = elevation_nl.ugrid.sel(y=section_y)
 
-    fig, (ax0, ax1) = plt.subplots(ncols=2)
-    uda.plot(ax=ax0, cmap="terrain")
-    sections.plot(ax=ax0)
-    section_data.plot.line(ax=ax1)
+  # Plot unstructured grid and cross section
+  fig, (ax0, ax1) = plt.subplots(figsize=(22.6, 10), ncols=2)
+  elevation_nl.ugrid.plot(ax=ax0, vmin=-20, vmax=150, cmap="terrain")
+  ax0.axhline(y=section_y, color="red")
+  section.plot(ax=ax1, x="x")
 
+.. image:: https://raw.githubusercontent.com/Deltares/xugrid/main/docs/_static/xugrid-demo.png
+  :target: https://github.com/deltares/xugrid
 
 Installation
 ------------
