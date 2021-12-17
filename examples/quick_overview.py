@@ -175,7 +175,7 @@ new_uds
 # Write netCDF files
 # ------------------
 #
-# Once again like xarray, NetCDF is the recommend file format for xugrid
+# Once again like xarray, NetCDF is the recommended file format for xugrid
 # objects. Xugrid automatically stores the grid topology according to the UGRID
 # conventions and merges it with the main dataset containing the data variables
 # before writing.

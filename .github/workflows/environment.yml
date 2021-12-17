@@ -3,21 +3,19 @@ name: xugrid
 channels:
   - conda-forge
     
-# note that these are the developer dependencies,
-# if you only want the user dependencies, see
-# install_requires in setup.cfg
+# Installing geopandas, pygeos, pyproj via mamba seems to break CI currently.
 dependencies:
   - black
   - dask
   - flake8
   - isort
   - netcdf4
-  - pydata-sphinx-theme
   - pip
   - pip:
     - meshkernel
     - meshzoo
     - numba_celltree
+  - pydata-sphinx-theme
   - pytest
   - pytest-cov
   - python=3.9
