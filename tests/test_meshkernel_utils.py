@@ -1,10 +1,17 @@
-import meshkernel as mk
 import pytest
 import shapely.geometry as sg
 
 from xugrid import meshkernel_utils as mku
 
+from . import requires_meshkernel
 
+try:
+    import meshkernel as mk
+except ImportError:
+    pass
+
+
+@requires_meshkernel
 def test_either_string_or_enum():
     assert (
         mku.either_string_or_enum("wave_courant", mk.RefinementType)
@@ -24,6 +31,7 @@ def test_either_string_or_enum():
         mku.either_string_or_enum(mk.AveragingMethod.MAX, mk.RefinementType)
 
 
+@requires_meshkernel
 def test_to_geometry_list():
     polygon = sg.Polygon(
         [

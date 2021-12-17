@@ -1,7 +1,6 @@
 from typing import Any, Tuple, Union
 
 import geopandas as gpd
-import meshkernel as mk
 import numpy as np
 import xarray as xr
 
@@ -223,7 +222,7 @@ class Ugrid1d(AbstractUgrid):
         return self.topology_attrs[key]
 
     @property
-    def mesh(self):
+    def mesh(self) -> "mk.Mesh1d":  # type: ignore # noqa
         """
         Create if needed, and return meshkernel Mesh1d object.
 
@@ -231,6 +230,8 @@ class Ugrid1d(AbstractUgrid):
         -------
         mesh: meshkernel.Mesh1d
         """
+        import meshkernel as mk
+
         if self._mesh is None:
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
@@ -240,7 +241,7 @@ class Ugrid1d(AbstractUgrid):
         return self._mesh
 
     @property
-    def meshkernel(self):
+    def meshkernel(self) -> "mk.MeshKernel":  # type: ignore # noqa
         """
         Create if needed, and return meshkernel MeshKernel instance.
 
@@ -248,6 +249,8 @@ class Ugrid1d(AbstractUgrid):
         -------
         meshkernel: meshkernel.MeshKernel
         """
+        import meshkernel as mk
+
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh1d_set(self.mesh)

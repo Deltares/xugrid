@@ -1,7 +1,6 @@
 from typing import Any, Tuple, Union
 
 import geopandas as gpd
-import meshkernel as mk
 import numpy as np
 import pyproj
 import shapely.geometry as sg
@@ -441,7 +440,7 @@ class Ugrid2d(AbstractUgrid):
         return self._node_face_connectivity
 
     @property
-    def mesh(self):
+    def mesh(self) -> "mk.Mesh2d":  # type: ignore # noqa
         """
         Create if needed, and return meshkernel Mesh2d object.
 
@@ -449,6 +448,8 @@ class Ugrid2d(AbstractUgrid):
         -------
         mesh: meshkernel.Mesh2d
         """
+        import meshkernel as mk
+
         if self._mesh is None:
             self._mesh = mk.Mesh2d(
                 node_x=self.node_x,
@@ -458,7 +459,7 @@ class Ugrid2d(AbstractUgrid):
         return self._mesh
 
     @property
-    def meshkernel(self) -> mk.MeshKernel:
+    def meshkernel(self) -> "mk.MeshKernel":  # type: ignore # noqa
         """
         Create if needed, and return meshkernel MeshKernel instance.
 
@@ -466,6 +467,8 @@ class Ugrid2d(AbstractUgrid):
         -------
         meshkernel: meshkernel.MeshKernel
         """
+        import meshkernel as mk
+
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel(is_geographic=False)
             self._meshkernel.mesh2d_set(self.mesh)
@@ -926,6 +929,8 @@ class Ugrid2d(AbstractUgrid):
         account_for_samples_outside_face: bool = True,
         max_refinement_iterations: int = 10,
     ):
+        import meshkernel as mk
+
         geometry_list = mku.to_geometry_list(polygon)
         refinement_type = mku.either_string_or_enum(refinement_type, mk.RefinementType)
 
@@ -950,6 +955,8 @@ class Ugrid2d(AbstractUgrid):
         delete_option: str = "all_face_circumenters",
         invert_deletion: bool = False,
     ):
+        import meshkernel as mk
+
         geometry_list = mku.to_geometry_list(polygon)
         delete_option = mku.either_string_or_enum(delete_option, mk.DeleteMeshOption)
         self._initialize_mesh_kernel()
@@ -959,6 +966,8 @@ class Ugrid2d(AbstractUgrid):
     def from_polygon(
         polygon: sg.Polygon,
     ):
+        import meshkernel as mk
+
         geometry_list = mku.to_geometry_list(polygon)
         _mesh_kernel = mk.MeshKernel()
         _mesh_kernel.mesh2d_make_mesh_from_polygon(geometry_list)

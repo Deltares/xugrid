@@ -1,5 +1,4 @@
 import geopandas as gpd
-import meshkernel as mk
 import numba_celltree
 import numpy as np
 import pygeos
@@ -9,6 +8,13 @@ import xarray as xr
 from scipy import sparse
 
 import xugrid
+
+try:
+    import meshkernel as mk
+except ImportError:
+    pass
+
+from . import requires_meshkernel
 
 NAME = xugrid.ugrid.ugrid_io.UGRID2D_DEFAULT_NAME
 VERTICES = np.array(
@@ -548,11 +554,13 @@ def test_reverse_cuthill_mckee():
     assert np.array_equal(index, [3, 2, 1, 0])
 
 
+@requires_meshkernel
 def test_mesh():
     grid = grid2d()
     assert isinstance(grid.mesh, mk.Mesh2d)
 
 
+@requires_meshkernel
 def test_meshkernel():
     grid = grid2d()
     assert isinstance(grid.meshkernel, mk.MeshKernel)

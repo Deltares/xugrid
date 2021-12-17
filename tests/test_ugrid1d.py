@@ -1,5 +1,4 @@
 import geopandas as gpd
-import meshkernel as mk
 import numpy as np
 import pygeos
 import pyproj
@@ -8,6 +7,13 @@ import xarray as xr
 from scipy import sparse
 
 import xugrid
+
+from . import requires_meshkernel
+
+try:
+    import meshkernel as mk
+except ImportError:
+    pass
 
 NAME = xugrid.ugrid.ugrid_io.UGRID1D_DEFAULT_NAME
 
@@ -185,11 +191,13 @@ def test_dimensions():
     assert grid.edge_dimension == f"{NAME}_nEdges"
 
 
+@requires_meshkernel
 def test_mesh():
     grid = grid1d()
     assert isinstance(grid.mesh, mk.Mesh1d)
 
 
+@requires_meshkernel
 def test_meshkernel():
     grid = grid1d()
     assert isinstance(grid.meshkernel, mk.MeshKernel)
