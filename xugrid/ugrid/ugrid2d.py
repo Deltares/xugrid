@@ -450,11 +450,18 @@ class Ugrid2d(AbstractUgrid):
         """
         import meshkernel as mk
 
+        edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
+        is_node = self.face_node_connectivity != self.fill_value
+        nodes_per_face = is_node.sum(axis=1).astype(np.int32)
+        face_nodes = self.face_node_connectivity[is_node].ravel().astype(np.int32)
+
         if self._mesh is None:
             self._mesh = mk.Mesh2d(
                 node_x=self.node_x,
                 node_y=self.node_y,
-                edge_nodes=self.edge_node_connectivity.flatten().astype(np.int32),
+                edge_nodes=edge_nodes,
+                face_nodes=face_nodes,
+                nodes_per_face=nodes_per_face,
             )
         return self._mesh
 

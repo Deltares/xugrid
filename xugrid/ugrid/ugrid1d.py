@@ -232,11 +232,13 @@ class Ugrid1d(AbstractUgrid):
         """
         import meshkernel as mk
 
+        edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
+
         if self._mesh is None:
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
                 node_y=self.node_y,
-                edge_nodes=self.edge_node_connectivity.ravel(),
+                edge_nodes=edge_nodes,
             )
         return self._mesh
 
