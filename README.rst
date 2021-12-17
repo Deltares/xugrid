@@ -29,7 +29,7 @@ of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
 
   # Plot unstructured grid and cross section
   fig, (ax0, ax1) = plt.subplots(figsize=(22.6, 10), ncols=2)
-  uda.ugrid.plot(ax=ax0, vmin=-20, vmax=150, cmap="terrain")
+  uda.ugrid.plot(ax=ax0, vmin=-20, vmax=90, cmap="terrain")
   ax0.axhline(y=section_y, color="red")
   section.plot(ax=ax1, x="x")
 
