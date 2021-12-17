@@ -1,0 +1,752 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>xugrid.Ugrid2d.triangulation &#8212; Xugrid 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="xugrid.Ugrid2d.voronoi_topology" href="xugrid.Ugrid2d.voronoi_topology.html" />
+    <link rel="prev" title="xugrid.Ugrid2d.triangulate" href="xugrid.Ugrid2d.triangulate.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+  <nav class="navbar navbar-dark navbar-expand-lg bg-deltares fixed-top bd-navbar shadow" id="navbar-main"><div class="container-xl">
+
+    <a class="navbar-brand" href="../index.html">
+    <p style="color:#fff;font-size:25px;" class="title">Xugrid</p>
+    </a>
+
+    <a class="navbar-brand" href="../index.html">
+    <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo" />
+    </a>
+  
+    <div id="navbar-menu" class="collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../user_guide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../api.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../dev_docs.html">
+  Development
+ </a>
+</li>
+
+        
+      </ul>
+    </div>
+
+
+    <a class="navbar-brand" href="https://www.deltares.nl/en/">
+    <img src="../_static/deltares-white.svg" class="logo" alt="logo" />
+    </a>
+
+</div>
+  </nav>
+
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_dataarray.html">
+   xugrid.open_dataarray
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_dataset.html">
+   xugrid.open_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_mfdataset.html">
+   xugrid.open_mfdataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_zarr.html">
+   xugrid.open_zarr
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.full_like.html">
+   xugrid.full_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.ones_like.html">
+   xugrid.ones_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.zeros_like.html">
+   xugrid.zeros_like
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.html">
+   xugrid.UgridAccessor
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.crs.html">
+   xugrid.UgridAccessor.crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.isel.html">
+   xugrid.UgridAccessor.isel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.sel.html">
+   xugrid.UgridAccessor.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.sel_points.html">
+   xugrid.UgridAccessor.sel_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.rasterize.html">
+   xugrid.UgridAccessor.rasterize
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.rasterize_like.html">
+   xugrid.UgridAccessor.rasterize_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_geodataframe.html">
+   xugrid.UgridAccessor.to_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.binary_dilation.html">
+   xugrid.UgridAccessor.binary_dilation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.binary_erosion.html">
+   xugrid.UgridAccessor.binary_erosion
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.connected_components.html">
+   xugrid.UgridAccessor.connected_components
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.reverse_cuthill_mckee.html">
+   xugrid.UgridAccessor.reverse_cuthill_mckee
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.laplace_interpolate.html">
+   xugrid.UgridAccessor.laplace_interpolate
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_dataset.html">
+   xugrid.UgridAccessor.to_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_netcdf.html">
+   xugrid.UgridAccessor.to_netcdf
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_zarr.html">
+   xugrid.UgridAccessor.to_zarr
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.html">
+   xugrid.UgridDataArray
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.ugrid.html">
+   xugrid.UgridDataArray.ugrid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.from_structured.html">
+   xugrid.UgridDataArray.from_structured
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataset.html">
+   xugrid.UgridDataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.ugrid.html">
+   xugrid.UgridDataArray.ugrid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataset.from_geodataframe.html">
+   xugrid.UgridDataset.from_geodataframe
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.html">
+   xugrid.Ugrid1d
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_dimension.html">
+   xugrid.Ugrid1d.topology_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.n_node.html">
+   xugrid.Ugrid1d.n_node
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_dimension.html">
+   xugrid.Ugrid1d.node_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_coordinates.html">
+   xugrid.Ugrid1d.node_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.n_edge.html">
+   xugrid.Ugrid1d.n_edge
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_dimension.html">
+   xugrid.Ugrid1d.edge_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_coordinates.html">
+   xugrid.Ugrid1d.edge_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_x.html">
+   xugrid.Ugrid1d.edge_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_y.html">
+   xugrid.Ugrid1d.edge_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.bounds.html">
+   xugrid.Ugrid1d.bounds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_edge_connectivity.html">
+   xugrid.Ugrid1d.node_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.copy.html">
+   xugrid.Ugrid1d.copy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.remove_topology.html">
+   xugrid.Ugrid1d.remove_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_coords.html">
+   xugrid.Ugrid1d.topology_coords
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_dataset.html">
+   xugrid.Ugrid1d.topology_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.sel.html">
+   xugrid.Ugrid1d.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_subset.html">
+   xugrid.Ugrid1d.topology_subset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.mesh.html">
+   xugrid.Ugrid1d.mesh
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.meshkernel.html">
+   xugrid.Ugrid1d.meshkernel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.set_crs.html">
+   xugrid.Ugrid1d.set_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.to_crs.html">
+   xugrid.Ugrid1d.to_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.from_dataset.html">
+   xugrid.Ugrid1d.from_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.from_geodataframe.html">
+   xugrid.Ugrid1d.from_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.to_pygeos.html">
+   xugrid.Ugrid1d.to_pygeos
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.html">
+   xugrid.Ugrid2d
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_dimension.html">
+   xugrid.Ugrid2d.topology_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_node.html">
+   xugrid.Ugrid2d.n_node
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_dimension.html">
+   xugrid.Ugrid2d.node_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_coordinates.html">
+   xugrid.Ugrid2d.node_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_edge.html">
+   xugrid.Ugrid2d.n_edge
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_dimension.html">
+   xugrid.Ugrid2d.edge_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_coordinates.html">
+   xugrid.Ugrid2d.edge_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_x.html">
+   xugrid.Ugrid2d.edge_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_y.html">
+   xugrid.Ugrid2d.edge_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_face.html">
+   xugrid.Ugrid2d.n_face
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_dimension.html">
+   xugrid.Ugrid2d.face_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_coordinates.html">
+   xugrid.Ugrid2d.face_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroids.html">
+   xugrid.Ugrid2d.centroids
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_x.html">
+   xugrid.Ugrid2d.face_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_y.html">
+   xugrid.Ugrid2d.face_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.bounds.html">
+   xugrid.Ugrid2d.bounds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroids.html">
+   xugrid.Ugrid2d.centroids
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_edge_connectivity.html">
+   xugrid.Ugrid2d.node_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_face_connectivity.html">
+   xugrid.Ugrid2d.node_face_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_node_connectivity.html">
+   xugrid.Ugrid2d.edge_node_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_edge_connectivity.html">
+   xugrid.Ugrid2d.face_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_face_connectivity.html">
+   xugrid.Ugrid2d.face_face_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.exterior_edges.html">
+   xugrid.Ugrid2d.exterior_edges
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.exterior_faces.html">
+   xugrid.Ugrid2d.exterior_faces
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.copy.html">
+   xugrid.Ugrid2d.copy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.triangulate.html">
+   xugrid.Ugrid2d.triangulate
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   xugrid.Ugrid2d.triangulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.voronoi_topology.html">
+   xugrid.Ugrid2d.voronoi_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroid_triangulation.html">
+   xugrid.Ugrid2d.centroid_triangulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.tesselate_centroidal_voronoi.html">
+   xugrid.Ugrid2d.tesselate_centroidal_voronoi
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.reverse_cuthill_mckee.html">
+   xugrid.Ugrid2d.reverse_cuthill_mckee
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.remove_topology.html">
+   xugrid.Ugrid2d.remove_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_coords.html">
+   xugrid.Ugrid2d.topology_coords
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_dataset.html">
+   xugrid.Ugrid2d.topology_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.sel.html">
+   xugrid.Ugrid2d.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.sel_points.html">
+   xugrid.Ugrid2d.sel_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.celltree.html">
+   xugrid.Ugrid2d.celltree
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.locate_points.html">
+   xugrid.Ugrid2d.locate_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.intersect_edges.html">
+   xugrid.Ugrid2d.intersect_edges
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.locate_bounding_box.html">
+   xugrid.Ugrid2d.locate_bounding_box
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.rasterize.html">
+   xugrid.Ugrid2d.rasterize
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.rasterize_like.html">
+   xugrid.Ugrid2d.rasterize_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_subset.html">
+   xugrid.Ugrid2d.topology_subset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.mesh.html">
+   xugrid.Ugrid2d.mesh
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.meshkernel.html">
+   xugrid.Ugrid2d.meshkernel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.set_crs.html">
+   xugrid.Ugrid2d.set_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.to_crs.html">
+   xugrid.Ugrid2d.to_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_dataset.html">
+   xugrid.Ugrid2d.from_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">
+   xugrid.Ugrid2d.from_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_structured.html">
+   xugrid.Ugrid2d.from_structured
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.to_pygeos.html">
+   xugrid.Ugrid2d.to_pygeos
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="xugrid-ugrid2d-triangulation">
+<h1>xugrid.Ugrid2d.triangulation<a class="headerlink" href="#xugrid-ugrid2d-triangulation" title="Permalink to this headline">¶</a></h1>
+<dl class="py property">
+<dt class="sig sig-object py" id="xugrid.Ugrid2d.triangulation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">triangulation</span></span><a class="headerlink" href="#xugrid.Ugrid2d.triangulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triangulation of the UGRID2D topology.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>triangulation</strong> (<em>tuple</em>) – Contains node_x, node_y, triangle face_node_connectivity.</p></li>
+<li><p><strong>triangle_face_connectivity</strong> (<em>1d array of integers</em>) – Identifies the original face for every triangle.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="xugrid.Ugrid2d.triangulate.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">xugrid.Ugrid2d.triangulate</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="xugrid.Ugrid2d.voronoi_topology.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">xugrid.Ugrid2d.voronoi_topology</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Deltares.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

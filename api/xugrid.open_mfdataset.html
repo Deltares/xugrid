@@ -1,0 +1,876 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>xugrid.open_mfdataset &#8212; Xugrid 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="xugrid.open_zarr" href="xugrid.open_zarr.html" />
+    <link rel="prev" title="xugrid.open_dataset" href="xugrid.open_dataset.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+  <nav class="navbar navbar-dark navbar-expand-lg bg-deltares fixed-top bd-navbar shadow" id="navbar-main"><div class="container-xl">
+
+    <a class="navbar-brand" href="../index.html">
+    <p style="color:#fff;font-size:25px;" class="title">Xugrid</p>
+    </a>
+
+    <a class="navbar-brand" href="../index.html">
+    <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo" />
+    </a>
+  
+    <div id="navbar-menu" class="collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav">
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../user_guide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../api.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../dev_docs.html">
+  Development
+ </a>
+</li>
+
+        
+      </ul>
+    </div>
+
+
+    <a class="navbar-brand" href="https://www.deltares.nl/en/">
+    <img src="../_static/deltares-white.svg" class="logo" alt="logo" />
+    </a>
+
+</div>
+  </nav>
+
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_dataarray.html">
+   xugrid.open_dataarray
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_dataset.html">
+   xugrid.open_dataset
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   xugrid.open_mfdataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.open_zarr.html">
+   xugrid.open_zarr
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.full_like.html">
+   xugrid.full_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.ones_like.html">
+   xugrid.ones_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.zeros_like.html">
+   xugrid.zeros_like
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.html">
+   xugrid.UgridAccessor
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.crs.html">
+   xugrid.UgridAccessor.crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.isel.html">
+   xugrid.UgridAccessor.isel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.sel.html">
+   xugrid.UgridAccessor.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.sel_points.html">
+   xugrid.UgridAccessor.sel_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.rasterize.html">
+   xugrid.UgridAccessor.rasterize
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.rasterize_like.html">
+   xugrid.UgridAccessor.rasterize_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_geodataframe.html">
+   xugrid.UgridAccessor.to_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.binary_dilation.html">
+   xugrid.UgridAccessor.binary_dilation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.binary_erosion.html">
+   xugrid.UgridAccessor.binary_erosion
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.connected_components.html">
+   xugrid.UgridAccessor.connected_components
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.reverse_cuthill_mckee.html">
+   xugrid.UgridAccessor.reverse_cuthill_mckee
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.laplace_interpolate.html">
+   xugrid.UgridAccessor.laplace_interpolate
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_dataset.html">
+   xugrid.UgridAccessor.to_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_netcdf.html">
+   xugrid.UgridAccessor.to_netcdf
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridAccessor.to_zarr.html">
+   xugrid.UgridAccessor.to_zarr
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.html">
+   xugrid.UgridDataArray
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.ugrid.html">
+   xugrid.UgridDataArray.ugrid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.from_structured.html">
+   xugrid.UgridDataArray.from_structured
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataset.html">
+   xugrid.UgridDataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArray.ugrid.html">
+   xugrid.UgridDataArray.ugrid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataset.from_geodataframe.html">
+   xugrid.UgridDataset.from_geodataframe
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.html">
+   xugrid.Ugrid1d
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_dimension.html">
+   xugrid.Ugrid1d.topology_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.n_node.html">
+   xugrid.Ugrid1d.n_node
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_dimension.html">
+   xugrid.Ugrid1d.node_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_coordinates.html">
+   xugrid.Ugrid1d.node_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.n_edge.html">
+   xugrid.Ugrid1d.n_edge
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_dimension.html">
+   xugrid.Ugrid1d.edge_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_coordinates.html">
+   xugrid.Ugrid1d.edge_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_x.html">
+   xugrid.Ugrid1d.edge_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.edge_y.html">
+   xugrid.Ugrid1d.edge_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.bounds.html">
+   xugrid.Ugrid1d.bounds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.node_edge_connectivity.html">
+   xugrid.Ugrid1d.node_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.copy.html">
+   xugrid.Ugrid1d.copy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.remove_topology.html">
+   xugrid.Ugrid1d.remove_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_coords.html">
+   xugrid.Ugrid1d.topology_coords
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_dataset.html">
+   xugrid.Ugrid1d.topology_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.sel.html">
+   xugrid.Ugrid1d.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.topology_subset.html">
+   xugrid.Ugrid1d.topology_subset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.mesh.html">
+   xugrid.Ugrid1d.mesh
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.meshkernel.html">
+   xugrid.Ugrid1d.meshkernel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.set_crs.html">
+   xugrid.Ugrid1d.set_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.to_crs.html">
+   xugrid.Ugrid1d.to_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.from_dataset.html">
+   xugrid.Ugrid1d.from_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.from_geodataframe.html">
+   xugrid.Ugrid1d.from_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.to_pygeos.html">
+   xugrid.Ugrid1d.to_pygeos
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.html">
+   xugrid.Ugrid2d
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_dimension.html">
+   xugrid.Ugrid2d.topology_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_node.html">
+   xugrid.Ugrid2d.n_node
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_dimension.html">
+   xugrid.Ugrid2d.node_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_coordinates.html">
+   xugrid.Ugrid2d.node_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_edge.html">
+   xugrid.Ugrid2d.n_edge
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_dimension.html">
+   xugrid.Ugrid2d.edge_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_coordinates.html">
+   xugrid.Ugrid2d.edge_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_x.html">
+   xugrid.Ugrid2d.edge_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_y.html">
+   xugrid.Ugrid2d.edge_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.n_face.html">
+   xugrid.Ugrid2d.n_face
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_dimension.html">
+   xugrid.Ugrid2d.face_dimension
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_coordinates.html">
+   xugrid.Ugrid2d.face_coordinates
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroids.html">
+   xugrid.Ugrid2d.centroids
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_x.html">
+   xugrid.Ugrid2d.face_x
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_y.html">
+   xugrid.Ugrid2d.face_y
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.bounds.html">
+   xugrid.Ugrid2d.bounds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroids.html">
+   xugrid.Ugrid2d.centroids
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_edge_connectivity.html">
+   xugrid.Ugrid2d.node_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.node_face_connectivity.html">
+   xugrid.Ugrid2d.node_face_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.edge_node_connectivity.html">
+   xugrid.Ugrid2d.edge_node_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_edge_connectivity.html">
+   xugrid.Ugrid2d.face_edge_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.face_face_connectivity.html">
+   xugrid.Ugrid2d.face_face_connectivity
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.exterior_edges.html">
+   xugrid.Ugrid2d.exterior_edges
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.exterior_faces.html">
+   xugrid.Ugrid2d.exterior_faces
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.copy.html">
+   xugrid.Ugrid2d.copy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.triangulate.html">
+   xugrid.Ugrid2d.triangulate
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.triangulation.html">
+   xugrid.Ugrid2d.triangulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.voronoi_topology.html">
+   xugrid.Ugrid2d.voronoi_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.centroid_triangulation.html">
+   xugrid.Ugrid2d.centroid_triangulation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.tesselate_centroidal_voronoi.html">
+   xugrid.Ugrid2d.tesselate_centroidal_voronoi
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.reverse_cuthill_mckee.html">
+   xugrid.Ugrid2d.reverse_cuthill_mckee
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.remove_topology.html">
+   xugrid.Ugrid2d.remove_topology
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_coords.html">
+   xugrid.Ugrid2d.topology_coords
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_dataset.html">
+   xugrid.Ugrid2d.topology_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.sel.html">
+   xugrid.Ugrid2d.sel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.sel_points.html">
+   xugrid.Ugrid2d.sel_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.celltree.html">
+   xugrid.Ugrid2d.celltree
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.locate_points.html">
+   xugrid.Ugrid2d.locate_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.intersect_edges.html">
+   xugrid.Ugrid2d.intersect_edges
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.locate_bounding_box.html">
+   xugrid.Ugrid2d.locate_bounding_box
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.rasterize.html">
+   xugrid.Ugrid2d.rasterize
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.rasterize_like.html">
+   xugrid.Ugrid2d.rasterize_like
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.topology_subset.html">
+   xugrid.Ugrid2d.topology_subset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.mesh.html">
+   xugrid.Ugrid2d.mesh
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.meshkernel.html">
+   xugrid.Ugrid2d.meshkernel
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.set_crs.html">
+   xugrid.Ugrid2d.set_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.to_crs.html">
+   xugrid.Ugrid2d.to_crs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_dataset.html">
+   xugrid.Ugrid2d.from_dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">
+   xugrid.Ugrid2d.from_geodataframe
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.from_structured.html">
+   xugrid.Ugrid2d.from_structured
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.to_pygeos.html">
+   xugrid.Ugrid2d.to_pygeos
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="xugrid-open-mfdataset">
+<h1>xugrid.open_mfdataset<a class="headerlink" href="#xugrid-open-mfdataset" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="xugrid.open_mfdataset">
+<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">open_mfdataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid_dataset.html#open_mfdataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.open_mfdataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open multiple files as a single dataset.</p>
+<p>If combine=’by_coords’ then the function <code class="docutils literal notranslate"><span class="pre">combine_by_coords</span></code> is used to combine
+the datasets into one before returning the result, and if combine=’nested’ then
+<code class="docutils literal notranslate"><span class="pre">combine_nested</span></code> is used. The filepaths must be structured according to which
+combining function is used, the details of which are given in the documentation for
+<code class="docutils literal notranslate"><span class="pre">combine_by_coords</span></code> and <code class="docutils literal notranslate"><span class="pre">combine_nested</span></code>. By default <code class="docutils literal notranslate"><span class="pre">combine='by_coords'</span></code>
+will be used. Requires dask to be installed. See documentation for
+details on dask <a class="footnote-reference brackets" href="#id3" id="id1">1</a>. Global attributes from the <code class="docutils literal notranslate"><span class="pre">attrs_file</span></code> are used
+for the combined dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>paths</strong> (<em>str</em><em> or </em><em>sequence</em>) – Either a string glob in the form <code class="docutils literal notranslate"><span class="pre">&quot;path/to/my/files/*.nc&quot;</span></code> or an explicit list of
+files to open. Paths can be given as strings or as pathlib Paths. If
+concatenation along more than one dimension is desired, then <code class="docutils literal notranslate"><span class="pre">paths</span></code> must be a
+nested list-of-lists (see <code class="docutils literal notranslate"><span class="pre">combine_nested</span></code> for details). (A string glob will
+be expanded to a 1-dimensional list.)</p></li>
+<li><p><strong>chunks</strong> (<em>int</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – Dictionary with keys given by dimension names and values given by chunk sizes.
+In general, these should divide the dimensions of each dataset. If int, chunk
+each dimension by <code class="docutils literal notranslate"><span class="pre">chunks</span></code>. By default, chunks will be chosen to load entire
+input files into memory at once. This has a major impact on performance: please
+see the full documentation for more details <a class="footnote-reference brackets" href="#id4" id="id2">2</a>.</p></li>
+<li><p><strong>concat_dim</strong> (<em>str</em><em>, or </em><em>list of str</em><em>, </em><em>DataArray</em><em>, </em><em>Index</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Dimensions to concatenate files along.  You only need to provide this argument
+if <code class="docutils literal notranslate"><span class="pre">combine='nested'</span></code>, and if any of the dimensions along which you want to
+concatenate is not a dimension in the original datasets, e.g., if you want to
+stack a collection of 2D arrays along a third dimension. Set
+<code class="docutils literal notranslate"><span class="pre">concat_dim=[...,</span> <span class="pre">None,</span> <span class="pre">...]</span></code> explicitly to disable concatenation along a
+particular dimension. Default is None, which for a 1D list of filepaths is
+equivalent to opening the files separately and then merging them with
+<code class="docutils literal notranslate"><span class="pre">xarray.merge</span></code>.</p></li>
+<li><p><strong>combine</strong> (<em>{&quot;by_coords&quot;</em><em>, </em><em>&quot;nested&quot;}</em><em>, </em><em>optional</em>) – Whether <code class="docutils literal notranslate"><span class="pre">xarray.combine_by_coords</span></code> or <code class="docutils literal notranslate"><span class="pre">xarray.combine_nested</span></code> is used to
+combine all the data. Default is to use <code class="docutils literal notranslate"><span class="pre">xarray.combine_by_coords</span></code>.</p></li>
+<li><p><strong>compat</strong> (<em>{&quot;identical&quot;</em><em>, </em><em>&quot;equals&quot;</em><em>, </em><em>&quot;broadcast_equals&quot;</em><em>,               </em><em>&quot;no_conflicts&quot;</em><em>, </em><em>&quot;override&quot;}</em><em>, </em><em>optional</em>) – <p>String indicating how to compare variables of the same name for
+potential conflicts when merging:</p>
+<blockquote>
+<div><ul>
+<li><p>”broadcast_equals”: all values must be equal when variables are
+broadcast against each other to ensure common dimensions.</p></li>
+<li><p>”equals”: all values and dimensions must be the same.</p></li>
+<li><p>”identical”: all values, dimensions and attributes must be the
+same.</p></li>
+<li><p>”no_conflicts”: only values which are not null in both datasets
+must be equal. The returned dataset then contains the combination
+of all non-null values.</p></li>
+<li><p>”override”: skip comparing and pick variable from first dataset</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>preprocess</strong> (<em>callable</em><em>, </em><em>optional</em>) – If provided, call this function on each dataset prior to concatenation.
+You can find the file-name from which each dataset was loaded in
+<code class="docutils literal notranslate"><span class="pre">ds.encoding[&quot;source&quot;]</span></code>.</p></li>
+<li><p><strong>engine</strong> (<em>{&quot;netcdf4&quot;</em><em>, </em><em>&quot;scipy&quot;</em><em>, </em><em>&quot;pydap&quot;</em><em>, </em><em>&quot;h5netcdf&quot;</em><em>, </em><em>&quot;pynio&quot;</em><em>, </em><em>&quot;cfgrib&quot;</em><em>, </em><em>&quot;zarr&quot;}</em><em>,         </em><em>optional</em>) – Engine to use when reading files. If not provided, the default engine
+is chosen based on available dependencies, with a preference for
+“netcdf4”.</p></li>
+<li><p><strong>data_vars</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;}</em><em> or </em><em>list of str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>These data variables will be concatenated together:</dt><dd><ul>
+<li><p>”minimal”: Only data variables in which the dimension already
+appears are included.</p></li>
+<li><p>”different”: Data variables which are not equal (ignoring
+attributes) across all datasets are also concatenated (as well as
+all for which dimension already appears). Beware: this option may
+load the data payload of data variables into memory if they are not
+already loaded.</p></li>
+<li><p>”all”: All data variables will be concatenated.</p></li>
+<li><p>list of str: The listed data variables will be concatenated, in
+addition to the “minimal” data variables.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>coords</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;}</em><em> or </em><em>list of str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>These coordinate variables will be concatenated together:</dt><dd><ul>
+<li><p>”minimal”: Only coordinates in which the dimension already appears
+are included.</p></li>
+<li><p>”different”: Coordinates which are not equal (ignoring attributes)
+across all datasets are also concatenated (as well as all for which
+dimension already appears). Beware: this option may load the data
+payload of coordinate variables into memory if they are not already
+loaded.</p></li>
+<li><p>”all”: All coordinate variables will be concatenated, except
+those corresponding to other dimensions.</p></li>
+<li><p>list of str: The listed coordinate variables will be concatenated,
+in addition the “minimal” coordinates.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>parallel</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the open and preprocess steps of this function will be
+performed in parallel using <code class="docutils literal notranslate"><span class="pre">dask.delayed</span></code>. Default is False.</p></li>
+<li><p><strong>join</strong> (<em>{&quot;outer&quot;</em><em>, </em><em>&quot;inner&quot;</em><em>, </em><em>&quot;left&quot;</em><em>, </em><em>&quot;right&quot;</em><em>, </em><em>&quot;exact</em><em>, </em><em>&quot;override&quot;}</em><em>, </em><em>optional</em>) – <p>String indicating how to combine differing indexes
+(excluding concat_dim) in objects</p>
+<ul>
+<li><p>”outer”: use the union of object indexes</p></li>
+<li><p>”inner”: use the intersection of object indexes</p></li>
+<li><p>”left”: use indexes from the first object with each dimension</p></li>
+<li><p>”right”: use indexes from the last object with each dimension</p></li>
+<li><p>”exact”: instead of aligning, raise <cite>ValueError</cite> when indexes to be
+aligned are not equal</p></li>
+<li><p>”override”: if indexes are of same size, rewrite indexes to be
+those of the first object with that dimension. Indexes for the same
+dimension must have the same size in all objects.</p></li>
+</ul>
+</p></li>
+<li><p><strong>attrs_file</strong> (<em>str</em><em> or </em><em>path-like</em><em>, </em><em>optional</em>) – Path of the file used to read global attributes from.
+By default global attributes are read from the first file provided,
+with wildcard matches sorted by filename.</p></li>
+<li><p><strong>**kwargs</strong> (<em>optional</em>) – Additional arguments passed on to <code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_dataset()</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">open_mfdataset</span></code> opens files with read-only access. When you modify values
+of a Dataset, even one linked to files on disk, only the in-memory copy you
+are manipulating in xarray is modified: the original file on disk is never
+touched.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">combine_by_coords</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">combine_nested</span></code>, <a class="reference internal" href="xugrid.open_dataset.html#xugrid.open_dataset" title="xugrid.open_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_dataset</span></code></a></p>
+</div>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="http://xarray.pydata.org/en/stable/dask.html">http://xarray.pydata.org/en/stable/dask.html</a></p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p><a class="reference external" href="http://xarray.pydata.org/en/stable/dask.html#chunking-and-performance">http://xarray.pydata.org/en/stable/dask.html#chunking-and-performance</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="xugrid.open_dataset.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">xugrid.open_dataset</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="xugrid.open_zarr.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">xugrid.open_zarr</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Deltares.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

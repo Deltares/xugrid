@@ -1,0 +1,4588 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Quick overview &#8212; Xugrid 0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plot unstructured mesh data" href="plotting.html" />
+    <link rel="prev" title="Terminology" href="../terminology.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+  <nav class="navbar navbar-dark navbar-expand-lg bg-deltares fixed-top bd-navbar shadow" id="navbar-main"><div class="container-xl">
+
+    <a class="navbar-brand" href="../index.html">
+    <p style="color:#fff;font-size:25px;" class="title">Xugrid</p>
+    </a>
+
+    <a class="navbar-brand" href="../index.html">
+    <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo" />
+    </a>
+  
+    <div id="navbar-menu" class="collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav">
+        <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../user_guide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../dev_docs.html">
+  Development
+ </a>
+</li>
+
+        
+      </ul>
+    </div>
+
+
+    <a class="navbar-brand" href="https://www.deltares.nl/en/">
+    <img src="../_static/deltares-white.svg" class="logo" alt="logo" />
+    </a>
+
+</div>
+  </nav>
+
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../terminology.html">
+   Terminology
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Quick overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="plotting.html">
+   Plot unstructured mesh data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="connectivity.html">
+   Connectivity
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../sample_data/index.html">
+   Sample Data
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../sample_data/xoxo.html">
+     Xoxo
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../sample_data/adh_san_diego.html">
+     ADH San Diego
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../sample_data/disk.html">
+     Disk
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#create-a-ugriddataarray">
+   Create a UgridDataArray
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#from-xarray-dataset">
+     From xarray Dataset
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#from-ugrid-and-dataarray">
+     From Ugrid and DataArray
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#from-netcdf-file">
+     From netCDF file
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting">
+   Plotting
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-selection">
+   Data selection
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#computation">
+   Computation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#geopandas">
+   Geopandas
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#xugriddatasets">
+   XugridDatasets
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#write-netcdf-files">
+   Write netCDF files
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-quick-overview-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="quick-overview">
+<span id="sphx-glr-examples-quick-overview-py"></span><h1>Quick overview<a class="headerlink" href="#quick-overview" title="Permalink to this headline">¶</a></h1>
+<p>Here are a number of quick examples of how to get started with xugrid. More
+detailed explanation can be found in the rest of the documentation.</p>
+<p>We’ll start by importing a few essential packages.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+</pre></div>
+</div>
+<section id="create-a-ugriddataarray">
+<h2>Create a UgridDataArray<a class="headerlink" href="#create-a-ugriddataarray" title="Permalink to this headline">¶</a></h2>
+<p>There are three ways to create a UgridDataArray:</p>
+<ul class="simple">
+<li><p>From an xarray Dataset containing the grid topology stored according to the
+UGRID conventions.</p></li>
+<li><p>From a xugrid Ugrid object and an xarray DataArray containing the data.</p></li>
+<li><p>From a UGRID netCDF file, via <a class="reference internal" href="../api/xugrid.open_dataset.html#xugrid.open_dataset" title="xugrid.open_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.open_dataset()</span></code></a>.</p></li>
+</ul>
+<section id="from-xarray-dataset">
+<h3>From xarray Dataset<a class="headerlink" href="#from-xarray-dataset" title="Permalink to this headline">¶</a></h3>
+<p>xugrid will automatically find the UGRID topological variables, and separate
+them from the main data variables.</p>
+<p>Details on the required variables can be found in the <a class="reference external" href="https://ugrid-conventions.github.io/ugrid-conventions">UGRID conventions</a>.
+For 1D and 2D UGRID topologies, the required variables are:</p>
+<ul class="simple">
+<li><p>x-coordinates of the nodes</p></li>
+<li><p>y-coordinates of the nodes</p></li>
+<li><p>edge node connectivity (1D) or face node connectivity (2D)</p></li>
+<li><p>a “dummy” variable storing the names of the above variables in its
+attributes</p></li>
+</ul>
+<p>We’ll start by fetching a dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">adh_san_diego</span><span class="p">(</span><span class="n">xarray</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ds</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:                 (node: 9140, time: 49, face: 16869, nmax_face: 3)
+Coordinates:
+  * node                    (node) int64 0 1 2 3 4 ... 9135 9136 9137 9138 9139
+  * time                    (time) timedelta64[ns] 00:00:00 ... 1 days 00:00:00
+    node_x                  (node) float64 4.759e+05 4.753e+05 ... 4.909e+05
+    node_y                  (node) float64 3.621e+06 3.621e+06 ... 3.608e+06
+Dimensions without coordinates: face, nmax_face
+Data variables:
+    elevation               (node) float64 -0.7463 -6.749 -12.93 ... 1.332 1.135
+    depth                   (time, node) float64 ...
+    mesh2d                  int32 0
+    face_node_connectivity  (face, nmax_face) float64 0.0 1.0 ... 9.137e+03</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-3e75e7f6-24c5-4676-ab50-cf3849d2865f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-3e75e7f6-24c5-4676-ab50-cf3849d2865f' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>node</span>: 9140</li><li><span class='xr-has-index'>time</span>: 49</li><li><span>face</span>: 16869</li><li><span>nmax_face</span>: 3</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-0bada6e9-2158-41eb-818c-7ad73454efad' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0bada6e9-2158-41eb-818c-7ad73454efad' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>node</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 9136 9137 9138 9139</div><input id='attrs-2a61a27e-3591-4ea5-b5b0-278a10b1c814' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2a61a27e-3591-4ea5-b5b0-278a10b1c814' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3f450946-a2e1-4756-adff-79a67cdd7cb9' class='xr-var-data-in' type='checkbox'><label for='data-3f450946-a2e1-4756-adff-79a67cdd7cb9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 9137, 9138, 9139])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>timedelta64[ns]</div><div class='xr-var-preview xr-preview'>00:00:00 ... 1 days 00:00:00</div><input id='attrs-4cc28da4-10d5-4770-a675-1b2dc977c0a8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4cc28da4-10d5-4770-a675-1b2dc977c0a8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6b2faa01-9d0b-438d-b3cb-d3173d0d9e99' class='xr-var-data-in' type='checkbox'><label for='data-6b2faa01-9d0b-438d-b3cb-d3173d0d9e99' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([             0,  1800000000000,  3600000000000,  5625000000000,
+        7425000000000,  9225000000000, 11025000000000, 12825000000000,
+       14625000000000, 16425000000000, 18225000000000, 20025000000000,
+       21825000000000, 23625000000000, 25425000000000, 27225000000000,
+       29025000000000, 30825000000000, 32625000000000, 34425000000000,
+       36225000000000, 38025000000000, 39750000000000, 41550000000000,
+       43350000000000, 45150000000000, 46950000000000, 48750000000000,
+       50550000000000, 52350000000000, 54150000000000, 55950000000000,
+       57750000000000, 59550000000000, 61350000000000, 63150000000000,
+       64950000000000, 66750000000000, 68550000000000, 70350000000000,
+       72150000000000, 73950000000000, 75750000000000, 77550000000000,
+       79350000000000, 81150000000000, 82950000000000, 84750000000000,
+       86400000000000], dtype=&#x27;timedelta64[ns]&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_x</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-97869813-7072-4d8d-b39a-85dd8c4c136c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-97869813-7072-4d8d-b39a-85dd8c4c136c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-26b7ff58-1956-4130-8984-8914c64ecce0' class='xr-var-data-in' type='checkbox'><label for='data-26b7ff58-1956-4130-8984-8914c64ecce0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475874.  , 475349.22, 474824.44, ..., 490841.  , 490811.  , 490857.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_y</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-7c5adeec-94ad-4f61-91f4-f9e9301a0d5e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7c5adeec-94ad-4f61-91f4-f9e9301a0d5e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d4a22b5e-d1bd-4903-9727-1a800ad89e30' class='xr-var-data-in' type='checkbox'><label for='data-d4a22b5e-d1bd-4903-9727-1a800ad89e30' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621341.  , 3621217.04, 3621093.08, ..., 3607533.5 , 3607511.  ,
+       3607521.  ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-6b082e0a-274a-486d-8ba1-b0389c35135e' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6b082e0a-274a-486d-8ba1-b0389c35135e' class='xr-section-summary' >Data variables: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-b6079180-c8eb-474a-89f3-cfb3d9992e99' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b6079180-c8eb-474a-89f3-cfb3d9992e99' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5f3b914f-ddd9-4540-942c-3397c687eced' class='xr-var-data-in' type='checkbox'><label for='data-5f3b914f-ddd9-4540-942c-3397c687eced' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>depth</span></div><div class='xr-var-dims'>(time, node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-e398d768-d1ec-46b9-a17b-8c359fdfdde7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e398d768-d1ec-46b9-a17b-8c359fdfdde7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-962cdd13-955b-465b-9b3f-69c78abdc5e7' class='xr-var-data-in' type='checkbox'><label for='data-962cdd13-955b-465b-9b3f-69c78abdc5e7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[447860 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-fcb977d9-fb09-4901-87dd-1d6683aff57a' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-fcb977d9-fb09-4901-87dd-1d6683aff57a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2d68b3e4-d9b2-4942-b19a-b54ddf44656c' class='xr-var-data-in' type='checkbox'><label for='data-2d68b3e4-d9b2-4942-b19a-b54ddf44656c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>cf_role :</span></dt><dd>mesh_topology</dd><dt><span>long_name :</span></dt><dd>Topology data of 2D mesh</dd><dt><span>topology_dimension :</span></dt><dd>2</dd><dt><span>node_coordinates :</span></dt><dd>node_x node_y</dd><dt><span>face_node_connectivity :</span></dt><dd>face_node_connectivity</dd><dt><span>edge_node_connectivity :</span></dt><dd>edge_node_connectivity</dd></dl></div><div class='xr-var-data'><pre>array(0, dtype=int32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_node_connectivity</span></div><div class='xr-var-dims'>(face, nmax_face)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-1852a728-7945-4eaa-a7d6-1ac9698a0553' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-1852a728-7945-4eaa-a7d6-1ac9698a0553' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d00f3f0c-e264-43a4-8088-3a1409cdf811' class='xr-var-data-in' type='checkbox'><label for='data-d00f3f0c-e264-43a4-8088-3a1409cdf811' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>cf_role :</span></dt><dd>face_node_connectivity</dd><dt><span>long_name :</span></dt><dd>Vertex nodes of mesh faces (counterclockwise)</dd><dt><span>start_index :</span></dt><dd>0</dd></dl></div><div class='xr-var-data'><pre>array([[0.000e+00, 1.000e+00, 3.400e+01],
+       [3.400e+01, 1.000e+00, 3.500e+01],
+       [2.000e+00, 3.500e+01, 1.000e+00],
+       ...,
+       [9.136e+03, 9.134e+03, 9.135e+03],
+       [9.136e+03, 9.135e+03, 9.138e+03],
+       [9.136e+03, 9.139e+03, 9.137e+03]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ff8ec78f-a0bf-4ab4-ba2d-2490f1419940' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ff8ec78f-a0bf-4ab4-ba2d-2490f1419940' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>There are a number of topology coordinates and variables: <code class="docutils literal notranslate"><span class="pre">node_x</span></code> and
+<code class="docutils literal notranslate"><span class="pre">node_y</span></code>, <code class="docutils literal notranslate"><span class="pre">mesh2d</span></code> and <code class="docutils literal notranslate"><span class="pre">face_node_connectivity</span></code>. The dummy variable
+is <code class="docutils literal notranslate"><span class="pre">mesh2d</span></code> contains only a 0 for data; its attributes contain a mapping of
+UGRID roles to dataset variables.</p>
+<p>We can convert this dataset to a UgridDataset which will automatically
+separate the variables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uds</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="n">uds</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:    (node: 9140, time: 49)
+Coordinates:
+  * node       (node) int64 0 1 2 3 4 5 6 ... 9133 9134 9135 9136 9137 9138 9139
+  * time       (time) timedelta64[ns] 00:00:00 00:30:00 ... 1 days 00:00:00
+    node_x     (node) float64 4.759e+05 4.753e+05 ... 4.908e+05 4.909e+05
+    node_y     (node) float64 3.621e+06 3.621e+06 ... 3.608e+06 3.608e+06
+Data variables:
+    elevation  (node) float64 -0.7463 -6.749 -12.93 -20.25 ... 1.326 1.332 1.135
+    depth      (time, node) float64 ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-fd664b73-06cd-4f85-b5e3-e844d7c0bf1c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-fd664b73-06cd-4f85-b5e3-e844d7c0bf1c' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>node</span>: 9140</li><li><span class='xr-has-index'>time</span>: 49</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-066fc3f1-06e9-46a8-94dc-04c918162078' class='xr-section-summary-in' type='checkbox'  checked><label for='section-066fc3f1-06e9-46a8-94dc-04c918162078' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>node</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 9136 9137 9138 9139</div><input id='attrs-7d27e3bc-4bef-412a-8928-5ccf0e008495' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7d27e3bc-4bef-412a-8928-5ccf0e008495' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fe451e44-7e02-4736-904f-a6c71afd79a6' class='xr-var-data-in' type='checkbox'><label for='data-fe451e44-7e02-4736-904f-a6c71afd79a6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 9137, 9138, 9139])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>timedelta64[ns]</div><div class='xr-var-preview xr-preview'>00:00:00 ... 1 days 00:00:00</div><input id='attrs-b3f0af7e-50fb-4485-9992-f873315ce13f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b3f0af7e-50fb-4485-9992-f873315ce13f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab2dd1e1-7dbb-4d62-a62c-3dada419b6df' class='xr-var-data-in' type='checkbox'><label for='data-ab2dd1e1-7dbb-4d62-a62c-3dada419b6df' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([             0,  1800000000000,  3600000000000,  5625000000000,
+        7425000000000,  9225000000000, 11025000000000, 12825000000000,
+       14625000000000, 16425000000000, 18225000000000, 20025000000000,
+       21825000000000, 23625000000000, 25425000000000, 27225000000000,
+       29025000000000, 30825000000000, 32625000000000, 34425000000000,
+       36225000000000, 38025000000000, 39750000000000, 41550000000000,
+       43350000000000, 45150000000000, 46950000000000, 48750000000000,
+       50550000000000, 52350000000000, 54150000000000, 55950000000000,
+       57750000000000, 59550000000000, 61350000000000, 63150000000000,
+       64950000000000, 66750000000000, 68550000000000, 70350000000000,
+       72150000000000, 73950000000000, 75750000000000, 77550000000000,
+       79350000000000, 81150000000000, 82950000000000, 84750000000000,
+       86400000000000], dtype=&#x27;timedelta64[ns]&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_x</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.759e+05 4.753e+05 ... 4.909e+05</div><input id='attrs-6d5c8a7c-7d59-463c-a1e7-4a31614571ae' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6d5c8a7c-7d59-463c-a1e7-4a31614571ae' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d5848b3b-5977-4e81-8dee-9999d9c06fb9' class='xr-var-data-in' type='checkbox'><label for='data-d5848b3b-5977-4e81-8dee-9999d9c06fb9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475874.  , 475349.22, 474824.44, ..., 490841.  , 490811.  ,
+       490857.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_y</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.621e+06 3.621e+06 ... 3.608e+06</div><input id='attrs-83d673c2-7f25-45c3-9973-c0ec0b732112' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-83d673c2-7f25-45c3-9973-c0ec0b732112' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fcc40af0-6f73-481f-b8e3-778ea4f6f7db' class='xr-var-data-in' type='checkbox'><label for='data-fcc40af0-6f73-481f-b8e3-778ea4f6f7db' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621341.  , 3621217.04, 3621093.08, ..., 3607533.5 , 3607511.  ,
+       3607521.  ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2d2d3b72-fa49-407a-84ee-052b27a1924a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2d2d3b72-fa49-407a-84ee-052b27a1924a' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-0.7463 -6.749 ... 1.332 1.135</div><input id='attrs-d4d1716b-e482-47e9-9fec-cb6d2c399867' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-d4d1716b-e482-47e9-9fec-cb6d2c399867' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-79bf45e3-9d1f-437a-8b1a-a39336dc5f13' class='xr-var-data-in' type='checkbox'><label for='data-79bf45e3-9d1f-437a-8b1a-a39336dc5f13' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>depth</span></div><div class='xr-var-dims'>(time, node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-93832f03-0126-4ea8-9f5b-e7bdf00b8be2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-93832f03-0126-4ea8-9f5b-e7bdf00b8be2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2892de1d-3a3a-4027-b024-04a1696002c7' class='xr-var-data-in' type='checkbox'><label for='data-2892de1d-3a3a-4027-b024-04a1696002c7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[447860 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-49fea0ad-decb-4ff1-a060-500dffab4181' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-49fea0ad-decb-4ff1-a060-500dffab4181' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>We can then grab one of the data variables as usual for xarray:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elev</span> <span class="o">=</span> <span class="n">uds</span><span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]</span>
+<span class="n">elev</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (node: 9140)&gt;
+array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])
+Coordinates:
+  * node     (node) int64 0 1 2 3 4 5 6 7 ... 9133 9134 9135 9136 9137 9138 9139
+    node_x   (node) float64 4.759e+05 4.753e+05 ... 4.908e+05 4.909e+05
+    node_y   (node) float64 3.621e+06 3.621e+06 ... 3.608e+06 3.608e+06</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>node</span>: 9140</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-575ab635-32ca-4359-b3f4-954bf3920f06' class='xr-array-in' type='checkbox' checked><label for='section-575ab635-32ca-4359-b3f4-954bf3920f06' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-0.7463 -6.749 -12.93 -20.25 -35.92 ... 1.193 1.012 1.326 1.332 1.135</span></div><div class='xr-array-data'><pre>array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])</pre></div></div></li><li class='xr-section-item'><input id='section-b982d25f-acc6-446b-9a87-15fd2c3a1e21' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b982d25f-acc6-446b-9a87-15fd2c3a1e21' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>node</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 9136 9137 9138 9139</div><input id='attrs-72d0d079-da29-4594-b0aa-140066c66a0f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-72d0d079-da29-4594-b0aa-140066c66a0f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-114701cf-b4ae-4690-a14c-1ffccd29c105' class='xr-var-data-in' type='checkbox'><label for='data-114701cf-b4ae-4690-a14c-1ffccd29c105' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 9137, 9138, 9139])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_x</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.759e+05 4.753e+05 ... 4.909e+05</div><input id='attrs-f191dfd4-4bc8-4f7c-9725-62bf9a5c1df4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f191dfd4-4bc8-4f7c-9725-62bf9a5c1df4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ac09e476-b255-4b57-b0f1-52ba30f15a6d' class='xr-var-data-in' type='checkbox'><label for='data-ac09e476-b255-4b57-b0f1-52ba30f15a6d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475874.  , 475349.22, 474824.44, ..., 490841.  , 490811.  ,
+       490857.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_y</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.621e+06 3.621e+06 ... 3.608e+06</div><input id='attrs-edfbdb93-7110-4ad5-8057-0a78f2b231ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-edfbdb93-7110-4ad5-8057-0a78f2b231ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6a52821c-bdb7-4155-9b57-e99b6d5791ce' class='xr-var-data-in' type='checkbox'><label for='data-6a52821c-bdb7-4155-9b57-e99b6d5791ce' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621341.  , 3621217.04, 3621093.08, ..., 3607533.5 , 3607511.  ,
+       3607521.  ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7507ff0c-1bed-4a88-a34d-06e7fe3dc006' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-7507ff0c-1bed-4a88-a34d-06e7fe3dc006' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="from-ugrid-and-dataarray">
+<h3>From Ugrid and DataArray<a class="headerlink" href="#from-ugrid-and-dataarray" title="Permalink to this headline">¶</a></h3>
+<p>Alternatively, we can build a Ugrid topology object first from vertices and
+connectivity numpy arrays, for example when using the topology data generated
+by a mesh generator (at which stage there is no data asssociated with the
+nodes, edges, or faces).</p>
+<p>There are many ways to construct such arrays, typically via mesh generators
+or Delaunay triangulation, but we will construct two simple triangles and
+some data by hand here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">fill_value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+<span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">uda</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+<span class="n">uda</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (mesh2d_nFaces: 2)&gt;
+array([1., 2.])
+Coordinates:
+    mesh2d_face_x  (mesh2d_nFaces) float64 0.6667 0.3333
+    mesh2d_face_y  (mesh2d_nFaces) float64 0.3333 0.7
+Dimensions without coordinates: mesh2d_nFaces</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span>mesh2d_nFaces</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-7c195494-e23e-4932-bd26-80c284d4c642' class='xr-array-in' type='checkbox' checked><label for='section-7c195494-e23e-4932-bd26-80c284d4c642' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 2.0</span></div><div class='xr-array-data'><pre>array([1., 2.])</pre></div></div></li><li class='xr-section-item'><input id='section-2f82d392-7b28-4f49-ad1c-3f31c0a11cee' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2f82d392-7b28-4f49-ad1c-3f31c0a11cee' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6667 0.3333</div><input id='attrs-b8d37f68-4ebc-42fd-8ed6-d4442dc9e595' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b8d37f68-4ebc-42fd-8ed6-d4442dc9e595' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4d52a612-0bdd-4c2f-ae85-0dedd7bdf743' class='xr-var-data-in' type='checkbox'><label for='data-4d52a612-0bdd-4c2f-ae85-0dedd7bdf743' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.66666667, 0.33333333])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3333 0.7</div><input id='attrs-5d76ab8f-2bf0-45e9-a8af-e6cd291fbbd6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5d76ab8f-2bf0-45e9-a8af-e6cd291fbbd6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e9c55bf1-1d5e-436b-a453-701c6c1d4538' class='xr-var-data-in' type='checkbox'><label for='data-e9c55bf1-1d5e-436b-a453-701c6c1d4538' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.33333333, 0.7       ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-0aa4c171-d3b1-4bcb-b5b9-82c53fa800c5' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0aa4c171-d3b1-4bcb-b5b9-82c53fa800c5' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="from-netcdf-file">
+<h3>From netCDF file<a class="headerlink" href="#from-netcdf-file" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../api/xugrid.open_dataset.html#xugrid.open_dataset" title="xugrid.open_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.open_dataset()</span></code></a> is demonstrated in the last section of this
+guide. Internally, it opens the netCDF as a regular dataset, then converts it
+as seen in the first example.</p>
+</section>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elev</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_quick_overview_001.png" srcset="../_images/sphx_glr_quick_overview_001.png" alt="quick overview" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f89eb96f610&gt;
+</pre></div>
+</div>
+</section>
+<section id="data-selection">
+<h2>Data selection<a class="headerlink" href="#data-selection" title="Permalink to this headline">¶</a></h2>
+<p>A UgridDataArray behaves identical to an xarray DataArray:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">whole</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">disk</span><span class="p">()[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To select based on the topology, use the <code class="docutils literal notranslate"><span class="pre">.ugrid</span></code> attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subset</span> <span class="o">=</span> <span class="n">whole</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="n">subset</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_quick_overview_002.png" srcset="../_images/sphx_glr_quick_overview_002.png" alt="quick overview" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f89d2c0faf0&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">ugrid.sel()</span></code> currently only supports data on the faces for 2D
+topologies, and data on edges for 1D topologies. More flexibility
+will be added soon.</p>
+</div>
+</section>
+<section id="computation">
+<h2>Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h2>
+<p>Computation on DataArrays is unchanged from xarray:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uda</span> <span class="o">+</span> <span class="mf">10.0</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (mesh2d_nFaces: 2)&gt;
+array([11., 12.])
+Coordinates:
+    mesh2d_face_x  (mesh2d_nFaces) float64 0.6667 0.3333
+    mesh2d_face_y  (mesh2d_nFaces) float64 0.3333 0.7
+Dimensions without coordinates: mesh2d_nFaces</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span>mesh2d_nFaces</span>: 2</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-40bddebc-7906-4d33-9f89-1716f6bff006' class='xr-array-in' type='checkbox' checked><label for='section-40bddebc-7906-4d33-9f89-1716f6bff006' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>11.0 12.0</span></div><div class='xr-array-data'><pre>array([11., 12.])</pre></div></div></li><li class='xr-section-item'><input id='section-c3d842f0-5f18-4799-aa76-64fb576101f0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c3d842f0-5f18-4799-aa76-64fb576101f0' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6667 0.3333</div><input id='attrs-86deb206-3796-407a-a0f5-3debf206cf62' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-86deb206-3796-407a-a0f5-3debf206cf62' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab881e69-4d1e-44c4-a052-d70b301142cf' class='xr-var-data-in' type='checkbox'><label for='data-ab881e69-4d1e-44c4-a052-d70b301142cf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.66666667, 0.33333333])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3333 0.7</div><input id='attrs-434acadb-e7c9-4e20-b19c-ed01263c3a32' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-434acadb-e7c9-4e20-b19c-ed01263c3a32' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-52ffb40a-fd7f-4a52-8635-a546577378d0' class='xr-var-data-in' type='checkbox'><label for='data-52ffb40a-fd7f-4a52-8635-a546577378d0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.33333333, 0.7       ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-04835ace-4102-4c35-b207-2a20c93065ad' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-04835ace-4102-4c35-b207-2a20c93065ad' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="geopandas">
+<h2>Geopandas<a class="headerlink" href="#geopandas" title="Permalink to this headline">¶</a></h2>
+<p>Xugrid objects provide a number of conversion functions from and to geopandas
+GeoDataFrames using <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.to_geodataframe()</span></code>, and
+<a class="reference internal" href="../api/xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe" title="xugrid.UgridDataset.from_geodataframe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataset.from_geodataframe()</span></code></a>. Note that storing large
+grids as GeoDataFrames can be very inefficient.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">to_geodataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="n">gdf</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test</th>
+      <th>mesh2d_face_x</th>
+      <th>mesh2d_face_y</th>
+      <th>geometry</th>
+    </tr>
+    <tr>
+      <th>mesh2d_nFaces</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.666667</td>
+      <td>0.333333</td>
+      <td>POLYGON ((1.00000 0.00000, 1.00000 1.00000, 0....</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.0</td>
+      <td>0.333333</td>
+      <td>0.700000</td>
+      <td>POLYGON ((1.00000 1.00000, 0.00000 1.10000, 0....</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>Conversion from Geopandas is easy too:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="o">.</span><span class="n">from_geodataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/xugrid/xugrid/.tox/build/lib/python3.9/site-packages/pygeos/io.py:85: UserWarning: The shapely GEOS version (3.9.1-CAPI-1.14.2) is incompatible with the PyGEOS GEOS version (3.10.1-CAPI-1.16.0). Conversions between both will be slow
+  warnings.warn(
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:        (mesh2d_nFaces: 2)
+Coordinates:
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 0 1
+    mesh2d_face_x  (mesh2d_nFaces) float64 0.6667 0.3333
+    mesh2d_face_y  (mesh2d_nFaces) float64 0.3333 0.7
+Data variables:
+    test           (mesh2d_nFaces) float64 1.0 2.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-ffd9d526-a299-4238-ad5e-3251cb0bbf67' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ffd9d526-a299-4238-ad5e-3251cb0bbf67' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 2</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-23a08fd3-cefc-403a-a084-a44cef2dbebc' class='xr-section-summary-in' type='checkbox'  checked><label for='section-23a08fd3-cefc-403a-a084-a44cef2dbebc' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1</div><input id='attrs-bd7613f9-35fa-4570-a45c-21c22d1cc407' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bd7613f9-35fa-4570-a45c-21c22d1cc407' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-601e5ff9-b665-4273-a1f0-6bedf0689111' class='xr-var-data-in' type='checkbox'><label for='data-601e5ff9-b665-4273-a1f0-6bedf0689111' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.6667 0.3333</div><input id='attrs-19da17f5-1c35-4133-b5fa-7898aeb46bb7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-19da17f5-1c35-4133-b5fa-7898aeb46bb7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0383339c-ae67-434d-bf35-32e6b56ba6e8' class='xr-var-data-in' type='checkbox'><label for='data-0383339c-ae67-434d-bf35-32e6b56ba6e8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.66666667, 0.33333333])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.3333 0.7</div><input id='attrs-9d069fce-28a5-4fd0-94d8-747172a2795d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9d069fce-28a5-4fd0-94d8-747172a2795d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d487e69a-c14b-4a6f-a719-9f687d87f924' class='xr-var-data-in' type='checkbox'><label for='data-d487e69a-c14b-4a6f-a719-9f687d87f924' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0.33333333, 0.7       ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2ae14170-d473-42bf-86b9-495ae6e459ce' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2ae14170-d473-42bf-86b9-495ae6e459ce' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>test</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0 2.0</div><input id='attrs-4f80eba9-87be-4b19-b04a-1a5063e1736a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4f80eba9-87be-4b19-b04a-1a5063e1736a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-74f50b58-ab45-47df-b1a4-d9e58780f71c' class='xr-var-data-in' type='checkbox'><label for='data-74f50b58-ab45-47df-b1a4-d9e58780f71c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1., 2.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c6e31268-992b-4d9c-9467-41af64418259' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-c6e31268-992b-4d9c-9467-41af64418259' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="xugriddatasets">
+<h2>XugridDatasets<a class="headerlink" href="#xugriddatasets" title="Permalink to this headline">¶</a></h2>
+<p>Like an Xarray Dataset, a UgridDataset is a dict-like container of
+UgridDataArrays. It is required that they share the same grid topology;
+but the individual DataArrays may be located on different aspects of the
+grid (nodes, faces, edges).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xu</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">disk</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:        (mesh2d_nNodes: 217, mesh2d_nFaces: 384, mesh2d_nEdges: 600)
+Coordinates:
+    mesh2d_face_x  (mesh2d_nFaces) float64 4.82 4.792 4.795 ... 5.384 5.191
+    mesh2d_face_y  (mesh2d_nFaces) float64 5.312 5.986 6.632 ... 9.56 9.781
+    mesh2d_edge_x  (mesh2d_nEdges) float64 5.0 5.0 4.729 ... 5.898 5.581 5.896
+    mesh2d_edge_y  (mesh2d_nEdges) float64 5.312 4.688 4.844 ... 9.021 9.27
+    mesh2d_node_x  (mesh2d_nNodes) float64 5.0 5.0 0.6699 ... 5.583 6.213 5.578
+    mesh2d_node_y  (mesh2d_nNodes) float64 5.0 10.0 7.5 ... 8.704 9.203 9.337
+Dimensions without coordinates: mesh2d_nNodes, mesh2d_nFaces, mesh2d_nEdges
+Data variables:
+    node_z         (mesh2d_nNodes) float64 1.941 9.182 0.1692 ... 4.581 5.932
+    face_z         (mesh2d_nFaces) float64 1.868 2.092 2.505 ... 7.283 8.483
+    edge_z         (mesh2d_nEdges) float64 1.993 1.817 1.805 ... 5.151 5.156</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-70f158c8-e8e5-4383-8ff9-9cd0be2ac22d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-70f158c8-e8e5-4383-8ff9-9cd0be2ac22d' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span>mesh2d_nNodes</span>: 217</li><li><span>mesh2d_nFaces</span>: 384</li><li><span>mesh2d_nEdges</span>: 600</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-16631fe0-5077-44f8-ace2-fb11c77cc3df' class='xr-section-summary-in' type='checkbox'  checked><label for='section-16631fe0-5077-44f8-ace2-fb11c77cc3df' class='xr-section-summary' >Coordinates: <span>(6)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.82 4.792 4.795 ... 5.384 5.191</div><input id='attrs-7e531b70-6114-4938-87d0-d91dbea9e0a9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7e531b70-6114-4938-87d0-d91dbea9e0a9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-de665f35-8934-49dc-8eea-b77b55934467' class='xr-var-data-in' type='checkbox'><label for='data-de665f35-8934-49dc-8eea-b77b55934467' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4.81957804, 4.79166667, 4.79542073, 4.79983981, 4.8031435 ,
+       4.80557156, 4.80740136, 4.80882022, 4.61124471, 4.58708739,
+       4.59526054, 4.60298331, 4.60871506, 4.61297292, 4.61622159,
+       4.25040079, 4.17792885, 4.17859387, 4.18906695, 4.19955652,
+       4.20850403, 4.2159012 , 4.0216642 , 3.96959552, 3.96925678,
+       3.9800686 , 3.99194412, 4.00261209, 3.68873166, 3.57369421,
+       3.54854243, 3.55192509, 3.56348763, 3.57662115, 3.449095  ,
+       3.36197821, 3.3402091 , 3.34295652, 3.3540566 , 3.13656571,
+       2.9912189 , 2.93580837, 2.92160182, 2.92519216, 2.8904056 ,
+       2.77338238, 2.72616967, 2.71326849, 2.58877638, 2.42211471,
+       2.33999743, 2.3051708 , 2.33832201, 2.19836847, 2.1273319 ,
+       2.04321624, 1.86109374, 1.75688399, 1.78973422, 1.6322748 ,
+       1.49892272, 1.30518858, 1.24319602, 0.95541217, 4.63915608,
+       4.04206746, 3.48415239, 2.93640552, 2.39191989, 1.84878779,
+       1.30632408, 0.76423239, 4.22248942, 3.6087516 , 3.04435554,
+       2.49338891, 1.94703707, 1.40270714, 0.85941761, 4.04206746,
+       3.3558577 , 2.75228808, 2.18028585, 1.62167123, 1.06959777,
+       0.52108979, 3.6087516 , 2.93919103, 2.33123499, 1.75345098,
+       1.19031259, 0.63488689, 3.48415239, 2.75228808, 2.09708486,
+       1.48773346, 0.90348506, 0.33350514, 3.04435554, 2.33123499,
+...
+       7.24771192, 7.90291514, 8.51226654, 9.09651494, 9.66649486,
+       6.95564446, 7.66876501, 8.31958181, 8.93087381, 9.5186115 ,
+       7.06359448, 7.81971415, 8.51226654, 9.15679636, 9.76963705,
+       7.50661109, 8.24654902, 8.93087381, 9.57346303, 7.60808011,
+       8.37832877, 9.09651494, 9.76963705, 8.05296293, 8.80968741,
+       9.5186115 , 8.15121221, 8.93040223, 9.66649486, 8.59729286,
+       9.36511311, 8.69367592, 9.47891021, 9.14058239, 9.23576761,
+       5.18042196, 5.74959921, 6.31126834, 6.86343429, 7.41122362,
+       7.95678376, 8.50107728, 9.04458783, 5.38875529, 5.9783358 ,
+       6.550905  , 7.1095944 , 7.66167799, 8.21026578, 8.75680398,
+       5.20833333, 5.82207115, 6.42630579, 7.0087811 , 7.57788529,
+       8.13890626, 8.69481142, 5.41291261, 6.03040448, 6.63802179,
+       7.22661762, 7.80163153, 8.3677252 , 5.20457927, 5.82140613,
+       6.45145757, 7.06419163, 7.66000257, 8.24311601, 5.40473946,
+       6.03074322, 6.6597909 , 7.27383033, 7.8726681 , 5.20016019,
+       5.81093305, 6.44807491, 7.07839818, 7.6948292 , 5.39701669,
+       6.0199314 , 6.65704348, 7.28673151, 5.1968565 , 5.80044348,
+       6.43651237, 7.07480784, 5.39128494, 6.00805588, 6.6459434 ,
+       5.19442844, 5.79149597, 6.42337885, 5.38702708, 5.99738791,
+       5.19259864, 5.7840988 , 5.38377841, 5.19117978])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.312 5.986 6.632 ... 9.56 9.781</div><input id='attrs-c2adb73a-9c8c-4eae-a0fa-32a75064ec1f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c2adb73a-9c8c-4eae-a0fa-32a75064ec1f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cfe3a125-7828-4e1c-ad38-01b7bd94af0a' class='xr-var-data-in' type='checkbox'><label for='data-cfe3a125-7828-4e1c-ad38-01b7bd94af0a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.3125    , 5.98584392, 6.63223616, 7.26727112, 7.89789636,
+       8.52645312, 9.1538927 , 9.78066545, 5.67334392, 6.36808007,
+       7.02450728, 7.66516748, 8.29934948, 8.93034582, 9.55955814,
+       5.67334392, 6.423869  , 7.12119511, 7.78773304, 8.43882179,
+       9.08146716, 9.71910038, 6.04163284, 6.78471292, 7.48652451,
+       8.15993423, 8.81704678, 9.46455628, 5.99328892, 6.77195613,
+       7.51399826, 8.21956962, 8.9008772 , 9.56661597, 6.3627683 ,
+       7.13591207, 7.87484218, 8.58228761, 9.26735727, 6.30697937,
+       7.09615514, 7.86385447, 8.59989125, 9.3096116 , 6.67641028,
+       7.46325362, 8.22618555, 8.96073517, 6.61943091, 7.41261529,
+       8.19449481, 8.9516421 , 6.98853744, 7.78152539, 8.55910743,
+       6.93160653, 7.7261892 , 8.51599023, 7.30034819, 8.09604141,
+       7.24374166, 8.03859967, 7.61214093, 7.55589927, 5.        ,
+       5.3125    , 5.63894723, 5.96029175, 6.27846545, 6.59484659,
+       6.91015104, 7.22476618, 5.        , 5.32644723, 5.66173898,
+       5.9887572 , 6.31081204, 6.62999763, 6.94741722, 4.6875    ,
+       5.        , 5.34923898, 5.6915779 , 6.0262065 , 6.35527796,
+       6.68050071, 4.67355277, 5.        , 5.35061244, 5.69668061,
+       6.03552139, 6.36851487, 4.36105277, 4.65076102, 5.        ,
+       5.35571516, 5.70638239, 6.05062574, 4.33826102, 4.64938756,
+...
+       5.34923898, 5.        , 4.64428484, 4.29361761, 3.94937426,
+       5.66173898, 5.35061244, 5.        , 4.64389794, 4.29175016,
+       5.96029175, 5.6915779 , 5.35571516, 5.        , 4.6420305 ,
+       5.9887572 , 5.69668061, 5.35610206, 5.        , 6.27846545,
+       6.0262065 , 5.70638239, 5.3579695 , 6.31081204, 6.03552139,
+       5.70824984, 6.59484659, 6.35527796, 6.05062574, 6.62999763,
+       6.36851487, 6.91015104, 6.68050071, 6.94741722, 7.22476618,
+       5.3125    , 5.67334392, 5.99328892, 6.30697937, 6.61943091,
+       6.93160653, 7.24374166, 7.55589927, 5.67334392, 6.04163284,
+       6.3627683 , 6.67641028, 6.98853744, 7.30034819, 7.61214093,
+       5.98584392, 6.423869  , 6.77195613, 7.09615514, 7.41261529,
+       7.7261892 , 8.03859967, 6.36808007, 6.78471292, 7.13591207,
+       7.46325362, 7.78152539, 8.09604141, 6.63223616, 7.12119511,
+       7.51399826, 7.86385447, 8.19449481, 8.51599023, 7.02450728,
+       7.48652451, 7.87484218, 8.22618555, 8.55910743, 7.26727112,
+       7.78773304, 8.21956962, 8.59989125, 8.9516421 , 7.66516748,
+       8.15993423, 8.58228761, 8.96073517, 7.89789636, 8.43882179,
+       8.9008772 , 9.3096116 , 8.29934948, 8.81704678, 9.26735727,
+       8.52645312, 9.08146716, 9.56661597, 8.93034582, 9.46455628,
+       9.1538927 , 9.71910038, 9.55955814, 9.78066545])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_edge_x</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 5.0 4.729 ... 5.898 5.581 5.896</div><input id='attrs-55068e4e-acc4-4100-b310-71b1a393b170' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-55068e4e-acc4-4100-b310-71b1a393b170' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0737a7f2-e453-442c-8787-36836ef126fa' class='xr-var-data-in' type='checkbox'><label for='data-0737a7f2-e453-442c-8787-36836ef126fa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.        , 5.        , 4.72936706, 5.27063294, 4.72936706,
+       5.27063294, 5.        , 4.71323033, 5.28676967, 0.82754882,
+       0.54077915, 0.94050592, 0.82754882, 0.94050592, 0.54077915,
+       5.        , 4.71323033, 5.28676967, 9.17245118, 9.45922085,
+       9.05949408, 9.05949408, 9.45922085, 9.17245118, 5.        ,
+       5.27063294, 4.72936706, 4.6875    , 5.3125    , 5.        ,
+       4.6875    , 4.69313109, 5.3125    , 5.30686891, 5.        ,
+       4.69313109, 4.69975971, 5.30686891, 5.30024029, 5.        ,
+       4.69975971, 4.70471526, 5.30024029, 5.29528474, 5.        ,
+       4.70471526, 4.70835734, 5.29528474, 5.29164266, 5.        ,
+       4.70835734, 4.71110205, 5.29164266, 5.28889795, 4.71323033,
+       5.28676967, 4.71110205, 5.28889795, 4.11274976, 4.42433238,
+       3.47163506, 4.11062147, 3.79281608, 2.82211564, 3.4654123 ,
+       3.13778824, 2.20352606, 2.8156726 , 2.50423013, 1.65208433,
+       2.2077562 , 1.93676772, 1.1911706 , 1.68179992, 1.46517055,
+       1.09818176, 1.25922461, 5.        , 4.72936706, 5.27063294,
+       4.6875    , 5.3125    , 5.        , 4.6875    , 4.69313109,
+       5.3125    , 5.30686891, 5.        , 4.69313109, 4.69975971,
+       5.30686891, 5.30024029, 5.        , 4.69975971, 4.70471526,
+       5.30024029, 5.29528474, 5.        , 4.70471526, 4.70835734,
+...
+       7.18009727, 7.40861461, 7.6393523 , 7.4732455 , 7.68568895,
+       7.74423398, 7.76252822, 7.97497167, 8.19160104, 8.25014607,
+       6.54560672, 6.54560672, 7.12156788, 6.84121345, 7.17060672,
+       7.67738488, 7.45096115, 7.75314751, 8.22627971, 8.02861008,
+       8.31763717, 8.77214166, 8.59106943, 8.87331767, 9.14574736,
+       7.17060672, 7.12156788, 7.80218636, 7.45096115, 7.80218636,
+       8.3933998 , 8.10437271, 8.42718636, 8.96467514, 8.71621345,
+       9.02131072, 9.30355896, 7.75314751, 7.67738488, 8.42718636,
+       8.02861008, 8.3933998 , 9.05509727, 8.71621345, 9.05509727,
+       9.36019454, 8.31763717, 8.22627971, 9.02131072, 8.59106943,
+       8.96467514, 9.30355896, 8.87331767, 8.77214166, 9.14574736,
+       5.92623782, 5.61936891, 6.51445868, 5.92060672, 6.23873782,
+       7.08185984, 6.52572087, 6.83203268, 7.6393523 , 7.11245079,
+       7.40861461, 8.19160104, 7.68568895, 7.97497167, 8.25014607,
+       5.93186891, 5.6071092 , 6.55631181, 5.92524029, 6.24587454,
+       7.15878745, 6.55218636, 6.86881181, 7.74423398, 7.16497563,
+       7.4732455 , 7.76252822, 5.92111483, 5.59552503, 6.55837454,
+       5.91615929, 6.23461236, 7.18326987, 6.55123782, 6.8718274 ,
+       7.18009727, 5.90902256, 5.58692741, 6.54806522, 5.90538048,
+       6.22044116, 6.54103074, 5.898346  , 5.58054062, 5.89560129])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_edge_y</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.312 4.688 4.844 ... 9.021 9.27</div><input id='attrs-b00fd8a3-682d-445e-8117-c1cb101af52b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b00fd8a3-682d-445e-8117-c1cb101af52b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-96f7feb4-e1bf-4837-8b20-7262df2c81fe' class='xr-var-data-in' type='checkbox'><label for='data-96f7feb4-e1bf-4837-8b20-7262df2c81fe' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.3125    , 4.6875    , 4.84375   , 5.15625   , 5.15625   ,
+       4.84375   , 9.6875    , 9.98349817, 9.98349817, 7.7400989 ,
+       7.24339927, 7.34375   , 2.2599011 , 2.65625   , 2.75660073,
+       0.3125    , 0.01650183, 0.01650183, 2.2599011 , 2.75660073,
+       2.65625   , 7.34375   , 7.24339927, 7.7400989 , 5.9375    ,
+       5.46875   , 5.46875   , 5.85376588, 5.85376588, 6.5625    ,
+       6.16626588, 6.51085423, 6.16626588, 6.51085423, 7.1875    ,
+       6.82335423, 7.15090668, 6.82335423, 7.15090668, 7.8125    ,
+       7.46340668, 7.78434454, 7.46340668, 7.78434454, 8.4375    ,
+       8.09684454, 8.41467968, 8.09684454, 8.41467968, 9.0625    ,
+       8.72717968, 9.04333905, 8.72717968, 9.04333905, 9.67099817,
+       9.67099817, 9.35583905, 9.35583905, 9.91031153, 9.65183722,
+       9.74824193, 9.59515241, 9.52849538, 9.48649208, 9.42311059,
+       9.29935389, 9.12934922, 9.14298883, 8.96317743, 8.69772383,
+       8.76239964, 8.54054723, 8.22353701, 8.30969963, 8.0678006 ,
+       7.5838489 , 7.82446139, 4.0625    , 4.53125   , 4.53125   ,
+       4.14623412, 4.14623412, 3.4375    , 3.83373412, 3.48914577,
+       3.83373412, 3.48914577, 2.8125    , 3.17664577, 2.84909332,
+       3.17664577, 2.84909332, 2.1875    , 2.53659332, 2.21565546,
+       2.53659332, 2.21565546, 1.5625    , 1.90315546, 1.58532032,
+...
+       1.22396076, 2.55973687, 2.79844384, 1.7845193 , 2.40397343,
+       2.00637171, 1.62562456, 2.24507869, 2.48697772, 2.089376  ,
+       4.82282915, 5.17717085, 4.47614153, 5.        , 4.82282915,
+       4.1418642 , 4.65331238, 4.47408134, 3.81503194, 4.30932078,
+       4.13421013, 3.49250356, 3.97213842, 3.80105961, 3.64060294,
+       5.17717085, 5.52385847, 4.82076896, 5.34668762, 5.17923104,
+       4.46642726, 5.        , 4.82076896, 4.1202378 , 4.64565831,
+       4.46584691, 4.2947681 , 5.52591866, 5.8581358 , 5.17923104,
+       5.69067922, 5.53357274, 4.82018861, 5.35434169, 5.17981139,
+       5.        , 5.86578987, 6.18496806, 5.53415309, 6.02786158,
+       5.8797622 , 5.7052319 , 6.19894039, 6.50749644, 6.35939706,
+       6.24994926, 6.42712011, 6.57540244, 6.59453762, 6.79121514,
+       6.88961542, 6.94925081, 7.12133635, 7.20155616, 7.27751366,
+       7.44026313, 7.51302228, 7.59602657, 7.75492131, 7.910624  ,
+       6.96838599, 7.09926091, 7.33714905, 7.29593843, 7.51638009,
+       7.67198407, 7.68846563, 7.87841493, 7.99362829, 8.04116441,
+       8.2154807 , 8.37437544, 7.64725502, 7.74775122, 8.05764597,
+       7.96819288, 8.2055568 , 8.42191156, 8.3955061 , 8.60172295,
+       8.77603924, 8.30605301, 8.38652422, 8.74963378, 8.62388814,
+       8.87339049, 9.07960733, 8.9538617 , 9.02051872, 9.27002107])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_node_x</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 5.0 0.6699 ... 6.213 5.578</div><input id='attrs-77cb3575-6475-4063-8b0a-13042d8c80b8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-77cb3575-6475-4063-8b0a-13042d8c80b8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-69bff648-fc58-488d-93d7-f5b242ee5ffa' class='xr-var-data-in' type='checkbox'><label for='data-69bff648-fc58-488d-93d7-f5b242ee5ffa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 5.        ,  5.        ,  0.66987298,  0.66987298,  5.        ,
+        9.33012702,  9.33012702,  5.        ,  5.        ,  5.        ,
+        5.        ,  5.        ,  5.        ,  5.        ,  4.42646067,
+        3.79903885,  3.14423128,  2.5       ,  1.90705213,  1.39711654,
+        0.98522466,  5.        ,  5.        ,  5.        ,  5.        ,
+        5.        ,  5.        ,  5.        ,  0.98522466,  1.39711654,
+        1.90705213,  2.5       ,  3.14423128,  3.79903885,  4.42646067,
+        4.45873412,  3.91746825,  3.37620237,  2.83493649,  2.29367061,
+        1.75240474,  1.21113886,  5.54126588,  6.08253175,  6.62379763,
+        7.16506351,  7.70632939,  8.24759526,  8.78886114,  0.41168532,
+        0.19615539,  0.05128341,  0.        ,  0.05128341,  0.19615539,
+        0.41168532,  4.45873412,  3.91746825,  3.37620237,  2.83493649,
+        2.29367061,  1.75240474,  1.21113886,  5.57353933,  6.20096115,
+        6.85576872,  7.5       ,  8.09294787,  8.60288346,  9.01477534,
+        9.58831468,  9.80384461,  9.94871659, 10.        ,  9.94871659,
+        9.80384461,  9.58831468,  5.54126588,  6.08253175,  6.62379763,
+        7.16506351,  7.70632939,  8.24759526,  8.78886114,  5.57353933,
+        6.20096115,  6.85576872,  7.5       ,  8.09294787,  8.60288346,
+        9.01477534,  4.375     ,  4.38626218,  4.39951942,  4.40943051,
+        4.41671467,  4.42220409,  3.77252437,  3.75      ,  3.75825092,
+...
+        1.89562729,  1.3175731 ,  0.75307662,  2.59807769,  1.89562729,
+        1.25      ,  0.63980546,  2.04715255,  1.3175731 ,  0.63980546,
+        1.50028803,  0.75307662,  0.95542865,  4.375     ,  3.77252437,
+        3.19855827,  2.63772204,  2.08357336,  1.53322456,  4.38626218,
+        3.75      ,  3.13737637,  2.54504873,  1.9664833 ,  4.39951942,
+        3.75825092,  3.125     ,  2.50846026,  4.40943051,  3.77252437,
+        3.1313452 ,  4.41671467,  3.78659332,  4.42220409,  5.625     ,
+        5.61373782,  5.60048058,  5.59056949,  5.58328533,  5.57779591,
+        6.22747563,  6.25      ,  6.24174908,  6.22747563,  6.21340668,
+        6.80144173,  6.86262363,  6.875     ,  6.8686548 ,  7.36227796,
+        7.45495127,  7.49153974,  7.91642664,  8.0335167 ,  8.46677544,
+        6.25      ,  6.84121345,  7.40192231,  7.95284745,  8.49971197,
+        9.04457135,  6.84121345,  7.5       ,  8.10437271,  8.6824269 ,
+        9.24692338,  7.40192231,  8.10437271,  8.75      ,  9.36019454,
+        7.95284745,  8.6824269 ,  9.36019454,  8.49971197,  9.24692338,
+        9.04457135,  5.625     ,  6.22747563,  6.80144173,  7.36227796,
+        7.91642664,  8.46677544,  5.61373782,  6.25      ,  6.86262363,
+        7.45495127,  8.0335167 ,  5.60048058,  6.24174908,  6.875     ,
+        7.49153974,  5.59056949,  6.22747563,  6.8686548 ,  5.58328533,
+        6.21340668,  5.57779591])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_node_y</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 10.0 7.5 ... 8.704 9.203 9.337</div><input id='attrs-0d6817e7-2d4e-4350-8f33-35c617dd8c62' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0d6817e7-2d4e-4350-8f33-35c617dd8c62' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2584f677-1143-467e-9e32-3b1b978e617f' class='xr-var-data-in' type='checkbox'><label for='data-2584f677-1143-467e-9e32-3b1b978e617f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 5.        , 10.        ,  7.5       ,  2.5       ,  0.        ,
+        2.5       ,  7.5       ,  5.625     ,  6.25      ,  6.875     ,
+        7.5       ,  8.125     ,  8.75      ,  9.375     ,  9.96699634,
+        9.85362672,  9.64285714,  9.33012702,  8.92857143,  8.46687623,
+        7.9801978 ,  4.375     ,  3.75      ,  3.125     ,  2.5       ,
+        1.875     ,  1.25      ,  0.625     ,  2.0198022 ,  1.53312377,
+        1.07142857,  0.66987298,  0.35714286,  0.14637328,  0.03300366,
+        4.6875    ,  4.375     ,  4.0625    ,  3.75      ,  3.4375    ,
+        3.125     ,  2.8125    ,  5.3125    ,  5.625     ,  5.9375    ,
+        6.25      ,  6.5625    ,  6.875     ,  7.1875    ,  6.98679854,
+        6.38675049,  5.71428571,  5.        ,  4.28571429,  3.61324951,
+        3.01320146,  5.3125    ,  5.625     ,  5.9375    ,  6.25      ,
+        6.5625    ,  6.875     ,  7.1875    ,  0.03300366,  0.14637328,
+        0.35714286,  0.66987298,  1.07142857,  1.53312377,  2.0198022 ,
+        3.01320146,  3.61324951,  4.28571429,  5.        ,  5.71428571,
+        6.38675049,  6.98679854,  4.6875    ,  4.375     ,  4.0625    ,
+        3.75      ,  3.4375    ,  3.125     ,  2.8125    ,  9.96699634,
+        9.85362672,  9.64285714,  9.33012702,  8.92857143,  8.46687623,
+        7.9801978 ,  6.08253175,  6.77170847,  7.42681336,  8.06868908,
+        8.70435935,  9.33667809,  6.41736677,  7.16506351,  7.86769667,
+...
+        5.35846208,  5.70868339,  6.05084101,  4.30662475,  4.64153792,
+        5.        ,  5.35962278,  3.97710364,  4.29131661,  4.64037722,
+        3.65296023,  3.94915899,  3.33204689,  3.91746825,  3.58263323,
+        3.26656189,  2.95420728,  2.64268041,  2.33127502,  3.22829153,
+        2.83493649,  2.49076541,  2.16526645,  1.84747697,  2.57318664,
+        2.13230333,  1.75240474,  1.40377215,  1.93131092,  1.45658307,
+        1.04414937,  1.29564065,  0.79663596,  0.66332191,  3.91746825,
+        3.22829153,  2.57318664,  1.93131092,  1.29564065,  0.66332191,
+        3.58263323,  2.83493649,  2.13230333,  1.45658307,  0.79663596,
+        3.26656189,  2.49076541,  1.75240474,  1.04414937,  2.95420728,
+        2.16526645,  1.40377215,  2.64268041,  1.84747697,  2.33127502,
+        5.        ,  4.64565831,  4.30662475,  3.97710364,  3.65296023,
+        3.33204689,  5.35434169,  5.        ,  4.64153792,  4.29131661,
+        3.94915899,  5.69337525,  5.35846208,  5.        ,  4.64037722,
+        6.02289636,  5.70868339,  5.35962278,  6.34703977,  6.05084101,
+        6.66795311,  6.08253175,  6.41736677,  6.73343811,  7.04579272,
+        7.35731959,  7.66872498,  6.77170847,  7.16506351,  7.50923459,
+        7.83473355,  8.15252303,  7.42681336,  7.86769667,  8.24759526,
+        8.59622785,  8.06868908,  8.54341693,  8.95585063,  8.70435935,
+        9.20336404,  9.33667809])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-d9e83e69-3225-498f-8fc2-c7dfab1decbc' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d9e83e69-3225-498f-8fc2-c7dfab1decbc' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_z</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.941 9.182 0.1692 ... 4.581 5.932</div><input id='attrs-dcfa5009-f905-432e-b695-e7856aca8de5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dcfa5009-f905-432e-b695-e7856aca8de5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4e88d0b4-a537-4b8b-8c6c-2cf6921d503c' class='xr-var-data-in' type='checkbox'><label for='data-4e88d0b4-a537-4b8b-8c6c-2cf6921d503c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.94086697,  9.18220451,  0.16920664,  0.72165724,  1.06362593,
+        7.92479531,  2.69911847,  2.09975131,  2.30958522,  2.68748894,
+        3.32342126,  4.27209756,  5.55986752,  7.19586448, 10.        ,
+        9.87549309,  8.53564812,  6.26977904,  3.82612141,  1.89228091,
+        0.71595946,  1.72614323,  1.4309924 ,  1.18295418,  1.22390807,
+        1.65839342,  2.13325875,  1.98173022,  0.62543361,  0.62988301,
+        0.63619776,  0.73700445,  0.91954386,  0.95471541,  0.97344379,
+        1.72607872,  1.51917675,  1.33130578,  1.17444706,  1.05684524,
+        0.9697864 ,  0.87041546,  2.15381138,  2.35591981,  2.53801581,
+        2.68983243,  2.79912752,  2.85074959,  2.82556179,  0.        ,
+        0.07496965,  0.26250862,  0.42574029,  0.51641614,  0.58590695,
+        0.68300626,  1.88213027,  2.03174202,  2.59138716,  3.31050085,
+        3.59109948,  2.98878944,  1.63066402,  1.28802813,  1.77372014,
+        2.66004625,  3.99506329,  5.58962097,  7.01795782,  7.85347654,
+        7.2309138 ,  5.66901275,  3.50719976,  1.51309613,  0.51219204,
+        0.72714034,  1.67691401,  1.88122472,  1.61806353,  1.38417811,
+        1.53928958,  2.33531445,  3.80080727,  5.76062788,  7.74984029,
+        5.9640108 ,  4.4580076 ,  3.75743851,  3.7602305 ,  3.83467993,
+        3.48020325,  2.25094373,  2.8843563 ,  3.78352638,  4.9567201 ,
+        6.39447769,  8.08064164,  2.89685853,  4.03087534,  5.31703854,
+...
+        2.38819975,  1.87365361,  0.81009139,  1.46459687,  1.88140003,
+        1.63585727,  0.74902165,  1.38884394,  1.48760982,  0.82082855,
+        1.25446602,  0.94195555,  0.99064404,  1.50179217,  1.3207664 ,
+        1.14635647,  0.98216424,  0.83840963,  0.72283321,  1.23360026,
+        1.09635461,  0.97453278,  0.85678024,  0.74088639,  1.05032898,
+        0.93369596,  0.8236032 ,  0.72391678,  1.20644923,  1.10024898,
+        0.93241837,  1.61813034,  1.32559537,  1.66044477,  1.44356698,
+        1.24913506,  1.50958631,  2.15961635,  2.68133559,  2.40736627,
+        1.32932846,  1.75121342,  2.65730912,  3.34409618,  3.0736685 ,
+        1.73284769,  2.92300036,  4.01668176,  4.01462236,  2.7787918 ,
+        4.4289945 ,  5.07467224,  4.34180671,  5.89413484,  6.14013185,
+        1.99234852,  1.58741361,  1.38651874,  1.76815078,  2.92278934,
+        4.81464394,  2.10187991,  1.57033068,  1.33902603,  1.86218442,
+        3.32699633,  2.16807257,  1.5049102 ,  1.19302968,  1.78099911,
+        2.17753807,  1.36138001,  0.9266051 ,  2.1141831 ,  1.11277075,
+        1.95662328,  2.3984021 ,  2.66772771,  2.91525473,  3.13444692,
+        3.31310731,  3.43517476,  2.6010072 ,  2.87028431,  3.14112535,
+        3.40399255,  3.64174298,  2.95269199,  3.14489557,  3.33771326,
+        3.54686075,  3.57657232,  3.67216577,  3.71380939,  4.5527151 ,
+        4.5814859 ,  5.93242701])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_z</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.868 2.092 2.505 ... 7.283 8.483</div><input id='attrs-5e71cd19-c760-458e-9c18-3109a677a876' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5e71cd19-c760-458e-9c18-3109a677a876' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5981d0ad-d40e-4868-9e24-9633677f2ba8' class='xr-var-data-in' type='checkbox'><label for='data-5981d0ad-d40e-4868-9e24-9633677f2ba8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.86789562e+00, 2.09173768e+00, 2.50478703e+00, 3.19197130e+00,
+       4.20601558e+00, 5.56777499e+00, 7.27914730e+00, 9.33461491e+00,
+       1.93260611e+00, 2.34531779e+00, 3.03198226e+00, 4.02815473e+00,
+       5.34836702e+00, 6.98778334e+00, 8.93424812e+00, 1.91352082e+00,
+       2.58493745e+00, 3.56711594e+00, 4.81954588e+00, 6.32311053e+00,
+       8.05647447e+00, 1.00000000e+01, 2.26211878e+00, 3.23979415e+00,
+       4.48019765e+00, 5.92969999e+00, 7.56429805e+00, 9.36448541e+00,
+       2.39718090e+00, 3.60384244e+00, 4.98190110e+00, 6.44758881e+00,
+       7.98339546e+00, 9.57956569e+00, 3.07327329e+00, 4.42192061e+00,
+       5.82275045e+00, 7.24117053e+00, 8.67363540e+00, 3.23639287e+00,
+       4.53751457e+00, 5.74990047e+00, 6.87598748e+00, 7.93565664e+00,
+       3.91876704e+00, 5.05307885e+00, 6.03736569e+00, 6.91365626e+00,
+       3.85286033e+00, 4.63254463e+00, 5.17113698e+00, 5.56004815e+00,
+       4.09869640e+00, 4.50971607e+00, 4.71432481e+00, 3.61156456e+00,
+       3.54251675e+00, 3.26017157e+00, 3.21172150e+00, 2.79673960e+00,
+       2.36369251e+00, 1.58439383e+00, 1.49913580e+00, 6.13718735e-01,
+       1.73213925e+00, 1.71935793e+00, 2.12663364e+00, 2.87927571e+00,
+       3.39452979e+00, 3.05823389e+00, 1.80955424e+00, 2.52421338e-01,
+       1.61832964e+00, 1.78758426e+00, 2.42558394e+00, 3.07769330e+00,
+       3.04815255e+00, 2.06658253e+00, 5.89806452e-01, 1.48547049e+00,
+...
+       2.54876620e+00, 1.76473918e+00, 8.67856208e-01, 6.53346582e-01,
+       2.33890505e+00, 1.37163556e+00, 5.51092370e-01, 2.58595261e+00,
+       1.59287546e+00, 4.80623878e-01, 2.27938585e+00, 1.08329222e+00,
+       2.54053517e+00, 1.29317146e+00, 2.11416934e+00, 2.38683522e+00,
+       1.97707283e+00, 2.24671678e+00, 2.49089952e+00, 2.70662635e+00,
+       2.88440474e+00, 3.01030800e+00, 3.06630677e+00, 3.02932786e+00,
+       2.14311251e+00, 2.43328879e+00, 2.69439347e+00, 2.92399629e+00,
+       3.11188466e+00, 3.24276217e+00, 3.29669104e+00, 2.17641200e+00,
+       2.49508895e+00, 2.79747590e+00, 3.08102607e+00, 3.33378530e+00,
+       3.53988297e+00, 3.67966149e+00, 2.35740678e+00, 2.66679279e+00,
+       2.97006316e+00, 3.25936776e+00, 3.51916892e+00, 3.73085750e+00,
+       2.44744733e+00, 2.73947464e+00, 3.01502542e+00, 3.29755221e+00,
+       3.57622955e+00, 3.83056722e+00, 2.67938758e+00, 2.93665105e+00,
+       3.18557511e+00, 3.44628521e+00, 3.70738615e+00, 2.93676346e+00,
+       3.17732762e+00, 3.34642235e+00, 3.51616785e+00, 3.70363706e+00,
+       3.25786841e+00, 3.43749708e+00, 3.55328647e+00, 3.66999611e+00,
+       3.74042764e+00, 3.94745881e+00, 3.98911303e+00, 3.96817430e+00,
+       4.18481869e+00, 4.31056826e+00, 4.27392102e+00, 4.91538614e+00,
+       5.14135806e+00, 5.09134419e+00, 5.51578007e+00, 5.65121695e+00,
+       6.49131148e+00, 6.82005978e+00, 7.28318195e+00, 8.48284669e+00])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>edge_z</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.993 1.817 1.805 ... 5.151 5.156</div><input id='attrs-590036e3-6557-4453-9615-c660aaaa571d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-590036e3-6557-4453-9615-c660aaaa571d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2bb0e73b-600b-4264-bb6a-31203fc8367b' class='xr-var-data-in' type='checkbox'><label for='data-2bb0e73b-600b-4264-bb6a-31203fc8367b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.99287981,  1.81679035,  1.80498916,  2.01938838,  1.87985002,
+        1.91102126,  8.09893408,  9.6103884 ,  8.44413971,  0.38243751,
+        0.03660573,  0.8366236 ,  0.65779993,  0.77487776,  0.69668977,
+        1.55578201,  0.9927347 ,  1.14412587,  7.91124421,  7.59760235,
+        6.79462937,  2.74593749,  2.17217197,  3.1066894 ,  2.16144596,
+        2.10777347,  1.95924548,  2.08161786,  2.21774993,  2.44110536,
+        2.23280565,  2.45924868,  2.30358474,  2.42344689,  2.93760708,
+        2.73044247,  3.08441026,  2.57352618,  2.7887575 ,  3.72283677,
+        3.5007689 ,  4.00200697,  3.05979673,  3.41904718,  4.83590774,
+        4.57304793,  5.22754024,  3.84921259,  4.3812002 ,  6.29311121,
+        5.95312815,  6.7592189 ,  4.99301521,  5.71355116,  8.58868233,
+        7.43705922,  7.63508071,  6.51929752, 10.        ,  8.96281509,
+        9.27581496,  9.09566761,  9.00173647,  7.43080711,  8.58875333,
+        7.91817279,  5.0133616 ,  7.01553291,  5.9776186 ,  2.78574578,
+        4.89576329,  3.87948195,  1.22789299,  2.95183434,  2.22103491,
+        1.18314216,  1.59760194,  1.55722614,  1.72047643,  1.77744378,
+        1.58557505,  1.57964159,  1.26026871,  1.45828124,  1.30364001,
+        1.41429536,  1.26108992,  1.12697341,  1.17476023,  1.08739991,
+        1.18290303,  1.19724316,  1.37424039,  1.08438094,  1.18772265,
+        1.32512384,  1.56307862,  1.90412491,  1.38169802,  1.6308967 ,
+...
+        4.51244313,  3.58953897,  3.47706329,  4.90195681,  4.37884828,
+        5.14678857,  5.4781051 ,  5.22621356,  5.19325143,  6.02713506,
+        1.76757648,  2.02292858,  1.40847568,  1.80096591,  1.55992972,
+        1.4593352 ,  1.39642485,  1.34550844,  2.21547337,  1.46170927,
+        1.79327163,  3.75172518,  2.31786663,  3.09166769,  4.03228576,
+        1.8092777 ,  2.11164652,  1.35756411,  1.81748076,  1.52009739,
+        1.45917104,  1.31393158,  1.25313539,  2.44224234,  1.40093834,
+        1.8075719 ,  2.45055152,  1.80776389,  2.1512435 ,  1.23983226,
+        1.78345078,  1.41824021,  1.32372854,  1.15170778,  1.05119084,
+        1.19807631,  1.74022195,  2.12682328,  1.02740935,  1.67445974,
+        1.22600284,  0.88143491,  1.58490293,  2.01981325,  1.46572826,
+        2.50287993,  2.45872516,  2.76268369,  2.59008995,  2.73830557,
+        2.99723212,  2.86871331,  3.00806632,  3.19757376,  3.1324055 ,
+        3.25757234,  3.34985371,  3.36828385,  3.47225509,  3.56059958,
+        2.70125405,  2.71725371,  2.97250875,  2.825351  ,  2.95273965,
+        3.24131252,  3.06707354,  3.19600262,  3.49365362,  3.31700108,
+        3.44594239,  3.56525559,  3.01342253,  3.1914638 ,  3.20465367,
+        3.25229056,  3.33336483,  3.40680234,  3.38566826,  3.45622067,
+        3.51939294,  3.59081984,  3.98136501,  3.65649451,  4.00057675,
+        4.03593834,  4.00613605,  4.53662907,  5.15098259,  5.15622858])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a907fb28-92fd-4860-90ce-3a4a0c551fa8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a907fb28-92fd-4860-90ce-3a4a0c551fa8' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>A UgridDataset may be initialized without data variables, but this requires
+a grid object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_uds</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="n">uds</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+<span class="n">new_uds</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:  ()
+Data variables:
+    *empty*</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-a56f59bb-521d-4e47-bdb7-b2a1aada8699' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a56f59bb-521d-4e47-bdb7-b2a1aada8699' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-774cefc1-07ad-4380-9fb3-6dfa87d55729' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-774cefc1-07ad-4380-9fb3-6dfa87d55729' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-e60a4584-cf34-4d0e-9137-09e58ec665d9' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e60a4584-cf34-4d0e-9137-09e58ec665d9' class='xr-section-summary'  title='Expand/collapse section'>Data variables: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-b83f7798-43fd-459e-bed0-579d4f223349' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-b83f7798-43fd-459e-bed0-579d4f223349' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>We can then add variables one-by-one, as we might with an xarray Dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_uds</span><span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">elev</span>
+<span class="n">new_uds</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:    (node: 9140)
+Coordinates:
+  * node       (node) int64 0 1 2 3 4 5 6 ... 9133 9134 9135 9136 9137 9138 9139
+    node_x     (node) float64 4.759e+05 4.753e+05 ... 4.908e+05 4.909e+05
+    node_y     (node) float64 3.621e+06 3.621e+06 ... 3.608e+06 3.608e+06
+Data variables:
+    elevation  (node) float64 -0.7463 -6.749 -12.93 -20.25 ... 1.326 1.332 1.135</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-622fbd36-dc4f-4fd8-8034-8d2527aedf01' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-622fbd36-dc4f-4fd8-8034-8d2527aedf01' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>node</span>: 9140</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-27ff2b05-540c-4c79-8916-110c8b50273a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-27ff2b05-540c-4c79-8916-110c8b50273a' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>node</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 9136 9137 9138 9139</div><input id='attrs-9129cc3b-ee88-4e5b-a7e5-1ef8187d26a3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9129cc3b-ee88-4e5b-a7e5-1ef8187d26a3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4c7f90fc-c307-4c63-8f1d-220b193a45f0' class='xr-var-data-in' type='checkbox'><label for='data-4c7f90fc-c307-4c63-8f1d-220b193a45f0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 9137, 9138, 9139])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_x</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.759e+05 4.753e+05 ... 4.909e+05</div><input id='attrs-936312c4-116f-47dd-9786-08731a02888e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-936312c4-116f-47dd-9786-08731a02888e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-76ff28c6-c114-4df1-976c-287c2a293682' class='xr-var-data-in' type='checkbox'><label for='data-76ff28c6-c114-4df1-976c-287c2a293682' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475874.  , 475349.22, 474824.44, ..., 490841.  , 490811.  ,
+       490857.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_y</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.621e+06 3.621e+06 ... 3.608e+06</div><input id='attrs-7c1c6972-7acf-4a8a-a9af-3d60bc7e1665' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7c1c6972-7acf-4a8a-a9af-3d60bc7e1665' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f03623aa-9eec-4141-9741-d29241068a5d' class='xr-var-data-in' type='checkbox'><label for='data-f03623aa-9eec-4141-9741-d29241068a5d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621341.  , 3621217.04, 3621093.08, ..., 3607533.5 , 3607511.  ,
+       3607521.  ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-70bac69d-319e-40ce-845d-b5d68413801d' class='xr-section-summary-in' type='checkbox'  checked><label for='section-70bac69d-319e-40ce-845d-b5d68413801d' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-0.7463 -6.749 ... 1.332 1.135</div><input id='attrs-50e372e3-ca32-4d53-9f5e-ac698ce37359' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-50e372e3-ca32-4d53-9f5e-ac698ce37359' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7e365fd5-78aa-4281-adc6-d046e5c0c4a2' class='xr-var-data-in' type='checkbox'><label for='data-7e365fd5-78aa-4281-adc6-d046e5c0c4a2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a164f42e-efff-47be-914b-337e0967c89d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a164f42e-efff-47be-914b-337e0967c89d' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="write-netcdf-files">
+<h2>Write netCDF files<a class="headerlink" href="#write-netcdf-files" title="Permalink to this headline">¶</a></h2>
+<p>Once again like xarray, NetCDF is the recommend file format for xugrid
+objects. Xugrid automatically stores the grid topology according to the UGRID
+conventions and merges it with the main dataset containing the data variables
+before writing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uds</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">&quot;example-ugrid.nc&quot;</span><span class="p">)</span>
+<span class="n">xu</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="s2">&quot;example-ugrid.nc&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
+Dimensions:        (node: 9140, face: 16869, time: 49)
+Coordinates:
+    node_y         (node) float64 3.621e+06 3.621e+06 ... 3.608e+06 3.608e+06
+  * face           (face) int64 0 1 2 3 4 5 ... 16864 16865 16866 16867 16868
+    node_x         (node) float64 4.759e+05 4.753e+05 ... 4.908e+05 4.909e+05
+  * node           (node) int64 0 1 2 3 4 5 6 ... 9134 9135 9136 9137 9138 9139
+  * time           (time) timedelta64[ns] 00:00:00 00:30:00 ... 1 days 00:00:00
+    mesh2d_face_x  (face) float64 4.757e+05 4.755e+05 ... 4.908e+05 4.908e+05
+    mesh2d_face_y  (face) float64 3.621e+06 3.621e+06 ... 3.608e+06 3.608e+06
+Data variables:
+    elevation      (node) float64 -0.7463 -6.749 -12.93 ... 1.326 1.332 1.135
+    depth          (time, node) float64 ...</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-d53655ea-a515-41b3-9534-4c14237d3595' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-d53655ea-a515-41b3-9534-4c14237d3595' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>node</span>: 9140</li><li><span class='xr-has-index'>face</span>: 16869</li><li><span class='xr-has-index'>time</span>: 49</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-8ba5e604-5db0-44d2-8bb5-5ddfdcb1f20a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8ba5e604-5db0-44d2-8bb5-5ddfdcb1f20a' class='xr-section-summary' >Coordinates: <span>(7)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_y</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.621e+06 3.621e+06 ... 3.608e+06</div><input id='attrs-fd9e84f9-7af9-42b0-a273-34a791f3151e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fd9e84f9-7af9-42b0-a273-34a791f3151e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e2cd386d-8960-43cb-a603-21ac262bbef2' class='xr-var-data-in' type='checkbox'><label for='data-e2cd386d-8960-43cb-a603-21ac262bbef2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621341.  , 3621217.04, 3621093.08, ..., 3607533.5 , 3607511.  ,
+       3607521.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>face</span></div><div class='xr-var-dims'>(face)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 ... 16865 16866 16867 16868</div><input id='attrs-c1ae9297-57c6-401f-862b-a7cc575bdae2' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c1ae9297-57c6-401f-862b-a7cc575bdae2' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f6c1e88f-57d8-470b-b2c8-712588cb11e8' class='xr-var-data-in' type='checkbox'><label for='data-f6c1e88f-57d8-470b-b2c8-712588cb11e8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([    0,     1,     2, ..., 16866, 16867, 16868])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>node_x</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.759e+05 4.753e+05 ... 4.909e+05</div><input id='attrs-e8f82d03-6342-4c15-8474-1048d8afbf88' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e8f82d03-6342-4c15-8474-1048d8afbf88' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2736e2ab-fd97-4c91-9b83-9d1518b2bed9' class='xr-var-data-in' type='checkbox'><label for='data-2736e2ab-fd97-4c91-9b83-9d1518b2bed9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475874.  , 475349.22, 474824.44, ..., 490841.  , 490811.  ,
+       490857.  ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>node</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 9136 9137 9138 9139</div><input id='attrs-85981d4a-71cf-489e-aceb-9e0a9bd2b5a5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-85981d4a-71cf-489e-aceb-9e0a9bd2b5a5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ac178ac-808e-409d-b192-ebcbe186b6ed' class='xr-var-data-in' type='checkbox'><label for='data-9ac178ac-808e-409d-b192-ebcbe186b6ed' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 9137, 9138, 9139])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>timedelta64[ns]</div><div class='xr-var-preview xr-preview'>00:00:00 ... 1 days 00:00:00</div><input id='attrs-b3dd4c2c-97b0-4abd-8ad6-93ed2b82b825' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b3dd4c2c-97b0-4abd-8ad6-93ed2b82b825' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-135f3f05-992b-4d0a-b1fd-08cabcce78c4' class='xr-var-data-in' type='checkbox'><label for='data-135f3f05-992b-4d0a-b1fd-08cabcce78c4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([             0,  1800000000000,  3600000000000,  5625000000000,
+        7425000000000,  9225000000000, 11025000000000, 12825000000000,
+       14625000000000, 16425000000000, 18225000000000, 20025000000000,
+       21825000000000, 23625000000000, 25425000000000, 27225000000000,
+       29025000000000, 30825000000000, 32625000000000, 34425000000000,
+       36225000000000, 38025000000000, 39750000000000, 41550000000000,
+       43350000000000, 45150000000000, 46950000000000, 48750000000000,
+       50550000000000, 52350000000000, 54150000000000, 55950000000000,
+       57750000000000, 59550000000000, 61350000000000, 63150000000000,
+       64950000000000, 66750000000000, 68550000000000, 70350000000000,
+       72150000000000, 73950000000000, 75750000000000, 77550000000000,
+       79350000000000, 81150000000000, 82950000000000, 84750000000000,
+       86400000000000], dtype=&#x27;timedelta64[ns]&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(face)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.757e+05 4.755e+05 ... 4.908e+05</div><input id='attrs-3e87df4c-ba93-4ba0-bf21-20d1ceda3fde' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3e87df4c-ba93-4ba0-bf21-20d1ceda3fde' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bdcd2ec1-71ee-40e3-98d6-837e4d651779' class='xr-var-data-in' type='checkbox'><label for='data-bdcd2ec1-71ee-40e3-98d6-837e4d651779' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([475704.80366667, 475508.906     , 475153.32233333, ...,
+       490820.5       , 490815.83333333, 490844.        ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(face)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.621e+06 3.621e+06 ... 3.608e+06</div><input id='attrs-dc60e891-051c-4ff1-a17f-c35fa23a5386' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-dc60e891-051c-4ff1-a17f-c35fa23a5386' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-593a271d-4345-4bef-b095-268fdb99fbc3' class='xr-var-data-in' type='checkbox'><label for='data-593a271d-4345-4bef-b095-268fdb99fbc3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([3621181.80666667, 3620992.53666667, 3621027.77      , ...,
+       3607530.66666667, 3607519.        , 3607523.5       ])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8997bb65-ef94-4a6c-afb2-25a0f9573b2b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8997bb65-ef94-4a6c-afb2-25a0f9573b2b' class='xr-section-summary' >Data variables: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-f6d536eb-050e-4e5d-8236-660f989b574a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f6d536eb-050e-4e5d-8236-660f989b574a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cdf7df1d-d140-4284-8dd8-32e81b449a3e' class='xr-var-data-in' type='checkbox'><label for='data-cdf7df1d-d140-4284-8dd8-32e81b449a3e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ -0.746347,  -6.748719, -12.934201, ...,   1.325582,   1.331751,
+         1.134696])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>depth</span></div><div class='xr-var-dims'>(time, node)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-083302df-13bb-435f-bdfa-cdb672a15755' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-083302df-13bb-435f-bdfa-cdb672a15755' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b715b4c4-5d6a-4bf2-af6f-bcb2217f2587' class='xr-var-data-in' type='checkbox'><label for='data-b715b4c4-5d6a-4bf2-af6f-bcb2217f2587' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[447860 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-db7e3e23-a0ff-42b3-b571-8b74cfac255c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-db7e3e23-a0ff-42b3-b571-8b74cfac255c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.512 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-quick-overview-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/0a38149bf493200adc9525eaf2f63577/quick_overview.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">quick_overview.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/e6a131fc5b44008f93f1969baa7ab8f2/quick_overview.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">quick_overview.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="../terminology.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Terminology</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="plotting.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plot unstructured mesh data</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Deltares.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
