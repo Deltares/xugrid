@@ -1024,21 +1024,55 @@ class Ugrid2d(AbstractUgrid):
         def _coord(da, dim):
             """
             Transform N xarray midpoints into N + 1 vertex edges
+
+            This assumes cell sizes can be provided by a "dx" or "dy"
+            coordinate. This is messy and should almost certainly be replaced
+            by an actual standard such as CF bounds -- however, xarray
+            initially did decode bounds as coordinates, see:
+
+            https://github.com/pydata/xarray/pull/2844
+
+            See also:
+            https://cf-xarray.readthedocs.io/en/latest/generated/cf_xarray.bounds_to_vertices.html
             """
-            dxs = np.diff(da[dim].values)
-            dx = dxs[0]
-            atolx = abs(1.0e-4 * dx)
-            if not np.allclose(dxs, dx, atolx):
-                raise ValueError(
-                    f"DataArray has to be equidistant along {dim}, or cellsizes"
-                    " must be provided as a coordinate."
-                )
-            dxs = np.full(da[dim].size, dx)
+            delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
+
+            # If empty array, return empty
+            if da[dim].size == 0:
+                raise ValueError(f"{dim} size must be >= 1")
+
+            if delta_dim in da.coords:  # equidistant or non-equidistant
+                dx = da[delta_dim].values
+                if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
+                    dxs = np.full(da[dim].size, dx)
+                else:  # array -> non-equidistant
+                    dxs = dx
+
+                if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
+                    raise ValueError(f"{dim} is not only increasing or only decreasing")
+
+            else:  # undefined -> equidistant
+                if da[dim].size == 1:
+                    raise ValueError(
+                        f"DataArray has size 1 along {dim}, so cellsize must be provided"
+                        " as a coordinate."
+                    )
+                dxs = np.diff(da[dim].values)
+                dx = dxs[0]
+                atolx = abs(1.0e-4 * dx)
+                if not np.allclose(dxs, dx, atolx):
+                    raise ValueError(
+                        f"DataArray has to be equidistant along {dim}, or cellsizes"
+                        " must be provided as a coordinate."
+                    )
+                dxs = np.full(da[dim].size, dx)
+
             dxs = np.abs(dxs)
             x = da[dim].values
             if not da.indexes[dim].is_monotonic_increasing:
                 x = x[::-1]
                 dxs = dxs[::-1]
+
             # This assumes the coordinate to be monotonic increasing
             x0 = x[0] - 0.5 * dxs[0]
             x = np.full(dxs.size + 1, x0)

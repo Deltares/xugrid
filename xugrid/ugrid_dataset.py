@@ -144,7 +144,6 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         grid = Ugrid2d.from_structured(da)
         dims = da.dims[:-2]
         coords = {k: da.coords[k] for k in dims}
-        coords[grid.face_dimension] = np.arange(da["y"].size * da["x"].size)
         face_da = xr.DataArray(
             da.data.reshape(*da.shape[:-2], -1),
             coords=coords,

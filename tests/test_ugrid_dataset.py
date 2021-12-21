@@ -95,6 +95,7 @@ class TestUgridDataArray:
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
+        assert uda.ugrid.grid.face_dimension not in uda.coords
 
     def test_unary_op(self):
         alltrue = self.uda.astype(bool)

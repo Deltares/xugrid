@@ -151,6 +151,7 @@ def test_ugrid2d_dataset__default_attrs():
         assert f"{name}" in ds
         assert f"{name}_nNodes" in ds.dims
         assert f"{name}_nFaces" in ds.dims
+        assert f"{name}_nMax_face_nodes" in ds.dims
         assert f"{name}_node_x" in ds.coords
         assert f"{name}_node_y" in ds.coords
         assert f"{name}_face_nodes" in ds

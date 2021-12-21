@@ -301,6 +301,7 @@ def ugrid2d_dataset(
     node_x_name, node_y_name = attrs["node_coordinates"].split()
     edge_node_name = attrs["edge_node_connectivity"]
     face_node_name = attrs["face_node_connectivity"]
+    nmax_face_name = attrs["max_face_nodes_dimension"]
 
     ds = xr.Dataset()
     ds[name] = xr.DataArray(
@@ -325,7 +326,7 @@ def ugrid2d_dataset(
     )
     ds[face_node_name] = xr.DataArray(
         data=face_node_connectivity,
-        dims=[face_dimension, "nmax_face"],
+        dims=[face_dimension, nmax_face_name],
         attrs={
             "cf_role": "face_node_connectivity",
             "long_name": "Vertex nodes of mesh faces (counterclockwise)",
