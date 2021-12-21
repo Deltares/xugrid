@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xugrid.ugrid.ugrid2d &#8212; Xugrid 0.1 documentation</title>
+    <title>xugrid.ugrid.ugrid2d &#8212; Xugrid 0.1.0 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -1151,21 +1151,55 @@
         <span class="k">def</span> <span class="nf">_coord</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Transform N xarray midpoints into N + 1 vertex edges</span>
+
+<span class="sd">            This assumes cell sizes can be provided by a &quot;dx&quot; or &quot;dy&quot;</span>
+<span class="sd">            coordinate. This is messy and should almost certainly be replaced</span>
+<span class="sd">            by an actual standard such as CF bounds -- however, xarray</span>
+<span class="sd">            initially did decode bounds as coordinates, see:</span>
+
+<span class="sd">            https://github.com/pydata/xarray/pull/2844</span>
+
+<span class="sd">            See also:</span>
+<span class="sd">            https://cf-xarray.readthedocs.io/en/latest/generated/cf_xarray.bounds_to_vertices.html</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-            <span class="n">dx</span> <span class="o">=</span> <span class="n">dxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">atolx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">1.0e-4</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dxs</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">atolx</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;DataArray has to be equidistant along </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">, or cellsizes&quot;</span>
-                    <span class="s2">&quot; must be provided as a coordinate.&quot;</span>
-                <span class="p">)</span>
-            <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+            <span class="n">delta_dim</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span> <span class="o">+</span> <span class="n">dim</span>  <span class="c1"># e.g. dx, dy, dz, etc.</span>
+
+            <span class="c1"># If empty array, return empty</span>
+            <span class="k">if</span> <span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> size must be &gt;= 1&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">delta_dim</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>  <span class="c1"># equidistant or non-equidistant</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">delta_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="k">if</span> <span class="n">dx</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span> <span class="ow">or</span> <span class="n">dx</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,):</span>  <span class="c1"># scalar -&gt; equidistant</span>
+                    <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># array -&gt; non-equidistant</span>
+                    <span class="n">dxs</span> <span class="o">=</span> <span class="n">dx</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">dxs</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">^</span> <span class="p">(</span><span class="n">dxs</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> is not only increasing or only decreasing&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># undefined -&gt; equidistant</span>
+                <span class="k">if</span> <span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;DataArray has size 1 along </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">, so cellsize must be provided&quot;</span>
+                        <span class="s2">&quot; as a coordinate.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">dxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">atolx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">1.0e-4</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dxs</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">atolx</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;DataArray has to be equidistant along </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">, or cellsizes&quot;</span>
+                        <span class="s2">&quot; must be provided as a coordinate.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+
             <span class="n">dxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dxs</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_increasing</span><span class="p">:</span>
                 <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">dxs</span> <span class="o">=</span> <span class="n">dxs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
             <span class="c1"># This assumes the coordinate to be monotonic increasing</span>
             <span class="n">x0</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">dxs</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
@@ -1258,7 +1292,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
 </p>
     </div>
     
