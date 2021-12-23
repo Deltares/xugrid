@@ -1,10 +1,10 @@
-import geopandas as gpd
-
 from .ugrid1d import Ugrid1d
 from .ugrid2d import Ugrid2d
 
 
-def grid_from_geodataframe(geodataframe: gpd.GeoDataFrame):
+def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
+    import geopandas as gpd
+
     gdf = geodataframe
     if not isinstance(gdf, gpd.GeoDataFrame):
         raise TypeError(
