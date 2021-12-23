@@ -8,16 +8,22 @@ Conversion from and to other data structures:
 from typing import Any, Tuple
 
 import numpy as np
-import pygeos
 
 from .connectivity import ragged_index
-from .typing import IntDType
+from .typing import (
+    FloatArray,
+    IntArray,
+    IntDType,
+    LineArray,
+    MissingOptionalModule,
+    PointArray,
+    PolygonArray,
+)
 
-FloatArray = np.ndarray
-IntArray = np.ndarray
-PointArray = np.ndarray
-LineArray = np.ndarray
-PolygonArray = np.ndarray
+try:
+    import pygeos
+except ImportError:
+    pygeos = MissingOptionalModule("pygeos")
 
 
 def contiguous_xy(xy: FloatArray) -> Tuple[FloatArray, FloatArray]:

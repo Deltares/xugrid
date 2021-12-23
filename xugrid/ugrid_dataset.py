@@ -2,7 +2,6 @@ import types
 from functools import wraps
 from typing import Any, Callable, Union
 
-import geopandas as gpd
 import numpy as np
 import scipy.sparse
 import xarray as xr
@@ -236,7 +235,7 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         return UgridAccessor(self.obj, self.grid)
 
     @staticmethod
-    def from_geodataframe(geodataframe: gpd.GeoDataFrame):
+    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
         """
         Convert a geodataframe into the appropriate Ugrid topology and dataset.
 
@@ -423,7 +422,7 @@ class UgridAccessor:
 
     def to_geodataframe(
         self, dim: str = None, name: str = None, dim_order=None
-    ) -> gpd.GeoDataFrame:
+    ) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """
         Convert data and topology of one facet (node, edge, face) of the grid
         to a geopandas GeoDataFrame. This also determines the geometry type of
@@ -453,6 +452,8 @@ class UgridAccessor:
         -------
         geodataframe: gpd.GeoDataFrame
         """
+        import geopandas as gpd
+
         if isinstance(self.obj, xr.DataArray):
             dim = self.obj.dims[-1]
             if self.obj.name is None:

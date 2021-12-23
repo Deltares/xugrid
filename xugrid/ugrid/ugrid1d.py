@@ -1,6 +1,5 @@
 from typing import Any, Tuple, Union
 
-import geopandas as gpd
 import numpy as np
 import xarray as xr
 
@@ -259,7 +258,7 @@ class Ugrid1d(AbstractUgrid):
         return self._meshkernel
 
     @staticmethod
-    def from_geodataframe(geodataframe: gpd.GeoDataFrame) -> "Ugrid1d":
+    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame") -> "Ugrid1d":  # type: ignore # noqa
         """
         Convert geodataframe of linestrings into a UGRID1D topology.
 

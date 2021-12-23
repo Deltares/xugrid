@@ -5,8 +5,6 @@ from enum import EnumMeta, IntEnum
 from typing import Union
 
 import numpy as np
-import pygeos
-import shapely.geometry as sg
 
 from .conversion import _to_pygeos
 
@@ -30,8 +28,11 @@ def either_string_or_enum(value: Union[str, IntEnum], enum_class: EnumMeta) -> I
     return value
 
 
-def to_geometry_list(polygon: Union[sg.Polygon, pygeos.Geometry]) -> "meshkernel.GeometryList":  # type: ignore # noqa
+def to_geometry_list(
+    polygon: Union["shapely.geometry.Polygon", "pygeos.Geometry"]  # type: ignore # noqa
+) -> "meshkernel.GeometryList":  # type: ignore # noqa
     import meshkernel
+    import pygeos
 
     polygon = _to_pygeos([polygon])[0]
     xy = pygeos.get_coordinates(pygeos.get_exterior_ring(polygon))

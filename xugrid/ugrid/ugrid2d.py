@@ -1,8 +1,6 @@
 from typing import Any, Tuple, Union
 
-import geopandas as gpd
 import numpy as np
-import shapely.geometry as sg
 import xarray as xr
 from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
@@ -928,7 +926,7 @@ class Ugrid2d(AbstractUgrid):
 
     def refine_polygon(
         self,
-        polygon: sg.Polygon,
+        polygon: "shapely.geometry.Polygon",  # type: ignore # noqa
         min_face_size: float,
         refine_intersected: bool = True,
         use_mass_center_when_refining: bool = True,
@@ -959,7 +957,7 @@ class Ugrid2d(AbstractUgrid):
 
     def delete_polygon(
         self,
-        polygon: sg.Polygon,
+        polygon: "shapely.geometry.Polygon",  # type: ignore # noqa
         delete_option: str = "all_face_circumenters",
         invert_deletion: bool = False,
     ):
@@ -972,7 +970,7 @@ class Ugrid2d(AbstractUgrid):
 
     @staticmethod
     def from_polygon(
-        polygon: sg.Polygon,
+        polygon: "shapely.geometry.Polygon",  # type: ignore # noqa
     ):
         import meshkernel as mk
 
@@ -992,7 +990,7 @@ class Ugrid2d(AbstractUgrid):
         return ugrid
 
     @staticmethod
-    def from_geodataframe(geodataframe: gpd.GeoDataFrame):
+    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
         """
         Convert a geodataframe of polygons to UGRID2D topology.
 

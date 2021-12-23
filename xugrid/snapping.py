@@ -3,11 +3,9 @@ Snapes nodes at an arbitrary distance together.
 """
 from typing import Tuple, Union
 
-import geopandas as gpd
 import numba as nb
 import numpy as np
 import pandas as pd
-import pygeos
 import xarray as xr
 from numba_celltree import CellTree2d
 from scipy import sparse
@@ -18,7 +16,24 @@ from xugrid.ugrid import Ugrid2d
 
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import FloatArray, IntArray, LineArray, Point, Vector
+from .typing import (
+    FloatArray,
+    IntArray,
+    LineArray,
+    MissingOptionalModule,
+    Point,
+    Vector,
+)
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = MissingOptionalModule("geopandas")
+
+try:
+    import pygeos
+except ImportError:
+    gpd = MissingOptionalModule("pygeos")
 
 
 def snap_nodes(
