@@ -127,10 +127,7 @@
   <h1>Source code for xugrid.ugrid.ugrid2d</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyproj</span>
-<span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">numba_celltree</span> <span class="kn">import</span> <span class="n">CellTree2d</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">csr_matrix</span>
@@ -250,6 +247,8 @@
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">pyproj</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
         <span class="c1"># Store dataset</span>
         <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1054,7 +1053,7 @@
 
     <span class="k">def</span> <span class="nf">refine_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">polygon</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span>
+        <span class="n">polygon</span><span class="p">:</span> <span class="s2">&quot;shapely.geometry.Polygon&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">min_face_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">refine_intersected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">use_mass_center_when_refining</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1085,7 +1084,7 @@
 
     <span class="k">def</span> <span class="nf">delete_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">polygon</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span>
+        <span class="n">polygon</span><span class="p">:</span> <span class="s2">&quot;shapely.geometry.Polygon&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">delete_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all_face_circumenters&quot;</span><span class="p">,</span>
         <span class="n">invert_deletion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
@@ -1098,7 +1097,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_polygon</span><span class="p">(</span>
-        <span class="n">polygon</span><span class="p">:</span> <span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">,</span>
+        <span class="n">polygon</span><span class="p">:</span> <span class="s2">&quot;shapely.geometry.Polygon&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="p">):</span>
         <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
 
@@ -1118,7 +1117,7 @@
         <span class="k">return</span> <span class="n">ugrid</span>
 
 <div class="viewcode-block" id="Ugrid2d.from_geodataframe"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe of polygons to UGRID2D topology.</span>
 
