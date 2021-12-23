@@ -5,7 +5,6 @@ import functools
 
 import numpy as np
 import xarray as xr
-from matplotlib.collections import LineCollection, PolyCollection
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
@@ -384,6 +383,8 @@ def tripcolor(grid, da, ax, **kwargs):
 
 @_plot2d
 def line(grid, da, ax, **kwargs):
+    from matplotlib.collections import LineCollection
+
     if da is not None:
         dim = get_ugrid_dim(grid, da)
         if dim != EDGE:
@@ -504,6 +505,8 @@ def pcolormesh(grid, da, ax, **kwargs):
     Pseudocolor plot of 2D UgridDataArray.
     Wraps :py:func:`matplotlib:matplotlib.pyplot.
     """
+    from matplotlib.collections import PolyCollection
+
     dim = get_ugrid_dim(grid, da)
     if dim != FACE:
         raise ValueError("pcolormesh only supports data on faces")
