@@ -2,7 +2,6 @@ from typing import Any, Tuple, Union
 
 import geopandas as gpd
 import numpy as np
-import pyproj
 import shapely.geometry as sg
 import xarray as xr
 from numba_celltree import CellTree2d
@@ -123,6 +122,8 @@ class Ugrid2d(AbstractUgrid):
         if crs is None:
             self.crs = None
         else:
+            import pyproj
+
             self.crs = pyproj.CRS.from_user_input(crs)
         # Store dataset
         if dataset is None:
