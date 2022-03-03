@@ -53,19 +53,31 @@
     <div class="container-fluid" id="banner"></div>
 
     
-  <nav class="navbar navbar-dark navbar-expand-lg bg-deltares fixed-top bd-navbar shadow" id="navbar-main"><div class="container-xl">
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-    <a class="navbar-brand" href="../index.html">
-    <p style="color:#fff;font-size:25px;" class="title">Xugrid</p>
-    </a>
+  <div id="navbar-start">
+    
+    
 
-    <a class="navbar-brand" href="../index.html">
-    <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo" />
-    </a>
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
   
-    <div id="navbar-menu" class="collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav">
-        <li class="toctree-l1 current active nav-item">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
  <a class="reference internal nav-link" href="../user_guide.html">
   User Guide
  </a>
@@ -83,18 +95,27 @@
  </a>
 </li>
 
-        
-      </ul>
+    
+</ul>
+      </div>
+      
     </div>
 
-
-    <a class="navbar-brand" href="https://www.deltares.nl/en/">
-    <img src="../_static/deltares-white.svg" class="logo" alt="logo" />
-    </a>
-
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://deltares.nl/en/" rel="noopener" target="_blank" title="Deltares"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
-  </nav>
-
+    </nav>
+    
 
     <div class="container-xl">
       <div class="row">
@@ -317,7 +338,7 @@ with a grid in which all cells are given a value of <code class="docutils litera
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_001.png" srcset="../_images/sphx_glr_connectivity_001.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1df1a25f10&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f406871daf0&gt;
 </pre></div>
 </div>
 <p>By default, the border value for binary dilation is <strong>also</strong> set to
@@ -332,7 +353,7 @@ start by setting a single value in the center of the grid to <code class="docuti
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_002.png" srcset="../_images/sphx_glr_connectivity_002.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1df8e9f0d0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f406f76abe0&gt;
 </pre></div>
 </div>
 <p>Now let’s run two dilations: one with the default border, and one with the
@@ -346,7 +367,7 @@ alternative border value:</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_003.png" srcset="../_images/sphx_glr_connectivity_003.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1df1afe190&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f4068753a90&gt;
 </pre></div>
 </div>
 </section>
@@ -363,7 +384,7 @@ analyse connected parts of the mesh.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_004.png" srcset="../_images/sphx_glr_connectivity_004.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1df1b5c4f0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f40686f88e0&gt;
 </pre></div>
 </div>
 </section>
@@ -376,7 +397,7 @@ Tesselation.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_005.png" srcset="../_images/sphx_glr_connectivity_005.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1df18e2fd0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4068508820&gt;
 </pre></div>
 </div>
 <p>There are two alternative flavors to consider. We can fully ignore the
@@ -398,7 +419,7 @@ the original.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_006.png" srcset="../_images/sphx_glr_connectivity_006.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1df8ef5130&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4068848910&gt;
 </pre></div>
 </div>
 </section>
@@ -415,7 +436,7 @@ them very attractive for e.g. visualization.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_007.png" srcset="../_images/sphx_glr_connectivity_007.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1df90de340&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f406866eb20&gt;
 </pre></div>
 </div>
 </section>
@@ -447,7 +468,7 @@ the upper and lower parts:</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_008.png" srcset="../_images/sphx_glr_connectivity_008.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1df1b83730&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4068f7d0a0&gt;
 </pre></div>
 </div>
 <p>We can now use Laplace interpolation to fill the gaps in the grid.</p>
@@ -456,7 +477,7 @@ the upper and lower parts:</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_009.png" srcset="../_images/sphx_glr_connectivity_009.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1df2870700&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f40684e1040&gt;
 </pre></div>
 </div>
 </section>
@@ -475,7 +496,7 @@ grids for bandwith reduction.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_010.png" srcset="../_images/sphx_glr_connectivity_010.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7f1df28836a0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7f406fa672e0&gt;
 </pre></div>
 </div>
 <p>The bandwidth of this matrix is poor. Connections are all over the place: low
@@ -490,10 +511,10 @@ locality:</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_connectivity_011.png" srcset="../_images/sphx_glr_connectivity_011.png" alt="connectivity" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7f1e011f48b0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7f406f837670&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.147 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.083 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-connectivity-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6b0c084f5a0bb605c9e7dc95a7138aea/connectivity.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">connectivity.py</span></code></a></p>
