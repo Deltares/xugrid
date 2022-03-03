@@ -46,6 +46,14 @@ Xugrid (pronounced "kiss you grid" by `visionaries 🗢
 Installation
 ------------
 
+Install via conda from the conda-forge channel:
+
+.. code:: console
+
+  conda install -c conda-forge xugrid
+
+Or from the Python Package Index:
+
 .. code:: console
 
   pip install xugrid
