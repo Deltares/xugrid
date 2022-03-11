@@ -83,7 +83,8 @@ def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntA
     segments = segments[np.diff(index) == 0]
     unique, inverse = np.unique(xy, return_inverse=True, axis=0)
     segments = inverse[segments]
-    return *contiguous_xy(unique), segments
+    x, y = contiguous_xy(unique)
+    return x, y, segments
 
 
 def _remove_last_vertex(xy: FloatArray, indices: IntArray):
@@ -121,4 +122,5 @@ def polygons_to_faces(
         valid = ragged_index(n, m, m_per_row).ravel()
         flat_conn[~valid] = fill_value
     flat_conn[valid] = inverse
-    return *contiguous_xy(unique), conn, fill_value
+    x, y = contiguous_xy(unique)
+    return x, y, conn, fill_value
