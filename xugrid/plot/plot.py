@@ -361,7 +361,7 @@ def _plot2d(plotfunc):
         return primitive
 
     return newplotfunc
-
+    
 
 @_plot2d
 def scatter(grid, da, ax, **kwargs):
@@ -402,7 +402,8 @@ def line(grid, da, ax, **kwargs):
     edge_coords[:, 1, 0] = grid.node_x[node_1]
     edge_coords[:, 1, 1] = grid.node_y[node_1]
 
-    norm = kwargs.pop("norm", None)
+    # PolyCollection takes a norm, but not vmin, vmax.
+    norm = kwargs.get("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
 
@@ -517,7 +518,8 @@ def pcolormesh(grid, da, ax, **kwargs):
     # Replace fill value; PolyCollection ignores NaN.
     vertices[faces == -1] = np.nan
 
-    norm = kwargs.pop("norm", None)
+    # PolyCollection takes a norm, but not vmin, vmax.
+    norm = kwargs.get("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
 
@@ -584,14 +586,24 @@ def plot(
     """
     dim = darray.dims[0]
     kwargs["ax"] = ax
-    if dim == grid.face_dimension:
-        return pcolormesh(grid, darray, **kwargs)
-    elif dim == grid.node_dimension:
-        return tripcolor(grid, darray, **kwargs)
-    elif dim == grid.edge_dimension:
-        return line(grid, darray, **kwargs)
+    if grid.topology_dimension == 1:
+        if dim == grid.edge_dimension:
+            return line(grid, darray, **kwargs)
+        elif dim == grid.node_dimension:
+            return scatter(grid, darray, **kwargs)
+        else:
+            raise ValueError("Data dimensions is not one of node or edge dimension.")
+    elif grid.topology_dimension == 2:
+        if dim == grid.face_dimension:
+            return pcolormesh(grid, darray, **kwargs)
+        elif dim == grid.node_dimension:
+            return tripcolor(grid, darray, **kwargs)
+        elif dim == grid.edge_dimension:
+            return line(grid, darray, **kwargs)
+        else:
+            raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
     else:
-        raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
+        raise ValueError("Topology dimension is not 1 or 2")
 
 
 class _PlotMethods:
