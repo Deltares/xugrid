@@ -125,7 +125,9 @@ def laplace_interpolate(
         )
         M = scipy.sparse.linalg.LinearOperator((n, n), ilu.solve)
         # Call conjugate gradient solver
-        x, info = scipy.sparse.linalg.cg(A, rhs, tol=tol, maxiter=maxiter, M=M)
+        x, info = scipy.sparse.linalg.cg(
+            A, rhs, tol=tol, maxiter=maxiter, M=M, atol="legacy"
+        )
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:

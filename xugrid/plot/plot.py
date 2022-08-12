@@ -361,7 +361,7 @@ def _plot2d(plotfunc):
         return primitive
 
     return newplotfunc
-    
+
 
 @_plot2d
 def scatter(grid, da, ax, **kwargs):
@@ -601,7 +601,9 @@ def plot(
         elif dim == grid.edge_dimension:
             return line(grid, darray, **kwargs)
         else:
-            raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
+            raise ValueError(
+                "Data dimensions is not one of face, node, or edge dimension."
+            )
     else:
         raise ValueError("Topology dimension is not 1 or 2")
 

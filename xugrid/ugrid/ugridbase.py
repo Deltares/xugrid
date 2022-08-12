@@ -8,16 +8,16 @@ from scipy.sparse import csr_matrix
 
 from .. import connectivity
 from ..typing import BoolArray, FloatArray, IntArray
-from . import ugrid_io
+from . import conventions
 
 
 class AbstractUgrid(abc.ABC):
     @abc.abstractproperty
-    def topology_dimension(self):
+    def topology_dimension():
         """ """
 
-    @abc.abstractmethod
-    def _get_dimension(self):
+    @abc.abstractproperty
+    def dimensions():
         """ """
 
     @abc.abstractstaticmethod
@@ -25,28 +25,77 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractmethod
-    def sel(self):
+    def to_dataset():
         """ """
 
     @abc.abstractmethod
-    def topology_dataset(self):
+    def isel():
         """ """
 
     @abc.abstractmethod
-    def topology_subset(self):
+    def sel():
         """ """
 
     @abc.abstractmethod
-    def remove_topology(self):
+    def topology_subset():
         """ """
 
     @abc.abstractmethod
-    def topology_coords(self):
+    def _clear_geometry_properties():
         """ """
 
-    @abc.abstractmethod
-    def _clear_geometry_properties(self):
-        """ """
+    @staticmethod
+    def _single_topology(dataset: xr.Dataset):
+        topologies = dataset.ugrid_roles.topology
+        n_topology = len(topologies)
+        if n_topology == 0:
+            raise ValueError("Dataset contains no UGRID topology variable.")
+        elif n_topology > 1:
+            raise ValueError(
+                "Dataset contains {n_topology} topology variables, "
+                "please specify the topology variable name to use."
+            )
+        return topologies[0]
+
+    def _filtered_attrs(self, dataset: xr.Dataset):
+        """
+        Removes names that are not present in the dataset.
+        """
+        topodim = self.topology_dimension
+        attrs = self._attrs.copy()
+
+        for key in conventions._DIM_NAMES[topodim]:
+            if key in attrs:
+                if attrs[key] not in dataset.dims:
+                    attrs.pop(key)
+
+        for key in conventions._CONNECTIVITY_NAMES[topodim]:
+            if key in attrs:
+                if attrs[key] not in dataset:
+                    attrs.pop(key)
+
+        for coord in conventions._COORD_NAMES[topodim]:
+            if coord in attrs:
+                names = attrs[coord].split(" ")
+                present = [name for name in names if name in dataset]
+                if present:
+                    attrs[coord] = " ".join(present)
+                else:
+                    attrs.pop(coord)
+
+        return attrs
+
+    def __repr__(self):
+        if self._dataset:
+            return self._dataset.__repr__()
+        else:
+            return self.to_dataset.__repr__()
+
+    def equals(self, other):
+        if not isinstance(other, type(self)):
+            return False
+        # TODO: check values, etc.
+        return True
 
     def copy(self):
         """Creates deepcopy"""
@@ -55,12 +104,12 @@ class AbstractUgrid(abc.ABC):
     @property
     def node_dimension(self):
         """Name of node dimension"""
-        return self._get_dimension("node")
+        return self._attrs["node_dimension"]
 
     @property
     def edge_dimension(self):
         """Name of edge dimension"""
-        return self._get_dimension("edge")
+        return self._attrs["edge_dimension"]
 
     @property
     def node_coordinates(self) -> FloatArray:
@@ -118,6 +167,28 @@ class AbstractUgrid(abc.ABC):
             self._ymax,
         )
 
+    @staticmethod
+    def _prepare_connectivity(
+        da: xr.DataArray, fill_value: Union[float, int], dtype: type
+    ) -> xr.DataArray:
+        start_index = da.attrs.get("start_index", 0)
+        if start_index not in (0, 1):
+            raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
+
+        data = da.values
+        if "_FillValue" in da.attrs:
+            is_fill = data == da.attrs["_FillValue"]
+        else:
+            is_fill = np.isnan(data)
+
+        cast = data.astype(dtype, copy=True)
+        if start_index:
+            cast -= start_index
+        cast[is_fill] = fill_value
+        if (cast[~is_fill] < 0).any():
+            raise ValueError("connectivity contains negative values")
+        return da.copy(data=cast)
+
     def _topology_subset(
         self, indices: Union[BoolArray, IntArray], node_connectivity: IntArray
     ):
@@ -139,28 +210,92 @@ class AbstractUgrid(abc.ABC):
             node_y = self.node_y[node_indices]
             return self.__class__(node_x, node_y, self.fill_value, new_connectivity)
 
-    def _remove_topology(
+    def set_node_coords(
         self,
-        obj: Union[xr.Dataset, xr.DataArray],
-        topology_variables: ugrid_io.UgridTopologyAttributes,
-    ) -> Union[xr.Dataset, xr.DataArray]:
+        node_x: str,
+        node_y: str,
+        obj: xr.DataArray | xr.Dataset,
+        projected: bool = True,
+    ):
         """
-        Removes the grid topology data from a dataset. Use after creating an
-        Ugrid object from the dataset.
+        Given names of x and y coordinates of the nodes of an object, set them
+        as the coordinates in the grid.
+
+        Parameters
+        ----------
+        node_x: str
+            Name of the x coordinate of the nodes in the object.
+        node_y: str
+            Name of the y coordinate of the nodes in the object.
         """
-        attrs = self.topology_attrs
-        names = []
-        if self.name in obj:
-            names.append(self.name)
-        for topology_attr in topology_variables.coordinates:
-            varname = attrs.get(topology_attr)
-            if varname and varname in obj:
-                names.extend(varname.split())
-        for topology_attr in topology_variables.connectivity:
-            varname = attrs.get(topology_attr)
-            if varname and varname in obj:
-                names.append(varname)
-        return obj.drop_vars(names)
+        if " " in node_x or " " in node_y:
+            raise ValueError("coordinate names may not contain spaces")
+
+        x = obj[node_x].values
+        y = obj[node_y].values
+
+        if (x.ndim != 1) or (x.size != self.n_node):
+            raise ValueError(
+                "shape of node_x does not match n_node of grid: "
+                f"{x.shape} versus {self.n_node}"
+            )
+        if (y.ndim != 1) or (y.size != self.n_node):
+            raise ValueError(
+                "shape of node_y does not match n_node of grid: "
+                f"{y.shape} versus {self.n_node}"
+            )
+
+        # Remove them, then append at the end.
+        node_coords = [
+            coord
+            for coord in self._attrs["node_coordinates"].split(" ")
+            if coord not in (node_x, node_y)
+        ]
+        node_coords.extend((node_x, node_y))
+
+        self._clear_geometry_properties()
+        self.node_x = np.ascontiguousarray(x)
+        self.node_y = np.ascontiguousarray(y)
+        self._attrs["node_coordinates"] = " ".join(node_coords)
+        self._indexes["node_x"] = node_x
+        self._indexes["node_y"] = node_y
+        self.projected = projected
+
+    def assign_node_coords(
+        self,
+        obj: xr.DataArray | xr.Dataset,
+    ) -> xr.DataArray | xr.Dataset:
+        """
+        Assign node coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+
+        Returns
+        -------
+        assigned (same type as obj)
+        """
+        xname = self._indexes["node_x"]
+        yname = self._indexes["node_y"]
+        x_attrs = conventions.DEFAULT_ATTRS["node_x"][self.projected]
+        y_attrs = conventions.DEFAULT_ATTRS["node_y"][self.projected]
+        coords = {
+            xname: xr.DataArray(
+                data=self.node_x,
+                dims=(self.node_dimension,),
+                attrs=x_attrs,
+            ),
+            yname: xr.DataArray(
+                data=self.node_y,
+                dims=(self.node_dimension,),
+                attrs=y_attrs,
+            ),
+        }
+        return obj.assign_coords(coords)
 
     @property
     def node_edge_connectivity(self) -> csr_matrix:

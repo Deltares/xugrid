@@ -16,7 +16,7 @@ except ImportError:
 
 from . import requires_meshkernel
 
-NAME = xugrid.ugrid.ugrid_io.UGRID2D_DEFAULT_NAME
+NAME = "mesh2d"
 VERTICES = np.array(
     [
         [0.0, 0.0],  # 0
@@ -80,14 +80,13 @@ NFJ = np.array([0, 0, 1, 1, 0, 2, 0, 1, 2, 3, 1, 3, 2, 3])
 NODE_FACE_CONNECTIVITY = sparse.coo_matrix((NFJ, (NFI, NFJ))).tocsr()
 
 
-def grid2d(dataset=None, name=None, crs=None):
+def grid2d(dataset=None, crs=None):
     grid = xugrid.Ugrid2d(
         node_x=VERTICES[:, 0],
         node_y=VERTICES[:, 1],
         fill_value=-1,
         face_node_connectivity=FACES,
         dataset=dataset,
-        name=name,
         crs=crs,
     )
     return grid
@@ -96,7 +95,7 @@ def grid2d(dataset=None, name=None, crs=None):
 def test_ugrid2d_init():
     grid = grid2d()
     assert grid.name == NAME
-    assert isinstance(grid.dataset, xr.Dataset)
+    assert grid._dataset is None
     assert grid.node_x.flags["C_CONTIGUOUS"]
     assert grid.node_y.flags["C_CONTIGUOUS"]
     assert grid._edge_node_connectivity is None
@@ -132,40 +131,9 @@ def test_to_crs():
     assert (~(grid.node_coordinates == reprojected.node_coordinates)).all()
 
 
-def test_ugrid2d_from_dataset():
+def test_to_dataset():
     grid = grid2d()
-    grid2 = xugrid.Ugrid2d.from_dataset(grid.dataset)
-    assert grid.dataset == grid2.dataset
-
-
-def test_remove_topology():
-    grid = grid2d()
-    ds = grid.dataset.copy()
-    ds["a"] = xr.DataArray(0)
-    actual = grid.remove_topology(ds)
-    print(actual)
-    assert set(actual.data_vars) == set(["a"])
-
-
-def test_topology_coords():
-    grid = grid2d()
-    ds = xr.Dataset()
-    ds["a"] = xr.DataArray([1, 2, 3], dims=[f"{NAME}_nNodes"])
-    ds["b"] = xr.DataArray([1, 2], dims=[f"{NAME}_nEdges"])
-    ds["c"] = xr.DataArray([1, 2], dims=[f"{NAME}_nFaces"])
-    coords = grid.topology_coords(ds)
-    assert isinstance(coords, dict)
-    assert f"{NAME}_edge_x" in coords
-    assert f"{NAME}_edge_y" in coords
-    assert f"{NAME}_node_x" in coords
-    assert f"{NAME}_node_y" in coords
-    assert f"{NAME}_face_x" in coords
-    assert f"{NAME}_face_y" in coords
-
-
-def test_topology_dataset():
-    grid = grid2d()
-    ds = grid.topology_dataset()
+    ds = grid.to_dataset()
     assert isinstance(ds, xr.Dataset)
     assert f"{NAME}" in ds
     assert f"{NAME}_nNodes" in ds.dims
@@ -173,6 +141,55 @@ def test_topology_dataset():
     assert f"{NAME}_node_x" in ds.coords
     assert f"{NAME}_node_y" in ds.coords
     assert f"{NAME}_face_nodes" in ds
+
+
+def test_ugrid2d_set_node_coords():
+    grid = grid2d()
+    ds = xr.Dataset()
+    lonvalues = VERTICES[:, 0] + 10.0
+    latvalues = VERTICES[:, 1] + 10.0
+    ds["lon"] = xr.DataArray(lonvalues, dims=[grid.node_dimension])
+    ds["lat"] = xr.DataArray(latvalues, dims=[grid.node_dimension])
+    ds["lon with space"] = ds["lon"]
+    ds["lat with space"] = ds["lat"]
+    ds["short_lon"] = xr.DataArray(np.arange(6.0), dims=["short_node"])
+    ds["long_lat"] = xr.DataArray(np.arange(8.0), dims=["long_node"])
+
+    with pytest.raises(ValueError, match="coordinate names may not contain spaces"):
+        grid.set_node_coords("lon with space", "lat with space", ds)
+    with pytest.raises(
+        ValueError, match="shape of node_x does not match n_node of grid: "
+    ):
+        grid.set_node_coords("short_lon", "lat", ds)
+    with pytest.raises(
+        ValueError, match="shape of node_y does not match n_node of grid: "
+    ):
+        grid.set_node_coords("lon", "long_lat", ds)
+
+    grid.set_node_coords("lon", "lat", ds, projected=False)
+    assert np.allclose(grid.node_x, lonvalues)
+    assert np.allclose(grid.node_y, latvalues)
+    assert grid._indexes["node_x"] == "lon"
+    assert grid._indexes["node_y"] == "lat"
+    assert not grid.projected
+
+
+def test_ugrid2d_dataset_roundtrip():
+    grid = grid2d()
+    ds = grid.to_dataset()
+    grid2 = xugrid.Ugrid2d.from_dataset(ds)
+    assert isinstance(grid2._dataset, xr.Dataset)
+    assert grid2._dataset == ds
+
+
+def test_assign_node_coords():
+    grid = grid2d()
+    ds = xr.Dataset()
+    # Place some data on the grid facets.
+    ds["a"] = xr.DataArray([1, 2, 3, 4, 5, 6, 7], dims=[f"{NAME}_nNodes"])
+    with_coords = grid.assign_node_coords(ds)
+    assert f"{NAME}_node_x" in with_coords
+    assert f"{NAME}_node_y" in with_coords
 
 
 def test_clear_geometry_properties():
@@ -202,18 +219,12 @@ def test_topology_dimension():
     assert grid.topology_dimension == 2
 
 
-def test_get_dimension():
-    grid = grid2d()
-    assert grid._get_dimension("node") == f"{NAME}_nNodes"
-    assert grid._get_dimension("edge") == f"{NAME}_nEdges"
-    assert grid._get_dimension("face") == f"{NAME}_nFaces"
-
-
 def test_dimensions():
     grid = grid2d()
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.face_dimension == f"{NAME}_nFaces"
+    assert grid.dimensions == (f"{NAME}_nNodes", f"{NAME}_nEdges", f"{NAME}_nFaces")
 
 
 def test_edge_node_connectivity():

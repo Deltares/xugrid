@@ -17,7 +17,7 @@ class TestPlot:
         plt.close("all")
 
         self.ds = xugrid.data.disk()
-        self.grid = self.ds.ugrid.grid
+        self.grid = self.ds.ugrid.grids[0]
         self.node = self.ds["node_z"]
         self.edge = self.ds["edge_z"]
         self.face = self.ds["face_z"]
