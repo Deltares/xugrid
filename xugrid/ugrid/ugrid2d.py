@@ -100,7 +100,8 @@ class Ugrid2d(AbstractUgrid):
             x, y = defaults["node_coordinates"].split(" ")
             self._indexes = {"node_x": x, "node_y": y}
         else:
-            self._attrs = {**defaults, **dataset[name].attrs}
+            derived_dims = dataset.ugrid_roles.dimensions[name]
+            self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
             self._indexes = indexes
 
         self._dataset = dataset

@@ -5,6 +5,7 @@ It takes some inspiration from: https://github.com/xarray-contrib/cf-xarray
 """
 import warnings
 from collections import ChainMap
+from itertools import chain
 from typing import Tuple
 
 import xarray as xr
@@ -26,6 +27,11 @@ _DIM_NAMES = {
 _COORD_NAMES = {
     1: ("node_coordinates", "edge_coordinates"),
     2: ("node_coordinates", "face_coordinates", "edge_coordinates"),
+}
+_COORD_DIMS = {
+    "node_coordinates": "node_dimension",
+    "edge_coordinates": "node_dimension",
+    "face_coordinates": "face_dimension",
 }
 
 _CONNECTIVITY_NAMES = {
@@ -227,10 +233,11 @@ def _get_coordinates(
 def _infer_dims(
     ds: xr.Dataset,
     connectivities: dict[str, str],
+    coordinates: dict[str, dict[str, Tuple[list[str]]]],
     vardict: dict[str, str],
 ) -> dict[str, str]:
     """
-    Infer dimensions based on connectivity.
+    Infer dimensions based on connectivity and coordinates.
     """
     inferred = {}
     for role, varname in connectivities.items():
@@ -248,11 +255,32 @@ def _infer_dims(
                             f"{key}: {prev_dim} not in {role}: {varname}"
                             f" with dimensions: {var_dims}"
                         )
+
+    for role, varnames in coordinates.items():
+        key = _COORD_DIMS[role]
+        for varname in chain.from_iterable(varnames):
+            var_dims = ds[varname].dims
+            if len(var_dims) != 1:
+                continue
+            var_dim = var_dims[0]
+
+            prev_dim = vardict.get(key) or inferred.get(key)
+            if prev_dim is None:
+                inferred[key] = var_dim
+            else:
+                if prev_dim != var_dim:
+                    raise UgridDimensionError(
+                        f"Conflicting names for {key}: {prev_dim} versus {var_dim}"
+                    )
+
     return inferred
 
 
 def _get_dimensions(
-    ds: xr.Dataset, topologies: list[str], connectivity: dict[str, dict[str, str]]
+    ds: xr.Dataset,
+    topologies: list[str],
+    connectivity: dict[str, dict[str, str]],
+    coordinates: dict[str, dict[str, Tuple[list[str]]]],
 ) -> dict[str, dict[str, str]]:
     """
     Get the dimensions from the topology attributes and infer them from
@@ -265,7 +293,9 @@ def _get_dimensions(
         # dimensions are optionally required: only if the dimension order is
         # nonstandard in any of the connectivity variables.
         vardict = {k: attrs[k] for k in _DIM_NAMES[topodim] if k in attrs}
-        inferred = _infer_dims(ds, connectivity[topology], vardict)
+        inferred = _infer_dims(
+            ds, connectivity[topology], coordinates[topology], vardict
+        )
         topology_dict[topology] = {**vardict, **inferred}
 
     return topology_dict
@@ -288,6 +318,26 @@ def _get_connectivity(
 
 @xr.register_dataset_accessor("ugrid_roles")
 class UgridRolesAccessor:
+    """
+    Xarray Dataset "accessor" to retrieve the names of UGRID variables.
+
+    Examples
+    --------
+
+    To get a list of the UGRID dummy variables in the dataset:
+
+    >>> dataset.ugrid_roles.topology
+
+    To get the names of the connectivity variables in the dataset:
+
+    >>> dataset.ugrid_roles.connectivity
+
+    Names can also be accessed directly through the topology:
+
+    >>> dataset.ugrid_roles["mesh2d"]["node_dimension"]
+
+    """
+
     def __init__(self, ds: xr.Dataset):
         self._ds = ds
 
@@ -300,22 +350,70 @@ class UgridRolesAccessor:
 
     @property
     def topology(self) -> list[str]:
+        """
+        Get the names of the topology dummy variables, marked by a CF-role of
+        ``mesh_topology``.
+
+        Returns
+        -------
+        topology: list[str]
+        """
         return _get_topology(self._ds)
 
     @property
     def coordinates(self) -> dict[str, dict[str, Tuple[list[str], list[str]]]]:
+        """
+        Get the names of the coordinate variables from the topology attributes.
+
+        Returns a dictionary with the coordinates for the UGRID coordinates:
+
+            * node coordinates
+            * edge coordinates
+            * face coordinates
+
+        Multiple coordinates may be defined. The coordinates are grouped by
+        their role (x or y).
+
+        Returns
+        -------
+        coordinates: dict[str, dict[str, Tuple[list[str]]]]
+        """
         return _get_coordinates(self._ds, self.topology)
 
     @property
     def dimensions(self) -> dict[str, dict[str, str]]:
         """
-        Get the dimensions from the topology attributes and infer them from
-        connectivity arrays or coordinates.
+        Get the dimension names from the topology attributes and infer them
+        from connectivity arrays or coordinates.
+
+        Returns a dictionary with the UGRID dimensions per topology:
+
+            * node dimension
+            * edge dimension
+            * face dimension
+
+        Returns
+        -------
+        dimensions: dict[str, dict[str, str]]
         """
-        return _get_dimensions(self._ds, self.topology, self.connectivity)
+        return _get_dimensions(
+            self._ds, self.topology, self.connectivity, self.coordinates
+        )
 
     @property
     def connectivity(self) -> dict[str, dict[str, str]]:
+        """
+        Get the names of the variables containing the UGRID connectivity data.
+
+            * face_node_connectivity
+            * edge_node_connectivity
+            * face_edge_connectivity
+            * edge_face_connectivity
+
+        Returns
+        -------
+        connectivity: dict[str, dict[str, str]]
+        """
         return _get_connectivity(self._ds, self.topology)
 
     def __repr__(self):
