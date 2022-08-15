@@ -91,6 +91,9 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         """
         Appropriately wrap result if necessary.
         """
+        if attr == "obj":
+            return self.obj
+
         result = getattr(self.obj, attr)
         if isinstance(result, xr.DataArray):
             return UgridDataArray(result, self.grid)
@@ -250,7 +253,9 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         return self.obj.__repr__()
 
     def __init__(
-        self, obj: xr.Dataset = None, grids: UgridType | Sequence[UgridType] = None
+        self,
+        obj: xr.Dataset = None,
+        grids: Union[UgridType, Sequence[UgridType]] = None,
     ):
         if grids is None:
             if obj is None:
@@ -330,6 +335,9 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         """
         Appropriately wrap result if necessary.
         """
+        if attr == "obj":
+            return self.obj
+
         result = getattr(self.obj, attr)
         grids = {dim: grid for grid in self.grids for dim in grid.dimensions}
         if isinstance(result, xr.DataArray):
@@ -1093,6 +1101,40 @@ def wrap_func_like(func):
     return _like
 
 
+def wrap_func_objects(func):
+    @wraps(func)
+    def _f(objects, *args, **kwargs):
+        grids = []
+        bare_objs = []
+        for obj in objects:
+            if isinstance(obj, UgridDataArray):
+                grids.append(obj.grid)
+            elif isinstance(obj, UgridDataset):
+                grids.extend(obj.grids)
+            else:
+                raise TypeError(
+                    "Can only concatenate xugrid UgridDataset and UgridDataArray "
+                    f"objects, got {type(obj).__name__}"
+                )
+
+            bare_objs.append(obj.obj)
+
+        grids = set(grids)
+        result = func(bare_objs, *args, **kwargs)
+        if isinstance(result, xr.DataArray):
+            if len(grids) > 1:
+                raise ValueError("All UgridDataArrays must have the same grid")
+            return UgridDataArray(result, next(iter(grids)))
+        else:
+            return UgridDataset(result, grids)
+
+    _f.__doc__ = func.__doc__
+    return _f
+
+
 full_like = wrap_func_like(xr.full_like)
 zeros_like = wrap_func_like(xr.zeros_like)
 ones_like = wrap_func_like(xr.ones_like)
+
+concat = wrap_func_objects(xr.concat)
+merge = wrap_func_objects(xr.merge)
