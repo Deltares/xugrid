@@ -5,8 +5,12 @@ from .plot import plot
 from .ugrid import Ugrid1d, Ugrid2d, UgridRolesAccessor
 from .ugrid_dataset import (
     UgridDataArray,
+    UgridDataArrayAccessor,
     UgridDataset,
+    UgridDatasetAccessor,
+    concat,
     full_like,
+    merge,
     ones_like,
     open_dataarray,
     open_dataset,

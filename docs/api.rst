@@ -11,7 +11,7 @@ Top-level functions
 -------------------
 
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
     
     open_dataarray
     open_dataset
@@ -20,15 +20,15 @@ Top-level functions
     full_like
     ones_like
     zeros_like
-
+    concat
+    merge
+   
 UGRID Accessor
 --------------
 
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
    
-    UgridRolesAccessor
-
     UgridDatasetAccessor
     UgridDatasetAccessor.assign_node_coords
     UgridDatasetAccessor.set_node_coords
@@ -48,7 +48,6 @@ UGRID Accessor
     UgridDataArrayAccessor.isel
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points
-    UgridDataArrayAccessor.plot
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
     UgridDataArrayAccessor.to_geodataframe
@@ -65,7 +64,7 @@ UgridDataArray
 --------------
 
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
 
     UgridDataArray
     UgridDataArray.ugrid
@@ -75,17 +74,17 @@ UgridDataset
 ------------
     
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
     
     UgridDataset
-    UgridDataArray.ugrid
+    UgridDataset.ugrid
     UgridDataset.from_geodataframe
 
 UGRID1D Topology
 ----------------
 
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
     
     Ugrid1d
 
@@ -129,7 +128,7 @@ UGRID2D Topology
 ----------------
 
 .. autosummary::
-    :toctree: api/
+   :toctree: api/
 
     Ugrid2d
 
@@ -198,3 +197,15 @@ UGRID2D Topology
     Ugrid2d.from_geodataframe
     Ugrid2d.from_structured
     Ugrid2d.to_pygeos
+
+UGRID Roles Accessor
+--------------------
+   
+.. autosummary::
+   :toctree: api/
+
+    UgridRolesAccessor
+    UgridRolesAccessor.topology
+    UgridRolesAccessor.connectivity
+    UgridRolesAccessor.coordinates
+    UgridRolesAccessor.dimensions

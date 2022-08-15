@@ -41,6 +41,25 @@ UGRID_DS["a"] = DARRAY
 UGRID_DS["b"] = DARRAY * 2
 
 
+def ugrid1d_ds():
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+    )
+    ds = grid.to_dataset()
+    ds["a1d"] = xr.DataArray([1, 2, 3], dims=[grid.node_dimension])
+    return xugrid.UgridDataset(ds)
+
+
 class TestUgridDataArray:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -67,6 +86,8 @@ class TestUgridDataArray:
         assert isinstance(self.uda.data, np.ndarray)
         # So are functions
         assert isinstance(self.uda.mean(), xugrid.UgridDataArray)
+        # obj should be accessible
+        assert isinstance(self.uda.obj, xr.DataArray)
 
     def test_ugrid_accessor(self):
         assert isinstance(self.uda.ugrid, xugrid.ugrid_dataset.UgridDataArrayAccessor)
@@ -281,6 +302,8 @@ class TestUgridDataset:
         assert tuple(self.uds.dims) == ("mesh2d_nFaces",)
         assert isinstance(self.uds.a, xugrid.UgridDataArray)
         assert isinstance(self.uds.mean(), xugrid.UgridDataset)
+        # obj should be accessible
+        assert isinstance(self.uds.obj, xr.Dataset)
 
     def test_unary_op(self):
         alltrue = self.uds.astype(bool)
@@ -458,3 +481,26 @@ def test_func_like():
     fullda = xugrid.ones_like(uds["a"])
     assert isinstance(fullda, xugrid.UgridDataArray)
     assert (fullda == 1).all()
+
+
+def test_concat():
+    uds = xugrid.UgridDataset(UGRID_DS)
+    uda = uds["a"]
+    uda1 = uda.assign_coords(layer=1)
+    uda2 = uda.assign_coords(layer=2)
+    result = xugrid.concat([uda1, uda2], dim="layer")
+    assert result.dims == ("layer", "mesh2d_nFaces")
+    assert np.array_equal(result["layer"], [1, 2])
+
+    uds1d = ugrid1d_ds()
+    uda3 = uds1d["a1d"].assign_coords(layer=2)
+    with pytest.raises(ValueError, match="All UgridDataArrays must have the same grid"):
+        xugrid.concat([uda1, uda3], dim="layer")
+
+
+def test_merge():
+    uds2d = xugrid.UgridDataset(UGRID_DS)
+    uds1d = ugrid1d_ds()
+    merged = xugrid.merge([uds2d, uds1d])
+    assert isinstance(merged, xugrid.UgridDataset)
+    assert len(merged.grids) == 2

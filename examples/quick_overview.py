@@ -121,7 +121,7 @@ subset.ugrid.plot()
 #
 #   ``ugrid.sel()`` currently only supports data on the faces for 2D
 #   topologies, and data on edges for 1D topologies. More flexibility
-#   will be added soon.
+#   may be added.
 #
 # Computation
 # -----------
@@ -135,9 +135,8 @@ uda + 10.0
 # ---------
 #
 # Xugrid objects provide a number of conversion functions from and to geopandas
-# GeoDataFrames using :py:meth:`xugrid.UgridDataArray.to_geodataframe`, and
-# :py:meth:`xugrid.UgridDataset.from_geodataframe`. Note that storing large
-# grids as GeoDataFrames can be very inefficient.
+# GeoDataFrames using :py:meth:`xugrid.UgridDataset.from_geodataframe`. Note
+# that storing large grids as GeoDataFrames can be very inefficient.
 
 gdf = uda.ugrid.to_geodataframe(name="test")
 gdf
@@ -162,7 +161,7 @@ xu.data.disk()
 # A UgridDataset may be initialized without data variables, but this requires
 # a grid object:
 
-new_uds = xu.UgridDataset(grid=uds.ugrid.grid)
+new_uds = xu.UgridDataset(grids=uds.ugrid.grids)
 new_uds
 
 # %%
