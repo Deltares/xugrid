@@ -4,70 +4,79 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Centroid Voronoi Tesselation (CVT) &#8212; Xugrid 0.1.3 documentation</title>
-    
-    <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
-    
-    <link rel="stylesheet"
-      href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+    <title>Centroid Voronoi Tesselation (CVT) &#8212; Xugrid 0.1.4 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
-    
-    <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Development" href="../dev_docs.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
 
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
 
   <div id="navbar-start">
     
     
+  
 
-<a class="navbar-brand" href="../index.html">
-  <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo">
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    <img src="../_static/xugrid-low-res.svg" class="logo__image only-light" alt="Logo image">
+    <img src="../_static/xugrid-low-res.svg" class="logo__image only-dark" alt="Logo image">
+  
+  
 </a>
-
-
     
   </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+    <span class="fas fa-bars"></span>
   </button>
 
   
@@ -103,6 +112,14 @@
     <div id="navbar-end">
       
       <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
           <a class="nav-link" href="https://deltares.nl/en/" rel="noopener" target="_blank" title="Deltares"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
@@ -116,13 +133,13 @@
     </nav>
     
 
-    <div class="container-xl">
-      <div class="row">
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
           
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -130,20 +147,21 @@
     
   </div>
 </nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
 
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage pt-5 pb-3">
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -162,23 +180,21 @@
 </ul>
 
 </nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
-          
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
 
           
           
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          <div class="bd-content col-12 col-md-9 col-xl-7">
               
-              <div>
+              <article class="bd-article" role="main">
                 
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
@@ -186,7 +202,7 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="centroid-voronoi-tesselation-cvt">
-<span id="sphx-glr-examples-dev-voronoi-py"></span><h1>Centroid Voronoi Tesselation (CVT)<a class="headerlink" href="#centroid-voronoi-tesselation-cvt" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-dev-voronoi-py"></span><h1>Centroid Voronoi Tesselation (CVT)<a class="headerlink" href="#centroid-voronoi-tesselation-cvt" title="Permalink to this heading">#</a></h1>
 <p>In principle, computing a centroid voronoi tesslation mesh from an existing mesh
 of convex cells is easy:</p>
 <ul class="simple">
@@ -302,8 +318,7 @@ black.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comparison_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_001.png" srcset="../_images/sphx_glr_voronoi_001.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
+<img src="../_images/sphx_glr_voronoi_001.png" srcset="../_images/sphx_glr_voronoi_001.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>It should be clear that the new voronoi mesh is not space filling: since it
@@ -329,8 +344,7 @@ this requires more topological information.</p>
 <span class="n">comparison_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_002.png" srcset="../_images/sphx_glr_voronoi_002.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
+<img src="../_images/sphx_glr_voronoi_002.png" srcset="../_images/sphx_glr_voronoi_002.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>A potential downside of including the full exterior only becomes clear when
@@ -365,8 +379,7 @@ we apply it to a mesh with a more complex exterior.</p>
 <span class="n">comparison_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_003.png" srcset="../_images/sphx_glr_voronoi_003.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
+<img src="../_images/sphx_glr_voronoi_003.png" srcset="../_images/sphx_glr_voronoi_003.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>The voronoi cell in the center of the disk has now become concave. This will
@@ -395,8 +408,7 @@ every centroid to exterior edges.</p>
 <span class="n">comparison_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_004.png" srcset="../_images/sphx_glr_voronoi_004.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
+<img src="../_images/sphx_glr_voronoi_004.png" srcset="../_images/sphx_glr_voronoi_004.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1500x500 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>This will (obviously) result in a mesh that does not preserve the exterior
@@ -454,7 +466,7 @@ exactly.</p>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_voronoi_005.png" srcset="../_images/sphx_glr_voronoi_005.png" alt="voronoi" class = "sphx-glr-single-img"/><section id="plotting">
-<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this heading">#</a></h2>
 <p>One of the uses of a voronoi tesselation is to visualize data that is located
 on the faces. This is once again relevant for finite volume or finite
 difference simulations; finite element simulation data is located on the
@@ -506,8 +518,7 @@ two faces.</p>
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_006.png" srcset="../_images/sphx_glr_voronoi_006.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.05, 1.05)
+<img src="../_images/sphx_glr_voronoi_006.png" srcset="../_images/sphx_glr_voronoi_006.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.05, 1.05)
 </pre></div>
 </div>
 <p>While the second option fills a greater proportion than the first option –
@@ -515,7 +526,7 @@ which is confined to the area between the centroids – it’s clear this
 approach results in artifacts in the exterior voronoi cells.</p>
 </section>
 <section id="infinite-rays">
-<h2>Infinite rays<a class="headerlink" href="#infinite-rays" title="Permalink to this headline">¶</a></h2>
+<h2>Infinite rays<a class="headerlink" href="#infinite-rays" title="Permalink to this heading">#</a></h2>
 <p>When only vertices are considered, the voronoi edges between the most outward
 vertices are unbounded: they extend into infinity (the dotted lines in the
 plots below). These can be intersected with the mesh exterior.</p>
@@ -554,12 +565,11 @@ centroids in orange.</p></li>
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_voronoi_007.png" srcset="../_images/sphx_glr_voronoi_007.png" alt="voronoi" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
+<img src="../_images/sphx_glr_voronoi_007.png" srcset="../_images/sphx_glr_voronoi_007.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.375 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.469 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/69a0d97cd56676c7761ca6c5aef43e94/voronoi.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">voronoi.py</span></code></a></p>
 </div>
@@ -572,43 +582,48 @@ centroids in orange.</p></li>
 </section>
 
 
-              </div>
+              </article>
               
-              
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../dev_docs.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Development</p>
-        </div>
-    </a>
-</div>
-              
-          </main>
-          
 
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="../dev_docs.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Development</p>
+      </div>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
       </div>
     </div>
+
   
-    <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
     &copy; Copyright Deltares.<br>
 </p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
-</p>
-    </div>
-    
   </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+  </div>
+  
+</div>
 </footer>
   </body>
 </html>

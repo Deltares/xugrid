@@ -53,7 +53,7 @@ recommended read.
         topology. "Vertex" is used interchangeably.
 
     Edge
-        A line or cuve bounded by two nodes.
+        A line or curve bounded by two nodes.
 
     Face
         A plane or surface enclosed by a set of edges. "Cell" is used somewhat

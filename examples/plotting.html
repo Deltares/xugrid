@@ -4,71 +4,80 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Plot unstructured mesh data &#8212; Xugrid 0.1.3 documentation</title>
-    
-    <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
-    
-    <link rel="stylesheet"
-      href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+    <title>Plot unstructured mesh data &#8212; Xugrid 0.1.4 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
-    
-    <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Connectivity" href="connectivity.html" />
     <link rel="prev" title="Quick overview" href="quick_overview.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
 
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
 
   <div id="navbar-start">
     
     
+  
 
-<a class="navbar-brand" href="../index.html">
-  <img src="../_static/xugrid-low-res.svg" class="logo" alt="logo">
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    <img src="../_static/xugrid-low-res.svg" class="logo__image only-light" alt="Logo image">
+    <img src="../_static/xugrid-low-res.svg" class="logo__image only-dark" alt="Logo image">
+  
+  
 </a>
-
-
     
   </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+    <span class="fas fa-bars"></span>
   </button>
 
   
@@ -104,6 +113,14 @@
     <div id="navbar-end">
       
       <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
           <a class="nav-link" href="https://deltares.nl/en/" rel="noopener" target="_blank" title="Deltares"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
@@ -117,13 +134,13 @@
     </nav>
     
 
-    <div class="container-xl">
-      <div class="row">
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
           
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -180,20 +197,21 @@
 
   </div>
 </nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
 
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage pt-5 pb-3">
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -232,23 +250,21 @@
 </ul>
 
 </nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
-          
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
 
           
           
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          <div class="bd-content col-12 col-md-9 col-xl-7">
               
-              <div>
+              <article class="bd-article" role="main">
                 
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
@@ -256,7 +272,7 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="plot-unstructured-mesh-data">
-<span id="sphx-glr-examples-plotting-py"></span><h1>Plot unstructured mesh data<a class="headerlink" href="#plot-unstructured-mesh-data" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-plotting-py"></span><h1>Plot unstructured mesh data<a class="headerlink" href="#plot-unstructured-mesh-data" title="Permalink to this heading">#</a></h1>
 <p>The labels that are present in xarray’s data structures allow for easy creation
 of informative plots: think of dates on the x-axis, or geospatial coordinates.
 Xarray provides a convenient way of plotting your data provided it is
@@ -270,7 +286,7 @@ is accessed via the <code class="docutils literal notranslate"><span class="pre"
 UgridDatasets and UgridDataArrays behave the same as ordinary Xarray DataArrays
 and Datasets otherwise.</p>
 <section id="imports">
-<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this heading">#</a></h2>
 <p>The following imports suffice for the examples.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
@@ -322,6 +338,7 @@ faces.</p>
 }
 
 html[theme=dark],
+body[data-theme=dark],
 body.vscode-dark {
   --xr-font-color0: rgba(255, 255, 255, 1);
   --xr-font-color2: rgba(255, 255, 255, 0.54);
@@ -643,259 +660,12 @@ dl.xr-attrs {
   fill: currentColor;
 }
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt;
-Dimensions:        (mesh2d_nNodes: 217, mesh2d_nFaces: 384, mesh2d_nEdges: 600)
-Coordinates:
-    mesh2d_face_x  (mesh2d_nFaces) float64 4.82 4.792 4.795 ... 5.384 5.191
-    mesh2d_face_y  (mesh2d_nFaces) float64 5.312 5.986 6.632 ... 9.56 9.781
-    mesh2d_edge_x  (mesh2d_nEdges) float64 5.0 5.0 4.729 ... 5.898 5.581 5.896
-    mesh2d_edge_y  (mesh2d_nEdges) float64 5.312 4.688 4.844 ... 9.021 9.27
-    mesh2d_node_x  (mesh2d_nNodes) float64 5.0 5.0 0.6699 ... 5.583 6.213 5.578
-    mesh2d_node_y  (mesh2d_nNodes) float64 5.0 10.0 7.5 ... 8.704 9.203 9.337
+Dimensions:  (mesh2d_nNodes: 217, mesh2d_nFaces: 384, mesh2d_nEdges: 600)
 Dimensions without coordinates: mesh2d_nNodes, mesh2d_nFaces, mesh2d_nEdges
 Data variables:
-    node_z         (mesh2d_nNodes) float64 1.941 9.182 0.1692 ... 4.581 5.932
-    face_z         (mesh2d_nFaces) float64 1.868 2.092 2.505 ... 7.283 8.483
-    edge_z         (mesh2d_nEdges) float64 1.993 1.817 1.805 ... 5.151 5.156</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-0c2444ed-285f-4c2f-8d50-31b02700ce11' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0c2444ed-285f-4c2f-8d50-31b02700ce11' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span>mesh2d_nNodes</span>: 217</li><li><span>mesh2d_nFaces</span>: 384</li><li><span>mesh2d_nEdges</span>: 600</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-8743370d-7c1c-4b9e-a55f-b23db851a14b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8743370d-7c1c-4b9e-a55f-b23db851a14b' class='xr-section-summary' >Coordinates: <span>(6)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>4.82 4.792 4.795 ... 5.384 5.191</div><input id='attrs-b326c017-b8e0-4740-8125-63f67475ff91' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b326c017-b8e0-4740-8125-63f67475ff91' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f277b7f8-7283-48a4-810f-e53fffe6cc54' class='xr-var-data-in' type='checkbox'><label for='data-f277b7f8-7283-48a4-810f-e53fffe6cc54' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([4.81957804, 4.79166667, 4.79542073, 4.79983981, 4.8031435 ,
-       4.80557156, 4.80740136, 4.80882022, 4.61124471, 4.58708739,
-       4.59526054, 4.60298331, 4.60871506, 4.61297292, 4.61622159,
-       4.25040079, 4.17792885, 4.17859387, 4.18906695, 4.19955652,
-       4.20850403, 4.2159012 , 4.0216642 , 3.96959552, 3.96925678,
-       3.9800686 , 3.99194412, 4.00261209, 3.68873166, 3.57369421,
-       3.54854243, 3.55192509, 3.56348763, 3.57662115, 3.449095  ,
-       3.36197821, 3.3402091 , 3.34295652, 3.3540566 , 3.13656571,
-       2.9912189 , 2.93580837, 2.92160182, 2.92519216, 2.8904056 ,
-       2.77338238, 2.72616967, 2.71326849, 2.58877638, 2.42211471,
-       2.33999743, 2.3051708 , 2.33832201, 2.19836847, 2.1273319 ,
-       2.04321624, 1.86109374, 1.75688399, 1.78973422, 1.6322748 ,
-       1.49892272, 1.30518858, 1.24319602, 0.95541217, 4.63915608,
-       4.04206746, 3.48415239, 2.93640552, 2.39191989, 1.84878779,
-       1.30632408, 0.76423239, 4.22248942, 3.6087516 , 3.04435554,
-       2.49338891, 1.94703707, 1.40270714, 0.85941761, 4.04206746,
-       3.3558577 , 2.75228808, 2.18028585, 1.62167123, 1.06959777,
-       0.52108979, 3.6087516 , 2.93919103, 2.33123499, 1.75345098,
-       1.19031259, 0.63488689, 3.48415239, 2.75228808, 2.09708486,
-       1.48773346, 0.90348506, 0.33350514, 3.04435554, 2.33123499,
-...
-       7.24771192, 7.90291514, 8.51226654, 9.09651494, 9.66649486,
-       6.95564446, 7.66876501, 8.31958181, 8.93087381, 9.5186115 ,
-       7.06359448, 7.81971415, 8.51226654, 9.15679636, 9.76963705,
-       7.50661109, 8.24654902, 8.93087381, 9.57346303, 7.60808011,
-       8.37832877, 9.09651494, 9.76963705, 8.05296293, 8.80968741,
-       9.5186115 , 8.15121221, 8.93040223, 9.66649486, 8.59729286,
-       9.36511311, 8.69367592, 9.47891021, 9.14058239, 9.23576761,
-       5.18042196, 5.74959921, 6.31126834, 6.86343429, 7.41122362,
-       7.95678376, 8.50107728, 9.04458783, 5.38875529, 5.9783358 ,
-       6.550905  , 7.1095944 , 7.66167799, 8.21026578, 8.75680398,
-       5.20833333, 5.82207115, 6.42630579, 7.0087811 , 7.57788529,
-       8.13890626, 8.69481142, 5.41291261, 6.03040448, 6.63802179,
-       7.22661762, 7.80163153, 8.3677252 , 5.20457927, 5.82140613,
-       6.45145757, 7.06419163, 7.66000257, 8.24311601, 5.40473946,
-       6.03074322, 6.6597909 , 7.27383033, 7.8726681 , 5.20016019,
-       5.81093305, 6.44807491, 7.07839818, 7.6948292 , 5.39701669,
-       6.0199314 , 6.65704348, 7.28673151, 5.1968565 , 5.80044348,
-       6.43651237, 7.07480784, 5.39128494, 6.00805588, 6.6459434 ,
-       5.19442844, 5.79149597, 6.42337885, 5.38702708, 5.99738791,
-       5.19259864, 5.7840988 , 5.38377841, 5.19117978])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.312 5.986 6.632 ... 9.56 9.781</div><input id='attrs-abb37220-bb2d-4c44-b2eb-ceb99d00e70d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-abb37220-bb2d-4c44-b2eb-ceb99d00e70d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-99116825-4d53-4e67-bc08-0094a139350c' class='xr-var-data-in' type='checkbox'><label for='data-99116825-4d53-4e67-bc08-0094a139350c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.3125    , 5.98584392, 6.63223616, 7.26727112, 7.89789636,
-       8.52645312, 9.1538927 , 9.78066545, 5.67334392, 6.36808007,
-       7.02450728, 7.66516748, 8.29934948, 8.93034582, 9.55955814,
-       5.67334392, 6.423869  , 7.12119511, 7.78773304, 8.43882179,
-       9.08146716, 9.71910038, 6.04163284, 6.78471292, 7.48652451,
-       8.15993423, 8.81704678, 9.46455628, 5.99328892, 6.77195613,
-       7.51399826, 8.21956962, 8.9008772 , 9.56661597, 6.3627683 ,
-       7.13591207, 7.87484218, 8.58228761, 9.26735727, 6.30697937,
-       7.09615514, 7.86385447, 8.59989125, 9.3096116 , 6.67641028,
-       7.46325362, 8.22618555, 8.96073517, 6.61943091, 7.41261529,
-       8.19449481, 8.9516421 , 6.98853744, 7.78152539, 8.55910743,
-       6.93160653, 7.7261892 , 8.51599023, 7.30034819, 8.09604141,
-       7.24374166, 8.03859967, 7.61214093, 7.55589927, 5.        ,
-       5.3125    , 5.63894723, 5.96029175, 6.27846545, 6.59484659,
-       6.91015104, 7.22476618, 5.        , 5.32644723, 5.66173898,
-       5.9887572 , 6.31081204, 6.62999763, 6.94741722, 4.6875    ,
-       5.        , 5.34923898, 5.6915779 , 6.0262065 , 6.35527796,
-       6.68050071, 4.67355277, 5.        , 5.35061244, 5.69668061,
-       6.03552139, 6.36851487, 4.36105277, 4.65076102, 5.        ,
-       5.35571516, 5.70638239, 6.05062574, 4.33826102, 4.64938756,
-...
-       5.34923898, 5.        , 4.64428484, 4.29361761, 3.94937426,
-       5.66173898, 5.35061244, 5.        , 4.64389794, 4.29175016,
-       5.96029175, 5.6915779 , 5.35571516, 5.        , 4.6420305 ,
-       5.9887572 , 5.69668061, 5.35610206, 5.        , 6.27846545,
-       6.0262065 , 5.70638239, 5.3579695 , 6.31081204, 6.03552139,
-       5.70824984, 6.59484659, 6.35527796, 6.05062574, 6.62999763,
-       6.36851487, 6.91015104, 6.68050071, 6.94741722, 7.22476618,
-       5.3125    , 5.67334392, 5.99328892, 6.30697937, 6.61943091,
-       6.93160653, 7.24374166, 7.55589927, 5.67334392, 6.04163284,
-       6.3627683 , 6.67641028, 6.98853744, 7.30034819, 7.61214093,
-       5.98584392, 6.423869  , 6.77195613, 7.09615514, 7.41261529,
-       7.7261892 , 8.03859967, 6.36808007, 6.78471292, 7.13591207,
-       7.46325362, 7.78152539, 8.09604141, 6.63223616, 7.12119511,
-       7.51399826, 7.86385447, 8.19449481, 8.51599023, 7.02450728,
-       7.48652451, 7.87484218, 8.22618555, 8.55910743, 7.26727112,
-       7.78773304, 8.21956962, 8.59989125, 8.9516421 , 7.66516748,
-       8.15993423, 8.58228761, 8.96073517, 7.89789636, 8.43882179,
-       8.9008772 , 9.3096116 , 8.29934948, 8.81704678, 9.26735727,
-       8.52645312, 9.08146716, 9.56661597, 8.93034582, 9.46455628,
-       9.1538927 , 9.71910038, 9.55955814, 9.78066545])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_edge_x</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 5.0 4.729 ... 5.898 5.581 5.896</div><input id='attrs-e5ba02f4-cfaa-4040-b85f-9cda403790ed' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e5ba02f4-cfaa-4040-b85f-9cda403790ed' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-685239d9-fd29-4be6-a127-75302c9506c1' class='xr-var-data-in' type='checkbox'><label for='data-685239d9-fd29-4be6-a127-75302c9506c1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.        , 5.        , 4.72936706, 5.27063294, 4.72936706,
-       5.27063294, 5.        , 4.71323033, 5.28676967, 0.82754882,
-       0.54077915, 0.94050592, 0.82754882, 0.94050592, 0.54077915,
-       5.        , 4.71323033, 5.28676967, 9.17245118, 9.45922085,
-       9.05949408, 9.05949408, 9.45922085, 9.17245118, 5.        ,
-       5.27063294, 4.72936706, 4.6875    , 5.3125    , 5.        ,
-       4.6875    , 4.69313109, 5.3125    , 5.30686891, 5.        ,
-       4.69313109, 4.69975971, 5.30686891, 5.30024029, 5.        ,
-       4.69975971, 4.70471526, 5.30024029, 5.29528474, 5.        ,
-       4.70471526, 4.70835734, 5.29528474, 5.29164266, 5.        ,
-       4.70835734, 4.71110205, 5.29164266, 5.28889795, 4.71323033,
-       5.28676967, 4.71110205, 5.28889795, 4.11274976, 4.42433238,
-       3.47163506, 4.11062147, 3.79281608, 2.82211564, 3.4654123 ,
-       3.13778824, 2.20352606, 2.8156726 , 2.50423013, 1.65208433,
-       2.2077562 , 1.93676772, 1.1911706 , 1.68179992, 1.46517055,
-       1.09818176, 1.25922461, 5.        , 4.72936706, 5.27063294,
-       4.6875    , 5.3125    , 5.        , 4.6875    , 4.69313109,
-       5.3125    , 5.30686891, 5.        , 4.69313109, 4.69975971,
-       5.30686891, 5.30024029, 5.        , 4.69975971, 4.70471526,
-       5.30024029, 5.29528474, 5.        , 4.70471526, 4.70835734,
-...
-       7.18009727, 7.40861461, 7.6393523 , 7.4732455 , 7.68568895,
-       7.74423398, 7.76252822, 7.97497167, 8.19160104, 8.25014607,
-       6.54560672, 6.54560672, 7.12156788, 6.84121345, 7.17060672,
-       7.67738488, 7.45096115, 7.75314751, 8.22627971, 8.02861008,
-       8.31763717, 8.77214166, 8.59106943, 8.87331767, 9.14574736,
-       7.17060672, 7.12156788, 7.80218636, 7.45096115, 7.80218636,
-       8.3933998 , 8.10437271, 8.42718636, 8.96467514, 8.71621345,
-       9.02131072, 9.30355896, 7.75314751, 7.67738488, 8.42718636,
-       8.02861008, 8.3933998 , 9.05509727, 8.71621345, 9.05509727,
-       9.36019454, 8.31763717, 8.22627971, 9.02131072, 8.59106943,
-       8.96467514, 9.30355896, 8.87331767, 8.77214166, 9.14574736,
-       5.92623782, 5.61936891, 6.51445868, 5.92060672, 6.23873782,
-       7.08185984, 6.52572087, 6.83203268, 7.6393523 , 7.11245079,
-       7.40861461, 8.19160104, 7.68568895, 7.97497167, 8.25014607,
-       5.93186891, 5.6071092 , 6.55631181, 5.92524029, 6.24587454,
-       7.15878745, 6.55218636, 6.86881181, 7.74423398, 7.16497563,
-       7.4732455 , 7.76252822, 5.92111483, 5.59552503, 6.55837454,
-       5.91615929, 6.23461236, 7.18326987, 6.55123782, 6.8718274 ,
-       7.18009727, 5.90902256, 5.58692741, 6.54806522, 5.90538048,
-       6.22044116, 6.54103074, 5.898346  , 5.58054062, 5.89560129])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_edge_y</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.312 4.688 4.844 ... 9.021 9.27</div><input id='attrs-275d8432-517d-4625-b03d-a083f72f33ff' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-275d8432-517d-4625-b03d-a083f72f33ff' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d086b88e-dbca-467a-8356-3865527d5661' class='xr-var-data-in' type='checkbox'><label for='data-d086b88e-dbca-467a-8356-3865527d5661' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([5.3125    , 4.6875    , 4.84375   , 5.15625   , 5.15625   ,
-       4.84375   , 9.6875    , 9.98349817, 9.98349817, 7.7400989 ,
-       7.24339927, 7.34375   , 2.2599011 , 2.65625   , 2.75660073,
-       0.3125    , 0.01650183, 0.01650183, 2.2599011 , 2.75660073,
-       2.65625   , 7.34375   , 7.24339927, 7.7400989 , 5.9375    ,
-       5.46875   , 5.46875   , 5.85376588, 5.85376588, 6.5625    ,
-       6.16626588, 6.51085423, 6.16626588, 6.51085423, 7.1875    ,
-       6.82335423, 7.15090668, 6.82335423, 7.15090668, 7.8125    ,
-       7.46340668, 7.78434454, 7.46340668, 7.78434454, 8.4375    ,
-       8.09684454, 8.41467968, 8.09684454, 8.41467968, 9.0625    ,
-       8.72717968, 9.04333905, 8.72717968, 9.04333905, 9.67099817,
-       9.67099817, 9.35583905, 9.35583905, 9.91031153, 9.65183722,
-       9.74824193, 9.59515241, 9.52849538, 9.48649208, 9.42311059,
-       9.29935389, 9.12934922, 9.14298883, 8.96317743, 8.69772383,
-       8.76239964, 8.54054723, 8.22353701, 8.30969963, 8.0678006 ,
-       7.5838489 , 7.82446139, 4.0625    , 4.53125   , 4.53125   ,
-       4.14623412, 4.14623412, 3.4375    , 3.83373412, 3.48914577,
-       3.83373412, 3.48914577, 2.8125    , 3.17664577, 2.84909332,
-       3.17664577, 2.84909332, 2.1875    , 2.53659332, 2.21565546,
-       2.53659332, 2.21565546, 1.5625    , 1.90315546, 1.58532032,
-...
-       1.22396076, 2.55973687, 2.79844384, 1.7845193 , 2.40397343,
-       2.00637171, 1.62562456, 2.24507869, 2.48697772, 2.089376  ,
-       4.82282915, 5.17717085, 4.47614153, 5.        , 4.82282915,
-       4.1418642 , 4.65331238, 4.47408134, 3.81503194, 4.30932078,
-       4.13421013, 3.49250356, 3.97213842, 3.80105961, 3.64060294,
-       5.17717085, 5.52385847, 4.82076896, 5.34668762, 5.17923104,
-       4.46642726, 5.        , 4.82076896, 4.1202378 , 4.64565831,
-       4.46584691, 4.2947681 , 5.52591866, 5.8581358 , 5.17923104,
-       5.69067922, 5.53357274, 4.82018861, 5.35434169, 5.17981139,
-       5.        , 5.86578987, 6.18496806, 5.53415309, 6.02786158,
-       5.8797622 , 5.7052319 , 6.19894039, 6.50749644, 6.35939706,
-       6.24994926, 6.42712011, 6.57540244, 6.59453762, 6.79121514,
-       6.88961542, 6.94925081, 7.12133635, 7.20155616, 7.27751366,
-       7.44026313, 7.51302228, 7.59602657, 7.75492131, 7.910624  ,
-       6.96838599, 7.09926091, 7.33714905, 7.29593843, 7.51638009,
-       7.67198407, 7.68846563, 7.87841493, 7.99362829, 8.04116441,
-       8.2154807 , 8.37437544, 7.64725502, 7.74775122, 8.05764597,
-       7.96819288, 8.2055568 , 8.42191156, 8.3955061 , 8.60172295,
-       8.77603924, 8.30605301, 8.38652422, 8.74963378, 8.62388814,
-       8.87339049, 9.07960733, 8.9538617 , 9.02051872, 9.27002107])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_node_x</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 5.0 0.6699 ... 6.213 5.578</div><input id='attrs-f83baa78-9d83-4684-a504-2af023d7d16f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f83baa78-9d83-4684-a504-2af023d7d16f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7959d845-c0dc-4ed2-9825-0dde18f48694' class='xr-var-data-in' type='checkbox'><label for='data-7959d845-c0dc-4ed2-9825-0dde18f48694' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 5.        ,  5.        ,  0.66987298,  0.66987298,  5.        ,
-        9.33012702,  9.33012702,  5.        ,  5.        ,  5.        ,
-        5.        ,  5.        ,  5.        ,  5.        ,  4.42646067,
-        3.79903885,  3.14423128,  2.5       ,  1.90705213,  1.39711654,
-        0.98522466,  5.        ,  5.        ,  5.        ,  5.        ,
-        5.        ,  5.        ,  5.        ,  0.98522466,  1.39711654,
-        1.90705213,  2.5       ,  3.14423128,  3.79903885,  4.42646067,
-        4.45873412,  3.91746825,  3.37620237,  2.83493649,  2.29367061,
-        1.75240474,  1.21113886,  5.54126588,  6.08253175,  6.62379763,
-        7.16506351,  7.70632939,  8.24759526,  8.78886114,  0.41168532,
-        0.19615539,  0.05128341,  0.        ,  0.05128341,  0.19615539,
-        0.41168532,  4.45873412,  3.91746825,  3.37620237,  2.83493649,
-        2.29367061,  1.75240474,  1.21113886,  5.57353933,  6.20096115,
-        6.85576872,  7.5       ,  8.09294787,  8.60288346,  9.01477534,
-        9.58831468,  9.80384461,  9.94871659, 10.        ,  9.94871659,
-        9.80384461,  9.58831468,  5.54126588,  6.08253175,  6.62379763,
-        7.16506351,  7.70632939,  8.24759526,  8.78886114,  5.57353933,
-        6.20096115,  6.85576872,  7.5       ,  8.09294787,  8.60288346,
-        9.01477534,  4.375     ,  4.38626218,  4.39951942,  4.40943051,
-        4.41671467,  4.42220409,  3.77252437,  3.75      ,  3.75825092,
-...
-        1.89562729,  1.3175731 ,  0.75307662,  2.59807769,  1.89562729,
-        1.25      ,  0.63980546,  2.04715255,  1.3175731 ,  0.63980546,
-        1.50028803,  0.75307662,  0.95542865,  4.375     ,  3.77252437,
-        3.19855827,  2.63772204,  2.08357336,  1.53322456,  4.38626218,
-        3.75      ,  3.13737637,  2.54504873,  1.9664833 ,  4.39951942,
-        3.75825092,  3.125     ,  2.50846026,  4.40943051,  3.77252437,
-        3.1313452 ,  4.41671467,  3.78659332,  4.42220409,  5.625     ,
-        5.61373782,  5.60048058,  5.59056949,  5.58328533,  5.57779591,
-        6.22747563,  6.25      ,  6.24174908,  6.22747563,  6.21340668,
-        6.80144173,  6.86262363,  6.875     ,  6.8686548 ,  7.36227796,
-        7.45495127,  7.49153974,  7.91642664,  8.0335167 ,  8.46677544,
-        6.25      ,  6.84121345,  7.40192231,  7.95284745,  8.49971197,
-        9.04457135,  6.84121345,  7.5       ,  8.10437271,  8.6824269 ,
-        9.24692338,  7.40192231,  8.10437271,  8.75      ,  9.36019454,
-        7.95284745,  8.6824269 ,  9.36019454,  8.49971197,  9.24692338,
-        9.04457135,  5.625     ,  6.22747563,  6.80144173,  7.36227796,
-        7.91642664,  8.46677544,  5.61373782,  6.25      ,  6.86262363,
-        7.45495127,  8.0335167 ,  5.60048058,  6.24174908,  6.875     ,
-        7.49153974,  5.59056949,  6.22747563,  6.8686548 ,  5.58328533,
-        6.21340668,  5.57779591])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_node_y</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>5.0 10.0 7.5 ... 8.704 9.203 9.337</div><input id='attrs-7b387188-45ed-4824-990f-ac90b8399442' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7b387188-45ed-4824-990f-ac90b8399442' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-82f409a1-632c-4296-81ee-a8917c35ed77' class='xr-var-data-in' type='checkbox'><label for='data-82f409a1-632c-4296-81ee-a8917c35ed77' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 5.        , 10.        ,  7.5       ,  2.5       ,  0.        ,
-        2.5       ,  7.5       ,  5.625     ,  6.25      ,  6.875     ,
-        7.5       ,  8.125     ,  8.75      ,  9.375     ,  9.96699634,
-        9.85362672,  9.64285714,  9.33012702,  8.92857143,  8.46687623,
-        7.9801978 ,  4.375     ,  3.75      ,  3.125     ,  2.5       ,
-        1.875     ,  1.25      ,  0.625     ,  2.0198022 ,  1.53312377,
-        1.07142857,  0.66987298,  0.35714286,  0.14637328,  0.03300366,
-        4.6875    ,  4.375     ,  4.0625    ,  3.75      ,  3.4375    ,
-        3.125     ,  2.8125    ,  5.3125    ,  5.625     ,  5.9375    ,
-        6.25      ,  6.5625    ,  6.875     ,  7.1875    ,  6.98679854,
-        6.38675049,  5.71428571,  5.        ,  4.28571429,  3.61324951,
-        3.01320146,  5.3125    ,  5.625     ,  5.9375    ,  6.25      ,
-        6.5625    ,  6.875     ,  7.1875    ,  0.03300366,  0.14637328,
-        0.35714286,  0.66987298,  1.07142857,  1.53312377,  2.0198022 ,
-        3.01320146,  3.61324951,  4.28571429,  5.        ,  5.71428571,
-        6.38675049,  6.98679854,  4.6875    ,  4.375     ,  4.0625    ,
-        3.75      ,  3.4375    ,  3.125     ,  2.8125    ,  9.96699634,
-        9.85362672,  9.64285714,  9.33012702,  8.92857143,  8.46687623,
-        7.9801978 ,  6.08253175,  6.77170847,  7.42681336,  8.06868908,
-        8.70435935,  9.33667809,  6.41736677,  7.16506351,  7.86769667,
-...
-        5.35846208,  5.70868339,  6.05084101,  4.30662475,  4.64153792,
-        5.        ,  5.35962278,  3.97710364,  4.29131661,  4.64037722,
-        3.65296023,  3.94915899,  3.33204689,  3.91746825,  3.58263323,
-        3.26656189,  2.95420728,  2.64268041,  2.33127502,  3.22829153,
-        2.83493649,  2.49076541,  2.16526645,  1.84747697,  2.57318664,
-        2.13230333,  1.75240474,  1.40377215,  1.93131092,  1.45658307,
-        1.04414937,  1.29564065,  0.79663596,  0.66332191,  3.91746825,
-        3.22829153,  2.57318664,  1.93131092,  1.29564065,  0.66332191,
-        3.58263323,  2.83493649,  2.13230333,  1.45658307,  0.79663596,
-        3.26656189,  2.49076541,  1.75240474,  1.04414937,  2.95420728,
-        2.16526645,  1.40377215,  2.64268041,  1.84747697,  2.33127502,
-        5.        ,  4.64565831,  4.30662475,  3.97710364,  3.65296023,
-        3.33204689,  5.35434169,  5.        ,  4.64153792,  4.29131661,
-        3.94915899,  5.69337525,  5.35846208,  5.        ,  4.64037722,
-        6.02289636,  5.70868339,  5.35962278,  6.34703977,  6.05084101,
-        6.66795311,  6.08253175,  6.41736677,  6.73343811,  7.04579272,
-        7.35731959,  7.66872498,  6.77170847,  7.16506351,  7.50923459,
-        7.83473355,  8.15252303,  7.42681336,  7.86769667,  8.24759526,
-        8.59622785,  8.06868908,  8.54341693,  8.95585063,  8.70435935,
-        9.20336404,  9.33667809])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-fc067cc5-f005-49f1-8a5b-df53418eb46b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-fc067cc5-f005-49f1-8a5b-df53418eb46b' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_z</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.941 9.182 0.1692 ... 4.581 5.932</div><input id='attrs-c430d831-2351-43b8-a6cc-0cd96ecba3aa' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c430d831-2351-43b8-a6cc-0cd96ecba3aa' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2068234c-8ae0-42a5-88b4-ce9ba2232d68' class='xr-var-data-in' type='checkbox'><label for='data-2068234c-8ae0-42a5-88b4-ce9ba2232d68' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.94086697,  9.18220451,  0.16920664,  0.72165724,  1.06362593,
+    node_z   (mesh2d_nNodes) float64 1.941 9.182 0.1692 ... 4.553 4.581 5.932
+    face_z   (mesh2d_nFaces) float64 1.868 2.092 2.505 ... 6.82 7.283 8.483
+    edge_z   (mesh2d_nEdges) float64 1.993 1.817 1.805 ... 4.537 5.151 5.156</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-51e10e2c-ac78-40c3-a903-fe4e55a957b5' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-51e10e2c-ac78-40c3-a903-fe4e55a957b5' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span>mesh2d_nNodes</span>: 217</li><li><span>mesh2d_nFaces</span>: 384</li><li><span>mesh2d_nEdges</span>: 600</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-6c50ebaf-22d3-475a-9fa1-6a1b66abfb06' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-6c50ebaf-22d3-475a-9fa1-6a1b66abfb06' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-8e786f9b-cb3b-44fc-892d-2a8aadb6f1c2' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8e786f9b-cb3b-44fc-892d-2a8aadb6f1c2' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_z</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.941 9.182 0.1692 ... 4.581 5.932</div><input id='attrs-9dbdcdec-b89a-4137-a506-c0d708c2c882' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9dbdcdec-b89a-4137-a506-c0d708c2c882' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c76837f5-bcd3-462b-aa9f-4b4552facec0' class='xr-var-data-in' type='checkbox'><label for='data-c76837f5-bcd3-462b-aa9f-4b4552facec0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.94086697,  9.18220451,  0.16920664,  0.72165724,  1.06362593,
         7.92479531,  2.69911847,  2.09975131,  2.30958522,  2.68748894,
         3.32342126,  4.27209756,  5.55986752,  7.19586448, 10.        ,
         9.87549309,  8.53564812,  6.26977904,  3.82612141,  1.89228091,
@@ -935,7 +705,7 @@ Data variables:
         3.31310731,  3.43517476,  2.6010072 ,  2.87028431,  3.14112535,
         3.40399255,  3.64174298,  2.95269199,  3.14489557,  3.33771326,
         3.54686075,  3.57657232,  3.67216577,  3.71380939,  4.5527151 ,
-        4.5814859 ,  5.93242701])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_z</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.868 2.092 2.505 ... 7.283 8.483</div><input id='attrs-1bb30102-c92f-443d-9a9f-7597b02cd516' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1bb30102-c92f-443d-9a9f-7597b02cd516' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d7727dfa-026d-4606-b9d8-7063caf14edc' class='xr-var-data-in' type='checkbox'><label for='data-d7727dfa-026d-4606-b9d8-7063caf14edc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.86789562e+00, 2.09173768e+00, 2.50478703e+00, 3.19197130e+00,
+        4.5814859 ,  5.93242701])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_z</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.868 2.092 2.505 ... 7.283 8.483</div><input id='attrs-e0308757-f9ee-4819-941f-cd2e8c6a157f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e0308757-f9ee-4819-941f-cd2e8c6a157f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2df05b55-8ff8-4254-bb3d-3b9a5cd550b3' class='xr-var-data-in' type='checkbox'><label for='data-2df05b55-8ff8-4254-bb3d-3b9a5cd550b3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.86789562e+00, 2.09173768e+00, 2.50478703e+00, 3.19197130e+00,
        4.20601558e+00, 5.56777499e+00, 7.27914730e+00, 9.33461491e+00,
        1.93260611e+00, 2.34531779e+00, 3.03198226e+00, 4.02815473e+00,
        5.34836702e+00, 6.98778334e+00, 8.93424812e+00, 1.91352082e+00,
@@ -975,7 +745,7 @@ Data variables:
        3.74042764e+00, 3.94745881e+00, 3.98911303e+00, 3.96817430e+00,
        4.18481869e+00, 4.31056826e+00, 4.27392102e+00, 4.91538614e+00,
        5.14135806e+00, 5.09134419e+00, 5.51578007e+00, 5.65121695e+00,
-       6.49131148e+00, 6.82005978e+00, 7.28318195e+00, 8.48284669e+00])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>edge_z</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.993 1.817 1.805 ... 5.151 5.156</div><input id='attrs-17548cf6-2938-4ccc-9e41-938c9c0e1c83' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-17548cf6-2938-4ccc-9e41-938c9c0e1c83' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f7828f9b-d683-41fe-a67f-42daedd51f72' class='xr-var-data-in' type='checkbox'><label for='data-f7828f9b-d683-41fe-a67f-42daedd51f72' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.99287981,  1.81679035,  1.80498916,  2.01938838,  1.87985002,
+       6.49131148e+00, 6.82005978e+00, 7.28318195e+00, 8.48284669e+00])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>edge_z</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.993 1.817 1.805 ... 5.151 5.156</div><input id='attrs-38c7f9b8-2ab1-486a-82df-7df0df04598a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-38c7f9b8-2ab1-486a-82df-7df0df04598a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5f133a26-7d10-40ca-87c7-4326045b243d' class='xr-var-data-in' type='checkbox'><label for='data-5f133a26-7d10-40ca-87c7-4326045b243d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.99287981,  1.81679035,  1.80498916,  2.01938838,  1.87985002,
         1.91102126,  8.09893408,  9.6103884 ,  8.44413971,  0.38243751,
         0.03660573,  0.8366236 ,  0.65779993,  0.77487776,  0.69668977,
         1.55578201,  0.9927347 ,  1.14412587,  7.91124421,  7.59760235,
@@ -1015,20 +785,19 @@ Data variables:
         3.44594239,  3.56525559,  3.01342253,  3.1914638 ,  3.20465367,
         3.25229056,  3.33336483,  3.40680234,  3.38566826,  3.45622067,
         3.51939294,  3.59081984,  3.98136501,  3.65649451,  4.00057675,
-        4.03593834,  4.00613605,  4.53662907,  5.15098259,  5.15622858])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-dd187fd9-8031-4448-8c2d-7f06d568f8d3' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-dd187fd9-8031-4448-8c2d-7f06d568f8d3' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+        4.03593834,  4.00613605,  4.53662907,  5.15098259,  5.15622858])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-205c64d5-8086-4d5b-81d7-9a9257630c38' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-205c64d5-8086-4d5b-81d7-9a9257630c38' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /></section>
 <section id="ugriddataarray">
-<h2>UgridDataArray<a class="headerlink" href="#ugriddataarray" title="Permalink to this headline">¶</a></h2>
+<h2>UgridDataArray<a class="headerlink" href="#ugriddataarray" title="Permalink to this heading">#</a></h2>
 <p>Just like Xarray, we can create a plot by selecting a DataArray from the
 Dataset and calling the <code class="xref py py-meth docutils literal notranslate"><span class="pre">UgridDataArray.ugrid.plot()</span></code> method.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uda</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_001.png" srcset="../_images/sphx_glr_plotting_001.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f47eb6d64f0&gt;
+<img src="../_images/sphx_glr_plotting_001.png" srcset="../_images/sphx_glr_plotting_001.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7dc9e408e0&gt;
 </pre></div>
 </div>
 <p>Like Xarray, the axes and the colorbar are labeled automatically using the
@@ -1040,16 +809,11 @@ the edges results in a different kind of plot:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;edge_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_002.png" srcset="../_images/sphx_glr_plotting_002.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f47f37a0310&gt;
+<img src="../_images/sphx_glr_plotting_002.png" srcset="../_images/sphx_glr_plotting_002.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f7dd261d9a0&gt;
 </pre></div>
 </div>
 <p>The method called by default depends on the type of the data:</p>
 <table class="table">
-<colgroup>
-<col style="width: 31%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Dimension</p></th>
 <th class="head"><p>Plotting function</p></th>
@@ -1057,13 +821,13 @@ the edges results in a different kind of plot:</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Face</p></td>
-<td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.pcolormesh()</span></code></p></td>
+<td><p><a class="reference internal" href="../api/xugrid.plot.pcolormesh.html#xugrid.plot.pcolormesh" title="xugrid.plot.pcolormesh"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.pcolormesh()</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>Edge</p></td>
-<td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.line()</span></code></p></td>
+<td><p><a class="reference internal" href="../api/xugrid.plot.line.html#xugrid.plot.line" title="xugrid.plot.line"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.line()</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>Node</p></td>
-<td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.tripcolor()</span></code></p></td>
+<td><p><a class="reference internal" href="../api/xugrid.plot.tripcolor.html#xugrid.plot.tripcolor" title="xugrid.plot.tripcolor"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.tripcolor()</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -1074,8 +838,7 @@ the edges results in a different kind of plot:</p>
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_003.png" srcset="../_images/sphx_glr_plotting_003.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f47f3ac8a00&gt;
+<img src="../_images/sphx_glr_plotting_003.png" srcset="../_images/sphx_glr_plotting_003.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7dd2372af0&gt;
 </pre></div>
 </div>
 <p>We can also exactly control the type of plot we want. For example, to plot
@@ -1083,8 +846,7 @@ filled contours for data associated with the face dimension:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_004.png" srcset="../_images/sphx_glr_plotting_004.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri.tricontour.TriContourSet object at 0x7f47f39e2a00&gt;
+<img src="../_images/sphx_glr_plotting_004.png" srcset="../_images/sphx_glr_plotting_004.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri.tricontour.TriContourSet object at 0x7f7dd2212400&gt;
 </pre></div>
 </div>
 <p>We can also overlay this data with the edges:</p>
@@ -1093,8 +855,7 @@ filled contours for data associated with the face dimension:</p>
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_005.png" srcset="../_images/sphx_glr_plotting_005.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f47f386e850&gt;
+<img src="../_images/sphx_glr_plotting_005.png" srcset="../_images/sphx_glr_plotting_005.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f7dd211f190&gt;
 </pre></div>
 </div>
 <p>In general, there has to be data associated with the mesh topology before a
@@ -1103,29 +864,29 @@ location of the edges is meaningful on its own: for this reason
 <code class="docutils literal notranslate"><span class="pre">plot.line()</span></code> does not error in the example above.</p>
 </section>
 <section id="other-types-of-plot">
-<h2>Other types of plot<a class="headerlink" href="#other-types-of-plot" title="Permalink to this headline">¶</a></h2>
+<h2>Other types of plot<a class="headerlink" href="#other-types-of-plot" title="Permalink to this heading">#</a></h2>
 <p>The available plotting methods per topology dimension are listed here.</p>
 <p>For the <strong>face</strong> dimension:</p>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contour()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contourf()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.imshow()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.pcolormesh()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.surface()</span></code></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.contour.html#xugrid.plot.contour" title="xugrid.plot.contour"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contour()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.contourf.html#xugrid.plot.contourf" title="xugrid.plot.contourf"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contourf()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.imshow.html#xugrid.plot.imshow" title="xugrid.plot.imshow"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.imshow()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.pcolormesh.html#xugrid.plot.pcolormesh" title="xugrid.plot.pcolormesh"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.pcolormesh()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.scatter.html#xugrid.plot.scatter" title="xugrid.plot.scatter"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.surface.html#xugrid.plot.surface" title="xugrid.plot.surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.surface()</span></code></a></p></li>
 </ul>
 <p>For the <strong>edge</strong> dimension:</p>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.line()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.line.html#xugrid.plot.line" title="xugrid.plot.line"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.line()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.scatter.html#xugrid.plot.scatter" title="xugrid.plot.scatter"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></a></p></li>
 </ul>
 <p>For the <strong>node</strong> dimension:</p>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contour()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contourf()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.surface()</span></code></p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.tripcolor()</span></code></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.contour.html#xugrid.plot.contour" title="xugrid.plot.contour"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contour()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.contourf.html#xugrid.plot.contourf" title="xugrid.plot.contourf"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.contourf()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.scatter.html#xugrid.plot.scatter" title="xugrid.plot.scatter"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.scatter()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.surface.html#xugrid.plot.surface" title="xugrid.plot.surface"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.surface()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/xugrid.plot.tripcolor.html#xugrid.plot.tripcolor" title="xugrid.plot.tripcolor"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.plot.tripcolor()</span></code></a></p></li>
 </ul>
 <p>All these (2D) plots are illustrated here for completeness’ sake:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
@@ -1145,8 +906,7 @@ location of the edges is meaningful on its own: for this reason
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_006.png" srcset="../_images/sphx_glr_plotting_006.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f47e4f14ac0&gt;
+<img src="../_images/sphx_glr_plotting_006.png" srcset="../_images/sphx_glr_plotting_006.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f7dc8f4c7c0&gt;
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">surface</span></code> methods generate 3D surface plots:</p>
@@ -1157,41 +917,38 @@ location of the edges is meaningful on its own: for this reason
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">surface</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_007.png" srcset="../_images/sphx_glr_plotting_007.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;mpl_toolkits.mplot3d.art3d.Poly3DCollection object at 0x7f47e4701a60&gt;
+<img src="../_images/sphx_glr_plotting_007.png" srcset="../_images/sphx_glr_plotting_007.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;mpl_toolkits.mplot3d.art3d.Poly3DCollection object at 0x7f7dc86b9b80&gt;
 </pre></div>
 </div>
 </section>
 <section id="additional-arguments">
-<h2>Additional Arguments<a class="headerlink" href="#additional-arguments" title="Permalink to this headline">¶</a></h2>
+<h2>Additional Arguments<a class="headerlink" href="#additional-arguments" title="Permalink to this heading">#</a></h2>
 <p>Once again like in Xarray, additional arguments are passed to the underlying
 matplotlib function and the additional arguments supported by Xarray can be
 used:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu&quot;</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_008.png" srcset="../_images/sphx_glr_plotting_008.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f47e44cc130&gt;
+<img src="../_images/sphx_glr_plotting_008.png" srcset="../_images/sphx_glr_plotting_008.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7dc84fafa0&gt;
 </pre></div>
 </div>
 </section>
 <section id="as-a-function">
-<h2>As a function<a class="headerlink" href="#as-a-function" title="Permalink to this headline">¶</a></h2>
+<h2>As a function<a class="headerlink" href="#as-a-function" title="Permalink to this heading">#</a></h2>
 <p>The plotting methods can also be called as a function, in which case they
 take an xarray DataArray and a xugrid grid as arguments.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
-<span class="n">da</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">da</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span>
 
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_009.png" srcset="../_images/sphx_glr_plotting_009.png" alt="plotting" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f47e4470df0&gt;
+<img src="../_images/sphx_glr_plotting_009.png" srcset="../_images/sphx_glr_plotting_009.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7dc8448b50&gt;
 </pre></div>
 </div>
 </section>
 <section id="xarray-dataarray-plots">
-<h2>Xarray DataArray plots<a class="headerlink" href="#xarray-dataarray-plots" title="Permalink to this headline">¶</a></h2>
+<h2>Xarray DataArray plots<a class="headerlink" href="#xarray-dataarray-plots" title="Permalink to this heading">#</a></h2>
 <p>As mentioned, apart from the <code class="docutils literal notranslate"><span class="pre">.ugrid</span></code> accessor, a UgridDataArray behaves the
 same as an Xarray DataArray. To illustrate, we can select a location
 somewhere in the unstructured topology, and plot the resulting timeseries:</p>
@@ -1200,12 +957,15 @@ somewhere in the unstructured topology, and plot the resulting timeseries:</p>
 <span class="n">depth</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_010.png" srcset="../_images/sphx_glr_plotting_010.png" alt="node = 1000, node_x = 4.84e+05, node_y = 3.614e+06" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x7f47e43bcf10&gt;]
+<img src="../_images/sphx_glr_plotting_010.png" srcset="../_images/sphx_glr_plotting_010.png" alt="node = 1000, node_x = 4.84e+05, node_y = 3.614e+06" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/xugrid/xugrid/.tox/build/lib/python3.9/site-packages/xugrid/ugrid/conventions.py:193: UserWarning: No standard_name of (&#39;projection_x_coordinate&#39;, &#39;longitude&#39;, &#39;projection_y_coordinate&#39;, &#39;latitude&#39;) in [&#39;node_x&#39;, &#39;node_y&#39;].
+Using node_x and node_y as projected x and y coordinates.
+  warnings.warn(
+
+[&lt;matplotlib.lines.Line2D object at 0x7f7dc8324640&gt;]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.261 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-plotting-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.744 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-plotting-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9a3a701ba63d3606a9cbb3896162541d/plotting.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plotting.py</span></code></a></p>
 </div>
@@ -1218,50 +978,55 @@ somewhere in the unstructured topology, and plot the resulting timeseries:</p>
 </section>
 
 
-              </div>
+              </article>
               
-              
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="quick_overview.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Quick overview</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="connectivity.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Connectivity</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
-</div>
-              
-          </main>
-          
 
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="quick_overview.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Quick overview</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="connectivity.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Connectivity</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
       </div>
     </div>
+
   
-    <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
     &copy; Copyright Deltares.<br>
 </p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
-</p>
-    </div>
-    
   </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+  </div>
+  
+</div>
 </footer>
   </body>
 </html>

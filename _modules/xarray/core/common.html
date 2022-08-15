@@ -5,67 +5,76 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xarray.core.common &#8212; Xugrid 0.1.3 documentation</title>
-    
-    <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
-    
-    <link rel="stylesheet"
-      href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+    <title>xarray.core.common &#8212; Xugrid 0.1.4 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
-    
-    <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
 
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
 
   <div id="navbar-start">
     
     
+  
 
-<a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/xugrid-low-res.svg" class="logo" alt="logo">
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    <img src="../../../_static/xugrid-low-res.svg" class="logo__image only-light" alt="Logo image">
+    <img src="../../../_static/xugrid-low-res.svg" class="logo__image only-dark" alt="Logo image">
+  
+  
 </a>
-
-
     
   </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+    <span class="fas fa-bars"></span>
   </button>
 
   
@@ -101,6 +110,14 @@
     <div id="navbar-end">
       
       <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
           <a class="nav-link" href="https://deltares.nl/en/" rel="noopener" target="_blank" title="Deltares"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
@@ -114,13 +131,13 @@
     </nav>
     
 
-    <div class="container-xl">
-      <div class="row">
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
           
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -128,26 +145,25 @@
     
   </div>
 </nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
 
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-          </div>
-          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+</div>
+
 
           
           
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          <div class="bd-content col-12 col-md-9 col-xl-7">
               
-              <div>
+              <article class="bd-article" role="main">
                 
   <h1>Source code for xarray.core.common</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
@@ -165,6 +181,7 @@
     <span class="n">Iterator</span><span class="p">,</span>
     <span class="n">Mapping</span><span class="p">,</span>
     <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -172,10 +189,9 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
-<span class="kn">from</span> <span class="nn">.npcompat</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
+<span class="kn">from</span> <span class="nn">.npcompat</span> <span class="kn">import</span> <span class="n">DTypeLike</span><span class="p">,</span> <span class="n">DTypeLikeSave</span>
 <span class="kn">from</span> <span class="nn">.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
 <span class="kn">from</span> <span class="nn">.pycompat</span> <span class="kn">import</span> <span class="n">is_duck_dask_array</span>
-<span class="kn">from</span> <span class="nn">.rolling_exp</span> <span class="kn">import</span> <span class="n">RollingExp</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">either_dict_or_kwargs</span><span class="p">,</span> <span class="n">is_scalar</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -188,13 +204,18 @@
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">datetime</span>
+
     <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">T_Xarray</span>
+    <span class="kn">from</span> <span class="nn">.indexes</span> <span class="kn">import</span> <span class="n">Index</span>
+    <span class="kn">from</span> <span class="nn">.resample</span> <span class="kn">import</span> <span class="n">Resample</span>
+    <span class="kn">from</span> <span class="nn">.rolling_exp</span> <span class="kn">import</span> <span class="n">RollingExp</span>
+    <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">ScalarOrArray</span><span class="p">,</span> <span class="n">SideOptions</span><span class="p">,</span> <span class="n">T_DataWithCoords</span>
     <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
-    <span class="kn">from</span> <span class="nn">.weighted</span> <span class="kn">import</span> <span class="n">Weighted</span>
 
 
+<span class="n">T_Resample</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T_Resample&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;Resample&quot;</span><span class="p">)</span>
 <span class="n">C</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
@@ -207,12 +228,14 @@
         <span class="k">if</span> <span class="n">include_skipna</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
+                    <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrapped_func</span>
 
@@ -245,13 +268,19 @@
 
             <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
-                    <span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">,</span> <span class="n">numeric_only</span><span class="o">=</span><span class="n">numeric_only</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span>
+                    <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+                    <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">,</span>
+                    <span class="n">numeric_only</span><span class="o">=</span><span class="n">numeric_only</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">numeric_only</span><span class="o">=</span><span class="n">numeric_only</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
+                    <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">numeric_only</span><span class="o">=</span><span class="n">numeric_only</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrapped_func</span>
 
@@ -302,6 +331,10 @@
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;pre&gt;</span><span class="si">{</span><span class="n">escape</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&lt;/pre&gt;&quot;</span>
         <span class="k">return</span> <span class="n">formatting_html</span><span class="o">.</span><span class="n">array_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># we use numpy: scalars will print fine and arrays will raise</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="fm">__format__</span><span class="p">(</span><span class="n">format_spec</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
@@ -336,7 +369,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">!r}</span><span class="s2"> not found in array dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Frozen</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Ordered mapping from dimension names to lengths.</span>
 
 <span class="sd">        Immutable.</span>
@@ -492,15 +525,16 @@
     <span class="sd">&quot;&quot;&quot;Shared base class for Dataset and DataArray.&quot;&quot;&quot;</span>
 
     <span class="n">_close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">_indexes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_close&quot;</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">squeeze</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return a new object with squeezed data.</span>
 
 <span class="sd">        Parameters</span>
@@ -509,7 +543,7 @@
 <span class="sd">            Selects a subset of the length one dimensions. If a dimension is</span>
 <span class="sd">            selected with length greater than one, an error is raised. If</span>
 <span class="sd">            None, all length one dimensions are squeezed.</span>
-<span class="sd">        drop : bool, optional</span>
+<span class="sd">        drop : bool, default: False</span>
 <span class="sd">            If ``drop=True``, drop squeezed coordinates instead of making them</span>
 <span class="sd">            scalar.</span>
 <span class="sd">        axis : None or int or iterable of int, optional</span>
@@ -528,12 +562,33 @@
         <span class="n">dims</span> <span class="o">=</span> <span class="n">get_squeeze_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="n">drop</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">})</span>
 
-    <span class="k">def</span> <span class="nf">clip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clip</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="nb">min</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">max</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array whose values are limited to ``[min, max]``.</span>
 <span class="sd">        At least one of max or min must be given.</span>
 
-<span class="sd">        Refer to `numpy.clip` for full documentation.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        min : None or Hashable, optional</span>
+<span class="sd">            Minimum value. If None, no lower clipping is performed.</span>
+<span class="sd">        max : None or Hashable, optional</span>
+<span class="sd">            Maximum value. If None, no upper clipping is performed.</span>
+<span class="sd">        keep_attrs : bool or None, optional</span>
+<span class="sd">            If True, the attributes (`attrs`) will be copied from</span>
+<span class="sd">            the original object to the new one. If False, the new</span>
+<span class="sd">            object will be returned without attributes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        clipped : same type as caller</span>
+<span class="sd">            This object, but with with values &lt; min are replaced with min,</span>
+<span class="sd">            and those &gt; max with max.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -556,7 +611,7 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xindexes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">name</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
@@ -565,7 +620,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-    <span class="k">def</span> <span class="nf">assign_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">coords_kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">assign_coords</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">coords_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Assign new coordinates to this object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -573,7 +632,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        coords : dict, optional</span>
+<span class="sd">        coords : dict-like or None, optional</span>
 <span class="sd">            A dict where the keys are the names of the coordinates</span>
 <span class="sd">            with the new values to assign. If the values are callable, they are</span>
 <span class="sd">            computed on this object and assigned to new coordinate variables.</span>
@@ -594,7 +653,7 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        Convert longitude coordinates from 0-359 to -180-179:</span>
+<span class="sd">        Convert `DataArray` longitude coordinates from 0-359 to -180-179:</span>
 
 <span class="sd">        &gt;&gt;&gt; da = xr.DataArray(</span>
 <span class="sd">        ...     np.random.rand(4),</span>
@@ -634,6 +693,54 @@
 
 <span class="sd">        &gt;&gt;&gt; _ = da.assign_coords({&quot;lon_2&quot;: (&quot;lon&quot;, lon_2)})</span>
 
+<span class="sd">        Note the same method applies to `Dataset` objects.</span>
+
+<span class="sd">        Convert `Dataset` longitude coordinates from 0-359 to -180-179:</span>
+
+<span class="sd">        &gt;&gt;&gt; temperature = np.linspace(20, 32, num=16).reshape(2, 2, 4)</span>
+<span class="sd">        &gt;&gt;&gt; precipitation = 2 * np.identity(4).reshape(2, 2, 4)</span>
+<span class="sd">        &gt;&gt;&gt; ds = xr.Dataset(</span>
+<span class="sd">        ...     data_vars=dict(</span>
+<span class="sd">        ...         temperature=([&quot;x&quot;, &quot;y&quot;, &quot;time&quot;], temperature),</span>
+<span class="sd">        ...         precipitation=([&quot;x&quot;, &quot;y&quot;, &quot;time&quot;], precipitation),</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     coords=dict(</span>
+<span class="sd">        ...         lon=([&quot;x&quot;, &quot;y&quot;], [[260.17, 260.68], [260.21, 260.77]]),</span>
+<span class="sd">        ...         lat=([&quot;x&quot;, &quot;y&quot;], [[42.25, 42.21], [42.63, 42.59]]),</span>
+<span class="sd">        ...         time=pd.date_range(&quot;2014-09-06&quot;, periods=4),</span>
+<span class="sd">        ...         reference_time=pd.Timestamp(&quot;2014-09-05&quot;),</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ...     attrs=dict(description=&quot;Weather-related data&quot;),</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; ds</span>
+<span class="sd">        &lt;xarray.Dataset&gt;</span>
+<span class="sd">        Dimensions:         (x: 2, y: 2, time: 4)</span>
+<span class="sd">        Coordinates:</span>
+<span class="sd">            lon             (x, y) float64 260.2 260.7 260.2 260.8</span>
+<span class="sd">            lat             (x, y) float64 42.25 42.21 42.63 42.59</span>
+<span class="sd">          * time            (time) datetime64[ns] 2014-09-06 2014-09-07 ... 2014-09-09</span>
+<span class="sd">            reference_time  datetime64[ns] 2014-09-05</span>
+<span class="sd">        Dimensions without coordinates: x, y</span>
+<span class="sd">        Data variables:</span>
+<span class="sd">            temperature     (x, y, time) float64 20.0 20.8 21.6 22.4 ... 30.4 31.2 32.0</span>
+<span class="sd">            precipitation   (x, y, time) float64 2.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 2.0</span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            description:  Weather-related data</span>
+<span class="sd">        &gt;&gt;&gt; ds.assign_coords(lon=(((ds.lon + 180) % 360) - 180))</span>
+<span class="sd">        &lt;xarray.Dataset&gt;</span>
+<span class="sd">        Dimensions:         (x: 2, y: 2, time: 4)</span>
+<span class="sd">        Coordinates:</span>
+<span class="sd">            lon             (x, y) float64 -99.83 -99.32 -99.79 -99.23</span>
+<span class="sd">            lat             (x, y) float64 42.25 42.21 42.63 42.59</span>
+<span class="sd">          * time            (time) datetime64[ns] 2014-09-06 2014-09-07 ... 2014-09-09</span>
+<span class="sd">            reference_time  datetime64[ns] 2014-09-05</span>
+<span class="sd">        Dimensions without coordinates: x, y</span>
+<span class="sd">        Data variables:</span>
+<span class="sd">            temperature     (x, y, time) float64 20.0 20.8 21.6 22.4 ... 30.4 31.2 32.0</span>
+<span class="sd">            precipitation   (x, y, time) float64 2.0 0.0 0.0 0.0 0.0 ... 0.0 0.0 0.0 2.0</span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            description:  Weather-related data</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Since ``coords_kwargs`` is a dictionary, the order of your arguments</span>
@@ -647,13 +754,15 @@
 <span class="sd">        Dataset.assign</span>
 <span class="sd">        Dataset.swap_dims</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">coords_kwargs</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coords_kwargs</span><span class="p">,</span> <span class="s2">&quot;assign_coords&quot;</span><span class="p">)</span>
+        <span class="n">coords_combined</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coords_kwargs</span><span class="p">,</span> <span class="s2">&quot;assign_coords&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_assign_results</span><span class="p">(</span><span class="n">coords_kwargs</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_assign_results</span><span class="p">(</span><span class="n">coords_combined</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Assign new attrs to this object.</span>
 
 <span class="sd">        Returns a new object equivalent to ``self.attrs.update(*args, **kwargs)``.</span>
@@ -681,8 +790,8 @@
     <span class="k">def</span> <span class="nf">pipe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply ``func(self, *args, **kwargs)``</span>
@@ -810,242 +919,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">groupby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">squeeze</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a GroupBy object for performing grouped operations.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        group : str, DataArray or IndexVariable</span>
-<span class="sd">            Array whose unique values should be used to group this array. If a</span>
-<span class="sd">            string, must be the name of a variable contained in this dataset.</span>
-<span class="sd">        squeeze : bool, optional</span>
-<span class="sd">            If &quot;group&quot; is a dimension of any arrays in this dataset, `squeeze`</span>
-<span class="sd">            controls whether the subarrays have a dimension of length 1 along</span>
-<span class="sd">            that dimension or if the dimension is squeezed out.</span>
-<span class="sd">        restore_coord_dims : bool, optional</span>
-<span class="sd">            If True, also restore the dimension order of multi-dimensional</span>
-<span class="sd">            coordinates.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        grouped</span>
-<span class="sd">            A `GroupBy` object patterned after `pandas.GroupBy` that can be</span>
-<span class="sd">            iterated over in the form of `(unique_value, grouped_array)` pairs.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        Calculate daily anomalies for daily data:</span>
-
-<span class="sd">        &gt;&gt;&gt; da = xr.DataArray(</span>
-<span class="sd">        ...     np.linspace(0, 1826, num=1827),</span>
-<span class="sd">        ...     coords=[pd.date_range(&quot;1/1/2000&quot;, &quot;31/12/2004&quot;, freq=&quot;D&quot;)],</span>
-<span class="sd">        ...     dims=&quot;time&quot;,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; da</span>
-<span class="sd">        &lt;xarray.DataArray (time: 1827)&gt;</span>
-<span class="sd">        array([0.000e+00, 1.000e+00, 2.000e+00, ..., 1.824e+03, 1.825e+03,</span>
-<span class="sd">               1.826e+03])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 2000-01-01 2000-01-02 ... 2004-12-31</span>
-<span class="sd">        &gt;&gt;&gt; da.groupby(&quot;time.dayofyear&quot;) - da.groupby(&quot;time.dayofyear&quot;).mean(&quot;time&quot;)</span>
-<span class="sd">        &lt;xarray.DataArray (time: 1827)&gt;</span>
-<span class="sd">        array([-730.8, -730.8, -730.8, ...,  730.2,  730.2,  730.5])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time       (time) datetime64[ns] 2000-01-01 2000-01-02 ... 2004-12-31</span>
-<span class="sd">            dayofyear  (time) int64 1 2 3 4 5 6 7 8 ... 359 360 361 362 363 364 365 366</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        core.groupby.DataArrayGroupBy</span>
-<span class="sd">        core.groupby.DatasetGroupBy</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># While we don&#39;t generally check the type of every arg, passing</span>
-        <span class="c1"># multiple dimensions as multiple arguments is common enough, and the</span>
-        <span class="c1"># consequences hidden enough (strings evaluate as true) to warrant</span>
-        <span class="c1"># checking here.</span>
-        <span class="c1"># A future version could make squeeze kwarg only, but would face</span>
-        <span class="c1"># backward-compat issues.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">squeeze</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`squeeze` must be True or False, but </span><span class="si">{</span><span class="n">squeeze</span><span class="si">}</span><span class="s2"> was supplied&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groupby_cls</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">squeeze</span><span class="o">=</span><span class="n">squeeze</span><span class="p">,</span> <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">groupby_bins</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">group</span><span class="p">,</span>
-        <span class="n">bins</span><span class="p">,</span>
-        <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">precision</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="n">include_lowest</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">squeeze</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a GroupBy object for performing grouped operations.</span>
-
-<span class="sd">        Rather than using all unique values of `group`, the values are discretized</span>
-<span class="sd">        first by applying `pandas.cut` [1]_ to `group`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        group : str, DataArray or IndexVariable</span>
-<span class="sd">            Array whose binned values should be used to group this array. If a</span>
-<span class="sd">            string, must be the name of a variable contained in this dataset.</span>
-<span class="sd">        bins : int or array-like</span>
-<span class="sd">            If bins is an int, it defines the number of equal-width bins in the</span>
-<span class="sd">            range of x. However, in this case, the range of x is extended by .1%</span>
-<span class="sd">            on each side to include the min or max values of x. If bins is a</span>
-<span class="sd">            sequence it defines the bin edges allowing for non-uniform bin</span>
-<span class="sd">            width. No extension of the range of x is done in this case.</span>
-<span class="sd">        right : bool, default: True</span>
-<span class="sd">            Indicates whether the bins include the rightmost edge or not. If</span>
-<span class="sd">            right == True (the default), then the bins [1,2,3,4] indicate</span>
-<span class="sd">            (1,2], (2,3], (3,4].</span>
-<span class="sd">        labels : array-like or bool, default: None</span>
-<span class="sd">            Used as labels for the resulting bins. Must be of the same length as</span>
-<span class="sd">            the resulting bins. If False, string bin labels are assigned by</span>
-<span class="sd">            `pandas.cut`.</span>
-<span class="sd">        precision : int</span>
-<span class="sd">            The precision at which to store and display the bins labels.</span>
-<span class="sd">        include_lowest : bool</span>
-<span class="sd">            Whether the first interval should be left-inclusive or not.</span>
-<span class="sd">        squeeze : bool, default: True</span>
-<span class="sd">            If &quot;group&quot; is a dimension of any arrays in this dataset, `squeeze`</span>
-<span class="sd">            controls whether the subarrays have a dimension of length 1 along</span>
-<span class="sd">            that dimension or if the dimension is squeezed out.</span>
-<span class="sd">        restore_coord_dims : bool, optional</span>
-<span class="sd">            If True, also restore the dimension order of multi-dimensional</span>
-<span class="sd">            coordinates.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        grouped</span>
-<span class="sd">            A `GroupBy` object patterned after `pandas.GroupBy` that can be</span>
-<span class="sd">            iterated over in the form of `(unique_value, grouped_array)` pairs.</span>
-<span class="sd">            The name of the group has the added suffix `_bins` in order to</span>
-<span class="sd">            distinguish it from the original variable.</span>
-
-<span class="sd">        References</span>
-<span class="sd">        ----------</span>
-<span class="sd">        .. [1] http://pandas.pydata.org/pandas-docs/stable/generated/pandas.cut.html</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groupby_cls</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">group</span><span class="p">,</span>
-            <span class="n">squeeze</span><span class="o">=</span><span class="n">squeeze</span><span class="p">,</span>
-            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
-            <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span><span class="p">,</span>
-            <span class="n">cut_kwargs</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;right&quot;</span><span class="p">:</span> <span class="n">right</span><span class="p">,</span>
-                <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
-                <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span>
-                <span class="s2">&quot;include_lowest&quot;</span><span class="p">:</span> <span class="n">include_lowest</span><span class="p">,</span>
-            <span class="p">},</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">weighted</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Weighted</span><span class="p">[</span><span class="n">T_Xarray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Weighted operations.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        weights : DataArray</span>
-<span class="sd">            An array of weights associated with the values in this Dataset.</span>
-<span class="sd">            Each value in the data contributes to the reduction operation</span>
-<span class="sd">            according to its associated weight.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        ``weights`` must be a DataArray and cannot contain missing values.</span>
-<span class="sd">        Missing values can be replaced by ``weights.fillna(0)``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">rolling</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dim</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_periods</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">window_kwargs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Rolling window object.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        dim : dict, optional</span>
-<span class="sd">            Mapping from the dimension name to create the rolling iterator</span>
-<span class="sd">            along (e.g. `time`) to its moving window size.</span>
-<span class="sd">        min_periods : int, default: None</span>
-<span class="sd">            Minimum number of observations in window required to have a value</span>
-<span class="sd">            (otherwise result is NA). The default, None, is equivalent to</span>
-<span class="sd">            setting min_periods equal to the size of the window.</span>
-<span class="sd">        center : bool or mapping, default: False</span>
-<span class="sd">            Set the labels at the center of the window.</span>
-<span class="sd">        **window_kwargs : optional</span>
-<span class="sd">            The keyword arguments form of ``dim``.</span>
-<span class="sd">            One of dim or window_kwargs must be provided.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        core.rolling.DataArrayRolling or core.rolling.DatasetRolling</span>
-<span class="sd">            A rolling object (``DataArrayRolling`` for ``DataArray``,</span>
-<span class="sd">            ``DatasetRolling`` for ``Dataset``)</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        Create rolling seasonal average of monthly data e.g. DJF, JFM, ..., SON:</span>
-
-<span class="sd">        &gt;&gt;&gt; da = xr.DataArray(</span>
-<span class="sd">        ...     np.linspace(0, 11, num=12),</span>
-<span class="sd">        ...     coords=[</span>
-<span class="sd">        ...         pd.date_range(</span>
-<span class="sd">        ...             &quot;1999-12-15&quot;,</span>
-<span class="sd">        ...             periods=12,</span>
-<span class="sd">        ...             freq=pd.DateOffset(months=1),</span>
-<span class="sd">        ...         )</span>
-<span class="sd">        ...     ],</span>
-<span class="sd">        ...     dims=&quot;time&quot;,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; da</span>
-<span class="sd">        &lt;xarray.DataArray (time: 12)&gt;</span>
-<span class="sd">        array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 1999-12-15 2000-01-15 ... 2000-11-15</span>
-<span class="sd">        &gt;&gt;&gt; da.rolling(time=3, center=True).mean()</span>
-<span class="sd">        &lt;xarray.DataArray (time: 12)&gt;</span>
-<span class="sd">        array([nan,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., nan])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 1999-12-15 2000-01-15 ... 2000-11-15</span>
-
-<span class="sd">        Remove the NaNs using ``dropna()``:</span>
-
-<span class="sd">        &gt;&gt;&gt; da.rolling(time=3, center=True).mean().dropna(&quot;time&quot;)</span>
-<span class="sd">        &lt;xarray.DataArray (time: 10)&gt;</span>
-<span class="sd">        array([ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10.])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 2000-01-15 2000-02-15 ... 2000-10-15</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        core.rolling.DataArrayRolling</span>
-<span class="sd">        core.rolling.DatasetRolling</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">dim</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">window_kwargs</span><span class="p">,</span> <span class="s2">&quot;rolling&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rolling_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="n">min_periods</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">rolling_exp</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">window</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;span&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">window_kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollingExp</span><span class="p">[</span><span class="n">T_DataWithCoords</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Exponentially-weighted moving window.</span>
 <span class="sd">        Similar to EWM in pandas</span>
@@ -1069,6 +948,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        core.rolling_exp.RollingExp</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rolling_exp</span>
 
         <span class="k">if</span> <span class="s2">&quot;keep_attrs&quot;</span> <span class="ow">in</span> <span class="n">window_kwargs</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -1079,96 +959,21 @@
 
         <span class="n">window</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">window_kwargs</span><span class="p">,</span> <span class="s2">&quot;rolling_exp&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">RollingExp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">window_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rolling_exp</span><span class="o">.</span><span class="n">RollingExp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">window_type</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">coarsen</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_resample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dim</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">boundary</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;exact&quot;</span><span class="p">,</span>
-        <span class="n">side</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-        <span class="n">coord_func</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">window_kwargs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Coarsen object.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        dim : mapping of hashable to int, optional</span>
-<span class="sd">            Mapping from the dimension name to the window size.</span>
-<span class="sd">        boundary : {&quot;exact&quot;, &quot;trim&quot;, &quot;pad&quot;}, default: &quot;exact&quot;</span>
-<span class="sd">            If &#39;exact&#39;, a ValueError will be raised if dimension size is not a</span>
-<span class="sd">            multiple of the window size. If &#39;trim&#39;, the excess entries are</span>
-<span class="sd">            dropped. If &#39;pad&#39;, NA will be padded.</span>
-<span class="sd">        side : {&quot;left&quot;, &quot;right&quot;} or mapping of str to {&quot;left&quot;, &quot;right&quot;}</span>
-<span class="sd">        coord_func : str or mapping of hashable to str, default: &quot;mean&quot;</span>
-<span class="sd">            function (name) that is applied to the coordinates,</span>
-<span class="sd">            or a mapping from coordinate name to function (name).</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        core.rolling.DataArrayCoarsen or core.rolling.DatasetCoarsen</span>
-<span class="sd">            A coarsen object (``DataArrayCoarsen`` for ``DataArray``,</span>
-<span class="sd">            ``DatasetCoarsen`` for ``Dataset``)</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        Coarsen the long time series by averaging over every four days.</span>
-
-<span class="sd">        &gt;&gt;&gt; da = xr.DataArray(</span>
-<span class="sd">        ...     np.linspace(0, 364, num=364),</span>
-<span class="sd">        ...     dims=&quot;time&quot;,</span>
-<span class="sd">        ...     coords={&quot;time&quot;: pd.date_range(&quot;1999-12-15&quot;, periods=364)},</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; da  # +doctest: ELLIPSIS</span>
-<span class="sd">        &lt;xarray.DataArray (time: 364)&gt;</span>
-<span class="sd">        array([  0.        ,   1.00275482,   2.00550964,   3.00826446,</span>
-<span class="sd">                 4.01101928,   5.0137741 ,   6.01652893,   7.01928375,</span>
-<span class="sd">                 8.02203857,   9.02479339,  10.02754821,  11.03030303,</span>
-<span class="sd">        ...</span>
-<span class="sd">               356.98071625, 357.98347107, 358.9862259 , 359.98898072,</span>
-<span class="sd">               360.99173554, 361.99449036, 362.99724518, 364.        ])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 1999-12-15 1999-12-16 ... 2000-12-12</span>
-<span class="sd">        &gt;&gt;&gt; da.coarsen(time=3, boundary=&quot;trim&quot;).mean()  # +doctest: ELLIPSIS</span>
-<span class="sd">        &lt;xarray.DataArray (time: 121)&gt;</span>
-<span class="sd">        array([  1.00275482,   4.01101928,   7.01928375,  10.02754821,</span>
-<span class="sd">                13.03581267,  16.04407713,  19.0523416 ,  22.06060606,</span>
-<span class="sd">                25.06887052,  28.07713499,  31.08539945,  34.09366391,</span>
-<span class="sd">        ...</span>
-<span class="sd">               349.96143251, 352.96969697, 355.97796143, 358.9862259 ,</span>
-<span class="sd">               361.99449036])</span>
-<span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 1999-12-16 1999-12-19 ... 2000-12-10</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        core.rolling.DataArrayCoarsen</span>
-<span class="sd">        core.rolling.DatasetCoarsen</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">dim</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">window_kwargs</span><span class="p">,</span> <span class="s2">&quot;coarsen&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coarsen_cls</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">dim</span><span class="p">,</span>
-            <span class="n">boundary</span><span class="o">=</span><span class="n">boundary</span><span class="p">,</span>
-            <span class="n">side</span><span class="o">=</span><span class="n">side</span><span class="p">,</span>
-            <span class="n">coord_func</span><span class="o">=</span><span class="n">coord_func</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">indexer</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">closed</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">base</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">loffset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resample_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T_Resample</span><span class="p">],</span>
+        <span class="n">indexer</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">skipna</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">closed</span><span class="p">:</span> <span class="n">SideOptions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="n">SideOptions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">base</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">loffset</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">indexer_kwargs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Resample</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns a Resample object for performing resampling operations.</span>
 
 <span class="sd">        Handles both downsampling and upsampling. The resampled</span>
@@ -1260,7 +1065,7 @@
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
-<span class="sd">        .. [1] http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases</span>
+<span class="sd">        .. [1] https://pandas.pydata.org/docs/user_guide/timeseries.html#dateoffset-objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
@@ -1292,7 +1097,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Resampling only supported along single dimensions.&quot;</span><span class="p">)</span>
         <span class="n">dim</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">indexer</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
 
-        <span class="n">dim_name</span> <span class="o">=</span> <span class="n">dim</span>
+        <span class="n">dim_name</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">dim</span>
         <span class="n">dim_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
 
         <span class="c1"># TODO: remove once pandas=1.1 is the minimum required version</span>
@@ -1303,8 +1108,7 @@
                 <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="c1"># TODO (benbovy - flexible indexes): update when CFTimeIndex is an xarray Index subclass</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xindexes</span><span class="p">[</span><span class="n">dim_name</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">(),</span> <span class="n">CFTimeIndex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">dim_name</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">(),</span> <span class="n">CFTimeIndex</span><span class="p">):</span>
                 <span class="kn">from</span> <span class="nn">.resample_cftime</span> <span class="kn">import</span> <span class="n">CFTimeGrouper</span>
 
                 <span class="n">grouper</span> <span class="o">=</span> <span class="n">CFTimeGrouper</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">closed</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">loffset</span><span class="p">)</span>
@@ -1315,7 +1119,7 @@
         <span class="n">group</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
             <span class="n">dim_coord</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span>
         <span class="p">)</span>
-        <span class="n">resampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resample_cls</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">resample_cls</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">dim_name</span><span class="p">,</span>
@@ -1324,9 +1128,9 @@
             <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">resampler</span>
-
-    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Filter elements from this object according to a condition.</span>
 
 <span class="sd">        This operation follows the normal broadcasting and alignment rules that</span>
@@ -1340,10 +1144,9 @@
 <span class="sd">        other : scalar, DataArray or Dataset, optional</span>
 <span class="sd">            Value to use for locations in this object where ``cond`` is False.</span>
 <span class="sd">            By default, these locations filled with NA.</span>
-<span class="sd">        drop : bool, optional</span>
+<span class="sd">        drop : bool, default: False</span>
 <span class="sd">            If True, coordinate labels that only correspond to False values of</span>
-<span class="sd">            the condition are dropped from the result. Mutually exclusive with</span>
-<span class="sd">            ``other``.</span>
+<span class="sd">            the condition are dropped from the result.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1396,6 +1199,14 @@
 <span class="sd">               [15., nan, nan, nan]])</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 
+<span class="sd">        &gt;&gt;&gt; a.where(a.x + a.y &lt; 4, -1, drop=True)</span>
+<span class="sd">        &lt;xarray.DataArray (x: 4, y: 4)&gt;</span>
+<span class="sd">        array([[ 0,  1,  2,  3],</span>
+<span class="sd">               [ 5,  6,  7, -1],</span>
+<span class="sd">               [10, 11, -1, -1],</span>
+<span class="sd">               [15, -1, -1, -1]])</span>
+<span class="sd">        Dimensions without coordinates: x, y</span>
+
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        numpy.where : corresponding numpy function</span>
@@ -1409,26 +1220,28 @@
             <span class="n">cond</span> <span class="o">=</span> <span class="n">cond</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot set `other` if drop=True&quot;</span><span class="p">)</span>
-
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;cond argument is </span><span class="si">{</span><span class="n">cond</span><span class="si">!r}</span><span class="s2"> but must be a </span><span class="si">{</span><span class="n">Dataset</span><span class="si">!r}</span><span class="s2"> or </span><span class="si">{</span><span class="n">DataArray</span><span class="si">!r}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
-            <span class="c1"># align so we can use integer indexing</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
 
-            <span class="c1"># get cond with the minimal size needed for the Dataset</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-                <span class="n">clipcond</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">clipcond</span> <span class="o">=</span> <span class="n">cond</span>
+            <span class="k">def</span> <span class="nf">_dataarray_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cond</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">))</span>
 
-            <span class="c1"># clip the data corresponding to coordinate dims that are not used</span>
-            <span class="n">nonzeros</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clipcond</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">clipcond</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
-            <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nonzeros</span><span class="p">}</span>
+            <span class="k">def</span> <span class="nf">_dataset_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+                <span class="n">cond_wdim</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">cond</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cond</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+                <span class="n">keepany</span> <span class="o">=</span> <span class="n">cond_wdim</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">keepany</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
+
+            <span class="n">_get_indexer</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_dataarray_indexer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)</span> <span class="k">else</span> <span class="n">_dataset_indexer</span>
+            <span class="p">)</span>
+
+            <span class="n">indexers</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">indexers</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
 
             <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexers</span><span class="p">)</span>
             <span class="n">cond</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexers</span><span class="p">)</span>
@@ -1451,14 +1264,23 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="n">close</span>
 
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Release any resources linked to this object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is a missing value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keep_attrs : bool or None, optional</span>
+<span class="sd">            If True, the attributes (`attrs`) will be copied from</span>
+<span class="sd">            the original object to the new one. If False, the new</span>
+<span class="sd">            object will be returned without attributes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1493,8 +1315,17 @@
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is not a missing value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keep_attrs : bool or None, optional</span>
+<span class="sd">            If True, the attributes (`attrs`) will be copied from</span>
+<span class="sd">            the original object to the new one. If False, the new</span>
+<span class="sd">            object will be returned without attributes.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1529,7 +1360,7 @@
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Tests each value in the array for whether it is in test elements.</span>
 
 <span class="sd">        Parameters</span>
@@ -1580,7 +1411,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">astype</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1588,7 +1419,7 @@
         <span class="n">subok</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy of the xarray object, with data cast to a specified type.</span>
 <span class="sd">        Leaves coordinate dtype unchanged.</span>
@@ -1655,7 +1486,7 @@
             <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1666,26 +1497,51 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 
+<span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">DTypeLikeSave</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLikeSave</span><span class="p">]]</span>
+
+
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">|</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="full_like"><a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a><span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="full_like"><a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a><span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a new object with the same shape and type as a given object.</span>
 
 <span class="sd">    Parameters</span>
@@ -1800,26 +1656,26 @@
             <span class="sa">f</span><span class="s2">&quot;fill_value must be scalar or, for datasets, a dict-like. Received </span><span class="si">{</span><span class="n">fill_value</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;&#39;dtype&#39; cannot be dict-like when passing a DataArray or Variable&quot;</span>
-        <span class="p">)</span>
-
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fill_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">fill_value</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">fill_value</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
 
+        <span class="n">dtype_</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLikeSave</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="n">dtype_</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">dtype</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dtype_</span> <span class="o">=</span> <span class="n">dtype</span>
 
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_full_like_variable</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">),</span> <span class="n">dtype_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">_full_like_variable</span><span class="p">(</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">),</span> <span class="n">dtype_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;dtype&#39; cannot be dict-like when passing a DataArray&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">DataArray</span><span class="p">(</span>
             <span class="n">_full_like_variable</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span>
             <span class="n">dims</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
@@ -1828,12 +1684,16 @@
             <span class="n">name</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;dtype&#39; cannot be dict-like when passing a Variable&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_full_like_variable</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected DataArray, Dataset, or Variable&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
@@ -1854,7 +1714,38 @@
     <span class="k">return</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="zeros_like"><a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a><span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="zeros_like"><a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a><span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a new object of zeros with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
 
@@ -1910,7 +1801,38 @@
     <span class="k">return</span> <span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ones_like"><a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a><span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<div class="viewcode-block" id="ones_like"><a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a><span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a new object of ones with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
 
@@ -1964,7 +1886,7 @@
 
     <span class="n">chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;chunks&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="s2">&quot;chunks&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">chunksizes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">chunks</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2003,7 +1925,10 @@
 
 <span class="k">def</span> <span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Check if an xarray.Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
 
 <span class="k">def</span> <span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -2013,36 +1938,41 @@
     <span class="k">return</span> <span class="n">is_np_datetime_like</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">or</span> <span class="n">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
 </pre></div>
 
-              </div>
+              </article>
               
+
               
-              <!-- Previous / next buttons -->
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
 <div class='prev-next-area'>
 </div>
+              </footer>
               
-          </main>
+          </div>
           
-
       </div>
     </div>
+
   
-    <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
     &copy; Copyright Deltares.<br>
 </p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
-</p>
-    </div>
-    
   </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+  </div>
+  
+</div>
 </footer>
   </body>
 </html>
