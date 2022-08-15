@@ -12,7 +12,7 @@ Top-level functions
 
 .. autosummary::
    :toctree: api/
-    
+
     open_dataarray
     open_dataset
     open_mfdataset
@@ -22,13 +22,36 @@ Top-level functions
     zeros_like
     concat
     merge
-   
-UGRID Accessor
+
+UgridDataArray
 --------------
 
 .. autosummary::
    :toctree: api/
-   
+
+    UgridDataArray
+    UgridDataArray.ugrid
+    UgridDataArray.from_structured
+
+UgridDataset
+------------
+
+.. autosummary::
+   :toctree: api/
+
+    UgridDataset
+    UgridDataset.ugrid
+    UgridDataset.from_geodataframe
+
+UGRID Accessor
+--------------
+
+These methods and attributes are available under the ``.ugrid`` attribute of a
+UgridDataArray or UgridDataset.
+
+.. autosummary::
+   :toctree: api/
+
     UgridDatasetAccessor
     UgridDatasetAccessor.assign_node_coords
     UgridDatasetAccessor.set_node_coords
@@ -40,7 +63,7 @@ UGRID Accessor
     UgridDatasetAccessor.to_dataset
     UgridDatasetAccessor.to_netcdf
     UgridDatasetAccessor.to_zarr
-    
+
     UgridDataArrayAccessor
     UgridDataArrayAccessor.assign_node_coords
     UgridDataArrayAccessor.set_node_coords
@@ -60,32 +83,30 @@ UGRID Accessor
     UgridDataArrayAccessor.to_netcdf
     UgridDataArrayAccessor.to_zarr
 
-UgridDataArray
---------------
+Plotting
+--------
+
+These methods are also available under the ``.ugrid.plot`` attribute of a
+UgridDataArray.
 
 .. autosummary::
    :toctree: api/
 
-    UgridDataArray
-    UgridDataArray.ugrid
-    UgridDataArray.from_structured
-
-UgridDataset
-------------
-    
-.. autosummary::
-   :toctree: api/
-    
-    UgridDataset
-    UgridDataset.ugrid
-    UgridDataset.from_geodataframe
+   plot.contour
+   plot.contourf
+   plot.imshow
+   plot.line
+   plot.pcolormesh
+   plot.scatter
+   plot.surface
+   plot.tripcolor
 
 UGRID1D Topology
 ----------------
 
 .. autosummary::
    :toctree: api/
-    
+
     Ugrid1d
 
     Ugrid1d.topology_dimension
@@ -104,7 +125,7 @@ UGRID1D Topology
     Ugrid1d.edge_y
 
     Ugrid1d.bounds
-    
+
     Ugrid1d.node_edge_connectivity
 
     Ugrid1d.copy
@@ -115,7 +136,7 @@ UGRID1D Topology
 
     Ugrid1d.mesh
     Ugrid1d.meshkernel
-    
+
     Ugrid1d.set_crs
     Ugrid1d.to_crs
 
@@ -156,18 +177,18 @@ UGRID2D Topology
 
     Ugrid2d.bounds
     Ugrid2d.centroids
-    
+
     Ugrid2d.node_edge_connectivity
     Ugrid2d.node_face_connectivity
     Ugrid2d.edge_node_connectivity
     Ugrid2d.face_edge_connectivity
     Ugrid2d.face_face_connectivity
-    
+
     Ugrid2d.exterior_edges
     Ugrid2d.exterior_faces
-    
+
     Ugrid2d.copy
-    
+
     Ugrid2d.triangulate
     Ugrid2d.triangulation
     Ugrid2d.voronoi_topology
@@ -188,7 +209,7 @@ UGRID2D Topology
 
     Ugrid2d.mesh
     Ugrid2d.meshkernel
-    
+
     Ugrid2d.set_crs
     Ugrid2d.to_crs
 
@@ -200,7 +221,7 @@ UGRID2D Topology
 
 UGRID Roles Accessor
 --------------------
-   
+
 .. autosummary::
    :toctree: api/
 

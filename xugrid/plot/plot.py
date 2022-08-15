@@ -503,7 +503,8 @@ def contourf(grid, da, ax, **kwargs):
 def pcolormesh(grid, da, ax, **kwargs):
     """
     Pseudocolor plot of 2D UgridDataArray.
-    Wraps :py:func:`matplotlib:matplotlib.pyplot.
+
+    Wraps matplotlib PolyCollection.
     """
     from matplotlib.collections import PolyCollection
 
