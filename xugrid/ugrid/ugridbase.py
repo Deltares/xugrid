@@ -214,7 +214,7 @@ class AbstractUgrid(abc.ABC):
         self,
         node_x: str,
         node_y: str,
-        obj: xr.DataArray | xr.Dataset,
+        obj: Union[xr.DataArray, xr.Dataset],
         projected: bool = True,
     ):
         """
@@ -263,8 +263,8 @@ class AbstractUgrid(abc.ABC):
 
     def assign_node_coords(
         self,
-        obj: xr.DataArray | xr.Dataset,
-    ) -> xr.DataArray | xr.Dataset:
+        obj: Union[xr.DataArray, xr.Dataset],
+    ) -> Union[xr.DataArray, xr.Dataset]:
         """
         Assign node coordinates from the grid to the object.
 
