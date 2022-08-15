@@ -4,7 +4,6 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
-import xarray as xr
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
@@ -620,14 +619,13 @@ class _PlotMethods:
         darray = obj.obj
         grid = obj.grid
 
-        if isinstance(darray, xr.Dataset):
-            raise NotImplementedError("Cannot plot Datasets into a facetgrid (yet)")
-        if len(darray.dims) > 1:
-            msg = (
-                "Data contains more dimensions than just a topology dimension "
-                f"(face, node, edge): {', '.join(darray.dims)}"
+        invalid = set(darray.dims) - set(grid.dimensions)
+        if invalid:
+            raise ValueError(
+                f"UgridDataArray contains non-topology dimensions: {invalid}.\n"
+                f"Expected one of {grid.dimensions}"
             )
-            raise ValueError(msg)
+
         self.grid = grid
         self.darray = darray
 
