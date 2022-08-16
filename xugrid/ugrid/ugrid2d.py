@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import Any, Tuple, Union
 
 import numpy as np
@@ -10,7 +11,7 @@ from .. import connectivity, conversion
 from .. import meshkernel_utils as mku
 from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType, SparseMatrix
 from ..voronoi import voronoi_topology
-from . import ugrid_io
+from . import conventions
 from .ugridbase import AbstractUgrid
 
 
@@ -61,13 +62,21 @@ class Ugrid2d(AbstractUgrid):
         node_y: FloatArray,
         fill_value: int,
         face_node_connectivity: Union[IntArray, SparseMatrix],
+        name: str = "mesh2d",
         edge_node_connectivity: IntArray = None,
         dataset: xr.Dataset = None,
-        name: str = None,
+        indexes: dict[str, str] = None,
+        projected: bool = True,
         crs: Any = None,
     ):
+        if dataset is not None and indexes is None:
+            raise ValueError("indexes must be provided for a dataset")
+
         self.node_x = np.ascontiguousarray(node_x)
         self.node_y = np.ascontiguousarray(node_y)
+        self.fill_value = fill_value
+        self.name = name
+        self.projected = projected
 
         if isinstance(face_node_connectivity, np.ndarray):
             face_node_connectivity = face_node_connectivity
@@ -80,14 +89,22 @@ class Ugrid2d(AbstractUgrid):
                 "face_node_connectivity should be an array of integers or a sparse matrix"
             )
 
-        self.fill_value = fill_value
         self.face_node_connectivity = connectivity.counterclockwise(
             face_node_connectivity, self.fill_value, self.node_coordinates
         )
-        if name is None:
-            name = ugrid_io.UGRID2D_DEFAULT_NAME
-        self.name = name
-        self.topology_attrs = None
+
+        # Store topology attributes
+        defaults = conventions.default_topology_attrs(name, self.topology_dimension)
+        if dataset is None:
+            self._attrs = defaults
+            x, y = defaults["node_coordinates"].split(" ")
+            self._indexes = {"node_x": x, "node_y": y}
+        else:
+            derived_dims = dataset.ugrid_roles.dimensions[name]
+            self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
+            self._indexes = indexes
+
+        self._dataset = dataset
 
         # Optional attributes, deferred initialization
         # Meshkernel
@@ -123,11 +140,6 @@ class Ugrid2d(AbstractUgrid):
             import pyproj
 
             self.crs = pyproj.CRS.from_user_input(crs)
-        # Store dataset
-        if dataset is None:
-            dataset = self.topology_dataset()
-        self.dataset = dataset
-        self.topology_attrs = dataset[self.name].attrs
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
@@ -151,8 +163,8 @@ class Ugrid2d(AbstractUgrid):
         self._voronoi_topology = None
         self._centroid_triangulation = None
 
-    @staticmethod
-    def from_dataset(dataset: xr.Dataset):
+    @classmethod
+    def from_dataset(cls, dataset: xr.Dataset, topology: str = None):
         """
         Extract the 2D UGRID topology information from an xarray Dataset.
 
@@ -163,7 +175,7 @@ class Ugrid2d(AbstractUgrid):
 
         Returns
         -------
-        grid: Ugrid2d
+        grid: Ugrid1dAdapter
         """
         ds = dataset
         if not isinstance(ds, xr.Dataset):
@@ -171,120 +183,91 @@ class Ugrid2d(AbstractUgrid):
                 "Ugrid should be initialized with xarray.Dataset. "
                 f"Received instead: {type(ds)}"
             )
+        if topology is None:
+            topology = cls._single_topology(ds)
+
+        indexes = {}
 
         # Collect names
-        mesh_topology = ugrid_io.get_topology_variable(ds)
-        ugrid_roles = ugrid_io.get_ugrid2d_variables(dataset, mesh_topology)
-        # Rename the arrays to their standard UGRID roles
-        topology_ds = ds[set(ugrid_roles.keys())]
-        ugrid_ds = topology_ds.rename(ugrid_roles)
-        # Coerce type and fill value
-        ugrid_ds["node_x"] = ugrid_ds["node_x"].astype(FloatDType)
-        ugrid_ds["node_y"] = ugrid_ds["node_y"].astype(FloatDType)
-        fill_value = -1
-        ugrid_ds["face_node_connectivity"] = ugrid_io.cast(
-            ugrid_ds["face_node_connectivity"], fill_value, IntDType
+        connectivity = ds.ugrid_roles.connectivity[topology]
+        coordinates = ds.ugrid_roles.coordinates[topology]
+        ugrid_vars = (
+            [topology]
+            + list(connectivity.values())
+            + list(chain.from_iterable(chain.from_iterable(coordinates.values())))
         )
-        if "edge_node_connectivity" in ugrid_ds:
-            edge_node_connectivity = (
-                ugrid_ds["edge_node_connectivity"].astype(IntDType).values
-            )
+        fill_value = -1
+
+        x_index = coordinates["node_coordinates"][0][0]
+        y_index = coordinates["node_coordinates"][1][0]
+        node_x_coordinates = ds[x_index].astype(FloatDType).values
+        node_y_coordinates = ds[y_index].astype(FloatDType).values
+
+        face_nodes = connectivity["face_node_connectivity"]
+        face_node_connectivity = cls._prepare_connectivity(
+            ds[face_nodes], fill_value, dtype=IntDType
+        ).values
+
+        edge_nodes = connectivity.get("edge_node_connectivity")
+        if edge_nodes:
+            edge_node_connectivity = cls._prepare_connectivity(
+                ds[edge_nodes], fill_value, dtype=IntDType
+            ).values
         else:
             edge_node_connectivity = None
 
-        return Ugrid2d(
-            ugrid_ds["node_x"].values,
-            ugrid_ds["node_y"].values,
+        indexes["node_x"] = x_index
+        indexes["node_y"] = y_index
+        projected = False  # TODO
+
+        return cls(
+            node_x_coordinates,
+            node_y_coordinates,
             fill_value,
-            ugrid_ds["face_node_connectivity"].values,
-            edge_node_connectivity,
-            topology_ds,
-            mesh_topology.name,
+            face_node_connectivity,
+            name=topology,
+            edge_node_connectivity=edge_node_connectivity,
+            dataset=ds[ugrid_vars],
+            indexes=indexes,
+            projected=projected,
+            crs=None,
         )
 
-    def topology_dataset(self):
-        """
-        Store the UGRID topology information in an xarray Dataset according to
-        the UGRID conventions.
+    def to_dataset(self, other: xr.Dataset = None) -> xr.Dataset:
+        node_x = self._indexes["node_x"]
+        node_y = self._indexes["node_y"]
+        face_nodes = self._attrs["face_node_connectivity"]
+        face_nodes_attrs = conventions.DEFAULT_ATTRS["face_node_connectivity"]
+        nmax_node_dim = self._attrs["max_face_nodes_dimension"]
+        edge_nodes = self._attrs["edge_node_connectivity"]
+        edge_nodes_attrs = conventions.DEFAULT_ATTRS["edge_node_connectivity"]
 
-        Returns
-        -------
-        ugrid_topology: xr.Dataset
-        """
-        return ugrid_io.ugrid2d_dataset(
-            self.node_x,
-            self.node_y,
-            self.fill_value,
-            self.face_node_connectivity,
-            self._edge_node_connectivity,
-            self.name,
-            self.topology_attrs,
-        )
+        data_vars = {
+            self.name: 0,
+            face_nodes: xr.DataArray(
+                data=self.face_node_connectivity,
+                attrs=face_nodes_attrs,
+                dims=(self.face_dimension, nmax_node_dim),
+            ),
+        }
+        if self.edge_node_connectivity is not None:
+            data_vars[edge_nodes] = xr.DataArray(
+                data=self.edge_node_connectivity,
+                attrs=edge_nodes_attrs,
+                dims=(self.edge_dimension, "two"),
+            )
 
-    def remove_topology(
-        self, obj: Union[xr.DataArray, xr.Dataset]
-    ) -> Union[xr.DataArray, xr.Dataset]:
-        """
-        Remove UGRID specific variables from the object.
+        dataset = xr.Dataset(data_vars, attrs={"Conventions": "CF-1.8 UGRID-1.0"})
 
-        Parameters
-        ----------
-        obj: Union[xr.DataArray, xr.Dataset]
+        if self._dataset:
+            dataset.update(self._dataset)
+        if other is not None:
+            dataset = dataset.merge(other)
+        if node_x not in dataset or node_y not in dataset:
+            dataset = self.assign_node_coords(dataset)
 
-        Returns
-        -------
-        sanitized: Union[xr.DataArray, xr.Dataset]
-        """
-        return self._remove_topology(obj, ugrid_io.UGRID2D_TOPOLOGY_VARIABLES)
-
-    def topology_coords(self, obj: Union[xr.DataArray, xr.Dataset]) -> dict:
-        """
-        Return a dictionary with the coordinates required for the dimension of
-        the object.
-
-        Parameters
-        ----------
-        obj: Union[xr.DataArray, xr.Dataset]
-
-        Returns
-        -------
-        coords: dict
-        """
-        coords = {}
-        dims = obj.dims
-        facedim = self.face_dimension
-        edgedim = self.edge_dimension
-        nodedim = self.node_dimension
-        attrs = self.topology_attrs
-
-        if facedim in dims:
-            # It's not a required attribute.
-            if "face_coordinates" in attrs:
-                name_x, name_y = attrs["face_coordinates"].split()
-            else:
-                name_x = f"{self.name}_face_x"
-                name_y = f"{self.name}_face_y"
-            coords[name_x] = (facedim, self.face_x)
-            coords[name_y] = (facedim, self.face_y)
-            attrs["face-coordinates"] = f"{name_x} {name_y}"
-
-        if edgedim in dims:
-            # It's not a required attribute.
-            if "edge_coordinates" in attrs:
-                name_x, name_y = attrs["edge_coordinates"].split()
-            else:
-                name_x = f"{self.name}_edge_x"
-                name_y = f"{self.name}_edge_y"
-            coords[name_x] = (edgedim, self.edge_x)
-            coords[name_y] = (edgedim, self.edge_y)
-            attrs["edge_coordinates"] = f"{name_x} {name_y}"
-
-        if nodedim in dims:
-            name_x, name_y = attrs["node_coordinates"].split()
-            coords[name_x] = (nodedim, self.node_x)
-            coords[name_y] = (nodedim, self.node_y)
-
-        return coords
+        dataset[self.name].attrs = self._filtered_attrs(dataset)
+        return dataset
 
     # These are all optional/derived UGRID attributes. They are not computed by
     # default, only when called upon.
@@ -296,24 +279,20 @@ class Ugrid2d(AbstractUgrid):
         return self.face_node_connectivity.shape[0]
 
     @property
+    def dimensions(self):
+        return self.node_dimension, self.edge_dimension, self.face_dimension
+
+    @property
     def topology_dimension(self):
         """Highest dimensionality of the geometric elements: 2"""
         return 2
-
-    def _get_dimension(self, dim):
-        key = f"{dim}_dimension"
-        if key not in self.topology_attrs:
-            self.topology_attrs[key] = ugrid_io.UGrid.mesh2d_get_attributes(self.name)[
-                key
-            ]
-        return self.topology_attrs[key]
 
     @property
     def face_dimension(self):
         """
         Return the name of the face dimension.
         """
-        return self._get_dimension("face")
+        return self._attrs["face_dimension"]
 
     def _edge_connectivity(self):
         (
@@ -689,6 +668,11 @@ class Ugrid2d(AbstractUgrid):
         x = np.arange(xmin + 0.5 * d, xmax, d)
         y = np.arange(ymax - 0.5 * d, ymin, -d)
         return self.rasterize_like(x, y)
+
+    def isel(self, dim, indexer):
+        if dim != self.face_dimension:
+            raise NotImplementedError("Can only index face_dimension for Ugrid2D")
+        return self.topology_subset(indexer)
 
     def _validate_indexer(self, indexer) -> Union[slice, np.ndarray]:
         if isinstance(indexer, slice):

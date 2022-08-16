@@ -17,7 +17,7 @@ class TestPlot:
         plt.close("all")
 
         self.ds = xugrid.data.disk()
-        self.grid = self.ds.ugrid.grid
+        self.grid = self.ds.ugrid.grids[0]
         self.node = self.ds["node_z"]
         self.edge = self.ds["edge_z"]
         self.face = self.ds["face_z"]
@@ -193,3 +193,16 @@ class TestPlot:
         h = fig.get_figheight()
         w = fig.get_figwidth()
         assert np.allclose(w / h, 1.26)
+
+    def test_error_dimension(self):
+        with pytest.raises(
+            ValueError, match="UgridDataArray contains non-topology dimensions"
+        ):
+            uda = xugrid.concat(
+                [
+                    self.face.assign_coords(time="2000-01-01"),
+                    self.face.assign_coords(time="2001-01-01"),
+                ],
+                dim="time",
+            )
+            uda.ugrid.plot()

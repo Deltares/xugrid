@@ -171,8 +171,8 @@ ds["face_z"].ugrid.plot(cmap="RdBu", levels=8, yincrease=False)
 # The plotting methods can also be called as a function, in which case they
 # take an xarray DataArray and a xugrid grid as arguments.
 
-grid = ds.ugrid.grid
-da = ds["face_z"].ugrid.obj
+grid = ds.ugrid.grids[0]
+da = ds.obj["face_z"]
 
 xugrid.plot.pcolormesh(grid, da)
 

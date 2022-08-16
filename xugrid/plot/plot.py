@@ -4,7 +4,6 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
-import xarray as xr
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
@@ -402,7 +401,8 @@ def line(grid, da, ax, **kwargs):
     edge_coords[:, 1, 0] = grid.node_x[node_1]
     edge_coords[:, 1, 1] = grid.node_y[node_1]
 
-    norm = kwargs.pop("norm", None)
+    # PolyCollection takes a norm, but not vmin, vmax.
+    norm = kwargs.get("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
 
@@ -503,7 +503,8 @@ def contourf(grid, da, ax, **kwargs):
 def pcolormesh(grid, da, ax, **kwargs):
     """
     Pseudocolor plot of 2D UgridDataArray.
-    Wraps :py:func:`matplotlib:matplotlib.pyplot.
+
+    Wraps matplotlib PolyCollection.
     """
     from matplotlib.collections import PolyCollection
 
@@ -517,7 +518,8 @@ def pcolormesh(grid, da, ax, **kwargs):
     # Replace fill value; PolyCollection ignores NaN.
     vertices[faces == -1] = np.nan
 
-    norm = kwargs.pop("norm", None)
+    # PolyCollection takes a norm, but not vmin, vmax.
+    norm = kwargs.get("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
 
@@ -584,14 +586,26 @@ def plot(
     """
     dim = darray.dims[0]
     kwargs["ax"] = ax
-    if dim == grid.face_dimension:
-        return pcolormesh(grid, darray, **kwargs)
-    elif dim == grid.node_dimension:
-        return tripcolor(grid, darray, **kwargs)
-    elif dim == grid.edge_dimension:
-        return line(grid, darray, **kwargs)
+    if grid.topology_dimension == 1:
+        if dim == grid.edge_dimension:
+            return line(grid, darray, **kwargs)
+        elif dim == grid.node_dimension:
+            return scatter(grid, darray, **kwargs)
+        else:
+            raise ValueError("Data dimensions is not one of node or edge dimension.")
+    elif grid.topology_dimension == 2:
+        if dim == grid.face_dimension:
+            return pcolormesh(grid, darray, **kwargs)
+        elif dim == grid.node_dimension:
+            return tripcolor(grid, darray, **kwargs)
+        elif dim == grid.edge_dimension:
+            return line(grid, darray, **kwargs)
+        else:
+            raise ValueError(
+                "Data dimensions is not one of face, node, or edge dimension."
+            )
     else:
-        raise ValueError("Data dimensions is not one of face, node, or edge dimension.")
+        raise ValueError("Topology dimension is not 1 or 2")
 
 
 class _PlotMethods:
@@ -606,14 +620,13 @@ class _PlotMethods:
         darray = obj.obj
         grid = obj.grid
 
-        if isinstance(darray, xr.Dataset):
-            raise NotImplementedError("Cannot plot Datasets into a facetgrid (yet)")
-        if len(darray.dims) > 1:
-            msg = (
-                "Data contains more dimensions than just a topology dimension "
-                f"(face, node, edge): {', '.join(darray.dims)}"
+        invalid = set(darray.dims) - set(grid.dimensions)
+        if invalid:
+            raise ValueError(
+                f"UgridDataArray contains non-topology dimensions: {invalid}.\n"
+                f"Expected one of {grid.dimensions}"
             )
-            raise ValueError(msg)
+
         self.grid = grid
         self.darray = darray
 

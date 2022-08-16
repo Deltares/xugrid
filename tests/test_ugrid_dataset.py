@@ -36,9 +36,28 @@ DARRAY = xr.DataArray(
     data=np.ones(GRID.n_face),
     dims=[GRID.face_dimension],
 )
-UGRID_DS = GRID.dataset.copy()
+UGRID_DS = GRID.to_dataset()
 UGRID_DS["a"] = DARRAY
 UGRID_DS["b"] = DARRAY * 2
+
+
+def ugrid1d_ds():
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+    )
+    ds = grid.to_dataset()
+    ds["a1d"] = xr.DataArray([1, 2, 3], dims=[grid.node_dimension])
+    return xugrid.UgridDataset(ds)
 
 
 class TestUgridDataArray:
@@ -55,14 +74,8 @@ class TestUgridDataArray:
         assert isinstance(int(self.uda[0]), int)
         assert isinstance(float(self.uda[0]), float)
 
-    def test_getitem(self):
-        assert isinstance(self.uda["mesh2d_face_x"], xugrid.UgridDataArray)
-
-    def test_setitem(self):
-        uda = self.uda.copy()
-        # This should be forwarded to the underlying xarray object
-        uda["mesh2d_face_x"] = 0.0
-        assert isinstance(uda["mesh2d_face_x"], xugrid.UgridDataArray)
+    def test_repr(self):
+        assert self.uda.__repr__() == self.uda.obj.__repr__()
 
     def test_getattr(self):
         # Get an attribute
@@ -71,13 +84,13 @@ class TestUgridDataArray:
         # should remain untouched.
         assert self.uda.dims == self.uda.ugrid.obj.dims
         assert isinstance(self.uda.data, np.ndarray)
-        # DataArrays are automatically wrapped
-        assert isinstance(self.uda.mesh2d_face_x, xugrid.UgridDataArray)
         # So are functions
         assert isinstance(self.uda.mean(), xugrid.UgridDataArray)
+        # obj should be accessible
+        assert isinstance(self.uda.obj, xr.DataArray)
 
     def test_ugrid_accessor(self):
-        assert isinstance(self.uda.ugrid, xugrid.ugrid_dataset.UgridAccessor)
+        assert isinstance(self.uda.ugrid, xugrid.ugrid_dataset.UgridDataArrayAccessor)
 
     def test_from_structured(self):
         da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
@@ -127,11 +140,10 @@ class TestUgridDataArray:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uda.ugrid.isel([0, 1])
+        actual = self.uda.ugrid.isel({GRID.face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataArray)
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
-        assert "mesh2d_nFaces_index" in actual.coords
 
     def test_sel_points(self):
         with pytest.raises(ValueError, match="x and y must be 1d"):
@@ -182,11 +194,12 @@ class TestUgridDataArray:
         assert np.allclose(actual["y"], y)
 
     def test_crs(self):
-        assert self.uda.ugrid.crs is None
+        crs = self.uda.ugrid.crs
+        assert crs == {"mesh2d": None}
 
     def test_to_geodataframe(self):
         with pytest.raises(ValueError, match="unable to convert unnamed"):
-            self.uda.ugrid.to_geodataframe("mesh2d_nFaces")
+            self.uda.ugrid.to_geodataframe()
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
         gdf = uda2.ugrid.to_geodataframe("mesh2d_nFaces")
@@ -250,10 +263,11 @@ class TestUgridDataset:
 
     def test_init(self):
         assert isinstance(self.uds.ugrid.obj, xr.Dataset)
-        assert isinstance(self.uds.ugrid.grid, xugrid.Ugrid2d)
-        assert "mesh2d_face_x" in self.uds.ugrid.obj
+        assert isinstance(self.uds.ugrid.grids[0], xugrid.Ugrid2d)
         # Try alternative initialization
-        uds = xugrid.UgridDataset(grid=GRID)
+        uds = xugrid.UgridDataset(grids=GRID)
+        assert isinstance(uds, xugrid.UgridDataset)
+        uds = xugrid.UgridDataset(grids=[GRID])
         assert isinstance(uds, xugrid.UgridDataset)
         uds["a"] = DARRAY
         assert "a" in uds.ugrid.obj
@@ -263,13 +277,15 @@ class TestUgridDataset:
         assert isinstance(uds, xugrid.UgridDataset)
         assert "a" in uds.ugrid.obj
         assert "b" in uds.ugrid.obj
-        assert "mesh2d_face_nodes" in uds.ugrid.grid.dataset
+        assert "mesh2d_face_nodes" in uds.ugrid.grids[0].to_dataset()
         assert "mesh2d_face_nodes" not in uds.ugrid.obj
+
+    def test_repr(self):
+        assert self.uds.__repr__() == self.uds.obj.__repr__()
 
     def test_getitem(self):
         assert "a" in self.uds
         assert "b" in self.uds
-        assert "mesh2d_face_x" in self.uds
         assert isinstance(self.uds["a"], xugrid.UgridDataArray)
         assert isinstance(self.uds[["a", "b"]], xugrid.UgridDataset)
 
@@ -286,6 +302,8 @@ class TestUgridDataset:
         assert tuple(self.uds.dims) == ("mesh2d_nFaces",)
         assert isinstance(self.uds.a, xugrid.UgridDataArray)
         assert isinstance(self.uds.mean(), xugrid.UgridDataset)
+        # obj should be accessible
+        assert isinstance(self.uds.obj, xr.Dataset)
 
     def test_unary_op(self):
         alltrue = self.uds.astype(bool)
@@ -303,7 +321,7 @@ class TestUgridDataset:
         assert isinstance(actual, xugrid.UgridDataset)
 
     def test_ugrid_accessor(self):
-        assert isinstance(self.uds.ugrid, xugrid.ugrid_dataset.UgridAccessor)
+        assert isinstance(self.uds.ugrid, xugrid.ugrid_dataset.UgridDatasetAccessor)
 
     def test_from_geodataframe(self):
         xy = np.array(
@@ -324,10 +342,9 @@ class TestUgridDataset:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uds.ugrid.isel([0, 1])
+        actual = self.uds.ugrid.isel({GRID.face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataset)
-        assert actual.ugrid.grid.n_face == 2
-        assert "mesh2d_nFaces_index" in actual.coords
+        assert actual.ugrid.grids[0].n_face == 2
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
 
@@ -360,34 +377,22 @@ class TestUgridDataset:
         assert isinstance(actual, xugrid.UgridDataset)
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
-        assert actual.ugrid.grid.n_face == 2
+        assert actual.ugrid.grids[0].n_face == 2
 
         actual = self.uds.ugrid.sel(x=slice(0, 1), y=slice(1, None))
         assert isinstance(actual, xugrid.UgridDataset)
         assert actual["a"].shape == (1,)
         assert actual["b"].shape == (1,)
-        assert actual.ugrid.grid.n_face == 1
+        assert actual.ugrid.grids[0].n_face == 1
 
     def test_crs(self):
-        assert self.uds.ugrid.crs is None
+        crs = self.uds.ugrid.crs
+        assert crs == {"mesh2d": None}
 
     def test_to_geodataframe(self):
-        gdf = self.uds.ugrid.to_geodataframe("mesh2d_nFaces")
+        gdf = self.uds.ugrid.to_geodataframe()
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
-
-    def test_connected_components(self):
-        actual = self.uds.ugrid.connected_components()
-        assert isinstance(actual, xugrid.UgridDataArray)
-        assert np.allclose(actual, 0)
-
-    def test_reverse_cuthill_mckee(self):
-        actual = self.uds.ugrid.reverse_cuthill_mckee()
-        assert isinstance(actual, xugrid.UgridDataset)
-
-    def test_laplace_interpolate(self):
-        with pytest.raises(NotImplementedError):
-            self.uds.ugrid.laplace_interpolate(direct_solve=True)
 
 
 def test_to_dataset():
@@ -403,7 +408,7 @@ def test_open_dataset(tmp_path):
     back = xugrid.open_dataset(path)
     assert isinstance(back, xugrid.UgridDataset)
     assert "b" in back
-    assert "mesh2d_face_nodes" in back.ugrid.grid.dataset
+    assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
 
 
@@ -450,7 +455,7 @@ def test_zarr_roundtrip(tmp_path):
     assert isinstance(back, xugrid.UgridDataset)
     assert "a" in back
     assert "b" in back
-    assert "mesh2d_face_nodes" in back.ugrid.grid.dataset
+    assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
 
 
@@ -461,13 +466,13 @@ def test_func_like():
     assert isinstance(fullda, xugrid.UgridDataArray)
     assert (fullda == 2).all()
     # Topology should be untouched
-    assert fullda.ugrid.grid.dataset == uds.ugrid.grid.dataset
+    assert fullda.ugrid.grid.to_dataset() == uds.ugrid.grids[0].to_dataset()
 
     fullds = xugrid.full_like(uds, 2)
     assert isinstance(fullds, xugrid.UgridDataset)
     assert (fullds["a"] == 2).all()
     assert (fullds["b"] == 2).all()
-    assert fullds.ugrid.grid.dataset == uds.ugrid.grid.dataset
+    assert fullds.ugrid.grids[0].to_dataset == uds.ugrid.grids[0].to_dataset()
 
     fullda = xugrid.zeros_like(uds["a"])
     assert isinstance(fullda, xugrid.UgridDataArray)
@@ -476,3 +481,26 @@ def test_func_like():
     fullda = xugrid.ones_like(uds["a"])
     assert isinstance(fullda, xugrid.UgridDataArray)
     assert (fullda == 1).all()
+
+
+def test_concat():
+    uds = xugrid.UgridDataset(UGRID_DS)
+    uda = uds["a"]
+    uda1 = uda.assign_coords(layer=1)
+    uda2 = uda.assign_coords(layer=2)
+    result = xugrid.concat([uda1, uda2], dim="layer")
+    assert result.dims == ("layer", "mesh2d_nFaces")
+    assert np.array_equal(result["layer"], [1, 2])
+
+    uds1d = ugrid1d_ds()
+    uda3 = uds1d["a1d"].assign_coords(layer=2)
+    with pytest.raises(ValueError, match="All UgridDataArrays must have the same grid"):
+        xugrid.concat([uda1, uda3], dim="layer")
+
+
+def test_merge():
+    uds2d = xugrid.UgridDataset(UGRID_DS)
+    uds1d = ugrid1d_ds()
+    merged = xugrid.merge([uds2d, uds1d])
+    assert isinstance(merged, xugrid.UgridDataset)
+    assert len(merged.grids) == 2

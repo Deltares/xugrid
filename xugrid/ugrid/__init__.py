@@ -1,5 +1,9 @@
+import xarray as xr
+
+from .conventions import UgridRolesAccessor
 from .ugrid1d import Ugrid1d
 from .ugrid2d import Ugrid2d
+from .ugridbase import AbstractUgrid
 
 
 def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
@@ -28,3 +32,15 @@ def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ign
             f"Invalid geometry type: {geom_type}. Expected Linestring or Polygon."
         )
     return grid
+
+
+def grid_from_dataset(dataset: xr.Dataset, topology: str):
+    topodim = dataset[topology].attrs["topology_dimension"]
+    if topodim == 1:
+        return Ugrid1d.from_dataset(dataset, topology)
+    elif topodim == 2:
+        return Ugrid2d.from_dataset(dataset, topology)
+    elif topodim == 3:
+        raise NotImplementedError
+    else:
+        raise ValueError(f"Invalid topology dimension: {topodim}")

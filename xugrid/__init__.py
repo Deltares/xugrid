@@ -2,12 +2,15 @@ import pkg_resources
 
 from . import data
 from .plot import plot
-from .ugrid import Ugrid1d, Ugrid2d
+from .ugrid import Ugrid1d, Ugrid2d, UgridRolesAccessor
 from .ugrid_dataset import (
-    UgridAccessor,
     UgridDataArray,
+    UgridDataArrayAccessor,
     UgridDataset,
+    UgridDatasetAccessor,
+    concat,
     full_like,
+    merge,
     ones_like,
     open_dataarray,
     open_dataset,

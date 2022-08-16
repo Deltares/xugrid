@@ -36,7 +36,7 @@ def disk():
         z = -(
             2 * (np.exp((r1 / 10) ** 2) - 1) * 30.0 * np.cos(7.0 * theta1)
             + (np.exp((r2 / 10) ** 2) - 1) * 30.0 * np.cos(11.0 * theta2)
-            + 0.7 * (x ** 2 + y ** 2)
+            + 0.7 * (x**2 + y**2)
         )
         zmin = z.min()
         zmax = z.max()
