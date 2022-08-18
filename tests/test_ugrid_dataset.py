@@ -2,43 +2,53 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pygeos
+import pyproj
 import pytest
 import xarray as xr
 
 import xugrid
 
-VERTICES = np.array(
-    [
-        [0.0, 0.0],  # 0
-        [1.0, 0.0],  # 1
-        [2.0, 0.0],  # 2
-        [0.0, 1.0],  # 3
-        [1.0, 1.0],  # 4
-        [2.0, 1.0],  # 5
-        [1.0, 2.0],  # 6
-    ]
-)
-FACES = np.array(
-    [
-        [0, 1, 4, 3],
-        [1, 2, 5, 4],
-        [3, 4, 6, -1],
-        [4, 5, 6, -1],
-    ]
-)
-GRID = xugrid.Ugrid2d(
-    node_x=VERTICES[:, 0],
-    node_y=VERTICES[:, 1],
-    fill_value=-1,
-    face_node_connectivity=FACES,
-)
-DARRAY = xr.DataArray(
-    data=np.ones(GRID.n_face),
-    dims=[GRID.face_dimension],
-)
-UGRID_DS = GRID.to_dataset()
-UGRID_DS["a"] = DARRAY
-UGRID_DS["b"] = DARRAY * 2
+
+def GRID():
+    VERTICES = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [1.0, 0.0],  # 1
+            [2.0, 0.0],  # 2
+            [0.0, 1.0],  # 3
+            [1.0, 1.0],  # 4
+            [2.0, 1.0],  # 5
+            [1.0, 2.0],  # 6
+        ]
+    )
+    FACES = np.array(
+        [
+            [0, 1, 4, 3],
+            [1, 2, 5, 4],
+            [3, 4, 6, -1],
+            [4, 5, 6, -1],
+        ]
+    )
+    return xugrid.Ugrid2d(
+        node_x=VERTICES[:, 0],
+        node_y=VERTICES[:, 1],
+        fill_value=-1,
+        face_node_connectivity=FACES,
+    )
+
+
+def DARRAY():
+    return xr.DataArray(
+        data=np.ones(GRID().n_face),
+        dims=[GRID().face_dimension],
+    )
+
+
+def UGRID_DS():
+    ds = GRID().to_dataset()
+    ds["a"] = DARRAY()
+    ds["b"] = DARRAY() * 2
+    return ds
 
 
 def ugrid1d_ds():
@@ -63,7 +73,7 @@ def ugrid1d_ds():
 class TestUgridDataArray:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.uda = xugrid.UgridDataArray(DARRAY, GRID)
+        self.uda = xugrid.UgridDataArray(DARRAY(), GRID())
 
     def test_init(self):
         assert isinstance(self.uda.ugrid.obj, xr.DataArray)
@@ -140,7 +150,7 @@ class TestUgridDataArray:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uda.ugrid.isel({GRID.face_dimension: [0, 1]})
+        actual = self.uda.ugrid.isel({GRID().face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataArray)
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
@@ -194,8 +204,20 @@ class TestUgridDataArray:
         assert np.allclose(actual["y"], y)
 
     def test_crs(self):
-        crs = self.uda.ugrid.crs
+        uda = self.uda
+        crs = uda.ugrid.crs
         assert crs == {"mesh2d": None}
+
+        uda.ugrid.set_crs(epsg=28992)
+        assert uda.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+
+        result = uda.ugrid.to_crs(epsg=32631)
+        assert uda is not result
+        assert np.allclose(uda.values, result.values)
+        assert uda.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+        assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
+        assert not np.array_equal(result.ugrid.grid.node_x, uda.ugrid.grid.node_x)
+        assert not np.array_equal(result.ugrid.grid.node_y, uda.ugrid.grid.node_y)
 
     def test_to_geodataframe(self):
         with pytest.raises(ValueError, match="unable to convert unnamed"):
@@ -257,23 +279,23 @@ class TestUgridDataset:
     @pytest.fixture(autouse=True)
     def setup(self):
         ds = xr.Dataset()
-        ds["a"] = DARRAY
-        ds["b"] = DARRAY * 2
-        self.uds = xugrid.UgridDataset(ds, GRID)
+        ds["a"] = DARRAY()
+        ds["b"] = DARRAY() * 2
+        self.uds = xugrid.UgridDataset(ds, GRID())
 
     def test_init(self):
         assert isinstance(self.uds.ugrid.obj, xr.Dataset)
         assert isinstance(self.uds.ugrid.grids[0], xugrid.Ugrid2d)
         # Try alternative initialization
-        uds = xugrid.UgridDataset(grids=GRID)
+        uds = xugrid.UgridDataset(grids=GRID())
         assert isinstance(uds, xugrid.UgridDataset)
-        uds = xugrid.UgridDataset(grids=[GRID])
+        uds = xugrid.UgridDataset(grids=[GRID()])
         assert isinstance(uds, xugrid.UgridDataset)
-        uds["a"] = DARRAY
+        uds["a"] = DARRAY()
         assert "a" in uds.ugrid.obj
 
     def test_init_from_dataset_only(self):
-        uds = xugrid.UgridDataset(UGRID_DS)
+        uds = xugrid.UgridDataset(UGRID_DS())
         assert isinstance(uds, xugrid.UgridDataset)
         assert "a" in uds.ugrid.obj
         assert "b" in uds.ugrid.obj
@@ -342,7 +364,7 @@ class TestUgridDataset:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uds.ugrid.isel({GRID.face_dimension: [0, 1]})
+        actual = self.uds.ugrid.isel({GRID().face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataset)
         assert actual.ugrid.grids[0].n_face == 2
         assert actual["a"].shape == (2,)
@@ -386,8 +408,26 @@ class TestUgridDataset:
         assert actual.ugrid.grids[0].n_face == 1
 
     def test_crs(self):
-        crs = self.uds.ugrid.crs
+        uds = self.uds
+        crs = uds.ugrid.crs
         assert crs == {"mesh2d": None}
+
+        with pytest.raises(ValueError, match="grid not found"):
+            uds.ugrid.set_crs(epsg=28992, topology="grid")
+
+        uds.ugrid.set_crs(epsg=28992, topology="mesh2d")
+        assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+
+        uds.ugrid.set_crs(epsg=28992)
+        assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+
+        with pytest.raises(ValueError, match="grid not found"):
+            uds.ugrid.to_crs(epsg=32631, topology="grid")
+
+        result = uds.ugrid.to_crs(epsg=32631, topology="mesh2d")
+        assert uds is not result
+        assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+        assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
 
     def test_to_geodataframe(self):
         gdf = self.uds.ugrid.to_geodataframe()
@@ -396,13 +436,13 @@ class TestUgridDataset:
 
 
 def test_to_dataset():
-    uds = xugrid.UgridDataset(UGRID_DS)
-    assert uds.ugrid.to_dataset() == UGRID_DS
+    uds = xugrid.UgridDataset(UGRID_DS())
+    assert uds.ugrid.to_dataset() == UGRID_DS()
 
 
 def test_open_dataset(tmp_path):
     path = tmp_path / "ugrid-dataset.nc"
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
     uds.ugrid.to_netcdf(path)
 
     back = xugrid.open_dataset(path)
@@ -414,7 +454,7 @@ def test_open_dataset(tmp_path):
 
 def test_open_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.nc"
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
     uds.ugrid.to_netcdf(path)
     with pytest.raises(ValueError, match="Given file dataset contains more than one"):
         xugrid.open_dataarray(path)
@@ -430,7 +470,7 @@ def test_open_dataarray_roundtrip(tmp_path):
 def test_open_mfdataset(tmp_path):
     path1 = tmp_path / "ugrid-dataset_1.nc"
     path2 = tmp_path / "ugrid-dataset_2.nc"
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
     uda1 = uds["a"].expand_dims(dim="layer")
     uda2 = uds["a"].expand_dims(dim="layer")
     uda1 = uda1.assign_coords(layer=[1])
@@ -448,7 +488,7 @@ def test_open_mfdataset(tmp_path):
 
 def test_zarr_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.zarr"
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
     uds.ugrid.to_zarr(path)
 
     back = xugrid.open_zarr(path)
@@ -460,7 +500,7 @@ def test_zarr_roundtrip(tmp_path):
 
 
 def test_func_like():
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
 
     fullda = xugrid.full_like(uds["a"], 2)
     assert isinstance(fullda, xugrid.UgridDataArray)
@@ -484,7 +524,7 @@ def test_func_like():
 
 
 def test_concat():
-    uds = xugrid.UgridDataset(UGRID_DS)
+    uds = xugrid.UgridDataset(UGRID_DS())
     uda = uds["a"]
     uda1 = uda.assign_coords(layer=1)
     uda2 = uda.assign_coords(layer=2)
@@ -499,7 +539,7 @@ def test_concat():
 
 
 def test_merge():
-    uds2d = xugrid.UgridDataset(UGRID_DS)
+    uds2d = xugrid.UgridDataset(UGRID_DS())
     uds1d = ugrid1d_ds()
     merged = xugrid.merge([uds2d, uds1d])
     assert isinstance(merged, xugrid.UgridDataset)

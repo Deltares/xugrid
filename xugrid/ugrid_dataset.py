@@ -531,6 +531,88 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         """
         return {grid.name: grid.crs for grid in self.grids}
 
+    def set_crs(
+        self,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
+        epsg: int = None,
+        allow_override: bool = False,
+        topology: str = None,
+    ):
+        """
+        Set the Coordinate Reference System (CRS) of a UGRID topology.
+
+        NOTE: The underlying geometries are not transformed to this CRS. To
+        transform the geometries to a new CRS, use the ``to_crs`` method.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying the projection.
+        allow_override : bool, default False
+            If the the UGRID topology already has a CRS, allow to replace the
+            existing CRS, even when both are not equal.
+        topology: str, optional
+            Name of the grid topology in which to set the CRS.
+            Sets the CRS for all grids if left unspecified.
+        """
+        if topology is None:
+            grids = self.grids
+        else:
+            names = [grid.name for grid in self.grids]
+            if topology not in names:
+                raise ValueError(f"{topology} not found. Expected one of: {names}")
+            grids = [grid for grid in self.grids if grid.name == topology]
+
+        for grid in grids:
+            grid.set_crs(crs, epsg, allow_override)
+
+    def to_crs(
+        self,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
+        epsg: int = None,
+        topology: str = None,
+    ) -> UgridDataset:
+        """
+        Transform geometries to a new coordinate reference system.
+        Transform all geometries in an active geometry column to a different coordinate
+        reference system. The ``crs`` attribute on the current Ugrid must
+        be set. Either ``crs`` or ``epsg`` may be specified for output.
+
+        This method will transform all points in all objects. It has no notion
+        of projecting the cells. All segments joining points are assumed to be
+        lines in the current projection, not geodesics. Objects crossing the
+        dateline (or other projection boundary) will have undesirable behavior.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying output projection.
+        topology: str, optional
+            Name of the grid topology to reproject.
+            Reprojects all grids if left unspecified.
+        """
+        if topology is None:
+            grids = [grid.to_crs(crs, epsg) for grid in self.grids]
+        else:
+            names = [grid.name for grid in self.grids]
+            if topology not in names:
+                raise ValueError(f"{topology} not found. Expected one of: {names}")
+            grids = [
+                grid.to_crs(crs, epsg) if grid.name == topology else grid.copy()
+                for grid in self.grids
+            ]
+
+        uds = UgridDataset(self.obj, grids)
+        return uds.ugrid.assign_node_coords()
+
     def to_geodataframe(
         self, dim_order=None
     ) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
@@ -767,6 +849,63 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             A dictionary containing the name of the grid and its CRS.
         """
         return {self.grid.name: self.grid.crs}
+
+    def set_crs(
+        self,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
+        epsg: int = None,
+        allow_override: bool = False,
+    ):
+        """
+        Set the Coordinate Reference System (CRS) of a UGRID topology.
+
+        NOTE: The underlying geometries are not transformed to this CRS. To
+        transform the geometries to a new CRS, use the ``to_crs`` method.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying the projection.
+        allow_override : bool, default False
+            If the the UGRID topology already has a CRS, allow to replace the
+            existing CRS, even when both are not equal.
+        """
+        self.grid.set_crs(crs, epsg, allow_override)
+
+    def to_crs(
+        self,
+        crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
+        epsg: int = None,
+    ) -> UgridDataArray:
+        """
+        Transform geometries to a new coordinate reference system.
+        Transform all geometries in an active geometry column to a different coordinate
+        reference system. The ``crs`` attribute on the current Ugrid must
+        be set. Either ``crs`` or ``epsg`` may be specified for output.
+
+        This method will transform all points in all objects. It has no notion
+        of projecting the cells. All segments joining points are assumed to be
+        lines in the current projection, not geodesics. Objects crossing the
+        dateline (or other projection boundary) will have undesirable behavior.
+
+        Parameters
+        ----------
+        crs : pyproj.CRS, optional if `epsg` is specified
+            The value can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        epsg : int, optional if `crs` is specified
+            EPSG code specifying output projection.
+        """
+        uda = UgridDataArray(self.obj, self.grid.to_crs(crs, epsg))
+        if self.grid.node_dimension in self.obj.dims:
+            return uda.ugrid.assign_node_coords()
+        else:
+            return uda
 
     def to_geodataframe(
         self, name: str = None, dim_order=None

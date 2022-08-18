@@ -332,10 +332,6 @@ class AbstractUgrid(abc.ABC):
             such as an authority string (eg "EPSG:4326") or a WKT string.
         epsg : int, optional if `crs` is specified
             EPSG code specifying the projection.
-        inplace : bool, default False
-            If True, the CRS of the UGRID topology will be changed in place
-            (while still returning the result) instead of making a copy of the
-            GeoSeries.
         allow_override : bool, default False
             If the the UGRID topology already has a CRS, allow to replace the
             existing CRS, even when both are not equal.
@@ -362,7 +358,6 @@ class AbstractUgrid(abc.ABC):
         self,
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
-        inplace: bool = False,
     ):
         """
         Transform geometries to a new coordinate reference system.
@@ -383,8 +378,6 @@ class AbstractUgrid(abc.ABC):
             such as an authority string (eg "EPSG:4326") or a WKT string.
         epsg : int, optional if `crs` is specified
             EPSG code specifying output projection.
-        inplace : bool, optional, default: False
-            Whether to return a new Ugrid or do the transformation in place.
         """
         import pyproj
 
@@ -400,16 +393,9 @@ class AbstractUgrid(abc.ABC):
         else:
             raise ValueError("Must pass either crs or epsg.")
 
-        if inplace:
-            grid = self
-        else:
-            grid = self.copy()
-
+        grid = self.copy()
         if self.crs.is_exact_same(crs):
-            if inplace:
-                return
-            else:
-                return grid
+            return grid
 
         transformer = pyproj.Transformer.from_crs(
             crs_from=self.crs, crs_to=crs, always_xy=True
@@ -418,7 +404,7 @@ class AbstractUgrid(abc.ABC):
         grid.node_x = node_x
         grid.node_y = node_y
         grid._clear_geometry_properties()
+        grid._dataset = None
         grid.crs = crs
 
-        if not inplace:
-            return grid
+        return grid

@@ -70,7 +70,7 @@ def test_set_crs():
     grid.set_crs("epsg:28992")
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
-    # This is allowed
+    # This is allowed: the same crs
     grid.set_crs("epsg:28992")
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
@@ -103,14 +103,6 @@ def test_to_crs():
     reprojected = grid.to_crs("epsg:28992")
     assert reprojected.crs == pyproj.CRS.from_epsg(28992)
     assert (~(grid.node_coordinates == reprojected.node_coordinates)).all()
-
-    # Test inplace
-    grid.to_crs("epsg:28992", inplace=True)
-    assert np.allclose(reprojected.node_coordinates, grid.node_coordinates)
-
-    # Test epsg alternative arg
-    grid.to_crs(epsg=4326, inplace=True)
-    assert grid.crs == pyproj.CRS.from_epsg(4326)
 
 
 def test_to_dataset():
