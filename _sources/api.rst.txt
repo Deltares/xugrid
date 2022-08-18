@@ -7,6 +7,11 @@ API Reference
 
 This page provides an auto-generated summary of xugrid's API.
 
+.. toctree::
+   :maxdepth: 1
+
+   changelog
+
 Top-level functions
 -------------------
 
@@ -56,6 +61,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.assign_node_coords
     UgridDatasetAccessor.set_node_coords
     UgridDatasetAccessor.crs
+    UgridDatasetAccessor.set_crs
+    UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.isel
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
@@ -68,6 +75,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.assign_node_coords
     UgridDataArrayAccessor.set_node_coords
     UgridDataArrayAccessor.crs
+    UgridDataArrayAccessor.set_crs
+    UgridDataArrayAccessor.to_crs
     UgridDataArrayAccessor.isel
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points

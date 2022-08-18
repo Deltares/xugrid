@@ -699,6 +699,88 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">crs</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
+<div class="viewcode-block" id="UgridDatasetAccessor.set_crs"><a class="viewcode-back" href="../../api/xugrid.UgridDatasetAccessor.set_crs.html#xugrid.UgridDatasetAccessor.set_crs">[docs]</a>    <span class="k">def</span> <span class="nf">set_crs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the Coordinate Reference System (CRS) of a UGRID topology.</span>
+
+<span class="sd">        NOTE: The underlying geometries are not transformed to this CRS. To</span>
+<span class="sd">        transform the geometries to a new CRS, use the ``to_crs`` method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
+<span class="sd">            The value can be anything accepted</span>
+<span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        epsg : int, optional if `crs` is specified</span>
+<span class="sd">            EPSG code specifying the projection.</span>
+<span class="sd">        allow_override : bool, default False</span>
+<span class="sd">            If the the UGRID topology already has a CRS, allow to replace the</span>
+<span class="sd">            existing CRS, even when both are not equal.</span>
+<span class="sd">        topology: str, optional</span>
+<span class="sd">            Name of the grid topology in which to set the CRS.</span>
+<span class="sd">            Sets the CRS for all grids if left unspecified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">topology</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">topology</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">:</span>
+            <span class="n">grid</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">allow_override</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridDatasetAccessor.to_crs"><a class="viewcode-back" href="../../api/xugrid.UgridDatasetAccessor.to_crs.html#xugrid.UgridDatasetAccessor.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform geometries to a new coordinate reference system.</span>
+<span class="sd">        Transform all geometries in an active geometry column to a different coordinate</span>
+<span class="sd">        reference system. The ``crs`` attribute on the current Ugrid must</span>
+<span class="sd">        be set. Either ``crs`` or ``epsg`` may be specified for output.</span>
+
+<span class="sd">        This method will transform all points in all objects. It has no notion</span>
+<span class="sd">        of projecting the cells. All segments joining points are assumed to be</span>
+<span class="sd">        lines in the current projection, not geodesics. Objects crossing the</span>
+<span class="sd">        dateline (or other projection boundary) will have undesirable behavior.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
+<span class="sd">            The value can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        epsg : int, optional if `crs` is specified</span>
+<span class="sd">            EPSG code specifying output projection.</span>
+<span class="sd">        topology: str, optional</span>
+<span class="sd">            Name of the grid topology to reproject.</span>
+<span class="sd">            Reprojects all grids if left unspecified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">topology</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">)</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">topology</span> <span class="k">else</span> <span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span>
+            <span class="p">]</span>
+
+        <span class="n">uds</span> <span class="o">=</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">uds</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="UgridDatasetAccessor.to_geodataframe"><a class="viewcode-back" href="../../api/xugrid.UgridDatasetAccessor.to_geodataframe.html#xugrid.UgridDatasetAccessor.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
@@ -935,6 +1017,63 @@
 <span class="sd">            A dictionary containing the name of the grid and its CRS.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">}</span>
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.set_crs"><a class="viewcode-back" href="../../api/xugrid.UgridDataArrayAccessor.set_crs.html#xugrid.UgridDataArrayAccessor.set_crs">[docs]</a>    <span class="k">def</span> <span class="nf">set_crs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the Coordinate Reference System (CRS) of a UGRID topology.</span>
+
+<span class="sd">        NOTE: The underlying geometries are not transformed to this CRS. To</span>
+<span class="sd">        transform the geometries to a new CRS, use the ``to_crs`` method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
+<span class="sd">            The value can be anything accepted</span>
+<span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        epsg : int, optional if `crs` is specified</span>
+<span class="sd">            EPSG code specifying the projection.</span>
+<span class="sd">        allow_override : bool, default False</span>
+<span class="sd">            If the the UGRID topology already has a CRS, allow to replace the</span>
+<span class="sd">            existing CRS, even when both are not equal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">allow_override</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_crs"><a class="viewcode-back" href="../../api/xugrid.UgridDataArrayAccessor.to_crs.html#xugrid.UgridDataArrayAccessor.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform geometries to a new coordinate reference system.</span>
+<span class="sd">        Transform all geometries in an active geometry column to a different coordinate</span>
+<span class="sd">        reference system. The ``crs`` attribute on the current Ugrid must</span>
+<span class="sd">        be set. Either ``crs`` or ``epsg`` may be specified for output.</span>
+
+<span class="sd">        This method will transform all points in all objects. It has no notion</span>
+<span class="sd">        of projecting the cells. All segments joining points are assumed to be</span>
+<span class="sd">        lines in the current projection, not geodesics. Objects crossing the</span>
+<span class="sd">        dateline (or other projection boundary) will have undesirable behavior.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
+<span class="sd">            The value can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        epsg : int, optional if `crs` is specified</span>
+<span class="sd">            EPSG code specifying output projection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">uda</span> <span class="o">=</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">node_dimension</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">uda</span></div>
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.to_geodataframe"><a class="viewcode-back" href="../../api/xugrid.UgridDataArrayAccessor.to_geodataframe.html#xugrid.UgridDataArrayAccessor.to_geodataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span>
