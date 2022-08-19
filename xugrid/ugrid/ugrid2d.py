@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -65,7 +65,7 @@ class Ugrid2d(AbstractUgrid):
         name: str = "mesh2d",
         edge_node_connectivity: IntArray = None,
         dataset: xr.Dataset = None,
-        indexes: dict[str, str] = None,
+        indexes: Dict[str, str] = None,
         projected: bool = True,
         crs: Any = None,
     ):

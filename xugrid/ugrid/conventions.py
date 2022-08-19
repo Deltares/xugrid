@@ -6,7 +6,7 @@ It takes some inspiration from: https://github.com/xarray-contrib/cf-xarray
 import warnings
 from collections import ChainMap
 from itertools import chain
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 import xarray as xr
 
@@ -170,13 +170,13 @@ def default_topology_attrs(name: str, topology_dimension: int):
         )
 
 
-def _get_topology(ds: xr.Dataset) -> list[str]:
+def _get_topology(ds: xr.Dataset) -> List[str]:
     return [k for k in ds.data_vars if ds[k].attrs.get("cf_role") == "mesh_topology"]
 
 
 def _infer_xy_coords(
-    ds: xr.Dataset, candidates: list[str]
-) -> Tuple[list[str], list[str]]:
+    ds: xr.Dataset, candidates: List[str]
+) -> Tuple[List[str], List[str]]:
     # TODO: add argument for latitude / longitude?
     x = []
     y = []
@@ -209,8 +209,8 @@ def _infer_xy_coords(
 
 
 def _get_coordinates(
-    ds: xr.Dataset, topologies: list[str]
-) -> dict[str, dict[str, Tuple[list[str], list[str]]]]:
+    ds: xr.Dataset, topologies: List[str]
+) -> Dict[str, Dict[str, Tuple[List[str], List[str]]]]:
     topology_dict = {}
     for topology in topologies:
         attrs = ds[topology].attrs
@@ -232,10 +232,10 @@ def _get_coordinates(
 
 def _infer_dims(
     ds: xr.Dataset,
-    connectivities: dict[str, str],
-    coordinates: dict[str, dict[str, Tuple[list[str]]]],
-    vardict: dict[str, str],
-) -> dict[str, str]:
+    connectivities: Dict[str, str],
+    coordinates: Dict[str, Dict[str, Tuple[List[str]]]],
+    vardict: Dict[str, str],
+) -> Dict[str, str]:
     """
     Infer dimensions based on connectivity and coordinates.
     """
@@ -278,10 +278,10 @@ def _infer_dims(
 
 def _get_dimensions(
     ds: xr.Dataset,
-    topologies: list[str],
-    connectivity: dict[str, dict[str, str]],
-    coordinates: dict[str, dict[str, Tuple[list[str]]]],
-) -> dict[str, dict[str, str]]:
+    topologies: List[str],
+    connectivity: Dict[str, Dict[str, str]],
+    coordinates: Dict[str, Dict[str, Tuple[List[str]]]],
+) -> Dict[str, Dict[str, str]]:
     """
     Get the dimensions from the topology attributes and infer them from
     connectivity arrays or coordinates.
@@ -302,8 +302,8 @@ def _get_dimensions(
 
 
 def _get_connectivity(
-    ds: xr.Dataset, topologies: list[str]
-) -> dict[str, dict[str, str]]:
+    ds: xr.Dataset, topologies: List[str]
+) -> Dict[str, Dict[str, str]]:
     topology_dict = {}
     for topology in topologies:
         attrs = ds[topology].attrs
@@ -349,19 +349,19 @@ class UgridRolesAccessor:
         )
 
     @property
-    def topology(self) -> list[str]:
+    def topology(self) -> List[str]:
         """
         Get the names of the topology dummy variables, marked by a CF-role of
         ``mesh_topology``.
 
         Returns
         -------
-        topology: list[str]
+        topology: List[str]
         """
         return _get_topology(self._ds)
 
     @property
-    def coordinates(self) -> dict[str, dict[str, Tuple[list[str], list[str]]]]:
+    def coordinates(self) -> Dict[str, Dict[str, Tuple[List[str], List[str]]]]:
         """
         Get the names of the coordinate variables from the topology attributes.
 
@@ -376,12 +376,12 @@ class UgridRolesAccessor:
 
         Returns
         -------
-        coordinates: dict[str, dict[str, Tuple[list[str]]]]
+        coordinates: dict[str, dict[str, Tuple[List[str]]]]
         """
         return _get_coordinates(self._ds, self.topology)
 
     @property
-    def dimensions(self) -> dict[str, dict[str, str]]:
+    def dimensions(self) -> Dict[str, Dict[str, str]]:
         """
         Get the dimension names from the topology attributes and infer them
         from connectivity arrays or coordinates.
@@ -401,7 +401,7 @@ class UgridRolesAccessor:
         )
 
     @property
-    def connectivity(self) -> dict[str, dict[str, str]]:
+    def connectivity(self) -> Dict[str, Dict[str, str]]:
         """
         Get the names of the variables containing the UGRID connectivity data.
 
@@ -412,7 +412,7 @@ class UgridRolesAccessor:
 
         Returns
         -------
-        connectivity: dict[str, dict[str, str]]
+        connectivity: Dict[str, Dict[str, str]]
         """
         return _get_connectivity(self._ds, self.topology)
 
