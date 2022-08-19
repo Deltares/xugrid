@@ -2,7 +2,7 @@ import abc
 import types
 from functools import wraps
 from itertools import chain
-from typing import Any, Callable, Sequence, Type, Union
+from typing import Any, Callable, Dict, Sequence, Tuple, Type, Union
 
 import numpy as np
 import pandas as pd
@@ -176,6 +176,22 @@ class AbstractUgridAccessor(abc.ABC):
 
     @abc.abstractproperty
     def crs():
+        """ """
+
+    @abc.abstractmethod
+    def set_crs():
+        """ """
+
+    @abc.abstractmethod
+    def to_crs():
+        """ """
+
+    @abc.abstractproperty
+    def bounds():
+        """ """
+
+    @abc.abstractproperty
+    def total_bounds():
         """ """
 
     @staticmethod
@@ -406,6 +422,32 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
     def __init__(self, obj: xr.Dataset, grids: Sequence[UgridType]):
         self.obj = obj
         self.grids = grids
+
+    @property
+    def grid(self) -> UgridType:
+        ngrid = len(self.grids)
+        if ngrid == 1:
+            return self.grids[0]
+        else:
+            raise AttributeError(
+                "Can only access grid topology via `.grid` if dataset contains "
+                f"exactly one grid. Dataset contains {ngrid} grids. Use "
+                "`.grids` instead."
+            )
+
+    @property
+    def bounds(self) -> Dict[str, Tuple]:
+        return {grid.name: grid.bounds for grid in self.grids}
+
+    @property
+    def total_bounds(self) -> Tuple:
+        bounds = np.column_stack([bound for bound in self.bounds.values()])
+        return (
+            bounds[0].min(),
+            bounds[1].min(),
+            bounds[2].max(),
+            bounds[3].max(),
+        )
 
     def assign_node_coords(self) -> UgridDataset:
         """
@@ -680,6 +722,14 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     def __init__(self, obj: xr.DataArray, grid: UgridType):
         self.obj = obj
         self.grid = grid
+
+    @property
+    def bounds(self) -> Dict[str, Tuple]:
+        return {self.grid.name: self.grid.bounds}
+
+    @property
+    def total_bounds(self) -> Tuple:
+        return next(iter(self.bounds.values()))
 
     plot = UncachedAccessor(_PlotMethods)
 
