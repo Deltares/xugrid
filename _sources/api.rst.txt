@@ -60,6 +60,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor
     UgridDatasetAccessor.assign_node_coords
     UgridDatasetAccessor.set_node_coords
+    UgridDatasetAccessor.bounds
+    UgridDatasetAccessor.total_bounds
     UgridDatasetAccessor.crs
     UgridDatasetAccessor.set_crs
     UgridDatasetAccessor.to_crs
@@ -74,6 +76,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor
     UgridDataArrayAccessor.assign_node_coords
     UgridDataArrayAccessor.set_node_coords
+    UgridDataArrayAccessor.bounds
+    UgridDataArrayAccessor.total_bounds
     UgridDataArrayAccessor.crs
     UgridDataArrayAccessor.set_crs
     UgridDataArrayAccessor.to_crs

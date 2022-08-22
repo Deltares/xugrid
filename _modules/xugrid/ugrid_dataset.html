@@ -170,7 +170,7 @@
 <span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -344,6 +344,22 @@
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span> <span class="nf">crs</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">set_crs</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">bounds</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">total_bounds</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
@@ -574,6 +590,41 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.__init__"><a class="viewcode-back" href="../../api/xugrid.UgridDatasetAccessor.html#xugrid.UgridDatasetAccessor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grids</span> <span class="o">=</span> <span class="n">grids</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
+        <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ngrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Can only access grid topology via `.grid` if dataset contains &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use &quot;</span>
+                <span class="s2">&quot;`.grids` instead.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``</span>
+<span class="sd">        values of the grid&#39;s node coordinates for every grid in the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a tuple containing ``minx, miny, maxx, maxy`` values for the</span>
+<span class="sd">        bounds of the dataset as a whole. Currently does not check whether the</span>
+<span class="sd">        coordinate reference systems (CRS) of the grids in the dataset match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">bound</span> <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+            <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_node_coords"><a class="viewcode-back" href="../../api/xugrid.UgridDatasetAccessor.assign_node_coords.html#xugrid.UgridDatasetAccessor.assign_node_coords">[docs]</a>    <span class="k">def</span> <span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -848,6 +899,22 @@
 <div class="viewcode-block" id="UgridDataArrayAccessor.__init__"><a class="viewcode-back" href="../../api/xugrid.UgridDataArrayAccessor.html#xugrid.UgridDataArrayAccessor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``</span>
+<span class="sd">        values of the grid&#39;s node coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a tuple containing ``minx, miny, maxx, maxy`` values of the grid&#39;s</span>
+<span class="sd">        node coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 
     <span class="n">plot</span> <span class="o">=</span> <span class="n">UncachedAccessor</span><span class="p">(</span><span class="n">_PlotMethods</span><span class="p">)</span>
 
