@@ -12,6 +12,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+Changed
+~~~~~~~
+
+Added
+~~~~~
+
+[0.1.5] 2022-08-22
+------------------
+
+Fixed
+~~~~~
+
 - ``list`` and ``dict`` type annotations have been replaced with ``List`` and ``Dict``
   from the typing module to support older versions of Python (<3.9).
 
