@@ -437,10 +437,19 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     @property
     def bounds(self) -> Dict[str, Tuple]:
+        """
+        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``
+        values of the grid's node coordinates for every grid in the dataset.
+        """
         return {grid.name: grid.bounds for grid in self.grids}
 
     @property
     def total_bounds(self) -> Tuple:
+        """
+        Returns a tuple containing ``minx, miny, maxx, maxy`` values for the
+        bounds of the dataset as a whole. Currently does not check whether the
+        coordinate reference systems (CRS) of the grids in the dataset match.
+        """
         bounds = np.column_stack([bound for bound in self.bounds.values()])
         return (
             bounds[0].min(),
@@ -725,10 +734,18 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     @property
     def bounds(self) -> Dict[str, Tuple]:
+        """
+        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``
+        values of the grid's node coordinates.
+        """
         return {self.grid.name: self.grid.bounds}
 
     @property
     def total_bounds(self) -> Tuple:
+        """
+        Returns a tuple containing ``minx, miny, maxx, maxy`` values of the grid's
+        node coordinates.
+        """
         return next(iter(self.bounds.values()))
 
     plot = UncachedAccessor(_PlotMethods)

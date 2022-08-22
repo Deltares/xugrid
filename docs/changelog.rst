@@ -12,6 +12,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+- ``list`` and ``dict`` type annotations have been replaced with ``List`` and ``Dict``
+  from the typing module to support older versions of Python (<3.9).
+
 Changed
 ~~~~~~~
 
@@ -28,6 +31,14 @@ Added
 - :meth:`xugrid.UgridDatasetAccessor.set_crs` has been added to set the CRS of
 - :meth:`xugrid.UgridDatasetAccessor.to_crs` has been added to reproject a grid
   or all grids of a dataset.
+- :attr:`xugrid.UgridDataArrayAccessor.bounds` has been added to get the bounds
+  of the grid coordinates.
+- :attr:`xugrid.UgridDataArrayAccessor.total_bounds` has been added to get the
+  bounds of the grid coordinates.
+- :attr:`xugrid.UgridDatasetAccessor.bounds` has been added to get the bounds
+  for every grid contained in the dataset.
+- :attr:`xugrid.UgridDatasetAccessor.total_bounds` has been added to get the
+  total bounds of all grids contained in the dataset.
 
 [0.1.4] 2022-08-16
 ------------------

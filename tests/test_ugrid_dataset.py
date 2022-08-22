@@ -274,6 +274,12 @@ class TestUgridDataArray:
         uda2.ugrid.to_zarr(path)
         assert path.exists()
 
+    def test_bounds(self):
+        assert self.uda.ugrid.bounds == {"mesh2d": (0.0, 0.0, 2.0, 2.0)}
+
+    def test_total_bounds(self):
+        assert self.uda.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
+
 
 class TestUgridDataset:
     @pytest.fixture(autouse=True)
@@ -433,6 +439,12 @@ class TestUgridDataset:
         gdf = self.uds.ugrid.to_geodataframe()
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
+
+    def test_bounds(self):
+        assert self.uds.ugrid.bounds == {"mesh2d": (0.0, 0.0, 2.0, 2.0)}
+
+    def test_total_bounds(self):
+        assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
 
 def test_to_dataset():
