@@ -11,6 +11,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
+- The setitem method of :class:`xugrid.UgridDataset` has been updated to check
+  the dimensions of grids rather than the dimensions of objects to decide
+  whether a new grids should be appended.
+- :meth:`xugrid.UgridDataArrayAccessor.assign_edge_coords` and
+  :meth:`xugrid.UgridDatasetAccessor.assign_edge_coords` have been added to add
+  the UGRID edge coordinates to the xarray object.
+- :meth:`xugrid.UgridDataArrayAccessor.assign_face_coords` and
+  :meth:`xugrid.UgridDatasetAccessor.assign_face_coords` have been added to add
+  the UGRID face coordinates to the xarray object.
 
 Changed
 ~~~~~~~
