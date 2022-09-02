@@ -59,6 +59,8 @@ UgridDataArray or UgridDataset.
 
     UgridDatasetAccessor
     UgridDatasetAccessor.assign_node_coords
+    UgridDatasetAccessor.assign_edge_coords
+    UgridDatasetAccessor.assign_face_coords
     UgridDatasetAccessor.set_node_coords
     UgridDatasetAccessor.bounds
     UgridDatasetAccessor.total_bounds
@@ -75,6 +77,8 @@ UgridDataArray or UgridDataset.
 
     UgridDataArrayAccessor
     UgridDataArrayAccessor.assign_node_coords
+    UgridDatasetAccessor.assign_edge_coords
+    UgridDatasetAccessor.assign_face_coords
     UgridDataArrayAccessor.set_node_coords
     UgridDataArrayAccessor.bounds
     UgridDataArrayAccessor.total_bounds
@@ -129,7 +133,8 @@ UGRID1D Topology
     Ugrid1d.node_dimension
     Ugrid1d.node_coordinates
     Ugrid1d.set_node_coords
-    Ugrid2d.assign_node_coords
+    Ugrid1d.assign_node_coords
+    Ugrid1d.assign_edge_coords
 
     Ugrid1d.n_edge
     Ugrid1d.edge_dimension
@@ -174,6 +179,8 @@ UGRID2D Topology
     Ugrid2d.node_coordinates
     Ugrid2d.set_node_coords
     Ugrid2d.assign_node_coords
+    Ugrid2d.assign_edge_coords
+    Ugrid2d.assign_face_coords
 
     Ugrid2d.n_edge
     Ugrid2d.edge_dimension
