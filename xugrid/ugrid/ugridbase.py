@@ -89,7 +89,7 @@ class AbstractUgrid(abc.ABC):
         if self._dataset:
             return self._dataset.__repr__()
         else:
-            return self.to_dataset.__repr__()
+            return self.to_dataset().__repr__()
 
     def equals(self, other):
         if not isinstance(other, type(self)):
@@ -292,6 +292,42 @@ class AbstractUgrid(abc.ABC):
             yname: xr.DataArray(
                 data=self.node_y,
                 dims=(self.node_dimension,),
+                attrs=y_attrs,
+            ),
+        }
+        return obj.assign_coords(coords)
+
+    def assign_edge_coords(
+        self,
+        obj: Union[xr.DataArray, xr.Dataset],
+    ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Assign node coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+
+        Returns
+        -------
+        assigned (same type as obj)
+        """
+        xname = self._indexes.get("edge_x", f"{self.name}_edge_x")
+        yname = self._indexes.get("edge_y", f"{self.name}_edge_y")
+        x_attrs = conventions.DEFAULT_ATTRS["edge_x"][self.projected]
+        y_attrs = conventions.DEFAULT_ATTRS["edge_y"][self.projected]
+        coords = {
+            xname: xr.DataArray(
+                data=self.edge_x,
+                dims=(self.edge_dimension,),
+                attrs=x_attrs,
+            ),
+            yname: xr.DataArray(
+                data=self.edge_y,
+                dims=(self.edge_dimension,),
                 attrs=y_attrs,
             ),
         }

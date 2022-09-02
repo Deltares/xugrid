@@ -190,6 +190,32 @@ def test_assign_node_coords():
     with_coords = grid.assign_node_coords(ds)
     assert f"{NAME}_node_x" in with_coords
     assert f"{NAME}_node_y" in with_coords
+    assert np.array_equal(with_coords[f"{NAME}_node_x"], grid.node_x)
+    assert np.array_equal(with_coords[f"{NAME}_node_y"], grid.node_y)
+
+
+def test_assign_edge_coords():
+    grid = grid2d()
+    ds = xr.Dataset()
+    # Place some data on the grid facets.
+    ds["a"] = xr.DataArray([1, 2, 3, 4, 5, 6, 7], dims=[f"{NAME}_nNodes"])
+    with_coords = grid.assign_edge_coords(ds)
+    assert f"{NAME}_edge_x" in with_coords
+    assert f"{NAME}_edge_y" in with_coords
+    assert np.array_equal(with_coords[f"{NAME}_edge_x"], grid.edge_x)
+    assert np.array_equal(with_coords[f"{NAME}_edge_y"], grid.edge_y)
+
+
+def test_assign_face_coords():
+    grid = grid2d()
+    ds = xr.Dataset()
+    # Place some data on the grid facets.
+    ds["a"] = xr.DataArray([1, 2, 3, 4, 5, 6, 7], dims=[f"{NAME}_nNodes"])
+    with_coords = grid.assign_face_coords(ds)
+    assert f"{NAME}_face_x" in with_coords
+    assert f"{NAME}_face_y" in with_coords
+    assert np.array_equal(with_coords[f"{NAME}_face_x"], grid.face_x)
+    assert np.array_equal(with_coords[f"{NAME}_face_y"], grid.face_y)
 
 
 def test_clear_geometry_properties():

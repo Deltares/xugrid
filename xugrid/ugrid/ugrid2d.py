@@ -97,8 +97,8 @@ class Ugrid2d(AbstractUgrid):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
         if dataset is None:
             self._attrs = defaults
-            x, y = defaults["node_coordinates"].split(" ")
-            self._indexes = {"node_x": x, "node_y": y}
+            node_x, node_y = defaults["node_coordinates"].split(" ")
+            self._indexes = {"node_x": node_x, "node_y": node_y}
         else:
             derived_dims = dataset.ugrid_roles.dimensions[name]
             self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
@@ -559,6 +559,42 @@ class Ugrid2d(AbstractUgrid):
                 self.node_coordinates, self.face_node_connectivity, self.fill_value
             )
         return self._celltree
+
+    def assign_face_coords(
+        self,
+        obj: Union[xr.DataArray, xr.Dataset],
+    ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Assign face coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+
+        Returns
+        -------
+        assigned (same type as obj)
+        """
+        xname = self._indexes.get("face_x", f"{self.name}_face_x")
+        yname = self._indexes.get("face_y", f"{self.name}_face_y")
+        x_attrs = conventions.DEFAULT_ATTRS["face_x"][self.projected]
+        y_attrs = conventions.DEFAULT_ATTRS["face_y"][self.projected]
+        coords = {
+            xname: xr.DataArray(
+                data=self.face_x,
+                dims=(self.face_dimension,),
+                attrs=x_attrs,
+            ),
+            yname: xr.DataArray(
+                data=self.face_y,
+                dims=(self.face_dimension,),
+                attrs=y_attrs,
+            ),
+        }
+        return obj.assign_coords(coords)
 
     def locate_points(self, points: FloatArray):
         """

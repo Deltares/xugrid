@@ -280,6 +280,22 @@ class TestUgridDataArray:
     def test_total_bounds(self):
         assert self.uda.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
+    def test_assign_coords(self):
+        with pytest.raises(
+            ValueError,
+            match="cannot add coordinates with new dimensions to a DataArray",
+        ):
+            self.uda.ugrid.assign_edge_coords()
+        with pytest.raises(
+            ValueError,
+            match="cannot add coordinates with new dimensions to a DataArray",
+        ):
+            self.uda.ugrid.assign_node_coords()
+
+        with_coords = self.uda.ugrid.assign_face_coords()
+        assert "mesh2d_face_x" in with_coords.coords
+        assert "mesh2d_face_y" in with_coords.coords
+
 
 class TestUgridDataset:
     @pytest.fixture(autouse=True)
@@ -435,6 +451,19 @@ class TestUgridDataset:
         assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
         assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
 
+    def test_assign_coords(self):
+        with_coords = (
+            self.uds.ugrid.assign_edge_coords()
+            .ugrid.assign_node_coords()
+            .ugrid.assign_face_coords()
+        )
+        assert "mesh2d_node_x" in with_coords.coords
+        assert "mesh2d_node_y" in with_coords.coords
+        assert "mesh2d_edge_x" in with_coords.coords
+        assert "mesh2d_edge_y" in with_coords.coords
+        assert "mesh2d_face_x" in with_coords.coords
+        assert "mesh2d_face_y" in with_coords.coords
+
     def test_to_geodataframe(self):
         gdf = self.uds.ugrid.to_geodataframe()
         assert isinstance(gdf, gpd.GeoDataFrame)
@@ -445,6 +474,39 @@ class TestUgridDataset:
 
     def test_total_bounds(self):
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
+
+
+def test_multiple_grids():
+    uds = xugrid.UgridDataset(grids=GRID())
+    assert len(uds.grids) == 1
+    uda = xugrid.UgridDataArray(DARRAY(), GRID())
+    uds["a"] = uda
+    assert len(uds.grids) == 1
+    assert isinstance(uds.ugrid.grid, xugrid.Ugrid2d)
+
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+    )
+    uda1d = xugrid.UgridDataArray(
+        xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
+        grid,
+    )
+
+    uds["b"] = uda1d
+    assert len(uds.grids) == 2
+
+    with pytest.raises(AttributeError):
+        uds.ugrid.grid
 
 
 def test_to_dataset():

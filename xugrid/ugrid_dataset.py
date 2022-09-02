@@ -325,21 +325,27 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
 
     def __setitem__(self, key, value):
         # TODO: check with topology
-        append = False
         if isinstance(value, UgridDataArray):
+            append = True
             # Check if the dimensions occur in self.
             # if they don't, the grid should be added.
-            matching_dims = [
-                dim for dim in value.grid.dimensions if dim in self.obj.dims
-            ]
-            if matching_dims:
-                # If they do match: the grids should match.
-                grids = {dim: grid for grid in self.grids for dim in grid.dimensions}
-                grid_to_match = grids[matching_dims[0]]
-                if not grid_to_match.equals(value.grid):
-                    raise ValueError("grids do not match")
-            else:
-                append = True
+            if self.grids is not None:
+                alldims = set(
+                    chain.from_iterable([grid.dimensions for grid in self.grids])
+                )
+                matching_dims = set(value.grid.dimensions).intersection(alldims)
+                if matching_dims:
+                    # If they do match: the grids should match.
+                    grids = {
+                        dim: grid for grid in self.grids for dim in grid.dimensions
+                    }
+                    firstdim = next(iter(matching_dims))
+                    if not grids[firstdim].equals(value.grid):
+                        raise ValueError(
+                            "Grids share dimension names but do not are not identical. "
+                            f"Matching dimensions: {matching_dims}"
+                        )
+                    append = False
 
             self.obj[key] = value.obj
             if append:
@@ -472,6 +478,39 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         result = self.obj
         for grid in self.grids:
             result = grid.assign_node_coords(result)
+        return UgridDataset(result, self.grids)
+
+    def assign_edge_coords(self) -> UgridDataset:
+        """
+        Assign edge coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Returns
+        -------
+        assigned: UgridDataset
+        """
+        result = self.obj
+        for grid in self.grids:
+            result = grid.assign_edge_coords(result)
+        return UgridDataset(result, self.grids)
+
+    def assign_face_coords(self) -> UgridDataset:
+        """
+        Assign face coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Returns
+        -------
+        assigned: UgridDataset
+        """
+        result = self.obj
+        for grid in self.grids:
+            if grid.topology_dimension > 1:
+                result = grid.assign_face_coords(result)
         return UgridDataset(result, self.grids)
 
     def set_node_coords(self, node_x: str, node_y: str, topology: str = None):
@@ -750,7 +789,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     plot = UncachedAccessor(_PlotMethods)
 
-    def assign_node_coords(self) -> xr.DataArray:
+    def assign_node_coords(self) -> UgridDataArray:
         """
         Assign node coordinates from the grid to the object.
 
@@ -762,6 +801,34 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         assigned: UgridDataset
         """
         return UgridDataArray(self.grid.assign_node_coords(self.obj), self.grid)
+
+    def assign_edge_coords(self) -> UgridDataArray:
+        """
+        Assign edge coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Returns
+        -------
+        assigned: UgridDataset
+        """
+        return UgridDataArray(self.grid.assign_edge_coords(self.obj), self.grid)
+
+    def assign_face_coords(self) -> UgridDataArray:
+        """
+        Assign face coordinates from the grid to the object.
+
+        Returns a new object with all the original data in addition to the new
+        node coordinates of the grid.
+
+        Returns
+        -------
+        assigned: UgridDataset
+        """
+        if self.grid.topology_dimension == 1:
+            raise TypeError("Cannot set face coords from a Ugrid1D topology")
+        return UgridDataArray(self.grid.assign_face_coords(self.obj), self.grid)
 
     def set_node_coords(self, node_x: str, node_y: str):
         """
