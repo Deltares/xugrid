@@ -9,6 +9,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Changed
+~~~~~~~
+
+Added
+~~~~~
+
+Fixed
+~~~~~
+
+[0.1.6] 2022-09-06
+------------------
+
 Fixed
 ~~~~~
 - The setitem method of :class:`xugrid.UgridDataset` has been updated to check
@@ -20,12 +32,9 @@ Fixed
 - :meth:`xugrid.UgridDataArrayAccessor.assign_face_coords` and
   :meth:`xugrid.UgridDatasetAccessor.assign_face_coords` have been added to add
   the UGRID face coordinates to the xarray object.
-
-Changed
-~~~~~~~
-
-Added
-~~~~~
+- Fixed mixups in `xugrid.UgridRolesAccessor` for inferring UGRID dimensions,
+  which would result incorrectly in a ``UgridDimensionError`` complaining about
+  conflicting dimension names.
 
 [0.1.5] 2022-08-22
 ------------------
