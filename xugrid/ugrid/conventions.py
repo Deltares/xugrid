@@ -30,7 +30,7 @@ _COORD_NAMES = {
 }
 _COORD_DIMS = {
     "node_coordinates": "node_dimension",
-    "edge_coordinates": "node_dimension",
+    "edge_coordinates": "edge_dimension",
     "face_coordinates": "face_dimension",
 }
 
@@ -245,7 +245,7 @@ def _infer_dims(
         var_dims = ds[varname].dims
         for key, dim in zip(expected_dims, var_dims):
             if isinstance(key, str):  # skip None or integer
-                prev_dim = vardict.get(key)
+                prev_dim = inferred.get(key)
                 # Not specified: default order can be used to infer dimensions.
                 if prev_dim is None:
                     inferred[key] = dim
