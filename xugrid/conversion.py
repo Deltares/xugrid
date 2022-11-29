@@ -5,9 +5,10 @@ Conversion from and to other data structures:
 * Structured data (e.g. rasters)
 
 """
-from typing import Any, Tuple
+from typing import Any, Tuple, Union
 
 import numpy as np
+import xarray as xr
 
 from .connectivity import ragged_index
 from .typing import (
@@ -124,3 +125,106 @@ def polygons_to_faces(
     flat_conn[valid] = inverse
     x, y = contiguous_xy(unique)
     return x, y, conn, fill_value
+
+
+def _scalar_spacing(coords, spacing):
+    dim = coords.dims[0]
+    diff = coords.diff(dim)
+    spacing_value = abs(spacing.item())
+    if not np.allclose(
+        abs(diff.values), spacing_value, atol=abs(1.0e-4 * spacing.item())
+    ):
+        raise ValueError(
+            f"spacing of {coords.name} does not match value of {spacing.name}"
+        )
+    halfdiff = xr.full_like(coords, 0.5 * spacing_value)
+    return halfdiff
+
+
+def _array_spacing(coords, spacing):
+    if coords.size != spacing.size:
+        raise ValueError(f"size of {coords.name} does not match size of {spacing.name}")
+    halfdiff = 0.5 * abs(spacing)
+    return halfdiff
+
+
+def _implicit_spacing(coords):
+    dim = coords.dims[0]
+    if coords.size == 1:
+        raise ValueError(
+            f"Cannot derive spacing of 1-sized coordinate: {coords.name} \n"
+            f"Set bounds yourself or assign a d{coords.name} variable with spacing"
+        )
+    halfdiff = 0.5 * abs(coords.diff(dim)).values
+    return np.insert(halfdiff, 0, halfdiff[0])
+
+
+def infer_bounds(
+    obj: Union[xr.DataArray, xr.Dataset],
+    var: str,
+):
+    coords = obj[var]
+    index = obj.indexes[var]
+    if not (index.is_monotonic_increasing or index.is_monotonic_decreasing):
+        raise ValueError(f"{var} is not monotonic")
+
+    # e.g. rioxarray will set dx, dy as (scalar) values.
+    spacing_name = f"d{var}"
+    if spacing_name in obj.coords:
+        spacing = obj[spacing_name]
+        spacing_shape = spacing.shape
+        if len(spacing_shape) > 1:
+            raise NotImplementedError(
+                f"More than one dimension in spacing variable: {spacing_name}"
+            )
+
+        if spacing_shape in ((), (1,)):
+            halfdiff = _scalar_spacing(coords, spacing)
+        else:
+            halfdiff = _array_spacing(coords, spacing)
+    # Implicit spacing
+    else:
+        halfdiff = _implicit_spacing(coords)
+
+    lower = coords - halfdiff
+    upper = coords + halfdiff
+    bounds = xr.concat([lower, upper], dim="bounds").transpose()
+    return bounds
+
+
+def infer_xy_coords(obj):
+    # First check names, then check whether CF roles are specified.
+    x = None
+    y = None
+    if "x" in obj.dims and "y" in obj.dims:
+        x, y = "x", "y"
+    elif "longitude" in obj.dims and "latitude" in obj.dims:
+        x, y = "longitude", "latitude"
+    else:
+        for name, da in obj.coords.items():
+            # Only 1D dimensions are allowed.
+            if da.ndim != 1:
+                continue
+
+            attrs = da.attrs
+            axis = attrs.get("axis", "").lower()
+            stdname = attrs.get("standard_name", "").lower()
+            if axis == "x" or stdname in ("longitude", "projection_x_coordinate"):
+                x = name
+            elif axis == "y" or stdname in ("latitude", "projection_y_coordinate"):
+                y = name
+
+    return x, y
+
+
+def bounds_to_vertices(bounds):
+    diff = np.diff(bounds.values, axis=0)
+    ascending = (diff >= 0.0).all()
+    descending = (diff <= 0.0).all()
+    if ascending:
+        vertices = np.concatenate((bounds[:, 0], bounds[-1:, 1]))
+    elif descending:
+        vertices = np.concatenate((bounds[:, 1], bounds[-1:, 0]))
+    else:
+        raise ValueError("Bounds are not monotonic ascending or monotonic descending")
+    return vertices

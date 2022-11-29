@@ -108,7 +108,7 @@ class TestUgridDataArray:
             xugrid.UgridDataArray.from_structured(da)
 
         da = xr.DataArray(
-            data=np.ones((2, 3, 4)),
+            data=np.arange(2 * 3 * 4).reshape((2, 3, 4)),
             coords={"layer": [1, 2], "y": [5.0, 10.0, 15.0], "x": [2.0, 4.0, 6.0, 8.0]},
             dims=["layer", "y", "x"],
             name="grid",
@@ -119,6 +119,11 @@ class TestUgridDataArray:
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
         assert uda.ugrid.grid.face_dimension not in uda.coords
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+        # Check whether flipping the y-axis doesn't cause any problems
+        flipped = da.isel(y=slice(None, None, -1))
+        uda = xugrid.UgridDataArray.from_structured(flipped)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
 
     def test_unary_op(self):
         alltrue = self.uda.astype(bool)

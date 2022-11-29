@@ -1048,91 +1048,34 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(x, y, fill_value, face_node_connectivity)
 
     @staticmethod
-    def from_structured(data: Union[xr.DataArray, xr.Dataset]) -> "Ugrid2d":
-        """
-        Derive the 2D-UGRID quadrilateral mesh topology from a structured DataArray
-        or Dataset, with (2D-dimensions) "y" and "x".
+    def from_structured(
+        data: Union[xr.DataArray, xr.Dataset],
+        x_bounds: str = None,
+        y_bounds: str = None,
+    ) -> "Ugrid2d":
+        if x_bounds is not None and y_bounds is not None:
+            x_bounds = data[x_bounds]
+            y_bounds = data[y_bounds]
+        else:
+            x_coord, y_coord = conversion.infer_xy_coords(data)
+            x_bounds = conversion.infer_bounds(data, x_coord)
+            y_bounds = conversion.infer_bounds(data, y_coord)
+            if x_bounds is None or y_bounds is None:
+                raise ValueError(
+                    "Could not infer bounds. Please provide x_bounds and"
+                    " y_bounds explicitly."
+                )
 
-        Parameters
-        ----------
-        data: Union[xr.DataArray, xr.Dataset]
-            Structured data from which the "x" and "y" coordinate will be used to
-            define the UGRID-2D topology.
+        nx, _ = x_bounds.shape
+        ny, _ = y_bounds.shape
+        nfaces = ny * nx
+        x = conversion.bounds_to_vertices(x_bounds)
+        y = conversion.bounds_to_vertices(y_bounds)
 
-        Returns
-        -------
-        ugrid_topology: Ugrid2d
-        """
-
-        def _coord(da, dim):
-            """
-            Transform N xarray midpoints into N + 1 vertex edges
-
-            This assumes cell sizes can be provided by a "dx" or "dy"
-            coordinate. This is messy and should almost certainly be replaced
-            by an actual standard such as CF bounds -- however, xarray
-            initially did decode bounds as coordinates, see:
-
-            https://github.com/pydata/xarray/pull/2844
-
-            See also:
-            https://cf-xarray.readthedocs.io/en/latest/generated/cf_xarray.bounds_to_vertices.html
-            """
-            delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-
-            # If empty array, return empty
-            if da[dim].size == 0:
-                raise ValueError(f"{dim} size must be >= 1")
-
-            if delta_dim in da.coords:  # equidistant or non-equidistant
-                dx = da[delta_dim].values
-                if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
-                    dxs = np.full(da[dim].size, dx)
-                else:  # array -> non-equidistant
-                    dxs = dx
-
-                if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
-                    raise ValueError(f"{dim} is not only increasing or only decreasing")
-
-            else:  # undefined -> equidistant
-                if da[dim].size == 1:
-                    raise ValueError(
-                        f"DataArray has size 1 along {dim}, so cellsize must be provided"
-                        " as a coordinate."
-                    )
-                dxs = np.diff(da[dim].values)
-                dx = dxs[0]
-                atolx = abs(1.0e-4 * dx)
-                if not np.allclose(dxs, dx, atolx):
-                    raise ValueError(
-                        f"DataArray has to be equidistant along {dim}, or cellsizes"
-                        " must be provided as a coordinate."
-                    )
-                dxs = np.full(da[dim].size, dx)
-
-            dxs = np.abs(dxs)
-            x = da[dim].values
-            if not da.indexes[dim].is_monotonic_increasing:
-                x = x[::-1]
-                dxs = dxs[::-1]
-
-            # This assumes the coordinate to be monotonic increasing
-            x0 = x[0] - 0.5 * dxs[0]
-            x = np.full(dxs.size + 1, x0)
-            x[1:] += np.cumsum(dxs)
-            return x
-
-        # Transform midpoints into vertices
-        # These are always returned monotonically increasing
-        xcoord = _coord(data, "x")
-        ycoord = _coord(data, "y")
         # Compute all vertices, these are the ugrid nodes
-        node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
-        linear_index = np.arange(node_x.size, dtype=np.intp).reshape(
-            ycoord.size, xcoord.size
-        )
+        node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
+        linear_index = np.arange(node_x.size, dtype=np.intp).reshape((ny + 1, nx + 1))
         # Allocate face_node_connectivity
-        nfaces = (ycoord.size - 1) * (xcoord.size - 1)
         face_nodes = np.empty((nfaces, 4), dtype=IntDType)
         # Set connectivity in counterclockwise manner
         face_nodes[:, 0] = linear_index[:-1, 1:].ravel()  # upper right
