@@ -143,6 +143,7 @@ UGRID1D Topology
     Ugrid1d.edge_y
 
     Ugrid1d.bounds
+    Ugrid1d.edge_bounds
 
     Ugrid1d.node_edge_connectivity
 
@@ -162,6 +163,8 @@ UGRID1D Topology
     Ugrid1d.to_dataset
     Ugrid1d.from_geodataframe
     Ugrid1d.to_pygeos
+    
+    Ugrid1d.plot
 
 UGRID2D Topology
 ----------------
@@ -196,6 +199,8 @@ UGRID2D Topology
     Ugrid2d.face_y
 
     Ugrid2d.bounds
+    Ugrid2d.edge_bounds
+    Ugrid2d.face_bounds
     Ugrid2d.centroids
 
     Ugrid2d.node_edge_connectivity
@@ -238,6 +243,8 @@ UGRID2D Topology
     Ugrid2d.from_geodataframe
     Ugrid2d.from_structured
     Ugrid2d.to_pygeos
+
+    Ugrid2d.plot
 
 UGRID Roles Accessor
 --------------------
