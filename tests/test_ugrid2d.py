@@ -38,16 +38,16 @@ FACES = np.array(
 )
 EDGE_NODES = np.array(
     [
-        [0, 1],
-        [0, 3],
-        [1, 2],
-        [1, 4],
-        [2, 5],
-        [3, 4],
-        [3, 6],
-        [4, 5],
-        [4, 6],
-        [5, 6],
+        [0, 1],  # 0
+        [0, 3],  # 1
+        [1, 2],  # 2
+        [1, 4],  # 3
+        [2, 5],  # 4
+        [3, 4],  # 5
+        [3, 6],  # 6
+        [4, 5],  # 7
+        [4, 6],  # 8
+        [5, 6],  # 9
     ]
 )
 EDGE_FACES = np.array(
@@ -102,7 +102,7 @@ def test_ugrid2d_init():
     assert grid._face_edge_connectivity is None
 
 
-def test_ugrid1d_properties():
+def test_ugrid2d_properties():
     # These are defined in the base class
     grid = grid2d()
     assert grid.edge_dimension == f"{NAME}_nEdges"
@@ -115,6 +115,44 @@ def test_ugrid1d_properties():
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
     node_edges = grid.node_edge_connectivity
     assert isinstance(node_edges, sparse.csr_matrix)
+
+
+def test_ugrid2d_edge_bounds():
+    grid = grid2d()
+    expected = np.array(
+        [
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+            [1.0, 0.0, 2.0, 0.0],
+            [1.0, 0.0, 1.0, 1.0],
+            [2.0, 0.0, 2.0, 1.0],
+            [0.0, 1.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0, 2.0],
+            [1.0, 1.0, 2.0, 1.0],
+            [1.0, 1.0, 1.0, 2.0],
+            [1.0, 1.0, 2.0, 2.0],
+        ]
+    )
+    actual = grid.edge_bounds
+    print(actual)
+    print(expected)
+    assert actual.shape == (10, 4)
+    assert np.allclose(actual, expected)
+
+
+def test_ugrid2d_face_bounds():
+    grid = grid2d()
+    expected = np.array(
+        [
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 2.0, 1.0],
+            [0.0, 1.0, 1.0, 2.0],
+            [1.0, 1.0, 2.0, 2.0],
+        ]
+    )
+    actual = grid.face_bounds
+    assert actual.shape == (4, 4)
+    assert np.allclose(actual, expected)
 
 
 def test_set_crs():

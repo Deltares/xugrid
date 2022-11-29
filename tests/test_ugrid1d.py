@@ -61,6 +61,19 @@ def test_ugrid1d_properties():
     assert isinstance(node_edges, sparse.csr_matrix)
 
 
+def test_ugrid1d_egde_bounds():
+    grid = grid1d()
+    expected = np.array(
+        [
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 1.0, 2.0, 2.0],
+        ]
+    )
+    actual = grid.edge_bounds
+    assert actual.shape == (2, 4)
+    assert np.allclose(actual, expected)
+
+
 def test_set_crs():
     grid = grid1d()
 

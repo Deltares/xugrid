@@ -167,6 +167,27 @@ class AbstractUgrid(abc.ABC):
             self._ymax,
         )
 
+    @property
+    def edge_bounds(self) -> FloatArray:
+        """
+        Returns a numpy array with columns ``minx, miny, maxx, maxy``,
+        describing the bounds of every edge in the grid.
+
+        Returns
+        -------
+        edge_bounds: np.ndarray of shape (n_edge, 4)
+        """
+        x = self.node_x[self.edge_node_connectivity]
+        y = self.node_y[self.edge_node_connectivity]
+        return np.column_stack(
+            [
+                x.min(axis=1),
+                y.min(axis=1),
+                x.max(axis=1),
+                y.max(axis=1),
+            ]
+        )
+
     @staticmethod
     def _prepare_connectivity(
         da: xr.DataArray, fill_value: Union[float, int], dtype: type

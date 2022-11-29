@@ -349,6 +349,30 @@ class Ugrid2d(AbstractUgrid):
         return self._centroids
 
     @property
+    def face_bounds(self):
+        """
+        Returns a numpy array with columns ``minx, miny, maxx, maxy``,
+        describing the bounds of every face in the grid.
+
+        Returns
+        -------
+        face_bounds: np.ndarray of shape (n_face, 4)
+        """
+        x = self.node_x[self.face_node_connectivity]
+        y = self.node_y[self.face_node_connectivity]
+        isfill = self.face_node_connectivity == self.fill_value
+        x[isfill] = np.nan
+        y[isfill] = np.nan
+        return np.column_stack(
+            [
+                np.nanmin(x, axis=1),
+                np.nanmin(y, axis=1),
+                np.nanmax(x, axis=1),
+                np.nanmax(y, axis=1),
+            ]
+        )
+
+    @property
     def face_x(self):
         """x-coordinate of centroid of every face"""
         return self.centroids[:, 0]
