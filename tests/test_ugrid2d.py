@@ -5,6 +5,7 @@ import pygeos
 import pyproj
 import pytest
 import xarray as xr
+from matplotlib.collections import LineCollection
 from scipy import sparse
 
 import xugrid
@@ -698,3 +699,9 @@ def test_grid_from_geodataframe():
     assert isinstance(grid, xugrid.Ugrid1d)
     grid = xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[polygon]))
     assert isinstance(grid, xugrid.Ugrid2d)
+
+
+def test_ugrid2d_plot():
+    grid = grid2d()
+    primitive = grid.plot()
+    assert isinstance(primitive, LineCollection)

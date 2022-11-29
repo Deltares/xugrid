@@ -465,3 +465,16 @@ class AbstractUgrid(abc.ABC):
         grid.crs = crs
 
         return grid
+
+    def plot(self, **kwargs):
+        """
+        Plots the edges of the mesh.
+
+        Parameters
+        ----------
+        **kwargs : optional
+            Additional keyword arguments to ``matplotlib.pyplot.line``.
+        """
+        from ..plot import line
+
+        return line(self, **kwargs)

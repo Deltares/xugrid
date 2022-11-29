@@ -4,6 +4,7 @@ import pygeos
 import pyproj
 import pytest
 import xarray as xr
+from matplotlib.collections import LineCollection
 from scipy import sparse
 
 import xugrid
@@ -220,3 +221,9 @@ def test_topology_subset():
     assert np.array_equal(actual.edge_node_connectivity, [[0, 1]])
     assert np.array_equal(actual.node_x, [1.0, 2.0])
     assert np.array_equal(actual.node_y, [1.0, 2.0])
+
+
+def test_ugrid1d_plot():
+    grid = grid1d()
+    primitive = grid.plot()
+    assert isinstance(primitive, LineCollection)
