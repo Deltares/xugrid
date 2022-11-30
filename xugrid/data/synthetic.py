@@ -1,4 +1,4 @@
-import meshzoo
+import matplotlib.tri
 import numpy as np
 import xarray as xr
 
@@ -24,6 +24,41 @@ def transform(vertices, minx, maxx, miny):
     return np.column_stack([x, y])
 
 
+def generate_disk(partitions: int, depth: int):
+    """
+    Generate a triangular mesh for the unit circle.
+
+    Parameters
+    ----------
+    partitions: int
+        Number of triangles around the origin.
+    depth: int
+        Number of "layers" of triangles around the origin.
+
+    Returns
+    -------
+    vertices: np.ndarray of floats with shape ``(n_vertex, 2)``
+    triangles: np.ndarray of integers with shape ``(n_triangle, 3)``
+    """
+    if partitions < 3:
+        raise ValueError("partitions should be >= 3")
+
+    N = depth + 1
+    n_per_level = partitions * np.arange(N)
+    n_per_level[0] = 1
+
+    delta_angle = (2 * np.pi) / np.repeat(n_per_level, n_per_level)
+    index = np.repeat(np.insert(n_per_level.cumsum()[:-1], 0, 0), n_per_level)
+    angles = delta_angle.cumsum()
+    angles = angles - angles[index] + 0.5 * np.pi
+    radii = np.repeat(np.linspace(0.0, 1.0, N), n_per_level)
+
+    x = np.cos(angles) * radii
+    y = np.sin(angles) * radii
+    triang = matplotlib.tri.Triangulation(x, y)
+    return np.column_stack((x, y)), triang.triangles
+
+
 def disk():
     def function_z(x, y):
         """
@@ -42,7 +77,7 @@ def disk():
         zmax = z.max()
         return (zmax - z) / (zmax - zmin) * 10.0
 
-    vertices, triangles = meshzoo.disk(6, 8)
+    vertices, triangles = generate_disk(6, 8)
     vertices = transform(vertices, 0.0, 10.0, 0.0)
     grid = xugrid.Ugrid2d(
         node_x=vertices[:, 0],

@@ -21,7 +21,6 @@ modules, should you not want to rely on more complex dependencies such as
 """
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
-import meshzoo
 import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 
@@ -30,6 +29,38 @@ from matplotlib.collections import LineCollection, PolyCollection
 # modules. The functions in these modules depend only on ``numpy`` and
 # ``scipy.sparse``.
 from xugrid import connectivity, voronoi
+
+
+def generate_disk(partitions: int, depth: int):
+    """
+    Generate a triangular mesh for the unit circle.
+
+    Parameters
+    ----------
+    partitions: int
+        Number of triangles around the origin.
+    depth: int
+        Number of "layers" of triangles around the origin.
+
+    Returns
+    -------
+    vertices: np.ndarray of floats with shape ``(n_vertex, 2)``
+    triangles: np.ndarray of integers with shape ``(n_triangle, 3)``
+    """
+    N = depth + 1
+    n_per_level = partitions * np.arange(N)
+    n_per_level[0] = 1
+
+    delta_angle = (2 * np.pi) / np.repeat(n_per_level, n_per_level)
+    index = np.repeat(np.insert(n_per_level.cumsum()[:-1], 0, 0), n_per_level)
+    angles = delta_angle.cumsum()
+    angles = angles - angles[index] + 0.5 * np.pi
+    radii = np.repeat(np.linspace(0.0, 1.0, N), n_per_level)
+
+    x = np.cos(angles) * radii
+    y = np.sin(angles) * radii
+    triang = mtri.Triangulation(x, y)
+    return np.column_stack((x, y)), triang.triangles
 
 
 def edge_plot(vertices, edge_nodes, ax, fill_value=-1, **kwargs):
@@ -98,7 +129,7 @@ def comparison_plot(
 #
 # Note: ``-1`` functions as the fill value in this example.
 
-vertices, faces = meshzoo.disk(5, 2)
+vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
 
 node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
@@ -152,7 +183,7 @@ comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 #
 # Let's take the circular mesh above, and remove a chunk.
 
-vertices, faces = meshzoo.disk(5, 2)
+vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
 dx, dy = centroids.T
 angle = np.arctan2(dy, dx)

@@ -1,6 +1,18 @@
+import pytest
 import xarray as xr
 
 import xugrid
+
+
+def test_generate_disk():
+    with pytest.raises(ValueError, match="partitions should be >= 3"):
+        xugrid.data.generate_disk(2, 2)
+
+    nodes, faces = xugrid.data.generate_disk(4, 1)
+    assert nodes.shape == (5, 2)
+    assert faces.shape == (4, 3)
+    _, faces = xugrid.data.generate_disk(4, 2)
+    assert faces.shape == (16, 3)
 
 
 def test_adh_san_diego():
