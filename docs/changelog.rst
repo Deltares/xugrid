@@ -11,12 +11,29 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Changed
 ~~~~~~~
+- Warn instead of error when the UGRID attributes indicate a set of coordinate
+  that are not present in the dataset.
 
 Added
 ~~~~~
 
+- :attr:`xugrid.Ugrid1d.edge_bounds` has been added to get the bounds
+  for every edge contained in the grid.
+- :attr:`xugrid.Ugrid2d.edge_bounds` has been added to get the bounds
+  for every edge contained in the grid.
+- :attr:`xugrid.Ugrid2d.face_bounds` has been added to get the bounds
+  for face edge contained in the grid.
+- :meth:`xugrid.Ugrid1d.from_meshkernel` and
+  :meth:`xugrid.Ugrid2d.from_meshkernel` have been added to initialize Ugrid
+  topology from a meshkernel object.
+- :meth:`xugrid.Ugrid1d.plot` and :meth:`xugrid.Ugrid2d.plot` have been added
+  to plot the edges of the grid.
+
 Fixed
 ~~~~~
+
+- :meth:`xugrid.UgridDataArray.from_structured` will no longer result in
+  a flipped grid when the structured coordintes are not ascending.
 
 [0.1.6] 2022-09-06
 ------------------
@@ -32,7 +49,7 @@ Fixed
 - :meth:`xugrid.UgridDataArrayAccessor.assign_face_coords` and
   :meth:`xugrid.UgridDatasetAccessor.assign_face_coords` have been added to add
   the UGRID face coordinates to the xarray object.
-- Fixed mixups in `xugrid.UgridRolesAccessor` for inferring UGRID dimensions,
+- Fixed mixups in ``xugrid.UgridRolesAccessor`` for inferring UGRID dimensions,
   which would result incorrectly in a ``UgridDimensionError`` complaining about
   conflicting dimension names.
 
