@@ -105,6 +105,17 @@ class TestConventionsElevation:
         actual = cv._get_coordinates(ds, ["mesh2d"])
         assert actual == self.coordinates
 
+        ds = xugrid.data.elevation_nl(xarray=True)
+        ds["mesh2d"].attrs["edge_coordinates"] = "mesh2d_edge_x mesh2d_edge_y"
+        with pytest.warns(UserWarning):
+            cv._get_coordinates(ds, ["mesh2d"])
+
+        ds = xugrid.data.elevation_nl(xarray=True)
+        ds["mesh2d"].attrs["edge_coordinates"] = "mesh2d_edge_x"
+        ds["mesh2d_edge_x"] = 0  # Put a dummy value in the dataset
+        with pytest.raises(cv.UgridCoordinateError):
+            cv._get_coordinates(ds, ["mesh2d"])
+
     def test_get_connectivity(self):
         ds = xugrid.data.elevation_nl(xarray=True)
         actual = cv._get_connectivity(ds, ["mesh2d"])

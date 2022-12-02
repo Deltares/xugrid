@@ -219,9 +219,16 @@ def _get_coordinates(
         for name in _COORD_NAMES[topodim]:
             if name in attrs:
                 candidates = [c for c in attrs[name].split(" ") if c in ds]
+                if len(candidates) == 0:
+                    warnings.warn(
+                        f"the following variables are specified for UGRID {name}: "
+                        f'"{attrs[name]}", but they are not present in the dataset'
+                    )
+                    continue
                 if len(candidates) < 2:
                     raise UgridCoordinateError(
-                        f"{topology}: at least two values required for {name}"
+                        f"{topology}: at least two values required for UGRID {name},"
+                        f' while only "{attrs[name]}" are specified.'
                     )
                 vardict[name] = _infer_xy_coords(ds, candidates)
 
