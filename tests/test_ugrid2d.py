@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import geopandas as gpd
 import numba_celltree
 import numpy as np
@@ -219,6 +221,30 @@ def test_ugrid2d_dataset_roundtrip():
     grid2 = xugrid.Ugrid2d.from_dataset(ds)
     assert isinstance(grid2._dataset, xr.Dataset)
     assert grid2._dataset == ds
+
+
+def test_ugrid2d_from_meshkernel():
+    # Setup a meshkernel Mesh2d mimick
+    class Mesh2d(NamedTuple):
+        node_x: np.ndarray
+        node_y: np.ndarray
+        face_nodes: np.ndarray
+        nodes_per_face: np.ndarray
+
+    mesh2d = Mesh2d(
+        node_x=np.array([0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0]),
+        node_y=np.array([0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0]),
+        face_nodes=np.array(
+            [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10]
+        ),
+        nodes_per_face=np.array([4, 4, 4, 4, 4, 4]),
+    )
+
+    grid = xugrid.Ugrid2d.from_meshkernel(mesh2d)
+    assert grid.n_face == 6
+    assert np.allclose(mesh2d.node_x, grid.node_x)
+    assert np.allclose(mesh2d.node_y, grid.node_y)
+    assert np.allclose(grid.face_node_connectivity, mesh2d.face_nodes.reshape((6, 4)))
 
 
 def test_assign_node_coords():

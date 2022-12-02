@@ -152,6 +152,24 @@ class Ugrid1d(AbstractUgrid):
             crs=None,
         )
 
+    @classmethod
+    def from_meshkernel(
+        cls,
+        mesh,
+        name: str = "mesh2d",
+        projected: bool = True,
+        crs: Any = None,
+    ):
+        return cls(
+            mesh.node_x,
+            mesh.node_y,
+            fill_value=-1,
+            edge_node_connectivity=mesh.edge_nodes.reshape((-1, 2)),
+            name=name,
+            projected=projected,
+            crs=crs,
+        )
+
     def to_dataset(self, other: xr.Dataset = None) -> xr.Dataset:
         node_x = self._indexes["node_x"]
         node_y = self._indexes["node_y"]

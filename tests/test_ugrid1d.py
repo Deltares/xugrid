@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import geopandas as gpd
 import numpy as np
 import pygeos
@@ -137,6 +139,47 @@ def test_ugrid1d_dataset_roundtrip():
     grid2 = xugrid.Ugrid1d.from_dataset(grid.to_dataset())
     assert isinstance(grid2._dataset, xr.Dataset)
     assert grid2._dataset == ds
+
+
+def test_ugrid1d_from_meshkernel():
+    class Mesh1d(NamedTuple):
+        node_x: np.ndarray
+        node_y: np.ndarray
+        edge_nodes: np.ndarray
+
+    mesh1d = Mesh1d(
+        node_x=np.array(
+            [
+                0.0,
+                0.8975979,
+                1.7951958,
+                2.6927937,
+                3.5903916,
+                4.48798951,
+                5.38558741,
+                6.28318531,
+            ]
+        ),
+        node_y=np.array(
+            [
+                0.00000000e00,
+                7.81831482e-01,
+                9.74927912e-01,
+                4.33883739e-01,
+                -4.33883739e-01,
+                -9.74927912e-01,
+                -7.81831482e-01,
+                -2.44929360e-16,
+            ]
+        ),
+        edge_nodes=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    )
+
+    grid = xugrid.Ugrid1d.from_meshkernel(mesh1d)
+    assert grid.n_edge == 7
+    assert np.allclose(mesh1d.node_x, grid.node_x)
+    assert np.allclose(mesh1d.node_y, grid.node_y)
+    assert np.allclose(grid.edge_node_connectivity, mesh1d.edge_nodes.reshape((7, 2)))
 
 
 def test_clear_geometry_properties():

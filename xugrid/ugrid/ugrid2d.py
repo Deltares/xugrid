@@ -47,9 +47,15 @@ class Ugrid2d(AbstractUgrid):
     node_y: ndarray of floats
     fill_value: int
     face_node_connectivity: ndarray of integers
+    name: string, optional
     edge_node_connectivity: ndarray of integers, optional
     dataset: xr.Dataset, optional
-    name: string, optional
+    indexes: Dict[str, str], optional
+        When a dataset is provided, a mapping from the UGRID role the dataset
+        variable name. E.g. {"face_x": "mesh2d_face_lon"}.
+    projected: bool, optional
+        Whether node_x and node_y are longitude and latitude or projected x and
+        y coordinates.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -162,6 +168,33 @@ class Ugrid2d(AbstractUgrid):
         self._triangulation = None
         self._voronoi_topology = None
         self._centroid_triangulation = None
+
+    @classmethod
+    def from_meshkernel(
+        cls,
+        mesh,
+        name: str = "mesh2d",
+        projected: bool = True,
+        crs: Any = None,
+    ):
+        """
+        Create a 2D UGRID topology from a MeshKernel Mesh2d object.
+        """
+        n_face = len(mesh.nodes_per_face)
+        n_max_node = mesh.nodes_per_face.max()
+        fill_value = -1
+        face_node_connectivity = np.full((n_face, n_max_node), fill_value)
+        isnode = connectivity.ragged_index(n_face, n_max_node, mesh.nodes_per_face)
+        face_node_connectivity[isnode] = mesh.face_nodes
+        return cls(
+            mesh.node_x,
+            mesh.node_y,
+            fill_value=fill_value,
+            face_node_connectivity=face_node_connectivity,
+            name=name,
+            projected=projected,
+            crs=crs,
+        )
 
     @classmethod
     def from_dataset(cls, dataset: xr.Dataset, topology: str = None):
