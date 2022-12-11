@@ -297,8 +297,8 @@ def snap_to_structured_grid(
     A line is included and snapped to a grid edge when the line separates
     the centroid of the cell with the centroid of the edge.
 
-    When a line in a cell is snapped to an edge that is shared with another
-    cell, this is denoted with a value of -1 in the second column of
+    When a line in a cell is snapped to an edge that is **not** shared with
+    another cell, this is denoted with a value of -1 in the second column of
     ``cell_to_cell``.
 
     Parameters
