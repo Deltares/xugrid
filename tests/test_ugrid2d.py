@@ -423,6 +423,32 @@ def test_locate_bounding_box():
     assert np.allclose(faces, [1, 3])
 
 
+def test_compute_barycentric_weights():
+    grid = grid2d()
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [0.5, 0.5],
+            [1.5, 0.5],
+            [0.5, 1.5],
+            [2.0, 2.0],
+        ]
+    )
+    expected_face = np.array([0, 0, 1, 2, -1])
+    expected_weights = np.array(
+        [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.25, 0.25, 0.25, 0.25],
+            [0.25, 0.25, 0.25, 0.25],
+            [0.5, 0.0, 0.5, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    face, weights = grid.compute_barycentric_weights(xy)
+    assert np.array_equal(face, expected_face)
+    assert np.allclose(weights, expected_weights)
+
+
 def test_rasterize():
     grid = grid2d()
     x, y, index = grid.rasterize(resolution=0.5)

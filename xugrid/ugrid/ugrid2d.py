@@ -712,6 +712,24 @@ class Ugrid2d(AbstractUgrid):
             & (self.face_y < ymax)
         )[0]
 
+    def compute_barycentric_weights(
+        self, points: FloatArray
+    ) -> Tuple[IntArray, FloatArray]:
+        """
+        Find in which face the points are located, and compute the barycentric
+        weight for every vertex of the face.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+
+        Returns
+        -------
+        face_index: ndarray of integers with shape ``(n_points,)``
+        weights: ndarray of floats with shape ```(n_points, n_max_node)``
+        """
+        return self.celltree.compute_barycentric_weights(points)
+
     def rasterize_like(
         self, x: FloatArray, y: FloatArray
     ) -> Tuple[FloatArray, FloatArray, IntArray]:
