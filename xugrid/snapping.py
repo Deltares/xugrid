@@ -250,12 +250,9 @@ def snap_to_edges(
     face_edge_connectivity: AdjacencyMatrix,
     centroids: FloatArray,
     edge_centroids: FloatArray,
+    edges: IntArray,
+    segment_index: IntArray,
 ) -> Tuple[IntArray, IntArray]:
-    # a line can only snap to two edges of a quad
-    max_n_new_edges = len(face_indices) * 2
-    edges = np.empty(max_n_new_edges, dtype=np.intp)
-    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
-
     count = 0
     for i in range(len(segment_indices)):
         segment = segment_indices[i]
@@ -359,7 +356,13 @@ def snap_to_structured_grid(
         line_edges
     )
 
-    # Create edges from the intersected lines
+    # Create edges from the intersected lines a: line can only snap to two
+    # edges of a quad. Pre-allocate the arrays here. For some reason, recent
+    # versions of numba refuse np.empty or np.zeros calls in this module (!).
+    # TODO: investigate...
+    max_n_new_edges = len(face_indices) * 2
+    edges = np.empty(max_n_new_edges, dtype=np.intp)
+    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
     edges, segment_index = snap_to_edges(
         segment_indices,
         face_indices,
@@ -367,6 +370,8 @@ def snap_to_structured_grid(
         face_edge_connectivity,
         topology.centroids,
         edge_centroids,
+        edges,
+        segment_index,
     )
     line_index = line_index[segment_index]
     face_to_face = edge_face_connectivity[edges]
