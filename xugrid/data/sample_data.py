@@ -42,6 +42,8 @@ def adh_san_diego(xarray=False):
     """
     fname = REGISTRY.fetch("ADH_SanDiego.nc")
     ds = xr.open_dataset(fname)
+    ds["node_x"].attrs["standard_name"] = "projection_x_coordinate"
+    ds["node_y"].attrs["standard_name"] = "projection_y_coordinate"
     if xarray:
         return ds
     else:
@@ -55,6 +57,8 @@ def elevation_nl(xarray=False):
     """
     fname = REGISTRY.fetch("elevation_nl.nc")
     ds = xr.open_dataset(fname)
+    ds["node_x"].attrs["standard_name"] = "projection_x_coordinate"
+    ds["node_y"].attrs["standard_name"] = "projection_y_coordinate"
     if xarray:
         return ds
     else:
