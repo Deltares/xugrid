@@ -172,14 +172,14 @@ def test_ugrid1d_from_meshkernel():
                 -2.44929360e-16,
             ]
         ),
-        edge_nodes=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        edge_nodes=np.array([0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 0, 0]),
     )
 
     grid = xugrid.Ugrid1d.from_meshkernel(mesh1d)
-    assert grid.n_edge == 7
+    assert grid.n_edge == 8
     assert np.allclose(mesh1d.node_x, grid.node_x)
     assert np.allclose(mesh1d.node_y, grid.node_y)
-    assert np.allclose(grid.edge_node_connectivity, mesh1d.edge_nodes.reshape((7, 2)))
+    assert np.allclose(grid.edge_node_connectivity, mesh1d.edge_nodes.reshape((8, 2)))
 
 
 def test_clear_geometry_properties():
