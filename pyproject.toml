@@ -2,6 +2,87 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "xugrid"
+description = "Xarray extension for unstructured grids"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+version = "0.1.8"
+maintainers = [
+    { name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }
+]
+requires-python = ">=3.7"
+dependencies = [
+    'pandas',
+    'numba',
+    'numba_celltree',
+    'numpy',
+    'pooch',
+    'scipy',
+    'xarray',
+]
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Topic :: Scientific/Engineering',
+]
+keywords = [
+    'mesh',
+    'ugrid',
+    'unstructured grid',
+    'xarray',
+]
+license = { text = "MIT" }
+
+[project.urls]
+Home = "https://github.com/deltares/rexgrid"
+Code = "https://github.com/deltares/rexgrid"
+Issues = "https://github.com/deltares/rexgrid/issues"
+
+[project.optional-dependencies]
+all = [
+    'geopandas',
+    'matplotlib',
+    'meshkernel',
+    'netcdf4',
+    'pooch',
+    'pygeos',
+    'pyproj',
+    'zarr',
+]
+# pyproject.toml doesn't quite support re-use like setup.cfg did:
+# https://github.com/pypa/setuptools/issues/3221
+docs = [
+  'geopandas',
+  'matplotlib',
+  'meshkernel',
+  'netcdf4',
+  'pooch',
+  'pygeos',
+  'pyproj',
+  'zarr',
+  'pydata-sphinx-theme',
+  'sphinx',
+  'sphinx-gallery'
+]
+
+[tool.setuptools]
+packages = [
+    "xugrid",
+    "xugrid.data",
+    "xugrid.plot",
+    "xugrid.ugrid",
+]
+license-files = ["LICENSE"]
+
 [tool.isort]
 profile = "black"
 
