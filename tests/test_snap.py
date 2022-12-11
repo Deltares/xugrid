@@ -116,7 +116,7 @@ def test_snap_to_nodes():
 def test_snap_to_structured_grid():
     idomain = xr.DataArray(
         data=[[1, 1], [1, 1]],
-        coords={"y": [1.5, 0.5], "x": [0.5, 1.5]},
+        coords={"y": [0.5, 1.5], "x": [0.5, 1.5]},
         dims=["y", "x"],
     )
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])

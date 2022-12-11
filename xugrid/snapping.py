@@ -242,7 +242,7 @@ def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
     return geometry
 
 
-@nb.njit
+@nb.njit(cache=True)
 def snap_to_edges(
     segment_indices: IntArray,
     face_indices: IntArray,
