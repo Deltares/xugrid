@@ -9,10 +9,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.1.8] 2022-12-13
+------------------
+
 Changed
 ~~~~~~~
 - Warn instead of error when the UGRID attributes indicate a set of coordinate
   that are not present in the dataset.
+- Use `pyproject.toml` for setuptools instead of `setup.cfg`.
 
 Added
 ~~~~~
@@ -35,7 +39,7 @@ Fixed
 - :meth:`xugrid.UgridDataArray.from_structured` will no longer result in
   a flipped grid when the structured coordintes are not ascending.
 
-[0.1.6] 2022-09-06
+[0.1.7] 2022-09-06
 ------------------
 
 Fixed
