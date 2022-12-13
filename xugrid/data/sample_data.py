@@ -57,8 +57,10 @@ def elevation_nl(xarray=False):
     """
     fname = REGISTRY.fetch("elevation_nl.nc")
     ds = xr.open_dataset(fname)
-    ds["node_x"].attrs["standard_name"] = "projection_x_coordinate"
-    ds["node_y"].attrs["standard_name"] = "projection_y_coordinate"
+    ds["mesh2d_node_x"].attrs["standard_name"] = "projection_x_coordinate"
+    ds["mesh2d_node_y"].attrs["standard_name"] = "projection_y_coordinate"
+    ds["mesh2d_face_x"].attrs["standard_name"] = "projection_x_coordinate"
+    ds["mesh2d_face_y"].attrs["standard_name"] = "projection_y_coordinate"
     if xarray:
         return ds
     else:
