@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.1.10] 2022-12-13
+------------------
+
+Fixed
+~~~~~
+
+- Move matplotlib import into a function body so matplotlib remains an optional
+  dependency. 
+
 [0.1.9] 2022-12-13
 ------------------
 

@@ -1,4 +1,3 @@
-import matplotlib.tri
 import numpy as np
 import xarray as xr
 
@@ -40,6 +39,8 @@ def generate_disk(partitions: int, depth: int):
     vertices: np.ndarray of floats with shape ``(n_vertex, 2)``
     triangles: np.ndarray of integers with shape ``(n_triangle, 3)``
     """
+    import matplotlib.tri
+
     if partitions < 3:
         raise ValueError("partitions should be >= 3")
 
