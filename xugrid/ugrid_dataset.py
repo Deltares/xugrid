@@ -68,6 +68,16 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         return self.obj.__repr__()
 
     def __init__(self, obj: xr.DataArray, grid: UgridType):
+        if not isinstance(obj, xr.DataArray):
+            raise TypeError(
+                "obj must be xarray.DataArray. Received instead: "
+                f"{type(obj).__name__}"
+            )
+        if not isinstance(grid, AbstractUgrid):
+            raise TypeError(
+                "grid must be Ugrid1d or Ugrid2d. Received instead: "
+                f"{type(grid).__name__}"
+            )
         self.grid = grid
         self.obj = obj
 
@@ -273,14 +283,25 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         obj: xr.Dataset = None,
         grids: Union[UgridType, Sequence[UgridType]] = None,
     ):
-        if grids is None:
-            if obj is None:
-                raise ValueError("At least either obj or grids is required")
+        if obj is None and grids is None:
+            raise ValueError("At least either obj or grids is required")
+
+        if obj is None:
+            ds = xr.Dataset()
+        else:
             if not isinstance(obj, xr.Dataset):
                 raise TypeError(
-                    "UgridDataset should be initialized with xarray.Dataset. "
-                    f"Received instead: {type(obj)}"
+                    "obj must be xarray.Dataset. Received instead: "
+                    f"{type(obj).__name__}"
                 )
+            connectivity_vars = [
+                name
+                for v in obj.ugrid_roles.connectivity.values()
+                for name in v.values()
+            ]
+            ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
+
+        if grids is None:
             topologies = obj.ugrid_roles.topology
             grids = [grid_from_dataset(obj, topology) for topology in topologies]
         else:
@@ -289,16 +310,13 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
                 grids = [grid for grid in grids]
             else:  # not iterable
                 grids = [grids]
-
-        if obj is None:
-            ds = xr.Dataset()
-        else:
-            connectivity_vars = [
-                name
-                for v in obj.ugrid_roles.connectivity.values()
-                for name in v.values()
-            ]
-            ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
+            # Now typecheck
+            for grid in grids:
+                if not isinstance(grid, AbstractUgrid):
+                    raise TypeError(
+                        "grid must be Ugrid1d or Ugrid2d. "
+                        f"Received instead: {type(grid).__name__}"
+                    )
 
         self.grids = grids
         self.obj = ds

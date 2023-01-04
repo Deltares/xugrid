@@ -70,6 +70,20 @@ def ugrid1d_ds():
     return xugrid.UgridDataset(ds)
 
 
+def test_init_errors():
+    with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
+        xugrid.UgridDataArray(0, GRID())
+    with pytest.raises(TypeError, match="grid must be Ugrid1d or Ugrid2d"):
+        xugrid.UgridDataArray(DARRAY(), 0)
+
+    with pytest.raises(ValueError, match="At least either obj or grids is required"):
+        xugrid.UgridDataset()
+    with pytest.raises(TypeError, match="obj must be xarray.Dataset"):
+        xugrid.UgridDataset(0, GRID())
+    with pytest.raises(TypeError, match="grid must be Ugrid1d or Ugrid2d"):
+        xugrid.UgridDataset(xr.Dataset(), 0)
+
+
 class TestUgridDataArray:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -78,6 +92,11 @@ class TestUgridDataArray:
     def test_init(self):
         assert isinstance(self.uda.ugrid.obj, xr.DataArray)
         assert isinstance(self.uda.ugrid.grid, xugrid.Ugrid2d)
+
+    def test_reinit_error(self):
+        # Should not be able to initialize using a UgridDataArray.
+        with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
+            xugrid.UgridDataArray(self.uda, GRID())
 
     def test_dunder_forward(self):
         assert isinstance(bool(self.uda[0]), bool)
@@ -320,6 +339,10 @@ class TestUgridDataset:
         assert isinstance(uds, xugrid.UgridDataset)
         uds["a"] = DARRAY()
         assert "a" in uds.ugrid.obj
+
+    def test_reinit_error(self):
+        with pytest.raises(TypeError, match="obj must be xarray.Dataset"):
+            xugrid.UgridDataset(self.uds, GRID())
 
     def test_init_from_dataset_only(self):
         uds = xugrid.UgridDataset(UGRID_DS())
