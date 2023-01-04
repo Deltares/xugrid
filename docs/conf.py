@@ -117,6 +117,10 @@ html_theme_options = {
             "type": "local",
         },
     ],
+    "logo": {
+        "image_light": "xugrid-low-res.svg",
+        "image_dark": "xugrid-low-res.svg",
+    },
 }
 
 # Custom sidebar templates, must be a dictionary that maps document names

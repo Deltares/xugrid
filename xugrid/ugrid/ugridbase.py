@@ -44,6 +44,26 @@ class AbstractUgrid(abc.ABC):
     def _clear_geometry_properties():
         """ """
 
+    def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
+        defaults = conventions.default_topology_attrs(name, self.topology_dimension)
+        if dataset is None:
+            if attrs is not None:
+                defaults.update(attrs)
+            x, y = defaults["node_coordinates"].split(" ")
+            self._indexes = {"node_x": x, "node_y": y}
+            self._attrs = defaults
+        else:
+            if attrs is not None:
+                raise ValueError("Provide either dataset or attrs, not both.")
+            if indexes is None:
+                raise ValueError("indexes must be provided for dataset")
+            derived_dims = dataset.ugrid_roles.dimensions[name]
+            self._indexes = indexes
+            self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
+        # Ensure the name is always in sync.
+        self._attrs["name"] = name
+        return
+
     @staticmethod
     def _single_topology(dataset: xr.Dataset):
         topologies = dataset.ugrid_roles.topology
@@ -229,7 +249,16 @@ class AbstractUgrid(abc.ABC):
             new_connectivity = connectivity.renumber(subset)
             node_x = self.node_x[node_indices]
             node_y = self.node_y[node_indices]
-            return self.__class__(node_x, node_y, self.fill_value, new_connectivity)
+            return self.__class__(
+                node_x,
+                node_y,
+                self.fill_value,
+                new_connectivity,
+                name=self.name,
+                projected=self.projected,
+                crs=self.crs,
+                attrs=self._attrs,
+            )
 
     def set_node_coords(
         self,

@@ -21,13 +21,24 @@ class Ugrid1d(AbstractUgrid):
     node_y: ndarray of floats
     fill_value: int
     edge_node_connectivity: ndarray of integers
-    dataset: xr.Dataset, optional
     name: string, optional
-        Network name. Defaults to "network1d" in dataset.
+        Network name. Defaults to "network1d".
+    dataset: xr.Dataset, optional
+    indexes: Dict[str, str], optional
+        When a dataset is provided, a mapping from the UGRID role to the dataset
+        variable name. E.g. {"face_x": "mesh2d_face_lon"}.
+    projected: bool, optional
+        Whether node_x and node_y are longitude and latitude or projected x and
+        y coordinates. Used to write the appropriate standard_name in the
+        coordinate attributes.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
         such as an authority string (eg "EPSG:4326") or a WKT string.
+    attrs: Dict[str, str], optional
+        UGRID topology attributes. Should not be provided together with
+        dataset: if other names are required, update the dataset instead.
+        A name entry is ignored, as name is given explicitly.
     """
 
     def __init__(
@@ -41,10 +52,8 @@ class Ugrid1d(AbstractUgrid):
         indexes: Dict[str, str] = None,
         projected: bool = True,
         crs: Any = None,
+        attrs: Dict[str, str] = None,
     ):
-        if dataset is not None and indexes is None:
-            raise ValueError("indexes must be provided for a dataset")
-
         self.node_x = np.ascontiguousarray(node_x)
         self.node_y = np.ascontiguousarray(node_y)
         self.fill_value = fill_value
@@ -52,17 +61,7 @@ class Ugrid1d(AbstractUgrid):
         self.name = name
         self.projected = projected
 
-        # Store topology attributes
-        defaults = conventions.default_topology_attrs(name, self.topology_dimension)
-        if dataset is None:
-            self._attrs = defaults
-            x, y = defaults["node_coordinates"].split(" ")
-            self._indexes = {"node_x": x, "node_y": y}
-        else:
-            derived_dims = dataset.ugrid_roles.dimensions[name]
-            self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
-            self._indexes = indexes
-
+        self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
 
         # Optional attributes, deferred initialization

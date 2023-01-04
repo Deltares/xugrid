@@ -21,7 +21,7 @@ except ImportError:
 NAME = "network1d"
 
 
-def grid1d(crs=None):
+def grid1d(dataset=None, indexes=None, crs=None, attrs=None):
     xy = np.array(
         [
             [0.0, 0.0],
@@ -34,7 +34,10 @@ def grid1d(crs=None):
         node_y=xy[:, 1],
         fill_value=-1,
         edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+        dataset=dataset,
+        indexes=indexes,
         crs=crs,
+        attrs=attrs,
     )
     return grid
 
@@ -45,6 +48,21 @@ def test_ugrid1d_init():
     assert grid._dataset is None
     assert grid.node_x.flags["C_CONTIGUOUS"]
     assert grid.node_y.flags["C_CONTIGUOUS"]
+
+
+def test_ugrid1d_alternative_init():
+    custom_attrs = {"node_dimension": "nNetNode", "name": "mesh1d"}
+    grid = grid1d(attrs=custom_attrs)
+    assert grid.node_dimension == "nNetNode"
+    assert grid.name == NAME
+    # name in attrs should be overwritten by given name.
+    assert grid._attrs["name"] == NAME
+
+    with pytest.raises(ValueError, match="Provide either dataset or attrs, not both"):
+        grid1d(dataset=xr.Dataset, attrs=custom_attrs)
+
+    with pytest.raises(ValueError, match="indexes must be provided for dataset"):
+        grid1d(dataset=xr.Dataset, indexes=None)
 
 
 def test_ugrid1d_properties():

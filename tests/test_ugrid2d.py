@@ -83,14 +83,16 @@ NFJ = np.array([0, 0, 1, 1, 0, 2, 0, 1, 2, 3, 1, 3, 2, 3])
 NODE_FACE_CONNECTIVITY = sparse.coo_matrix((NFJ, (NFI, NFJ))).tocsr()
 
 
-def grid2d(dataset=None, crs=None):
+def grid2d(dataset=None, indexes=None, crs=None, attrs=None):
     grid = xugrid.Ugrid2d(
         node_x=VERTICES[:, 0],
         node_y=VERTICES[:, 1],
         fill_value=-1,
         face_node_connectivity=FACES,
         dataset=dataset,
+        indexes=indexes,
         crs=crs,
+        attrs=attrs,
     )
     return grid
 
@@ -103,6 +105,21 @@ def test_ugrid2d_init():
     assert grid.node_y.flags["C_CONTIGUOUS"]
     assert grid._edge_node_connectivity is None
     assert grid._face_edge_connectivity is None
+
+
+def test_ugrid2d_alternative_init():
+    custom_attrs = {"node_dimension": "nNetNode", "name": "mesh1d"}
+    grid = grid2d(attrs=custom_attrs)
+    assert grid.node_dimension == "nNetNode"
+    assert grid.name == NAME
+    # name in attrs should be overwritten by given name.
+    assert grid._attrs["name"] == NAME
+
+    with pytest.raises(ValueError, match="Provide either dataset or attrs, not both"):
+        grid2d(dataset=xr.Dataset, attrs=custom_attrs)
+
+    with pytest.raises(ValueError, match="indexes must be provided for dataset"):
+        grid2d(dataset=xr.Dataset, indexes=None)
 
 
 def test_ugrid2d_properties():
@@ -651,6 +668,12 @@ def test_topology_subset():
     edge_indices = np.array([0, 1, 2, 3])
     actual = grid.topology_subset(edge_indices)
     assert actual is grid
+
+    # Check that alternative attrs are preserved.
+    grid = grid2d(attrs={"node_dimension": "nNetNode"})
+    edge_indices = np.array([1])
+    actual = grid.topology_subset(edge_indices)
+    assert actual.node_dimension == "nNetNode"
 
 
 def test_triangulate():
