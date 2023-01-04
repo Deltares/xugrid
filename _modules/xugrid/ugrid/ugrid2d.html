@@ -34,9 +34,6 @@
   <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/ugrid/ugrid2d';</script>
@@ -326,7 +323,7 @@
 
 
 <div class="viewcode-block" id="Ugrid2d"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d">[docs]</a><span class="k">class</span> <span class="nc">Ugrid2d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores the topological data of a 2-D unstructured grid.</span>
 
 <span class="sd">    Parameters</span>
@@ -336,18 +333,24 @@
 <span class="sd">    fill_value: int</span>
 <span class="sd">    face_node_connectivity: ndarray of integers</span>
 <span class="sd">    name: string, optional</span>
+<span class="sd">        Mesh name. Defaults to &quot;mesh2d&quot;.</span>
 <span class="sd">    edge_node_connectivity: ndarray of integers, optional</span>
 <span class="sd">    dataset: xr.Dataset, optional</span>
 <span class="sd">    indexes: Dict[str, str], optional</span>
-<span class="sd">        When a dataset is provided, a mapping from the UGRID role the dataset</span>
+<span class="sd">        When a dataset is provided, a mapping from the UGRID role to the dataset</span>
 <span class="sd">        variable name. E.g. {&quot;face_x&quot;: &quot;mesh2d_face_lon&quot;}.</span>
 <span class="sd">    projected: bool, optional</span>
 <span class="sd">        Whether node_x and node_y are longitude and latitude or projected x and</span>
-<span class="sd">        y coordinates.</span>
+<span class="sd">        y coordinates. Used to write the appropriate standard_name in the</span>
+<span class="sd">        coordinate attributes.</span>
 <span class="sd">    crs: Any, optional</span>
 <span class="sd">        Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">        :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
 <span class="sd">        such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">    attrs: Dict[str, str], optional</span>
+<span class="sd">        UGRID topology attributes. Should not be provided together with</span>
+<span class="sd">        dataset: if other names are required, update the dataset instead.</span>
+<span class="sd">        A name entry is ignored, as name is given explicitly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Ugrid2d.__init__"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -362,10 +365,8 @@
         <span class="n">indexes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;indexes must be provided for a dataset&quot;</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span> <span class="o">=</span> <span class="n">fill_value</span>
@@ -387,17 +388,7 @@
             <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
         <span class="p">)</span>
 
-        <span class="c1"># Store topology attributes</span>
-        <span class="n">defaults</span> <span class="o">=</span> <span class="n">conventions</span><span class="o">.</span><span class="n">default_topology_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology_dimension</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="n">defaults</span>
-            <span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;node_x&quot;</span><span class="p">:</span> <span class="n">node_x</span><span class="p">,</span> <span class="s2">&quot;node_y&quot;</span><span class="p">:</span> <span class="n">node_y</span><span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">derived_dims</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">derived_dims</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span> <span class="o">=</span> <span class="n">indexes</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_indexes_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
 
         <span class="c1"># Optional attributes, deferred initialization</span>
@@ -436,7 +427,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
         <span class="c1"># Meshkernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
@@ -465,7 +456,7 @@
         <span class="n">projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a 2D UGRID topology from a MeshKernel Mesh2d object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_face</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes_per_face</span><span class="p">)</span>
@@ -486,7 +477,7 @@
 
 <div class="viewcode-block" id="Ugrid2d.from_dataset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_dataset.html#xugrid.Ugrid2d.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the 2D UGRID topology information from an xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
@@ -594,7 +585,7 @@
     <span class="c1"># default, only when called upon.</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_face</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the number of faces in the UGRID2D topology.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -605,12 +596,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 2&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 2&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the name of the face dimension.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">]</span>
@@ -626,7 +617,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Edge to node connectivity. Every edge consists of a connection between</span>
 <span class="sd">        two nodes.</span>
 
@@ -640,7 +631,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_edge_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csr_matrix</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Face to edge connectivity.</span>
 
 <span class="sd">        Returns</span>
@@ -653,7 +644,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">centroids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Centroid (x, y) of every face.</span>
 
 <span class="sd">        Returns</span>
@@ -671,7 +662,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a numpy array with columns ``minx, miny, maxx, maxy``,</span>
 <span class="sd">        describing the bounds of every face in the grid.</span>
 
@@ -695,17 +686,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;x-coordinate of centroid of every face&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;x-coordinate of centroid of every face&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;y-coordinate of centroid of every face&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;y-coordinate of centroid of every face&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Centroid (x, y) of every face.</span>
 
 <span class="sd">        Returns</span>
@@ -716,7 +707,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">edge_face_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Edge to face connectivity. An edge may belong to a single face</span>
 <span class="sd">        (exterior edge), or it may be shared by two faces (interior edge).</span>
 
@@ -734,7 +725,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_face_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csr_matrix</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Face to face connectivity. Derived from shared edges.</span>
 
 <span class="sd">        Returns</span>
@@ -749,7 +740,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">node_face_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Node to face connectivity. Inverted from face node connectivity.</span>
 
 <span class="sd">        Returns</span>
@@ -764,7 +755,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh2d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel Mesh2d object.</span>
 
 <span class="sd">        Returns</span>
@@ -790,7 +781,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.MeshKernel&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel MeshKernel instance.</span>
 
 <span class="sd">        Returns</span>
@@ -806,7 +797,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">voronoi_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Centroidal Voronoi tesselation of this UGRID2D topology.</span>
 
 <span class="sd">        Returns</span>
@@ -827,7 +818,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">centroid_triangulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Triangulation of centroidal voronoi tesselation.</span>
 
 <span class="sd">        Required for e.g. contouring face data, which takes triangles and</span>
@@ -849,7 +840,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">triangulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Triangulation of the UGRID2D topology.</span>
 
 <span class="sd">        Returns</span>
@@ -869,7 +860,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exterior_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get all exterior edges, i.e. edges with no other face.</span>
 
 <span class="sd">        Returns</span>
@@ -881,7 +872,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exterior_faces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get all exterior faces, i.e. faces with an unshared edge.</span>
 
 <span class="sd">        Returns</span>
@@ -894,7 +885,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the celltree if needed, and returns celltree.</span>
 
 <span class="sd">        A celltree is a search structure for spatial lookups in unstructured grids.</span>
@@ -909,7 +900,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign face coordinates from the grid to the object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -942,7 +933,7 @@
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.locate_points"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points">[docs]</a>    <span class="k">def</span> <span class="nf">locate_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face points are located.</span>
 
 <span class="sd">        Parameters</span>
@@ -956,7 +947,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.intersect_edges"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_edges.html#xugrid.Ugrid2d.intersect_edges">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face edges are located and compute the intersection with</span>
 <span class="sd">        the face edges.</span>
 
@@ -978,7 +969,7 @@
 <div class="viewcode-block" id="Ugrid2d.locate_bounding_box"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box">[docs]</a>    <span class="k">def</span> <span class="nf">locate_bounding_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find which faces are located in the bounding box. The centroids of the</span>
 <span class="sd">        faces are used.</span>
 
@@ -1003,7 +994,7 @@
 <div class="viewcode-block" id="Ugrid2d.compute_barycentric_weights"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.compute_barycentric_weights.html#xugrid.Ugrid2d.compute_barycentric_weights">[docs]</a>    <span class="k">def</span> <span class="nf">compute_barycentric_weights</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face the points are located, and compute the barycentric</span>
 <span class="sd">        weight for every vertex of the face.</span>
 
@@ -1021,7 +1012,7 @@
 <div class="viewcode-block" id="Ugrid2d.rasterize_like"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize_like.html#xugrid.Ugrid2d.rasterize_like">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize unstructured grid by sampling on the x and y coordinates.</span>
 
 <span class="sd">        Parameters</span>
@@ -1041,7 +1032,7 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">index</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.rasterize"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize.html#xugrid.Ugrid2d.rasterize">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize unstructured grid by sampling.</span>
 
 <span class="sd">        x and y coordinates are generated from the bounds of the UGRID2D</span>
@@ -1106,7 +1097,7 @@
         <span class="k">return</span> <span class="n">indexer</span>
 
 <div class="viewcode-block" id="Ugrid2d.sel_points"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points">[docs]</a>    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
 <span class="sd">        Parameters</span>
@@ -1139,7 +1130,7 @@
         <span class="k">return</span> <span class="n">dim</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">coords</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.sel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find selection in the UGRID x and y coordinates.</span>
 
 <span class="sd">        The indexing for x and y always occurs orthogonally, i.e.:</span>
@@ -1218,7 +1209,7 @@
         <span class="k">return</span> <span class="n">dim</span><span class="p">,</span> <span class="n">as_ugrid</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">coords</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.topology_subset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset">[docs]</a>    <span class="k">def</span> <span class="nf">topology_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoolArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new UGRID1D topology for a subset of this topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -1234,7 +1225,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_topology_subset</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.triangulate"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>    <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Triangulate this UGRID2D topology, breaks more complex polygons down</span>
 <span class="sd">        into triangles.</span>
 
@@ -1248,7 +1239,7 @@
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a centroidal Voronoi tesselation of this UGRID2D topology.</span>
 
 <span class="sd">        Such a tesselation is not guaranteed to produce convex cells. To ensure</span>
@@ -1285,7 +1276,7 @@
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.reverse_cuthill_mckee"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.reverse_cuthill_mckee.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reduces bandwith of the connectivity matrix.</span>
 
 <span class="sd">        Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.</span>
@@ -1374,7 +1365,7 @@
 
 <div class="viewcode-block" id="Ugrid2d.from_geodataframe"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe of polygons to UGRID2D topology.</span>
 
 <span class="sd">        Returns</span>
@@ -1424,7 +1415,7 @@
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.to_pygeos"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_pygeos.html#xugrid.Ugrid2d.to_pygeos">[docs]</a>    <span class="k">def</span> <span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert UGRID topology to pygeos objects.</span>
 
 <span class="sd">        * nodes: points</span>
@@ -1523,7 +1514,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.0.0.<br>
 </p>
 
   </div>

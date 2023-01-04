@@ -34,9 +34,6 @@
   <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/ugrid/ugrid1d';</script>
@@ -299,7 +296,7 @@
 
 
 <div class="viewcode-block" id="Ugrid1d"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d">[docs]</a><span class="k">class</span> <span class="nc">Ugrid1d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores the topological data of a &quot;1-D unstructured grid&quot;: a</span>
 <span class="sd">    collection of connected line elements, such as a river network.</span>
 
@@ -309,13 +306,24 @@
 <span class="sd">    node_y: ndarray of floats</span>
 <span class="sd">    fill_value: int</span>
 <span class="sd">    edge_node_connectivity: ndarray of integers</span>
-<span class="sd">    dataset: xr.Dataset, optional</span>
 <span class="sd">    name: string, optional</span>
-<span class="sd">        Network name. Defaults to &quot;network1d&quot; in dataset.</span>
+<span class="sd">        Network name. Defaults to &quot;network1d&quot;.</span>
+<span class="sd">    dataset: xr.Dataset, optional</span>
+<span class="sd">    indexes: Dict[str, str], optional</span>
+<span class="sd">        When a dataset is provided, a mapping from the UGRID role to the dataset</span>
+<span class="sd">        variable name. E.g. {&quot;face_x&quot;: &quot;mesh2d_face_lon&quot;}.</span>
+<span class="sd">    projected: bool, optional</span>
+<span class="sd">        Whether node_x and node_y are longitude and latitude or projected x and</span>
+<span class="sd">        y coordinates. Used to write the appropriate standard_name in the</span>
+<span class="sd">        coordinate attributes.</span>
 <span class="sd">    crs: Any, optional</span>
 <span class="sd">        Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">        :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
 <span class="sd">        such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">    attrs: Dict[str, str], optional</span>
+<span class="sd">        UGRID topology attributes. Should not be provided together with</span>
+<span class="sd">        dataset: if other names are required, update the dataset instead.</span>
+<span class="sd">        A name entry is ignored, as name is given explicitly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Ugrid1d.__init__"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -329,10 +337,8 @@
         <span class="n">indexes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;indexes must be provided for a dataset&quot;</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span> <span class="o">=</span> <span class="n">fill_value</span>
@@ -340,17 +346,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projected</span> <span class="o">=</span> <span class="n">projected</span>
 
-        <span class="c1"># Store topology attributes</span>
-        <span class="n">defaults</span> <span class="o">=</span> <span class="n">conventions</span><span class="o">.</span><span class="n">default_topology_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology_dimension</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="n">defaults</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;node_x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;node_y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">derived_dims</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="o">**</span><span class="n">derived_dims</span><span class="p">,</span> <span class="o">**</span><span class="n">dataset</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span> <span class="o">=</span> <span class="n">indexes</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_indexes_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
 
         <span class="c1"># Optional attributes, deferred initialization</span>
@@ -379,7 +375,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.from_dataset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_dataset.html#xugrid.Ugrid1d.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the 1D UGRID topology information from an xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
@@ -485,7 +481,7 @@
         <span class="k">return</span> <span class="n">dataset</span></div>
 
     <span class="k">def</span> <span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
         <span class="c1"># Meshkernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
@@ -502,7 +498,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 1&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 1&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
@@ -514,7 +510,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel Mesh1d object.</span>
 
 <span class="sd">        Returns</span>
@@ -535,7 +531,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.MeshKernel&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel MeshKernel instance.</span>
 
 <span class="sd">        Returns</span>
@@ -551,7 +547,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_geodataframe.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert geodataframe of linestrings into a UGRID1D topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -569,7 +565,7 @@
         <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid1d.to_pygeos"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.to_pygeos.html#xugrid.Ugrid1d.to_pygeos">[docs]</a>    <span class="k">def</span> <span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert UGRID topology to pygeos objects.</span>
 
 <span class="sd">        * nodes: points</span>
@@ -617,7 +613,7 @@
         <span class="k">return</span> <span class="n">indexer</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">indexer</span><span class="o">.</span><span class="n">stop</span>
 
 <div class="viewcode-block" id="Ugrid1d.sel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select a selection of edges, based on edge centroids.</span>
 
 <span class="sd">        Parameters</span>
@@ -643,7 +639,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="Ugrid1d.topology_subset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topology_subset.html#xugrid.Ugrid1d.topology_subset">[docs]</a>    <span class="k">def</span> <span class="nf">topology_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoolArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new UGRID1D topology for a subset of this topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -717,7 +713,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.0.0.<br>
 </p>
 
   </div>

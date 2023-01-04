@@ -9,8 +9,27 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+- :meth:`xugrid.Ugrid1d.topology_subset`,
+  :meth:`xugrid.Ugrid2d.topology_subset`, and therefore also
+  :meth:`xugrid.UgridDataArrayAccessor.sel` and
+  :meth:`xugrid.UgridDatasetAccessor.sel` now propagate UGRID attributes.
+  Before this fix, dimension of the UGRID topology would go out of sync with
+  the DataArray, as a subset would return a new UGRID topology with default
+  UGRID names. 
+
+Changed
+~~~~~~~
+
+Added
+~~~~~
+- :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` can now be initialized
+  with an ``attrs`` argument to setup non-default UGRID attributes such as
+  alternative node, edge, or face dimensions.
+
 [0.1.10] 2022-12-13
-------------------
+-------------------
 
 Fixed
 ~~~~~

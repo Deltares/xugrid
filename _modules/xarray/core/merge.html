@@ -34,9 +34,6 @@
   <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/merge';</script>
@@ -353,14 +350,14 @@
 
 
 <span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;object carrying the information of a call&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;object carrying the information of a call&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
 
 <span class="k">def</span> <span class="nf">broadcast_dimension_size</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Variable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Extract dimension sizes from a dictionary of variables.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract dimension sizes from a dictionary of variables.</span>
 
 <span class="sd">    Raises ValueError if any dimensions have different sizes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -374,7 +371,7 @@
 
 
 <span class="k">class</span> <span class="nc">MergeError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error class for merge failures due to incompatible arguments.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Error class for merge failures due to incompatible arguments.&quot;&quot;&quot;</span>
 
     <span class="c1"># inherits from ValueError for backward compatibility</span>
     <span class="c1"># TODO: move this to an xarray.exceptions module?</span>
@@ -386,7 +383,7 @@
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
     <span class="n">equals</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return the unique variable from a list of variables or raise MergeError.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the unique variable from a list of variables or raise MergeError.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -465,7 +462,7 @@
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Make sure that elements given in prioritized will not corrupt any</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make sure that elements given in prioritized will not corrupt any</span>
 <span class="sd">    index given in grouped.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prioritized_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prioritized</span><span class="p">)</span>
@@ -500,7 +497,7 @@
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">equals</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Merge dicts of variables, while resolving conflicts appropriately.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge dicts of variables, while resolving conflicts appropriately.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -608,7 +605,7 @@
     <span class="n">list_of_mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Collect variables and indexes from list of mappings of xarray objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect variables and indexes from list of mappings of xarray objects.</span>
 
 <span class="sd">    Mappings must either be Dataset objects, or have values of one of the</span>
 <span class="sd">    following types:</span>
@@ -665,7 +662,7 @@
 <span class="k">def</span> <span class="nf">collect_from_coordinates</span><span class="p">(</span>
     <span class="n">list_of_coords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Coordinates</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Collect variables and indexes to be merged from Coordinate objects.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect variables and indexes to be merged from Coordinate objects.&quot;&quot;&quot;</span>
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">list_of_coords</span><span class="p">:</span>
@@ -683,7 +680,7 @@
     <span class="n">exclude_dims</span><span class="p">:</span> <span class="n">AbstractSet</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Merge variables/indexes from coordinates without automatic alignments.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge variables/indexes from coordinates without automatic alignments.</span>
 
 <span class="sd">    This function is used for merging coordinate from pre-existing xarray</span>
 <span class="sd">    objects.</span>
@@ -716,7 +713,7 @@
 <span class="k">def</span> <span class="nf">determine_coords</span><span class="p">(</span>
     <span class="n">list_of_mappings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Given a list of dicts with xarray object values, identify coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a list of dicts with xarray object values, identify coordinates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -752,7 +749,7 @@
 
 
 <span class="k">def</span> <span class="nf">coerce_pandas_values</span><span class="p">(</span><span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Convert pandas values found in a list of labeled objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert pandas values found in a list of labeled objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -789,7 +786,7 @@
     <span class="n">priority_arg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Extract the priority variable from a list of mappings.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the priority variable from a list of mappings.</span>
 
 <span class="sd">    We need this method because in some cases the priority argument itself</span>
 <span class="sd">    might have conflicting values (e.g., if it is a dict with two DataArray</span>
@@ -838,7 +835,7 @@
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Merge coordinate variables.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge coordinate variables.</span>
 
 <span class="sd">    See merge_core below for argument descriptions. This works similarly to</span>
 <span class="sd">    merge_core, except everything we don&#39;t worry about whether variables are</span>
@@ -856,7 +853,7 @@
 
 
 <span class="k">def</span> <span class="nf">merge_data_and_coords</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Used in Dataset.__init__.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Used in Dataset.__init__.&quot;&quot;&quot;</span>
     <span class="n">indexes</span><span class="p">,</span> <span class="n">coords</span> <span class="o">=</span> <span class="n">_create_indexes_from_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">)</span>
     <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">]</span>
     <span class="n">explicit_coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -870,7 +867,7 @@
 
 
 <span class="k">def</span> <span class="nf">_create_indexes_from_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Maybe create default indexes from a mapping of coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Maybe create default indexes from a mapping of coordinates.</span>
 
 <span class="sd">    Return those indexes and updated coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -905,7 +902,7 @@
 
 
 <span class="k">def</span> <span class="nf">assert_valid_explicit_coords</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">explicit_coords</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Validate explicit coordinate names/dims.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate explicit coordinate names/dims.</span>
 
 <span class="sd">    Raise a MergeError if an explicit coord shares a name with a dimension</span>
 <span class="sd">    but is comprised of arbitrary dimensions.</span>
@@ -920,7 +917,7 @@
 
 
 <span class="k">def</span> <span class="nf">merge_attrs</span><span class="p">(</span><span class="n">variable_attrs</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Combine attributes from different variables according to combine_attrs&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine attributes from different variables according to combine_attrs&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">variable_attrs</span><span class="p">:</span>
         <span class="c1"># no attributes to merge</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -991,7 +988,7 @@
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Core logic for merging labeled objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Core logic for merging labeled objects.</span>
 
 <span class="sd">    This is not public API.</span>
 
@@ -1077,7 +1074,7 @@
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Merge any number of xarray objects into a single Dataset as variables.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge any number of xarray objects into a single Dataset as variables.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1329,7 +1326,7 @@
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Guts of the Dataset.merge method.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Guts of the Dataset.merge method.&quot;&quot;&quot;</span>
     <span class="c1"># we are locked into supporting overwrite_vars for the Dataset.merge</span>
     <span class="c1"># method due for backwards compatibility</span>
     <span class="c1"># TODO: consider deprecating it?</span>
@@ -1367,7 +1364,7 @@
 
 
 <span class="k">def</span> <span class="nf">dataset_update_method</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CoercibleMapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Guts of the Dataset.update method.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Guts of the Dataset.update method.</span>
 
 <span class="sd">    This drops a duplicated coordinates from `other` if `other` is not an</span>
 <span class="sd">    `xarray.Dataset`, e.g., if it&#39;s a dict with DataArray values (GH2068,</span>
@@ -1455,7 +1452,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.0.0.<br>
 </p>
 
   </div>

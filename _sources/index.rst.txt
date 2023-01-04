@@ -1,7 +1,7 @@
 Xugrid
 ======
 
-.. image:: https://img.shields.io/github/workflow/status/deltares/xugrid/ci?style=flat-square
+.. image:: https://img.shields.io/github/actions/workflow/status/deltares/xugrid/ci.yml?style=flat-square
    :target: https://github.com/deltares/xugrid/actions?query=workflows%3Aci
 .. image:: https://img.shields.io/codecov/c/github/deltares/xugrid.svg?style=flat-square
    :target: https://app.codecov.io/gh/deltares/xugrid

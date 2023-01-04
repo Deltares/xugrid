@@ -34,9 +34,6 @@
   <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/common';</script>
@@ -369,7 +366,7 @@
         <span class="k">return</span> <span class="n">wrapped_func</span>
 
     <span class="n">_reduce_extra_args_docstring</span> <span class="o">=</span> <span class="n">dedent</span><span class="p">(</span>
-        <span class="sd">&quot;&quot;&quot;\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;\</span>
 <span class="sd">        dim : str or sequence of str, optional</span>
 <span class="sd">            Dimension(s) over which to apply `{name}`.</span>
 <span class="sd">        axis : int or sequence of int, optional</span>
@@ -379,7 +376,7 @@
     <span class="p">)</span>
 
     <span class="n">_cum_extra_args_docstring</span> <span class="o">=</span> <span class="n">dedent</span><span class="p">(</span>
-        <span class="sd">&quot;&quot;&quot;\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;\</span>
 <span class="sd">        dim : str or sequence of str, optional</span>
 <span class="sd">            Dimension over which to apply `{name}`.</span>
 <span class="sd">        axis : int or sequence of int, optional</span>
@@ -414,7 +411,7 @@
         <span class="k">return</span> <span class="n">wrapped_func</span>
 
     <span class="n">_reduce_extra_args_docstring</span> <span class="o">=</span> <span class="n">dedent</span><span class="p">(</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        dim : str or sequence of str, optional</span>
 <span class="sd">            Dimension(s) over which to apply `{name}`.  By default `{name}` is</span>
 <span class="sd">            applied over all dimensions.</span>
@@ -422,7 +419,7 @@
     <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
     <span class="n">_cum_extra_args_docstring</span> <span class="o">=</span> <span class="n">dedent</span><span class="p">(</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        dim : str or sequence of str, optional</span>
 <span class="sd">            Dimension over which to apply `{name}`.</span>
 <span class="sd">        axis : int or sequence of int, optional</span>
@@ -433,7 +430,7 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractArray</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Shared base class for DataArray and Variable.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shared base class for DataArray and Variable.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -487,7 +484,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Return axis number(s) corresponding to dimension(s) in this array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return axis number(s) corresponding to dimension(s) in this array.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -512,7 +509,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Frozen</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Ordered mapping from dimension names to lengths.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ordered mapping from dimension names to lengths.</span>
 
 <span class="sd">        Immutable.</span>
 
@@ -524,12 +521,12 @@
 
 
 <span class="k">class</span> <span class="nc">AttrAccessMixin</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Mixin class that allows getting keys with attribute access&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that allows getting keys with attribute access&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Verify that all subclasses explicitly define ``__slots__``. If they don&#39;t,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify that all subclasses explicitly define ``__slots__``. If they don&#39;t,</span>
 <span class="sd">        raise error in the core xarray module and a FutureWarning in third-party</span>
 <span class="sd">        extensions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -548,12 +545,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_attr_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;Places to look-up items for attribute-style access&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Places to look-up items for attribute-style access&quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_item_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;Places to look-up items for key-autocompletion&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Places to look-up items for key-autocompletion&quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -573,7 +570,7 @@
     <span class="c1"># runtime before every single assignment. All of this is just temporary until the</span>
     <span class="c1"># FutureWarning can be changed into a hard crash.</span>
     <span class="k">def</span> <span class="nf">_setattr_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deprecated third party subclass (see ``__init_subclass__`` above)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated third party subclass (see ``__init_subclass__`` above)&quot;&quot;&quot;</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="c1"># Custom, non-slotted attr, or improperly assigned variable?</span>
@@ -586,7 +583,7 @@
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Objects with ``__slots__`` raise AttributeError if you try setting an</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Objects with ``__slots__`` raise AttributeError if you try setting an</span>
 <span class="sd">        undeclared attribute. This is desirable, but the error message could use some</span>
 <span class="sd">        improvement.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -605,7 +602,7 @@
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Provide method name lookup and completion. Only provide &#39;public&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide method name lookup and completion. Only provide &#39;public&#39;</span>
 <span class="sd">        methods.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">extra_attrs</span> <span class="o">=</span> <span class="p">{</span>
@@ -617,7 +614,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span> <span class="o">|</span> <span class="n">extra_attrs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_ipython_key_completions_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Provide method for the key-autocompletions in IPython.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide method for the key-autocompletions in IPython.</span>
 <span class="sd">        See http://ipython.readthedocs.io/en/stable/config/integrating.html#tab-completion</span>
 <span class="sd">        For the details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -635,7 +632,7 @@
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Get a list of dimensions to squeeze out.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of dimensions to squeeze out.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot use both parameters `axis` and `dim`&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dim</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -664,7 +661,7 @@
 
 
 <span class="k">class</span> <span class="nc">DataWithCoords</span><span class="p">(</span><span class="n">AttrAccessMixin</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Shared base class for Dataset and DataArray.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shared base class for Dataset and DataArray.&quot;&quot;&quot;</span>
 
     <span class="n">_close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="n">_indexes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span>
@@ -677,7 +674,7 @@
         <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a new object with squeezed data.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new object with squeezed data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -711,7 +708,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array whose values are limited to ``[min, max]``.</span>
 <span class="sd">        At least one of max or min must be given.</span>
 
@@ -748,7 +745,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Get an index for a dimension, with fall-back to a default RangeIndex&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an index for a dimension, with fall-back to a default RangeIndex&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
@@ -767,7 +764,7 @@
         <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">coords_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Assign new coordinates to this object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign new coordinates to this object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
 <span class="sd">        coordinates.</span>
@@ -906,7 +903,7 @@
     <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Assign new attrs to this object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign new attrs to this object.</span>
 
 <span class="sd">        Returns a new object equivalent to ``self.attrs.update(*args, **kwargs)``.</span>
 
@@ -936,7 +933,7 @@
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply ``func(self, *args, **kwargs)``</span>
 
 <span class="sd">        This method replicates the pandas method of the same name.</span>
@@ -1068,7 +1065,7 @@
         <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;span&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">window_kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RollingExp</span><span class="p">[</span><span class="n">T_DataWithCoords</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Exponentially-weighted moving window.</span>
 <span class="sd">        Similar to EWM in pandas</span>
 
@@ -1119,7 +1116,7 @@
         <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">indexer_kwargs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Resample</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns a Resample object for performing resampling operations.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a Resample object for performing resampling operations.</span>
 
 <span class="sd">        Handles both downsampling and upsampling. The resampled</span>
 <span class="sd">        dimension must be a datetime-like coordinate. If any intervals</span>
@@ -1302,7 +1299,7 @@
     <span class="k">def</span> <span class="nf">where</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Filter elements from this object according to a condition.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter elements from this object according to a condition.</span>
 
 <span class="sd">        This operation follows the normal broadcasting and alignment rules that</span>
 <span class="sd">        xarray uses for binary arithmetic.</span>
@@ -1422,7 +1419,7 @@
         <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">where_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">set_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Register the function that releases any resources linked to this object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the function that releases any resources linked to this object.</span>
 
 <span class="sd">        This method controls how xarray cleans up resources associated</span>
 <span class="sd">        with this object when the ``.close()`` method is called. It is mostly</span>
@@ -1438,7 +1435,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="n">close</span>
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Release any resources linked to this object.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release any resources linked to this object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1446,7 +1443,7 @@
     <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is a missing value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is a missing value.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1491,7 +1488,7 @@
     <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is not a missing value.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is not a missing value.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1534,7 +1531,7 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Tests each value in the array for whether it is in test elements.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tests each value in the array for whether it is in test elements.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1593,7 +1590,7 @@
         <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy of the xarray object, with data cast to a specified type.</span>
 <span class="sd">        Leaves coordinate dtype unchanged.</span>
 
@@ -1712,7 +1709,7 @@
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return a new object with the same shape and type as a given object.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object with the same shape and type as a given object.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1864,7 +1861,7 @@
 <span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="k">if</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
@@ -1916,7 +1913,7 @@
 <div class="viewcode-block" id="zeros_like"><a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a><span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return a new object of zeros with the same shape and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object of zeros with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
 
 <span class="sd">    Parameters</span>
@@ -2003,7 +2000,7 @@
 <div class="viewcode-block" id="ones_like"><a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a><span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return a new object of ones with the same shape and</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object of ones with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
 
 <span class="sd">    Parameters</span>
@@ -2068,17 +2065,17 @@
 
 
 <span class="k">def</span> <span class="nf">is_np_datetime_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Check if a dtype is a subclass of the numpy datetime types&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a dtype is a subclass of the numpy datetime types&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">is_np_timedelta_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Check whether dtype is of the timedelta64 dtype.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether dtype is of the timedelta64 dtype.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Check if an array contains cftime.datetime objects&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an array contains cftime.datetime objects&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cftime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2094,7 +2091,7 @@
 
 
 <span class="k">def</span> <span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Check if an xarray.Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an xarray.Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2102,7 +2099,7 @@
 
 
 <span class="k">def</span> <span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Check if a variable contains datetime like objects (either</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a variable contains datetime like objects (either</span>
 <span class="sd">    np.datetime64, np.timedelta64, or cftime.datetime)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">is_np_datetime_like</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">or</span> <span class="n">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
@@ -2166,7 +2163,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.0.0.<br>
 </p>
 
   </div>
