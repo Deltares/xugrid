@@ -6,8 +6,14 @@ import pytest
 
 def _importorskip(modname):
     try:
-        importlib.import_module(modname)
-        has = True
+        import meshkernel
+
+        # If the DLL/SO fails to load / be found, still skip.
+        try:
+            meshkernel.MeshKernel(is_geographic=False)
+            has = True
+        except OSError:
+            has = False
     except ImportError:
         has = False
     func = pytest.mark.skipif(not has, reason=f"requires {modname}")
