@@ -29,15 +29,19 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractmethod
+    def topology_subset():
+        """ """
+
+    @abc.abstractmethod
+    def clip_box():
+        """ """
+
+    @abc.abstractmethod
     def isel():
         """ """
 
     @abc.abstractmethod
     def sel():
-        """ """
-
-    @abc.abstractmethod
-    def topology_subset():
         """ """
 
     @abc.abstractmethod
@@ -230,35 +234,17 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    def _topology_subset(
-        self, indices: Union[BoolArray, IntArray], node_connectivity: IntArray
-    ):
-        is_same = False
-        if np.issubdtype(indices.dtype, np.bool_):
-            is_same = indices.all()
+    @staticmethod
+    def _check_index_identity(index: Union[BoolArray, IntArray], n: int) -> bool:
+        """
+        Check whether index would return all values.
+        """
+        if np.issubdtype(index.dtype, np.bool_):
+            return index.all()
+        elif np.issubdtype(index.dtype, np.integer):
+            return np.array_equal(index, np.arange(n))
         else:
-            # TODO: check for unique indices if integer?
-            is_same = np.array_equal(indices, np.arange(node_connectivity.shape[0]))
-
-        if is_same:
-            return self
-        # Subset of faces, create new topology data
-        else:
-            subset = node_connectivity[indices]
-            node_indices = np.unique(subset.ravel())
-            new_connectivity = connectivity.renumber(subset)
-            node_x = self.node_x[node_indices]
-            node_y = self.node_y[node_indices]
-            return self.__class__(
-                node_x,
-                node_y,
-                self.fill_value,
-                new_connectivity,
-                name=self.name,
-                projected=self.projected,
-                crs=self.crs,
-                attrs=self._attrs,
-            )
+            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
 
     def set_node_coords(
         self,

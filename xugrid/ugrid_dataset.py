@@ -22,23 +22,82 @@ from .ugrid import AbstractUgrid, Ugrid2d, grid_from_dataset, grid_from_geodataf
 UgridType = Type[AbstractUgrid]
 
 
+def maybe_xugrid(obj, grid):
+    if isinstance(obj, xr.DataArray):
+        return UgridDataArray(obj, grid)
+    elif isinstance(obj, xr.Dataset):
+        return UgridDataset(obj, grid)
+    else:
+        return obj
+        # raise TypeError(f"Expected Dataset or DataArray, received {type(obj).__name__}")
+
+
+def check_ugrid_alignment(obj, grid):
+    """
+    Check whether the xarray object dimensions still align with the grid.
+    """
+    griddims = grid.dimensions
+    shared_dims = set(griddims).intersection(obj.dims)
+    if shared_dims:
+        for dim in shared_dims:
+            ugridsize = griddims[dim]
+            objsize = obj[dim].size
+            if ugridsize != objsize:
+                raise ValueError(
+                    f"conflicting sizes for dimension '{dim}': "
+                    f"length {ugridsize} in UGRID topology and "
+                    f"length {objsize} in xarray dimension"
+                )
+        return maybe_xugrid(obj, grid)
+    else:
+        return obj
+
+
 def xarray_wrapper(func, grid):
     """
-    runs a function, and if the result is an xarray dataset or an xarray
-    dataArray, it creates an UgridDataset or an UgridDataArray around it
+    Runs a function, and if the result is an xarray Dataset or an xarray
+    DataArray, it creates an UgridDataset or an UgridDataArray around it
+    if UGRID dimensions are present.
     """
 
     @wraps(func)
     def wrapped(*args, **kwargs):
         result = func(*args, **kwargs)
-        if isinstance(result, xr.Dataset):
-            return UgridDataset(result, grid)
-        elif isinstance(result, xr.DataArray):
-            return UgridDataArray(result, grid)
+        if isinstance(result, (xr.Dataset, xr.DataArray)):
+            return check_ugrid_alignment(result, grid)
         else:
             return result
 
     return wrapped
+
+
+def filter_indexers(indexers, grids):
+    indexers = indexers.copy()
+    ugrid_indexers = []
+    for grid in grids:
+        ugrid_dims = set(grid.dimensions).intersection(indexers)
+        if ugrid_dims:
+            if len(ugrid_dims) > 1:
+                raise ValueError(
+                    "Can only index along one UGRID dimension at a time. "
+                    f"Received for topology {grid.name}: {ugrid_dims}"
+                )
+            dim = ugrid_dims.pop()
+            ugrid_indexers.append((grid, (dim, indexers.pop(dim))))
+        else:
+            ugrid_indexers.append((grid, None))
+    return indexers, ugrid_indexers
+
+
+def ugrid_sel(obj, ugrid_indexers):
+    grids = []
+    for (grid, indexer_args) in ugrid_indexers:
+        if indexer_args is None:
+            grids.append(grid)
+        else:
+            obj, new_grid = grid.isel(*indexer_args, obj)
+            grids.append(new_grid)
+    return obj, grids
 
 
 class DunderForwardMixin:
@@ -86,10 +145,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         forward getters to xr.DataArray. Wrap result if necessary
         """
         result = self.obj[key]
-        if isinstance(result, xr.DataArray):
-            return UgridDataArray(result, self.grid)
-        else:
-            return result
+        return maybe_xugrid(result, self.grid)
 
     def __setitem__(self, key, value):
         """
@@ -133,6 +189,35 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
             other = other.obj
         return UgridDataArray(self.obj._inplace_binary_op(other, f), self.grid)
 
+    def isel(
+        self,
+        indexers=None,
+        drop: bool = False,
+        missing_dims="raise",
+        **indexers_kwargs,
+    ):
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
+        obj_indexers, ugrid_indexers = filter_indexers(indexers, self.grids)
+        result = self.obj.isel(obj_indexers, drop=drop, missing_dims=missing_dims)
+        result, grids = ugrid_sel(result, ugrid_indexers)
+        return UgridDataset(result, grids[0])
+
+    def sel(
+        self,
+        indexers=None,
+        method=None,
+        tolerance=None,
+        drop=False,
+        **indexers_kwargs,
+    ):
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
+        obj_indexers, ugrid_indexers = filter_indexers(indexers, [self.grid])
+        result = self.obj.sel(
+            obj_indexers, method=method, tolerance=tolerance, drop=drop
+        )
+        result, grids = ugrid_sel(result, ugrid_indexers)
+        return UgridDataset(result, grids[0])
+
     @property
     def ugrid(self):
         """
@@ -169,6 +254,10 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
             name=da.name,
         )
         return UgridDataArray(face_da, grid)
+
+
+UgridDataArray.isel.__doc__ = xr.DataArray.isel.__doc__
+UgridDataArray.sel.__doc__ = xr.DataArray.sel.__doc__
 
 
 class AbstractUgridAccessor(abc.ABC):
@@ -209,21 +298,11 @@ class AbstractUgridAccessor(abc.ABC):
         # TODO: also do vectorized indexing like xarray?
         # Might not be worth it, as orthogonal and vectorized indexing are
         # quite confusing.
-        dim, ugrid, index, coords = grid.sel(x=x, y=y)
-        result = obj.isel({dim: index})
-
-        if not ugrid:
-            return result.assign_coords(coords)
-
-        grid = grid.topology_subset(index)
-        if isinstance(obj, xr.DataArray):
-            return UgridDataArray(result, grid)
-        elif isinstance(obj, xr.Dataset):
-            return UgridDataset(result, grid)
+        result = grid.sel(obj, x, y)
+        if isinstance(result, tuple):
+            return maybe_xugrid(*result)
         else:
-            raise TypeError(
-                f"Expected UgridDataArray or UgridDataset, got {type(result).__name__}"
-            )
+            return result
 
     @staticmethod
     def _sel_points(obj, grid, x, y):
@@ -244,6 +323,29 @@ class AbstractUgridAccessor(abc.ABC):
         dim, _, index, coords = grid.sel_points(x, y)
         result = obj.isel({dim: index})
         return result.assign_coords(coords)
+
+    def clip_box(
+        self,
+        xmin: float,
+        ymin: float,
+        xmax: float,
+        ymax: float,
+    ):
+        """
+        Clip the DataArray or Dataset by a bounding box.
+
+        Parameters
+        ----------
+        xmin: float
+        ymin: float
+        xmax: float
+        ymax: float
+
+        -------
+        clipped:
+            xugrid.UgridDataArray or xugrid.UgridDataset
+        """
+        return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
     def to_netcdf(self, *args, **kwargs):
         """
@@ -416,6 +518,35 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
             other = other.obj
         return UgridDataset(self.obj._inplace_binary_op(other, f), self.grids)
 
+    def isel(
+        self,
+        indexers=None,
+        drop: bool = False,
+        missing_dims="warn",
+        **indexers_kwargs: Any,
+    ):
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
+        obj_indexers, ugrid_indexers = filter_indexers(indexers, self.grids)
+        result = self.obj.isel(obj_indexers, drop=drop, missing_dims=missing_dims)
+        result, grids = ugrid_sel(result, ugrid_indexers)
+        return UgridDataset(result, grids)
+
+    def sel(
+        self,
+        indexers=None,
+        method=None,
+        tolerance=None,
+        drop: bool = False,
+        **indexers_kwargs: Any,
+    ):
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
+        obj_indexers, ugrid_indexers = filter_indexers(indexers, self.grids)
+        result = self.obj.sel(
+            obj_indexers, method=method, tolerance=tolerance, drop=drop
+        )
+        result, grids = ugrid_sel(result, ugrid_indexers)
+        return UgridDataset(result, grids)
+
     @property
     def ugrid(self):
         """
@@ -440,6 +571,11 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         grid = grid_from_geodataframe(geodataframe)
         ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1))
         return UgridDataset(ds, [grid])
+
+
+# Set docstrings
+UgridDataset.sel.__doc__ = xr.Dataset.sel.__doc__
+UgridDataset.isel.__doc__ = xr.Dataset.isel.__doc__
 
 
 class UgridDatasetAccessor(AbstractUgridAccessor):
@@ -941,6 +1077,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     def _raster(self, x, y, index) -> xr.DataArray:
         index = index.ravel()
+        # Cast to float for nodata values (NaN)
         data = self.obj.isel({self.grid.face_dimension: index}).astype(float).values
         data[index == -1] = np.nan
         out = xr.DataArray(

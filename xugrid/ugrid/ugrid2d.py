@@ -307,7 +307,11 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def dimensions(self):
-        return self.node_dimension, self.edge_dimension, self.face_dimension
+        return {
+            self.node_dimension: self.n_node,
+            self.edge_dimension: self.n_edge,
+            self.face_dimension: self.n_face,
+        }
 
     @property
     def topology_dimension(self):
@@ -774,10 +778,127 @@ class Ugrid2d(AbstractUgrid):
         y = np.arange(ymax - 0.5 * d, ymin, -d)
         return self.rasterize_like(x, y)
 
-    def isel(self, dim, indexer):
-        if dim != self.face_dimension:
-            raise NotImplementedError("Can only index face_dimension for Ugrid2D")
-        return self.topology_subset(indexer)
+    def topology_subset(
+        self, face_index: Union[BoolArray, IntArray], return_index: bool = False
+    ):
+        """
+        Create a new (valid) UGRID1D topology for a subset of this topology.
+
+        Parameters
+        ----------
+        face_index: 1d array of integers or bool
+            Edges of the subset.
+        return_index: bool, optional
+            Whether to return node_index, edge_index, face_index.
+
+        Returns
+        -------
+        subset: Ugrid2d
+        """
+        index = np.atleast_1d(face_index)
+        if self._check_index_identity(index, self.n_face):
+            return self
+
+        face_subset = self.face_node_connectivity[index]
+        node_index = np.unique(face_subset.ravel())
+        new_faces = connectivity.renumber(face_subset)
+        node_x = self.node_x[node_index]
+        node_y = self.node_y[node_index]
+
+        edge_index = None
+        new_edges = None
+        if self.edge_node_connectivity is not None:
+            edge_index = np.sort(self.face_edge_connectivity[index].ravel())
+            edge_subset = self.edge_node_connectivity[edge_index]
+            new_edges = connectivity.renumber(edge_subset)
+
+        grid = self.__class__(
+            node_x,
+            node_y,
+            self.fill_value,
+            new_faces,
+            name=self.name,
+            edge_node_connectivity=new_edges,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self._attrs,
+        )
+        if return_index:
+            return grid, (node_index, edge_index, face_index)
+        else:
+            return grid
+
+    def clip_box(
+        self,
+        xmin: float,
+        ymin: float,
+        xmax: float,
+        ymax: float,
+    ):
+        xmin, ymin, xmax, ymax = self.bounds
+        bounds = [xmin, ymin, xmax, ymax]
+        face_index = self.locate_bounding_box(*bounds)
+        return self.topology_subset(face_index)
+
+    def _isel_obj(
+        self,
+        obj,
+        indexes,
+    ):
+        indexes = {k: v for k, v in zip(self.dimensions, indexes)}
+        dims = set(self.dimensions).intersection(obj.dims)
+        new_obj = obj
+        for dim in dims:
+            new_obj = new_obj.isel({dim: indexes[dim]})
+        return new_obj
+
+    def isel(self, dim, indexer, obj):
+        """
+        Select based on node, edge, or face.
+
+        Face selection always results in a valid UGRID topology.
+        Node or edge selection may result in invalid topologies (incomplete
+        faces), and will error in such a case.
+
+        Parameters
+        ----------
+        indexer: str
+            One of the grid's node, edge, or face dimensions.
+        indexer: np.ndarray of integers or bools
+        obj: xr.Dataset or xr.DataArray
+
+        Returns
+        -------
+        obj: xr.Dataset or xr.DataArray
+        grid: Ugrid2d
+        """
+        msg = (
+            "This {entity} selection results in an invalid Ugrid2d topology. "
+            "Use .ugrid.sel() instead."
+        )
+
+        if dim == self.face_dimension:
+            grid, indexes = self.topology_subset(indexer, True)
+
+        elif dim == self.edge_dimension:
+            face_index = np.unique(self.node_face_connectivity[indexer].data)
+            grid, indexes = self.topology_subset(self, face_index, True)
+            other_index = indexes[0]
+            if not np.array_equal(np.sort(indexer), other_index):
+                raise ValueError(msg.format(entity="edge"))
+
+        elif dim == self.node_dimension:
+            face_index = np.unique(self.edge_face_connectivity[indexer])
+            grid, indexes = self.topology_subset(self, face_index, True)
+            other_index = indexes[1]
+            if not np.array_equal(np.sort(indexer), other_index):
+                raise ValueError(msg.format(entity="node"))
+
+        else:
+            raise ValueError(f"dim should be one of {self.dimensions}, received: {dim}")
+
+        result = self._isel_obj(obj, indexes)
+        return result, grid
 
     def _validate_indexer(self, indexer) -> Union[slice, np.ndarray]:
         if isinstance(indexer, slice):
@@ -811,7 +932,63 @@ class Ugrid2d(AbstractUgrid):
 
         return indexer
 
-    def sel_points(self, x: FloatArray, y: FloatArray):
+    def _sel_box(
+        self,
+        x,
+        y,
+        obj,
+    ):
+        xmin, ymin, xmax, ymax = self.bounds
+        bounds = [
+            numeric_bound(x.start, xmin),
+            numeric_bound(y.start, ymin),
+            numeric_bound(x.stop, xmax),
+            numeric_bound(y.stop, ymax),
+        ]
+        face_index = self.locate_bounding_box(*bounds)
+        grid, indexes = self.topology_subset(face_index, return_index=True)
+        new_obj = self._isel_obj(obj, indexes)
+        return new_obj, grid
+
+    def _sel_yline(
+        self,
+        x,
+        y,
+        obj,
+    ):
+        xmin, _, xmax, _ = self.bounds
+        if y.size != 1:
+            raise ValueError(
+                "If x is a slice without steps, y should be a single value"
+            )
+        y = y[0]
+        xstart = numeric_bound(x.start, xmin)
+        xstop = numeric_bound(x.stop, xmax)
+        edges = np.array([[[xstart, y], [xstop, y]]])
+        _, index, xy = self.intersect_edges(edges)
+        coords, index = section_coordinates(edges, xy, self.face_dimension, index)
+        return obj.isel({self.face_dimension: index}).assign_coords(coords)
+
+    def _sel_xline(
+        self,
+        x,
+        y,
+        obj,
+    ):
+        _, ymin, _, ymax = self.bounds
+        if x.size != 1:
+            raise ValueError(
+                "If y is a slice without steps, x should be a single value"
+            )
+        x = x[0]
+        ystart = numeric_bound(y.start, ymin)
+        ystop = numeric_bound(y.stop, ymax)
+        edges = np.array([[[x, ystart], [x, ystop]]])
+        _, index, xy = self.intersect_edges(edges)
+        coords, index = section_coordinates(edges, xy, self.face_dimension, index)
+        return obj.isel({self.face_dimension: index}).assign_coords(coords)
+
+    def _sel_points(self, x: FloatArray, y: FloatArray, obj):
         """
         Select points in the unstructured grid.
 
@@ -842,9 +1019,9 @@ class Ugrid2d(AbstractUgrid):
             "x": (dim, xy[valid, 0]),
             "y": (dim, xy[valid, 1]),
         }
-        return dim, False, index, coords
+        return obj.isel({dim: index}).assign_coords(coords)
 
-    def sel(self, x=None, y=None):
+    def sel(self, obj, x=None, y=None):
         """
         Find selection in the UGRID x and y coordinates.
 
@@ -855,6 +1032,7 @@ class Ugrid2d(AbstractUgrid):
 
         Parameters
         ----------
+        obj: xr.DataArray or xr.Dataset
         x: float, 1d array, slice
         y: float, 1d array, slice
 
@@ -873,71 +1051,20 @@ class Ugrid2d(AbstractUgrid):
 
         x = self._validate_indexer(x)
         y = self._validate_indexer(y)
-        dim = self.face_dimension
-        as_ugrid = False
-        xmin, ymin, xmax, ymax = self.bounds
         if isinstance(x, slice) and isinstance(y, slice):
-            # Bounding box selection
-            # Fill None values by infinite
-            bounds = [
-                numeric_bound(x.start, xmin),
-                numeric_bound(y.start, ymin),
-                numeric_bound(x.stop, xmax),
-                numeric_bound(y.stop, ymax),
-            ]
-            as_ugrid = True
-            coords = {}
-            index = self.locate_bounding_box(*bounds)
+            return self._sel_box(x, y, obj)
         elif isinstance(x, slice) and isinstance(y, np.ndarray):
-            if y.size != 1:
-                raise ValueError(
-                    "If x is a slice without steps, y should be a single value"
-                )
-            y = y[0]
-            xstart = numeric_bound(x.start, xmin)
-            xstop = numeric_bound(x.stop, xmax)
-            edges = np.array([[[xstart, y], [xstop, y]]])
-            _, index, xy = self.intersect_edges(edges)
-            coords, index = section_coordinates(edges, xy, dim, index)
-
+            return self._sel_yline(x, y, obj)
         elif isinstance(x, np.ndarray) and isinstance(y, slice):
-            if x.size != 1:
-                raise ValueError(
-                    "If y is a slice without steps, x should be a single value"
-                )
-            x = x[0]
-            ystart = numeric_bound(y.start, ymin)
-            ystop = numeric_bound(y.stop, ymax)
-            edges = np.array([[[x, ystart], [x, ystop]]])
-            _, index, xy = self.intersect_edges(edges)
-            coords, index = section_coordinates(edges, xy, dim, index)
-
+            return self._sel_xline(x, y, obj)
         elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
             # Orthogonal points
             yy, xx = np.meshgrid(y, x, indexing="ij")
             return self.sel_points(xx.ravel(), yy.ravel())
-
         else:
             raise TypeError(
                 f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
             )
-        return dim, as_ugrid, index, coords
-
-    def topology_subset(self, index: Union[BoolArray, IntArray]):
-        """
-        Create a new UGRID1D topology for a subset of this topology.
-
-        Parameters
-        ----------
-        face_index: 1d array of integers or bool
-            Edges of the subset.
-
-        Returns
-        -------
-        subset: Ugrid2d
-        """
-        index = np.atleast_1d(index)
-        return self._topology_subset(index, self.face_node_connectivity)
 
     def triangulate(self):
         """

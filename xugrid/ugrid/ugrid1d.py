@@ -4,7 +4,7 @@ from typing import Any, Dict, Tuple, Union
 import numpy as np
 import xarray as xr
 
-from .. import conversion
+from .. import connectivity, conversion
 from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType
 from . import conventions
 from .ugridbase import AbstractUgrid
@@ -218,7 +218,7 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def dimensions(self):
-        return self.node_dimension, self.edge_dimension
+        return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
     # These are all optional UGRID attributes. They are not computed by
     # default, only when called upon.
@@ -366,5 +366,31 @@ class Ugrid1d(AbstractUgrid):
         -------
         subset: Ugrid1d
         """
-        edge_index = np.atleast_1d(edge_index)
-        return self._topology_subset(edge_index, self.edge_node_connectivity)
+        index = np.atleast_1d(edge_index)
+        if self._check_index_identity(index, len(self.edge_node_connectivity)):
+            return self
+
+        edge_subset = self.edge_node_connectivity[index]
+        node_index = np.unique(edge_subset.ravel())
+        new_edges = connectivity.renumber(edge_subset)
+        node_x = self.node_x[node_index]
+        node_y = self.node_y[node_index]
+        return self.__class__(
+            node_x,
+            node_y,
+            self.fill_value,
+            new_edges,
+            name=self.name,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self._attrs,
+        )
+
+    def clip_box(
+        self,
+        xmin: float,
+        ymin: float,
+        xmax: float,
+        ymax: float,
+    ):
+        return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
