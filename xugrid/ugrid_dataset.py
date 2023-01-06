@@ -22,17 +22,7 @@ from .ugrid import AbstractUgrid, Ugrid2d, grid_from_dataset, grid_from_geodataf
 UgridType = Type[AbstractUgrid]
 
 
-def maybe_xugrid(obj, grid):
-    if isinstance(obj, xr.DataArray):
-        return UgridDataArray(obj, grid)
-    elif isinstance(obj, xr.Dataset):
-        return UgridDataset(obj, grid)
-    else:
-        return obj
-        # raise TypeError(f"Expected Dataset or DataArray, received {type(obj).__name__}")
-
-
-def check_ugrid_alignment(obj, grid):
+def ugrid_aligns(obj, grid):
     """
     Check whether the xarray object dimensions still align with the grid.
     """
@@ -48,9 +38,26 @@ def check_ugrid_alignment(obj, grid):
                     f"length {ugridsize} in UGRID topology and "
                     f"length {objsize} in xarray dimension"
                 )
-        return maybe_xugrid(obj, grid)
+        return True
     else:
-        return obj
+        return False
+
+
+def maybe_xugrid(obj, grid):
+    if isinstance(obj, xr.DataArray):
+        if ugrid_aligns(obj, grid):
+            return UgridDataset(obj, grid)
+    elif isinstance(obj, xr.Dataset):
+        if ugrid_aligns(obj, grid):
+            return UgridDataArray(obj, grid)
+    return obj
+
+
+def maybe_xarray(arg):
+    if isinstance(arg, (UgridDataArray, UgridDataset)):
+        return arg.obj
+    else:
+        return arg
 
 
 def xarray_wrapper(func, grid):
@@ -62,11 +69,10 @@ def xarray_wrapper(func, grid):
 
     @wraps(func)
     def wrapped(*args, **kwargs):
+        args = [maybe_xarray(arg) for arg in args]
+        kwargs = {k: maybe_xarray(v) for k, v in kwargs.items()}
         result = func(*args, **kwargs)
-        if isinstance(result, (xr.Dataset, xr.DataArray)):
-            return check_ugrid_alignment(result, grid)
-        else:
-            return result
+        return maybe_xugrid(result, grid)
 
     return wrapped
 
@@ -149,7 +155,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
 
     def __setitem__(self, key, value):
         """
-        forward setters to  xr.DataArray
+        forward setters to xr.DataArray
         """
         self.obj[key] = value
 
@@ -180,13 +186,11 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         f: Callable,
         reflexive: bool = False,
     ):
-        if isinstance(other, (UgridDataArray, UgridDataset)):
-            other = other.obj
+        other = maybe_xarray(other)
         return UgridDataArray(self.obj._binary_op(other, f, reflexive), self.grid)
 
     def _inplace_binary_op(self, other, f: Callable):
-        if isinstance(other, (UgridDataArray, UgridDataset)):
-            other = other.obj
+        other = maybe_xarray(other)
         return UgridDataArray(self.obj._inplace_binary_op(other, f), self.grid)
 
     def isel(
@@ -197,10 +201,10 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
         **indexers_kwargs,
     ):
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
-        obj_indexers, ugrid_indexers = filter_indexers(indexers, self.grids)
+        obj_indexers, ugrid_indexers = filter_indexers(indexers, [self.grid])
         result = self.obj.isel(obj_indexers, drop=drop, missing_dims=missing_dims)
         result, grids = ugrid_sel(result, ugrid_indexers)
-        return UgridDataset(result, grids[0])
+        return UgridDataArray(result, grids[0])
 
     def sel(
         self,
@@ -216,7 +220,7 @@ class UgridDataArray(DataArrayOpsMixin, DunderForwardMixin):
             obj_indexers, method=method, tolerance=tolerance, drop=drop
         )
         result, grids = ugrid_sel(result, ugrid_indexers)
-        return UgridDataset(result, grids[0])
+        return UgridDataArray(result, grids[0])
 
     @property
     def ugrid(self):
@@ -509,13 +513,11 @@ class UgridDataset(DatasetOpsMixin, DunderForwardMixin):
         f: Callable,
         reflexive: bool = False,
     ):
-        if isinstance(other, (UgridDataArray, UgridDataset)):
-            other = other.obj
+        other = maybe_xarray(other)
         return UgridDataset(self.obj._binary_op(other, f, reflexive), self.grids)
 
     def _inplace_binary_op(self, other, f: Callable):
-        if isinstance(other, (UgridDataArray, UgridDataset)):
-            other = other.obj
+        other = maybe_xarray(other)
         return UgridDataset(self.obj._inplace_binary_op(other, f), self.grids)
 
     def isel(
