@@ -1,79 +1,10 @@
 from functools import wraps
-from typing import Sequence, Tuple, Type, Union
 
 import xarray as xr
+from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 
-# from .plot.pyvista import to_pyvista_grid
-from xugrid.ops import UgridDataArrayOps, UgridDatasetOps
-from xugrid.ugrid import AbstractUgrid, grid_from_dataset
-from xugrid.wrap import DataArrayForwardMixin, DatasetForwardMixin
-
-UgridType = Type[AbstractUgrid]
-
-
-class UgridDataset(DatasetForwardMixin, UgridDatasetOps):
-    def __init__(
-        self,
-        obj: xr.Dataset = None,
-        grids: Union[UgridType, Sequence[UgridType]] = None,
-    ):
-        if obj is None and grids is None:
-            raise ValueError("At least either obj or grids is required")
-
-        if obj is None:
-            ds = xr.Dataset()
-        else:
-            if not isinstance(obj, xr.Dataset):
-                raise TypeError(
-                    "obj must be xarray.Dataset. Received instead: "
-                    f"{type(obj).__name__}"
-                )
-            connectivity_vars = [
-                name
-                for v in obj.ugrid_roles.connectivity.values()
-                for name in v.values()
-            ]
-            ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
-
-        if grids is None:
-            topologies = obj.ugrid_roles.topology
-            grids = [grid_from_dataset(obj, topology) for topology in topologies]
-        else:
-            # Make sure it's a new list
-            if isinstance(grids, (list, tuple, set)):
-                grids = [grid for grid in grids]
-            else:  # not iterable
-                grids = [grids]
-            # Now typecheck
-            for grid in grids:
-                if not isinstance(grid, AbstractUgrid):
-                    raise TypeError(
-                        "grid must be Ugrid1d or Ugrid2d. "
-                        f"Received instead: {type(grid).__name__}"
-                    )
-
-        self.grids = grids
-        self.obj = ds
-
-
-class UgridDataArray(DataArrayForwardMixin, UgridDataArrayOps):
-    def __init__(self, obj: xr.DataArray, grid: UgridType):
-        if not isinstance(obj, xr.DataArray):
-            raise TypeError(
-                "obj must be xarray.DataArray. Received instead: "
-                f"{type(obj).__name__}"
-            )
-        if not isinstance(grid, AbstractUgrid):
-            raise TypeError(
-                "grid must be Ugrid1d or Ugrid2d. Received instead: "
-                f"{type(grid).__name__}"
-            )
-        self.grid = grid
-        self.obj = obj
-
-
-# Wrapped IO methods
-# ------------------
+from xugrid.core.wrap import UgridDataArray
+from xugrid.core.wrap import UgridDataset
 
 
 def open_dataset(*args, **kwargs):

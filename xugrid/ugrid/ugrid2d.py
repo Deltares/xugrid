@@ -7,12 +7,18 @@ from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
-from .. import connectivity, conversion
-from .. import meshkernel_utils as mku
-from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType, SparseMatrix
-from ..voronoi import voronoi_topology
-from . import conventions
-from .ugridbase import AbstractUgrid
+from xugrid import meshkernel_utils as mku
+from xugrid.constants import (
+    BoolArray,
+    FloatArray,
+    FloatDType,
+    IntArray,
+    IntDType,
+    SparseMatrix,
+)
+from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.ugridbase import AbstractUgrid
+from xugrid.ugrid.voronoi import voronoi_topology
 
 
 def section_coordinates(

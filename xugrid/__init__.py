@@ -1,13 +1,9 @@
 import pkg_resources
 
-from . import data
-from .plot import plot
-from .ugrid import Ugrid1d, Ugrid2d, UgridRolesAccessor
-from .ugrid_dataset import (
-    UgridDataArray,
-    UgridDataArrayAccessor,
-    UgridDataset,
-    UgridDatasetAccessor,
+from xugrid import data
+from xugrid.accessor.dataarray_accessor import UgridDataArrayAccessor
+from xugrid.accessor.dataset_accessor import UgridDatasetAccessor
+from xugrid.core.common import (
     concat,
     full_like,
     merge,
@@ -18,6 +14,12 @@ from .ugrid_dataset import (
     open_zarr,
     zeros_like,
 )
+from xugrid.core.wrap import UgridDataArray
+from xugrid.core.wrap import UgridDataset
+from xugrid.plot import plot
+from xugrid.ugrid.conventions import UgridRolesAccessor
+from xugrid.ugrid.ugrid1d import Ugrid1d
+from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
     __version__ = pkg_resources.get_distribution(__name__).version

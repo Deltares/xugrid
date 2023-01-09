@@ -4,7 +4,14 @@ import numba as nb
 import numpy as np
 from scipy import sparse
 
-from .typing import X_EPSILON, BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
+from xugrid.constants import (
+    X_EPSILON,
+    BoolArray,
+    FloatArray,
+    IntArray,
+    IntDType,
+    SparseMatrix,
+)
 
 
 class AdjacencyMatrix(NamedTuple):

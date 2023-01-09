@@ -12,11 +12,7 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
-from xugrid.ugrid import Ugrid2d
-
-from . import connectivity
-from .connectivity import AdjacencyMatrix
-from .typing import (
+from xugrid.constants import (
     FloatArray,
     IntArray,
     LineArray,
@@ -24,6 +20,9 @@ from .typing import (
     Point,
     Vector,
 )
+from xugrid.ugrid import connectivity
+from xugrid.ugrid.connectivity import AdjacencyMatrix
+from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
     import geopandas as gpd

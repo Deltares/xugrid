@@ -4,10 +4,10 @@ from typing import Any, Dict, Tuple, Union
 import numpy as np
 import xarray as xr
 
-from .. import connectivity, conversion
-from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType
-from . import conventions
-from .ugridbase import AbstractUgrid
+from xugrid import conversion
+from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
+from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.ugridbase import AbstractUgrid
 
 
 class Ugrid1d(AbstractUgrid):

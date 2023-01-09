@@ -1,14 +1,13 @@
 import abc
 import copy
-from typing import Tuple, Union
+from typing import Tuple, Type, Union
 
 import numpy as np
 import xarray as xr
 from scipy.sparse import csr_matrix
 
-from .. import connectivity
-from ..typing import BoolArray, FloatArray, IntArray
-from . import conventions
+from xugrid.constants import BoolArray, FloatArray, IntArray
+from xugrid.ugrid import connectivity, conventions
 
 
 class AbstractUgrid(abc.ABC):
@@ -493,3 +492,6 @@ class AbstractUgrid(abc.ABC):
         from ..plot import line
 
         return line(self, **kwargs)
+
+
+UgridType = Type[AbstractUgrid]
