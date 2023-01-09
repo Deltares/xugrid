@@ -3,8 +3,7 @@ from functools import wraps
 import xarray as xr
 from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 
-from xugrid.core.wrap import UgridDataArray
-from xugrid.core.wrap import UgridDataset
+from xugrid.core.wrap import UgridDataArray, UgridDataset
 
 
 def open_dataset(*args, **kwargs):

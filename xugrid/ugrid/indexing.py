@@ -1,11 +1,13 @@
 """
-Align UGRID topology with the xarray object and vice versa.
+Index into UGRID topology with the xarray object and vice versa.
 
 * Assign coordinates to the node, face, edge dimensions.
 * Do an xarray operation
 * Update UGRID topology as needed, or error for invalid topology.
 
 """
+import numpy as np
+import pandas as pd
 
 
 def ugrid_aligns(obj, grid):
@@ -47,6 +49,31 @@ def filter_indexers(indexers, grids):
     return indexers, ugrid_indexers
 
 
+def validate_and_check_for_identity(index, n: int):
+    if isinstance(np.ndarray):
+        if np.issubdtype(index.dtype, np.bool_):
+            return index.all()
+        elif np.issubdtype(index.dtype, np.integer):
+            index = pd.Index(index)
+        else:
+            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
+    elif not isinstance(index, pd.Index):
+        raise TypeError(
+            "index should be pandas Index or numpy arrray. Received: "
+            f"{type(index).__name__}"
+        )
+
+    if isinstance(index, pd.Index):
+        if not index.is_unique():
+            raise ValueError(
+                "index contains repeated values. Only subsets will result "
+                "in valid UGRID topology."
+            )
+        return index.size == n
+
+    return False
+
+
 def ugrid_sel(obj, ugrid_indexers):
     grids = []
     for (grid, indexer_args) in ugrid_indexers:
@@ -56,3 +83,20 @@ def ugrid_sel(obj, ugrid_indexers):
             obj, new_grid = grid.isel(*indexer_args, obj)
             grids.append(new_grid)
     return obj, grids
+
+
+def align_dataarray(obj, grid):
+    griddims = grid.dimensions
+    shared_dims = set(griddims).intersection(obj.dims)
+    ugrid_indexers = {dim: obj.indexes for dim in shared_dims}
+
+    if shared_dims:
+        for dim in shared_dims:
+            ugridsize = griddims[dim]
+            objsize = obj[dim].size
+            if ugridsize != objsize:
+                raise ValueError(
+                    f"conflicting sizes for dimension '{dim}': "
+                    f"length {ugridsize} in UGRID topology and "
+                    f"length {objsize} in xarray dimension"
+                )

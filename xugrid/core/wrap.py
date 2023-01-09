@@ -11,9 +11,14 @@ from typing import Sequence, Union
 
 import xarray as xr
 
+import xugrid
 from xugrid.conversion import grid_from_dataset
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType
+
+# Import entire module here for circular import of UgridDatasetAccessor and
+# UgridDataArrayAccessor. Note: can only be used in functions (since that code
+# is run at runtime).
 
 
 class AbstractForwardMixin(abc.ABC):
@@ -43,13 +48,27 @@ def ugrid_aligns(obj, grid):
         return False
 
 
-def maybe_xugrid(obj, grid):
+def maybe_xugrid(obj, topology):
+    # Topology can either be a sequence of grids or a grid.
+    if isinstance(topology, (list, set, tuple)):
+        grids = {dim: grid for grid in topology for dim in grid.dimensions}
+    else:
+        grids = {dim: topology for dim in topology.dimensions}
+    item_grids = list(set(grids[dim] for dim in obj.dims if dim in grids))
+
     if isinstance(obj, xr.DataArray):
+        if len(item_grids) == 0:
+            return obj
+        if len(item_grids) > 1:
+            raise RuntimeError("This shouldn't happen. Please open an issue.")
+        grid = item_grids[0]
         if ugrid_aligns(obj, grid):
             return UgridDataArray(obj, grid)
+
     elif isinstance(obj, xr.Dataset):
-        if ugrid_aligns(obj, grid):
+        if ugrid_aligns(obj, item_grids):
             return UgridDataset(obj, grid)
+
     return obj
 
 
@@ -69,8 +88,8 @@ def wraps_xarray(method):
         result = method(*args, **kwargs)
 
         # Sidestep staticmethods, classmethods
-        if isinstance(self, AbstractForwardMixin):
-            return maybe_xugrid(result, self.grid)
+        if isinstance(self, (UgridDataArray, UgridDataset)):
+            return maybe_xugrid(result, self.grids)
         else:
             return result
 
@@ -175,8 +194,9 @@ class UgridDataArray(DataArrayForwardMixin):
         UGRID Accessor. This "accessor" makes operations using the UGRID
         topology available.
         """
-        from xugrid.accessor.dataarray_accessor import UgridDataArrayAccessor
-        return UgridDataArrayAccessor(self.obj, self.grid)
+        return xugrid.accessor.dataarray_accessor.UgridDataArrayAccessor(
+            self.obj, self.grid
+        )
 
     @staticmethod
     def from_structured(da: xr.DataArray):
@@ -258,5 +278,6 @@ class UgridDataset(DatasetForwardMixin):
         UGRID Accessor. This "accessor" makes operations using the UGRID
         topology available.
         """
-        from xugrid.accessor.dataset_accessor import UgridDatasetAccessor
-        return UgridDatasetAccessor(self.obj, self.grids)
+        return xugrid.accessor.dataset_accessor.UgridDatasetAccessor(
+            self.obj, self.grids
+        )

@@ -7,7 +7,7 @@ import xarray as xr
 from xarray.core.utils import either_dict_or_kwargs
 
 # from .plot.pyvista import to_pyvista_grid
-from xugrid.accessor.base import AbstractUgridAccessor
+from xugrid.core.accessorbase import AbstractUgridAccessor
 from xugrid.core.wrap import UgridDataset
 from xugrid.ugrid.ugridbase import UgridType
 

@@ -1,8 +1,6 @@
 import pkg_resources
 
 from xugrid import data
-from xugrid.accessor.dataarray_accessor import UgridDataArrayAccessor
-from xugrid.accessor.dataset_accessor import UgridDatasetAccessor
 from xugrid.core.common import (
     concat,
     full_like,
@@ -14,8 +12,9 @@ from xugrid.core.common import (
     open_zarr,
     zeros_like,
 )
-from xugrid.core.wrap import UgridDataArray
-from xugrid.core.wrap import UgridDataset
+from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
+from xugrid.core.dataset_accessor import UgridDatasetAccessor
+from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.ugrid1d import Ugrid1d

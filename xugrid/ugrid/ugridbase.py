@@ -3,6 +3,7 @@ import copy
 from typing import Tuple, Type, Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 from scipy.sparse import csr_matrix
 
@@ -238,12 +239,28 @@ class AbstractUgrid(abc.ABC):
         """
         Check whether index would return all values.
         """
-        if np.issubdtype(index.dtype, np.bool_):
-            return index.all()
-        elif np.issubdtype(index.dtype, np.integer):
-            return np.array_equal(index, np.arange(n))
-        else:
-            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
+        if isinstance(np.ndarray):
+            if np.issubdtype(index.dtype, np.bool_):
+                return index.all()
+            elif np.issubdtype(index.dtype, np.integer):
+                index = pd.Index(index)
+            else:
+                raise TypeError(
+                    f"index should be bool or integer. Received: {index.dtype}"
+                )
+        elif not isinstance(index, pd.Index):
+            raise TypeError(
+                "index should be pandas Index or numpy arrray. Received: "
+                f"{type(index).__name__}"
+            )
+
+        if isinstance(index, pd.Index):
+            if not index.is_unique():
+                raise ValueError(
+                    "index contains repeated values. Only subsets will result "
+                    "in valid UGRID topology."
+                )
+            return index.size == n
 
     def set_node_coords(
         self,

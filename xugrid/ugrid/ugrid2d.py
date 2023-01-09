@@ -7,6 +7,7 @@ from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
+from xugrid import conversion
 from xugrid import meshkernel_utils as mku
 from xugrid.constants import (
     BoolArray,
