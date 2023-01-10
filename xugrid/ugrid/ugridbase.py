@@ -19,7 +19,11 @@ def as_pandas_index(index, n: int):
                 f"index size {index.size} is larger than dimension size: {n}"
             )
         if np.issubdtype(index.dtype, np.bool_):
-            pd_index = np.arange(np.arange(n)[index])
+            # Significantly quicker if all true.
+            if index.all():
+                pd_index = pd.RangeIndex(0, n)
+            else:
+                pd_index = pd.Index(np.arange(np.arange(n)[index]))
         elif np.issubdtype(index.dtype, np.integer):
             pd_index = pd.Index(index)
         else:
@@ -53,7 +57,9 @@ def align(obj, grids, old_indexes):
     if old_indexes is None:
         return obj, grids
 
-    ugrid_dims = set(chain.from_iterable(grid.dimensions for grid in grids)).intersection(old_indexes)
+    ugrid_dims = set(
+        chain.from_iterable(grid.dimensions for grid in grids)
+    ).intersection(old_indexes)
     new_indexes = {
         k: index
         for k, index in obj.indexes.items()

@@ -8,10 +8,11 @@ import abc
 import types
 from collections import ChainMap
 from functools import wraps
+from itertools import chain
 from typing import Sequence, Union
 
-import numpy as np
 import xarray as xr
+from pandas import RangeIndex
 
 import xugrid
 from xugrid.conversion import grid_from_dataset
@@ -103,25 +104,52 @@ def wrap(
 ):
     FuncType = (types.FunctionType, types.MethodType)
 
-    class Empty:
-        pass
+    # Set every method, property from the xarray object to the UgridDataArray,
+    # UgridDataset. Don't set everything, as this will break the objects.
+    #
+    # class Empty:
+    #     pass
+    #
+    # keep = {
+    #     "__eq__",
+    #     "__ge__",
+    #     "__gt__",
+    #     "__le__",
+    #     "__lt__",
+    #     "__ne__",
+    #     "__repr__",
+    #     "__str__",
+    # }
+    #
+    # remove = set(dir(Empty)) - keep
 
-    keep = {
-        "__eq__",
-        "__ge__",
-        "__gt__",
-        "__le__",
-        "__lt__",
-        "__ne__",
+    remove = {
+        # These members are shared by all objects:
+        "__class__",
+        "__delattr__",
+        "__dict__",
+        "__dir__",
+        "__doc__",
+        "__format__",
+        "__getattribute__",
+        "__hash__",
+        "__init__",
+        "__init_subclass__",
+        "__module__",
+        "__new__",
         "__reduce__",
         "__reduce_ex__",
-    }
-    remove = {
+        "__setattr__",
+        "__sizeof__",
+        "__subclasshook__",
+        "__weakref__"
+        # These are additionally included in xarray:
         "__getatrr__",
         "__slots__",
         "__annotations__",
     }
-    attr_names = (set(dir(source_class)) - set(dir(Empty)) - remove) | keep
+
+    attr_names = set(dir(source_class)) - remove
     all_attrs = {k: getattr(source_class, k) for k in attr_names}
 
     methods = {k: v for k, v in all_attrs.items() if isinstance(v, FuncType)}
@@ -159,18 +187,13 @@ class DatasetForwardMixin(AbstractForwardMixin):
         target_class_dict=vars(),
         source_class=xr.Dataset,
     )
-    
+
 
 def assign_ugrid_coords(obj, grids):
     grid_dims = ChainMap(*(grid.dimensions for grid in grids))
     ugrid_dims = set(grid_dims.keys()).intersection(obj.dims)
-    to_reset = set(obj.indexes)
-    to_add = ugrid_dims - to_reset
-    ugrid_coords = {
-        dim: np.arange(0, grid_dims[dim], dtype=int)
-        for dim in to_add
-    }
-    obj = obj.assign_coords(ugrid_coords).reset_index(tuple(to_reset))
+    ugrid_coords = {dim: RangeIndex(0, grid_dims[dim]) for dim in ugrid_dims}
+    obj = obj.assign_coords(ugrid_coords)
     return obj
 
 
@@ -187,17 +210,20 @@ class UgridDataArray(DataArrayForwardMixin):
                 f"{type(grid).__name__}"
             )
 
-        self.grid = grid
-        self.obj = assign_ugrid_coords(obj, [grid])
+        self._grid = grid
+        self._obj = assign_ugrid_coords(obj, [grid])
 
     def __getattr__(self, attr):
-        if attr == "obj":
-            return self.obj
-        elif attr == "grid":
-            return self.grid
-
         result = getattr(self.obj, attr)
         return maybe_xugrid(result, [self.grid])
+
+    @property
+    def obj(self):
+        return self._obj
+
+    @property
+    def grid(self):
+        return self._grid
 
     @property
     def ugrid(self):
@@ -280,17 +306,16 @@ class UgridDataset(DatasetForwardMixin):
                         f"Received instead: {type(grid).__name__}"
                     )
 
-        self.grids = grids
-        self.obj = assign_ugrid_coords(ds, grids)
+        self._grids = grids
+        self._obj = assign_ugrid_coords(ds, grids)
 
-    def __getattr__(self, attr):
-        if attr == "obj":
-            return self.obj
-        elif attr == "grid":
-            return self.grid
+    @property
+    def obj(self):
+        return self._obj
 
-        result = getattr(self.obj, attr)
-        return maybe_xugrid(result, self.grids)
+    @property
+    def grids(self):
+        return self._grids
 
     @property
     def ugrid(self):
@@ -299,3 +324,38 @@ class UgridDataset(DatasetForwardMixin):
         topology available.
         """
         return xugrid.core.dataset_accessor.UgridDatasetAccessor(self.obj, self.grids)
+
+    def __getattr__(self, attr):
+        result = getattr(self.obj, attr)
+        return maybe_xugrid(result, self.grids)
+
+    def __setitem__(self, key, value):
+        # TODO: check with topology
+        if isinstance(value, UgridDataArray):
+            append = True
+            # Check if the dimensions occur in self.
+            # if they don't, the grid should be added.
+            if self.grids is not None:
+                alldims = set(
+                    chain.from_iterable([grid.dimensions for grid in self.grids])
+                )
+                matching_dims = set(value.grid.dimensions).intersection(alldims)
+                if matching_dims:
+                    append = False
+                    # If they do match: the grids should match.
+                    grids = {
+                        dim: grid for grid in self.grids for dim in grid.dimensions
+                    }
+                    firstdim = next(iter(matching_dims))
+                    grid_to_check = grids[firstdim]
+                    if not grid_to_check.equals(value.grid):
+                        raise ValueError(
+                            "Grids share dimension names but do not are not identical. "
+                            f"Matching dimensions: {matching_dims}"
+                        )
+
+            self.obj[key] = value.obj
+            if append:
+                self._grids.append(value.grid)
+        else:
+            self.obj[key] = value
