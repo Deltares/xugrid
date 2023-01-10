@@ -159,6 +159,19 @@ class DatasetForwardMixin(AbstractForwardMixin):
         target_class_dict=vars(),
         source_class=xr.Dataset,
     )
+    
+
+def assign_ugrid_coords(obj, grids):
+    grid_dims = ChainMap(*(grid.dimensions for grid in grids))
+    ugrid_dims = set(grid_dims.keys()).intersection(obj.dims)
+    to_reset = set(obj.indexes)
+    to_add = ugrid_dims - to_reset
+    ugrid_coords = {
+        dim: np.arange(0, grid_dims[dim], dtype=int)
+        for dim in to_add
+    }
+    obj = obj.assign_coords(ugrid_coords).reset_index(tuple(to_reset))
+    return obj
 
 
 class UgridDataArray(DataArrayForwardMixin):
@@ -174,17 +187,8 @@ class UgridDataArray(DataArrayForwardMixin):
                 f"{type(grid).__name__}"
             )
 
-        ugrid_dimensions = set(grid.dimensions).intersection(obj.dims)
-        ugrid_coords = {
-            dim: np.arange(0, grid.dimensions[dim], dtype=int)
-            for dim in ugrid_dimensions
-        }
-        obj = obj.drop_vars(ugrid_dimensions, errors="ignore").assign_coords(
-            ugrid_coords
-        )
-
         self.grid = grid
-        self.obj = obj
+        self.obj = assign_ugrid_coords(obj, [grid])
 
     def __getattr__(self, attr):
         if attr == "obj":
@@ -276,20 +280,8 @@ class UgridDataset(DatasetForwardMixin):
                         f"Received instead: {type(grid).__name__}"
                     )
 
-        # Set index coordinates for UGRID topology dims (nodes, edges, faces).
-        grid_dimensions = ChainMap(*(grid.dimensions for grid in grids))
-        ugrid_dimensions = set(grid_dimensions.keys()).intersection(ds.dims)
-        ugrid_coords = {
-            dim: np.arange(0, grid_dimensions[dim], dtype=int)
-            for dim in ugrid_dimensions
-        }
-        obj = obj.drop_vars(ugrid_dimensions, errors="ignore").assign_coords(
-            ugrid_coords
-        )
-        ds = ds.assign_coords(ugrid_coords)
-
         self.grids = grids
-        self.obj = ds
+        self.obj = assign_ugrid_coords(ds, grids)
 
     def __getattr__(self, attr):
         if attr == "obj":

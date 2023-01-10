@@ -53,7 +53,7 @@ def align(obj, grids, old_indexes):
     if old_indexes is None:
         return obj, grids
 
-    ugrid_dims = set(chain.from_iterable(grid.dimensions for grid in grids))
+    ugrid_dims = set(chain.from_iterable(grid.dimensions for grid in grids)).intersection(old_indexes)
     new_indexes = {
         k: index
         for k, index in obj.indexes.items()
