@@ -6,15 +6,17 @@ This allows for tab completion and documentation.
 
 import abc
 import types
+from collections import ChainMap
 from functools import wraps
 from typing import Sequence, Union
 
+import numpy as np
 import xarray as xr
 
 import xugrid
 from xugrid.conversion import grid_from_dataset
 from xugrid.ugrid.ugrid2d import Ugrid2d
-from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType
+from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType, align
 
 # Import entire module here for circular import of UgridDatasetAccessor and
 # UgridDataArrayAccessor. Note: can only be used in functions (since that code
@@ -26,50 +28,34 @@ class AbstractForwardMixin(abc.ABC):
     Serves as a common identifier for UgridDataset, UgridDataArray.
     """
 
-
-def ugrid_aligns(obj, grid):
-    """
-    Check whether the xarray object dimensions still align with the grid.
-    """
-    griddims = grid.dimensions
-    shared_dims = set(griddims).intersection(obj.dims)
-    if shared_dims:
-        for dim in shared_dims:
-            ugridsize = griddims[dim]
-            objsize = obj[dim].size
-            if ugridsize != objsize:
-                raise ValueError(
-                    f"conflicting sizes for dimension '{dim}': "
-                    f"length {ugridsize} in UGRID topology and "
-                    f"length {objsize} in xarray dimension"
-                )
-        return True
-    else:
-        return False
+    def to_xarray(self):
+        return self.obj
 
 
-def maybe_xugrid(obj, topology):
+def maybe_xugrid(obj, topology, old_indexes=None):
+    if not isinstance(obj, (xr.DataArray, xr.Dataset)):
+        return obj
+
     # Topology can either be a sequence of grids or a grid.
     if isinstance(topology, (list, set, tuple)):
         grids = {dim: grid for grid in topology for dim in grid.dimensions}
     else:
         grids = {dim: topology for dim in topology.dimensions}
+
     item_grids = list(set(grids[dim] for dim in obj.dims if dim in grids))
 
-    if isinstance(obj, xr.DataArray):
-        if len(item_grids) == 0:
-            return obj
-        if len(item_grids) > 1:
-            raise RuntimeError("This shouldn't happen. Please open an issue.")
-        grid = item_grids[0]
-        if ugrid_aligns(obj, grid):
-            return UgridDataArray(obj, grid)
+    if len(item_grids) == 0:
+        return obj
+    else:
+        result, aligned = align(obj, item_grids, old_indexes)
 
-    elif isinstance(obj, xr.Dataset):
-        if ugrid_aligns(obj, item_grids):
-            return UgridDataset(obj, grid)
+        if isinstance(result, xr.DataArray):
+            if len(aligned) > 1:
+                raise RuntimeError("This shouldn't happen. Please open an issue.")
+            return UgridDataArray(result, aligned[0])
 
-    return obj
+        elif isinstance(result, xr.Dataset):
+            return UgridDataset(result, aligned)
 
 
 def maybe_xarray(arg):
@@ -88,8 +74,10 @@ def wraps_xarray(method):
         result = method(*args, **kwargs)
 
         # Sidestep staticmethods, classmethods
-        if isinstance(self, (UgridDataArray, UgridDataset)):
-            return maybe_xugrid(result, self.grids)
+        if isinstance(self, UgridDataArray):
+            return maybe_xugrid(result, [self.grid], self.obj.indexes)
+        elif isinstance(self, UgridDataset):
+            return maybe_xugrid(result, self.grids, self.obj.indexes)
         else:
             return result
 
@@ -185,8 +173,27 @@ class UgridDataArray(DataArrayForwardMixin):
                 "grid must be Ugrid1d or Ugrid2d. Received instead: "
                 f"{type(grid).__name__}"
             )
+
+        ugrid_dimensions = set(grid.dimensions).intersection(obj.dims)
+        ugrid_coords = {
+            dim: np.arange(0, grid.dimensions[dim], dtype=int)
+            for dim in ugrid_dimensions
+        }
+        obj = obj.drop_vars(ugrid_dimensions, errors="ignore").assign_coords(
+            ugrid_coords
+        )
+
         self.grid = grid
         self.obj = obj
+
+    def __getattr__(self, attr):
+        if attr == "obj":
+            return self.obj
+        elif attr == "grid":
+            return self.grid
+
+        result = getattr(self.obj, attr)
+        return maybe_xugrid(result, [self.grid])
 
     @property
     def ugrid(self):
@@ -194,7 +201,7 @@ class UgridDataArray(DataArrayForwardMixin):
         UGRID Accessor. This "accessor" makes operations using the UGRID
         topology available.
         """
-        return xugrid.accessor.dataarray_accessor.UgridDataArrayAccessor(
+        return xugrid.core.dataarray_accessor.UgridDataArrayAccessor(
             self.obj, self.grid
         )
 
@@ -269,8 +276,29 @@ class UgridDataset(DatasetForwardMixin):
                         f"Received instead: {type(grid).__name__}"
                     )
 
+        # Set index coordinates for UGRID topology dims (nodes, edges, faces).
+        grid_dimensions = ChainMap(*(grid.dimensions for grid in grids))
+        ugrid_dimensions = set(grid_dimensions.keys()).intersection(ds.dims)
+        ugrid_coords = {
+            dim: np.arange(0, grid_dimensions[dim], dtype=int)
+            for dim in ugrid_dimensions
+        }
+        obj = obj.drop_vars(ugrid_dimensions, errors="ignore").assign_coords(
+            ugrid_coords
+        )
+        ds = ds.assign_coords(ugrid_coords)
+
         self.grids = grids
         self.obj = ds
+
+    def __getattr__(self, attr):
+        if attr == "obj":
+            return self.obj
+        elif attr == "grid":
+            return self.grid
+
+        result = getattr(self.obj, attr)
+        return maybe_xugrid(result, self.grids)
 
     @property
     def ugrid(self):
@@ -278,6 +306,4 @@ class UgridDataset(DatasetForwardMixin):
         UGRID Accessor. This "accessor" makes operations using the UGRID
         topology available.
         """
-        return xugrid.accessor.dataset_accessor.UgridDatasetAccessor(
-            self.obj, self.grids
-        )
+        return xugrid.core.dataset_accessor.UgridDatasetAccessor(self.obj, self.grids)

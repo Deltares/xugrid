@@ -1,5 +1,6 @@
 import abc
 import copy
+from itertools import chain
 from typing import Tuple, Type, Union
 
 import numpy as np
@@ -9,6 +10,70 @@ from scipy.sparse import csr_matrix
 
 from xugrid.constants import BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
+
+
+def as_pandas_index(index, n: int):
+    if isinstance(index, np.ndarray):
+        if index.size > n:
+            raise ValueError(
+                f"index size {index.size} is larger than dimension size: {n}"
+            )
+        if np.issubdtype(index.dtype, np.bool_):
+            pd_index = np.arange(np.arange(n)[index])
+        elif np.issubdtype(index.dtype, np.integer):
+            pd_index = pd.Index(index)
+        else:
+            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
+
+    elif isinstance(index, pd.Index):
+        pd_index = index
+
+    else:
+        raise TypeError(
+            "index should be pandas Index or numpy array. Received: "
+            f"{type(index).__name__}"
+        )
+
+    if not pd_index.is_unique:
+        raise ValueError(
+            "index contains repeated values; only subsets will result "
+            "in valid UGRID topology."
+        )
+    if not pd_index.is_monotonic_increasing:
+        raise NotImplementedError("UGRID indexes must be sorted and unique.")
+
+    return pd_index
+
+
+def align(obj, grids, old_indexes):
+    """
+    Check which indexes have changed. Index on those new values.
+    If none are changed, return (obj, grids) as is.
+    """
+    if old_indexes is None:
+        return obj, grids
+
+    ugrid_dims = set(chain.from_iterable(grid.dimensions for grid in grids))
+    new_indexes = {
+        k: index
+        for k, index in obj.indexes.items()
+        if (k in ugrid_dims) and (not index.equals(old_indexes[k]))
+    }
+    if not new_indexes:
+        return obj, grids
+
+    # Group the indexers by grid
+    new_grids = []
+    for grid in grids:
+        ugrid_dims = set(grid.dimensions).intersection(new_indexes)
+        ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
+        newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
+        indexers = {
+            k: v for k, v in indexers.items() if k in obj.dims and k not in new_indexes
+        }
+        obj = obj.isel(indexers)
+        new_grids.append(newgrid)
+    return obj, new_grids
 
 
 class AbstractUgrid(abc.ABC):
