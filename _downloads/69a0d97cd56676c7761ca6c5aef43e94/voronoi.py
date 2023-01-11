@@ -28,7 +28,7 @@ from matplotlib.collections import LineCollection, PolyCollection
 # From xugrid, we need only import the ``connectivity`` and ``voronoi``
 # modules. The functions in these modules depend only on ``numpy`` and
 # ``scipy.sparse``.
-from xugrid import connectivity, voronoi
+from xugrid.ugrid import connectivity, voronoi
 
 
 def generate_disk(partitions: int, depth: int):

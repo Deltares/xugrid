@@ -410,11 +410,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="xugrid.UgridDatasetAccessor.isel.html">
-   xugrid.UgridDatasetAccessor.isel
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="xugrid.UgridDatasetAccessor.sel.html">
    xugrid.UgridDatasetAccessor.sel
   </a>
@@ -492,11 +487,6 @@
  <li class="toctree-l1">
   <a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_crs.html">
    xugrid.UgridDataArrayAccessor.to_crs
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="xugrid.UgridDataArrayAccessor.isel.html">
-   xugrid.UgridDataArrayAccessor.isel
   </a>
  </li>
  <li class="toctree-l1">
@@ -1119,11 +1109,10 @@
 <h1>xugrid.UgridDataArray<a class="headerlink" href="#xugrid-ugriddataarray" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="xugrid.UgridDataArray">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">UgridDataArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">AbstractUgrid</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid_dataset.html#UgridDataArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray" title="Permalink to this definition">#</a></dt>
-<dd><p>Wraps an xarray DataArray, adding UGRID topology.</p>
-<dl class="py method">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">UgridDataArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">AbstractUgrid</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/core/wrap.html#UgridDataArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py method">
 <dt class="sig sig-object py" id="xugrid.UgridDataArray.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">AbstractUgrid</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid_dataset.html#UgridDataArray.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">AbstractUgrid</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/core/wrap.html#UgridDataArray.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -1132,28 +1121,454 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#xugrid.UgridDataArray.__init__" title="xugrid.UgridDataArray.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(obj, grid)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code>([dim, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">all</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">any</span></code>([dim, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">any</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">argmax</span></code>([dim, axis, keep_attrs, skipna])</p></td>
+<td><p>Index or indices of the maximum of the DataArray over one or more dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">argmin</span></code>([dim, axis, keep_attrs, skipna])</p></td>
+<td><p>Index or indices of the minimum of the DataArray over one or more dimensions.</p></td>
+</tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">argsort</span></code>([axis, kind, order])</p></td>
 <td><p>Returns the indices that would sort this array.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conj</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_numpy</span></code>()</p></td>
+<td><p>Coerces wrapped data and coordinates into numpy arrays, returning a DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_attrs</span></code>(*args, **kwargs)</p></td>
+<td><p>Assign new attrs to this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assign_coords</span></code>([coords])</p></td>
+<td><p>Assign new coordinates to this object.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">astype</span></code>(dtype, *[, order, casting, subok, ...])</p></td>
+<td><p>Copy of the xarray object, with data cast to a specified type.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bfill</span></code>(dim[, limit])</p></td>
+<td><p>Fill NaN values by propagating values backward</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">broadcast_equals</span></code>(other)</p></td>
+<td><p>Two DataArrays are broadcast equal if they are equal after broadcasting them against each other such that they have the same dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">broadcast_like</span></code>(other[, exclude])</p></td>
+<td><p>Broadcast this DataArray against another Dataset or DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunk</span></code>([chunks, name_prefix, token, lock, ...])</p></td>
+<td><p>Coerce this array's data into a dask arrays with the given chunks.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clip</span></code>([min, max, keep_attrs])</p></td>
+<td><p>Return an array whose values are limited to <code class="docutils literal notranslate"><span class="pre">[min,</span> <span class="pre">max]</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code>()</p></td>
+<td><p>Release any resources linked to this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">coarsen</span></code>([dim, boundary, side, coord_func])</p></td>
+<td><p>Coarsen object for DataArrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">combine_first</span></code>(other)</p></td>
+<td><p>Combine two DataArray objects, with union of coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute</span></code>(**kwargs)</p></td>
+<td><p>Manually trigger loading of this array's data from disk or a remote source into memory and return a new array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conj</span></code>()</p></td>
 <td><p>Complex-conjugate all elements.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conjugate</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conjugate</span></code>()</p></td>
 <td><p>Return the complex conjugate, element-wise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_calendar</span></code>(calendar[, dim, align_on, ...])</p></td>
+<td><p>Convert the DataArray to another calendar.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>([deep, data])</p></td>
+<td><p>Returns a copy of this array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>([dim, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">count</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumprod</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">cumprod</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumsum</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">cumsum</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cumulative_integrate</span></code>([coord, datetime_unit])</p></td>
+<td><p>Integrate cumulatively along the given coordinate using the trapezoidal rule.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">curvefit</span></code>(coords, func[, reduce_dims, ...])</p></td>
+<td><p>Curve fitting optimization for arbitrary functions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">diff</span></code>(dim[, n, label])</p></td>
+<td><p>Calculate the n-th order discrete difference along given axis.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">differentiate</span></code>(coord[, edge_order, datetime_unit])</p></td>
+<td><p>Differentiate the array with the second order accurate central differences.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dot</span></code>(other[, dims])</p></td>
+<td><p>Perform dot product of two DataArrays along their shared dims.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop</span></code>([labels, dim, errors])</p></td>
+<td><p>Backward compatible method based on <cite>drop_vars</cite> and <cite>drop_sel</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_duplicates</span></code>(dim[, keep])</p></td>
+<td><p>Returns a new DataArray with duplicate dimension values removed.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_indexes</span></code>(coord_names, *[, errors])</p></td>
+<td><p>Drop the indexes assigned to the given coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_isel</span></code>([indexers])</p></td>
+<td><p>Drop index positions from this DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_sel</span></code>([labels, errors])</p></td>
+<td><p>Drop index labels from this DataArray.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_vars</span></code>(names, *[, errors])</p></td>
+<td><p>Returns an array with dropped variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropna</span></code>(dim[, how, thresh])</p></td>
+<td><p>Returns a new array with dropped labels for missing values along the provided dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equals</span></code>(other)</p></td>
+<td><p>True if two DataArrays have the same dimensions, coordinates and values; otherwise False.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_dims</span></code>([dim, axis])</p></td>
+<td><p>Return a new object with an additional axis (or axes) inserted at the corresponding position in the array shape.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ffill</span></code>(dim[, limit])</p></td>
+<td><p>Fill NaN values by propagating values forward</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fillna</span></code>(value)</p></td>
+<td><p>Fill missing values in this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_cdms2</span></code>()</p></td>
+<td><p>Convert a cdms2.Variable into an xarray.DataArray</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>()</p></td>
+<td><p>Convert a dictionary into an xarray.DataArray</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_iris</span></code>()</p></td>
+<td><p>Convert a iris.cube.Cube into an xarray.DataArray</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_series</span></code>([sparse])</p></td>
+<td><p>Convert a pandas.Series into an xarray.DataArray.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured" title="xugrid.UgridDataArray.from_structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structured</span></code></a>(da)</p></td>
 <td><p>Create a UgridDataArray from a (structured) xarray DataArray.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_axis_num</span></code>(dim)</p></td>
+<td><p>Return axis number(s) corresponding to dimension(s) in this array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_index</span></code>(key)</p></td>
+<td><p>Get an index for a dimension, with fall-back to a default RangeIndex</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby</span></code>(group[, squeeze, restore_coord_dims])</p></td>
+<td><p>Returns a DataArrayGroupBy object for performing grouped operations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby_bins</span></code>(group, bins[, right, labels, ...])</p></td>
+<td><p>Returns a DataArrayGroupBy object for performing grouped operations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">head</span></code>([indexers])</p></td>
+<td><p>Return a new DataArray whose data is given by the the first <cite>n</cite> values along the specified dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">identical</span></code>(other)</p></td>
+<td><p>Like equals, but also checks the array name and attributes, and attributes on all coordinates.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmax</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
+<td><p>Return the coordinate label of the maximum value along a dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmin</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
+<td><p>Return the coordinate label of the minimum value along a dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code>([coord, datetime_unit])</p></td>
+<td><p>Integrate along the given coordinate using the trapezoidal rule.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([coords, method, assume_sorted, kwargs])</p></td>
+<td><p>Interpolate a DataArray onto new coordinates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_calendar</span></code>(target[, dim])</p></td>
+<td><p>Interpolates the DataArray to another calendar based on decimal year measure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_like</span></code>(other[, method, assume_sorted, ...])</p></td>
+<td><p>Interpolate this object onto the coordinates of another object, filling out of range values with NaN.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_na</span></code>([dim, method, limit, ...])</p></td>
+<td><p>Fill in NaNs by interpolating according to different methods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>([indexers, drop, missing_dims])</p></td>
+<td><p>Return a new DataArray whose data is given by selecting indexes along the specified dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isin</span></code>(test_elements)</p></td>
+<td><p>Tests each value in the array for whether it is in test elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isnull</span></code>([keep_attrs])</p></td>
+<td><p>Test each value in the array for whether it is a missing value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">item</span></code>(*args)</p></td>
+<td><p>Copy an element of an array to a standard Python scalar and return it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code>(**kwargs)</p></td>
+<td><p>Manually trigger loading of this array's data from disk or a remote source into memory and return this array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_blocks</span></code>(func[, args, kwargs, template])</p></td>
+<td><p>Apply a function to each block of this DataArray.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">max</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">mean</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">median</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">median</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code>([dim, skipna, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">min</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">notnull</span></code>([keep_attrs])</p></td>
+<td><p>Test each value in the array for whether it is not a missing value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code>([pad_width, mode, stat_length, ...])</p></td>
+<td><p>Pad this array along one or more dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">persist</span></code>(**kwargs)</p></td>
+<td><p>Trigger computation in constituent dask arrays</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipe</span></code>(func, *args, **kwargs)</p></td>
+<td><p>Apply <code class="docutils literal notranslate"><span class="pre">func(self,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">polyfit</span></code>(dim, deg[, skipna, rcond, w, full, cov])</p></td>
+<td><p>Least squares polynomial fit.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prod</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">prod</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantile</span></code>(q[, dim, method, keep_attrs, ...])</p></td>
+<td><p>Compute the qth quantile of the data along the specified dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code>([queries, parser, engine, missing_dims])</p></td>
+<td><p>Return a new data array indexed along the specified dimension(s), where the indexers are given as strings containing Python expressions to be evaluated against the values in the array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span></code>(dim[, pct, keep_attrs])</p></td>
+<td><p>Ranks the data.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce</span></code>(func[, dim, axis, keep_attrs, keepdims])</p></td>
+<td><p>Reduce this array by applying <cite>func</cite> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex</span></code>([indexers, method, tolerance, copy, ...])</p></td>
+<td><p>Conform this object onto the indexes of another object, filling in missing values with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex_like</span></code>(other[, method, tolerance, ...])</p></td>
+<td><p>Conform this object onto the indexes of another object, filling in missing values with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>([new_name_or_name_dict])</p></td>
+<td><p>Returns a new DataArray with renamed coordinates, dimensions or a new name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder_levels</span></code>([dim_order])</p></td>
+<td><p>Rearrange index levels using input order.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code>([indexer, skipna, closed, label, ...])</p></td>
+<td><p>Returns a Resample object for performing resampling operations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_coords</span></code>([names, drop])</p></td>
+<td><p>Given names of coordinates, reset them to become variables.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_index</span></code>(dims_or_levels[, drop])</p></td>
+<td><p>Reset the specified index(es) or multi-index level(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">roll</span></code>([shifts, roll_coords])</p></td>
+<td><p>Roll this array by an offset along one or more dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling</span></code>([dim, min_periods, center])</p></td>
+<td><p>Rolling window object for DataArrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_exp</span></code>([window, window_type])</p></td>
+<td><p>Exponentially-weighted moving window.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>(*args, **kwargs)</p></td>
 <td><p>Evenly round to the given number of decimals.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">searchsorted</span></code>(v[, side, sorter])</p></td>
+<td><p>Find indices where elements of v should be inserted in a to maintain order.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>([indexers, method, tolerance, drop])</p></td>
+<td><p>Return a new DataArray whose data is given by selecting index labels along the specified dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_close</span></code>(close)</p></td>
+<td><p>Register the function that releases any resources linked to this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_index</span></code>([indexes, append])</p></td>
+<td><p>Set DataArray (multi-)indexes using one or more existing coordinates.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_xindex</span></code>(coord_names[, index_cls])</p></td>
+<td><p>Set a new, Xarray-compatible index from one or more existing coordinate(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code>([shifts, fill_value])</p></td>
+<td><p>Shift this DataArray by an offset along one or more dimensions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortby</span></code>(variables[, ascending])</p></td>
+<td><p>Sort object by labels or values (along an axis).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">squeeze</span></code>([dim, drop, axis])</p></td>
+<td><p>Return a new object with squeezed data.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stack</span></code>([dimensions, create_index, index_cls])</p></td>
+<td><p>Stack any number of existing dimensions into a single new dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">std</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">std</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">sum</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_dims</span></code>([dims_dict])</p></td>
+<td><p>Returns a new DataArray with swapped dimensions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tail</span></code>([indexers])</p></td>
+<td><p>Return a new DataArray whose data is given by the the last <cite>n</cite> values along the specified dimension(s).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">thin</span></code>([indexers])</p></td>
+<td><p>Return a new DataArray whose data is given by each <cite>n</cite> value along the specified dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_cdms2</span></code>()</p></td>
+<td><p>Convert this array into a cdms2.Variable</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([name, dim_order])</p></td>
+<td><p>Convert this array and its coordinates into a tidy pandas.DataFrame.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>([dim, name, promote_attrs])</p></td>
+<td><p>Convert a DataArray to a Dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([data, encoding])</p></td>
+<td><p>Convert this xarray.DataArray into a dictionary following xarray naming conventions.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_index</span></code>()</p></td>
+<td><p>Convert this variable to a pandas.Index.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_iris</span></code>()</p></td>
+<td><p>Convert this array into a iris.cube.Cube</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_masked_array</span></code>([copy])</p></td>
+<td><p>Convert this array into a numpy.ma.MaskedArray</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>([path, mode, format, group, ...])</p></td>
+<td><p>Write dataset contents to a netCDF file.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_numpy</span></code>()</p></td>
+<td><p>Coerces wrapped data to numpy and returns a numpy.ndarray.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>()</p></td>
+<td><p>Convert this array into a pandas object with the same shape.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_series</span></code>()</p></td>
+<td><p>Convert this array into a pandas.Series.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_unstacked_dataset</span></code>(dim[, level])</p></td>
+<td><p>Unstack DataArray expanding to Dataset along a given level of a stacked coordinate.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(*dims[, transpose_coords, ...])</p></td>
+<td><p>Return a new DataArray object with transposed dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unify_chunks</span></code>()</p></td>
+<td><p>Unify chunk size along all chunked dimensions of this DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstack</span></code>([dim, fill_value, sparse])</p></td>
+<td><p>Unstack existing dimensions corresponding to MultiIndexes into multiple new dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
+<td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">var</span></code> along some dimension(s).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted</span></code>(weights)</p></td>
+<td><p>Weighted DataArray operations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">where</span></code>(cond[, other, drop])</p></td>
+<td><p>Filter elements from this object according to a condition.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">attrs</span></code></p></td>
+<td><p>Dictionary storing arbitrary metadata with this array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunks</span></code></p></td>
+<td><p>Tuple of block lengths for this dataarray's data, in order of dimensions, or None if the underlying data is not a dask array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunksizes</span></code></p></td>
+<td><p>Mapping from dimension names to block lengths for this dataarray's data, or None if the underlying data is not a dask array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">coords</span></code></p></td>
+<td><p>Dictionary-like container of coordinate arrays.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></p></td>
+<td><p>The DataArray's data as an array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dims</span></code></p></td>
+<td><p>Tuple of dimension names associated with this array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtype</span></code></p></td>
+<td><p>Data-type of the array’s elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">encoding</span></code></p></td>
+<td><p>Dictionary of format-specific settings for how this array should be serialized.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">imag</span></code></p></td>
+<td><p>The imaginary part of the array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">indexes</span></code></p></td>
+<td><p>Mapping of pandas.Index objects used for label based indexing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">loc</span></code></p></td>
+<td><p>Attribute for location based indexing like pandas.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>The name of this array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nbytes</span></code></p></td>
+<td><p>Total bytes consumed by the elements of this DataArray's data.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndim</span></code></p></td>
+<td><p>Number of array dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></p></td>
+<td><p>Default plot of DataArray using <code class="xref py py-mod docutils literal notranslate"><span class="pre">matplotlib:matplotlib.pyplot</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">real</span></code></p></td>
+<td><p>The real part of the array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></p></td>
+<td><p>Tuple of array dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">size</span></code></p></td>
+<td><p>Number of elements in the array.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sizes</span></code></p></td>
+<td><p>Ordered mapping from dimension names to lengths.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArray.ugrid.html#xugrid.UgridDataArray.ugrid" title="xugrid.UgridDataArray.ugrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ugrid</span></code></a></p></td>
 <td><p>UGRID Accessor.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></p></td>
+<td><p>The array's data as a numpy.ndarray.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">variable</span></code></p></td>
+<td><p>Low level interface to the Variable object for this DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">xindexes</span></code></p></td>
+<td><p>Mapping of xarray Index objects used for label based indexing.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1272,7 +1687,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.0.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.2.<br>
 </p>
 
   </div>
