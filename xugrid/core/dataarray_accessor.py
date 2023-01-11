@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Union
 import numpy as np
 import scipy.sparse
 import xarray as xr
-from xarray.core.utils import UncachedAccessor, either_dict_or_kwargs
+from xarray.core.utils import UncachedAccessor
 
 # from .plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
@@ -97,37 +97,6 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         self.grid.set_node_coords(node_x, node_y, self.obj)
 
-    def isel(self, indexers, **indexers_kwargs):
-        """
-        Returns a new object with arrays indexed along edges or faces.
-
-        Parameters
-        ----------
-        indexer: 1d array of integer or bool
-
-        Returns
-        -------
-        indexed: Union[UgridDataArray, UgridDataset]
-        """
-        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
-        dims = self.grid.dimensions
-        invalid = indexers.keys() - set(dims)
-        if invalid:
-            raise ValueError(
-                f"Dimensions {invalid} do not exist. Expected one of {dims}"
-            )
-
-        if len(indexers) > 1:
-            raise NotImplementedError("Can only index a single dimension at a time")
-        dim, indexer = next(iter(indexers.items()))
-
-        result = self.obj.isel({dim: indexer})
-        grid = self.grid.isel(dim, indexer)
-        if isinstance(self.obj, xr.DataArray):
-            return UgridDataArray(result, grid)
-        else:
-            raise TypeError(f"Expected UgridDataArray, got {type(result).__name__}")
-
     def sel(self, x=None, y=None):
         """
         Returns a new object, a subselection in the UGRID x and y coordinates.
@@ -172,7 +141,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         points: Union[xr.DataArray, xr.Dataset]
         """
-        return self._sel_points(self.obj, self.grid, x, y)
+        return self.grid.sel_points(self.obj, x, y)
 
     def _raster(self, x, y, index) -> xr.DataArray:
         index = index.ravel()

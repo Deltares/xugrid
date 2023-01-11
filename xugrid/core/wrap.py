@@ -4,7 +4,6 @@ Wrap in advance instead of overloading __getattr__.
 This allows for tab completion and documentation.
 """
 
-import abc
 import types
 from collections import ChainMap
 from functools import wraps
@@ -15,22 +14,13 @@ import xarray as xr
 from pandas import RangeIndex
 
 import xugrid
-from xugrid.conversion import grid_from_dataset
+from xugrid.conversion import grid_from_dataset, grid_from_geodataframe
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType, align
 
 # Import entire module here for circular import of UgridDatasetAccessor and
 # UgridDataArrayAccessor. Note: can only be used in functions (since that code
 # is run at runtime).
-
-
-class AbstractForwardMixin(abc.ABC):
-    """
-    Serves as a common identifier for UgridDataset, UgridDataArray.
-    """
-
-    def to_xarray(self):
-        return self.obj
 
 
 def maybe_xugrid(obj, topology, old_indexes=None):
@@ -173,7 +163,7 @@ def wrap(
     return
 
 
-class DataArrayForwardMixin(AbstractForwardMixin):
+class DataArrayForwardMixin:
 
     wrap(
         target_class_dict=vars(),
@@ -181,7 +171,7 @@ class DataArrayForwardMixin(AbstractForwardMixin):
     )
 
 
-class DatasetForwardMixin(AbstractForwardMixin):
+class DatasetForwardMixin:
 
     wrap(
         target_class_dict=vars(),
@@ -359,3 +349,18 @@ class UgridDataset(DatasetForwardMixin):
                 self._grids.append(value.grid)
         else:
             self.obj[key] = value
+
+    @staticmethod
+    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
+        """
+        Convert a geodataframe into the appropriate Ugrid topology and dataset.
+        Parameters
+        ----------
+        geodataframe: gpd.GeoDataFrame
+        Returns
+        -------
+        dataset: UGridDataset
+        """
+        grid = grid_from_geodataframe(geodataframe)
+        ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1))
+        return UgridDataset(ds, [grid])

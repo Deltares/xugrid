@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy import sparse
 
-from xugrid import interpolate
+from xugrid.ugrid import interpolate
 
 
 def test_laplace_interpolate():

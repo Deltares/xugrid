@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from xugrid import connectivity, voronoi
+from xugrid.ugrid import connectivity, voronoi
 
 
 def rowsort(a):

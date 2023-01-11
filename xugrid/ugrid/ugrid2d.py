@@ -315,6 +315,10 @@ class Ugrid2d(AbstractUgrid):
         return self.face_node_connectivity.shape[0]
 
     @property
+    def core_dimension(self):
+        return self.face_dimension
+
+    @property
     def dimensions(self):
         return {
             self.node_dimension: self.n_node,
@@ -791,7 +795,7 @@ class Ugrid2d(AbstractUgrid):
         self, face_index: Union[BoolArray, IntArray], return_index: bool = False
     ):
         """
-        Create a new (valid) UGRID1D topology for a subset of this topology.
+        Create a new UGRID1D topology for a subset of this topology.
 
         Parameters
         ----------
@@ -803,9 +807,13 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         subset: Ugrid2d
+        indexes: dict
+            Dictionary with keys node dimension, edge dimension, face dimension
+            and values their respective index. Only returned if return_index is
+            True.
         """
         if not isinstance(face_index, pd.Index):
-            face_index = as_pandas_index(face_index)
+            face_index = as_pandas_index(face_index, self.n_face)
 
         # The pandas index may only contain uniques. So if size matches, it's the identity.
         if face_index.size == self.n_face:
@@ -879,15 +887,18 @@ class Ugrid2d(AbstractUgrid):
 
         Parameters
         ----------
-        indexer: str
-            One of the grid's node, edge, or face dimensions.
-        indexer: np.ndarray of integers or bools
-        obj: xr.Dataset or xr.DataArray
+        indexers: dict of str to np.ndarray of integers or bools
+        return_index: bool, optional
+            Whether to return node_index, edge_index, face_index.
 
         Returns
         -------
         obj: xr.Dataset or xr.DataArray
         grid: Ugrid2d
+        indexes: dict
+            Dictionary with keys node dimension, edge dimension, face dimension
+            and values their respective index. Only returned if return_index is
+            True.
         """
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
         alldims = set(self.dimensions)
@@ -918,23 +929,9 @@ class Ugrid2d(AbstractUgrid):
         face_index = {k: as_pandas_index(v, self.n_face) for k, v in face_index.items()}
 
         # Check the indexes against each other.
-        dim, index = face_index.popitem()
-        for check_dim, check_index in face_index.items():
-            if not index.equals(check_index):
-                raise ValueError(
-                    f"UGRID dimensions do not align: {dim} versus {check_dim}"
-                )
-
+        index = self._precheck(face_index)
         grid, finalized_indexers = self.topology_subset(index, return_index=True)
-
-        # Now check whether the original indexers resulted in a valid topology.
-        for dim, indexer in indexers.items():
-            if dim != facedim:
-                if not indexer.equals(finalized_indexers[dim]):
-                    raise ValueError(
-                        f"This subset selection of UGRID dimension {dim} results"
-                        "in an invalid topology "
-                    )
+        self._postcheck(indexers, finalized_indexers)
 
         if return_index:
             return grid, finalized_indexers
@@ -975,9 +972,9 @@ class Ugrid2d(AbstractUgrid):
 
     def _sel_box(
         self,
+        obj,
         x,
         y,
-        obj,
     ):
         xmin, ymin, xmax, ymax = self.bounds
         bounds = [
@@ -988,15 +985,15 @@ class Ugrid2d(AbstractUgrid):
         ]
         face_index = self.locate_bounding_box(*bounds)
         grid, indexes = self.topology_subset(face_index, return_index=True)
-        indexes = {k: v for k, v in indexes if k in obj.dims}
+        indexes = {k: v for k, v in indexes.items() if k in obj.dims}
         new_obj = obj.isel(indexes)
         return new_obj, grid
 
     def _sel_yline(
         self,
+        obj,
         x,
         y,
-        obj,
     ):
         xmin, _, xmax, _ = self.bounds
         if y.size != 1:
@@ -1013,9 +1010,9 @@ class Ugrid2d(AbstractUgrid):
 
     def _sel_xline(
         self,
+        obj,
         x,
         y,
-        obj,
     ):
         _, ymin, _, ymax = self.bounds
         if x.size != 1:
@@ -1030,7 +1027,7 @@ class Ugrid2d(AbstractUgrid):
         coords, index = section_coordinates(edges, xy, self.face_dimension, index)
         return obj.isel({self.face_dimension: index}).assign_coords(coords)
 
-    def _sel_points(self, x: FloatArray, y: FloatArray, obj):
+    def sel_points(self, obj, x: FloatArray, y: FloatArray):
         """
         Select points in the unstructured grid.
 
@@ -1038,13 +1035,11 @@ class Ugrid2d(AbstractUgrid):
         ----------
         x: 1d array of floats with shape ``(n_points,)``
         y: 1d array of floats with shape ``(n_points,)``
+        obj: xr.DataArray or xr.Dataset
 
         Returns
         -------
-        dimension: str
-        as_ugrid: bool
-        index: 1d array of integers
-        coords: dict
+        selection: xr.DataArray or xr.Dataset
         """
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
@@ -1094,19 +1089,20 @@ class Ugrid2d(AbstractUgrid):
         x = self._validate_indexer(x)
         y = self._validate_indexer(y)
         if isinstance(x, slice) and isinstance(y, slice):
-            return self._sel_box(x, y, obj)
+            f = self._sel_box
         elif isinstance(x, slice) and isinstance(y, np.ndarray):
-            return self._sel_yline(x, y, obj)
+            f = self._sel_yline
         elif isinstance(x, np.ndarray) and isinstance(y, slice):
-            return self._sel_xline(x, y, obj)
+            f = self._sel_xline
         elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
             # Orthogonal points
-            yy, xx = np.meshgrid(y, x, indexing="ij")
-            return self.sel_points(xx.ravel(), yy.ravel())
+            y, x = [a.ravel() for a in np.meshgrid(y, x, indexing="ij")]
+            f = self.sel_points
         else:
             raise TypeError(
                 f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
             )
+        return f(obj, x, y)
 
     def triangulate(self):
         """

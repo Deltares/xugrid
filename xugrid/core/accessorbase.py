@@ -47,26 +47,6 @@ class AbstractUgridAccessor(abc.ABC):
         else:
             return result
 
-    @staticmethod
-    def _sel_points(obj, grid, x, y):
-        """
-        Select points in the unstructured grid.
-
-        Parameters
-        ----------
-        x: ndarray of floats with shape ``(n_points,)``
-        y: ndarray of floats with shape ``(n_points,)``
-
-        Returns
-        -------
-        points: Union[xr.DataArray, xr.Dataset]
-        """
-        if grid.topology_dimension != 2:
-            raise NotImplementedError
-        dim, _, index, coords = grid.sel_points(x, y)
-        result = obj.isel({dim: index})
-        return result.assign_coords(coords)
-
     def clip_box(
         self,
         xmin: float,

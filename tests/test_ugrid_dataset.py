@@ -92,6 +92,7 @@ class TestUgridDataArray:
     def test_init(self):
         assert isinstance(self.uda.ugrid.obj, xr.DataArray)
         assert isinstance(self.uda.ugrid.grid, xugrid.Ugrid2d)
+        assert self.uda.grid.face_dimension in self.uda.coords
 
     def test_reinit_error(self):
         # Should not be able to initialize using a UgridDataArray.
@@ -114,12 +115,12 @@ class TestUgridDataArray:
         assert self.uda.dims == self.uda.ugrid.obj.dims
         assert isinstance(self.uda.data, np.ndarray)
         # So are functions
-        assert isinstance(self.uda.mean(), xugrid.UgridDataArray)
+        assert isinstance(self.uda.isnull(), xugrid.UgridDataArray)
         # obj should be accessible
         assert isinstance(self.uda.obj, xr.DataArray)
 
     def test_ugrid_accessor(self):
-        assert isinstance(self.uda.ugrid, xugrid.ugrid_dataset.UgridDataArrayAccessor)
+        assert isinstance(self.uda.ugrid, xugrid.UgridDataArrayAccessor)
 
     def test_from_structured(self):
         da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
@@ -137,7 +138,6 @@ class TestUgridDataArray:
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
-        assert uda.ugrid.grid.face_dimension not in uda.coords
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
         # Check whether flipping the y-axis doesn't cause any problems
         flipped = da.isel(y=slice(None, None, -1))
@@ -174,7 +174,7 @@ class TestUgridDataArray:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uda.ugrid.isel({GRID().face_dimension: [0, 1]})
+        actual = self.uda.isel({GRID().face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataArray)
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
@@ -248,7 +248,7 @@ class TestUgridDataArray:
             self.uda.ugrid.to_geodataframe()
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
-        gdf = uda2.ugrid.to_geodataframe("mesh2d_nFaces")
+        gdf = uda2.ugrid.to_geodataframe("mesh2d")
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
 
@@ -373,7 +373,7 @@ class TestUgridDataset:
     def test_getattr(self):
         assert tuple(self.uds.dims) == ("mesh2d_nFaces",)
         assert isinstance(self.uds.a, xugrid.UgridDataArray)
-        assert isinstance(self.uds.mean(), xugrid.UgridDataset)
+        assert isinstance(self.uds.notnull(), xugrid.UgridDataset)
         # obj should be accessible
         assert isinstance(self.uds.obj, xr.Dataset)
 
@@ -393,7 +393,7 @@ class TestUgridDataset:
         assert isinstance(actual, xugrid.UgridDataset)
 
     def test_ugrid_accessor(self):
-        assert isinstance(self.uds.ugrid, xugrid.ugrid_dataset.UgridDatasetAccessor)
+        assert isinstance(self.uds.ugrid, xugrid.UgridDatasetAccessor)
 
     def test_from_geodataframe(self):
         xy = np.array(
@@ -414,7 +414,7 @@ class TestUgridDataset:
 
     # Accessor tests
     def test_isel(self):
-        actual = self.uds.ugrid.isel({GRID().face_dimension: [0, 1]})
+        actual = self.uds.isel({GRID().face_dimension: [0, 1]})
         assert isinstance(actual, xugrid.UgridDataset)
         assert actual.ugrid.grids[0].n_face == 2
         assert actual["a"].shape == (2,)

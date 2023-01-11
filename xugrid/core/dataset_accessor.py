@@ -1,10 +1,8 @@
-from itertools import chain
 from typing import Dict, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import either_dict_or_kwargs
 
 # from .plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
@@ -134,42 +132,6 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         grid.set_node_coords(node_x, node_y, self.obj)
 
-    def isel(self, indexers, **indexers_kwargs):
-        """
-        Returns a new object with arrays indexed along edges or faces.
-
-        Parameters
-        ----------
-        indexer: 1d array of integer or bool
-
-        Returns
-        -------
-        indexed: Union[UgridDataArray, UgridDataset]
-        """
-        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
-        alldims = set(chain.from_iterable([grid.dimensions for grid in self.grids]))
-        invalid = indexers.keys() - alldims
-        if invalid:
-            raise ValueError(
-                f"Dimensions {invalid} do not exist. Expected one of {alldims}"
-            )
-
-        if len(indexers) > 1:
-            raise NotImplementedError("Can only index a single dimension at a time")
-        dim, indexer = next(iter(indexers.items()))
-
-        # Find grid to use for selection
-        grids = [
-            grid.isel(dim, indexer) if dim in grid.dimensions else grid
-            for grid in self.grids
-        ]
-        result = self.obj.isel({dim: indexer})
-
-        if isinstance(self.obj, xr.Dataset):
-            return UgridDataset(result, grids)
-        else:
-            raise TypeError(f"Expected UgridDataset, got {type(result).__name__}")
-
     def sel(self, x=None, y=None):
         result = self.obj
         for grid in self.grids:
@@ -177,9 +139,21 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         return result
 
     def sel_points(self, x, y):
+        """
+        Select points in the unstructured grid.
+
+        Parameters
+        ----------
+        x: ndarray of floats with shape ``(n_points,)``
+        y: ndarray of floats with shape ``(n_points,)``
+
+        Returns
+        -------
+        points: Union[xr.DataArray, xr.Dataset]
+        """
         result = self.obj
         for grid in self.grids:
-            result = self._sel_points(result, grid, x, y)
+            result = grid.sel_points(result, x, y)
         return result
 
     def to_dataset(self):

@@ -12,7 +12,7 @@ from xugrid.constants import BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
 
 
-def as_pandas_index(index, n: int):
+def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
     if isinstance(index, np.ndarray):
         if index.size > n:
             raise ValueError(
@@ -23,7 +23,7 @@ def as_pandas_index(index, n: int):
             if index.all():
                 pd_index = pd.RangeIndex(0, n)
             else:
-                pd_index = pd.Index(np.arange(np.arange(n)[index]))
+                pd_index = pd.Index((np.arange(n)[index]))
         elif np.issubdtype(index.dtype, np.integer):
             pd_index = pd.Index(index)
         else:
@@ -88,6 +88,10 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractproperty
+    def core_dimension():
+        """ """
+
+    @abc.abstractproperty
     def dimensions():
         """ """
 
@@ -108,7 +112,7 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractmethod
-    def isel():
+    def sel_points():
         """ """
 
     @abc.abstractmethod
@@ -305,33 +309,24 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    @staticmethod
-    def _check_index_identity(index: Union[BoolArray, IntArray], n: int) -> bool:
-        """
-        Check whether index would return all values.
-        """
-        if isinstance(np.ndarray):
-            if np.issubdtype(index.dtype, np.bool_):
-                return index.all()
-            elif np.issubdtype(index.dtype, np.integer):
-                index = pd.Index(index)
-            else:
-                raise TypeError(
-                    f"index should be bool or integer. Received: {index.dtype}"
-                )
-        elif not isinstance(index, pd.Index):
-            raise TypeError(
-                "index should be pandas Index or numpy arrray. Received: "
-                f"{type(index).__name__}"
-            )
-
-        if isinstance(index, pd.Index):
-            if not index.is_unique():
+    def _precheck(self, multi_index):
+        dim, index = multi_index.popitem()
+        for check_dim, check_index in multi_index.items():
+            if not index.equals(check_index):
                 raise ValueError(
-                    "index contains repeated values. Only subsets will result "
-                    "in valid UGRID topology."
+                    f"UGRID dimensions do not align: {dim} versus {check_dim}"
                 )
-            return index.size == n
+        return index
+
+    def _postcheck(self, indexers, finalized_indexers):
+        for dim, indexer in indexers.items():
+            if dim != self.core_dimension:
+                if not indexer.equals(finalized_indexers[dim]):
+                    raise ValueError(
+                        f"This subset selection of UGRID dimension {dim} results"
+                        "in an invalid topology "
+                    )
+        return
 
     def set_node_coords(
         self,
