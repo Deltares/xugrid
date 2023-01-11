@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy import sparse
 
-from xugrid import connectivity
+from xugrid.ugrid import connectivity
 
 
 @pytest.fixture(scope="function")

@@ -21,12 +21,36 @@ Fixed
 
 Changed
 ~~~~~~~
+- Forwarding to the internal xarray object is now setup at class definition of
+  :class:`UgridDataArray` and :class:`UgridDataset` rather than at runtime.
+  This means tab completion and docstrings for the xarray methods should work.
+- The UGRID dimensions in :class:`UgridDataArray` and :class:`UgridDataset` are
+  labelled at initialization. This allows us to track necessary changes to the
+  UGRID topology for general xarray operations. Forwarded methods (such as
+  :meth:`UgridDataArray.isel`) will now create a subset topology if possible, or
+  error if an invalid topology is created by the selection.
+- This also means that selection on one facet of the grid (e.g. the face
+  dimension) will also result in a valid selection of the data on another facet
+  (such as the edge dimension).
+- :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` 
+- Consequently, :meth:`xugrid.UgridDataArrayAccessor.isel` and
+  :meth:`xugrid.UgridDatasetAccessor.isel` have been removed.
+- :property:`xugrid.Ugrid1d.dimensions` and
+  :property:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
+  keys the dimension names and as the values the sizes of the dimensions.
 
 Added
 ~~~~~
 - :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` can now be initialized
   with an ``attrs`` argument to setup non-default UGRID attributes such as
   alternative node, edge, or face dimensions.
+- :meth:`xugrid.Ugrid1d.topology_subset`,
+  :meth:`xugrid.Ugrid2d.topology_subset`, :meth:`xugrid.Ugrid1d.isel`, and
+  :meth:`xugrid.Ugrid2d.isel` now take a ``return_index`` argument and will
+  to return UGRID dimension indexes if set to True.
+- :meth:`xugrid.UgridDataArrayAccessor.clip_box` and
+  :meth:`xugrid.UgridDatasetAccessor.clip_box` have been added to more easily
+  select data in a bounding box.
 
 [0.1.10] 2022-12-13
 -------------------

@@ -6,8 +6,6 @@ from typing import Union
 
 import numpy as np
 
-from .conversion import _to_pygeos
-
 
 def either_string_or_enum(value: Union[str, IntEnum], enum_class: EnumMeta) -> IntEnum:
     """Convert to enum if needed, check value"""
@@ -33,6 +31,8 @@ def to_geometry_list(
 ) -> "meshkernel.GeometryList":  # type: ignore # noqa
     import meshkernel
     import pygeos
+
+    from xugrid.conversion import _to_pygeos
 
     polygon = _to_pygeos([polygon])[0]
     xy = pygeos.get_coordinates(pygeos.get_exterior_ring(polygon))

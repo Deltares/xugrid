@@ -9,7 +9,7 @@ import pytest
 import shapely.geometry as sg
 import xarray as xr
 
-from xugrid.snapping import snap_nodes, snap_to_nodes, snap_to_structured_grid
+from xugrid.ugrid.snapping import snap_nodes, snap_to_nodes, snap_to_structured_grid
 
 
 def test_snap__three_points():

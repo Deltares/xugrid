@@ -1,19 +1,94 @@
 import abc
 import copy
-from typing import Tuple, Union
+from itertools import chain
+from typing import Tuple, Type, Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 from scipy.sparse import csr_matrix
 
-from .. import connectivity
-from ..typing import BoolArray, FloatArray, IntArray
-from . import conventions
+from xugrid.constants import BoolArray, FloatArray, IntArray
+from xugrid.ugrid import connectivity, conventions
+
+
+def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
+    if isinstance(index, np.ndarray):
+        if index.size > n:
+            raise ValueError(
+                f"index size {index.size} is larger than dimension size: {n}"
+            )
+        if np.issubdtype(index.dtype, np.bool_):
+            # Significantly quicker if all true.
+            if index.all():
+                pd_index = pd.RangeIndex(0, n)
+            else:
+                pd_index = pd.Index((np.arange(n)[index]))
+        elif np.issubdtype(index.dtype, np.integer):
+            pd_index = pd.Index(index)
+        else:
+            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
+
+    elif isinstance(index, pd.Index):
+        pd_index = index
+
+    else:
+        raise TypeError(
+            "index should be pandas Index or numpy array. Received: "
+            f"{type(index).__name__}"
+        )
+
+    if not pd_index.is_unique:
+        raise ValueError(
+            "index contains repeated values; only subsets will result "
+            "in valid UGRID topology."
+        )
+    if not pd_index.is_monotonic_increasing:
+        raise NotImplementedError("UGRID indexes must be sorted and unique.")
+
+    return pd_index
+
+
+def align(obj, grids, old_indexes):
+    """
+    Check which indexes have changed. Index on those new values.
+    If none are changed, return (obj, grids) as is.
+    """
+    if old_indexes is None:
+        return obj, grids
+
+    ugrid_dims = set(
+        chain.from_iterable(grid.dimensions for grid in grids)
+    ).intersection(old_indexes)
+    new_indexes = {
+        k: index
+        for k, index in obj.indexes.items()
+        if (k in ugrid_dims) and (not index.equals(old_indexes[k]))
+    }
+    if not new_indexes:
+        return obj, grids
+
+    # Group the indexers by grid
+    new_grids = []
+    for grid in grids:
+        ugrid_dims = set(grid.dimensions).intersection(new_indexes)
+        ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
+        newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
+        indexers = {
+            k: v for k, v in indexers.items() if k in obj.dims and k not in new_indexes
+        }
+        obj = obj.isel(indexers)
+        new_grids.append(newgrid)
+    return obj, new_grids
 
 
 class AbstractUgrid(abc.ABC):
     @abc.abstractproperty
     def topology_dimension():
+        """ """
+
+    @abc.abstractproperty
+    def core_dimension():
         """ """
 
     @abc.abstractproperty
@@ -37,7 +112,7 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractmethod
-    def isel():
+    def sel_points():
         """ """
 
     @abc.abstractmethod
@@ -234,17 +309,24 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    @staticmethod
-    def _check_index_identity(index: Union[BoolArray, IntArray], n: int) -> bool:
-        """
-        Check whether index would return all values.
-        """
-        if np.issubdtype(index.dtype, np.bool_):
-            return index.all()
-        elif np.issubdtype(index.dtype, np.integer):
-            return np.array_equal(index, np.arange(n))
-        else:
-            raise TypeError(f"index should be bool or integer. Received: {index.dtype}")
+    def _precheck(self, multi_index):
+        dim, index = multi_index.popitem()
+        for check_dim, check_index in multi_index.items():
+            if not index.equals(check_index):
+                raise ValueError(
+                    f"UGRID dimensions do not align: {dim} versus {check_dim}"
+                )
+        return index
+
+    def _postcheck(self, indexers, finalized_indexers):
+        for dim, indexer in indexers.items():
+            if dim != self.core_dimension:
+                if not indexer.equals(finalized_indexers[dim]):
+                    raise ValueError(
+                        f"This subset selection of UGRID dimension {dim} results"
+                        "in an invalid topology "
+                    )
+        return
 
     def set_node_coords(
         self,
@@ -490,6 +572,9 @@ class AbstractUgrid(abc.ABC):
         **kwargs : optional
             Additional keyword arguments to ``matplotlib.pyplot.line``.
         """
-        from ..plot import line
+        from xugrid.plot import line
 
         return line(self, **kwargs)
+
+
+UgridType = Type[AbstractUgrid]

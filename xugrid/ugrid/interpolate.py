@@ -4,7 +4,7 @@ import numpy as np
 import scipy.sparse
 import scipy.sparse.linalg
 
-from .typing import FloatArray
+from xugrid.constants import FloatArray
 
 
 def laplace_interpolate(

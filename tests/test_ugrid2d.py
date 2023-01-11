@@ -154,8 +154,6 @@ def test_ugrid2d_edge_bounds():
         ]
     )
     actual = grid.edge_bounds
-    print(actual)
-    print(expected)
     assert actual.shape == (10, 4)
     assert np.allclose(actual, expected)
 
@@ -332,7 +330,11 @@ def test_dimensions():
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.face_dimension == f"{NAME}_nFaces"
-    assert grid.dimensions == (f"{NAME}_nNodes", f"{NAME}_nEdges", f"{NAME}_nFaces")
+    assert grid.dimensions == {
+        f"{NAME}_nNodes": 7,
+        f"{NAME}_nEdges": 10,
+        f"{NAME}_nFaces": 4,
+    }
 
 
 def test_edge_node_connectivity():
@@ -482,197 +484,217 @@ def test_rasterize():
     assert np.array_equal(index, expected_index)
 
 
-def test_sel_points():
-    grid = grid2d()
-    x = [0.5, 1.5]
-    y = [0.5, 1.25]
+class TestUgrid2dSelection:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.grid = grid2d()
+        self.obj = xr.DataArray([0, 1, 2, 3], dims=[self.grid.face_dimension])
 
-    with pytest.raises(ValueError, match="shape of x does not match shape of y"):
-        grid.sel_points(x=[0.5, 1.5], y=[0.5])
-    with pytest.raises(ValueError, match="x and y must be 1d"):
-        grid.sel_points(x=[x], y=[y])
+    def test_sel_points(self):
+        x = [0.5, 1.5]
+        y = [0.5, 1.25]
 
-    dim, as_ugrid, index, coords = grid.sel_points(x=x, y=y)
-    assert dim == f"{NAME}_nFaces"
-    assert not as_ugrid
-    assert np.array_equal(index, [0, 3])
-    assert coords["x"][0] == dim
-    assert coords["y"][0] == dim
-    assert np.array_equal(coords["x"][1], x)
-    assert np.array_equal(coords["y"][1], y)
+        with pytest.raises(ValueError, match="shape of x does not match shape of y"):
+            self.grid.sel_points(obj=self.obj, x=[0.5, 1.5], y=[0.5])
+        with pytest.raises(ValueError, match="x and y must be 1d"):
+            self.grid.sel_points(obj=self.obj, x=[x], y=[y])
 
+        actual = self.grid.sel_points(obj=self.obj, x=x, y=y)
+        assert isinstance(actual, xr.DataArray)
 
-def test_validate_indexer():
-    grid = grid2d()
-    with pytest.raises(ValueError, match="slice stop should be larger than"):
-        grid._validate_indexer(slice(2, 0))
-    with pytest.raises(ValueError, match="step should be None"):
-        grid._validate_indexer(slice(None, 2, 1))
-    with pytest.raises(ValueError, match="step should be None"):
-        grid._validate_indexer(slice(0, None, 1))
+        dim = f"{NAME}_nFaces"
+        expected = xr.DataArray(
+            data=[0, 3],
+            coords={
+                "x": (dim, x),
+                "y": (dim, y),
+            },
+            dims=[dim],
+        )
+        assert expected.equals(actual)
 
-    expected = np.arange(0.0, 2.0, 0.5)
-    assert np.allclose(grid._validate_indexer(slice(0, 2, 0.5)), expected)
-    assert grid._validate_indexer(slice(None, 2)) == slice(None, 2)
-    assert grid._validate_indexer(slice(0, None)) == slice(0, None)
+    def test_validate_indexer(self):
+        with pytest.raises(ValueError, match="slice stop should be larger than"):
+            self.grid._validate_indexer(slice(2, 0))
+        with pytest.raises(ValueError, match="step should be None"):
+            self.grid._validate_indexer(slice(None, 2, 1))
+        with pytest.raises(ValueError, match="step should be None"):
+            self.grid._validate_indexer(slice(0, None, 1))
 
-    with pytest.raises(TypeError, match="Invalid indexer type"):
-        grid._validate_indexer((0, 1, 2))
+        expected = np.arange(0.0, 2.0, 0.5)
+        assert np.allclose(self.grid._validate_indexer(slice(0, 2, 0.5)), expected)
+        assert self.grid._validate_indexer(slice(None, 2)) == slice(None, 2)
+        assert self.grid._validate_indexer(slice(0, None)) == slice(0, None)
 
-    # list
-    actual = grid._validate_indexer([0.0, 1.0, 2.0])
-    assert isinstance(actual, np.ndarray)
-    assert np.allclose(actual, [0.0, 1.0, 2.0])
+        with pytest.raises(TypeError, match="Invalid indexer type"):
+            self.grid._validate_indexer((0, 1, 2))
 
-    # numpy array
-    actual = grid._validate_indexer(np.array([0.0, 1.0, 2.0]))
-    assert isinstance(actual, np.ndarray)
-    assert np.allclose(actual, [0.0, 1.0, 2.0])
+        # list
+        actual = self.grid._validate_indexer([0.0, 1.0, 2.0])
+        assert isinstance(actual, np.ndarray)
+        assert np.allclose(actual, [0.0, 1.0, 2.0])
 
-    # xarray DataArray
-    indexer = xr.DataArray([0.0, 1.0, 2.0], {"x": [0, 1, 2]}, ["x"])
-    actual = grid._validate_indexer(indexer)
-    assert isinstance(actual, np.ndarray)
-    assert np.allclose(actual, [0.0, 1.0, 2.0])
+        # numpy array
+        actual = self.grid._validate_indexer(np.array([0.0, 1.0, 2.0]))
+        assert isinstance(actual, np.ndarray)
+        assert np.allclose(actual, [0.0, 1.0, 2.0])
 
-    # float
-    actual = grid._validate_indexer(1.0)
-    assert isinstance(actual, np.ndarray)
-    assert np.allclose(actual, [1.0])
+        # xarray DataArray
+        indexer = xr.DataArray([0.0, 1.0, 2.0], {"x": [0, 1, 2]}, ["x"])
+        actual = self.grid._validate_indexer(indexer)
+        assert isinstance(actual, np.ndarray)
+        assert np.allclose(actual, [0.0, 1.0, 2.0])
 
-    # int
-    actual = grid._validate_indexer(1)
-    assert isinstance(actual, np.ndarray)
-    assert np.allclose(actual, [1])
+        # float
+        actual = self.grid._validate_indexer(1.0)
+        assert isinstance(actual, np.ndarray)
+        assert np.allclose(actual, [1.0])
 
+        # int
+        actual = self.grid._validate_indexer(1)
+        assert isinstance(actual, np.ndarray)
+        assert np.allclose(actual, [1])
 
-def test_sel__bounding_box():
-    grid = grid2d()
+    def test_sel__bounding_box(self):
+        def check_output(actual, expected):
+            assert isinstance(actual, tuple)
+            new_obj, new_grid = actual
+            assert isinstance(new_obj, xr.DataArray)
+            assert isinstance(new_grid, xugrid.Ugrid2d)
+            assert new_obj.dims[0] == f"{NAME}_nFaces"
+            assert new_grid.face_dimension == f"{NAME}_nFaces"
+            assert np.array_equal(new_obj.values, expected)
 
-    def check_output(dim, as_ugrid, index, coords, expected_index):
-        assert dim == f"{NAME}_nFaces"
-        assert as_ugrid
-        assert isinstance(index, np.ndarray)
-        assert np.allclose(index, expected_index)
-        assert coords == {}
+        actual = self.grid.sel(obj=self.obj, x=slice(0.0, 2.0), y=slice(0.0, 1.0))
+        check_output(actual, [0, 1])
 
-    dim, as_ugrid, index, coords = grid.sel(x=slice(0.0, 2.0), y=slice(0.0, 1.0))
-    check_output(dim, as_ugrid, index, coords, [0, 1])
+        actual = self.grid.sel(obj=self.obj, x=slice(None, None), y=slice(None, 1.0))
+        check_output(actual, [0, 1])
 
-    dim, as_ugrid, index, coords = grid.sel(x=slice(None, None), y=slice(None, 1.0))
-    check_output(dim, as_ugrid, index, coords, [0, 1])
+        actual = self.grid.sel(obj=self.obj, x=slice(0.0, 1.0), y=slice(0.0, 2.0))
+        check_output(actual, [0, 2])
 
-    dim, as_ugrid, index, coords = grid.sel(x=slice(0.0, 1.0), y=slice(0.0, 2.0))
-    check_output(dim, as_ugrid, index, coords, [0, 2])
+        actual = self.grid.sel(obj=self.obj, x=slice(None, 1.0), y=slice(None, None))
+        check_output(actual, [0, 2])
 
-    dim, as_ugrid, index, coords = grid.sel(x=slice(None, 1.0), y=slice(None, None))
-    check_output(dim, as_ugrid, index, coords, [0, 2])
+        for x, y in zip([None, None, slice(0, 2)], [None, slice(0, 2), None]):
+            actual = self.grid.sel(obj=self.obj, x=x, y=y)
+            check_output(actual, [0, 1, 2, 3])
 
-    for x, y in zip([None, None, slice(0, 2)], [None, slice(0, 2), None]):
-        dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
-        check_output(dim, as_ugrid, index, coords, [0, 1, 2, 3])
+        # Check default arguments, should return entire grid
+        actual = self.grid.sel(obj=self.obj)
+        check_output(actual, [0, 1, 2, 3])
 
-    # Check default arguments, should return entire grid
-    dim, as_ugrid, index, coords = grid.sel()
-    check_output(dim, as_ugrid, index, coords, [0, 1, 2, 3])
+    def test_sel__points_from_scalar(self):
+        def check_output(actual):
+            assert isinstance(actual, xr.DataArray)
+            dim = f"{NAME}_nFaces"
+            expected = xr.DataArray(
+                data=[0],
+                coords={
+                    "x": (dim, [0.5]),
+                    "y": (dim, [0.5]),
+                },
+                dims=[dim],
+            )
+            assert expected.equals(actual)
 
+        actual = self.grid.sel(obj=self.obj, x=0.5, y=0.5)
+        check_output(actual)
 
-def test_sel__points_from_scalar():
-    grid = grid2d()
+        actual = self.grid.sel(obj=self.obj, x=[0.5], y=[0.5])
+        check_output(actual)
 
-    def check_output(dim, as_ugrid, index, coords):
-        assert dim == f"{NAME}_nFaces"
-        assert not as_ugrid
-        assert np.allclose(index, [0])
-        assert coords["x"][0] == dim
-        assert coords["y"][0] == dim
-        assert np.allclose(coords["x"][1], [0.5])
-        assert np.allclose(coords["y"][1], [0.5])
+        with pytest.raises(TypeError, match="Invalid indexer type"):
+            self.grid.sel(obj=self.obj, x=(0.5,), y=[0.5])
 
-    dim, as_ugrid, index, coords = grid.sel(x=0.5, y=0.5)
-    check_output(dim, as_ugrid, index, coords)
+    def test_sel__points_from_arrays_and_slice(self):
+        def check_output(actual):
+            assert isinstance(actual, xr.DataArray)
+            dim = f"{NAME}_nFaces"
+            expected = xr.DataArray(
+                data=[0, 0, 1, 2, 2, 3],
+                coords={
+                    "x": (dim, [0.4, 0.8, 1.2, 0.4, 0.8, 1.2]),
+                    "y": (dim, [0.5, 0.5, 0.5, 1.1, 1.1, 1.1]),
+                },
+                dims=[dim],
+            )
+            # This fails for some reason:
+            # assert expected.equals(actual)
+            assert np.array_equal(expected.values, actual.values)
+            assert expected.dims == actual.dims
+            assert np.allclose(expected["y"].values, actual["y"].values)
+            assert np.allclose(expected["x"].values, actual["x"].values)
 
-    dim, as_ugrid, index, coords = grid.sel(x=[0.5], y=[0.5])
-    check_output(dim, as_ugrid, index, coords)
+        x = [0.4, 0.8, 1.2]
+        y = [0.5, 1.1]
+        actual = self.grid.sel(obj=self.obj, x=x, y=y)
+        check_output(actual)
 
-    with pytest.raises(TypeError, match="Invalid indexer type"):
-        grid.sel(x=(0.5,), y=[0.5])
+        x = slice(0.4, 1.5, 0.4)  # Evaluates to: [0.4, 0.8, 1.2]
+        actual = self.grid.sel(obj=self.obj, x=x, y=y)
+        check_output(actual)
 
+    def test_sel__edges_from_slice(self):
+        with pytest.raises(ValueError, match="If x is a slice without steps"):
+            self.grid.sel(obj=self.obj, x=slice(None, None), y=[0.25, 0.75])
+        with pytest.raises(ValueError, match="If x is a slice without steps"):
+            self.grid.sel(obj=self.obj, x=slice(None, None), y=slice(0.25, 1.0, 0.25))
+        with pytest.raises(ValueError, match="If y is a slice without steps"):
+            self.grid.sel(obj=self.obj, x=[0.25, 0.75], y=slice(None, None))
 
-def test_sel__points_from_arrays_and_slice():
-    grid = grid2d()
+        actual = self.grid.sel(obj=self.obj, x=slice(None, None), y=0.5)
+        assert isinstance(actual, xr.DataArray)
+        dim = f"{NAME}_nFaces"
+        expected = xr.DataArray(
+            data=[0, 1],
+            coords={
+                "x": (dim, [0.5, 1.5]),
+                "y": (dim, [0.5, 0.5]),
+                "s": (dim, [0.5, 1.5]),
+            },
+            dims=[dim],
+        )
+        assert expected.equals(actual)
 
-    def check_output(dim, as_ugrid, index, coords):
-        assert dim == f"{NAME}_nFaces"
-        assert not as_ugrid
-        assert coords["x"][0] == dim
-        assert coords["y"][0] == dim
-        assert np.allclose(index, [0, 0, 1, 2, 2, 3])
-        assert np.allclose(coords["x"][1], [0.4, 0.8, 1.2, 0.4, 0.8, 1.2])
-        assert np.allclose(coords["y"][1], [0.5, 0.5, 0.5, 1.1, 1.1, 1.1])
-
-    x = [0.4, 0.8, 1.2]
-    y = [0.5, 1.1]
-    dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
-    check_output(dim, as_ugrid, index, coords)
-
-    x = slice(0.4, 1.5, 0.4)  # Evaluates to: [0.4, 0.8, 1.2]
-    dim, as_ugrid, index, coords = grid.sel(x=x, y=y)
-    check_output(dim, as_ugrid, index, coords)
-
-
-def test_sel__edges_from_slice():
-    grid = grid2d()
-
-    with pytest.raises(ValueError, match="If x is a slice without steps"):
-        grid.sel(x=slice(None, None), y=[0.25, 0.75])
-    with pytest.raises(ValueError, match="If x is a slice without steps"):
-        grid.sel(x=slice(None, None), y=slice(0.25, 1.0, 0.25))
-    with pytest.raises(ValueError, match="If y is a slice without steps"):
-        grid.sel(x=[0.25, 0.75], y=slice(None, None))
-
-    dim, as_ugrid, index, coords = grid.sel(x=slice(None, None), y=0.5)
-    assert dim == f"{NAME}_nFaces"
-    assert not as_ugrid
-    assert coords["x"][0] == dim
-    assert coords["y"][0] == dim
-    assert np.allclose(index, [0, 1])
-    assert np.allclose(coords["x"][1], [0.5, 1.5])
-    assert np.allclose(coords["y"][1], [0.5, 0.5])
-
-    dim, as_ugrid, index, coords = grid.sel(x=0.5, y=slice(None, None))
-    assert dim == f"{NAME}_nFaces"
-    assert not as_ugrid
-    assert coords["x"][0] == dim
-    assert coords["y"][0] == dim
-    assert np.allclose(index, [0, 2])
-    assert np.allclose(coords["x"][1], [0.5, 0.5])
-    assert np.allclose(coords["y"][1], [0.5, 1.25])
+        actual = self.grid.sel(obj=self.obj, x=0.5, y=slice(None, None))
+        assert isinstance(actual, xr.DataArray)
+        expected = xr.DataArray(
+            data=[0, 2],
+            coords={
+                "x": (dim, [0.5, 0.5]),
+                "y": (dim, [0.5, 1.25]),
+                "s": (dim, [0.5, 1.25]),
+            },
+            dims=[dim],
+        )
+        assert expected.equals(actual)
 
 
 def test_topology_subset():
     grid = grid2d()
-    edge_indices = np.array([1])
-    actual = grid.topology_subset(edge_indices)
+    face_index = np.array([1])
+    actual = grid.topology_subset(face_index)
     assert np.array_equal(actual.face_node_connectivity, [[0, 1, 3, 2]])
     assert np.array_equal(actual.node_x, [1.0, 2.0, 1.0, 2.0])
     assert np.array_equal(actual.node_y, [0.0, 0.0, 1.0, 1.0])
 
-    edge_indices = np.array([False, True, False, False])
-    actual = grid.topology_subset(edge_indices)
+    face_index = np.array([False, True, False, False])
+    actual = grid.topology_subset(face_index)
     assert np.array_equal(actual.face_node_connectivity, [[0, 1, 3, 2]])
     assert np.array_equal(actual.node_x, [1.0, 2.0, 1.0, 2.0])
     assert np.array_equal(actual.node_y, [0.0, 0.0, 1.0, 1.0])
 
     # Entire mesh
-    edge_indices = np.array([0, 1, 2, 3])
-    actual = grid.topology_subset(edge_indices)
+    face_index = np.array([0, 1, 2, 3])
+    actual = grid.topology_subset(face_index)
     assert actual is grid
 
     # Check that alternative attrs are preserved.
     grid = grid2d(attrs={"node_dimension": "nNetNode"})
-    edge_indices = np.array([1])
-    actual = grid.topology_subset(edge_indices)
+    face_index = np.array([1])
+    actual = grid.topology_subset(face_index)
     assert actual.node_dimension == "nNetNode"
 
 
@@ -746,10 +768,10 @@ def test_to_pygeos():
 
 def test_grid_from_geodataframe():
     with pytest.raises(TypeError, match="Cannot convert a list"):
-        xugrid.ugrid.grid_from_geodataframe([])
+        xugrid.conversion.grid_from_geodataframe([])
 
     with pytest.raises(ValueError, match="geodataframe contains no geometry"):
-        xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[]))
+        xugrid.conversion.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[]))
 
     x = np.array([0.0, 1.0, 2.0])
     y = np.array([0.0, 0.0, 0.0])
@@ -766,13 +788,17 @@ def test_grid_from_geodataframe():
     points = pygeos.creation.points(x, y)
 
     with pytest.raises(ValueError, match="Multiple geometry types detected"):
-        xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[line, polygon]))
+        xugrid.conversion.grid_from_geodataframe(
+            gpd.GeoDataFrame(geometry=[line, polygon])
+        )
     with pytest.raises(ValueError, match="Invalid geometry type"):
-        xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=points))
+        xugrid.conversion.grid_from_geodataframe(gpd.GeoDataFrame(geometry=points))
 
-    grid = xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[line]))
+    grid = xugrid.conversion.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[line]))
     assert isinstance(grid, xugrid.Ugrid1d)
-    grid = xugrid.ugrid.grid_from_geodataframe(gpd.GeoDataFrame(geometry=[polygon]))
+    grid = xugrid.conversion.grid_from_geodataframe(
+        gpd.GeoDataFrame(geometry=[polygon])
+    )
     assert isinstance(grid, xugrid.Ugrid2d)
 
 

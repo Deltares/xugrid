@@ -20,8 +20,8 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from .connectivity import renumber
-from .typing import FloatArray, IntArray
+from xugrid.constants import FloatArray, IntArray
+from xugrid.ugrid.connectivity import renumber
 
 
 def dot_product2d(U: FloatArray, V: FloatArray):

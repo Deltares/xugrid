@@ -1,9 +1,7 @@
-from typing import NamedTuple, Type, Union
+from typing import NamedTuple, Union
 
 import numpy as np
 from scipy.sparse import coo_matrix, csr_matrix
-
-from xugrid.ugrid.ugridbase import AbstractUgrid
 
 # import numpy.typing as npt
 
@@ -33,9 +31,6 @@ class Point(NamedTuple):
 class Vector(NamedTuple):
     x: float
     y: float
-
-
-UgridType = Type[AbstractUgrid]
 
 
 # Spatial coordinate epsilon for floating point comparison

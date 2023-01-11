@@ -1,4 +1,4 @@
-from .plot import (
+from xugrid.plot.plot import (
     contour,
     contourf,
     imshow,

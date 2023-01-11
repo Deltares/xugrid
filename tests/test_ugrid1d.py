@@ -227,7 +227,10 @@ def test_dimensions():
     grid = grid1d()
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
-    assert grid.dimensions == (f"{NAME}_nNodes", f"{NAME}_nEdges")
+    assert grid.dimensions == {
+        f"{NAME}_nNodes": 3,
+        f"{NAME}_nEdges": 2,
+    }
 
 
 @requires_meshkernel
@@ -262,17 +265,26 @@ def test_to_pygeos():
 
 def test_sel():
     grid = grid1d()
+    obj = xr.DataArray(
+        data=[0, 1],
+        dims=[grid.edge_dimension],
+    )
     with pytest.raises(ValueError, match="Ugrid1d only supports slice indexing"):
-        grid.sel(x=1.0, y=1.0)
+        grid.sel(obj=obj, x=1.0, y=1.0)
     with pytest.raises(ValueError, match="Ugrid1d does not support steps"):
-        grid.sel(x=slice(0, 2, 1), y=slice(0, 2, 1))
+        grid.sel(obj=obj, x=slice(0, 2, 1), y=slice(0, 2, 1))
     with pytest.raises(ValueError, match="slice start should be smaller"):
-        grid.sel(x=slice(2, 0), y=slice(0, 2))
-    dim, as_ugrid, index, coords = grid.sel(x=slice(0, 1), y=slice(0, 1))
-    assert dim == f"{NAME}_nEdges"
-    assert as_ugrid
-    assert np.allclose(index, [0])
-    assert coords == {}
+        grid.sel(obj, x=slice(2, 0), y=slice(0, 2))
+
+    actual = grid.sel(obj=obj, x=slice(0, 1), y=slice(0, 1))
+    assert isinstance(actual, tuple)
+    new_obj, new_grid = actual
+
+    assert isinstance(new_obj, xr.DataArray)
+    assert isinstance(new_grid, xugrid.Ugrid1d)
+    assert new_obj.dims[0] == f"{NAME}_nEdges"
+    assert new_grid.edge_dimension == f"{NAME}_nEdges"
+    assert np.array_equal(new_obj.values, [0])
 
 
 def test_topology_subset():

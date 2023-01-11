@@ -2,12 +2,14 @@ from itertools import chain
 from typing import Any, Dict, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
+from xarray.core.utils import either_dict_or_kwargs
 
-from .. import connectivity, conversion
-from ..typing import BoolArray, FloatArray, FloatDType, IntArray, IntDType
-from . import conventions
-from .ugridbase import AbstractUgrid
+from xugrid import conversion
+from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
+from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 
 
 class Ugrid1d(AbstractUgrid):
@@ -151,6 +153,22 @@ class Ugrid1d(AbstractUgrid):
             crs=None,
         )
 
+    def _clear_geometry_properties(self):
+        """Clear all properties that may have been invalidated"""
+        # Meshkernel
+        self._mesh = None
+        self._meshkernel = None
+        # Celltree
+        self._celltree = None
+        # Bounds
+        self._xmin = None
+        self._xmax = None
+        self._ymin = None
+        self._ymax = None
+        # Edges
+        self._edge_x = None
+        self._edge_y = None
+
     @classmethod
     def from_meshkernel(
         cls,
@@ -195,26 +213,14 @@ class Ugrid1d(AbstractUgrid):
         dataset[self.name].attrs = self._filtered_attrs(dataset)
         return dataset
 
-    def _clear_geometry_properties(self):
-        """Clear all properties that may have been invalidated"""
-        # Meshkernel
-        self._mesh = None
-        self._meshkernel = None
-        # Celltree
-        self._celltree = None
-        # Bounds
-        self._xmin = None
-        self._xmax = None
-        self._ymin = None
-        self._ymax = None
-        # Edges
-        self._edge_x = None
-        self._edge_y = None
-
     @property
     def topology_dimension(self):
         """Highest dimensionality of the geometric elements: 1"""
         return 1
+
+    @property
+    def core_dimension(self):
+        return self.node_dimension
 
     @property
     def dimensions(self):
@@ -312,10 +318,64 @@ class Ugrid1d(AbstractUgrid):
                 " Ugrid1d topology."
             )
 
-    def isel(self, dim, indexer):
-        if dim != self.edge_dimension:
-            raise NotImplementedError("Can only index edge_dimension for Ugrid1D")
-        return self.topology_subset(indexer)
+    def sel_points(obj, x, y):
+        raise NotImplementedError("Cannot select points in a UGRID 1D topology")
+
+    def isel(self, indexers=None, return_index=False, **indexers_kwargs):
+        """
+        Select based on node or edge.
+
+        Edge selection always results in a valid UGRID topology. Node selection
+        may result in invalid topologies (incomplete edges), and will error in
+        such a case.
+
+        Parameters
+        ----------
+        indexers: dict of str to np.ndarray of integers or bools
+        return_index: bool, optional
+            Whether to return node_index, edge_index.
+
+        Returns
+        -------
+        obj: xr.Dataset or xr.DataArray
+        grid: Ugrid2d
+        indexes: dict
+            Dictionary with keys node dimension, edge dimension and values
+            their respective index. Only returned if return_index is True.
+        """
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
+        alldims = set(self.dimensions)
+        invalid = indexers.keys() - alldims
+        if invalid:
+            raise ValueError(
+                f"Dimensions {invalid} do not exist. Expected one of {alldims}"
+            )
+
+        indexers = {
+            k: as_pandas_index(v, self.dimensions[k]) for k, v in indexers.items()
+        }
+        nodedim, edgedim = self.dimensions
+        edge_index = {}
+        if nodedim in indexers:
+            node_index = indexers[nodedim]
+            edge_index[nodedim] = np.unique(
+                self.node_edge_connectivity[node_index].data
+            )
+        if edgedim in indexers:
+            edge_index[edgedim] = indexers[edgedim]
+
+        # Convert all to pandas index.
+        edge_index = {k: as_pandas_index(v, self.n_edge) for k, v in edge_index.items()}
+
+        # Check the indexes against each other.
+        index = self._precheck(edge_index)
+        grid, finalized_indexers = self.topology_subset(index, return_index=True)
+        self._postcheck(indexers, finalized_indexers)
+
+        if return_index:
+            return grid, finalized_indexers
+        else:
+            return grid
 
     def _validate_indexer(self, indexer) -> Tuple[float, float]:
         if isinstance(indexer, slice):
@@ -327,7 +387,7 @@ class Ugrid1d(AbstractUgrid):
             raise ValueError("Ugrid1d only supports slice indexing")
         return indexer.start, indexer.stop
 
-    def sel(self, x, y) -> Tuple[str, bool, IntArray, dict]:
+    def sel(self, obj, x, y) -> Tuple:
         """
         Select a selection of edges, based on edge centroids.
 
@@ -345,15 +405,20 @@ class Ugrid1d(AbstractUgrid):
         """
         xmin, xmax = self._validate_indexer(x)
         ymin, ymax = self._validate_indexer(y)
-        index = np.nonzero(
+        edge_index = np.nonzero(
             (self.edge_x >= xmin)
             & (self.edge_x < xmax)
             & (self.edge_y >= ymin)
             & (self.edge_y < ymax)
         )[0]
-        return self.edge_dimension, True, index, {}
+        grid, indexes = self.topology_subset(edge_index, return_index=True)
+        indexes = {k: v for k, v in indexes.items() if k in obj.dims}
+        new_obj = obj.isel(indexes)
+        return new_obj, grid
 
-    def topology_subset(self, edge_index: Union[BoolArray, IntArray]):
+    def topology_subset(
+        self, edge_index: Union[BoolArray, IntArray], return_index: bool = False
+    ):
         """
         Create a new UGRID1D topology for a subset of this topology.
 
@@ -361,21 +426,35 @@ class Ugrid1d(AbstractUgrid):
         ----------
         edge_index: 1d array of integers or bool
             Edges of the subset.
+        return_index: bool, optional
+            Whether to return node_index, edge_index.
 
         Returns
         -------
         subset: Ugrid1d
+        indexes: dict
+            Dictionary with keys node dimension and edge dimension and values
+            their respective index. Only returned if return_index is True.
         """
-        index = np.atleast_1d(edge_index)
-        if self._check_index_identity(index, len(self.edge_node_connectivity)):
-            return self
+        if not isinstance(edge_index, pd.Index):
+            edge_index = as_pandas_index(edge_index, self.n_edge)
 
-        edge_subset = self.edge_node_connectivity[index]
+        if edge_index.size == self.n_edge:
+            if return_index:
+                indexes = {
+                    self.node_dimension: pd.RangeIndex(0, self.n_node),
+                    self.edge_dimension: pd.RangeIndex(0, self.n_edge),
+                }
+                return self, indexes
+            else:
+                return self
+
+        edge_subset = self.edge_node_connectivity[edge_index]
         node_index = np.unique(edge_subset.ravel())
         new_edges = connectivity.renumber(edge_subset)
         node_x = self.node_x[node_index]
         node_y = self.node_y[node_index]
-        return self.__class__(
+        grid = self.__class__(
             node_x,
             node_y,
             self.fill_value,
@@ -385,6 +464,14 @@ class Ugrid1d(AbstractUgrid):
             crs=self.crs,
             attrs=self._attrs,
         )
+        if return_index:
+            indexes = {
+                self.node_dimension: pd.Index(node_index),
+                self.edge_dimension: edge_index,
+            }
+            return grid, indexes
+        else:
+            return grid
 
     def clip_box(
         self,
