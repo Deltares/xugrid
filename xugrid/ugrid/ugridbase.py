@@ -572,7 +572,7 @@ class AbstractUgrid(abc.ABC):
         **kwargs : optional
             Additional keyword arguments to ``matplotlib.pyplot.line``.
         """
-        from ..plot import line
+        from xugrid.plot import line
 
         return line(self, **kwargs)
 

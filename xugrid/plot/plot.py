@@ -15,7 +15,7 @@ from xarray.plot.utils import (
     label_from_attrs,
 )
 
-from ..typing import FloatDType
+from xugrid.constants import FloatDType
 
 NODE = 0
 EDGE = 1

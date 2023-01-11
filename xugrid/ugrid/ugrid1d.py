@@ -387,7 +387,7 @@ class Ugrid1d(AbstractUgrid):
             raise ValueError("Ugrid1d only supports slice indexing")
         return indexer.start, indexer.stop
 
-    def sel(self, x, y) -> Tuple[str, bool, IntArray, dict]:
+    def sel(self, obj, x, y) -> Tuple:
         """
         Select a selection of edges, based on edge centroids.
 
@@ -405,13 +405,16 @@ class Ugrid1d(AbstractUgrid):
         """
         xmin, xmax = self._validate_indexer(x)
         ymin, ymax = self._validate_indexer(y)
-        index = np.nonzero(
+        edge_index = np.nonzero(
             (self.edge_x >= xmin)
             & (self.edge_x < xmax)
             & (self.edge_y >= ymin)
             & (self.edge_y < ymax)
         )[0]
-        return self.edge_dimension, True, index, {}
+        grid, indexes = self.topology_subset(edge_index, return_index=True)
+        indexes = {k: v for k, v in indexes.items() if k in obj.dims}
+        new_obj = obj.isel(indexes)
+        return new_obj, grid
 
     def topology_subset(
         self, edge_index: Union[BoolArray, IntArray], return_index: bool = False

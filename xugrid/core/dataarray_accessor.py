@@ -5,7 +5,7 @@ import scipy.sparse
 import xarray as xr
 from xarray.core.utils import UncachedAccessor
 
-# from .plot.pyvista import to_pyvista_grid
+# from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
 from xugrid.core.wrap import UgridDataArray
 from xugrid.plot.plot import _PlotMethods
