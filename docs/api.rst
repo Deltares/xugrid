@@ -7,6 +7,9 @@ API Reference
 
 This page provides an auto-generated summary of xugrid's API.
 
+Xugrid also almost completely exposes the attributes and methods of xarray
+DataArrays and Datasets. Refer to the Xarray documentation.
+
 .. toctree::
    :maxdepth: 1
 
@@ -67,7 +70,6 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.crs
     UgridDatasetAccessor.set_crs
     UgridDatasetAccessor.to_crs
-    UgridDatasetAccessor.isel
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
     UgridDatasetAccessor.to_geodataframe
@@ -85,7 +87,6 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.crs
     UgridDataArrayAccessor.set_crs
     UgridDataArrayAccessor.to_crs
-    UgridDataArrayAccessor.isel
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points
     UgridDataArrayAccessor.rasterize
