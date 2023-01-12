@@ -32,11 +32,12 @@ Changed
 - This also means that selection on one facet of the grid (e.g. the face
   dimension) will also result in a valid selection of the data on another facet
   (such as the edge dimension).
-- :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` 
+- :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` now take an ``obj``
+  argument and return a DataArray or Dataset.
 - Consequently, :meth:`xugrid.UgridDataArrayAccessor.isel` and
   :meth:`xugrid.UgridDatasetAccessor.isel` have been removed.
-- :property:`xugrid.Ugrid1d.dimensions` and
-  :property:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
+- :attr:`xugrid.Ugrid1d.dimensions` and
+  :attr:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
   keys the dimension names and as the values the sizes of the dimensions.
 
 Added
