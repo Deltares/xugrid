@@ -1122,6 +1122,9 @@
 Before this fix, dimension of the UGRID topology would go out of sync with
 the DataArray, as a subset would return a new UGRID topology with default
 UGRID names.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset" title="xugrid.Ugrid2d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.topology_subset()</span></code></a>,:meth:<cite>xugrid.UgridDataArrayAccessor.sel</cite>
+<a class="reference internal" href="api/xugrid.UgridDatasetAccessor.sel.html#xugrid.UgridDatasetAccessor.sel" title="xugrid.UgridDatasetAccessor.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.sel()</span></code></a> will now return a correct UGRID 2D
+topology when fill values are present in the face node connectivity.</p></li>
 </ul>
 </section>
 <section id="changed">
@@ -1138,11 +1141,12 @@ error if an invalid topology is created by the selection.</p></li>
 <li><p>This also means that selection on one facet of the grid (e.g. the face
 dimension) will also result in a valid selection of the data on another facet
 (such as the edge dimension).</p></li>
-<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel" title="xugrid.Ugrid1d.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.sel()</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel" title="xugrid.Ugrid2d.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel" title="xugrid.Ugrid1d.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.sel()</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel" title="xugrid.Ugrid2d.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel()</span></code></a> now take an <code class="docutils literal notranslate"><span class="pre">obj</span></code>
+argument and return a DataArray or Dataset.</p></li>
 <li><p>Consequently, <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.isel()</span></code> and
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.isel()</span></code> have been removed.</p></li>
-<li><p><a href="#id1"><span class="problematic" id="id2">:property:`xugrid.Ugrid1d.dimensions`</span></a> and
-<a href="#id3"><span class="problematic" id="id4">:property:`xugrid.Ugrid2d.dimensions`</span></a> will now return a dictionary with the
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.dimensions.html#xugrid.Ugrid1d.dimensions" title="xugrid.Ugrid1d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.dimensions</span></code></a> and
+<a class="reference internal" href="api/xugrid.Ugrid2d.dimensions.html#xugrid.Ugrid2d.dimensions" title="xugrid.Ugrid2d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.dimensions</span></code></a> will now return a dictionary with the
 keys the dimension names and as the values the sizes of the dimensions.</p></li>
 </ul>
 </section>
@@ -1162,28 +1166,28 @@ select data in a bounding box.</p></li>
 </ul>
 </section>
 </section>
-<section id="id5">
-<h2>[0.1.10] 2022-12-13<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h2>
-<section id="id6">
-<h3>Fixed<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id1">
+<h2>[0.1.10] 2022-12-13<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<section id="id2">
+<h3>Fixed<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Move matplotlib import into a function body so matplotlib remains an optional
 dependency.</p></li>
 </ul>
 </section>
 </section>
-<section id="id7">
-<h2>[0.1.9] 2022-12-13<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h2>
-<section id="id8">
-<h3>Changed<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h2>[0.1.9] 2022-12-13<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h2>
+<section id="id4">
+<h3>Changed<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Warn instead of error when the UGRID attributes indicate a set of coordinate
 that are not present in the dataset.</p></li>
 <li><p>Use <cite>pyproject.toml</cite> for setuptools instead of <cite>setup.cfg</cite>.</p></li>
 </ul>
 </section>
-<section id="id9">
-<h3>Added<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Added<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.edge_bounds.html#xugrid.Ugrid1d.edge_bounds" title="xugrid.Ugrid1d.edge_bounds"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.edge_bounds</span></code></a> has been added to get the bounds
 for every edge contained in the grid.</p></li>
@@ -1198,18 +1202,18 @@ topology from a meshkernel object.</p></li>
 to plot the edges of the grid.</p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Fixed<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Fixed<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured" title="xugrid.UgridDataArray.from_structured"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.from_structured()</span></code></a> will no longer result in
 a flipped grid when the structured coordintes are not ascending.</p></li>
 </ul>
 </section>
 </section>
-<section id="id11">
-<h2>[0.1.7] 2022-09-06<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h2>
-<section id="id12">
-<h3>Fixed<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h2>[0.1.7] 2022-09-06<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h2>
+<section id="id8">
+<h3>Fixed<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The setitem method of <a class="reference internal" href="api/xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.UgridDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridDataset</span></code></a> has been updated to check
 the dimensions of grids rather than the dimensions of objects to decide
@@ -1226,25 +1230,25 @@ conflicting dimension names.</p></li>
 </ul>
 </section>
 </section>
-<section id="id13">
-<h2>[0.1.5] 2022-08-22<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h2>
-<section id="id14">
-<h3>Fixed<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h3>
+<section id="id9">
+<h2>[0.1.5] 2022-08-22<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h2>
+<section id="id10">
+<h3>Fixed<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">list</span></code> and <code class="docutils literal notranslate"><span class="pre">dict</span></code> type annotations have been replaced with <code class="docutils literal notranslate"><span class="pre">List</span></code> and <code class="docutils literal notranslate"><span class="pre">Dict</span></code>
 from the typing module to support older versions of Python (&lt;3.9).</p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>Changed<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h3>
+<section id="id11">
+<h3>Changed<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">inplace</span></code> argument has been removed from <a class="reference internal" href="api/xugrid.Ugrid1d.to_crs.html#xugrid.Ugrid1d.to_crs" title="xugrid.Ugrid1d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.to_crs()</span></code></a>
 and <a class="reference internal" href="api/xugrid.Ugrid2d.to_crs.html#xugrid.Ugrid2d.to_crs" title="xugrid.Ugrid2d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.to_crs()</span></code></a>; A copy is returned when the CRS is already
 as requested.</p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>Added<a class="headerlink" href="#id16" title="Permalink to this heading">#</a></h3>
+<section id="id12">
+<h3>Added<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.set_crs.html#xugrid.UgridDataArrayAccessor.set_crs" title="xugrid.UgridDataArrayAccessor.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.set_crs()</span></code></a> has been added to set the CRS.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.to_crs.html#xugrid.UgridDataArrayAccessor.to_crs" title="xugrid.UgridDataArrayAccessor.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.to_crs()</span></code></a> has been added to reproject the
@@ -1263,18 +1267,18 @@ total bounds of all grids contained in the dataset.</p></li>
 </ul>
 </section>
 </section>
-<section id="id17">
-<h2>[0.1.4] 2022-08-16<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h2>
-<section id="id18">
-<h3>Fixed<a class="headerlink" href="#id18" title="Permalink to this heading">#</a></h3>
+<section id="id13">
+<h2>[0.1.4] 2022-08-16<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h2>
+<section id="id14">
+<h3>Fixed<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>A <code class="docutils literal notranslate"><span class="pre">start_index</span></code> of 1 in connectivity arrays is handled and will no longer
 result in indexing errors.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">levels</span></code> argument is now respected in line and pcolormesh plotting methods.</p></li>
 </ul>
 </section>
-<section id="id19">
-<h3>Changed<a class="headerlink" href="#id19" title="Permalink to this heading">#</a></h3>
+<section id="id15">
+<h3>Changed<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>UGRID variables are now extracted via <a class="reference internal" href="api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor" title="xugrid.UgridRolesAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor</span></code></a> to
 allow for multiple UGRID topologies in a single dataset.</p></li>
@@ -1296,8 +1300,8 @@ as access to the dataset should occur via the <code class="docutils literal notr
 instead, which can check for consistency with the xarray object.</p></li>
 </ul>
 </section>
-<section id="id20">
-<h3>Added<a class="headerlink" href="#id20" title="Permalink to this heading">#</a></h3>
+<section id="id16">
+<h3>Added<a class="headerlink" href="#id16" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor" title="xugrid.UgridRolesAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor</span></code></a> has been added to extract UGRID variables
 from xarray Datasets.</p></li>
@@ -1313,8 +1317,8 @@ as the active coordinates of the Ugrid topology.</p></li>
 </ul>
 </section>
 </section>
-<section id="id21">
-<h2>[0.1.3] 2021-12-23<a class="headerlink" href="#id21" title="Permalink to this heading">#</a></h2>
+<section id="id17">
+<h2>[0.1.3] 2021-12-23<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h2>
 </section>
 </section>
 
@@ -1379,10 +1383,32 @@ as the active coordinates of the Ugrid topology.</p></li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id5">
+  <a class="reference internal nav-link" href="#id1">
    [0.1.10] 2022-12-13
   </a>
   <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     Fixed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   [0.1.9] 2022-12-13
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id4">
+     Changed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id5">
+     Added
+    </a>
+   </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id6">
      Fixed
@@ -1392,41 +1418,41 @@ as the active coordinates of the Ugrid topology.</p></li>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id7">
-   [0.1.9] 2022-12-13
+   [0.1.7] 2022-09-06
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#id8">
-     Changed
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id9">
-     Added
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id10">
      Fixed
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id11">
-   [0.1.7] 2022-09-06
+  <a class="reference internal nav-link" href="#id9">
+   [0.1.5] 2022-08-22
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id12">
+    <a class="reference internal nav-link" href="#id10">
      Fixed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id11">
+     Changed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id12">
+     Added
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id13">
-   [0.1.5] 2022-08-22
+   [0.1.4] 2022-08-16
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -1448,28 +1474,6 @@ as the active coordinates of the Ugrid topology.</p></li>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id17">
-   [0.1.4] 2022-08-16
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id18">
-     Fixed
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id19">
-     Changed
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id20">
-     Added
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id21">
    [0.1.3] 2021-12-23
   </a>
  </li>

@@ -734,6 +734,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span>
 
+        <span class="c1"># N.B. edges do not contain fill values, as there are always two nodes</span>
+        <span class="c1"># required to form an edge.</span>
         <span class="n">edge_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
         <span class="n">node_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">edge_subset</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="n">new_edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">edge_subset</span><span class="p">)</span>

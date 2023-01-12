@@ -18,6 +18,9 @@ Fixed
   Before this fix, dimension of the UGRID topology would go out of sync with
   the DataArray, as a subset would return a new UGRID topology with default
   UGRID names. 
+- :meth:`xugrid.Ugrid2d.topology_subset`,:meth:`xugrid.UgridDataArrayAccessor.sel`
+  :meth:`xugrid.UgridDatasetAccessor.sel` will now return a correct UGRID 2D
+  topology when fill values are present in the face node connectivity.
 
 Changed
 ~~~~~~~
@@ -32,11 +35,12 @@ Changed
 - This also means that selection on one facet of the grid (e.g. the face
   dimension) will also result in a valid selection of the data on another facet
   (such as the edge dimension).
-- :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` 
+- :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` now take an ``obj``
+  argument and return a DataArray or Dataset.
 - Consequently, :meth:`xugrid.UgridDataArrayAccessor.isel` and
   :meth:`xugrid.UgridDatasetAccessor.isel` have been removed.
-- :property:`xugrid.Ugrid1d.dimensions` and
-  :property:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
+- :attr:`xugrid.Ugrid1d.dimensions` and
+  :attr:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
   keys the dimension names and as the values the sizes of the dimensions.
 
 Added
