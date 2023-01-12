@@ -18,6 +18,9 @@ Fixed
   Before this fix, dimension of the UGRID topology would go out of sync with
   the DataArray, as a subset would return a new UGRID topology with default
   UGRID names. 
+- :meth:`xugrid.Ugrid2d.topology_subset`,:meth:`xugrid.UgridDataArrayAccessor.sel`
+  :meth:`xugrid.UgridDatasetAccessor.sel` will now return a correct UGRID 2D
+  topology when fill values are present in the face node connectivity.
 
 Changed
 ~~~~~~~

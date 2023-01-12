@@ -831,7 +831,8 @@ class Ugrid2d(AbstractUgrid):
         index = face_index.values
         face_subset = self.face_node_connectivity[index]
         node_index = np.unique(face_subset.ravel())
-        new_faces = connectivity.renumber(face_subset)
+        node_index = node_index[node_index != self.fill_value]
+        new_faces = connectivity.renumber(face_subset, self.fill_value)
         node_x = self.node_x[node_index]
         node_y = self.node_y[node_index]
 

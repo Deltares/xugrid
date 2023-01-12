@@ -147,7 +147,7 @@ def invert_sparse_to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray
 
 # Renumbering
 # -----------
-def renumber(a: IntArray) -> IntArray:
+def _renumber(a: IntArray) -> IntArray:
     # Taken from https://github.com/scipy/scipy/blob/v1.7.1/scipy/stats/stats.py#L8631-L8737
     # (scipy is BSD-3-Clause License)
     arr = np.ravel(np.asarray(a))
@@ -158,6 +158,16 @@ def renumber(a: IntArray) -> IntArray:
     obs = np.r_[True, arr[1:] != arr[:-1]]
     dense = obs.cumsum()[inv] - 1
     return dense.reshape(a.shape)
+
+
+def renumber(a: IntArray, fill_value: int = None):
+    if fill_value is None:
+        return _renumber(a)
+
+    valid = a != fill_value
+    renumbered = np.full_like(a, fill_value)
+    renumbered[valid] = _renumber(a[valid])
+    return renumbered
 
 
 def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArray:

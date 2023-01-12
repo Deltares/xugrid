@@ -204,6 +204,42 @@ def test_renumber():
     assert np.array_equal(actual, expected)
 
 
+def test_renumber_with_fill_value():
+    a = np.array(
+        [
+            [0, 1, -1],
+            [10, 11, 12],
+            [30, -1, 32],
+        ]
+    )
+    actual = connectivity.renumber(a, fill_value=-1)
+    expected = np.array(
+        [
+            [0, 1, -1],
+            [2, 3, 4],
+            [5, -1, 6],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+    a = np.array(
+        [
+            [0, -1, 2],
+            [10, 11, 2],
+            [30, -1, 2],
+        ]
+    )
+    actual = connectivity.renumber(a, fill_value=-1)
+    expected = np.array(
+        [
+            [0, -1, 1],
+            [2, 3, 1],
+            [4, -1, 1],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+
 def test_close_polygons(mixed_mesh):
     faces, fill_value = mixed_mesh
     closed, isfill = connectivity.close_polygons(faces, fill_value)

@@ -66,7 +66,7 @@ def wraps_xarray(method):
 
         # Sidestep staticmethods, classmethods
         if isinstance(self, UgridDataArray):
-            return maybe_xugrid(result, [self.grid], self.obj.indexes)
+            return maybe_xugrid(result, self.grid, self.obj.indexes)
         elif isinstance(self, UgridDataset):
             return maybe_xugrid(result, self.grids, self.obj.indexes)
         else:

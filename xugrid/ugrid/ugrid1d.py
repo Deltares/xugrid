@@ -449,6 +449,8 @@ class Ugrid1d(AbstractUgrid):
             else:
                 return self
 
+        # N.B. edges do not contain fill values, as there are always two nodes
+        # required to form an edge.
         edge_subset = self.edge_node_connectivity[edge_index]
         node_index = np.unique(edge_subset.ravel())
         new_edges = connectivity.renumber(edge_subset)
