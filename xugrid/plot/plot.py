@@ -16,6 +16,7 @@ from xarray.plot.utils import (
 )
 
 from xugrid.constants import FloatDType
+from xugrid.ugrid.connectivity import close_polygons
 
 NODE = 0
 EDGE = 1
@@ -454,7 +455,7 @@ def imshow(grid, da, ax, **kwargs):
 
     _, _, index = grid.rasterize(resolution)
     img = da.values[index].astype(float)
-    img[index == -1] = np.nan
+    img[index == grid.fill_value] = np.nan
     primitive = ax.imshow(img, **kwargs)
     return primitive
 
@@ -513,15 +514,14 @@ def pcolormesh(grid, da, ax, **kwargs):
         raise ValueError("pcolormesh only supports data on faces")
 
     nodes = grid.node_coordinates
-    faces = grid.face_node_connectivity
+    faces, _ = close_polygons(grid.face_node_connectivity, grid.fill_value)
     vertices = nodes[faces]
-    # Replace fill value; PolyCollection ignores NaN.
-    vertices[faces == -1] = np.nan
 
     # PolyCollection takes a norm, but not vmin, vmax.
     norm = kwargs.get("norm", None)
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
+    kwargs["closed"] = False  # Vertices are closing.
 
     collection = PolyCollection(vertices, **kwargs)
     collection.set_array(da.values.ravel())
