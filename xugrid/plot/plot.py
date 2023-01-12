@@ -624,7 +624,7 @@ class _PlotMethods:
         if invalid:
             raise ValueError(
                 f"UgridDataArray contains non-topology dimensions: {invalid}.\n"
-                f"Expected one of {grid.dimensions}"
+                f"Expected only one of {set(grid.dimensions.keys())}."
             )
 
         self.grid = grid
