@@ -173,10 +173,31 @@ class Ugrid1d(AbstractUgrid):
     def from_meshkernel(
         cls,
         mesh,
-        name: str = "mesh2d",
+        name: str = "network1d",
         projected: bool = True,
         crs: Any = None,
     ):
+        """
+        Create a 1D UGRID topology from a MeshKernel Mesh1d object.
+
+        Parameters
+        ----------
+        mesh: MeshKernel.Mesh2d
+        name: str
+            Mesh name. Defaults to "network1d".
+        projected: bool
+            Whether node_x and node_y are longitude and latitude or projected x and
+            y coordinates. Used to write the appropriate standard_name in the
+            coordinate attributes.
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        grid: Ugrid1d
+        """
         return cls(
             mesh.node_x,
             mesh.node_y,
@@ -483,3 +504,28 @@ class Ugrid1d(AbstractUgrid):
         ymax: float,
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
+
+    @staticmethod
+    def merge_partitions(grids):
+        from xugrid.ugrid import partitioning
+
+        # Grab a sample grid
+        grid = next(iter(grids))
+        fill_value = grid.fill_value
+        node_coordinates, node_indexes, node_inverse = partitioning.merge_nodes(grids)
+        new_edges, edge_indexes = partitioning.merge_edges(grids, node_inverse)
+        indexes = {
+            grid.node_dimension: node_indexes,
+            grid.edge_dimension: edge_indexes,
+        }
+
+        merged_grid = Ugrid1d(
+            *node_coordinates.T,
+            fill_value,
+            new_edges,
+            name=grid.name,
+            projected=grid.projected,
+            crs=grid.crs,
+            attrs=grid._attrs,
+        )
+        return merged_grid, indexes

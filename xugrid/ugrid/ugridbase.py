@@ -123,6 +123,10 @@ class AbstractUgrid(abc.ABC):
     def _clear_geometry_properties():
         """ """
 
+    @abc.abstractstaticmethod
+    def merge_partitions():
+        """ """
+
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
         if dataset is None:

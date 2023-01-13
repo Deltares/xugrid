@@ -182,6 +182,24 @@ class Ugrid2d(AbstractUgrid):
     ):
         """
         Create a 2D UGRID topology from a MeshKernel Mesh2d object.
+
+        Parameters
+        ----------
+        mesh: MeshKernel.Mesh2d
+        name: str
+            Mesh name. Defaults to "mesh2d".
+        projected: bool
+            Whether node_x and node_y are longitude and latitude or projected x and
+            y coordinates. Used to write the appropriate standard_name in the
+            coordinate attributes.
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        grid: Ugrid2d
         """
         n_face = len(mesh.nodes_per_face)
         n_max_node = mesh.nodes_per_face.max()
@@ -308,11 +326,23 @@ class Ugrid2d(AbstractUgrid):
     # These are all optional/derived UGRID attributes. They are not computed by
     # default, only when called upon.
     @property
-    def n_face(self):
+    def n_face(self) -> int:
         """
         Return the number of faces in the UGRID2D topology.
         """
         return self.face_node_connectivity.shape[0]
+
+    @property
+    def n_max_node_per_face(self) -> int:
+        """
+        Return the maximum number of nodes that a face can contain in the
+        UGRID2D topology.
+        """
+        return self.face_node_connectivity.shape[1]
+
+    @property
+    def n_node_per_face(self) -> IntArray:
+        return (self.face_node_connectivity != self.fill_value).sum(axis=1)
 
     @property
     def core_dimension(self):
@@ -1104,6 +1134,40 @@ class Ugrid2d(AbstractUgrid):
                 f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
             )
         return f(obj, x, y)
+
+    @staticmethod
+    def merge_partitions(grids):
+        from xugrid.ugrid import partitioning
+
+        # Grab a sample grid
+        grid = next(iter(grids))
+        fill_value = grid.fill_value
+        node_coordinates, node_indexes, node_inverse = partitioning.merge_nodes(grids)
+        new_faces, face_indexes = partitioning.merge_faces(
+            grids, node_inverse, fill_value
+        )
+        indexes = {
+            grid.node_dimension: node_indexes,
+            grid.face_dimension: face_indexes,
+        }
+
+        if grid._edge_node_connectivity is not None:
+            new_edges, edge_indexes = partitioning.merge_edges(grids, node_inverse)
+            indexes[grid.edge_dimension] = edge_indexes
+        else:
+            new_edges = None
+
+        merged_grid = Ugrid2d(
+            *node_coordinates.T,
+            fill_value,
+            new_faces,
+            name=grid.name,
+            edge_node_connectivity=new_edges,
+            projected=grid.projected,
+            crs=grid.crs,
+            attrs=grid._attrs,
+        )
+        return merged_grid, indexes
 
     def triangulate(self):
         """

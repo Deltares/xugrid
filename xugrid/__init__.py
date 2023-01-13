@@ -17,6 +17,7 @@ from xugrid.core.dataset_accessor import UgridDatasetAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
 from xugrid.ugrid.conventions import UgridRolesAccessor
+from xugrid.ugrid.partitioning import merge_partitions
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 

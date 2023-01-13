@@ -154,6 +154,7 @@ UGRID1D Topology
     Ugrid1d.sel
     Ugrid1d.topology_subset
 
+    Ugrid1d.from_meshkernel
     Ugrid1d.mesh
     Ugrid1d.meshkernel
 
@@ -234,6 +235,7 @@ UGRID2D Topology
     Ugrid2d.rasterize_like
     Ugrid2d.topology_subset
 
+    Ugrid2d.from_meshkernel
     Ugrid2d.mesh
     Ugrid2d.meshkernel
 

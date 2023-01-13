@@ -8,7 +8,7 @@ import types
 from collections import ChainMap
 from functools import wraps
 from itertools import chain
-from typing import Sequence, Union
+from typing import List, Sequence, Union
 
 import xarray as xr
 from pandas import RangeIndex
@@ -64,10 +64,9 @@ def wraps_xarray(method):
         kwargs = {k: maybe_xarray(v) for k, v in kwargs.items()}
         result = method(*args, **kwargs)
 
-        # Sidestep staticmethods, classmethods
-        if isinstance(self, UgridDataArray):
-            return maybe_xugrid(result, self.grid, self.obj.indexes)
-        elif isinstance(self, UgridDataset):
+        # Sidestep staticmethods, classmethods: in that case self will not be a
+        # xugrid type.
+        if isinstance(self, (UgridDataArray, UgridDataset)):
             return maybe_xugrid(result, self.grids, self.obj.indexes)
         else:
             return result
@@ -216,6 +215,10 @@ class UgridDataArray(DataArrayForwardMixin):
         return self._grid
 
     @property
+    def grids(self) -> List[UgridType]:
+        return [self._grid]
+
+    @property
     def ugrid(self):
         """
         UGRID Accessor. This "accessor" makes operations using the UGRID
@@ -304,7 +307,19 @@ class UgridDataset(DatasetForwardMixin):
         return self._obj
 
     @property
-    def grids(self):
+    def grid(self) -> UgridType:
+        ngrid = len(self.grids)
+        if ngrid == 1:
+            return self.grids[0]
+        else:
+            raise AttributeError(
+                "Can only access grid topology via `.grid` if dataset contains "
+                f"exactly one grid. Dataset contains {ngrid} grids. Use "
+                "`.grids` instead."
+            )
+
+    @property
+    def grids(self) -> List[UgridType]:
         return self._grids
 
     @property
