@@ -454,14 +454,35 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_y</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Ugrid1d.from_meshkernel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_meshkernel.html#xugrid.Ugrid1d.from_meshkernel">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_meshkernel</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">mesh</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;network1d&quot;</span><span class="p">,</span>
         <span class="n">projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a 1D UGRID topology from a MeshKernel Mesh1d object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mesh: MeshKernel.Mesh2d</span>
+<span class="sd">        name: str</span>
+<span class="sd">            Mesh name. Defaults to &quot;network1d&quot;.</span>
+<span class="sd">        projected: bool</span>
+<span class="sd">            Whether node_x and node_y are longitude and latitude or projected x and</span>
+<span class="sd">            y coordinates. Used to write the appropriate standard_name in the</span>
+<span class="sd">            coordinate attributes.</span>
+<span class="sd">        crs: Any, optional</span>
+<span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grid: Ugrid1d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">mesh</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
             <span class="n">mesh</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
@@ -470,7 +491,7 @@
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">projected</span><span class="o">=</span><span class="n">projected</span><span class="p">,</span>
             <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid1d.to_dataset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.to_dataset.html#xugrid.Ugrid1d.to_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span>
@@ -767,7 +788,32 @@
         <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">partitioning</span>
+
+        <span class="c1"># Grab a sample grid</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">grids</span><span class="p">))</span>
+        <span class="n">fill_value</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="n">node_coordinates</span><span class="p">,</span> <span class="n">node_indexes</span><span class="p">,</span> <span class="n">node_inverse</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">merge_nodes</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
+        <span class="n">new_edges</span><span class="p">,</span> <span class="n">edge_indexes</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">merge_edges</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">grid</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">node_indexes</span><span class="p">,</span>
+            <span class="n">grid</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="n">edge_indexes</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">merged_grid</span> <span class="o">=</span> <span class="n">Ugrid1d</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">node_coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">new_edges</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">projected</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">projected</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_attrs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div>
 </pre></div>
 
             </article>
