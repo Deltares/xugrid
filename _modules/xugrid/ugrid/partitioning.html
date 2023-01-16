@@ -405,16 +405,35 @@
     <span class="k">return</span> <span class="n">_merge_connectivity</span><span class="p">(</span><span class="n">all_edges</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">fast_concat</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">take_and_concat</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Concatenate the data objects: can easily be a factor 4 faster than</span>
-<span class="sd">    xarray.concat.</span>
+<span class="sd">    Using the dask array functions is much faster than relying on da.isel and</span>
+<span class="sd">    xr.concat.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    objects: list of xr.DataArray, length n_partition.</span>
+<span class="sd">    dim: str</span>
+<span class="sd">        Dimension over which to take and concatenate.</span>
+<span class="sd">    indexes: list of integer ndarray</span>
+<span class="sd">        One index per partition, length n_partition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    merged: xr.DataArray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sample</span> <span class="o">=</span> <span class="n">objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">dims</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">dims</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">name</span>
     <span class="n">attrs</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">attrs</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">var</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">dims</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">dims</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+        <span class="p">],</span>
+        <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
 
 
@@ -538,21 +557,6 @@
     <span class="p">]</span>
     <span class="n">vars_by_dim</span><span class="p">,</span> <span class="n">other_vars</span> <span class="o">=</span> <span class="n">group_vars_by_ugrid_dim</span><span class="p">(</span><span class="n">data_objects</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">)</span>
 
-    <span class="c1"># Merge the UGRID topologies into one, and find the indexes to index into</span>
-    <span class="c1"># the data to avoid duplicates.</span>
-    <span class="n">merged_grids</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">objects</span> <span class="o">=</span> <span class="n">data_objects</span>
-    <span class="k">for</span> <span class="n">grids</span> <span class="ow">in</span> <span class="n">grids_by_name</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
-        <span class="n">merged_grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged_grid</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span> <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">)</span>
-            <span class="p">]</span>
-
-    <span class="c1"># Merge the variables one by one. Skip variables that do not align on other</span>
-    <span class="c1"># dimensions. Should error based on value of an optional argument?</span>
     <span class="c1"># First, merge identical non-UGRID variables:</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">other_vars</span><span class="p">:</span>
@@ -562,17 +566,26 @@
             <span class="p">)[</span><span class="n">var</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">pass</span>
-    <span class="c1"># Second, concatenate UGRID variables along a UGRID dimension.</span>
-    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="nb">vars</span> <span class="ow">in</span> <span class="n">vars_by_dim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
-            <span class="n">var_objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">]</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">merged</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">fast_concat</span><span class="p">(</span><span class="n">var_objects</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">pass</span>
+
+    <span class="c1"># Merge the UGRID topologies into one, and find the indexes to index into</span>
+    <span class="c1"># the data to avoid duplicates. Merge the variables one by one. Skip</span>
+    <span class="c1"># variables that do not align on other dimensions. Should maybe error based</span>
+    <span class="c1"># on value of an optional &quot;compat&quot; argument?</span>
+    <span class="n">merged_grids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">grids</span> <span class="ow">in</span> <span class="n">grids_by_name</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
+        <span class="n">merged_grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged_grid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">vars_by_dim</span><span class="p">[</span><span class="n">dim</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">]</span>
+                    <span class="n">merged</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">take_and_concat</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>
 
     <span class="c1"># The coordinates have been concatenated as well. Set them back as such.</span>
-    <span class="n">coordnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="n">coordnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">set_coords</span><span class="p">(</span><span class="n">coordnames</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
 </pre></div>

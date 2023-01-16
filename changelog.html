@@ -1140,6 +1140,14 @@ UGRID names.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset" title="xugrid.Ugrid2d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.topology_subset()</span></code></a>,:meth:<cite>xugrid.UgridDataArrayAccessor.sel</cite>
 <a class="reference internal" href="api/xugrid.UgridDatasetAccessor.sel.html#xugrid.UgridDatasetAccessor.sel" title="xugrid.UgridDatasetAccessor.sel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.sel()</span></code></a> will now return a correct UGRID 2D
 topology when fill values are present in the face node connectivity.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.plot.contour.html#xugrid.plot.contour" title="xugrid.plot.contour"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.plot.contour()</span></code></a> and <a class="reference internal" href="api/xugrid.plot.contourf.html#xugrid.plot.contourf" title="xugrid.plot.contourf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.plot.contourf()</span></code></a> will no longer
+plot erratic contours when “island” faces are present (no connections to
+other faces) or when “slivers” are present (where cells have a only a left or
+right neighbor).</p></li>
+<li><p><a class="reference internal" href="api/xugrid.plot.pcolormesh.html#xugrid.plot.pcolormesh" title="xugrid.plot.pcolormesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.plot.pcolormesh()</span></code></a> will draw all edges around faces now when
+edgecolor is defined, rather than skipping some edges.</p></li>
+<li><p>Do not mutate edge_node_connectivity in UGRID2D when the
+face_node_connectivity property is accessed.</p></li>
 </ul>
 </section>
 <section id="changed">
@@ -1163,6 +1171,9 @@ argument and return a DataArray or Dataset.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.dimensions.html#xugrid.Ugrid1d.dimensions" title="xugrid.Ugrid1d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.dimensions</span></code></a> and
 <a class="reference internal" href="api/xugrid.Ugrid2d.dimensions.html#xugrid.Ugrid2d.dimensions" title="xugrid.Ugrid2d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.dimensions</span></code></a> will now return a dictionary with the
 keys the dimension names and as the values the sizes of the dimensions.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.voronoi_topology.html#xugrid.Ugrid2d.voronoi_topology" title="xugrid.Ugrid2d.voronoi_topology"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.voronoi_topology</span></code></a> will now include exterior vertices
+to also generate a valid 2D topology when e.g. “island” faces are present
+(no connections to other faces).</p></li>
 </ul>
 </section>
 <section id="added">
@@ -1178,6 +1189,10 @@ to return UGRID dimension indexes if set to True.</p></li>
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.clip_box()</span></code> and
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.clip_box()</span></code> have been added to more easily
 select data in a bounding box.</p></li>
+<li><p>Added <cite>.grid</cite>, <cite>.grids</cite>, <cite>.object</cite> properties on <code class="xref py py-class docutils literal notranslate"><span class="pre">UgridDataArray</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">UgridDataset</span></code>.</p></li>
+<li><p>Added <a class="reference internal" href="api/xugrid.merge_partitions.html#xugrid.merge_partitions" title="xugrid.merge_partitions"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.merge_partitions()</span></code></a> to merge topology and data that have
+been partitioned along UGRID dimensions.</p></li>
 </ul>
 </section>
 </section>
