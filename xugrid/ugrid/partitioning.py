@@ -120,16 +120,35 @@ def merge_edges(grids, node_inverse):
     return _merge_connectivity(all_edges, slices)
 
 
-def fast_concat(objects, dim):
+def take_and_concat(objects, dim, indexes):
     """
-    Concatenate the data objects: can easily be a factor 4 faster than
-    xarray.concat.
+    Using the dask array functions is much faster than relying on da.isel and
+    xr.concat.
+
+    Parameters
+    ----------
+    objects: list of xr.DataArray, length n_partition.
+    dim: str
+        Dimension over which to take and concatenate.
+    indexes: list of integer ndarray
+        One index per partition, length n_partition.
+
+    Returns
+    -------
+    merged: xr.DataArray
     """
     sample = objects[0]
     dims = sample.dims
     name = sample.name
     attrs = sample.attrs
-    data = dask.array.concatenate([var.data for var in objects], axis=dims.index(dim))
+    axis = dims.index(dim)
+    data = dask.array.concatenate(
+        [
+            dask.array.take(obj.data, index, axis=axis)
+            for obj, index in zip(objects, indexes)
+        ],
+        axis=axis,
+    )
     return xr.DataArray(data, dims=dims, name=name, attrs=attrs)
 
 
@@ -253,21 +272,6 @@ def merge_partitions(partitions):
     ]
     vars_by_dim, other_vars = group_vars_by_ugrid_dim(data_objects, ugrid_dims)
 
-    # Merge the UGRID topologies into one, and find the indexes to index into
-    # the data to avoid duplicates.
-    merged_grids = []
-    objects = data_objects
-    for grids in grids_by_name.values():
-        grid = grids[0]
-        merged_grid, indexes = grid.merge_partitions(grids)
-        merged_grids.append(merged_grid)
-        for dim, dim_indexes in indexes.items():
-            objects = [
-                obj.isel({dim: index}) for obj, index in zip(objects, dim_indexes)
-            ]
-
-    # Merge the variables one by one. Skip variables that do not align on other
-    # dimensions. Should error based on value of an optional argument?
     # First, merge identical non-UGRID variables:
     merged = xr.Dataset()
     for var in other_vars:
@@ -277,16 +281,25 @@ def merge_partitions(partitions):
             )[var]
         except ValueError:
             pass
-    # Second, concatenate UGRID variables along a UGRID dimension.
-    for dim, vars in vars_by_dim.items():
-        for var in vars:
-            var_objects = [obj[var] for obj in objects]
-            try:
-                merged[var] = fast_concat(var_objects, dim)
-            except ValueError:
-                pass
+
+    # Merge the UGRID topologies into one, and find the indexes to index into
+    # the data to avoid duplicates. Merge the variables one by one. Skip
+    # variables that do not align on other dimensions. Should maybe error based
+    # on value of an optional "compat" argument?
+    merged_grids = []
+    for grids in grids_by_name.values():
+        grid = grids[0]
+        merged_grid, indexes = grid.merge_partitions(grids)
+        merged_grids.append(merged_grid)
+        for dim, dim_indexes in indexes.items():
+            for var in vars_by_dim[dim]:
+                try:
+                    objects = [obj[var] for obj in data_objects]
+                    merged[var] = take_and_concat(objects, dim, dim_indexes)
+                except ValueError:
+                    pass
 
     # The coordinates have been concatenated as well. Set them back as such.
-    coordnames = set(objects[0].coords).intersection(merged.data_vars)
+    coordnames = set(data_objects[0].coords).intersection(merged.data_vars)
     merged = merged.set_coords(coordnames)
     return UgridDataset(merged, merged_grids)
