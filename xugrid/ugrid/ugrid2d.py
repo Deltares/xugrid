@@ -121,6 +121,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Area
+        self._area = None
         # Centroids
         self._centroids = None
         # Bounds
@@ -157,6 +159,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Area
+        self._area = None
         # Centroids
         self._centroids = None
         # Bounds
@@ -427,6 +431,17 @@ class Ugrid2d(AbstractUgrid):
                 self.node_y,
             )
         return self._centroids
+
+    @property
+    def area(self) -> FloatArray:
+        if self._area is None:
+            self._area = connectivity.area(
+                self.face_node_connectivity,
+                self.fill_value,
+                self.node_x,
+                self.node_y,
+            )
+        return self._area
 
     @property
     def face_bounds(self):

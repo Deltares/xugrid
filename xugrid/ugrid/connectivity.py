@@ -308,6 +308,24 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
 
 
+def area(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+):
+    nodes = np.column_stack([node_x, node_y])
+    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    coordinates = nodes[closed]
+    # Shift coordinates to avoid precision loss
+    coordinates[..., 0] -= node_x.mean()
+    coordinates[..., 1] -= node_y.mean()
+    a = coordinates[:, :-1]
+    b = coordinates[:, 1:]
+    determinant = np.cross(a, b)
+    return 0.5 * abs(determinant.sum(axis=1))
+
+
 def centroids(
     face_node_connectivity: IntArray,
     fill_value: int,
@@ -329,6 +347,7 @@ def centroids(
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
         closed, _ = close_polygons(face_node_connectivity, fill_value)
         coordinates = nodes[closed]
+        # Shift coordinates to avoid precision loss
         a = coordinates[:, :-1]
         b = coordinates[:, 1:]
         c = a + b
