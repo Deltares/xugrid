@@ -191,6 +191,7 @@ def group_vars_by_ugrid_dim(data_objects, ugrid_dims):
     # Group variables by UGRID dimension.
     ds = data_objects[0]
     grouped = defaultdict(list)
+    other = []
     for var, da in ds.variables.items():
         intersection = ugrid_dims.intersection(da.dims)
         if intersection:
@@ -200,8 +201,10 @@ def group_vars_by_ugrid_dim(data_objects, ugrid_dims):
                 )
             dim = intersection.pop()
             grouped[dim].append(var)
+        else:
+            other.append(var)
 
-    return grouped
+    return grouped, set(other)
 
 
 def merge_partitions(partitions):
@@ -247,7 +250,7 @@ def merge_partitions(partitions):
         obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
         for obj in data_objects
     ]
-    vars_by_dim = group_vars_by_ugrid_dim(data_objects, ugrid_dims)
+    vars_by_dim, other_vars = group_vars_by_ugrid_dim(data_objects, ugrid_dims)
 
     # Merge the UGRID topologies into one, and find the indexes to index into
     # the data to avoid duplicates.
@@ -264,7 +267,16 @@ def merge_partitions(partitions):
 
     # Merge the variables one by one. Skip variables that do not align on other
     # dimensions. Should error based on value of an optional argument?
+    # First, merge identical non-UGRID variables:
     merged = xr.Dataset()
+    for var in other_vars:
+        try:
+            merged[var] = xr.merge(
+                [obj[var] for obj in data_objects], compat="identical"
+            )[var]
+        except ValueError:
+            pass
+    # Second, concatenate UGRID variables along a UGRID dimension.
     for dim, vars in vars_by_dim.items():
         for var in vars:
             var_objects = [obj[var] for obj in objects]
