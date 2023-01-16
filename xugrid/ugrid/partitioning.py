@@ -4,6 +4,7 @@ Create and merge partitioned UGRID topologies.
 from collections import defaultdict
 from itertools import accumulate
 
+import dask.array
 import numpy as np
 import xarray as xr
 
@@ -119,6 +120,18 @@ def merge_edges(grids, node_inverse):
     return _merge_connectivity(all_edges, slices)
 
 
+def fast_concat(objects, dim):
+    """
+    Concatenate the data objects: can easily be a factor 4 faster than
+    xarray.concat.
+    """
+    sample = objects[0]
+    dims = sample.dims
+    name = sample.name
+    data = dask.array.concatenate([var.data for var in objects], axis=dims.index(dim))
+    return xr.DataArray(data, dims=dims, name=name)
+
+
 def validate_partition_topology(grouped, n_partition: int):
     n = n_partition
     if not all(len(v) == n for v in grouped.values()):
@@ -178,7 +191,7 @@ def group_vars_by_ugrid_dim(data_objects, ugrid_dims):
     # Group variables by UGRID dimension.
     ds = data_objects[0]
     grouped = defaultdict(list)
-    for var, da in ds.data_vars.items():
+    for var, da in ds.variables.items():
         intersection = ugrid_dims.intersection(da.dims)
         if intersection:
             if len(intersection) > 1:
@@ -192,6 +205,25 @@ def group_vars_by_ugrid_dim(data_objects, ugrid_dims):
 
 
 def merge_partitions(partitions):
+    """
+    Merge topology and data, partitioned along UGRID dimensions, into a single
+    UgridDataset.
+
+    UGRID topologies and variables are merged if they share a name. Topologies
+    and variables must be present in *all* partitions. Dimension names must
+    match.
+
+    Variables are omitted from the merged result if non-UGRID dimensions do not
+    match in size.
+
+    Parameters
+    ----------
+    partitions : sequence of UgridDataset or UgridDataArray
+
+    Returns
+    -------
+    merged : UgridDataset
+    """
     types = set(type(obj) for obj in partitions)
     msg = "Expected UgridDataArray or UgridDataset, received: {}"
     if len(types) > 1:
@@ -201,18 +233,24 @@ def merge_partitions(partitions):
     if obj_type not in (UgridDataArray, UgridDataset):
         raise TypeError(msg.format(obj_type.__name__))
 
-    # Convert to dataset for convenience
-    data_objects = [partition.obj for partition in partitions]
-    data_objects = [
-        obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
-        for obj in data_objects
-    ]
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = set(dim for grid in grids for dim in grid.dimensions)
     grids_by_name = group_grids_by_name(partitions)
+
+    # Collect xarray objects, drop ugrid dimension coordinates if present.
+    data_objects = [
+        partition.obj.drop_vars(ugrid_dims, errors="ignore") for partition in partitions
+    ]
+    # Convert to dataset for convenience
+    data_objects = [
+        obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
+        for obj in data_objects
+    ]
     vars_by_dim = group_vars_by_ugrid_dim(data_objects, ugrid_dims)
 
+    # Merge the UGRID topologies into one, and find the indexes to index into
+    # the data to avoid duplicates.
     merged_grids = []
     objects = data_objects
     for grids in grids_by_name.values():
@@ -224,16 +262,18 @@ def merge_partitions(partitions):
                 obj.isel({dim: index}) for obj, index in zip(objects, dim_indexes)
             ]
 
+    # Merge the variables one by one. Skip variables that do not align on other
+    # dimensions. Should error based on value of an optional argument?
     merged = xr.Dataset()
     for dim, vars in vars_by_dim.items():
         for var in vars:
+            var_objects = [obj[var] for obj in objects]
             try:
-                das = [obj[var] for obj in objects]
-                merged[var] = xr.concat(das, dim=dim)
-            # This should mean that another dimension doesn't align, e.g. a
-            # variable that depends on the n_max_node_per_face dimension,
-            # e.g. for triangles and quadrangles.
+                merged[var] = fast_concat(var_objects, dim)
             except ValueError:
                 pass
 
+    # The coordinates have been concatenated as well. Set them back as such.
+    coordnames = set(objects[0].coords).intersection(merged.data_vars)
+    merged = merged.set_coords(coordnames)
     return UgridDataset(merged, merged_grids)
