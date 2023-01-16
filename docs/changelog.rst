@@ -11,6 +11,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
+
 - :meth:`xugrid.Ugrid1d.topology_subset`,
   :meth:`xugrid.Ugrid2d.topology_subset`, and therefore also
   :meth:`xugrid.UgridDataArrayAccessor.sel` and
@@ -21,9 +22,18 @@ Fixed
 - :meth:`xugrid.Ugrid2d.topology_subset`,:meth:`xugrid.UgridDataArrayAccessor.sel`
   :meth:`xugrid.UgridDatasetAccessor.sel` will now return a correct UGRID 2D
   topology when fill values are present in the face node connectivity.
+- :meth:`xugrid.plot.contour` and :meth:`xugrid.plot.contourf` will no longer
+  plot erratic contours when "island" faces are present (no connections to
+  other faces) or when "slivers" are present (where cells have a only a left or
+  right neighbor).
+- :meth:`xugrid.plot.pcolormesh` will draw all edges around faces now when
+  edgecolor is defined, rather than skipping some edges.
+- Do not mutate edge_node_connectivity in UGRID2D when the
+  face_node_connectivity property is accessed.
 
 Changed
 ~~~~~~~
+
 - Forwarding to the internal xarray object is now setup at class definition of
   :class:`UgridDataArray` and :class:`UgridDataset` rather than at runtime.
   This means tab completion and docstrings for the xarray methods should work.
@@ -42,9 +52,13 @@ Changed
 - :attr:`xugrid.Ugrid1d.dimensions` and
   :attr:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
   keys the dimension names and as the values the sizes of the dimensions.
+- :attr:`xugrid.Ugrid2d.voronoi_topology` will now include exterior vertices
+  to also generate a valid 2D topology when e.g. "island" faces are present
+  (no connections to other faces).
 
 Added
 ~~~~~
+
 - :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` can now be initialized
   with an ``attrs`` argument to setup non-default UGRID attributes such as
   alternative node, edge, or face dimensions.
@@ -55,6 +69,10 @@ Added
 - :meth:`xugrid.UgridDataArrayAccessor.clip_box` and
   :meth:`xugrid.UgridDatasetAccessor.clip_box` have been added to more easily
   select data in a bounding box.
+- Added `.grid`, `.grids`, `.object` properties on :class:`UgridDataArray` and
+  :class:`UgridDataset`.
+- Added :func:`xugrid.merge_partitions` to merge topology and data that have
+  been partitioned along UGRID dimensions.
 
 [0.1.10] 2022-12-13
 -------------------
