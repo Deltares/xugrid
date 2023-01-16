@@ -580,6 +580,11 @@ class Ugrid2d(AbstractUgrid):
                 self.node_face_connectivity,
                 self.node_coordinates,
                 self.centroids,
+                self.edge_face_connectivity,
+                self.edge_node_connectivity,
+                self.fill_value,
+                add_exterior=True,
+                add_vertices=False,
             )
             self._voronoi_topology = vertices, faces, face_index
         return self._voronoi_topology
