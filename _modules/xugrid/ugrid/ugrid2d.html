@@ -660,6 +660,7 @@
         <span class="p">)</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -687,6 +688,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_edge_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_edge_connectivity</span><span class="p">()</span>
+            <span class="c1"># if self._edge_node_connectivity is None:</span>
+            <span class="c1">#    self._edge_connectivity()</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#    raise NotImplementedError</span>
+        <span class="c1">#                self._face_edge_connectivity =</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_edge_connectivity</span>
 
     <span class="nd">@property</span>
@@ -859,6 +865,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_face_connectivity</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">add_vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_voronoi_topology</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">face_index</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_voronoi_topology</span>

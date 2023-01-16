@@ -30,6 +30,7 @@ Top-level functions
     zeros_like
     concat
     merge
+    merge_partitions
 
 UgridDataArray
 --------------
