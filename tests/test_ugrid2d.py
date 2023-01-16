@@ -382,20 +382,53 @@ def test_node_face_connectivity():
 def test_voronoi_topology():
     grid = grid2d()
     vertices, faces, face_index = grid.voronoi_topology
-    assert np.allclose(vertices, CENTROIDS)
+    expected_exterior = np.array(
+        [
+            [0.5, 0.0],
+            [0.0, 0.5],
+            [1.5, 0.0],
+            [2.0, 0.5],
+            [0.5, 1.5],
+            [1.5, 1.5],
+        ]
+    )
+    expected_vertices = np.vstack([CENTROIDS, expected_exterior])
+    assert np.allclose(vertices, expected_vertices)
     assert isinstance(faces, sparse.coo_matrix)
-    assert np.array_equal(faces.row, [0, 0, 0, 0])
-    assert np.array_equal(faces.col, [0, 1, 3, 2])
-    assert np.array_equal(face_index, [0, 1, 2, 3])
+    expected_row = np.array(
+        [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6]
+    )
+    expected_col = np.array(
+        [0, 1, 3, 2, 4, 0, 5, 4, 6, 1, 0, 6, 7, 1, 5, 0, 2, 8, 1, 7, 9, 3, 2, 3, 9, 8]
+    )
+    assert np.array_equal(faces.row, expected_row)
+    assert np.array_equal(faces.col, expected_col)
+    assert np.array_equal(face_index, [0, 1, 2, 3, 0, 0, 1, 1, 2, 3])
 
 
 def test_centroid_triangulation():
     grid = grid2d()
     (x, y, triangles), face_index = grid.centroid_triangulation
-    assert np.allclose(x, CENTROIDS[:, 0])
-    assert np.allclose(y, CENTROIDS[:, 1])
-    assert np.array_equal(triangles, [[0, 1, 3], [0, 3, 2]])
-    assert np.array_equal(face_index, [0, 1, 2, 3])
+    assert np.allclose(x, list(CENTROIDS[:, 0]) + [0.5, 0.0, 1.5, 2.0, 0.5, 1.5])
+    assert np.allclose(y, list(CENTROIDS[:, 1]) + [0.0, 0.5, 0.0, 0.5, 1.5, 1.5])
+    expected_triangles = np.array(
+        [
+            [0, 1, 3],
+            [0, 3, 2],
+            [4, 0, 5],
+            [4, 6, 1],
+            [4, 1, 0],
+            [6, 7, 1],
+            [5, 0, 2],
+            [5, 2, 8],
+            [1, 7, 9],
+            [1, 9, 3],
+            [2, 3, 9],
+            [2, 9, 8],
+        ]
+    )
+    assert np.array_equal(triangles, expected_triangles)
+    assert np.array_equal(face_index, [0, 1, 2, 3, 0, 0, 1, 1, 2, 3])
 
 
 def test_triangulation():
