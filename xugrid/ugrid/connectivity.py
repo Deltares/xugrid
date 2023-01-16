@@ -229,8 +229,12 @@ def counterclockwise(
 # Derived connectivities
 # ----------------------
 def edge_connectivity(
-    face_node_connectivity: IntArray, fill_value: int
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    edge_node_connectivity=None,
 ) -> Tuple[IntArray, IntArray]:
+    """Derive new edge_node_connectivity and face_edge_connectivity."""
+    prior = edge_node_connectivity
     n, m = face_node_connectivity.shape
     # Close the polygons: [0 1 2 3] -> [0 1 2 3 0]
     closed, isfill = close_polygons(face_node_connectivity, fill_value)
@@ -247,6 +251,13 @@ def edge_connectivity(
     edge_node_connectivity, inverse_indices = np.unique(
         ar=edge_node_connectivity, return_inverse=True, axis=0
     )
+
+    if prior is not None:  # prior edge_node_connectivity exists
+        # argsort doesn't work on rows!
+        _, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
+        inverse_indices = index[inverse_indices]
+        edge_node_connectivity = prior
+
     # Create face_edge_connectivity
     face_edge_connectivity = np.full((n, m), fill_value, dtype=np.int64)
     isnode = ~isfill[:, :-1]

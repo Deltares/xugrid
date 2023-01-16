@@ -375,6 +375,7 @@ class Ugrid2d(AbstractUgrid):
         ) = connectivity.edge_connectivity(
             self.face_node_connectivity,
             self.fill_value,
+            self._edge_node_connectivity,
         )
 
     @property
@@ -402,6 +403,11 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._face_edge_connectivity is None:
             self._edge_connectivity()
+            # if self._edge_node_connectivity is None:
+            #    self._edge_connectivity()
+            # else:
+            #    raise NotImplementedError
+        #                self._face_edge_connectivity =
         return self._face_edge_connectivity
 
     @property
