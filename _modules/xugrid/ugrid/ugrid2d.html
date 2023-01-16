@@ -406,6 +406,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Celltree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Bounds</span>
@@ -442,6 +444,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Celltree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Bounds</span>
@@ -712,6 +716,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">area</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
