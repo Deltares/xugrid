@@ -128,8 +128,9 @@ def fast_concat(objects, dim):
     sample = objects[0]
     dims = sample.dims
     name = sample.name
+    attrs = sample.attrs
     data = dask.array.concatenate([var.data for var in objects], axis=dims.index(dim))
-    return xr.DataArray(data, dims=dims, name=name)
+    return xr.DataArray(data, dims=dims, name=name, attrs=attrs)
 
 
 def validate_partition_topology(grouped, n_partition: int):
