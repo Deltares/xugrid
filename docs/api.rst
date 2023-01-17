@@ -198,13 +198,13 @@ UGRID2D Topology
     Ugrid2d.face_dimension
     Ugrid2d.face_coordinates
     Ugrid2d.centroids
+    Ugrid2d.area
     Ugrid2d.face_x
     Ugrid2d.face_y
 
     Ugrid2d.bounds
     Ugrid2d.edge_bounds
     Ugrid2d.face_bounds
-    Ugrid2d.centroids
 
     Ugrid2d.node_edge_connectivity
     Ugrid2d.node_face_connectivity
