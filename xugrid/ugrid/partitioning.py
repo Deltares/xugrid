@@ -4,7 +4,6 @@ Create and merge partitioned UGRID topologies.
 from collections import defaultdict
 from itertools import accumulate
 
-import dask.array
 import numpy as np
 import xarray as xr
 
@@ -120,38 +119,6 @@ def merge_edges(grids, node_inverse):
     return _merge_connectivity(all_edges, slices)
 
 
-def take_and_concat(objects, dim, indexes):
-    """
-    Using the dask array functions is much faster than relying on da.isel and
-    xr.concat.
-
-    Parameters
-    ----------
-    objects: list of xr.DataArray, length n_partition.
-    dim: str
-        Dimension over which to take and concatenate.
-    indexes: list of integer ndarray
-        One index per partition, length n_partition.
-
-    Returns
-    -------
-    merged: xr.DataArray
-    """
-    sample = objects[0]
-    dims = sample.dims
-    name = sample.name
-    attrs = sample.attrs
-    axis = dims.index(dim)
-    data = dask.array.concatenate(
-        [
-            dask.array.take(obj.data, index, axis=axis)
-            for obj, index in zip(objects, indexes)
-        ],
-        axis=axis,
-    )
-    return xr.DataArray(data, dims=dims, name=name, attrs=attrs)
-
-
 def validate_partition_topology(grouped, n_partition: int):
     n = n_partition
     if not all(len(v) == n for v in grouped.values()):
@@ -205,26 +172,49 @@ def validate_partition_objects(data_objects):
             )
 
 
-def group_vars_by_ugrid_dim(data_objects, ugrid_dims):
+def separate_variables(data_objects, ugrid_dims):
+    """
+    Separate into UGRID variables grouped by dimension, and other variables.
+    """
     validate_partition_objects(data_objects)
 
+    def assert_single_dim(intersection):
+        if len(intersection) > 1:
+            raise ValueError(
+                f"{var} contains more than one UGRID dimension: {intersection}"
+            )
+
+    def remove_item(tuple, index):
+        return tuple[:index] + tuple[index + 1 :]
+
+    def all_equal(iterator):
+        first = next(iter(iterator))
+        return all(element == first for element in iterator)
+
     # Group variables by UGRID dimension.
-    ds = data_objects[0]
-    grouped = defaultdict(list)
-    other = []
-    for var, da in ds.variables.items():
+    first = data_objects[0]
+    variables = first.variables
+    vardims = {var: tuple(first[var].dims) for var in variables}
+    grouped = defaultdict(list)  # UGRID associated vars
+    other = []  # other vars
+    for var, da in variables.items():
+        shapes = (obj[var].shape for obj in data_objects)
+
+        # Check if variable depends on UGRID dimension.
         intersection = ugrid_dims.intersection(da.dims)
         if intersection:
-            if len(intersection) > 1:
-                raise ValueError(
-                    f"{var} contains more than one UGRID dimension: {intersection}"
-                )
-            dim = intersection.pop()
-            grouped[dim].append(var)
-        else:
+            assert_single_dim(intersection)
+            # Now check whether the non-UGRID dimensions match.
+            dim = intersection.pop()  # Get the single element in the set.
+            axis = vardims[var].index(dim)
+            shapes = [remove_item(shape, axis) for shape in shapes]
+            if all_equal(shapes):
+                grouped[dim].append(var)
+
+        elif all_equal(shapes):
             other.append(var)
 
-    return grouped, set(other)
+    return grouped, other
 
 
 def merge_partitions(partitions):
@@ -256,50 +246,38 @@ def merge_partitions(partitions):
     if obj_type not in (UgridDataArray, UgridDataset):
         raise TypeError(msg.format(obj_type.__name__))
 
-    # Collect grids
-    grids = [grid for p in partitions for grid in p.grids]
-    ugrid_dims = set(dim for grid in grids for dim in grid.dimensions)
-    grids_by_name = group_grids_by_name(partitions)
-
-    # Collect xarray objects, drop ugrid dimension coordinates if present.
-    data_objects = [
-        partition.obj.drop_vars(ugrid_dims, errors="ignore") for partition in partitions
-    ]
     # Convert to dataset for convenience
+    data_objects = [partition.obj for partition in partitions]
     data_objects = [
         obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
         for obj in data_objects
     ]
-    vars_by_dim, other_vars = group_vars_by_ugrid_dim(data_objects, ugrid_dims)
+    # Collect grids
+    grids = [grid for p in partitions for grid in p.grids]
+    ugrid_dims = set(dim for grid in grids for dim in grid.dimensions)
+    grids_by_name = group_grids_by_name(partitions)
+    vars_by_dim, other_vars = separate_variables(data_objects, ugrid_dims)
 
-    # First, merge identical non-UGRID variables:
-    merged = xr.Dataset()
-    for var in other_vars:
-        try:
-            merged[var] = xr.merge(
-                [obj[var] for obj in data_objects], compat="identical"
-            )[var]
-        except ValueError:
-            pass
+    # First, take identical non-UGRID variables from the first partition:
+    merged = data_objects[0][other_vars]
 
     # Merge the UGRID topologies into one, and find the indexes to index into
-    # the data to avoid duplicates. Merge the variables one by one. Skip
-    # variables that do not align on other dimensions. Should maybe error based
-    # on value of an optional "compat" argument?
+    # the data to avoid duplicates.
     merged_grids = []
     for grids in grids_by_name.values():
+        # First, merge the grid topology.
         grid = grids[0]
         merged_grid, indexes = grid.merge_partitions(grids)
         merged_grids.append(merged_grid)
-        for dim, dim_indexes in indexes.items():
-            for var in vars_by_dim[dim]:
-                try:
-                    objects = [obj[var] for obj in data_objects]
-                    merged[var] = take_and_concat(objects, dim, dim_indexes)
-                except ValueError:
-                    pass
 
-    # The coordinates have been concatenated as well. Set them back as such.
-    coordnames = set(data_objects[0].coords).intersection(merged.data_vars)
-    merged = merged.set_coords(coordnames)
+        # Now remove duplicates, then concatenate along the UGRID dimension.
+        for dim, dim_indexes in indexes.items():
+            vars = vars_by_dim[dim]
+            selection = [
+                obj[vars].isel({dim: index})
+                for obj, index in zip(data_objects, dim_indexes)
+            ]
+            merged_selection = xr.concat(selection, dim=dim)
+            merged.update(merged_selection)
+
     return UgridDataset(merged, merged_grids)
