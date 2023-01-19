@@ -70,6 +70,22 @@ def ugrid1d_ds():
     return xugrid.UgridDataset(ds)
 
 
+def test_properties():
+    uda = xugrid.UgridDataArray(DARRAY(), GRID())
+    uds = xugrid.UgridDataset(UGRID_DS())
+
+    for item in (uda, uda.ugrid, uds, uds.ugrid):
+        assert isinstance(getattr(item, "grid"), xugrid.Ugrid2d)
+        grids = getattr(item, "grids")
+        assert isinstance(grids, list)
+        assert isinstance(grids[0], xugrid.Ugrid2d)
+
+    assert isinstance(uda.obj, xr.DataArray)
+    assert isinstance(uda.ugrid.obj, xr.DataArray)
+    assert isinstance(uds.obj, xr.Dataset)
+    assert isinstance(uds.ugrid.obj, xr.Dataset)
+
+
 def test_init_errors():
     with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
         xugrid.UgridDataArray(0, GRID())
@@ -533,8 +549,11 @@ def test_multiple_grids():
     uds["b"] = uda1d
     assert len(uds.grids) == 2
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError):
         uds.ugrid.grid
+
+    with pytest.raises(TypeError):
+        uds.grid
 
 
 def test_to_dataset():

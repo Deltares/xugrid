@@ -308,15 +308,8 @@ class UgridDataset(DatasetForwardMixin):
 
     @property
     def grid(self) -> UgridType:
-        ngrid = len(self.grids)
-        if ngrid == 1:
-            return self.grids[0]
-        else:
-            raise AttributeError(
-                "Can only access grid topology via `.grid` if dataset contains "
-                f"exactly one grid. Dataset contains {ngrid} grids. Use "
-                "`.grids` instead."
-            )
+        # We need to do some checking. Don't duplicate that logic.
+        return self.ugrid.grid
 
     @property
     def grids(self) -> List[UgridType]:

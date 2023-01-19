@@ -21,7 +21,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         if ngrid == 1:
             return self.grids[0]
         else:
-            raise AttributeError(
+            raise TypeError(
                 "Can only access grid topology via `.grid` if dataset contains "
                 f"exactly one grid. Dataset contains {ngrid} grids. Use "
                 "`.grids` instead."

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import scipy.sparse
@@ -23,6 +23,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     def __init__(self, obj: xr.DataArray, grid: UgridType):
         self.obj = obj
         self.grid = grid
+
+    @property
+    def grids(self) -> List[UgridType]:
+        return [self.grid]
 
     @property
     def bounds(self) -> Dict[str, Tuple]:
