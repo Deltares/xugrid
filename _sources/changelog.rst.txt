@@ -12,6 +12,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+Changed
+~~~~~~~
+
+Added
+~~~~~
+
+[0.2.0] 2023-01-19
+------------------
+
+Fixed
+~~~~~
+
 - :meth:`xugrid.Ugrid1d.topology_subset`,
   :meth:`xugrid.Ugrid2d.topology_subset`, and therefore also
   :meth:`xugrid.UgridDataArrayAccessor.sel` and
