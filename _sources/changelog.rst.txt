@@ -19,7 +19,7 @@ Fixed
   Before this fix, dimension of the UGRID topology would go out of sync with
   the DataArray, as a subset would return a new UGRID topology with default
   UGRID names. 
-- :meth:`xugrid.Ugrid2d.topology_subset`,:meth:`xugrid.UgridDataArrayAccessor.sel`
+- :meth:`xugrid.Ugrid2d.topology_subset`, :meth:`xugrid.UgridDataArrayAccessor.sel`
   :meth:`xugrid.UgridDatasetAccessor.sel` will now return a correct UGRID 2D
   topology when fill values are present in the face node connectivity.
 - :meth:`xugrid.plot.contour` and :meth:`xugrid.plot.contourf` will no longer
@@ -47,14 +47,15 @@ Changed
   (such as the edge dimension).
 - :meth:`xugrid.Ugrid1d.sel` and :meth:`xugrid.Ugrid2d.sel` now take an ``obj``
   argument and return a DataArray or Dataset.
-- Consequently, :meth:`xugrid.UgridDataArrayAccessor.isel` and
-  :meth:`xugrid.UgridDatasetAccessor.isel` have been removed.
+- Consequently, `xugrid.UgridDataArrayAccessor.isel` and
+  `xugrid.UgridDatasetAccessor.isel` have been removed.
 - :attr:`xugrid.Ugrid1d.dimensions` and
   :attr:`xugrid.Ugrid2d.dimensions` will now return a dictionary with the
   keys the dimension names and as the values the sizes of the dimensions.
-- :attr:`xugrid.Ugrid2d.voronoi_topology` will now include exterior vertices
-  to also generate a valid 2D topology when e.g. "island" faces are present
-  (no connections to other faces).
+- :attr:`xugrid.Ugrid2d.voronoi_topology` will now include exterior vertices to
+  also generate a valid 2D topology when when "island" faces are present (no
+  connections to other faces) or when "slivers" are present (where cells have a
+  only a left or right neighbor).
 
 Added
 ~~~~~
@@ -69,8 +70,9 @@ Added
 - :meth:`xugrid.UgridDataArrayAccessor.clip_box` and
   :meth:`xugrid.UgridDatasetAccessor.clip_box` have been added to more easily
   select data in a bounding box.
-- Added `.grid`, `.grids`, `.object` properties on :class:`UgridDataArray` and
-  :class:`UgridDataset`.
+- For convenience, ``.grid``, ``.grids``, ``.obj`` properties are now available
+  on all these classes: :class:`UgridDataArray`, :class:`UgridDataset`,
+  :class:`UgridDataArrayAccessor`, and :class:`UgridDatasetAccessor`.
 - Added :func:`xugrid.merge_partitions` to merge topology and data that have
   been partitioned along UGRID dimensions.
 

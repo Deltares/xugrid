@@ -593,15 +593,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
-        <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ngrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                <span class="s2">&quot;Can only access grid topology via `.grid` if dataset contains &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use &quot;</span>
-                <span class="s2">&quot;`.grids` instead.&quot;</span>
-            <span class="p">)</span>
+        <span class="c1"># We need to do some checking. Don&#39;t duplicate that logic.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]:</span>
