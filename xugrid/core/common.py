@@ -35,7 +35,7 @@ def open_dataarray(*args, **kwargs):
     if data_array.name == DATAARRAY_VARIABLE:
         data_array.name = None
 
-    return data_array
+    return UgridDataArray(data_array, dataset.grid)
 
 
 def open_mfdataset(*args, **kwargs):

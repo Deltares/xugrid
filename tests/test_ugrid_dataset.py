@@ -582,10 +582,9 @@ def test_open_dataarray_roundtrip(tmp_path):
 
     path = tmp_path / "ugrid-dataarray.nc"
     uds["a"].ugrid.to_netcdf(path)
-    # TODO: remove topology_variable from dataset as well!
-    # back = xugrid.open_dataarray(path)
-    # assert isinstance(back, xugrid.UgridDataArray)
-    # assert back.name == "a"
+    back = xugrid.open_dataarray(path)
+    assert isinstance(back, xugrid.UgridDataArray)
+    assert back.name == "a"
 
 
 def test_open_mfdataset(tmp_path):

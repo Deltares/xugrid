@@ -11,6 +11,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
+- :func:`xugrid.open_dataarray` will now return :class:`xugrid.UgridDataArray`
+  instead of only an xarray DataArray without topology.
 
 Changed
 ~~~~~~~
