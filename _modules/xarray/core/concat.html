@@ -289,22 +289,27 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">.alignment</span> <span class="kn">import</span> <span class="n">align</span>
-<span class="kn">from</span> <span class="nn">.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
-<span class="kn">from</span> <span class="nn">.indexes</span> <span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
-<span class="kn">from</span> <span class="nn">.merge</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span>
+<span class="kn">from</span> <span class="nn">xarray.core.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
+<span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
+<span class="kn">from</span> <span class="nn">xarray.core.merge</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_VALID_COMPAT</span><span class="p">,</span>
     <span class="n">collect_variables_and_indexes</span><span class="p">,</span>
     <span class="n">merge_attrs</span><span class="p">,</span>
     <span class="n">merge_collected</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">T_DataArray</span><span class="p">,</span> <span class="n">T_Dataset</span>
-<span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
-<span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">concat</span> <span class="k">as</span> <span class="n">concat_vars</span>
+<span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="n">T_DataArray</span><span class="p">,</span> <span class="n">T_Dataset</span>
+<span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">concat</span> <span class="k">as</span> <span class="n">concat_vars</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">ConcatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CombineAttrsOptions</span><span class="p">,</span>
+        <span class="n">CompatOptions</span><span class="p">,</span>
+        <span class="n">ConcatOptions</span><span class="p">,</span>
+        <span class="n">JoinOptions</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="nd">@overload</span>
@@ -499,8 +504,8 @@
     <span class="c1"># TODO: add ignore_index arguments copied from pandas.concat</span>
     <span class="c1"># TODO: support concatenating scalar coordinates even if the concatenated</span>
     <span class="c1"># dimension already exists</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">first_obj</span><span class="p">,</span> <span class="n">objs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">peek_at</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
@@ -550,7 +555,7 @@
 <span class="sd">    for concatenating along the new dimension.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
 
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="kc">None</span>
 
@@ -726,8 +731,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Concatenate a sequence of datasets along a new or existing dimension</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
 
@@ -913,7 +918,7 @@
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataArray</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
 
     <span class="n">arrays</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
 

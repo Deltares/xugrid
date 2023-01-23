@@ -1142,7 +1142,8 @@ can also be used.</p></li>
 arrays. <code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the dataset with dask using a single
 chunk for all arrays. <code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the dataset with dask using
 engine preferred chunks if exposed by the backend, otherwise with
-a single chunk for all arrays.
+a single chunk for all arrays. In order to reproduce the default behavior
+of <code class="docutils literal notranslate"><span class="pre">xr.open_zarr(...)</span></code> use <code class="docutils literal notranslate"><span class="pre">xr.open_dataset(...,</span> <span class="pre">engine='zarr',</span> <span class="pre">chunks={})</span></code>.
 <code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
 engine preferred chunks. See dask chunking for more details.</p></li>
 <li><p><strong>cache</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, cache data loaded from the underlying datastore in memory as

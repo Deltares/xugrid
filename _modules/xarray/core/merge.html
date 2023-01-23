@@ -302,24 +302,24 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dtypes</span>
-<span class="kn">from</span> <span class="nn">.alignment</span> <span class="kn">import</span> <span class="n">deep_align</span>
-<span class="kn">from</span> <span class="nn">.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
-<span class="kn">from</span> <span class="nn">.indexes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span>
+<span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">deep_align</span>
+<span class="kn">from</span> <span class="nn">xarray.core.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
+<span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Index</span><span class="p">,</span>
     <span class="n">Indexes</span><span class="p">,</span>
     <span class="n">create_default_index_implicit</span><span class="p">,</span>
     <span class="n">filter_indexes_from_coords</span><span class="p">,</span>
     <span class="n">indexes_equal</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
-<span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
+<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
+<span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
 
     <span class="n">DimsLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span>
     <span class="n">ArrayLike</span> <span class="o">=</span> <span class="n">Any</span>
@@ -618,8 +618,8 @@
 <span class="sd">    with a matching key/name.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">{}</span>
@@ -727,8 +727,8 @@
 <span class="sd">        All variable found in the input should appear in either the set of</span>
 <span class="sd">        coordinate or non-coordinate names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">coord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">noncoord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -762,8 +762,8 @@
 <span class="sd">    List of Dataset or dictionary objects. Any inputs or values in the inputs</span>
 <span class="sd">    that were pandas objects have been converted into native xarray objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
@@ -1028,8 +1028,8 @@
 <span class="sd">    ------</span>
 <span class="sd">    MergeError if the merge cannot be done successfully.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">_assert_compat_valid</span><span class="p">(</span><span class="n">compat</span><span class="p">)</span>
 
@@ -1293,8 +1293,8 @@
 <span class="sd">    combine_nested</span>
 <span class="sd">    combine_by_coords</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">dict_like_objects</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
@@ -1370,8 +1370,8 @@
 <span class="sd">    `xarray.Dataset`, e.g., if it&#39;s a dict with DataArray values (GH2068,</span>
 <span class="sd">    GH2180).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
         <span class="n">other</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>

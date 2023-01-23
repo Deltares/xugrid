@@ -305,10 +305,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
-<span class="kn">from</span> <span class="nn">.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
-<span class="kn">from</span> <span class="nn">.pycompat</span> <span class="kn">import</span> <span class="n">is_duck_dask_array</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">either_dict_or_kwargs</span><span class="p">,</span> <span class="n">is_scalar</span>
+<span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">xarray.core.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
+<span class="kn">from</span> <span class="nn">xarray.core.pycompat</span> <span class="kn">import</span> <span class="n">is_duck_dask_array</span>
+<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">either_dict_or_kwargs</span><span class="p">,</span> <span class="n">is_scalar</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cftime</span>
@@ -324,19 +324,19 @@
 
     <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
 
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">.indexes</span> <span class="kn">import</span> <span class="n">Index</span>
-    <span class="kn">from</span> <span class="nn">.resample</span> <span class="kn">import</span> <span class="n">Resample</span>
-    <span class="kn">from</span> <span class="nn">.rolling_exp</span> <span class="kn">import</span> <span class="n">RollingExp</span>
-    <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="n">Index</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">Resample</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.rolling_exp</span> <span class="kn">import</span> <span class="n">RollingExp</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">DatetimeLike</span><span class="p">,</span>
         <span class="n">DTypeLikeSave</span><span class="p">,</span>
         <span class="n">ScalarOrArray</span><span class="p">,</span>
         <span class="n">SideOptions</span><span class="p">,</span>
         <span class="n">T_DataWithCoords</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">DTypeLikeSave</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLikeSave</span><span class="p">]]</span>
 
@@ -733,7 +733,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.clip : equivalent function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># When this was a unary func, the default was True, so retaining the</span>
@@ -1088,7 +1088,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        core.rolling_exp.RollingExp</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">rolling_exp</span>
+        <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">rolling_exp</span>
 
         <span class="k">if</span> <span class="s2">&quot;keep_attrs&quot;</span> <span class="ow">in</span> <span class="n">window_kwargs</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -1223,9 +1223,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
-        <span class="kn">from</span> <span class="nn">..coding.cftimeindex</span> <span class="kn">import</span> <span class="n">CFTimeIndex</span>
-        <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
+        <span class="kn">from</span> <span class="nn">xarray.coding.cftimeindex</span> <span class="kn">import</span> <span class="n">CFTimeIndex</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -1263,7 +1263,7 @@
             <span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">dim_name</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">(),</span> <span class="n">CFTimeIndex</span><span class="p">):</span>
-                <span class="kn">from</span> <span class="nn">.resample_cftime</span> <span class="kn">import</span> <span class="n">CFTimeGrouper</span>
+                <span class="kn">from</span> <span class="nn">xarray.core.resample_cftime</span> <span class="kn">import</span> <span class="n">CFTimeGrouper</span>
 
                 <span class="n">grouper</span> <span class="o">=</span> <span class="n">CFTimeGrouper</span><span class="p">(</span>
                     <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
@@ -1380,9 +1380,9 @@
 <span class="sd">        numpy.where : corresponding numpy function</span>
 <span class="sd">        where : equivalent function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.alignment</span> <span class="kn">import</span> <span class="n">align</span>
-        <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
         <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">cond</span><span class="p">):</span>
             <span class="n">cond</span> <span class="o">=</span> <span class="n">cond</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1473,7 +1473,7 @@
 <span class="sd">        array([False,  True, False])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1518,7 +1518,7 @@
 <span class="sd">        array([ True, False,  True])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1557,10 +1557,10 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.isin</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
-        <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-        <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_elements</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1642,7 +1642,7 @@
 <span class="sd">        dask.array.Array.astype</span>
 <span class="sd">        sparse.COO.astype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="n">casting</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="n">subok</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
@@ -1812,9 +1812,9 @@
 <span class="sd">    ones_like</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_scalar</span><span class="p">(</span><span class="n">fill_value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fill_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
@@ -1862,7 +1862,7 @@
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="k">if</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
         <span class="n">fill_value</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">get_fill_value</span><span class="p">(</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
