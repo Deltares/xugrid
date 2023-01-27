@@ -129,20 +129,29 @@ class AbstractUgrid(abc.ABC):
 
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
+
         if dataset is None:
-            if attrs is not None:
+            if attrs is None:
+                x, y = defaults["node_coordinates"].split()
+                indexes = {"node_x": x, "node_y": y}
+            else:
+                if indexes is None:
+                    raise ValueError("indexes must be provided for attrs")
                 defaults.update(attrs)
-            x, y = defaults["node_coordinates"].split(" ")
-            self._indexes = {"node_x": x, "node_y": y}
+
+            self._indexes = indexes
             self._attrs = defaults
+
         else:
             if attrs is not None:
                 raise ValueError("Provide either dataset or attrs, not both.")
             if indexes is None:
                 raise ValueError("indexes must be provided for dataset")
+
             derived_dims = dataset.ugrid_roles.dimensions[name]
             self._indexes = indexes
             self._attrs = {**defaults, **derived_dims, **dataset[name].attrs}
+
         # Ensure the name is always in sync.
         self._attrs["name"] = name
         return
@@ -327,7 +336,7 @@ class AbstractUgrid(abc.ABC):
             if dim != self.core_dimension:
                 if not indexer.equals(finalized_indexers[dim]):
                     raise ValueError(
-                        f"This subset selection of UGRID dimension {dim} results"
+                        f"This subset selection of UGRID dimension {dim} results "
                         "in an invalid topology "
                     )
         return

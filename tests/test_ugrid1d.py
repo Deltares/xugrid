@@ -51,8 +51,13 @@ def test_ugrid1d_init():
 
 
 def test_ugrid1d_alternative_init():
-    custom_attrs = {"node_dimension": "nNetNode", "name": "mesh1d"}
-    grid = grid1d(attrs=custom_attrs)
+    custom_attrs = {
+        "node_dimension": "nNetNode",
+        "name": "mesh1d",
+        "node_coordinates": "mesh1d_node_x mesh1d_node_y",
+    }
+    indexes = {"node_x": "mesh1d_node_x", "node_y": "mesh1d_node_y"}
+    grid = grid1d(indexes=indexes, attrs=custom_attrs)
     assert grid.node_dimension == "nNetNode"
     assert grid.name == NAME
     # name in attrs should be overwritten by given name.
@@ -63,6 +68,9 @@ def test_ugrid1d_alternative_init():
 
     with pytest.raises(ValueError, match="indexes must be provided for dataset"):
         grid1d(dataset=xr.Dataset, indexes=None)
+
+    with pytest.raises(ValueError, match="indexes must be provided for attrs"):
+        grid1d(attrs=custom_attrs)
 
 
 def test_ugrid1d_properties():

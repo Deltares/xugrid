@@ -562,6 +562,40 @@ def test_multiple_grids():
         uds.grid
 
 
+def test_multiple_coordinates():
+    grid = GRID()
+    ds = UGRID_DS()
+    attrs = ds["mesh2d"].attrs
+    attrs["node_coordinates"] += " mesh2d_node_lon mesh2d_node_lat"
+    ds = ds.assign_coords(
+        mesh2d_node_lon=(grid.node_dimension, np.arange(grid.n_node)),
+        mesh2d_node_lat=(grid.node_dimension, np.arange(grid.n_node)),
+    )
+    ds["mesh2d_node_lon"].attrs["standard_name"] = "longitude"
+    ds["mesh2d_node_lat"].attrs["standard_name"] = "latitude"
+    print(ds.ugrid_roles.coordinates)
+    assert ds.ugrid_roles.coordinates == {
+        "mesh2d": {
+            "node_coordinates": (
+                ["mesh2d_node_x", "mesh2d_node_lon"],
+                ["mesh2d_node_y", "mesh2d_node_lat"],
+            )
+        }
+    }
+
+    # Make sure everything goes right when subsetting: tests whether all
+    # attributes and grid indexes are propagated to the new grid object.
+    uds = xugrid.UgridDataset(ds)
+    subset = uds.isel({grid.face_dimension: [0, 1]})
+    assert isinstance(subset, xugrid.UgridDataset)
+    subset_ds = uds.ugrid.to_dataset()
+    assert "mesh2d_node_x" in subset_ds
+    assert "mesh2d_node_y" in subset_ds
+    assert "mesh2d_node_lon" in subset_ds
+    assert "mesh2d_node_lat" in subset_ds
+    assert subset_ds["mesh2d"].attrs["node_coordinates"] == attrs["node_coordinates"]
+
+
 def test_to_dataset():
     uds = xugrid.UgridDataset(UGRID_DS())
     assert uds.ugrid.to_dataset() == UGRID_DS()

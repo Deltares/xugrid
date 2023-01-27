@@ -483,6 +483,7 @@ class Ugrid1d(AbstractUgrid):
             self.fill_value,
             new_edges,
             name=self.name,
+            indexes=self._indexes,
             projected=self.projected,
             crs=self.crs,
             attrs=self._attrs,
