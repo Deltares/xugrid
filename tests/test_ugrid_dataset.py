@@ -86,6 +86,12 @@ def test_properties():
     assert isinstance(uds.ugrid.obj, xr.Dataset)
 
 
+def test_xarray_property_setter():
+    uda = xugrid.UgridDataArray(DARRAY(), GRID())
+    uda.name = "new_name"
+    assert uda.name == "new_name"
+
+
 def test_init_errors():
     with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
         xugrid.UgridDataArray(0, GRID())

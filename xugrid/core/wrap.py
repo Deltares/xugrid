@@ -149,8 +149,11 @@ def wrap(
 
     properties = {k: v for k, v in all_attrs.items() if isinstance(v, property)}
     for name, prop in properties.items():
-        wrapped = property(wraps_xarray(prop.__get__))
-        setattr(wrapped, "__doc__", prop.__doc__)
+        wrapped = property(
+            fget=wraps_xarray(prop.__get__),
+            fset=wraps_xarray(prop.__set__),
+            doc=prop.__doc__,
+        )
         target_class_dict[name] = wrapped
 
     accessors = {k: v for k, v in all_attrs.items() if isinstance(v, type)}
