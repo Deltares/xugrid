@@ -16,6 +16,11 @@ from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
+from xugrid.regrid.regridder import (
+    BarycentricInterpolator,
+    CentroidLocatorRegridder,
+    OverlapRegridder,
+)
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
 from xugrid.ugrid.ugrid1d import Ugrid1d

@@ -14,5 +14,7 @@ Information on specific methods and classes can be found in the API Reference.
    terminology.rst
    examples/quick_overview.rst
    examples/plotting.rst
+   examples/regridder_overview.rst
+   examples/overlap_regridder.rst
    examples/connectivity.rst
    sample_data/index.rst

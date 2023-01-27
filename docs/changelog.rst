@@ -20,6 +20,12 @@ Changed
 Added
 ~~~~~
 
+- Several regridding methods have been added for face associated data:
+  :class:`xugrid.BarycentricInterpolator` have been added to interpolate
+  smoothly, :class:`xugrid.CentroidLocatorRegridder` has been added to simply
+  sample based on face centroid, and :class:`xugrid.OverlapRegridder` supports
+  may aggregation methods (e.g. area weighted mean).
+
 [0.2.0] 2023-01-19
 ------------------
 
