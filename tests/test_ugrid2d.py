@@ -145,6 +145,13 @@ def test_ugrid2d_properties():
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
     node_edges = grid.node_edge_connectivity
     assert isinstance(node_edges, sparse.csr_matrix)
+    edge_node_coords = grid.edge_node_coordinates
+    face_node_coords = grid.face_node_coordinates
+    assert edge_node_coords.shape == (10, 2, 2)
+    assert face_node_coords.shape == (4, 4, 2)
+    are_nan = np.isnan(face_node_coords)
+    assert are_nan[2:, -1:, :].all()
+    assert not are_nan[:, :-1, :].any()
 
 
 def test_ugrid2d_edge_bounds():

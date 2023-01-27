@@ -489,6 +489,25 @@ class Ugrid2d(AbstractUgrid):
         return self.centroids
 
     @property
+    def face_node_coordinates(self) -> FloatArray:
+        """
+        Node coordinates of every face.
+
+        "Fill node" coordinates are set as NaN.
+
+        Returns
+        -------
+        face_node_coordinates: ndarray of floats with shape ``(n_face, n_max_node_per_face, 2)``
+        """
+        coords = np.full(
+            (self.n_face, self.n_max_node_per_face, 2), np.nan, dtype=FloatDType
+        )
+        is_node = self.face_node_connectivity != self.fill_value
+        index = self.face_node_connectivity[is_node]
+        coords[is_node, :] = self.node_coordinates[index]
+        return coords
+
+    @property
     def edge_face_connectivity(self) -> IntArray:
         """
         Edge to face connectivity. An edge may belong to a single face

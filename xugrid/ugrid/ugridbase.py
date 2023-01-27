@@ -258,6 +258,11 @@ class AbstractUgrid(abc.ABC):
         return np.column_stack([self.edge_x, self.edge_y])
 
     @property
+    def edge_node_coordinates(self) -> FloatArray:
+        """Node coordinates for every edge, shape: ``n_edge, 2, 2``."""
+        return self.node_coordinates[self.edge_node_connectivity]
+
+    @property
     def bounds(self) -> Tuple[float, float, float, float]:
         """Returns a tuple with the node bounds: xmin, ymin, xmax, ymax"""
         if any(
