@@ -1375,7 +1375,7 @@ class Ugrid2d(AbstractUgrid):
 
         # Compute all vertices, these are the ugrid nodes
         node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-        linear_index = np.arange(node_x.size, dtype=np.intp).reshape((ny + 1, nx + 1))
+        linear_index = np.arange(node_x.size, dtype=IntDType).reshape((ny + 1, nx + 1))
         # Allocate face_node_connectivity
         face_nodes = np.empty((nfaces, 4), dtype=IntDType)
         # Set connectivity in counterclockwise manner

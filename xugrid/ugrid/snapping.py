@@ -15,6 +15,7 @@ from scipy.spatial import cKDTree
 from xugrid.constants import (
     FloatArray,
     IntArray,
+    IntDType,
     LineArray,
     MissingOptionalModule,
     Point,
@@ -360,8 +361,8 @@ def snap_to_structured_grid(
     # versions of numba refuse np.empty or np.zeros calls in this module (!).
     # TODO: investigate...
     max_n_new_edges = len(face_indices) * 2
-    edges = np.empty(max_n_new_edges, dtype=np.intp)
-    segment_index = np.empty(max_n_new_edges, dtype=np.intp)
+    edges = np.empty(max_n_new_edges, dtype=IntDType)
+    segment_index = np.empty(max_n_new_edges, dtype=IntDType)
     edges, segment_index = snap_to_edges(
         segment_indices,
         face_indices,
