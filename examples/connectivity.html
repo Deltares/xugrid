@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Sample Data" href="../sample_data/index.html" />
-    <link rel="prev" title="Plot unstructured mesh data" href="plotting.html" />
+    <link rel="prev" title="OverlapRegridder" href="overlap_regridder.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -286,6 +286,16 @@
    Plot unstructured mesh data
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="regridder_overview.html">
+   Regridding overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="overlap_regridder.html">
+   OverlapRegridder
+  </a>
+ </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Connectivity
@@ -423,7 +433,7 @@ with a grid in which all cells are given a value of <code class="docutils litera
 <span class="n">iter5</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_001.png" srcset="../_images/sphx_glr_connectivity_001.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7faf5130b0a0&gt;
+<img src="../_images/sphx_glr_connectivity_001.png" srcset="../_images/sphx_glr_connectivity_001.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd9c628b8b0&gt;
 </pre></div>
 </div>
 <p>By default, the border value for binary dilation is <strong>also</strong> set to
@@ -437,7 +447,7 @@ start by setting a single value in the center of the grid to <code class="docuti
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_002.png" srcset="../_images/sphx_glr_connectivity_002.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7faf51f3f850&gt;
+<img src="../_images/sphx_glr_connectivity_002.png" srcset="../_images/sphx_glr_connectivity_002.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd9c6b26fd0&gt;
 </pre></div>
 </div>
 <p>Now let’s run two dilations: one with the default border, and one with the
@@ -450,7 +460,7 @@ alternative border value:</p>
 <span class="n">iter1_boundary</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_003.png" srcset="../_images/sphx_glr_connectivity_003.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7faf522fb340&gt;
+<img src="../_images/sphx_glr_connectivity_003.png" srcset="../_images/sphx_glr_connectivity_003.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd9c6397af0&gt;
 </pre></div>
 </div>
 </section>
@@ -466,7 +476,7 @@ analyse connected parts of the mesh.</p>
 <span class="n">labeled</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_004.png" srcset="../_images/sphx_glr_connectivity_004.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7faf51d57d30&gt;
+<img src="../_images/sphx_glr_connectivity_004.png" srcset="../_images/sphx_glr_connectivity_004.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd9c5ecd190&gt;
 </pre></div>
 </div>
 </section>
@@ -478,7 +488,7 @@ Tesselation.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">voronoi_grid</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_005.png" srcset="../_images/sphx_glr_connectivity_005.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7faf5234b160&gt;
+<img src="../_images/sphx_glr_connectivity_005.png" srcset="../_images/sphx_glr_connectivity_005.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fd9c6e5d580&gt;
 </pre></div>
 </div>
 <p>There are two alternative flavors to consider. We can fully ignore the
@@ -499,7 +509,7 @@ the original.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">convex_exterior</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_006.png" srcset="../_images/sphx_glr_connectivity_006.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7faf5bdd6ac0&gt;
+<img src="../_images/sphx_glr_connectivity_006.png" srcset="../_images/sphx_glr_connectivity_006.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fd9c603cee0&gt;
 </pre></div>
 </div>
 </section>
@@ -515,7 +525,7 @@ them very attractive for e.g. visualization.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">triangulation</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_007.png" srcset="../_images/sphx_glr_connectivity_007.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7faf52263d00&gt;
+<img src="../_images/sphx_glr_connectivity_007.png" srcset="../_images/sphx_glr_connectivity_007.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fd9c6c67160&gt;
 </pre></div>
 </div>
 </section>
@@ -546,7 +556,7 @@ the upper and lower parts:</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_008.png" srcset="../_images/sphx_glr_connectivity_008.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7faf5bca54c0&gt;
+<img src="../_images/sphx_glr_connectivity_008.png" srcset="../_images/sphx_glr_connectivity_008.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fd9c69ca8e0&gt;
 </pre></div>
 </div>
 <p>We can now use Laplace interpolation to fill the gaps in the grid.</p>
@@ -554,7 +564,7 @@ the upper and lower parts:</p>
 <span class="n">filled</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gist_rainbow&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">7.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_009.png" srcset="../_images/sphx_glr_connectivity_009.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7faf5215d5b0&gt;
+<img src="../_images/sphx_glr_connectivity_009.png" srcset="../_images/sphx_glr_connectivity_009.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd9c691a940&gt;
 </pre></div>
 </div>
 </section>
@@ -572,7 +582,7 @@ grids for bandwith reduction.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_010.png" srcset="../_images/sphx_glr_connectivity_010.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7faf5ba067c0&gt;
+<img src="../_images/sphx_glr_connectivity_010.png" srcset="../_images/sphx_glr_connectivity_010.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fd9c681e460&gt;
 </pre></div>
 </div>
 <p>The bandwidth of this matrix is poor. Connections are all over the place: low
@@ -586,10 +596,10 @@ locality:</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_011.png" srcset="../_images/sphx_glr_connectivity_011.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7faf5d16c9d0&gt;
+<img src="../_images/sphx_glr_connectivity_011.png" srcset="../_images/sphx_glr_connectivity_011.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fd9c695c6a0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.486 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.545 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-connectivity-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6b0c084f5a0bb605c9e7dc95a7138aea/connectivity.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">connectivity.py</span></code></a></p>
@@ -610,11 +620,11 @@ locality:</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="plotting.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="overlap_regridder.html" title="previous page">
       <i class="fas fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Plot unstructured mesh data</p>
+          <p class="prev-next-title">OverlapRegridder</p>
       </div>
   </a>
   <a class='right-next' id="next-link" href="../sample_data/index.html" title="next page">

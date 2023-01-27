@@ -101,6 +101,21 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.to_dataset
     UgridDataArrayAccessor.to_netcdf
     UgridDataArrayAccessor.to_zarr
+    
+Regridding
+----------
+
+Regridding is the process of converting gridded data from one grid to another
+grid. Xugrid provides tools for 2D and 3D regridding of structured gridded
+data, represented as xarray objects, as well as (layered) unstructured gridded
+data, represented as xugrid objects.
+
+.. autosummary::
+      :toctree: api/
+       
+       BarycentricInterpolator
+       CentroidLocatorRegridder
+       OverlapRegridder
 
 Plotting
 --------
@@ -111,14 +126,14 @@ UgridDataArray.
 .. autosummary::
    :toctree: api/
 
-   plot.contour
-   plot.contourf
-   plot.imshow
-   plot.line
-   plot.pcolormesh
-   plot.scatter
-   plot.surface
-   plot.tripcolor
+    plot.contour
+    plot.contourf
+    plot.imshow
+    plot.line
+    plot.pcolormesh
+    plot.scatter
+    plot.surface
+    plot.tripcolor
 
 UGRID1D Topology
 ----------------

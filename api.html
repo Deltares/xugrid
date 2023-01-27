@@ -562,6 +562,23 @@
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
+  <a class="reference internal" href="api/xugrid.BarycentricInterpolator.html">
+   xugrid.BarycentricInterpolator
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="api/xugrid.CentroidLocatorRegridder.html">
+   xugrid.CentroidLocatorRegridder
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="api/xugrid.OverlapRegridder.html">
+   xugrid.OverlapRegridder
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
   <a class="reference internal" href="api/xugrid.plot.contour.html">
    xugrid.plot.contour
   </a>
@@ -1325,6 +1342,26 @@ UgridDataArray or UgridDataset.</p>
 </tbody>
 </table>
 </section>
+<section id="regridding">
+<h2>Regridding<a class="headerlink" href="#regridding" title="Permalink to this heading">#</a></h2>
+<p>Regridding is the process of converting gridded data from one grid to another
+grid. Xugrid provides tools for 2D and 3D regridding of structured gridded
+data, represented as xarray objects, as well as (layered) unstructured gridded
+data, represented as xugrid objects.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator" title="xugrid.BarycentricInterpolator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BarycentricInterpolator</span></code></a>(source, target[, ...])</p></td>
+<td><p>The BaryCentricInterpolator searches the centroid of every face of the target grid in the source grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder" title="xugrid.CentroidLocatorRegridder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CentroidLocatorRegridder</span></code></a>(source, target[, ...])</p></td>
+<td><p>The CentroidLocatorRegridded regrids by searching the source grid for the centroids of the target grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder" title="xugrid.OverlapRegridder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OverlapRegridder</span></code></a>(source, target[, method, ...])</p></td>
+<td><p>The OverlapRegridder regrids by computing which target faces overlap with which source faces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="plotting">
 <h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this heading">#</a></h2>
 <p>These methods are also available under the <code class="docutils literal notranslate"><span class="pre">.ugrid.plot</span></code> attribute of a
@@ -1728,6 +1765,11 @@ UgridDataArray.</p>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#ugrid-accessor">
    UGRID Accessor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regridding">
+   Regridding
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
