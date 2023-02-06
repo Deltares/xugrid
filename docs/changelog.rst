@@ -11,8 +11,24 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
+
+Changed
+~~~~~~~
+
+Added
+~~~~~
+
+[0.2.1] 2023-02-06
+------------------
+
+Fixed
+~~~~~
 - :func:`xugrid.open_dataarray` will now return :class:`xugrid.UgridDataArray`
   instead of only an xarray DataArray without topology.
+- Setting wrapped properties of the xarray object (such as ``name``) now works.
+- Creating new (subset) topologies via e.g. selection will no longer error when
+  datasets contains multiple coordinates systems (such as both longitude and
+  latitude next to projected x and y coordinates). 
 
 Changed
 ~~~~~~~
@@ -25,6 +41,9 @@ Added
   smoothly, :class:`xugrid.CentroidLocatorRegridder` has been added to simply
   sample based on face centroid, and :class:`xugrid.OverlapRegridder` supports
   may aggregation methods (e.g. area weighted mean).
+- Added :attr:`xugrid.Ugrid1d.edge_node_coordinates`.
+- Added :attr:`xugrid.Ugrid2d.edge_node_coordinates` and
+  :attr:`xugrid.Ugrid2d.face_node_coordinates`.
 
 [0.2.0] 2023-01-19
 ------------------
