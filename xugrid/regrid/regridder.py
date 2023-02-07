@@ -5,10 +5,17 @@ import abc
 from itertools import chain
 from typing import Callable, Optional, Tuple, Union
 
-import dask.array
 import numba
 import numpy as np
 import xarray as xr
+
+# dask as optional dependency
+try:
+    import dask.array
+
+    DaskArray = dask.array.Array
+except ImportError:
+    DaskArray = ()
 
 from xugrid.constants import FloatArray
 from xugrid.core.wrap import UgridDataArray, UgridDataset
@@ -108,7 +115,7 @@ class BaseRegridder(abc.ABC):
         size = self.target.size
         out_shape = first_dims + self.target.shape
 
-        if isinstance(source, dask.array.Array):
+        if isinstance(source, DaskArray):
             chunks = source.chunks[:-1] + (self.target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
@@ -123,7 +130,8 @@ class BaseRegridder(abc.ABC):
             out = self._regrid(source, self.csr_weights, size)
         else:
             raise TypeError(
-                f"Expected dask.array.Array or numpy.ndarray. Received: {type(source)}"
+                "Expected dask.array.Array or numpy.ndarray. Received: "
+                f"{type(source).__name__}"
             )
 
         return out.reshape(out_shape)
