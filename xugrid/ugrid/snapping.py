@@ -12,6 +12,7 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
+import xugrid as xu
 from xugrid.constants import (
     FloatArray,
     IntArray,
@@ -253,6 +254,25 @@ def snap_to_edges(
     edges: IntArray,
     segment_index: IntArray,
 ) -> Tuple[IntArray, IntArray]:
+    """
+    This algorithm works as follows:
+
+    * It takes the intersected edges; any edge (p to q) to test falls fully
+      within a single face.
+    * For a face, we take it centroid (a).
+    * We loop through every edge of the face.
+    * If the edge separates the centroid (a) from the centroid of the edge (b)
+      we store that edge as a separating edge.
+
+    We test for separation by:
+
+    * Finding whether a and b are located at opposite sides of the half-plane
+      created by the edge p -> q (U).
+    * Finding whether p and q are located at opposide sides of the half-plane
+      created by a -> b (V).
+
+    Do the minimum amount of work: reuse a_left, only compute V if needed.
+    """
     count = 0
     for i in range(len(segment_indices)):
         segment = segment_indices[i]
@@ -261,20 +281,16 @@ def snap_to_edges(
         p = as_point(intersection_edges[i, 0])
         q = as_point(intersection_edges[i, 1])
         U = to_vector(p, q)
-        U_dot_U = dot_product(U, U)
-        if U_dot_U == 0:
+        if U.x == 0 and U.y == 0:
             continue
 
-        U = to_vector(p, q)
         a_left = left_of(a, p, U)
-        U_dot_U = dot_product(U, U)
         for edge in connectivity.neighbors(face_edge_connectivity, face):
             b = as_point(edge_centroids[edge])
             b_left = left_of(b, p, U)
             if a_left != b_left:
-                V = to_vector(p, b)
-                t = dot_product(U, V) / U_dot_U
-                if 0 <= t <= 1:
+                V = to_vector(a, b)
+                if left_of(p, a, V) != left_of(q, a, V):
                     edges[count] = edge
                     segment_index[count] = segment
                     count += 1
@@ -282,9 +298,9 @@ def snap_to_edges(
     return edges[:count], segment_index[:count]
 
 
-def snap_to_structured_grid(
+def snap_to_grid(
     lines: gpd.GeoDataFrame,
-    grid: xr.DataArray,
+    grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
     return_geometry: bool = False,
 ) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
@@ -302,7 +318,7 @@ def snap_to_structured_grid(
     ----------
     lines: gpd.GeoDataFrame
         Line data. Geometry colum should contain exclusively LineStrings.
-    grid: xr.DataArray of integers
+    grid: xr.DataArray or xu.UgridDataArray of integers
         Grid of cells to snap lines to. Cells with a value of 0 are not
         included.
     max_snap_distance: float
@@ -320,15 +336,22 @@ def snap_to_structured_grid(
         ``True``.
     """
     if isinstance(grid, xr.DataArray):
-        active = grid.values != 0
+        active = grid.values > 0
         # Convert structured to unstructured representation
         topology = Ugrid2d.from_structured(grid)
-        vertices = topology.node_coordinates
-        faces = topology.face_node_connectivity
         nrow, ncol = active.shape
         face_to_cell = np.arange(nrow * ncol)[active.ravel()]
+    elif isinstance(grid, xu.UgridDataArray):
+        active = grid.values > 0
+        topology = grid.ugrid.grid
+        face_to_cell = np.arange(topology.n_face)[active]
     else:
-        raise NotImplementedError
+        raise TypeError(
+            f"Expected xarray.DataArray or xugrid.UgridDataArray, received: {type(grid).__name__}"
+        )
+
+    vertices = topology.node_coordinates
+    faces = topology.face_node_connectivity
 
     # Derive connectivity
     edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(

@@ -9,7 +9,7 @@ import pytest
 import shapely.geometry as sg
 import xarray as xr
 
-from xugrid.ugrid.snapping import snap_nodes, snap_to_nodes, snap_to_structured_grid
+from xugrid.ugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
 
 
 def test_snap__three_points():
@@ -113,7 +113,7 @@ def test_snap_to_nodes():
     assert np.array_equal(snap_y, expected_y)
 
 
-def test_snap_to_structured_grid():
+def test_snap_to_grid():
     idomain = xr.DataArray(
         data=[[1, 1], [1, 1]],
         coords={"y": [0.5, 1.5], "x": [0.5, 1.5]},
@@ -121,15 +121,13 @@ def test_snap_to_structured_grid():
     )
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_structured_grid(line_gdf, idomain, 2.0)
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0)
     assert np.array_equal(cell_to_cell, [[0, -1], [0, 2], [2, 3]])
     assert isinstance(df, pd.DataFrame)
     assert np.allclose(df["resistance"], 100.0)
 
     # Return geometry
-    cell_to_cell, df = snap_to_structured_grid(
-        line_gdf, idomain, 2.0, return_geometry=True
-    )
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
     assert np.array_equal(cell_to_cell, [[0, -1], [0, 2], [2, 3]])
     assert isinstance(df, gpd.GeoDataFrame)
     assert np.allclose(df["resistance"], 100.0)
@@ -140,9 +138,7 @@ def test_snap_to_structured_grid():
     # 2. Line starts and stops right below and above cell centroids.
     line = sg.LineString([[0.5, 0.0], [0.75, 0.5], [1.0, 1.0], [1.25, 1.5], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_structured_grid(
-        line_gdf, idomain, 2.0, return_geometry=True
-    )
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
 
     assert np.array_equal(cell_to_cell, [[0, -1], [0, 1], [2, 3]])
     assert isinstance(df, pd.DataFrame)
@@ -151,7 +147,5 @@ def test_snap_to_structured_grid():
     # Now the same case, but with line rotated to horizontal
     line = sg.LineString([[0.0, 0.5], [0.5, 0.75], [1.0, 1.0], [1.5, 1.25], [2.0, 1.5]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
-    cell_to_cell, df = snap_to_structured_grid(
-        line_gdf, idomain, 2.0, return_geometry=True
-    )
+    cell_to_cell, df = snap_to_grid(line_gdf, idomain, 2.0, return_geometry=True)
     assert np.array_equal(cell_to_cell, [[0, 2], [1, 3]])
