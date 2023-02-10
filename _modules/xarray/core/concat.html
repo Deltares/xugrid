@@ -285,12 +285,13 @@
   <h1>Source code for xarray.core.concat</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span>
+<span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span><span class="p">,</span> <span class="n">reindex_variables</span>
 <span class="kn">from</span> <span class="nn">xarray.core.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
 <span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
 <span class="kn">from</span> <span class="nn">xarray.core.merge</span> <span class="kn">import</span> <span class="p">(</span>
@@ -663,7 +664,9 @@
 
             <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="n">concat_over</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="nb">set</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subset</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+                    <span class="nb">set</span><span class="p">()</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
+                        <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">subset</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
                 <span class="k">pass</span>
@@ -691,19 +694,26 @@
 
 <span class="c1"># determine dimensional coordinate names and a dict mapping name to DataArray</span>
 <span class="k">def</span> <span class="nf">_parse_datasets</span><span class="p">(</span>
-    <span class="n">datasets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]:</span>
-
+    <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
+    <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
+    <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
+<span class="p">]:</span>
     <span class="n">dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">all_coord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">data_vars</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># list of data_vars</span>
     <span class="n">dim_coords</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># maps dim name to variable</span>
     <span class="n">dims_sizes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># shared dimension sizes to expand variables</span>
+    <span class="n">variables_order</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># variables in order of appearance</span>
 
     <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
         <span class="n">dims_sizes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="n">all_coord_names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
         <span class="n">data_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+        <span class="n">variables_order</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
 
         <span class="c1"># preserves ordering of dimensions</span>
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
@@ -714,7 +724,7 @@
                 <span class="n">dim_coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span>
         <span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">all_coord_names</span><span class="p">,</span> <span class="n">data_vars</span>
+    <span class="k">return</span> <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">all_coord_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">variables_order</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_dataset_concat</span><span class="p">(</span>
@@ -724,7 +734,7 @@
     <span class="n">coords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span>
@@ -756,7 +766,9 @@
         <span class="n">align</span><span class="p">(</span><span class="o">*</span><span class="n">datasets</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="n">dim</span><span class="p">],</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span>
     <span class="p">)</span>
 
-    <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">data_names</span> <span class="o">=</span> <span class="n">_parse_datasets</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+    <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">data_names</span><span class="p">,</span> <span class="n">vars_order</span> <span class="o">=</span> <span class="n">_parse_datasets</span><span class="p">(</span>
+        <span class="n">datasets</span>
+    <span class="p">)</span>
     <span class="n">dim_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dim_coords</span><span class="p">)</span>
     <span class="n">unlabeled_dims</span> <span class="o">=</span> <span class="n">dim_names</span> <span class="o">-</span> <span class="n">coord_names</span>
 
@@ -810,7 +822,7 @@
 
     <span class="c1"># we&#39;ve already verified everything is consistent; now, calculate</span>
     <span class="c1"># shared dimension sizes so we can expand the necessary variables</span>
-    <span class="k">def</span> <span class="nf">ensure_common_dims</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">ensure_common_dims</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">):</span>
         <span class="c1"># ensure each variable with the given name shares the same</span>
         <span class="c1"># dimensions and the same shape for all of them except along the</span>
         <span class="c1"># concat dimension</span>
@@ -838,16 +850,35 @@
                     <span class="n">data</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">set_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
                     <span class="k">yield</span> <span class="n">PandasIndex</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">coord_dtype</span><span class="o">=</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
+    <span class="c1"># create concatenation index, needed for later reindexing</span>
+    <span class="n">concat_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">)))</span>
+
     <span class="c1"># stack up each variable and/or index to fill-out the dataset (in order)</span>
     <span class="c1"># n.b. this loop preserves variable order, needed for groupby.</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">vars_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">concat_over</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_indexes</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="nb">vars</span> <span class="o">=</span> <span class="n">ensure_common_dims</span><span class="p">([</span><span class="n">ds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">])</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not present in all datasets.&quot;</span><span class="p">)</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">variable_index</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">var_concat_dim_length</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+                    <span class="n">variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span><span class="p">)</span>
+                    <span class="c1"># add to variable index, needed for reindexing</span>
+                    <span class="n">var_idx</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="nb">sum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">k</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="p">]</span>
+                    <span class="n">variable_index</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">var_idx</span><span class="p">)</span>
+                    <span class="n">var_concat_dim_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_idx</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># raise if coordinate not in all datasets</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">coord_names</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;coordinate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not present in all datasets.&quot;</span>
+                        <span class="p">)</span>
+            <span class="nb">vars</span> <span class="o">=</span> <span class="n">ensure_common_dims</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">var_concat_dim_length</span><span class="p">)</span>
 
-            <span class="c1"># Try concatenate the indexes, concatenate the variables when no index</span>
+            <span class="c1"># Try to concatenate the indexes, concatenate the variables when no index</span>
             <span class="c1"># is found on all datasets.</span>
             <span class="n">indexes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_indexes</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">indexes</span><span class="p">:</span>
@@ -874,6 +905,15 @@
                 <span class="n">combined_var</span> <span class="o">=</span> <span class="n">concat_vars</span><span class="p">(</span>
                     <span class="nb">vars</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
                 <span class="p">)</span>
+                <span class="c1"># reindex if variable is not present in all datasets</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat_index</span><span class="p">):</span>
+                    <span class="n">combined_var</span> <span class="o">=</span> <span class="n">reindex_variables</span><span class="p">(</span>
+                        <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">combined_var</span><span class="p">},</span>
+                        <span class="n">dim_pos_indexers</span><span class="o">=</span><span class="p">{</span>
+                            <span class="n">dim</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span><span class="o">.</span><span class="n">get_indexer</span><span class="p">(</span><span class="n">concat_index</span><span class="p">)</span>
+                        <span class="p">},</span>
+                        <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+                    <span class="p">)[</span><span class="n">name</span><span class="p">]</span>
                 <span class="n">result_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_var</span>
 
         <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">result_vars</span><span class="p">:</span>
