@@ -200,16 +200,6 @@ def as_point(a: FloatArray) -> Point:
     return Point(a[0], a[1])
 
 
-@nb.njit(inline="always")
-def cross_product(u: Vector, v: Vector) -> float:
-    return u.x * v.y - u.y * v.x
-
-
-@nb.njit(inline="always")
-def dot_product(u: Vector, v: Vector) -> float:
-    return u.x * v.x + u.y * v.y
-
-
 def lines_as_edges(line_coords, line_index) -> FloatArray:
     edges = np.empty((len(line_coords) - 1, 2, 2))
     edges[:, 0, :] = line_coords[:-1]
@@ -270,6 +260,8 @@ def snap_to_edges(
       created by the edge p -> q (U).
     * Finding whether p and q are located at opposide sides of the half-plane
       created by a -> b (V).
+    * The separation test will return False if the lines are collinear. This is
+      desirable here, if U runs collinear with V, U doesn't separate a from b.
 
     Do the minimum amount of work: reuse a_left, only compute V if needed.
     """
