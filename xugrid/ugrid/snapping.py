@@ -290,11 +290,73 @@ def snap_to_edges(
     return edges[:count], segment_index[:count]
 
 
+def _find_largest_edges(
+    intersection_edges: FloatArray,
+    segment_index: IntArray,
+    edges: IntArray,
+    line_index: IntArray,
+):
+    valid_edges = intersection_edges[segment_index]
+    max_edge_index = (
+        pd.DataFrame(
+            data={
+                "edges": edges,
+                "length": ((valid_edges[:, 1] - valid_edges[:, 0]) ** 2).sum(axis=1),
+            }
+        )
+        .groupby("edges")
+        .idxmax()["length"]
+        .values
+    )
+
+    edges = edges[max_edge_index]
+    line_index = line_index[max_edge_index]
+    return edges, line_index
+
+
+def _create_output_dataset(
+    lines: gpd.GeoDataFrame,
+    topology: "xu.Ugrid2d",
+    edges: IntArray,
+    line_index: IntArray,
+) -> xu.UgridDataset:
+    uds = xu.UgridDataset(grids=[topology])
+    data = np.full(topology.n_edge, np.nan)
+    data[edges] = line_index
+    uds["line_index"] = xr.DataArray(
+        data=data,
+        dims=[topology.edge_dimension],
+    )
+    for column in lines.columns:
+        if column == "geometry":
+            continue
+        data = np.full(topology.n_edge, np.nan)
+        data[edges] = lines[column].iloc[line_index]
+        uds[column] = xr.DataArray(
+            data=data,
+            dims=[topology.edge_dimension],
+        )
+    return uds
+
+
+def _create_output_gdf(
+    lines,
+    vertices,
+    edge_node_connectivity,
+    edges,
+    line_index,
+):
+    edge_vertices = vertices[edge_node_connectivity[edges]]
+    geometry = pygeos.creation.linestrings(edge_vertices)
+    return gpd.GeoDataFrame(
+        lines.drop(columns="geometry").iloc[line_index], geometry=geometry
+    )
+
+
 def snap_to_grid(
     lines: gpd.GeoDataFrame,
     grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
-    return_geometry: bool = False,
 ) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
     """
     Snap a collection of lines to a grid.
@@ -314,10 +376,6 @@ def snap_to_grid(
         Grid of cells to snap lines to. Cells with a value of 0 are not
         included.
     max_snap_distance: float
-    return_geometry: bool, optional. Default: False.
-        Whether to return geometry. In this case a GeoDataFrame is returned
-        with the snapped line segments, rather than a DataFrame without
-        geometry.
 
     Returns
     -------
@@ -327,16 +385,13 @@ def snap_to_grid(
         Data for every segment. GeoDataFrame if ``return_geometry`` is
         ``True``.
     """
-    if isinstance(grid, xr.DataArray):
-        active = grid.values > 0
+    if isinstance(grid, Ugrid2d):
+        topology = grid
+    elif isinstance(grid, xr.DataArray):
         # Convert structured to unstructured representation
         topology = Ugrid2d.from_structured(grid)
-        nrow, ncol = active.shape
-        face_to_cell = np.arange(nrow * ncol)[active.ravel()]
     elif isinstance(grid, xu.UgridDataArray):
-        active = grid.values > 0
         topology = grid.ugrid.grid
-        face_to_cell = np.arange(topology.n_face)[active]
     else:
         raise TypeError(
             f"Expected xarray.DataArray or xugrid.UgridDataArray, received: {type(grid).__name__}"
@@ -350,9 +405,6 @@ def snap_to_grid(
         faces, -1
     )
     A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
-    edge_face_connectivity = connectivity.to_dense(
-        connectivity.invert_sparse(A), fill_value=-1
-    )
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz)
 
     # Create geometric data
@@ -389,17 +441,13 @@ def snap_to_grid(
         segment_index,
     )
     line_index = line_index[segment_index]
-    face_to_face = edge_face_connectivity[edges]
-    cell_to_cell = face_to_cell[face_to_face]
-    cell_to_cell[face_to_face == -1] = -1
 
-    if return_geometry:
-        edge_vertices = vertices[edge_node_connectivity[edges]]
-        geometry = pygeos.creation.linestrings(edge_vertices)
-        gdf = gpd.GeoDataFrame(
-            lines.drop(columns="geometry").iloc[line_index], geometry=geometry
-        )
-        return cell_to_cell, gdf
-    else:
-        df = lines.drop(columns="geometry").iloc[line_index]
-        return cell_to_cell, df
+    # When multiple line parts are snapped to the same edge, use the ones with
+    # the greatest length inside the cell.
+    edges, line_index = _find_largest_edges(
+        intersection_edges, segment_index, edges, line_index
+    )
+
+    uds = _create_output_dataset(lines, topology, edges, line_index)
+    gdf = _create_output_gdf(lines, vertices, edge_node_connectivity, edges, line_index)
+    return uds, gdf
