@@ -116,6 +116,7 @@ data, represented as xugrid objects.
        BarycentricInterpolator
        CentroidLocatorRegridder
        OverlapRegridder
+       RelativeOverlapRegridder
 
 Plotting
 --------

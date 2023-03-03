@@ -4,23 +4,6 @@ Contains common reduction methods.
 import numpy as np
 
 
-def get_method(method, methods, relative: bool):
-    if isinstance(method, str):
-        try:
-            _method, _relative = methods[method]
-            return _method, _relative
-        except KeyError as e:
-            raise ValueError(
-                "Invalid regridding method. Available methods are: {}".format(
-                    methods.keys()
-                )
-            ) from e
-    elif callable(method):
-        return method, relative
-    else:
-        raise TypeError("method must be a string or callable")
-
-
 def mean(values, indices, weights):
     vsum = 0.0
     wsum = 0.0
@@ -187,15 +170,19 @@ def max_overlap(values, indices, weights):
     return v
 
 
-OVERLAP_METHODS = {
-    "mean": (mean, False),
-    "harmonic_mean": (harmonic_mean, False),
-    "geometric_mean": (geometric_mean, False),
-    "sum": (sum, False),
-    "minimum": (minimum, False),
-    "maximum": (maximum, False),
-    "mode": (mode, False),
-    "median": (median, False),
-    "conductance": (conductance, True),
-    "max_overlap": (max_overlap, False),
+ASBOLUTE_OVERLAP_METHODS = {
+    "mean": mean,
+    "harmonic_mean": harmonic_mean,
+    "geometric_mean": geometric_mean,
+    "sum": sum,
+    "minimum": minimum,
+    "maximum": maximum,
+    "mode": mode,
+    "median": median,
+    "max_overlap": max_overlap,
+}
+
+
+RELATIVE_OVERLAP_METHODS = {
+    "conductance": conductance,
 }

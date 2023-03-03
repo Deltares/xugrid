@@ -3,7 +3,7 @@ This module is heavily inspired by xemsf.frontend.py
 """
 import abc
 from itertools import chain
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import numba
 import numpy as np
@@ -17,12 +17,23 @@ try:
 except ImportError:
     DaskArray = ()
 
-from xugrid.constants import FloatArray
+from xugrid.constants import FloatArray, IntArray
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.regrid import reduce
 from xugrid.regrid.unstructured import UnstructuredGrid2d
 from xugrid.regrid.weight_matrix import WeightMatrixCSR, create_weight_matrix, nzrange
 from xugrid.ugrid.ugrid2d import Ugrid2d
+
+
+def get_method(method, methods):
+    try:
+        return methods[method]
+    except KeyError as e:
+        raise ValueError(
+            "Invalid regridding method. Available methods are: {}".format(
+                methods.keys()
+            )
+        ) from e
 
 
 def _prepend(ds: xr.Dataset, prefix: str):
@@ -49,9 +60,34 @@ def get_grid(arg):
     else:
         options = {"Ugrid2d", "UgridDataArray", "UgridDataset"}
         raise TypeError(f"Expected one of {options}, received: {type(arg).__name__}")
+    
+
+def make_regrid(func):
+    """
+    Uses a closure to capture func, so numba can compile it efficiently without
+    function call overhead.
+    """
+    f = numba.njit(func, inline="always")
+
+    def _regrid(source: FloatArray, A: WeightMatrixCSR, size: int):
+        n_extra = source.shape[0]
+        out = np.full((n_extra, size), np.nan)
+        for extra_index in numba.prange(n_extra):
+            source_flat = source[extra_index]
+            for target_index in range(A.n):
+                indices, weights = nzrange(A, target_index)
+                if len(indices) > 0:
+                    out[extra_index, target_index] = f(
+                        source_flat, indices, weights
+                    )
+        return out
+    
+    return _regrid
 
 
 class BaseRegridder(abc.ABC):
+    _JIT_FUNCTIONS = {}
+
     def __init__(
         self,
         source: Ugrid2d,
@@ -66,6 +102,14 @@ class BaseRegridder(abc.ABC):
             self.compute_weights()
         else:
             self.source_index, self.target_index, self.weights = weights
+            
+    @property
+    def regrid_weights(self):
+        return (
+            self.source_index,
+            self.target_index,
+            self.weights,
+        )
 
     @abc.abstractmethod
     def to_dataset(self):
@@ -73,28 +117,14 @@ class BaseRegridder(abc.ABC):
         Store the computed weights in a dataset for re-use.
         """
 
-    def _setup_regrid(self, func) -> None:
-        """
-        Use a closure to capture func.
-        """
-
-        f = numba.njit(func)
-
-        @numba.njit(parallel=True)
-        def _regrid(source: FloatArray, A: WeightMatrixCSR, size: int):
-            n_extra = source.shape[0]
-            out = np.full((n_extra, size), np.nan)
-            for extra_index in numba.prange(n_extra):
-                source_flat = source[extra_index]
-                for target_index in range(A.n):
-                    indices, weights = nzrange(A, target_index)
-                    if len(indices) > 0:
-                        out[extra_index, target_index] = f(
-                            source_flat, indices, weights
-                        )
-            return out
-
-        self._regrid = _regrid
+    def _setup_regrid(self, func) -> Callable:
+        if isinstance(func, str):
+            self._regrid = get_method(func, self._JIT_FUNCTIONS)
+        elif callable(func):
+            self._regrid = make_regrid(func) 
+        else:
+            raise TypeError(
+                f"method must be string or callable, received: {type(func).__name}")
         return
 
     def regrid_array(self, source):
@@ -253,9 +283,50 @@ class CentroidLocatorRegridder(BaseRegridder):
             },
         )
         return xr.merge((source_ds, target_ds, regrid_ds))
+    
+
+class BaseOverlapRegridder(BaseRegridder, abc.ABC):
+    def __init__(
+        self,
+        source: UgridDataArray,
+        target: UgridDataArray,
+        method: Union[str, Callable],
+        weights: Optional[Union[Tuple, WeightMatrixCSR]] = None,
+    ):
+        source = get_grid(source)
+        target = get_grid(target)
+        self.source = UnstructuredGrid2d(source)
+        self.target = UnstructuredGrid2d(target)
+        self._setup_regrid(method)
+        if weights is None:
+            self.compute_weights()
+        elif isinstance(weights, WeightMatrixCSR):
+            self.source_index = None
+            self.target_index = None
+            self.weights = None
+            self.csr_weights = weights
+        else:
+            self.source_index, self.target_index, self.weights = weights
+
+    def _compute_weights(self, relative: bool):
+        self.source_index, self.target_index, self.weights = self.source.overlap(
+            self.target, relative=relative
+        )
+        self.csr_weights = create_weight_matrix(
+            self.target_index, self.source_index, self.weights
+        )
+        return
+    
+    @property
+    def regrid_weights(self):
+        return self.csr_weights
+
+    @classmethod
+    def to_dataset(self, dataset: xr.Dataset):
+        return
 
 
-class OverlapRegridder(BaseRegridder):
+class OverlapRegridder(BaseOverlapRegridder):
     """
     The OverlapRegridder regrids by computing which target faces overlap with
     which source faces. It stores the area of overlap, which can be used in
@@ -271,7 +342,6 @@ class OverlapRegridder(BaseRegridder):
     * ``"maximum"``
     * ``"mode"``
     * ``"median"``
-    * ``"conductance"``
     * ``"max_overlap"``
 
     Custom aggregation functions are also supported, if they can be compiled by
@@ -283,44 +353,48 @@ class OverlapRegridder(BaseRegridder):
     target: Ugrid2d, UgridDataArray
     method: str, function, optional
         Default value is ``"mean"``.
-    relative: bool, optional
-        Default value is ``False``. Should only be provided when using a custom
-        aggregation function. When relative is True, the intersection area is
-        divided by the total area of the source face.
-
     """
-
+    _JIT_FUNCTIONS = {k: numba.njit(make_regrid(f), parallel=True, cache=True) for k, f in reduce.ASBOLUTE_OVERLAP_METHODS.items()}
+    
     def __init__(
         self,
         source: UgridDataArray,
         target: UgridDataArray,
         method: Union[str, Callable] = "mean",
-        relative: bool = False,
         weights: Optional[Tuple] = None,
     ):
-        source = get_grid(source)
-        target = get_grid(target)
-        self.source = UnstructuredGrid2d(source)
-        self.target = UnstructuredGrid2d(target)
-        func, relative = reduce.get_method(method, reduce.OVERLAP_METHODS, relative)
-        self._setup_regrid(func)
-        if weights is None:
-            self.compute_weights(relative)
-        else:
-            self.source_index, self.target_index, self.weights = weights
+        super().__init__(source=source, target=target, method=method, weights=weights)
+        
+    def compute_weights(self) -> None:
+        self._compute_weights(relative=False)
 
-    def compute_weights(self, relative):
-        self.source_index, self.target_index, self.weights = self.source.overlap(
-            self.target, relative
-        )
-        self.csr_weights = create_weight_matrix(
-            self.target_index, self.source_index, self.weights
-        )
-        return
 
-    @classmethod
-    def to_dataset(self, dataset: xr.Dataset):
-        return
+class RelativeOverlapRegridder(BaseOverlapRegridder):
+    """
+    The RelativeOverlapRegridder regrids by computing which target faces
+    overlap with which source faces. It stores the area of overlap, which can
+    be used in multiple ways to aggregate the values associated with the source
+    faces. Unlike the OverlapRegridder, the intersection area is divided by the
+    total area of the source face. This is required for e.g. first-order
+    conserative regridding.
+
+    Currently supported aggregation methods are:
+
+    * ``"max_overlap"``
+
+    Custom aggregation functions are also supported, if they can be compiled by
+    Numba. See the User Guide.
+
+    Parameters
+    ----------
+    source: Ugrid2d, UgridDataArray
+    target: Ugrid2d, UgridDataArray
+    method: str, function, optional
+    """
+    _JIT_FUNCTIONS = {k: numba.njit(make_regrid(f), parallel=True, cache=True) for k, f in reduce.RELATIVE_OVERLAP_METHODS.items()}
+
+    def compute_weights(self) -> None:
+        self._compute_weights(relative=True)
 
 
 class BarycentricInterpolator(BaseRegridder):
@@ -337,12 +411,13 @@ class BarycentricInterpolator(BaseRegridder):
     target: Ugrid2d, UgridDataArray
 
     """
+    _JIT_FUNCTIONS = {"mean": numba.njit(make_regrid(reduce.mean), parallel=True, cache=True)}
 
     def __init__(
         self,
         source: UgridDataArray,
         target: UgridDataArray,
-        weights: Optional[Tuple] = None,
+        weights: Optional[Union[Tuple, WeightMatrixCSR]] = None,
     ):
         source = get_grid(source)
         target = get_grid(target)
@@ -350,9 +425,15 @@ class BarycentricInterpolator(BaseRegridder):
         self.target = UnstructuredGrid2d(target)
         # Since the weights for a target face sum up to 1.0, a weight mean is
         # appropriate, and takes care of NaN values in the source data.
-        self._setup_regrid(reduce.mean)
+        self._setup_regrid("mean")
+
         if weights is None:
             self.compute_weights()
+        elif isinstance(weights, WeightMatrixCSR):
+            self.source_index = None
+            self.target_index = None
+            self.weights = None
+            self.csr_weights = weights
         else:
             self.source_index, self.target_index, self.weights = weights
 
@@ -366,6 +447,10 @@ class BarycentricInterpolator(BaseRegridder):
             self.target_index, self.source_index, self.weights
         )
         return
+
+    @property
+    def regrid_weights(self):
+        return self.csr_weights
 
     @classmethod
     def to_dataset(self, dataset: xr.Dataset):

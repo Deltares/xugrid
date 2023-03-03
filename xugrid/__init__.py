@@ -20,6 +20,7 @@ from xugrid.regrid.regridder import (
     BarycentricInterpolator,
     CentroidLocatorRegridder,
     OverlapRegridder,
+    RelativeOverlapRegridder,
 )
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
