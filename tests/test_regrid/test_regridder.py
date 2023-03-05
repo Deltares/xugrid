@@ -3,7 +3,12 @@ import pytest
 import xarray as xr
 
 import xugrid as xu
-from xugrid import BarycentricInterpolator, CentroidLocatorRegridder, OverlapRegridder
+from xugrid import (
+    BarycentricInterpolator,
+    CentroidLocatorRegridder,
+    OverlapRegridder,
+    RelativeOverlapRegridder,
+)
 
 
 @pytest.fixture(scope="function")
@@ -28,7 +33,13 @@ def quads(dx):
 
 
 @pytest.mark.parametrize(
-    "cls", [CentroidLocatorRegridder, OverlapRegridder, BarycentricInterpolator]
+    "cls",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
 )
 def test_check_source_target_types(disk, cls):
     with pytest.raises(TypeError):

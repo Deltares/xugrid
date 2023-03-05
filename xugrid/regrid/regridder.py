@@ -2,12 +2,13 @@
 This module is heavily inspired by xemsf.frontend.py
 """
 import abc
-from itertools import chain
-from typing import Callable, NamedTuple, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numba
 import numpy as np
 import xarray as xr
+
+import xugrid as xu
 
 # dask as optional dependency
 try:
@@ -17,50 +18,19 @@ try:
 except ImportError:
     DaskArray = ()
 
-from xugrid.constants import FloatArray, IntArray
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+import xugrid
+from xugrid.constants import FloatArray
+from xugrid.core.wrap import UgridDataArray
 from xugrid.regrid import reduce
 from xugrid.regrid.unstructured import UnstructuredGrid2d
-from xugrid.regrid.weight_matrix import WeightMatrixCSR, create_weight_matrix, nzrange
-from xugrid.ugrid.ugrid2d import Ugrid2d
+from xugrid.regrid.weight_matrix import (
+    WeightMatrixCOO,
+    WeightMatrixCSR,
+    nzrange,
+    weight_matrix_coo,
+    weight_matrix_csr,
+)
 
-
-def get_method(method, methods):
-    try:
-        return methods[method]
-    except KeyError as e:
-        raise ValueError(
-            "Invalid regridding method. Available methods are: {}".format(
-                methods.keys()
-            )
-        ) from e
-
-
-def _prepend(ds: xr.Dataset, prefix: str):
-    vars = ds.data_vars
-    dims = ds.dims
-    name_dict = {v: f"{prefix}{v}" for v in chain(vars, dims)}
-    return ds.rename(name_dict)
-
-
-def _get_grid_variables(ds: xr.Dataset, prefix: str):
-    ds = ds[[var for var in ds.data_vars if var.startswith(prefix)]]
-    name_dict = {
-        v: v.replace(prefix, "") if v.startswith(prefix) else v
-        for v in chain(ds.data_vars, ds.dims)
-    }
-    return ds.rename(name_dict)
-
-
-def get_grid(arg):
-    if isinstance(arg, (UgridDataArray, UgridDataset)):
-        return arg.grid
-    elif isinstance(arg, Ugrid2d):
-        return arg
-    else:
-        options = {"Ugrid2d", "UgridDataArray", "UgridDataset"}
-        raise TypeError(f"Expected one of {options}, received: {type(arg).__name__}")
-    
 
 def make_regrid(func):
     """
@@ -77,12 +47,10 @@ def make_regrid(func):
             for target_index in range(A.n):
                 indices, weights = nzrange(A, target_index)
                 if len(indices) > 0:
-                    out[extra_index, target_index] = f(
-                        source_flat, indices, weights
-                    )
+                    out[extra_index, target_index] = f(source_flat, indices, weights)
         return out
-    
-    return _regrid
+
+    return numba.njit(_regrid, parallel=True, cache=True)
 
 
 class BaseRegridder(abc.ABC):
@@ -90,74 +58,73 @@ class BaseRegridder(abc.ABC):
 
     def __init__(
         self,
-        source: Ugrid2d,
-        target: Ugrid2d,
-        weights: Optional[Tuple] = None,
+        source: "xugrid.Ugrid2d",
+        target: "xugrid.Ugrid2d",
     ):
-        source = get_grid(source)
-        target = get_grid(target)
-        self.source_grid = source
-        self.target_grid = target
-        if weights is None:
-            self.compute_weights()
-        else:
-            self.source_index, self.target_index, self.weights = weights
-            
-    @property
-    def regrid_weights(self):
-        return (
-            self.source_index,
-            self.target_index,
-            self.weights,
-        )
+        self._target = UnstructuredGrid2d(target)
+        self._compute_weights(UnstructuredGrid2d(source), self._target)
+        return
+
+    @abc.abstractproperty
+    def weights(self):
+        """ """
 
     @abc.abstractmethod
-    def to_dataset(self):
-        """
-        Store the computed weights in a dataset for re-use.
-        """
+    def _compute_weights(self, source, target):
+        """ """
 
     def _setup_regrid(self, func) -> Callable:
         if isinstance(func, str):
-            self._regrid = get_method(func, self._JIT_FUNCTIONS)
+            functions = self._JIT_FUNCTIONS
+            try:
+                self._regrid = functions[func]
+            except KeyError as e:
+                raise ValueError(
+                    "Invalid regridding method. Available methods are: {}".format(
+                        functions.keys()
+                    )
+                ) from e
         elif callable(func):
-            self._regrid = make_regrid(func) 
+            self._regrid = make_regrid(func)
         else:
             raise TypeError(
-                f"method must be string or callable, received: {type(func).__name}")
+                f"method must be string or callable, received: {type(func).__name}"
+            )
         return
 
     def regrid_array(self, source):
         first_dims = source.shape[:-1]
         last_dims = source.shape[-1:]
 
-        if last_dims != self.source.shape:
-            raise ValueError(
-                "Shape of last source dimensions does not match regridder "
-                f"shape: {last_dims} versus {self.source.shape}"
-            )
+        # TODO: store source and do some checking.
+        # Alternatively, check by weights.
+        # if last_dims != self._source.shape:
+        #    raise ValueError(
+        #        "Shape of last source dimensions does not match regridder "
+        #        f"shape: {last_dims} versus {self._source.shape}"
+        #    )
 
         if source.ndim == 1:
             source = source[np.newaxis]
         elif source.ndim > 2:
             source = source.reshape((-1,) + last_dims)
 
-        size = self.target.size
-        out_shape = first_dims + self.target.shape
+        size = self._target.size
+        out_shape = first_dims + self._target.shape
 
         if isinstance(source, DaskArray):
-            chunks = source.chunks[:-1] + (self.target.shape,)
+            chunks = source.chunks[:-1] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
-                self.csr_weights,  # *args
+                self._weights,  # *args
                 size,  # *args
                 dtype=np.float64,
                 chunks=chunks,
                 meta=np.array((), dtype=source.dtype),
             )
         elif isinstance(source, np.ndarray):
-            out = self._regrid(source, self.csr_weights, size)
+            out = self._regrid(source, self._weights, size)
         else:
             raise TypeError(
                 "Expected dask.array.Array or numpy.ndarray. Received: "
@@ -166,16 +133,15 @@ class BaseRegridder(abc.ABC):
 
         return out.reshape(out_shape)
 
-    def regrid_dataarray(self, source):
-        source_dims = (source.ugrid.grid.face_dimension,)
+    def regrid_dataarray(self, source: xr.DataArray, source_dims: Tuple[str]):
         # Do not set vectorize=True: numba will run the for loop more
         # efficiently, and guarantees a single large allocation.
         out = xr.apply_ufunc(
             self.regrid_array,
-            source.ugrid.obj,
+            source,
             input_core_dims=[source_dims],
             exclude_dims=set(source_dims),
-            output_core_dims=[self.target.dims],
+            output_core_dims=[self._target.dims],
             dask="allowed",
             keep_attrs=True,
             output_dtypes=[source.dtype],
@@ -199,11 +165,56 @@ class BaseRegridder(abc.ABC):
         -------
         regridded: UgridDataArray
         """
-        regridded = self.regrid_dataarray(object)
+        source_dims = (object.ugrid.grid.face_dimension,)
+        regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
         return UgridDataArray(
             regridded,
-            self.target.grid,
+            self._target.ugrid_topology,
         )
+
+    def to_dataset(self) -> xr.Dataset:
+        """
+        Store the computed weights and target in a dataset for re-use.
+        """
+        ds = xr.Dataset(
+            {f"__regrid_{k}": v for k, v in zip(self._weights._fields, self._weights)}
+        )
+        ugrid_ds = self._target.ugrid_topology.to_dataset()
+        return xr.merge(ds, ugrid_ds)
+
+    @staticmethod
+    def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
+        return WeightMatrixCSR(
+            dataset["__regrid_data"].values,
+            dataset["__regrid_indices"].values,
+            dataset["__regrid_indptr"].values,
+            dataset["__regrid_n"].values,
+            dataset["__regrid_nnz"].values,
+        )
+
+    @staticmethod
+    def _coo_from_dataset(dataset: xr.Dataset) -> WeightMatrixCOO:
+        return WeightMatrixCOO(
+            dataset["__regrid_data"].values,
+            dataset["__regrid_row"].values,
+            dataset["__regrid_col"].values,
+            dataset["__regrid_nnz"].values,
+        )
+
+    @abc.abstractclassmethod
+    def _weights_from_dataset(
+        cls, dataset: xr.Dataset
+    ) -> Union[WeightMatrixCOO, WeightMatrixCSR]:
+        """
+        Return either COO or CSR weights.
+        """
+
+    @classmethod
+    def from_weights(cls, weights, target: "xugrid.Ugrid2d"):
+        instance = cls.__new__()
+        instance._weights = weights
+        instance._target = UnstructuredGrid2d(target)
+        return instance
 
     @classmethod
     def from_dataset(cls, dataset: xr.Dataset):
@@ -211,18 +222,9 @@ class BaseRegridder(abc.ABC):
         Reconstruct the regridder from a dataset with source, target indices
         and weights.
         """
-        source = Ugrid2d.from_dataset(_get_grid_variables(dataset, "__source__"))
-        target = Ugrid2d.from_dataset(_get_grid_variables(dataset, "__target__"))
-        weights = (
-            dataset["source_index"].values,
-            dataset["target_index"].values,
-            dataset["weights"].values,
-        )
-        return cls(
-            source,
-            target,
-            weights,
-        )
+        target = xu.Ugrid2d.from_dataset(dataset)
+        weights = cls._weights_from_dataset(dataset)
+        return cls.from_weights(weights, target)
 
 
 class CentroidLocatorRegridder(BaseRegridder):
@@ -237,93 +239,78 @@ class CentroidLocatorRegridder(BaseRegridder):
     ----------
     source: Ugrid2d, UgridDataArray
     target: Ugrid2d, UgridDataArray
-
+    weights: Optional[WeightMatrixCOO]
     """
 
-    def compute_weights(self):
-        tree = self.source_grid.celltree
-        self.source_index = tree.locate_points(self.target_grid.centroids)
-        self.weights = xr.DataArray(
-            data=np.where(self.source_index != -1, 1.0, np.nan),
-            dims=[self.target_grid.face_dimension],
-        )
+    def _compute_weights(self, source, target):
+        source_index, target_index, weight_values = source.locate_centroids(target)
+        self._weights = weight_matrix_coo(source_index, target_index, weight_values)
         return
 
-    def regrid(self, obj: UgridDataArray) -> UgridDataArray:
-        """
-        Regrid an object to the target grid topology.
+    @staticmethod
+    @numba.njit(parallel=True, cache=True)
+    def _regrid(source: FloatArray, A: WeightMatrixCOO, size: int):
+        n_extra = source.shape[0]
+        out = np.full((n_extra, size), np.nan)
+        for extra_index in numba.prange(n_extra):
+            source_flat = source[extra_index]
+            for target_index, source_index in zip(A.row, A.col):
+                out[extra_index, target_index] = source_flat[source_index]
+        return out
 
-        Parameters
-        ----------
-        obj: UgridDataArray
+    @property
+    def weights(self):
+        return self._weights
 
-        Returns
-        -------
-        regridded: UgridDataArray
-            The data regridded to the target grid. The target grid has been set
-            as the face dimension.
-        """
-        grid = obj.ugrid.grid
-        facedim = grid.face_dimension
-        da = obj.obj.isel({facedim: self.source_index})
-        da.name = obj.name
-        uda = UgridDataArray(da, self.target_grid)
-        uda = uda.rename({facedim: self.target_grid.face_dimension})
-        uda = uda * self.weights.values
-        return uda
+    @weights.setter
+    def weights(self, weights: WeightMatrixCOO, target: "xugrid.Ugrid2d"):
+        if not isinstance(weights, WeightMatrixCOO):
+            raise TypeError(
+                f"Expected WeightMatrixCOO, received: {type(weights).__name__}"
+            )
+        self._weights = weights
+        return
 
-    def to_dataset(self) -> xr.Dataset:
-        source_ds = _prepend(self.source_grid.to_dataset(), "__source__")
-        target_ds = _prepend(self.target_grid.to_dataset(), "__target__")
-        regrid_ds = xr.Dataset(
-            {
-                "source_index": self.source_index,
-                "target_index": np.nan,
-                "weights": self.weights,
-            },
-        )
-        return xr.merge((source_ds, target_ds, regrid_ds))
-    
+    @staticmethod
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+        return cls._coo_from_dataset(dataset)
+
 
 class BaseOverlapRegridder(BaseRegridder, abc.ABC):
-    def __init__(
-        self,
-        source: UgridDataArray,
-        target: UgridDataArray,
-        method: Union[str, Callable],
-        weights: Optional[Union[Tuple, WeightMatrixCSR]] = None,
-    ):
-        source = get_grid(source)
-        target = get_grid(target)
-        self.source = UnstructuredGrid2d(source)
-        self.target = UnstructuredGrid2d(target)
-        self._setup_regrid(method)
-        if weights is None:
-            self.compute_weights()
-        elif isinstance(weights, WeightMatrixCSR):
-            self.source_index = None
-            self.target_index = None
-            self.weights = None
-            self.csr_weights = weights
-        else:
-            self.source_index, self.target_index, self.weights = weights
-
-    def _compute_weights(self, relative: bool):
-        self.source_index, self.target_index, self.weights = self.source.overlap(
-            self.target, relative=relative
+    def _compute_weights(self, source, target, relative: bool) -> None:
+        source_index, target_index, weight_values = source.overlap(
+            target, relative=relative
         )
-        self.csr_weights = create_weight_matrix(
-            self.target_index, self.source_index, self.weights
-        )
+        self._weights = weight_matrix_csr(source_index, target_index, weight_values)
         return
-    
+
     @property
-    def regrid_weights(self):
-        return self.csr_weights
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, weights: WeightMatrixCSR):
+        if not isinstance(weights, WeightMatrixCSR):
+            raise TypeError(
+                f"Expected WeightMatrixCSR, received: {type(weights).__name__}"
+            )
+        self._weights = weights
+        return
 
     @classmethod
-    def to_dataset(self, dataset: xr.Dataset):
-        return
+    def from_weights(
+        cls,
+        weights: WeightMatrixCSR,
+        method: Union[str, Callable],
+        target: Optional["xugrid.Ugrid2d"],
+    ):
+        instance = super().from_weights(weights, target)
+        instance._setup_regrid(method)
+        return instance
+
+    @classmethod
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+        return cls._csr_from_dataset(dataset)
 
 
 class OverlapRegridder(BaseOverlapRegridder):
@@ -354,19 +341,22 @@ class OverlapRegridder(BaseOverlapRegridder):
     method: str, function, optional
         Default value is ``"mean"``.
     """
-    _JIT_FUNCTIONS = {k: numba.njit(make_regrid(f), parallel=True, cache=True) for k, f in reduce.ASBOLUTE_OVERLAP_METHODS.items()}
-    
+
+    _JIT_FUNCTIONS = {
+        k: make_regrid(f) for k, f in reduce.ASBOLUTE_OVERLAP_METHODS.items()
+    }
+
     def __init__(
         self,
         source: UgridDataArray,
         target: UgridDataArray,
         method: Union[str, Callable] = "mean",
-        weights: Optional[Tuple] = None,
     ):
-        super().__init__(source=source, target=target, method=method, weights=weights)
-        
-    def compute_weights(self) -> None:
-        self._compute_weights(relative=False)
+        super().__init__(source=source, target=target)
+        self._setup_regrid(method)
+
+    def _compute_weights(self, source, target) -> None:
+        super()._compute_weights(source, target, relative=False)
 
 
 class RelativeOverlapRegridder(BaseOverlapRegridder):
@@ -391,10 +381,22 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
     target: Ugrid2d, UgridDataArray
     method: str, function, optional
     """
-    _JIT_FUNCTIONS = {k: numba.njit(make_regrid(f), parallel=True, cache=True) for k, f in reduce.RELATIVE_OVERLAP_METHODS.items()}
 
-    def compute_weights(self) -> None:
-        self._compute_weights(relative=True)
+    _JIT_FUNCTIONS = {
+        k: make_regrid(f) for k, f in reduce.RELATIVE_OVERLAP_METHODS.items()
+    }
+
+    def __init__(
+        self,
+        source: UgridDataArray,
+        target: UgridDataArray,
+        method: Union[str, Callable],
+    ):
+        super().__init__(source=source, target=target)
+        self._setup_regrid(method)
+
+    def _compute_weights(self, source, target) -> None:
+        super()._compute_weights(source, target, relative=True)
 
 
 class BarycentricInterpolator(BaseRegridder):
@@ -411,47 +413,43 @@ class BarycentricInterpolator(BaseRegridder):
     target: Ugrid2d, UgridDataArray
 
     """
-    _JIT_FUNCTIONS = {"mean": numba.njit(make_regrid(reduce.mean), parallel=True, cache=True)}
+
+    _JIT_FUNCTIONS = {"mean": make_regrid(reduce.mean)}
 
     def __init__(
         self,
         source: UgridDataArray,
         target: UgridDataArray,
-        weights: Optional[Union[Tuple, WeightMatrixCSR]] = None,
     ):
-        source = get_grid(source)
-        target = get_grid(target)
-        self.source = UnstructuredGrid2d(source)
-        self.target = UnstructuredGrid2d(target)
+        super().__init__(source, target)
         # Since the weights for a target face sum up to 1.0, a weight mean is
         # appropriate, and takes care of NaN values in the source data.
         self._setup_regrid("mean")
 
-        if weights is None:
-            self.compute_weights()
-        elif isinstance(weights, WeightMatrixCSR):
-            self.source_index = None
-            self.target_index = None
-            self.weights = None
-            self.csr_weights = weights
-        else:
-            self.source_index, self.target_index, self.weights = weights
-
-    def compute_weights(self):
-        (
-            self.source_index,
-            self.target_index,
-            self.weights,
-        ) = self.source.barycentric(self.target)
-        self.csr_weights = create_weight_matrix(
-            self.target_index, self.source_index, self.weights
-        )
+    def _compute_weights(self, source, target):
+        source_index, target_index, weights = source.barycentric(target)
+        self._weights = weight_matrix_csr(source_index, target_index, weights)
         return
 
     @property
-    def regrid_weights(self):
-        return self.csr_weights
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, weights: WeightMatrixCSR):
+        if not isinstance(weights, WeightMatrixCSR):
+            raise TypeError(
+                f"Expected WeightMatrixCSR, received: {type(weights).__name__}"
+            )
+        self._weights = weights
+        return
 
     @classmethod
-    def to_dataset(self, dataset: xr.Dataset):
-        return
+    def from_weights(cls, weights: WeightMatrixCSR, target: Optional["xugrid.Ugrid2d"]):
+        instance = super().from_weights(weights, target)
+        instance._setup_regrid("mean")
+        return instance
+
+    @classmethod
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+        return cls._csr_from_dataset(dataset)

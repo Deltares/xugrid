@@ -2,12 +2,21 @@ import numpy as np
 import pytest
 
 import xugrid
-from xugrid.regrid import unstructured
+from xugrid.regrid.unstructured import UnstructuredGrid2d
 
 
 @pytest.fixture(scope="function")
 def circle():
-    return unstructured.UnstructuredGrid2d(xugrid.data.disk().grid)
+    return UnstructuredGrid2d(xugrid.data.disk().grid)
+
+
+def test_init():
+    uds = xugrid.data.disk()
+    assert isinstance(UnstructuredGrid2d(uds), UnstructuredGrid2d)
+    assert isinstance(UnstructuredGrid2d(uds["face_z"]), UnstructuredGrid2d)
+    assert isinstance(UnstructuredGrid2d(uds.ugrid.grid), UnstructuredGrid2d)
+    with pytest.raises(TypeError):
+        UnstructuredGrid2d(1)
 
 
 def test_grid_properties(circle):
@@ -34,9 +43,8 @@ def test_overlap(circle, relative):
         assert np.allclose(weights[sorter], circle.area)
 
 
-def test_locate(circle):
-    points = circle.grid.centroids
-    source, target, weights = circle.locate(points)
+def test_locate_centroids(circle):
+    source, target, weights = circle.locate_centroids(circle)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.arange(circle.size))
     assert np.array_equal(target[sorter], np.arange(circle.size))
