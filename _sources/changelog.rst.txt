@@ -15,6 +15,18 @@ Fixed
 Changed
 ~~~~~~~
 
+- ``pygeos`` has been replaced by ``shapely >= 2.0``.
+- :func:`xugrid.snap_to_grid` will now return a UgridDataset and a geopandas
+  GeoDataFrame. The UgridDataset contains the snapped data on the edges of the
+  the UGRID topology.
+- :class:`xugrid.RelativeOverlapRegridder` has been created to separate the
+  relative overlap logic from :class:`xugrid.OverlapRegridder`.
+- :class:`xugrid.BarycentricInterpolator`,
+  :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
+  and :class:`RelativeOverlapRegridder` can now be instantiated from weights
+  (``.from_weights``) or from a dataset (``.from_dataset``) containing
+  pre-computed weights.
+
 Added
 ~~~~~
 

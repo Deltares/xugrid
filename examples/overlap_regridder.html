@@ -409,7 +409,7 @@ some bathymetry) of the Netherlands, and a coarser target grid.</p>
 <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7efbfe12fc10&gt;
+<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f27472348b0&gt;
 </pre></div>
 </div>
 <section id="method-comparison">
@@ -418,8 +418,8 @@ some bathymetry) of the Netherlands, and a coarser target grid.</p>
 xugrid. We’ll create a regridder once for every method, and plot the results
 side by side.</p>
 <dl class="simple">
-<dt>..note::</dt><dd><p>Sum and conductance (which is first-order conservative) result in much higher
-values. The white in the figures are high values, not no data.</p>
+<dt>..note::</dt><dd><p>Sum and results in much higher values. The white in the figures are high
+values, not no data.</p>
 </dd>
 </dl>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">functions</span> <span class="o">=</span> <span class="p">[</span>
@@ -431,7 +431,6 @@ values. The white in the figures are high values, not no data.</p>
     <span class="s2">&quot;maximum&quot;</span><span class="p">,</span>
     <span class="s2">&quot;mode&quot;</span><span class="p">,</span>
     <span class="s2">&quot;median&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;conductance&quot;</span><span class="p">,</span>
     <span class="s2">&quot;max_overlap&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
@@ -445,7 +444,21 @@ values. The white in the figures are high values, not no data.</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_002.png" srcset="../_images/sphx_glr_overlap_regridder_002.png" alt="mean, harmonic_mean, geometric_mean, sum, minimum, maximum, mode, median, conductance, max_overlap" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_overlap_regridder_002.png" srcset="../_images/sphx_glr_overlap_regridder_002.png" alt="mean, harmonic_mean, geometric_mean, sum, minimum, maximum, mode, median, max_overlap" class = "sphx-glr-single-img"/></section>
+<section id="relative-overlap">
+<h2>Relative overlap<a class="headerlink" href="#relative-overlap" title="Permalink to this heading">#</a></h2>
+<p>For some reductions, the relative degree of overlap with the original source
+cell is required rather than the absolute overlap, e.g. for first-order
+conservative methods, such as conductance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">regridder</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">RelativeOverlapRegridder</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">uda</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;conductance&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">regridder</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">uda</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f27473e0a90&gt;
+</pre></div>
+</div>
+</section>
 <section id="custom-reductions">
 <h2>Custom reductions<a class="headerlink" href="#custom-reductions" title="Permalink to this heading">#</a></h2>
 <p>It’s also possible to define your own reduction methods. Such a method is
@@ -484,7 +497,7 @@ allocations.</p></li>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7efc07e44070&gt;
+<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f2747a9af40&gt;
 </pre></div>
 </div>
 <p>Not every reduction uses the weights argument. For example, computing an
@@ -501,10 +514,10 @@ function can deal with NaN values! – hence <code class="docutils literal notra
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7efbfdf895e0&gt;
+<img src="../_images/sphx_glr_overlap_regridder_005.png" srcset="../_images/sphx_glr_overlap_regridder_005.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f2748397cd0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.809 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.647 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-overlap-regridder-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9510c04155266403a85c77c93b648199/overlap_regridder.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">overlap_regridder.py</span></code></a></p>
@@ -558,6 +571,11 @@ function can deal with NaN values! – hence <code class="docutils literal notra
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#method-comparison">
    Method comparison
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#relative-overlap">
+   Relative overlap
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">

@@ -64,8 +64,8 @@ grid.plot(ax=ax, color="red")
 # side by side.
 #
 # ..note::
-#   Sum and conductance (which is first-order conservative) result in much higher
-#   values. The white in the figures are high values, not no data.
+#   Sum and results in much higher values. The white in the figures are high
+#   values, not no data.
 
 functions = [
     "mean",
@@ -76,7 +76,6 @@ functions = [
     "maximum",
     "mode",
     "median",
-    "conductance",
     "max_overlap",
 ]
 
@@ -88,6 +87,18 @@ for f, ax in zip(functions, axes):
     result = regridder.regrid(uda)
     result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain", ax=ax)
     ax.set_title(f)
+
+# %%
+# Relative overlap
+# ----------------
+#
+# For some reductions, the relative degree of overlap with the original source
+# cell is required rather than the absolute overlap, e.g. for first-order
+# conservative methods, such as conductance:
+
+regridder = xu.RelativeOverlapRegridder(source=uda, target=grid, method="conductance")
+result = regridder.regrid(uda)
+result.ugrid.plot()
 
 # %%
 # Custom reductions
@@ -148,5 +159,3 @@ result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
 # %%
 # .. _Numba: https://numba.pydata.org/
-
-# %%

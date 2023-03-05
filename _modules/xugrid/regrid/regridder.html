@@ -287,12 +287,13 @@
 <span class="sd">This module is heavily inspired by xemsf.frontend.py</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numba</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
 
 <span class="c1"># dask as optional dependency</span>
 <span class="k">try</span><span class="p">:</span>
@@ -302,117 +303,113 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">DaskArray</span> <span class="o">=</span> <span class="p">()</span>
 
+<span class="kn">import</span> <span class="nn">xugrid</span>
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FloatArray</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
+<span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span>
 <span class="kn">from</span> <span class="nn">xugrid.regrid</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">xugrid.regrid.unstructured</span> <span class="kn">import</span> <span class="n">UnstructuredGrid2d</span>
-<span class="kn">from</span> <span class="nn">xugrid.regrid.weight_matrix</span> <span class="kn">import</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">create_weight_matrix</span><span class="p">,</span> <span class="n">nzrange</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
+<span class="kn">from</span> <span class="nn">xugrid.regrid.weight_matrix</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">WeightMatrixCOO</span><span class="p">,</span>
+    <span class="n">WeightMatrixCSR</span><span class="p">,</span>
+    <span class="n">nzrange</span><span class="p">,</span>
+    <span class="n">weight_matrix_coo</span><span class="p">,</span>
+    <span class="n">weight_matrix_csr</span><span class="p">,</span>
+<span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_prepend</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="nb">vars</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span>
-    <span class="n">dims</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span>
-    <span class="n">name_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">dims</span><span class="p">)}</span>
-    <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name_dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">make_regrid</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses a closure to capture func, so numba can compile it efficiently without</span>
+<span class="sd">    function call overhead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">n_extra</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_extra</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">extra_index</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_extra</span><span class="p">):</span>
+            <span class="n">source_flat</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">extra_index</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">target_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">nzrange</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">target_index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">source_flat</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
 
-<span class="k">def</span> <span class="nf">_get_grid_variables</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]]</span>
-    <span class="n">name_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name_dict</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">get_grid</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">arg</span><span class="o">.</span><span class="n">grid</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">arg</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Ugrid2d&quot;</span><span class="p">,</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">,</span> <span class="s2">&quot;UgridDataset&quot;</span><span class="p">}</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected one of </span><span class="si">{</span><span class="n">options</span><span class="si">}</span><span class="s2">, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">_regrid</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">BaseRegridder</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">source</span><span class="p">:</span> <span class="n">Ugrid2d</span><span class="p">,</span>
-        <span class="n">target</span><span class="p">:</span> <span class="n">Ugrid2d</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_grid</span> <span class="o">=</span> <span class="n">source</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span> <span class="o">=</span> <span class="n">target</span>
-        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">compute_weights</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Store the computed weights in a dataset for re-use.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_setup_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Use a closure to capture func.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">f</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-
-        <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">n_extra</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_extra</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">extra_index</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_extra</span><span class="p">):</span>
-                <span class="n">source_flat</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">extra_index</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">target_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
-                    <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">nzrange</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">target_index</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">out</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span>
-                            <span class="n">source_flat</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span>
-                        <span class="p">)</span>
-            <span class="k">return</span> <span class="n">out</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span> <span class="o">=</span> <span class="n">_regrid</span>
+    <span class="k">def</span> <span class="nf">_setup_regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_JIT_FUNCTIONS</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span> <span class="o">=</span> <span class="n">functions</span><span class="p">[</span><span class="n">func</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Invalid regridding method. Available methods are: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="p">)</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span> <span class="o">=</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;method must be string or callable, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">__name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">regrid_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
         <span class="n">first_dims</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">last_dims</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
 
-        <span class="k">if</span> <span class="n">last_dims</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Shape of last source dimensions does not match regridder &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;shape: </span><span class="si">{</span><span class="n">last_dims</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+        <span class="c1"># TODO: store source and do some checking.</span>
+        <span class="c1"># Alternatively, check by weights.</span>
+        <span class="c1"># if last_dims != self._source.shape:</span>
+        <span class="c1">#    raise ValueError(</span>
+        <span class="c1">#        &quot;Shape of last source dimensions does not match regridder &quot;</span>
+        <span class="c1">#        f&quot;shape: {last_dims} versus {self._source.shape}&quot;</span>
+        <span class="c1">#    )</span>
 
         <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">last_dims</span><span class="p">)</span>
 
-        <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">size</span>
-        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">first_dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">first_dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">DaskArray</span><span class="p">):</span>
-            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">,)</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span><span class="p">,)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">,</span>  <span class="c1"># func</span>
                 <span class="n">source</span><span class="p">,</span>  <span class="c1"># *args</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">csr_weights</span><span class="p">,</span>  <span class="c1"># *args</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">,</span>  <span class="c1"># *args</span>
                 <span class="n">size</span><span class="p">,</span>  <span class="c1"># *args</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
                 <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">csr_weights</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected dask.array.Array or numpy.ndarray. Received: &quot;</span>
@@ -421,16 +418,15 @@
 
         <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out_shape</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">regrid_dataarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
-        <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
+    <span class="k">def</span> <span class="nf">regrid_dataarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
         <span class="c1"># Do not set vectorize=True: numba will run the for loop more</span>
         <span class="c1"># efficiently, and guarantees a single large allocation.</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">regrid_array</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
+            <span class="n">source</span><span class="p">,</span>
             <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[</span><span class="n">source_dims</span><span class="p">],</span>
             <span class="n">exclude_dims</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">source_dims</span><span class="p">),</span>
-            <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">dims</span><span class="p">],</span>
+            <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">dims</span><span class="p">],</span>
             <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span><span class="p">,</span>
             <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">],</span>
@@ -454,11 +450,56 @@
 <span class="sd">        -------</span>
 <span class="sd">        regridded: UgridDataArray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">regridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
+        <span class="n">regridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span>
             <span class="n">regridded</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">ugrid_topology</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store the computed weights and target in a dataset for re-use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+            <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;__regrid_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">_fields</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">)}</span>
+        <span class="p">)</span>
+        <span class="n">ugrid_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">ugrid_topology</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">ds</span><span class="p">,</span> <span class="n">ugrid_ds</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCSR</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">WeightMatrixCSR</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_indices&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_indptr&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_nnz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">WeightMatrixCOO</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_row&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_nnz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractclassmethod</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return either COO or CSR weights.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
@@ -466,18 +507,9 @@
 <span class="sd">        Reconstruct the regridder from a dataset with source, target indices</span>
 <span class="sd">        and weights.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">_get_grid_variables</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;__source__&quot;</span><span class="p">))</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">_get_grid_variables</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;__target__&quot;</span><span class="p">))</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;source_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;target_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">source</span><span class="p">,</span>
-            <span class="n">target</span><span class="p">,</span>
-            <span class="n">weights</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_weights_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CentroidLocatorRegridder"><a class="viewcode-back" href="../../../api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder">[docs]</a><span class="k">class</span> <span class="nc">CentroidLocatorRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
@@ -492,55 +524,70 @@
 <span class="sd">    ----------</span>
 <span class="sd">    source: Ugrid2d, UgridDataArray</span>
 <span class="sd">    target: Ugrid2d, UgridDataArray</span>
-
+<span class="sd">    weights: Optional[WeightMatrixCOO]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_grid</span><span class="o">.</span><span class="n">celltree</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span><span class="o">.</span><span class="n">centroids</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
-            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">],</span>
-        <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">locate_centroids</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_coo</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Regrid an object to the target grid topology.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">n_extra</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_extra</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">extra_index</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_extra</span><span class="p">):</span>
+            <span class="n">source_flat</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">extra_index</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">col</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_flat</span><span class="p">[</span><span class="n">source_index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        obj: UgridDataArray</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        regridded: UgridDataArray</span>
-<span class="sd">            The data regridded to the target grid. The target grid has been set</span>
-<span class="sd">            as the face dimension.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
-        <span class="n">facedim</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">})</span>
-        <span class="n">da</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">uda</span> <span class="o">=</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span><span class="p">)</span>
-        <span class="n">uda</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">})</span>
-        <span class="n">uda</span> <span class="o">=</span> <span class="n">uda</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">return</span> <span class="n">uda</span>
+    <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCOO</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCOO, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-        <span class="n">source_ds</span> <span class="o">=</span> <span class="n">_prepend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_grid</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(),</span> <span class="s2">&quot;__source__&quot;</span><span class="p">)</span>
-        <span class="n">target_ds</span> <span class="o">=</span> <span class="n">_prepend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_grid</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(),</span> <span class="s2">&quot;__target__&quot;</span><span class="p">)</span>
-        <span class="n">regrid_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;source_index&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span>
-                <span class="s2">&quot;target_index&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
-            <span class="p">},</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">BaseOverlapRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span>
+            <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">source_ds</span><span class="p">,</span> <span class="n">target_ds</span><span class="p">,</span> <span class="n">regrid_ds</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_csr</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
+
+    <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="k">return</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="OverlapRegridder"><a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder">[docs]</a><span class="k">class</span> <span class="nc">OverlapRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
+<div class="viewcode-block" id="OverlapRegridder"><a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder">[docs]</a><span class="k">class</span> <span class="nc">OverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The OverlapRegridder regrids by computing which target faces overlap with</span>
 <span class="sd">    which source faces. It stores the area of overlap, which can be used in</span>
@@ -556,7 +603,6 @@
 <span class="sd">    * ``&quot;maximum&quot;``</span>
 <span class="sd">    * ``&quot;mode&quot;``</span>
 <span class="sd">    * ``&quot;median&quot;``</span>
-<span class="sd">    * ``&quot;conductance&quot;``</span>
 <span class="sd">    * ``&quot;max_overlap&quot;``</span>
 
 <span class="sd">    Custom aggregation functions are also supported, if they can be compiled by</span>
@@ -568,44 +614,86 @@
 <span class="sd">    target: Ugrid2d, UgridDataArray</span>
 <span class="sd">    method: str, function, optional</span>
 <span class="sd">        Default value is ``&quot;mean&quot;``.</span>
-<span class="sd">    relative: bool, optional</span>
-<span class="sd">        Default value is ``False``. Should only be provided when using a custom</span>
-<span class="sd">        aggregation function. When relative is True, the intersection area is</span>
-<span class="sd">        divided by the total area of the source face.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">reduce</span><span class="o">.</span><span class="n">ASBOLUTE_OVERLAP_METHODS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
 
 <div class="viewcode-block" id="OverlapRegridder.__init__"><a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-        <span class="n">relative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="n">func</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="n">reduce</span><span class="o">.</span><span class="n">get_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">reduce</span><span class="o">.</span><span class="n">OVERLAP_METHODS</span><span class="p">,</span> <span class="n">relative</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">compute_weights</span><span class="p">(</span><span class="n">relative</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">relative</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">csr_weights</span> <span class="o">=</span> <span class="n">create_weight_matrix</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span>
-        <span class="p">)</span>
-        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
-        <span class="k">return</span></div>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="RelativeOverlapRegridder"><a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder">[docs]</a><span class="k">class</span> <span class="nc">RelativeOverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The RelativeOverlapRegridder regrids by computing which target faces</span>
+<span class="sd">    overlap with which source faces. It stores the area of overlap, which can</span>
+<span class="sd">    be used in multiple ways to aggregate the values associated with the source</span>
+<span class="sd">    faces. Unlike the OverlapRegridder, the intersection area is divided by the</span>
+<span class="sd">    total area of the source face. This is required for e.g. first-order</span>
+<span class="sd">    conserative regridding.</span>
+
+<span class="sd">    Currently supported aggregation methods are:</span>
+
+<span class="sd">    * ``&quot;max_overlap&quot;``</span>
+
+<span class="sd">    Custom aggregation functions are also supported, if they can be compiled by</span>
+<span class="sd">    Numba. See the User Guide.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source: Ugrid2d, UgridDataArray</span>
+<span class="sd">    target: Ugrid2d, UgridDataArray</span>
+<span class="sd">    method: str, function, optional</span>
+<span class="sd">        Default value is &quot;first_order_conservative&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">reduce</span><span class="o">.</span><span class="n">RELATIVE_OVERLAP_METHODS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="RelativeOverlapRegridder.__init__"><a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;first_order_conservative&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;first_order_conservative&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
 
 
 <div class="viewcode-block" id="BarycentricInterpolator"><a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator">[docs]</a><span class="k">class</span> <span class="nc">BarycentricInterpolator</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
@@ -623,38 +711,45 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">reduce</span><span class="o">.</span><span class="n">mean</span><span class="p">)}</span>
+
 <div class="viewcode-block" id="BarycentricInterpolator.__init__"><a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">get_grid</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="c1"># Since the weights for a target face sum up to 1.0, a weight mean is</span>
         <span class="c1"># appropriate, and takes care of NaN values in the source data.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">reduce</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">compute_weights</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">barycentric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">csr_weights</span> <span class="o">=</span> <span class="n">create_weight_matrix</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span>
-        <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">barycentric</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_csr</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
+
+    <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="k">return</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
-        <span class="k">return</span></div>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">]):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 </pre></div>
 
             </article>

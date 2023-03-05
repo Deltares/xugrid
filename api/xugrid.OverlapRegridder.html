@@ -40,7 +40,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.OverlapRegridder';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="xugrid.plot.contour" href="xugrid.plot.contour.html" />
+    <link rel="next" title="xugrid.RelativeOverlapRegridder" href="xugrid.RelativeOverlapRegridder.html" />
     <link rel="prev" title="xugrid.CentroidLocatorRegridder" href="xugrid.CentroidLocatorRegridder.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
@@ -576,6 +576,11 @@
    xugrid.OverlapRegridder
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.RelativeOverlapRegridder.html">
+   xugrid.RelativeOverlapRegridder
+  </a>
+ </li>
 </ul>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -766,8 +771,8 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="xugrid.Ugrid1d.to_pygeos.html">
-   xugrid.Ugrid1d.to_pygeos
+  <a class="reference internal" href="xugrid.Ugrid1d.to_shapely.html">
+   xugrid.Ugrid1d.to_shapely
   </a>
  </li>
  <li class="toctree-l1">
@@ -1073,8 +1078,8 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="xugrid.Ugrid2d.to_pygeos.html">
-   xugrid.Ugrid2d.to_pygeos
+  <a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html">
+   xugrid.Ugrid2d.to_shapely
   </a>
  </li>
  <li class="toctree-l1">
@@ -1141,7 +1146,7 @@
 <h1>xugrid.OverlapRegridder<a class="headerlink" href="#xugrid-overlapregridder" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="xugrid.OverlapRegridder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">OverlapRegridder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/regrid/regridder.html#OverlapRegridder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.OverlapRegridder" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">OverlapRegridder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/regrid/regridder.html#OverlapRegridder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.OverlapRegridder" title="Permalink to this definition">#</a></dt>
 <dd><p>The OverlapRegridder regrids by computing which target faces overlap with
 which source faces. It stores the area of overlap, which can be used in
 multiple ways to aggregate the values associated with the source faces.</p>
@@ -1155,7 +1160,6 @@ multiple ways to aggregate the values associated with the source faces.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;maximum&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;median&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;conductance&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;max_overlap&quot;</span></code></p></li>
 </ul>
 <p>Custom aggregation functions are also supported, if they can be compiled by
@@ -1166,28 +1170,25 @@ Numba. See the User Guide.</p>
 <li><p><strong>source</strong> (<a class="reference internal" href="xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d"><em>Ugrid2d</em></a><em>, </em><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><em>UgridDataArray</em></a>) – </p></li>
 <li><p><strong>target</strong> (<a class="reference internal" href="xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d"><em>Ugrid2d</em></a><em>, </em><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><em>UgridDataArray</em></a>) – </p></li>
 <li><p><strong>method</strong> (<em>str</em><em>, </em><em>function</em><em>, </em><em>optional</em>) – Default value is <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>.</p></li>
-<li><p><strong>relative</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default value is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Should only be provided when using a custom
-aggregation function. When relative is True, the intersection area is
-divided by the total area of the source face.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.OverlapRegridder.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/regrid/regridder.html#OverlapRegridder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.OverlapRegridder.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/regrid/regridder.html#OverlapRegridder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.OverlapRegridder.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#xugrid.OverlapRegridder.__init__" title="xugrid.OverlapRegridder.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(source, target[, method, relative, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#xugrid.OverlapRegridder.__init__" title="xugrid.OverlapRegridder.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(source, target[, method])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_weights</span></code>(relative)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataset</span></code>(dataset)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataset</span></code>(dataset)</p></td>
 <td><p>Reconstruct the regridder from a dataset with source, target indices and weights.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_weights</span></code>(weights, target[, method])</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid</span></code>(object)</p></td>
 <td><p>Regrid the data from a DataArray from its old grid topology to the new target topology.</p></td>
@@ -1195,11 +1196,19 @@ divided by the total area of the source face.</p></li>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_array</span></code>(source)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_dataarray</span></code>(source)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_dataarray</span></code>(source, source_dims)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>(dataset)</p></td>
-<td><p>Store the computed weights in a dataset for re-use.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>()</p></td>
+<td><p>Store the computed weights and target in a dataset for re-use.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weights</span></code></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -1222,10 +1231,10 @@ divided by the total area of the source face.</p></li>
           <p class="prev-next-title">xugrid.CentroidLocatorRegridder</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="xugrid.plot.contour.html" title="next page">
+  <a class='right-next' id="next-link" href="xugrid.RelativeOverlapRegridder.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">xugrid.plot.contour</p>
+      <p class="prev-next-title">xugrid.RelativeOverlapRegridder</p>
   </div>
   <i class="fas fa-angle-right"></i>
   </a>
