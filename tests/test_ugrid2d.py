@@ -3,9 +3,9 @@ from typing import NamedTuple
 import geopandas as gpd
 import numba_celltree
 import numpy as np
-import pygeos
 import pyproj
 import pytest
+import shapely
 import xarray as xr
 from matplotlib.collections import LineCollection
 from scipy import sparse
@@ -801,22 +801,22 @@ def test_from_geodataframe():
             [0.0, 0.0],
         ]
     )
-    gdf = gpd.GeoDataFrame(geometry=[pygeos.creation.polygons(xy)])
+    gdf = gpd.GeoDataFrame(geometry=[shapely.polygons(xy)])
     grid = xugrid.Ugrid2d.from_geodataframe(gdf)
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
-def test_to_pygeos():
+def test_to_shapely():
     grid = grid2d()
 
-    points = grid.to_pygeos(f"{NAME}_nNodes")
-    assert isinstance(points[0], pygeos.Geometry)
+    points = grid.to_shapely(f"{NAME}_nNodes")
+    assert isinstance(points[0], shapely.Geometry)
 
-    lines = grid.to_pygeos(f"{NAME}_nEdges")
-    assert isinstance(lines[0], pygeos.Geometry)
+    lines = grid.to_shapely(f"{NAME}_nEdges")
+    assert isinstance(lines[0], shapely.Geometry)
 
-    polygons = grid.to_pygeos(f"{NAME}_nFaces")
-    assert isinstance(polygons[0], pygeos.Geometry)
+    polygons = grid.to_shapely(f"{NAME}_nFaces")
+    assert isinstance(polygons[0], shapely.Geometry)
 
 
 def test_grid_from_geodataframe():
@@ -828,7 +828,7 @@ def test_grid_from_geodataframe():
 
     x = np.array([0.0, 1.0, 2.0])
     y = np.array([0.0, 0.0, 0.0])
-    line = pygeos.creation.linestrings(x, y)
+    line = shapely.linestrings(x, y)
     xy = np.array(
         [
             [0.0, 0.0],
@@ -837,8 +837,8 @@ def test_grid_from_geodataframe():
             [0.0, 0.0],
         ]
     )
-    polygon = pygeos.creation.polygons(xy)
-    points = pygeos.creation.points(x, y)
+    polygon = shapely.polygons(xy)
+    points = shapely.points(x, y)
 
     with pytest.raises(ValueError, match="Multiple geometry types detected"):
         xugrid.conversion.grid_from_geodataframe(

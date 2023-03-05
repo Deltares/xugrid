@@ -316,7 +316,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             gdfs.append(
                 gpd.GeoDataFrame(
                     data=ds[variables].to_dataframe(dim_order=dim_order),
-                    geometry=grid.to_pygeos(dim),
+                    geometry=grid.to_shapely(dim),
                 )
             )
 

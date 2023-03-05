@@ -5,7 +5,7 @@ Conversion from and to other data structures:
 * Structured data (e.g. rasters)
 
 """
-from typing import Any, Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -24,9 +24,9 @@ from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
-    import pygeos
+    import shapely
 except ImportError:
-    pygeos = MissingOptionalModule("pygeos")
+    shapely = MissingOptionalModule("shapely")
 
 
 def contiguous_xy(xy: FloatArray) -> Tuple[FloatArray, FloatArray]:
@@ -35,7 +35,7 @@ def contiguous_xy(xy: FloatArray) -> Tuple[FloatArray, FloatArray]:
 
 
 def nodes_to_points(x: FloatArray, y: FloatArray) -> PointArray:
-    return pygeos.points(x, y)
+    return shapely.points(x, y)
 
 
 def edges_to_linestrings(
@@ -44,7 +44,7 @@ def edges_to_linestrings(
     c = edge_node_connectivity.ravel()
     xy = np.column_stack((x[c], y[c]))
     i = np.repeat(np.arange(len(edge_node_connectivity)), 2)
-    return pygeos.linestrings(xy, indices=i)
+    return shapely.linestrings(xy, indices=i)
 
 
 def faces_to_polygons(
@@ -55,32 +55,16 @@ def faces_to_polygons(
     i = np.repeat(np.arange(len(face_node_connectivity)), m_per_row)
     c = face_node_connectivity.ravel()[is_data.ravel()]
     xy = np.column_stack((x[c], y[c]))
-    rings = pygeos.linearrings(xy, indices=i)
-    return pygeos.polygons(rings)
-
-
-def _to_pygeos(geometry: Any):
-    first = geometry[0]
-    if not isinstance(first, pygeos.Geometry):
-        # might be shapely
-        try:
-            geometry = pygeos.from_shapely(geometry)
-        except TypeError:
-            raise TypeError(
-                "geometry should be pygeos or shapely type. "
-                f"Received instead {type(first)}"
-            )
-    return geometry
+    rings = shapely.linearrings(xy, indices=i)
+    return shapely.polygons(rings)
 
 
 def points_to_nodes(points: PointArray) -> Tuple[FloatArray, FloatArray]:
-    points = _to_pygeos(points)
-    return contiguous_xy(pygeos.get_coordinates(points))
+    return contiguous_xy(shapely.get_coordinates(points))
 
 
 def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntArray]:
-    edges = _to_pygeos(edges)
-    xy, index = pygeos.get_coordinates(edges, return_index=True)
+    xy, index = shapely.get_coordinates(edges, return_index=True)
     linear_index = np.arange(index.size)
     segments = np.column_stack([linear_index[:-1], linear_index[1:]])
     segments = segments[np.diff(index) == 0]
@@ -105,9 +89,8 @@ def _remove_last_vertex(xy: FloatArray, indices: IntArray):
 def polygons_to_faces(
     polygons: PolygonArray,
 ) -> Tuple[FloatArray, FloatArray, IntArray, int]:
-    polygons = _to_pygeos(polygons)
     xy, indices = _remove_last_vertex(
-        *pygeos.get_coordinates(polygons, return_index=True)
+        *shapely.get_coordinates(polygons, return_index=True)
     )
     unique, inverse = np.unique(xy, axis=0, return_inverse=True)
     n = len(polygons)

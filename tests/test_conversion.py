@@ -1,7 +1,7 @@
 import geopandas as gpd
 import numpy as np
-import pygeos
 import pytest
+import shapely
 import xarray as xr
 
 from xugrid import conversion as cv
@@ -24,7 +24,7 @@ def line():
 def line_gdf():
     x = np.array([0.0, 1.0, 2.0])
     y = np.array([0.0, 0.0, 0.0])
-    gdf = gpd.GeoDataFrame(geometry=[pygeos.creation.linestrings(x, y)])
+    gdf = gpd.GeoDataFrame(geometry=[shapely.linestrings(x, y)])
     return gdf
 
 

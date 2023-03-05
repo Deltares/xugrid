@@ -1,9 +1,9 @@
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import pygeos
 import pyproj
 import pytest
+import shapely
 import xarray as xr
 
 import xugrid
@@ -426,7 +426,7 @@ class TestUgridDataset:
                 [0.0, 0.0],
             ]
         )
-        polygon = pygeos.creation.polygons(xy)
+        polygon = shapely.polygons(xy)
         df = pd.DataFrame({"a": [1.0], "b": [2.0]})
         gdf = gpd.GeoDataFrame(df, geometry=[polygon])
         uds = xugrid.UgridDataset.from_geodataframe(gdf)

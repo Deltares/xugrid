@@ -32,9 +32,9 @@ except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
 try:
-    import pygeos
+    import shapely
 except ImportError:
-    gpd = MissingOptionalModule("pygeos")
+    shapely = MissingOptionalModule("shapely")
 
 
 def snap_nodes(
@@ -217,17 +217,7 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
 
 def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
     geometry = lines.geometry.values
-    first = geometry[0]
-    if not isinstance(first, pygeos.Geometry):
-        # might be shapely
-        try:
-            geometry = pygeos.from_shapely(geometry)
-        except TypeError:
-            raise TypeError(
-                "lines geometry should only contain either shapely or pygeos "
-                "geometries."
-            )
-    geom_type = pygeos.get_type_id(geometry)
+    geom_type = shapely.get_type_id(geometry)
     if not (geom_type == 1).all():
         raise ValueError("Geometry should contain only LineStrings")
     return geometry
@@ -347,7 +337,7 @@ def _create_output_gdf(
     line_index,
 ):
     edge_vertices = vertices[edge_node_connectivity[edges]]
-    geometry = pygeos.creation.linestrings(edge_vertices)
+    geometry = shapely.linestrings(edge_vertices)
     return gpd.GeoDataFrame(
         lines.drop(columns="geometry").iloc[line_index], geometry=geometry
     )
@@ -410,7 +400,7 @@ def snap_to_grid(
     # Create geometric data
     edge_centroids = vertices[edge_node_connectivity].mean(axis=1)
     line_geometry = coerce_geometry(lines)
-    line_coords, line_index = pygeos.get_coordinates(line_geometry, return_index=True)
+    line_coords, line_index = shapely.get_coordinates(line_geometry, return_index=True)
     # Snap line_coords to grid
     x, y = snap_to_nodes(
         *line_coords.T, *vertices.T, max_snap_distance, tiebreaker="nearest"

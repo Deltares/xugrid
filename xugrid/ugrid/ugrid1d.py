@@ -307,8 +307,17 @@ class Ugrid1d(AbstractUgrid):
         return Ugrid1d(x, y, fill_value, edge_node_connectivity)
 
     def to_pygeos(self, dim):
+        from warnings import warn
+
+        warn(
+            ".to_pygeos has been deprecated. Use .to_shapely instead.",
+            DeprecationWarning,
+        )
+        return self.to_shapely(dim)
+
+    def to_shapely(self, dim):
         """
-        Convert UGRID topology to pygeos objects.
+        Convert UGRID topology to shapely objects.
 
         * nodes: points
         * edges: linestrings
@@ -320,7 +329,7 @@ class Ugrid1d(AbstractUgrid):
 
         Returns
         -------
-        geometry: ndarray of pygeos.Geometry
+        geometry: ndarray of shapely.Geometry
         """
         if dim == self.node_dimension:
             return conversion.nodes_to_points(

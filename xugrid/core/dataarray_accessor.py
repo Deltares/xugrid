@@ -314,7 +314,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         # For non-static, requires repeating all geometries.
         # Call reset_index on multi-index to generate them as regular columns.
         df = ds[variables].to_dataframe(dim_order=dim_order)
-        geometry = self.grid.to_pygeos(dim)
+        geometry = self.grid.to_shapely(dim)
         return gpd.GeoDataFrame(df, geometry=geometry)
 
     def _binary_iterate(self, iterations: int, mask, value, border_value):

@@ -2,9 +2,9 @@ from typing import NamedTuple
 
 import geopandas as gpd
 import numpy as np
-import pygeos
 import pyproj
 import pytest
+import shapely
 import xarray as xr
 from matplotlib.collections import LineCollection
 from scipy import sparse
@@ -264,19 +264,19 @@ def test_meshkernel():
 def test_from_geodataframe():
     x = np.array([0.0, 1.0, 2.0])
     y = np.array([0.0, 0.0, 0.0])
-    gdf = gpd.GeoDataFrame(geometry=[pygeos.creation.linestrings(x, y)])
+    gdf = gpd.GeoDataFrame(geometry=[shapely.linestrings(x, y)])
     grid = xugrid.Ugrid1d.from_geodataframe(gdf)
     assert isinstance(grid, xugrid.Ugrid1d)
 
 
-def test_to_pygeos():
+def test_to_shapely():
     grid = grid1d()
 
-    points = grid.to_pygeos(f"{NAME}_nNodes")
-    assert isinstance(points[0], pygeos.Geometry)
+    points = grid.to_shapely(f"{NAME}_nNodes")
+    assert isinstance(points[0], shapely.Geometry)
 
-    lines = grid.to_pygeos(f"{NAME}_nEdges")
-    assert isinstance(lines[0], pygeos.Geometry)
+    lines = grid.to_shapely(f"{NAME}_nEdges")
+    assert isinstance(lines[0], shapely.Geometry)
 
 
 def test_sel():

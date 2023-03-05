@@ -27,13 +27,10 @@ def either_string_or_enum(value: Union[str, IntEnum], enum_class: EnumMeta) -> I
 
 
 def to_geometry_list(
-    polygon: Union["shapely.geometry.Polygon", "pygeos.Geometry"]  # type: ignore # noqa
+    polygon: Union["shapely.Geometry"],  # type: ignore # noqa
 ) -> "meshkernel.GeometryList":  # type: ignore # noqa
     import meshkernel
-    import pygeos
+    import shapely
 
-    from xugrid.conversion import _to_pygeos
-
-    polygon = _to_pygeos([polygon])[0]
-    xy = pygeos.get_coordinates(pygeos.get_exterior_ring(polygon))
+    xy = shapely.get_coordinates(shapely.get_exterior_ring(polygon))
     return meshkernel.GeometryList(np.array(xy[:, 0]), np.array(xy[:, 1]))

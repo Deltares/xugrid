@@ -181,7 +181,7 @@ UGRID1D Topology
     Ugrid1d.from_dataset
     Ugrid1d.to_dataset
     Ugrid1d.from_geodataframe
-    Ugrid1d.to_pygeos
+    Ugrid1d.to_shapely
     
     Ugrid1d.plot
 
@@ -263,7 +263,7 @@ UGRID2D Topology
     Ugrid2d.to_dataset
     Ugrid2d.from_geodataframe
     Ugrid2d.from_structured
-    Ugrid2d.to_pygeos
+    Ugrid2d.to_shapely
 
     Ugrid2d.plot
 

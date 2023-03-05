@@ -1406,9 +1406,9 @@ class Ugrid2d(AbstractUgrid):
         face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
         return Ugrid2d(node_x, node_y, -1, face_nodes)
 
-    def to_pygeos(self, dim):
+    def to_shapely(self, dim):
         """
-        Convert UGRID topology to pygeos objects.
+        Convert UGRID topology to shapely objects.
 
         * nodes: points
         * edges: linestrings
@@ -1421,7 +1421,7 @@ class Ugrid2d(AbstractUgrid):
 
         Returns
         -------
-        geometry: ndarray of pygeos.Geometry
+        geometry: ndarray of shapely.Geometry
         """
         if dim == self.face_dimension:
             return conversion.faces_to_polygons(
