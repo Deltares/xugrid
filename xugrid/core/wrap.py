@@ -166,7 +166,6 @@ def wrap(
 
 
 class DataArrayForwardMixin:
-
     wrap(
         target_class_dict=vars(),
         source_class=xr.DataArray,
@@ -174,7 +173,6 @@ class DataArrayForwardMixin:
 
 
 class DatasetForwardMixin:
-
     wrap(
         target_class_dict=vars(),
         source_class=xr.Dataset,
