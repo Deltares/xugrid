@@ -140,7 +140,7 @@ def median(values, indices, weights):
     return np.nanpercentile(values[indices], 50)
 
 
-def conductance(values, indices, weights):
+def first_order_conservative(values, indices, weights):
     # Uses relative weights!
     # Rename to: first order conservative?
     v_agg = 0.0
@@ -155,6 +155,9 @@ def conductance(values, indices, weights):
         return np.nan
     else:
         return v_agg
+
+
+conductance = first_order_conservative
 
 
 def max_overlap(values, indices, weights):
@@ -185,4 +188,5 @@ ASBOLUTE_OVERLAP_METHODS = {
 
 RELATIVE_OVERLAP_METHODS = {
     "conductance": conductance,
+    "first_order_conservative": first_order_conservative,
 }

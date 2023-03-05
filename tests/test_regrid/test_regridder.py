@@ -110,3 +110,41 @@ def test_barycentric_interpolator(disk):
     broadcasted = regridder.regrid(obj)
     assert broadcasted.dims == ("layer", square.grid.face_dimension)
     assert broadcasted.shape == (5, 1600)
+
+
+@pytest.mark.parametrize(
+    "cls",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
+)
+def test_regridder_from_weights(cls, disk):
+    square = quads(1.0)
+    regridder = cls(source=disk, target=square)
+    result = regridder.regrid(disk)
+    weights = regridder.weights
+    new_regridder = cls.from_weights(weights, target=square)
+    new_result = new_regridder.regrid(disk)
+    assert new_result.equals(result)
+
+
+@pytest.mark.parametrize(
+    "cls",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
+)
+def test_regridder_from_dataset(cls, disk):
+    square = quads(1.0)
+    regridder = cls(source=disk, target=square)
+    result = regridder.regrid(disk)
+    dataset = regridder.to_dataset()
+    new_regridder = cls.from_dataset(dataset)
+    new_result = new_regridder.regrid(disk)
+    assert new_result.equals(result)

@@ -180,7 +180,7 @@ class BaseRegridder(abc.ABC):
             {f"__regrid_{k}": v for k, v in zip(self._weights._fields, self._weights)}
         )
         ugrid_ds = self._target.ugrid_topology.to_dataset()
-        return xr.merge(ds, ugrid_ds)
+        return xr.merge((ds, ugrid_ds))
 
     @staticmethod
     def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
@@ -211,7 +211,7 @@ class BaseRegridder(abc.ABC):
 
     @classmethod
     def from_weights(cls, weights, target: "xugrid.Ugrid2d"):
-        instance = cls.__new__()
+        instance = cls.__new__(cls)
         instance._weights = weights
         instance._target = UnstructuredGrid2d(target)
         return instance
@@ -271,7 +271,7 @@ class CentroidLocatorRegridder(BaseRegridder):
         self._weights = weights
         return
 
-    @staticmethod
+    @classmethod
     def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
         return cls._coo_from_dataset(dataset)
 
@@ -296,17 +296,6 @@ class BaseOverlapRegridder(BaseRegridder, abc.ABC):
             )
         self._weights = weights
         return
-
-    @classmethod
-    def from_weights(
-        cls,
-        weights: WeightMatrixCSR,
-        method: Union[str, Callable],
-        target: Optional["xugrid.Ugrid2d"],
-    ):
-        instance = super().from_weights(weights, target)
-        instance._setup_regrid(method)
-        return instance
 
     @classmethod
     def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
@@ -358,6 +347,17 @@ class OverlapRegridder(BaseOverlapRegridder):
     def _compute_weights(self, source, target) -> None:
         super()._compute_weights(source, target, relative=False)
 
+    @classmethod
+    def from_weights(
+        cls,
+        weights: WeightMatrixCSR,
+        target: "xugrid.Ugrid2d",
+        method: Union[str, Callable] = "mean",
+    ):
+        instance = super().from_weights(weights, target)
+        instance._setup_regrid(method)
+        return instance
+
 
 class RelativeOverlapRegridder(BaseOverlapRegridder):
     """
@@ -380,6 +380,7 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
     source: Ugrid2d, UgridDataArray
     target: Ugrid2d, UgridDataArray
     method: str, function, optional
+        Default value is "first_order_conservative".
     """
 
     _JIT_FUNCTIONS = {
@@ -390,13 +391,24 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
         self,
         source: UgridDataArray,
         target: UgridDataArray,
-        method: Union[str, Callable],
+        method: Union[str, Callable] = "first_order_conservative",
     ):
         super().__init__(source=source, target=target)
         self._setup_regrid(method)
 
     def _compute_weights(self, source, target) -> None:
         super()._compute_weights(source, target, relative=True)
+
+    @classmethod
+    def from_weights(
+        cls,
+        weights: WeightMatrixCSR,
+        target: "xugrid.Ugrid2d",
+        method: Union[str, Callable] = "first_order_conservative",
+    ):
+        instance = super().from_weights(weights, target)
+        instance._setup_regrid(method)
+        return instance
 
 
 class BarycentricInterpolator(BaseRegridder):
