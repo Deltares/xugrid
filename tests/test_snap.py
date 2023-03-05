@@ -1,16 +1,11 @@
-import os
-
-os.environ["NUMBA_DISABLE_JIT"] = "1"
-
 import geopandas as gpd
 import numpy as np
-import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
 
-from xugrid.ugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
 import xugrid as xu
+from xugrid.ugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
 
 
 def test_snap__three_points():
