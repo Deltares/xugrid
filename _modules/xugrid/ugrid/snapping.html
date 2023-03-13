@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>xugrid.ugrid.snapping &#8212; Xugrid 0.2.1 documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/ugrid/snapping';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="../../../_static/xugrid-low-res.svg" class="logo__image only-light" alt="Logo image">
+    <img src="../../../_static/xugrid-low-res.svg" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../user_guide.html">
+                        User Guide
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../api.html">
+                        API Reference
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../dev_docs.html">
+                        Development
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../user_guide.html">
+                        User Guide
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../api.html">
+                        API Reference
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../dev_docs.html">
+                        Development
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <h1>Source code for xugrid.ugrid.snapping</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Snapes nodes at an arbitrary distance together.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">numba_celltree</span> <span class="kn">import</span> <span class="n">CellTree2d</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">cKDTree</span>
+
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">IntDType</span><span class="p">,</span>
+    <span class="n">LineArray</span><span class="p">,</span>
+    <span class="n">MissingOptionalModule</span><span class="p">,</span>
+    <span class="n">Point</span><span class="p">,</span>
+    <span class="n">Vector</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">AdjacencyMatrix</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">shapely</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">snap_nodes</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Snap neigbhoring vertices together that are located within a maximum</span>
+<span class="sd">    distance from each other.</span>
+
+<span class="sd">    If vertices are located within a maximum distance, they are merged into a</span>
+<span class="sd">    single vertex. The coordinates of the merged coordinates are given by the</span>
+<span class="sd">    centroid of the merging vertices.</span>
+
+<span class="sd">    Note that merging is a communicative process: vertex A might lie close to</span>
+<span class="sd">    vertex B, vertex B might lie close to vertex C, and so on. These points are</span>
+<span class="sd">    grouped and merged into a single new vertex.</span>
+
+<span class="sd">    This function also return an inverse index array. In case of a connectivity</span>
+<span class="sd">    array, ``inverse`` can be used to index into, yielding the updated</span>
+<span class="sd">    numbers. E.g.:</span>
+
+<span class="sd">    ``updated_face_nodes = inverse[face_nodes]``</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: 1D nd array of floats of size N</span>
+<span class="sd">    y: 1D nd array of floats of size N</span>
+<span class="sd">    max_distance: float</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    inverse: 1D nd array of ints of size N</span>
+<span class="sd">        Inverse index array: the new vertex number for every old vertex. Is</span>
+<span class="sd">        None when no vertices within max_distance of each other.</span>
+<span class="sd">    x_merged: 1D nd array of floats of size M</span>
+<span class="sd">        Returns a copy of ``x`` when no vertices within max_distance of each</span>
+<span class="sd">        other.</span>
+<span class="sd">    y_merged: 1D nd array of floats of size M</span>
+<span class="sd">        Returns a copy of ``y`` when no vertices within max_distance of each</span>
+<span class="sd">        other.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, find all the points that lie within max_distance of each other</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">coo_distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
+        <span class="n">tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># Get rid of diagonal</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">coo_distances</span><span class="o">.</span><span class="n">row</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">coo_distances</span><span class="o">.</span><span class="n">col</span>
+    <span class="n">off_diagonal</span> <span class="o">=</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">off_diagonal</span><span class="p">]</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="p">[</span><span class="n">off_diagonal</span><span class="p">]</span>
+    <span class="c1"># If no pairs are found, there is nothing to snap</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Next, group the points together.</span>
+        <span class="c1"># Point A might lie close to point B, point B might lie close to</span>
+        <span class="c1"># Point C, and so on. These points are grouped, and their centroid</span>
+        <span class="c1"># is computed.</span>
+        <span class="n">coo_content</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+        <span class="n">coo_matrix</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">coo_content</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="c1"># Directed is true: this matrix is symmetrical</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span><span class="n">coo_matrix</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">inverse</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+            <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">snap_to_nodes</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">to_x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">to_y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">tiebreaker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Snap vertices (x, y) to another set of vertices (to_x, to_y) if within a</span>
+<span class="sd">    specified maximum distance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x: 1D nd array of floats of size N</span>
+<span class="sd">    y: 1D nd array of floats of size N</span>
+<span class="sd">    to_x: 1D nd array of floats of size M</span>
+<span class="sd">    to_y: 1D nd array of floats of size M</span>
+<span class="sd">    max_distance: float</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x_snapped: 1D nd array of floats of size N</span>
+<span class="sd">    y_snapped: 1D nd array of floats of size N</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tiebreaker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid tiebreaker: </span><span class="si">{</span><span class="n">tiebreaker</span><span class="si">}</span><span class="s2">, should be one of &quot;</span>
+            <span class="s1">&#39;{None, &quot;nearest&quot;} instead.&#39;</span>
+        <span class="p">)</span>
+    <span class="c1"># Build KDTrees</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="n">to_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">to_x</span><span class="p">,</span> <span class="n">to_y</span><span class="p">))</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">to_tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">to_coords</span><span class="p">)</span>
+
+    <span class="c1"># Build distance matrix, identify points to snap (update) and possible ties</span>
+    <span class="c1"># row (i) is index in x, y; column (j) is index in to_x, to_y</span>
+    <span class="c1"># Convert to csr for quicker row indexing, and row reductions.</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
+        <span class="n">to_tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+    <span class="n">n_per_row</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">update</span> <span class="o">=</span> <span class="n">n_per_row</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">tie</span> <span class="o">=</span> <span class="n">n_per_row</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="c1"># Update the points that snap to a single (to_x, to_y) vertex</span>
+    <span class="n">xnew</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ynew</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">j_update</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">update</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span>
+    <span class="n">xnew</span><span class="p">[</span><span class="n">update</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_x</span><span class="p">[</span><span class="n">j_update</span><span class="p">]</span>
+    <span class="n">ynew</span><span class="p">[</span><span class="n">update</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_y</span><span class="p">[</span><span class="n">j_update</span><span class="p">]</span>
+
+    <span class="c1"># Resolve ties with multiple (to_x, to_y) candidates</span>
+    <span class="k">if</span> <span class="n">tie</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">tiebreaker</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+            <span class="n">ties</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">tie</span><span class="p">]</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+            <span class="n">j_nearest</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;i&quot;</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">data</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">ties</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">values</span>
+            <span class="p">)</span>
+            <span class="n">xnew</span><span class="p">[</span><span class="n">tie</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_x</span><span class="p">[</span><span class="n">j_nearest</span><span class="p">]</span>
+            <span class="n">ynew</span><span class="p">[</span><span class="n">tie</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_y</span><span class="p">[</span><span class="n">j_nearest</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">tiebreaker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Ties detected: multiple options to snap to, given max distance: &quot;</span>
+                <span class="s2">&quot;set a smaller tolerance or specify a tiebreaker.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid tiebreaker&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xnew</span><span class="p">,</span> <span class="n">ynew</span>
+
+
+<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">to_vector</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+
+<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">as_point</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">lines_as_edges</span><span class="p">(</span><span class="n">line_coords</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">line_coords</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">line_coords</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">line_index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+
+
+<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">left_of</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">Vector</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># Whether point a is left of vector U</span>
+    <span class="c1"># U: p -&gt; q direction vector</span>
+    <span class="c1"># TODO: maybe add epsilon for floating point</span>
+    <span class="k">return</span> <span class="n">U</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">U</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">coerce_geometry</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LineArray</span><span class="p">:</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">geom_type</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">geom_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry should contain only LineStrings&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">geometry</span>
+
+
+<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">snap_to_edges</span><span class="p">(</span>
+    <span class="n">segment_indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">face_indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">intersection_edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">face_edge_connectivity</span><span class="p">:</span> <span class="n">AdjacencyMatrix</span><span class="p">,</span>
+    <span class="n">centroids</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">edge_centroids</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">segment_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This algorithm works as follows:</span>
+
+<span class="sd">    * It takes the intersected edges; any edge (p to q) to test falls fully</span>
+<span class="sd">      within a single face.</span>
+<span class="sd">    * For a face, we take it centroid (a).</span>
+<span class="sd">    * We loop through every edge of the face.</span>
+<span class="sd">    * If the edge separates the centroid (a) from the centroid of the edge (b)</span>
+<span class="sd">      we store that edge as a separating edge.</span>
+
+<span class="sd">    We test for separation by:</span>
+
+<span class="sd">    * Finding whether a and b are located at opposite sides of the half-plane</span>
+<span class="sd">      created by the edge p -&gt; q (U).</span>
+<span class="sd">    * Finding whether p and q are located at opposide sides of the half-plane</span>
+<span class="sd">      created by a -&gt; b (V).</span>
+<span class="sd">    * The separation test will return False if the lines are collinear. This is</span>
+<span class="sd">      desirable here, if U runs collinear with V, U doesn&#39;t separate a from b.</span>
+
+<span class="sd">    Do the minimum amount of work: reuse a_left, only compute V if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segment_indices</span><span class="p">)):</span>
+        <span class="n">segment</span> <span class="o">=</span> <span class="n">segment_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">face</span> <span class="o">=</span> <span class="n">face_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">as_point</span><span class="p">(</span><span class="n">centroids</span><span class="p">[</span><span class="n">face</span><span class="p">])</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">as_point</span><span class="p">(</span><span class="n">intersection_edges</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">as_point</span><span class="p">(</span><span class="n">intersection_edges</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">U</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">a_left</span> <span class="o">=</span> <span class="n">left_of</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="n">face</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">as_point</span><span class="p">(</span><span class="n">edge_centroids</span><span class="p">[</span><span class="n">edge</span><span class="p">])</span>
+            <span class="n">b_left</span> <span class="o">=</span> <span class="n">left_of</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">a_left</span> <span class="o">!=</span> <span class="n">b_left</span><span class="p">:</span>
+                <span class="n">V</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">left_of</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span> <span class="o">!=</span> <span class="n">left_of</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+                    <span class="n">edges</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge</span>
+                    <span class="n">segment_index</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">segment</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">edges</span><span class="p">[:</span><span class="n">count</span><span class="p">],</span> <span class="n">segment_index</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_find_largest_edges</span><span class="p">(</span>
+    <span class="n">intersection_edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">segment_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">line_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">valid_edges</span> <span class="o">=</span> <span class="n">intersection_edges</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
+    <span class="n">max_edge_index</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;edges&quot;</span><span class="p">:</span> <span class="n">edges</span><span class="p">,</span>
+                <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="p">((</span><span class="n">valid_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">valid_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;edges&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">idxmax</span><span class="p">()[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span>
+        <span class="o">.</span><span class="n">values</span>
+    <span class="p">)</span>
+
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="n">max_edge_index</span><span class="p">]</span>
+    <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_index</span><span class="p">[</span><span class="n">max_edge_index</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span>
+
+
+<span class="k">def</span> <span class="nf">_create_output_dataset</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="s2">&quot;xu.Ugrid2d&quot;</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">line_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
+    <span class="n">uds</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">(</span><span class="n">grids</span><span class="o">=</span><span class="p">[</span><span class="n">topology</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_index</span>
+    <span class="n">uds</span><span class="p">[</span><span class="s2">&quot;line_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">topology</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">lines</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="o">==</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span>
+        <span class="n">uds</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">topology</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">uds</span>
+
+
+<span class="k">def</span> <span class="nf">_create_output_gdf</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">,</span>
+    <span class="n">vertices</span><span class="p">,</span>
+    <span class="n">edge_node_connectivity</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">,</span>
+    <span class="n">line_index</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">edge_vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">edges</span><span class="p">]]</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">edge_vertices</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">line_index</span><span class="p">],</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="snap_to_grid"><a class="viewcode-back" href="../../../api/xugrid.snap_to_grid.html#xugrid.snap_to_grid">[docs]</a><span class="k">def</span> <span class="nf">snap_to_grid</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="n">grid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
+    <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Snap a collection of lines to a grid.</span>
+
+<span class="sd">    A line is included and snapped to a grid edge when the line separates</span>
+<span class="sd">    the centroid of the cell with the centroid of the edge.</span>
+
+<span class="sd">    When a line in a cell is snapped to an edge that is **not** shared with</span>
+<span class="sd">    another cell, this is denoted with a value of -1 in the second column of</span>
+<span class="sd">    ``cell_to_cell``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lines: gpd.GeoDataFrame</span>
+<span class="sd">        Line data. Geometry colum should contain exclusively LineStrings.</span>
+<span class="sd">    grid: xr.DataArray or xu.UgridDataArray of integers</span>
+<span class="sd">        Grid of cells to snap lines to. Cells with a value of 0 are not</span>
+<span class="sd">        included.</span>
+<span class="sd">    max_snap_distance: float</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cell_to_cell: ndarray of integers with shape ``(N, 2)``</span>
+<span class="sd">        Cells whose centroids are separated from each other by a line.</span>
+<span class="sd">    segment_data: pd.DataFrame or gpd.DataFrame</span>
+<span class="sd">        Data for every segment. GeoDataFrame if ``return_geometry`` is</span>
+<span class="sd">        ``True``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="c1"># Convert structured to unstructured representation</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected xarray.DataArray or xugrid.UgridDataArray, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">node_coordinates</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">face_node_connectivity</span>
+
+    <span class="c1"># Derive connectivity</span>
+    <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
+        <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">AdjacencyMatrix</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">indptr</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">nnz</span><span class="p">)</span>
+
+    <span class="c1"># Create geometric data</span>
+    <span class="n">edge_centroids</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">edge_node_connectivity</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">line_geometry</span> <span class="o">=</span> <span class="n">coerce_geometry</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">line_coords</span><span class="p">,</span> <span class="n">line_index</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">line_geometry</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Snap line_coords to grid</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">snap_to_nodes</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">line_coords</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">tiebreaker</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span>
+    <span class="p">)</span>
+    <span class="n">line_edges</span> <span class="o">=</span> <span class="n">lines_as_edges</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]),</span> <span class="n">line_index</span><span class="p">)</span>
+
+    <span class="c1"># Search for intersections</span>
+    <span class="n">celltree</span> <span class="o">=</span> <span class="n">CellTree2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">segment_indices</span><span class="p">,</span> <span class="n">face_indices</span><span class="p">,</span> <span class="n">intersection_edges</span> <span class="o">=</span> <span class="n">celltree</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span>
+        <span class="n">line_edges</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create edges from the intersected lines a: line can only snap to two</span>
+    <span class="c1"># edges of a quad. Pre-allocate the arrays here. For some reason, recent</span>
+    <span class="c1"># versions of numba refuse np.empty or np.zeros calls in this module (!).</span>
+    <span class="c1"># TODO: investigate...</span>
+    <span class="n">max_n_new_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">max_n_new_edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">)</span>
+    <span class="n">segment_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">max_n_new_edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">)</span>
+    <span class="n">edges</span><span class="p">,</span> <span class="n">segment_index</span> <span class="o">=</span> <span class="n">snap_to_edges</span><span class="p">(</span>
+        <span class="n">segment_indices</span><span class="p">,</span>
+        <span class="n">face_indices</span><span class="p">,</span>
+        <span class="n">intersection_edges</span><span class="p">,</span>
+        <span class="n">face_edge_connectivity</span><span class="p">,</span>
+        <span class="n">topology</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
+        <span class="n">edge_centroids</span><span class="p">,</span>
+        <span class="n">edges</span><span class="p">,</span>
+        <span class="n">segment_index</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_index</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
+
+    <span class="c1"># When multiple line parts are snapped to the same edge, use the ones with</span>
+    <span class="c1"># the greatest length inside the cell.</span>
+    <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span> <span class="o">=</span> <span class="n">_find_largest_edges</span><span class="p">(</span>
+        <span class="n">intersection_edges</span><span class="p">,</span> <span class="n">segment_index</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span>
+    <span class="p">)</span>
+
+    <span class="n">uds</span> <span class="o">=</span> <span class="n">_create_output_dataset</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">_create_output_gdf</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">uds</span><span class="p">,</span> <span class="n">gdf</span></div>
+</pre></div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright Deltares.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
