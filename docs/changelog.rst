@@ -9,6 +9,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.3.0] 2023-03-14
+------------------
+
 Fixed
 ~~~~~
 
@@ -26,6 +29,8 @@ Changed
   and :class:`RelativeOverlapRegridder` can now be instantiated from weights
   (``.from_weights``) or from a dataset (``.from_dataset``) containing
   pre-computed weights.
+- Regridder classes initiated with method *geometric_mean* now return NaNs for
+  negative data.
 
 Added
 ~~~~~
