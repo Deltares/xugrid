@@ -50,15 +50,14 @@ def geometric_mean(values, indices, weights):
     for i, w in zip(indices, weights):
         w = w / normsum
         v = values[i]
-        if v < 0:
+        # Skip if v is NaN or 0.
+        if v > 0 and w > 0:
+            v_agg += w * np.log(abs(v))
+            w_sum += w
+        elif v < 0:
             # Computing a geometric mean of negative numbers requires a complex
             # value.
             return np.nan
-        elif np.isnan(v) or v == 0:
-            continue
-        if w > 0:
-            v_agg += w * np.log(abs(v))
-            w_sum += w
 
     if w_sum == 0:
         return np.nan
