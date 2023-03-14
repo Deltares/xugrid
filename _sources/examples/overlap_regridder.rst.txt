@@ -114,11 +114,11 @@ some bathymetry) of the Netherlands, and a coarser target grid.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f1c0ee77d60>
+    <matplotlib.collections.LineCollection object at 0x7ff5d87d9e20>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-72
 
 Method comparison
 -----------------
@@ -127,11 +127,14 @@ Let's compare the different reduction functions that are available in
 xugrid. We'll create a regridder once for every method, and plot the results
 side by side.
 
-..note::
+.. note::
   Sum and results in much higher values. The white in the figures are high
-  values, not no data.
+  values, not no data. In contrast, a geometric mean generally only makes
+  sense for physical quantities with a "true zero": surface elevation is not
+  such quantity, as a datum is an arbitrary level. The xugrid geometric mean
+  returns NaN if reducing over negative values.
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-91
+.. GENERATED FROM PYTHON SOURCE LINES 72-94
 
 .. code-block:: default
 
@@ -169,7 +172,7 @@ side by side.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-98
+.. GENERATED FROM PYTHON SOURCE LINES 95-101
 
 Relative overlap
 ----------------
@@ -178,7 +181,7 @@ For some reductions, the relative degree of overlap with the original source
 cell is required rather than the absolute overlap, e.g. for first-order
 conservative methods, such as conductance:
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-103
+.. GENERATED FROM PYTHON SOURCE LINES 101-106
 
 .. code-block:: default
 
@@ -201,11 +204,11 @@ conservative methods, such as conductance:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f1c0f193460>
+    <matplotlib.collections.PolyCollection object at 0x7ff5e1d49460>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-121
+.. GENERATED FROM PYTHON SOURCE LINES 107-124
 
 Custom reductions
 -----------------
@@ -225,7 +228,7 @@ arguments: ``values``, ``indices``, ``weights``.
 Xugrid regridder reduction functions are implemented in such a way. For a example, the area
 could be implemented as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-128
+.. GENERATED FROM PYTHON SOURCE LINES 124-131
 
 .. code-block:: default
 
@@ -243,7 +246,7 @@ could be implemented as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-139
+.. GENERATED FROM PYTHON SOURCE LINES 132-142
 
 .. note::
    * Custom reductions methods must be able to deal with NaN values as these
@@ -256,7 +259,7 @@ could be implemented as follows:
 
 To use our custom method, we provide at initialization of the OverlapRegridder:
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-144
+.. GENERATED FROM PYTHON SOURCE LINES 142-147
 
 .. code-block:: default
 
@@ -279,18 +282,18 @@ To use our custom method, we provide at initialization of the OverlapRegridder:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f1c0f7fac70>
+    <matplotlib.collections.PolyCollection object at 0x7ff5e20d8c70>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-149
+.. GENERATED FROM PYTHON SOURCE LINES 148-152
 
 Not every reduction uses the weights argument. For example, computing an
 arbitrary quantile value requires just the values. Again, make sure the
 function can deal with NaN values! -- hence ``nanpercentile`` rather than
 ``percentile`` here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-160
+.. GENERATED FROM PYTHON SOURCE LINES 152-163
 
 .. code-block:: default
 
@@ -319,18 +322,18 @@ function can deal with NaN values! -- hence ``nanpercentile`` rather than
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f1c188b5610>
+    <matplotlib.collections.PolyCollection object at 0x7ff5d9a85eb0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-162
+.. GENERATED FROM PYTHON SOURCE LINES 164-165
 
 .. _Numba: https://numba.pydata.org/
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.990 seconds)
+   **Total running time of the script:** ( 0 minutes  4.866 seconds)
 
 
 .. _sphx_glr_download_examples_overlap_regridder.py:

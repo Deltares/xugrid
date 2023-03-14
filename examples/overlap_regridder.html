@@ -409,7 +409,7 @@ some bathymetry) of the Netherlands, and a coarser target grid.</p>
 <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1c0ee77d60&gt;
+<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7ff5d87d9e20&gt;
 </pre></div>
 </div>
 <section id="method-comparison">
@@ -417,11 +417,14 @@ some bathymetry) of the Netherlands, and a coarser target grid.</p>
 <p>Let’s compare the different reduction functions that are available in
 xugrid. We’ll create a regridder once for every method, and plot the results
 side by side.</p>
-<dl class="simple">
-<dt>..note::</dt><dd><p>Sum and results in much higher values. The white in the figures are high
-values, not no data.</p>
-</dd>
-</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Sum and results in much higher values. The white in the figures are high
+values, not no data. In contrast, a geometric mean generally only makes
+sense for physical quantities with a “true zero”: surface elevation is not
+such quantity, as a datum is an arbitrary level. The xugrid geometric mean
+returns NaN if reducing over negative values.</p>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">functions</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="s2">&quot;harmonic_mean&quot;</span><span class="p">,</span>
@@ -455,7 +458,7 @@ conservative methods, such as conductance:</p>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1c0f193460&gt;
+<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7ff5e1d49460&gt;
 </pre></div>
 </div>
 </section>
@@ -497,7 +500,7 @@ allocations.</p></li>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1c0f7fac70&gt;
+<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7ff5e20d8c70&gt;
 </pre></div>
 </div>
 <p>Not every reduction uses the weights argument. For example, computing an
@@ -514,10 +517,10 @@ function can deal with NaN values! – hence <code class="docutils literal notra
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_005.png" srcset="../_images/sphx_glr_overlap_regridder_005.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1c188b5610&gt;
+<img src="../_images/sphx_glr_overlap_regridder_005.png" srcset="../_images/sphx_glr_overlap_regridder_005.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7ff5d9a85eb0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.990 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.866 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-overlap-regridder-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9510c04155266403a85c77c93b648199/overlap_regridder.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">overlap_regridder.py</span></code></a></p>
