@@ -63,9 +63,12 @@ grid.plot(ax=ax, color="red")
 # xugrid. We'll create a regridder once for every method, and plot the results
 # side by side.
 #
-# ..note::
+# .. note::
 #   Sum and results in much higher values. The white in the figures are high
-#   values, not no data.
+#   values, not no data. In contrast, a geometric mean generally only makes
+#   sense for physical quantities with a "true zero": surface elevation is not
+#   such quantity, as a datum is an arbitrary level. The xugrid geometric mean
+#   returns NaN if reducing over negative values.
 
 functions = [
     "mean",

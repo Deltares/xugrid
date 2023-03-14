@@ -47,21 +47,24 @@ def geometric_mean(values, indices, weights):
     if normsum == 0:
         return np.nan
 
-    m = 0
     for i, w in zip(indices, weights):
+        w = w / normsum
         v = values[i]
-        if np.isnan(v) or v == 0:
+        if v < 0:
+            # Computing a geometric mean of negative numbers requires a complex
+            # value.
+            return np.nan
+        elif np.isnan(v) or v == 0:
             continue
         if w > 0:
             v_agg += w * np.log(abs(v))
             w_sum += w
-            if v < 0:
-                m += 1
 
     if w_sum == 0:
         return np.nan
     else:
-        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+        # w_sum is generally 1.0, but might not be if there are NaNs present!
+        return np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, indices, weights):
