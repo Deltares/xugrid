@@ -102,6 +102,22 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.to_netcdf
     UgridDataArrayAccessor.to_zarr
     
+
+Snapping
+--------
+
+Snapping is the process of moving nodes/edges/faces to other
+nodes/edges/faces if within a certain range.
+
+.. autosummary::
+      :toctree: api/
+
+       snap_nodes
+       snap_to_nodes
+       snap_to_edges
+       snap_to_grid
+
+
 Regridding
 ----------
 

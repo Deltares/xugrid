@@ -296,9 +296,16 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">xarray.core.indexing</span> <span class="kn">import</span> <span class="n">BasicIndexer</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span>
 <span class="kn">from</span> <span class="nn">xarray.core.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
+<span class="kn">from</span> <span class="nn">xarray.core.pdcompat</span> <span class="kn">import</span> <span class="n">_convert_base_to_offset</span>
 <span class="kn">from</span> <span class="nn">xarray.core.pycompat</span> <span class="kn">import</span> <span class="n">is_duck_dask_array</span>
-<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">either_dict_or_kwargs</span><span class="p">,</span> <span class="n">is_scalar</span>
+<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Frozen</span><span class="p">,</span>
+    <span class="n">either_dict_or_kwargs</span><span class="p">,</span>
+    <span class="n">emit_user_level_warning</span><span class="p">,</span>
+    <span class="n">is_scalar</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cftime</span>
@@ -325,6 +332,7 @@
         <span class="n">ScalarOrArray</span><span class="p">,</span>
         <span class="n">SideOptions</span><span class="p">,</span>
         <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="n">T_Variable</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
 
@@ -1128,6 +1136,12 @@
 <span class="sd">            For frequencies that evenly subdivide 1 day, the &quot;origin&quot; of the</span>
 <span class="sd">            aggregated intervals. For example, for &quot;24H&quot; frequency, base could</span>
 <span class="sd">            range from 0 through 23.</span>
+
+<span class="sd">            .. deprecated:: 2023.03.0</span>
+<span class="sd">                Following pandas, the ``base`` parameter is deprecated in favor</span>
+<span class="sd">                of the ``origin`` and ``offset`` parameters, and will be removed</span>
+<span class="sd">                in a future version of xarray.</span>
+
 <span class="sd">        origin : {&#39;epoch&#39;, &#39;start&#39;, &#39;start_day&#39;, &#39;end&#39;, &#39;end_day&#39;}, pd.Timestamp, datetime.datetime, np.datetime64, or cftime.datetime, default &#39;start_day&#39;</span>
 <span class="sd">            The datetime on which to adjust the grouping. The timezone of origin</span>
 <span class="sd">            must match the timezone of the index.</span>
@@ -1143,6 +1157,12 @@
 <span class="sd">        loffset : timedelta or str, optional</span>
 <span class="sd">            Offset used to adjust the resampled time labels. Some pandas date</span>
 <span class="sd">            offset strings are supported.</span>
+
+<span class="sd">            .. deprecated:: 2023.03.0</span>
+<span class="sd">                Following pandas, the ``loffset`` parameter is deprecated in favor</span>
+<span class="sd">                of using time offset arithmetic, and will be removed in a future</span>
+<span class="sd">                version of xarray.</span>
+
 <span class="sd">        restore_coord_dims : bool, optional</span>
 <span class="sd">            If True, also restore the dimension order of multi-dimensional</span>
 <span class="sd">            coordinates.</span>
@@ -1213,8 +1233,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
-        <span class="kn">from</span> <span class="nn">xarray.coding.cftimeindex</span> <span class="kn">import</span> <span class="n">CFTimeIndex</span>
         <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">TimeResampleGrouper</span>
         <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1244,28 +1264,36 @@
         <span class="n">dim_name</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="n">dim</span>
         <span class="n">dim_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">dim_name</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">(),</span> <span class="n">CFTimeIndex</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">xarray.core.resample_cftime</span> <span class="kn">import</span> <span class="n">CFTimeGrouper</span>
+        <span class="k">if</span> <span class="n">loffset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emit_user_level_warning</span><span class="p">(</span>
+                <span class="s2">&quot;Following pandas, the `loffset` parameter to resample will be deprecated &quot;</span>
+                <span class="s2">&quot;in a future version of xarray.  Switch to using time offset arithmetic.&quot;</span><span class="p">,</span>
+                <span class="ne">FutureWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
-            <span class="n">grouper</span> <span class="o">=</span> <span class="n">CFTimeGrouper</span><span class="p">(</span>
-                <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-                <span class="n">closed</span><span class="o">=</span><span class="n">closed</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-                <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
-                <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">,</span>
-                <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
-                <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emit_user_level_warning</span><span class="p">(</span>
+                <span class="s2">&quot;Following pandas, the `base` parameter to resample will be deprecated in &quot;</span>
+                <span class="s2">&quot;a future version of xarray.  Switch to using `origin` or `offset` instead.&quot;</span><span class="p">,</span>
+                <span class="ne">FutureWarning</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">grouper</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Grouper</span><span class="p">(</span>
-                <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-                <span class="n">closed</span><span class="o">=</span><span class="n">closed</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-                <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
-                <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
-                <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
-                <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">,</span>
-            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base and offset cannot be present at the same time&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">dim_name</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas_index</span><span class="p">()</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">_convert_base_to_offset</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="n">grouper</span> <span class="o">=</span> <span class="n">TimeResampleGrouper</span><span class="p">(</span>
+            <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+            <span class="n">closed</span><span class="o">=</span><span class="n">closed</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+            <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="n">group</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
             <span class="n">dim_coord</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span>
         <span class="p">)</span>
@@ -2055,31 +2083,27 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an array contains cftime.datetime objects&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a array inside a Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cftime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">is_duck_dask_array</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
-                <span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                    <span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">first_idx</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">*</span> <span class="n">array</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span><span class="p">):</span>
+            <span class="n">first_idx</span> <span class="o">=</span> <span class="n">BasicIndexer</span><span class="p">(</span><span class="n">first_idx</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">first_idx</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">cftime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an xarray.Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a variable contains datetime like objects (either</span>
 <span class="sd">    np.datetime64, np.timedelta64, or cftime.datetime)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
