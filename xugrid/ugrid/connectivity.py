@@ -338,10 +338,8 @@ def centroids(
     if n_max_node == 3:
         # Since it's triangular, computing the average of the vertices suffices
         coordinates = nodes[face_node_connectivity]
-        coordinates[face_node_connectivity == fill_value] = np.nan
         return np.nanmean(coordinates, axis=1)
     else:
-        # TODO: convex might be simpler
         # This is mathematically equivalent to triangulating, computing triangle centroids
         # and computing the area weighted average of those centroids
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
@@ -356,6 +354,44 @@ def centroids(
         centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
         centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
         return centroid_coordinates
+
+
+@nb.njit(cache=True, parallel=True)
+def _circumcenters_triangle(xxx: FloatArray, yyy: FloatArray):
+    """Numba should nicely fuse these operations."""
+    a_x, b_x, c_x = xxx
+    a_y, b_y, c_y = yyy
+    D_inv = 0.5 / (
+        (a_y * c_x + b_y * a_x - b_y * c_x - a_y * b_x - c_y * a_x + c_y * b_x)
+    )
+    x = ((a_x - c_x) * (a_x + c_x) + (a_y - c_y) * (a_y + c_y)) * (b_y - c_y) - (
+        (b_x - c_x) * (b_x + c_x) + (b_y - c_y) * (b_y + c_y)
+    ) * (a_y - c_y)
+    y = ((b_x - c_x) * (b_x + c_x) + (b_y - c_y) * (b_y + c_y)) * (a_x - c_x) - (
+        (a_x - c_x) * (a_x + c_x) + (a_y - c_y) * (a_y + c_y)
+    ) * (b_x - c_x)
+    return D_inv * x, D_inv * y
+
+
+def circumcenters(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+) -> FloatArray:
+    # TODO: Skyum or Welzl implementation for polygons -- although it's
+    # practical use is dubious?
+    n_max_node = face_node_connectivity.shape[1]
+    # Check if it's fully triangular
+    if n_max_node == 3:
+        xxx = node_x[face_node_connectivity.T]
+        yyy = node_y[face_node_connectivity.T]
+        x, y = _circumcenters_triangle(xxx, yyy)
+    else:
+        raise NotImplementedError(
+            "Circumcenters are only supported for triangular grids"
+        )
+    return np.column_stack((x, y))
 
 
 def _triangulate(i: IntArray, j: IntArray, n_triangle_per_row: IntArray) -> IntArray:

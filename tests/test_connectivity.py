@@ -361,6 +361,36 @@ def test_centroids(mixed_mesh):
     assert np.allclose(actual, expected)
 
 
+def test_circumcenters_error(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    nodes = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 0.0],
+            [2.0, 1.0],
+        ]
+    )
+    with pytest.raises(NotImplementedError):
+        connectivity.circumcenters(faces, fill_value, nodes[:, 0], nodes[:, 1])
+
+
+def test_circumcenters(triangle_mesh):
+    faces, fill_value = triangle_mesh
+    nodes = np.array(
+        [
+            [0.0, 1.0],
+            [0.0, 0.0],
+            [2.0, 0.0],
+            [1.0, -2.0],
+        ]
+    )
+    actual = connectivity.circumcenters(faces, fill_value, nodes[:, 0], nodes[:, 1])
+    expected = np.array([[1.0, 0.5], [1.0, -0.75]])
+    assert np.allclose(actual, expected)
+
+
 def test_structured_connectivity():
     active = np.array(
         [

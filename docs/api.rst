@@ -254,6 +254,7 @@ UGRID2D Topology
     Ugrid2d.voronoi_topology
     Ugrid2d.centroid_triangulation
     Ugrid2d.tesselate_centroidal_voronoi
+    Ugrid2d.tesselate_circumcenter_voronoi
     Ugrid2d.reverse_cuthill_mckee
     Ugrid2d.compute_barycentric_weights
 

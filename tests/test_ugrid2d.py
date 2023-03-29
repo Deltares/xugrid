@@ -772,6 +772,41 @@ def test_tesselate_centroidal_voronoi():
     assert voronoi.n_face == 7
 
 
+def test_tesselate_circumcenter_voronoi():
+    grid = grid2d()
+
+    # Can only deal with triangular grids
+    with pytest.raises(NotImplementedError):
+        grid.tesselate_circumcenter_voronoi()
+
+    # Now test with triangular grid
+    vertices = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [2.0, 0.0],  # 1
+            [1.0, 1.0],  # 2
+            [2.0, 2.0],  # 3
+            [0.0, 2.0],  # 4
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 2],
+            [1, 3, 2],
+            [3, 4, 2],
+            [4, 0, 2],
+        ]
+    )
+    grid = xugrid.Ugrid2d(
+        node_x=vertices[:, 0],
+        node_y=vertices[:, 1],
+        fill_value=-1,
+        face_node_connectivity=faces,
+    )
+    voronoi = grid.tesselate_circumcenter_voronoi()
+    assert voronoi.n_face == 5
+
+
 def test_reverse_cuthill_mckee():
     grid = grid2d()
     new, index = grid.reverse_cuthill_mckee()
