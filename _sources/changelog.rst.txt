@@ -35,6 +35,9 @@ Changed
 Added
 ~~~~~
 
+- :func:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` has been added to
+  provide orthogonal voronoi cells for triangular grids.
+
 [0.2.1] 2023-02-06
 ------------------
 

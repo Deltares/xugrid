@@ -410,6 +410,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Bounds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xmin</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xmax</span> <span class="o">=</span> <span class="kc">None</span>
@@ -448,6 +449,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Bounds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xmin</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xmax</span> <span class="o">=</span> <span class="kc">None</span>
@@ -716,6 +718,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">circumcenters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
@@ -1515,6 +1528,27 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">add_exterior</span><span class="p">:</span>
+            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
+            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi_topology</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_face_connectivity</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+            <span class="n">centroids</span><span class="p">,</span>
+            <span class="n">edge_face_connectivity</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">add_exterior</span><span class="p">,</span>
+            <span class="n">add_vertices</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a centroidal Voronoi tesselation of this UGRID2D topology.</span>
@@ -1532,25 +1566,26 @@
 <span class="sd">        -------</span>
 <span class="sd">        tesselation: Ugrid2d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">add_exterior</span><span class="p">:</span>
-            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
-            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">)</span></div>
 
-        <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi_topology</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">node_face_connectivity</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
-            <span class="n">edge_face_connectivity</span><span class="p">,</span>
-            <span class="n">edge_node_connectivity</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
-            <span class="n">add_exterior</span><span class="p">,</span>
-            <span class="n">add_vertices</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Ugrid2d.tesselate_circumcenter_voronoi"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_circumcenter_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a circumcenter Voronoi tesselation of this UGRID2D topology.</span>
+
+<span class="sd">        Such a tesselation is not guaranteed to produce convex cells. To ensure</span>
+<span class="sd">        convexity, set ``add_vertices=False`` -- this will result in a</span>
+<span class="sd">        different exterior, however.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        add_exterior: bool, default: True</span>
+<span class="sd">        add_vertices: bool, default: True</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tesselation: Ugrid2d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.reverse_cuthill_mckee"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.reverse_cuthill_mckee.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
