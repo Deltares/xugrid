@@ -4,14 +4,7 @@ import numba as nb
 import numpy as np
 from scipy import sparse
 
-from xugrid.constants import (
-    X_EPSILON,
-    BoolArray,
-    FloatArray,
-    IntArray,
-    IntDType,
-    SparseMatrix,
-)
+from xugrid.constants import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
 
 
 class AdjacencyMatrix(NamedTuple):
@@ -197,29 +190,10 @@ def reverse_orientation(face_node_connectivity: IntArray, fill_value: int):
 def counterclockwise(
     face_node_connectivity: IntArray, fill_value: int, nodes: FloatArray
 ) -> IntArray:
-    # In principle, we need only compute the cross product of the first three
-    # vertices to determine whether a polygon is ordered clockwise (cw) or ccw.
-    # However, this fails if there are hanging nodes amongst the first few.
-    # First, we try with just first triangles.
-    p = nodes[face_node_connectivity[:, :3]]
+    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    p = nodes[closed]
     dxy = np.diff(p, axis=1)
-    normal = np.cross(dxy[:, 0], dxy[:, 1])
-    reverse = normal < 0
-
-    # Check whether there are any hanging nodes
-    hanging = np.abs(normal) < X_EPSILON
-    if hanging.any():
-        # For these rows, go through the entire polygon
-        n = hanging.sum()
-        m = face_node_connectivity.shape[1]
-        closed, _ = close_polygons(face_node_connectivity[hanging], fill_value)
-        p = nodes[closed]
-        dxy = np.diff(p, axis=1)
-        normal = np.empty((n, m))
-        for i in range(m - 1):
-            normal[:, i] = np.cross(dxy[:, i], dxy[:, i + 1])
-        reverse[hanging] = normal.sum(axis=1) < 0
-
+    reverse = (np.cross(dxy[:, :-1], dxy[:, 1:])).sum(axis=1) < 0
     ccw = face_node_connectivity.copy()
     if reverse.any():
         ccw[reverse] = reverse_orientation(face_node_connectivity[reverse], fill_value)
