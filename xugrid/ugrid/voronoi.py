@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from xugrid.constants import FloatArray, IntArray
+from xugrid.constants import X_EPSILON, FloatArray, IntArray
 from xugrid.ugrid.connectivity import renumber
 
 
@@ -101,30 +101,37 @@ def exterior_vertices(
     # np.dot(U, V) doesn't do the desired thing here
     projected_vertices = a + ((dot_product2d(U, V) / dot_product2d(V, V)) * V.T).T
 
-    # Create the numbering pointing to these new vertices
-    n_new = len(projected_vertices)
+    # Create the numbering pointing to these new vertices.
+    # Discard vertices that overlap with e.g. circumcenters.
+    keep = np.linalg.norm(projected_vertices - centroid_vertices, axis=1) > (
+        X_EPSILON * X_EPSILON
+    )
+    face_i = face_i[keep]
+    vertices_keep = projected_vertices[keep]
     n_centroid = len(centroids)
-    i = exterior_nodes.ravel()
-    n = n_centroid + n_new
-    j = np.repeat(np.arange(n_centroid, n), 2)
+    i_keep = exterior_nodes[keep].ravel()
+    n = n_centroid + len(vertices_keep)
+    j_keep = np.repeat(np.arange(n_centroid, n), 2)
     n_interpolated = 0
 
     # We add a substitution value for the actual vertex
     if add_vertices:
+        n_new = len(projected_vertices)
+        i = exterior_nodes.ravel()
         order = np.argsort(i)
         jj = np.repeat(np.arange(n_new), 2)[order]
         to_interpolate = projected_vertices[jj]
         interpolated = 0.5 * (to_interpolate[::2] + to_interpolate[1::2])
         n_interpolated = len(interpolated)
-        i = np.concatenate([i, i[order][::2]])
-        j = np.concatenate([j, np.arange(n, n + n_interpolated)])
-        projected_vertices = np.concatenate([projected_vertices, interpolated])
+        i_keep = np.concatenate([i_keep, i[order][::2]])
+        j_keep = np.concatenate([j_keep, np.arange(n, n + n_interpolated)])
+        vertices_keep = np.concatenate([vertices_keep, interpolated])
         # Create face index: the face of the original mesh associated with every
         # voronoi vertex is a centroid. The exterior vertices are an exception to
         # this: these are associated with two faces. So we set a value of -1 here.
         face_i = np.concatenate([face_i, np.full(n_interpolated, -1)])
 
-    return i, j, projected_vertices, face_i, n_interpolated
+    return i_keep, j_keep, vertices_keep, face_i, n_interpolated
 
 
 def exterior_topology(

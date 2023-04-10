@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+import xugrid as xu
 from xugrid.ugrid import connectivity, voronoi
 
 
@@ -246,3 +247,46 @@ class TestVoronoi:
         assert np.allclose(rowsort(vertices), expected_vertices)
         assert (face_i == -1).sum() == 10
         assert np.allclose(mesh_area(vertices, actual_faces), 6.0)
+
+
+def test_projected_vertices_on_edge():
+    """
+    For certain triangles, the voronoi projection falls exactly on the edge.
+         x
+        ---
+      -------
+    x -- o -- x
+         |
+         |
+         v
+
+    Where:
+
+    * x: the triangle vertices
+    * o: the circumcenter
+    * -->: the orthogonal voronoi ray
+
+    This results in a centroid which is identical to the voronoi ray edge
+    intersection. This will then create a zero length edge, which is obviously
+    problematic.
+    """
+    nodes = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [0.0, 2.0],  # 1
+            [2.0, 2.0],  # 2
+            [0.0, 2.0],  # 3
+            [1.0, 1.0],  # 4
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 4],
+            [1, 2, 4],
+            [2, 3, 4],
+            [3, 0, 4],
+        ]
+    )
+    grid = xu.Ugrid2d(nodes[:, 0], nodes[:, 1], -1, faces)
+    voronoi_grid = grid.tesselate_circumcenter_voronoi()
+    assert voronoi_grid.n_face
