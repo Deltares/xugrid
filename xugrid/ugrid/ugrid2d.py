@@ -1121,6 +1121,9 @@ class Ugrid2d(AbstractUgrid):
         """
         Select points in the unstructured grid.
 
+        Out-of-bounds points are ignored. They may be identified via the
+        ``index`` coordinate of the returned selection.
+
         Parameters
         ----------
         x: 1d array of floats with shape ``(n_points,)``
@@ -1143,6 +1146,7 @@ class Ugrid2d(AbstractUgrid):
         valid = index != -1
         index = index[valid]
         coords = {
+            "index": (dim, np.arange(len(valid))[valid]),
             "x": (dim, xy[valid, 0]),
             "y": (dim, xy[valid, 1]),
         }

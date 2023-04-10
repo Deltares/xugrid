@@ -556,12 +556,19 @@ class TestUgrid2dSelection:
         expected = xr.DataArray(
             data=[0, 3],
             coords={
+                "index": (dim, [0, 1]),
                 "x": (dim, x),
                 "y": (dim, y),
             },
             dims=[dim],
         )
         assert expected.equals(actual)
+
+    def test_sel_points_out_of_bounds(self):
+        x = [-10.0, 0.5, -20.0, 1.5, -30.0]
+        y = [-10.0, 0.5, -20.0, 1.25, -30.0]
+        actual = self.grid.sel_points(obj=self.obj, x=x, y=y)
+        assert np.array_equal(actual["index"], [1, 3])
 
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):
@@ -642,6 +649,7 @@ class TestUgrid2dSelection:
             expected = xr.DataArray(
                 data=[0],
                 coords={
+                    "index": (dim, [0]),
                     "x": (dim, [0.5]),
                     "y": (dim, [0.5]),
                 },

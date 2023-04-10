@@ -135,6 +135,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     def sel_points(self, x, y):
         """
         Select points in the unstructured grid.
+        
+        Out-of-bounds points are ignored. They may be identified via the
+        ``index`` coordinate of the returned selection.
 
         Parameters
         ----------
