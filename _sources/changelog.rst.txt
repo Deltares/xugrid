@@ -9,6 +9,22 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+Changed
+~~~~~~~
+
+- :meth:`xugrid.Ugrid2d.sel_points` and
+  :meth:`xugrid.UgridDataArrayAccessor.sel_points` now return a result with an
+  "index" coordinate, containing the (integer) index of the points. 
+
+Added
+~~~~~
+
+- :func:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` has been added to
+  provide orthogonal voronoi cells for triangular grids.
+
 [0.3.0] 2023-03-14
 ------------------
 

@@ -1406,6 +1406,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
+<span class="sd">        Out-of-bounds points are ignored. They may be identified via the</span>
+<span class="sd">        ``index`` coordinate of the returned selection.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: 1d array of floats with shape ``(n_points,)``</span>
@@ -1428,6 +1431,7 @@
         <span class="n">valid</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid</span><span class="p">))[</span><span class="n">valid</span><span class="p">]),</span>
             <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
             <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
         <span class="p">}</span>
