@@ -306,6 +306,21 @@ class TestUgridDataArray:
         actual = uda2.to_dataset()
         assert isinstance(actual, xugrid.UgridDataset)
 
+    def test_ugrid_to_dataset(self):
+        uda2 = self.uda.copy()
+        uda2.ugrid.obj.name = "test"
+        ds = uda2.ugrid.to_dataset(optional_attributes=True)
+        assert "mesh2d_edge_nodes" in ds
+        assert "mesh2d_face_nodes" in ds
+        assert "mesh2d_face_edges" in ds
+        assert "mesh2d_face_faces" in ds
+        assert "mesh2d_edge_faces" in ds
+        assert "mesh2d_boundary_nodes" in ds
+        assert "mesh2d_face_x" in ds
+        assert "mesh2d_face_y" in ds
+        assert "mesh2d_edge_x" in ds
+        assert "mesh2d_edge_y" in ds
+
     def test_to_netcdf(self, tmp_path):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
@@ -596,9 +611,21 @@ def test_multiple_coordinates():
     assert subset_ds["mesh2d"].attrs["node_coordinates"] == attrs["node_coordinates"]
 
 
-def test_to_dataset():
+def test_ugrid_to_dataset():
     uds = xugrid.UgridDataset(UGRID_DS())
     assert uds.ugrid.to_dataset() == UGRID_DS()
+
+    ds = uds.ugrid.to_dataset(optional_attributes=True)
+    assert "mesh2d_edge_nodes" in ds
+    assert "mesh2d_face_nodes" in ds
+    assert "mesh2d_face_edges" in ds
+    assert "mesh2d_face_faces" in ds
+    assert "mesh2d_edge_faces" in ds
+    assert "mesh2d_boundary_nodes" in ds
+    assert "mesh2d_face_x" in ds
+    assert "mesh2d_face_y" in ds
+    assert "mesh2d_edge_x" in ds
+    assert "mesh2d_edge_y" in ds
 
 
 def test_open_dataset(tmp_path):

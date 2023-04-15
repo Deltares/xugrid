@@ -96,6 +96,7 @@ def test_ugrid1d_properties():
     actual_coords = grid.edge_node_coordinates
     assert actual_coords.shape == (2, 2, 2)
     assert np.allclose(actual_coords, expected_coords)
+    assert isinstance(grid.attrs, dict)
 
 
 def test_ugrid1d_egde_bounds():
@@ -165,6 +166,10 @@ def test_to_dataset():
     assert f"{NAME}_node_x" in ds.coords
     assert f"{NAME}_node_y" in ds.coords
     assert f"{NAME}_edge_nodes" in ds
+
+    ds = grid.to_dataset(optional_attributes=True)
+    assert f"{NAME}_edge_x" in ds.coords
+    assert f"{NAME}_edge_y" in ds.coords
 
 
 def test_ugrid1d_dataset_roundtrip():

@@ -141,6 +141,7 @@ class Ugrid2d(AbstractUgrid):
         self._node_face_connectivity = None
         self._face_edge_connectivity = None
         self._face_face_connectivity = None
+        self._boundary_node_connectivity = None
         # Derived topology
         self._triangulation = None
         self._voronoi_topology = None
@@ -293,14 +294,21 @@ class Ugrid2d(AbstractUgrid):
             crs=None,
         )
 
-    def to_dataset(self, other: xr.Dataset = None) -> xr.Dataset:
+    def _get_name_and_attrs(self, name: str):
+        key = f"{name}_connectivity"
+        attrs = conventions.DEFAULT_ATTRS[key]
+        if "_FillValue" in attrs:
+            attrs["_FillValue"] = self.fill_value
+        return self._attrs[key], attrs
+
+    def to_dataset(
+        self, other: xr.Dataset = None, optional_attributes: bool = False
+    ) -> xr.Dataset:
         node_x = self._indexes["node_x"]
         node_y = self._indexes["node_y"]
-        face_nodes = self._attrs["face_node_connectivity"]
-        face_nodes_attrs = conventions.DEFAULT_ATTRS["face_node_connectivity"]
+        face_nodes, face_nodes_attrs = self._get_name_and_attrs("face_node")
         nmax_node_dim = self._attrs["max_face_nodes_dimension"]
-        edge_nodes = self._attrs["edge_node_connectivity"]
-        edge_nodes_attrs = conventions.DEFAULT_ATTRS["edge_node_connectivity"]
+        edge_nodes, edge_nodes_attrs = self._get_name_and_attrs("edge_node")
 
         data_vars = {
             self.name: 0,
@@ -310,21 +318,53 @@ class Ugrid2d(AbstractUgrid):
                 dims=(self.face_dimension, nmax_node_dim),
             ),
         }
-        if self.edge_node_connectivity is not None:
+        if self.edge_node_connectivity is not None or optional_attributes:
             data_vars[edge_nodes] = xr.DataArray(
                 data=self.edge_node_connectivity,
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             )
+        if optional_attributes:
+            face_edges, face_edges_attrs = self._get_name_and_attrs("face_edge")
+            face_faces, face_faces_attrs = self._get_name_and_attrs("face_face")
+            edge_faces, edge_faces_attrs = self._get_name_and_attrs("edge_face")
+            bound_nodes, bound_nodes_attrs = self._get_name_and_attrs("boundary_node")
+            fill_value = self.fill_value
+            boundary_edge_dim = self._attrs["boundary_edge_dimension"]
+
+            data_vars[face_edges] = xr.DataArray(
+                data=self.face_edge_connectivity,
+                attrs=face_edges_attrs,
+                dims=(self.face_dimension, nmax_node_dim),
+            )
+            data_vars[face_faces] = xr.DataArray(
+                data=connectivity.to_dense(
+                    self.face_face_connectivity, fill_value, self.n_max_node_per_face
+                ),
+                attrs=face_faces_attrs,
+                dims=(self.face_dimension, nmax_node_dim),
+            )
+            data_vars[edge_faces] = xr.DataArray(
+                data=self.edge_face_connectivity,
+                attrs=edge_faces_attrs,
+                dims=(self.edge_dimension, "two"),
+            )
+            data_vars[bound_nodes] = xr.DataArray(
+                data=self.boundary_node_connectivity,
+                attrs=bound_nodes_attrs,
+                dims=(boundary_edge_dim, "two"),
+            )
 
         dataset = xr.Dataset(data_vars, attrs={"Conventions": "CF-1.8 UGRID-1.0"})
-
         if self._dataset:
             dataset.update(self._dataset)
         if other is not None:
             dataset = dataset.merge(other)
         if node_x not in dataset or node_y not in dataset:
             dataset = self.assign_node_coords(dataset)
+        if optional_attributes:
+            dataset = self.assign_face_coords(dataset)
+            dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
         return dataset
@@ -421,12 +461,24 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._face_edge_connectivity is None:
             self._edge_connectivity()
-            # if self._edge_node_connectivity is None:
-            #    self._edge_connectivity()
-            # else:
-            #    raise NotImplementedError
-        #                self._face_edge_connectivity =
         return self._face_edge_connectivity
+
+    @property
+    def boundary_node_connectivity(self) -> IntArray:
+        """
+        Boundary node connectivity
+
+        Returns:
+        --------
+        connectivity: ndarray of integers with shape ``(n_boundary_edge, 2)``
+        """
+        if self._boundary_node_connectivity is None:
+            self._boundary_node_connectivity = connectivity.boundary_node_connectivity(
+                self.edge_face_connectivity,
+                self.fill_value,
+                self.edge_node_connectivity,
+            )
+        return self._boundary_node_connectivity
 
     @property
     def centroids(self) -> FloatArray:

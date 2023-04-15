@@ -214,6 +214,10 @@ class AbstractUgrid(abc.ABC):
         return copy.deepcopy(self)
 
     @property
+    def attrs(self):
+        return self._attrs
+
+    @property
     def node_dimension(self):
         """Name of node dimension"""
         return self._attrs["node_dimension"]

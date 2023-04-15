@@ -208,7 +208,9 @@ class Ugrid1d(AbstractUgrid):
             crs=crs,
         )
 
-    def to_dataset(self, other: xr.Dataset = None) -> xr.Dataset:
+    def to_dataset(
+        self, other: xr.Dataset = None, optional_attributes: bool = False
+    ) -> xr.Dataset:
         node_x = self._indexes["node_x"]
         node_y = self._indexes["node_y"]
         edge_nodes = self._attrs["edge_node_connectivity"]
@@ -230,6 +232,8 @@ class Ugrid1d(AbstractUgrid):
             dataset = dataset.merge(other)
         if node_x not in dataset or node_y not in dataset:
             dataset = self.assign_node_coords(dataset)
+        if optional_attributes:
+            dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
         return dataset

@@ -24,6 +24,6 @@ def get_examples():
 
 
 @pytest.mark.parametrize("example", get_examples())
-@pytest.skipif(on_ci(), reason="Examples are run during docs build")
+@pytest.mark.skipif(on_ci(), reason="Examples are run during docs build")
 def test_example(example):
     subprocess.run([sys.executable, example], check=True)

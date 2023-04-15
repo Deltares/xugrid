@@ -159,18 +159,25 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             result = grid.sel_points(result, x, y)
         return result
 
-    def to_dataset(self):
+    def to_dataset(self, optional_attributes: bool = False):
         """
         Converts this UgridDataArray or UgridDataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
 
+        Parameters
+        ----------
+        optional_attributes: bool, default: False.
+            Whether to generate the UGRID optional attributes.
+
         Returns
         -------
         dataset: UgridDataset
         """
-        return xr.merge([grid.to_dataset(self.obj) for grid in self.grids])
+        return xr.merge(
+            [grid.to_dataset(self.obj, optional_attributes) for grid in self.grids]
+        )
 
     @property
     def crs(self):

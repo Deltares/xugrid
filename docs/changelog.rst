@@ -12,18 +12,35 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+- :meth:`xugrid.Ugrid2d.tesselate_centroidal_voronoi` and
+  :meth:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` will only include
+  relevant centroids, rather than all the original centroids when
+  ``add_exterior=False``. Previously, a scrambled voronoi grid could result
+  from the tesselation when the original grid contained cells with only one
+  neighbor.
+
 Changed
 ~~~~~~~
 
 - :meth:`xugrid.Ugrid2d.sel_points` and
   :meth:`xugrid.UgridDataArrayAccessor.sel_points` now return a result with an
   "index" coordinate, containing the (integer) index of the points. 
+- :class:`xugrid.Ugrid2d` will now error during initialization if the
+  node_edge_connectivity is invalid (i.e. contains nodes that are not used in
+  any face).
 
 Added
 ~~~~~
 
-- :func:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` has been added to
+- :meth:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` has been added to
   provide orthogonal voronoi cells for triangular grids.
+- :meth:`xugrid.Ugrid1d.to_dataset`, :meth:`xugrid.Ugrid2d.to_dataset`,
+  :meth:`xugrid.UgridDataArrayAccessor.to_dataset`, and
+  :meth:`xugrid.UgridDatasetAccessor.to_dataset` now take an
+  ``optional_attributes`` keyword argument to generate the optional UGRID
+  attributes.
+- :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` now have an ``attrs``
+  property.
 
 [0.3.0] 2023-03-14
 ------------------

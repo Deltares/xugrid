@@ -514,15 +514,20 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         da_filled = da.copy(data=filled)
         return UgridDataArray(da_filled, grid)
 
-    def to_dataset(self):
+    def to_dataset(self, optional_attributes: bool = False):
         """
         Converts this UgridDataArray or UgridDataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
 
+        Parameters
+        ----------
+        optional_attributes: bool, default: False.
+            Whether to generate the UGRID optional attributes.
+
         Returns
         -------
         dataset: UgridDataset
         """
-        return self.grid.to_dataset(self.obj)
+        return self.grid.to_dataset(self.obj, optional_attributes)

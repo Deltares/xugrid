@@ -169,6 +169,7 @@ def test_ugrid2d_properties():
     are_nan = np.isnan(face_node_coords)
     assert are_nan[2:, -1:, :].all()
     assert not are_nan[:, :-1, :].any()
+    assert isinstance(grid.attrs, dict)
 
 
 def test_ugrid2d_edge_bounds():
@@ -231,6 +232,18 @@ def test_to_dataset():
     assert f"{NAME}_node_x" in ds.coords
     assert f"{NAME}_node_y" in ds.coords
     assert f"{NAME}_face_nodes" in ds
+
+    ds = grid.to_dataset(optional_attributes=True)
+    assert f"{NAME}_edge_nodes" in ds
+    assert f"{NAME}_face_nodes" in ds
+    assert f"{NAME}_face_edges" in ds
+    assert f"{NAME}_face_faces" in ds
+    assert f"{NAME}_edge_faces" in ds
+    assert f"{NAME}_boundary_nodes" in ds
+    assert f"{NAME}_face_x" in ds
+    assert f"{NAME}_face_y" in ds
+    assert f"{NAME}_edge_x" in ds
+    assert f"{NAME}_edge_y" in ds
 
 
 def test_ugrid2d_set_node_coords():
