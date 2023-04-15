@@ -420,7 +420,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_y</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Connectivity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="o">=</span> <span class="n">edge_node_connectivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">edge_node_connectivity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_face_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_node_edge_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_node_face_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
@@ -682,6 +682,18 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_edge_connectivity</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span>
+
+    <span class="nd">@edge_node_connectivity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">associated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">)</span>
+            <span class="n">associated</span> <span class="o">=</span> <span class="n">associated</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">associated</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">associated</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;edge_node_connectivity is invalid, the following edges are not &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;associated with any face: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="o">~</span><span class="n">associated</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_edge_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">csr_matrix</span><span class="p">:</span>
