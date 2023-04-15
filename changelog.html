@@ -648,6 +648,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="api/xugrid.Ugrid1d.attrs.html">
+   xugrid.Ugrid1d.attrs
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="api/xugrid.Ugrid1d.n_node.html">
    xugrid.Ugrid1d.n_node
   </a>
@@ -802,6 +807,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="api/xugrid.Ugrid2d.dimensions.html">
    xugrid.Ugrid2d.dimensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="api/xugrid.Ugrid1d.attrs.html">
+   xugrid.Ugrid1d.attrs
   </a>
  </li>
  <li class="toctree-l1">
@@ -1163,6 +1173,14 @@
 <h2>[Unreleased]<a class="headerlink" href="#unreleased" title="Permalink to this heading">#</a></h2>
 <section id="fixed">
 <h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi" title="xugrid.Ugrid2d.tesselate_centroidal_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_centroidal_voronoi()</span></code></a> and
+<a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> will only include
+relevant centroids, rather than all the original centroids when
+<code class="docutils literal notranslate"><span class="pre">add_exterior=False</span></code>. Previously, a scrambled voronoi grid could result
+from the tesselation when the original grid contained cells with only one
+neighbor.</p></li>
+</ul>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
@@ -1170,13 +1188,29 @@
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points" title="xugrid.Ugrid2d.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel_points()</span></code></a> and
 <a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.sel_points()</span></code></a> now return a result with an
 “index” coordinate, containing the (integer) index of the points.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.Ugrid2d</span></code></a> will now error during initialization if the
+node_edge_connectivity is invalid (i.e. contains nodes that are not used in
+any face).</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.plot.pcolormesh()</span></code> now defaults to
+<code class="docutils literal notranslate"><span class="pre">edgecolors=&quot;face&quot;</span></code> to avoid white lines (which can be become relatively
+dominant in when plotting large grids).</p></li>
 </ul>
 </section>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> has been added to
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> has been added to
 provide orthogonal voronoi cells for triangular grids.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.to_dataset.html#xugrid.Ugrid1d.to_dataset" title="xugrid.Ugrid1d.to_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.to_dataset()</span></code></a>, <a class="reference internal" href="api/xugrid.Ugrid2d.to_dataset.html#xugrid.Ugrid2d.to_dataset" title="xugrid.Ugrid2d.to_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.to_dataset()</span></code></a>,
+<a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.to_dataset.html#xugrid.UgridDataArrayAccessor.to_dataset" title="xugrid.UgridDataArrayAccessor.to_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.to_dataset()</span></code></a>, and
+<a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset" title="xugrid.UgridDatasetAccessor.to_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.to_dataset()</span></code></a> now take an
+<code class="docutils literal notranslate"><span class="pre">optional_attributes</span></code> keyword argument to generate the optional UGRID
+attributes.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.html#xugrid.Ugrid1d" title="xugrid.Ugrid1d"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.Ugrid1d</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.Ugrid2d</span></code></a> now have an <code class="docutils literal notranslate"><span class="pre">attrs</span></code>
+property.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.rasterize()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.rasterize_like()</span></code> have been added to
+rasterize all face variables in a UgridDataset.</p></li>
 </ul>
 </section>
 </section>

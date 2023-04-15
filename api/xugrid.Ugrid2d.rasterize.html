@@ -648,6 +648,11 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.attrs.html">
+   xugrid.Ugrid1d.attrs
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="xugrid.Ugrid1d.n_node.html">
    xugrid.Ugrid1d.n_node
   </a>
@@ -802,6 +807,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="xugrid.Ugrid2d.dimensions.html">
    xugrid.Ugrid2d.dimensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.attrs.html">
+   xugrid.Ugrid1d.attrs
   </a>
  </li>
  <li class="toctree-l1">
@@ -1158,13 +1168,16 @@
 <h1>xugrid.Ugrid2d.rasterize<a class="headerlink" href="#xugrid-ugrid2d-rasterize" title="Permalink to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.Ugrid2d.rasterize">
-<span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">rasterize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/ugrid2d.html#Ugrid2d.rasterize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.rasterize" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">rasterize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/ugrid2d.html#Ugrid2d.rasterize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.rasterize" title="Permalink to this definition">#</a></dt>
 <dd><p>Rasterize unstructured grid by sampling.</p>
 <p>x and y coordinates are generated from the bounds of the UGRID2D
 topology and the provided resolution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>resolution</strong> (<em>float</em>) – Spacing in x and y.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resolution</strong> (<em>float</em>) – Spacing in x and y.</p></li>
+<li><p><strong>bounds</strong> (<em>tuple</em><em> of </em><em>four floats</em><em>, </em><em>optional</em>) – xmin, ymin, xmax, ymax</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
