@@ -168,6 +168,36 @@ def test_invert_sparse(triangle_mesh, mixed_mesh):
     assert np.array_equal(actual, expected)
 
 
+def test_to_dense(triangle_mesh):
+    faces, fill_value = triangle_mesh
+    sparse = connectivity.to_sparse(faces, fill_value)
+    actual = connectivity.to_dense(sparse, fill_value)
+    assert np.array_equal(actual, np.sort(faces, axis=1))
+
+    with pytest.raises(ValueError, match="n_columns 2 is too small"):
+        connectivity.to_dense(sparse, fill_value, n_columns=2)
+
+    # now pad
+    actual = connectivity.to_dense(sparse, fill_value, n_columns=4)
+    expected = np.array(
+        [
+            [0, 1, 2, fill_value],
+            [1, 2, 3, fill_value],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+    # and twice
+    actual = connectivity.to_dense(sparse, fill_value, n_columns=5)
+    expected = np.array(
+        [
+            [0, 1, 2, fill_value, fill_value],
+            [1, 2, 3, fill_value, fill_value],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+
 def test_renumber():
     a = np.array(
         [

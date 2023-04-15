@@ -83,10 +83,17 @@ def to_sparse(
     return _to_sparse(conn, fill_value, invert=False, sort_indices=sort_indices)
 
 
-def to_dense(conn: SparseMatrix, fill_value: int) -> IntArray:
+def to_dense(conn: SparseMatrix, fill_value: int, n_columns: int = None) -> IntArray:
     n, _ = conn.shape
     m_per_row = conn.getnnz(axis=1)
     m = m_per_row.max()
+    if n_columns is not None:
+        if n_columns < m:
+            raise ValueError(
+                f"n_columns {n_columns} is too small for the data, requires {m}"
+            )
+        m = n_columns
+
     # Allocate 2D array and create a flat view of the dense connectivity
     dense_conn = np.empty((n, m), dtype=IntDType)
     flat_conn = dense_conn.ravel()
@@ -202,6 +209,16 @@ def counterclockwise(
 
 # Derived connectivities
 # ----------------------
+def boundary_node_connectivity(
+    edge_face_connectivity: IntArray,
+    fill_value: int,
+    edge_node_connectivity: IntArray,
+) -> IntArray:
+    """Is a subset of the edge_node_connectivity"""
+    is_boundary = (edge_face_connectivity == fill_value).any(axis=1)
+    return edge_node_connectivity[is_boundary]
+
+
 def edge_connectivity(
     face_node_connectivity: IntArray,
     fill_value: int,
