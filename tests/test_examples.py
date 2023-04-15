@@ -11,7 +11,7 @@ def on_ci():
     """
     Don't test the examples on CI: they run during building of documentation.
     """
-    return os.environ.get("CI") is not None
+    return os.environ.get("GITHUB_ACTIONS") is not None
 
 
 def get_examples():
