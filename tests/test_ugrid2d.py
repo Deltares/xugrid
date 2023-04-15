@@ -563,6 +563,23 @@ def test_rasterize():
     assert np.allclose(y, [1.75, 1.25, 0.75, 0.25])
     assert np.array_equal(index, expected_index)
 
+    # Test with alternative bounds
+    bounds = (-1.0, -1.0, 2.0, 2.0)
+    x, y, index = grid.rasterize(resolution=0.5, bounds=bounds)
+    expected_index = np.array(
+        [
+            [-1, -1, -1, 2, -1, -1],
+            [-1, -1, 2, 2, 3, -1],
+            [-1, -1, 0, 0, 1, 1],
+            [-1, -1, 0, 0, 1, 1],
+            [-1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1],
+        ]
+    )
+    assert np.allclose(x, [-0.75, -0.25, 0.25, 0.75, 1.25, 1.75])
+    assert np.allclose(y, [1.75, 1.25, 0.75, 0.25, -0.25, -0.75])
+    assert np.array_equal(index, expected_index)
+
 
 class TestUgrid2dSelection:
     @pytest.fixture(autouse=True)

@@ -150,19 +150,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         return self.grid.sel_points(self.obj, x, y)
 
-    def _raster(self, x, y, index) -> xr.DataArray:
-        index = index.ravel()
-        # Cast to float for nodata values (NaN)
-        data = self.obj.isel({self.grid.face_dimension: index}).astype(float).values
-        data[index == -1] = np.nan
-        out = xr.DataArray(
-            data=data.reshape(y.size, x.size),
-            coords={"y": y, "x": x},
-            dims=["y", "x"],
-        )
-        return out
-
-    def rasterize(self, resolution: float):
+    def rasterize(self, resolution: float) -> xr.DataArray:
         """
         Rasterize unstructured grid by sampling.
 
@@ -173,12 +161,12 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        rasterized: Union[xr.DataArray, xr.Dataset]
+        rasterized: xr.DataArray
         """
         x, y, index = self.grid.rasterize(resolution)
         return self._raster(x, y, index)
 
-    def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]):
+    def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]) -> xr.DataArray:
         """
         Rasterize unstructured grid by sampling on the x and y coordinates
         of ``other``.
@@ -192,7 +180,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        rasterized: Union[xr.DataArray, xr.Dataset]
+        rasterized: xr.DataArray
         """
         x, y, index = self.grid.rasterize_like(
             x=other["x"].values,

@@ -159,6 +159,49 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             result = grid.sel_points(result, x, y)
         return result
 
+    def rasterize(self, resolution: float) -> xr.Dataset:
+        """
+        Rasterize all face data on 2D unstructured grids by sampling.
+
+        Parameters
+        ----------
+        resolution: float
+            Spacing in x and y.
+
+        Returns
+        -------
+        rasterized: xr.Dataset
+        """
+        datasets = []
+        for grid in self.grids:
+            xx, yy, index = grid.rasterize(resolution, self.total_bounds)
+            datasets.append(self._raster(xx, yy, index))
+        return xr.merge(datasets)
+
+    def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
+        """
+        Rasterize unstructured all face data on 2D unstructured grids by
+        sampling on the x and y coordinates of ``other``.
+
+        Parameters
+        ----------
+        resolution: float
+            Spacing in x and y.
+        other: Union[xr.DataArray, xr.Dataset]
+            Object to take x and y coordinates from.
+
+        Returns
+        -------
+        rasterized: xr.Dataset
+        """
+        x = other["x"].values
+        y = other["y"].values
+        datasets = []
+        for grid in self.grids:
+            xx, yy, index = grid.rasterize_like(x, y)
+            datasets.append(self._raster(xx, yy, index))
+        return xr.merge(datasets)
+
     def to_dataset(self, optional_attributes: bool = False):
         """
         Converts this UgridDataArray or UgridDataset into a standard

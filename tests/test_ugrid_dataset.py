@@ -494,6 +494,24 @@ class TestUgridDataset:
         assert actual["b"].shape == (1,)
         assert actual.ugrid.grids[0].n_face == 1
 
+    def test_rasterize(self):
+        actual = self.uds.ugrid.rasterize(resolution=0.5)
+        x = [0.25, 0.75, 1.25, 1.75]
+        y = [1.75, 1.25, 0.75, 0.25]
+        assert isinstance(actual, xr.Dataset)
+        assert actual["a"].shape == (4, 4)
+        assert actual["b"].shape == (4, 4)
+        assert np.allclose(actual["x"], x)
+        assert np.allclose(actual["y"], y)
+
+        da = xr.DataArray(np.empty((4, 4)), {"y": y, "x": x}, ["y", "x"])
+        actual = self.uds.ugrid.rasterize_like(other=da)
+        assert isinstance(actual, xr.Dataset)
+        assert actual["a"].shape == (4, 4)
+        assert actual["b"].shape == (4, 4)
+        assert np.allclose(actual["x"], x)
+        assert np.allclose(actual["y"], y)
+
     def test_crs(self):
         uds = self.uds
         crs = uds.ugrid.crs

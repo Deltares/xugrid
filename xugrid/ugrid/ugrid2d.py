@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -915,7 +915,11 @@ class Ugrid2d(AbstractUgrid):
         index = self.celltree.locate_points(nodes).reshape((y.size, x.size))
         return x, y, index
 
-    def rasterize(self, resolution: float) -> Tuple[FloatArray, FloatArray, IntArray]:
+    def rasterize(
+        self,
+        resolution: float,
+        bounds: Optional[Tuple[float, float, float, float]] = None,
+    ) -> Tuple[FloatArray, FloatArray, IntArray]:
         """
         Rasterize unstructured grid by sampling.
 
@@ -926,6 +930,8 @@ class Ugrid2d(AbstractUgrid):
         ----------
         resolution: float
             Spacing in x and y.
+        bounds: tuple of four floats, optional
+            xmin, ymin, xmax, ymax
 
         Returns
         -------
@@ -933,7 +939,9 @@ class Ugrid2d(AbstractUgrid):
         y: 1d array of floats with shape ``(nrow,)``
         face_index: 1d array of integers with shape ``(nrow * ncol,)``
         """
-        xmin, ymin, xmax, ymax = self.bounds
+        if bounds is None:
+            bounds = self.bounds
+        xmin, ymin, xmax, ymax = bounds
         d = abs(resolution)
         xmin = np.floor(xmin / d) * d
         xmax = np.ceil(xmax / d) * d

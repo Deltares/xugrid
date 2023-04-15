@@ -28,6 +28,9 @@ Changed
 - :class:`xugrid.Ugrid2d` will now error during initialization if the
   node_edge_connectivity is invalid (i.e. contains nodes that are not used in
   any face).
+- :meth:`xugrid.UgridDataArrayAccessor.plot.pcolormesh` now defaults to
+  ``edgecolors="face"`` to avoid white lines (which can be become relatively
+  dominant in when plotting large grids).
 
 Added
 ~~~~~
@@ -41,6 +44,9 @@ Added
   attributes.
 - :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` now have an ``attrs``
   property.
+- :meth:`xugrid.UgridDatasetAccessor.rasterize` and
+  :meth:`xugrid.UgridDatasetAccessor.rasterize_like` have been added to
+  rasterize all face variables in a UgridDataset.
 
 [0.3.0] 2023-03-14
 ------------------

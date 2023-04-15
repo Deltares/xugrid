@@ -1,4 +1,8 @@
 import abc
+from typing import Tuple
+
+import numpy as np
+import xarray as xr
 
 
 class AbstractUgridAccessor(abc.ABC):
@@ -46,6 +50,28 @@ class AbstractUgridAccessor(abc.ABC):
             return maybe_xugrid(*result)
         else:
             return result
+
+    @staticmethod
+    def _raster_xy(bounds: Tuple[float, float, float, float], resolution: float):
+        xmin, ymin, xmax, ymax = bounds
+        d = abs(resolution)
+        xmin = np.floor(xmin / d) * d
+        xmax = np.ceil(xmax / d) * d
+        ymin = np.floor(ymin / d) * d
+        ymax = np.ceil(ymax / d) * d
+        x = np.arange(xmin + 0.5 * d, xmax, d)
+        y = np.arange(ymax - 0.5 * d, ymin, -d)
+        return x, y
+
+    def _raster(self, x, y, index) -> xr.DataArray:
+        index = index.ravel()
+        indexer = xr.DataArray(
+            data=index.reshape(y.size, x.size),
+            coords={"y": y, "x": x},
+            dims=["y", "x"],
+        )
+        out = self.obj.isel({self.grid.face_dimension: indexer}).where(indexer != -1)
+        return out
 
     def clip_box(
         self,
