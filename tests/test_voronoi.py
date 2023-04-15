@@ -323,8 +323,8 @@ def test_isolated_face():
     )
     faces = np.array(
         [
-            [0, 1, 4, 5],
-            [1, 2, 5, 6],
+            [0, 1, 5, 4],
+            [1, 2, 6, 5],
             [2, 3, 7, 6],
             [8, 9, 3, 2],
             [6, 7, 11, 10],
@@ -332,4 +332,5 @@ def test_isolated_face():
     )
     grid = xu.Ugrid2d(nodes[:, 0], nodes[:, 1], -1, faces)
     voronoi_grid = grid.tesselate_centroidal_voronoi(False, False)
+    assert voronoi_grid.n_face == 2
     assert voronoi_grid.n_node == 4
