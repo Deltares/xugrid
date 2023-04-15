@@ -227,8 +227,10 @@ def edge_connectivity(
     )
 
     if prior is not None:  # prior edge_node_connectivity exists
-        # argsort doesn't work on rows!
-        _, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
+        unique, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
+        # Check whether everything looks okay:
+        if not np.array_equal(unique, edge_node_connectivity):
+            raise ValueError("Invalid edge_node_connectivity")
         inverse_indices = index[inverse_indices]
         edge_node_connectivity = prior
 

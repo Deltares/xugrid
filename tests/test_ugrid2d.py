@@ -1,3 +1,4 @@
+import re
 from typing import NamedTuple
 
 import geopandas as gpd
@@ -105,6 +106,22 @@ def test_ugrid2d_init():
     assert grid.node_y.flags["C_CONTIGUOUS"]
     assert grid._edge_node_connectivity is None
     assert grid._face_edge_connectivity is None
+
+
+def test_ugrid2d_init__invalid_edge_nodes():
+    edge_nodes = np.vstack((EDGE_NODES, [6, 7]))
+    msg = re.escape(
+        "edge_node_connectivity is invalid, the following edges "
+        "are not associated with any face: [10]"
+    )
+    with pytest.raises(ValueError, match=msg):
+        xugrid.Ugrid2d(
+            node_x=VERTICES[:, 0],
+            node_y=VERTICES[:, 1],
+            fill_value=-1,
+            face_node_connectivity=FACES,
+            edge_node_connectivity=edge_nodes,
+        )
 
 
 def test_ugrid2d_alternative_init():

@@ -1,3 +1,4 @@
+import warnings
 from itertools import chain
 from typing import Any, Dict, Tuple, Union
 
@@ -135,7 +136,7 @@ class Ugrid2d(AbstractUgrid):
         self._edge_x = None
         self._edge_y = None
         # Connectivity
-        self._edge_node_connectivity = edge_node_connectivity
+        self.edge_node_connectivity = edge_node_connectivity
         self._edge_face_connectivity = None
         self._node_edge_connectivity = None
         self._node_face_connectivity = None
@@ -397,6 +398,18 @@ class Ugrid2d(AbstractUgrid):
         if self._edge_node_connectivity is None:
             self._edge_connectivity()
         return self._edge_node_connectivity
+
+    @edge_node_connectivity.setter
+    def edge_node_connectivity(self, value):
+        if value is not None:
+            associated = np.isin(value, self.face_node_connectivity)
+            associated = associated[:, 0] & associated[:, 1]
+            if not associated.all():
+                raise ValueError(
+                    "edge_node_connectivity is invalid, the following edges are not "
+                    f"associated with any face: {np.flatnonzero(~associated)}"
+                )
+        self._edge_node_connectivity = value
 
     @property
     def face_edge_connectivity(self) -> csr_matrix:
