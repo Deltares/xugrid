@@ -337,8 +337,8 @@ def voronoi_topology(
         i = np.concatenate([node_i, exterior_i + offset])
         j = np.concatenate([j, exterior_j])
     else:
+        vor_vertices = centroids[np.unique(face_i)]
         face_i = np.arange(face_i.max() + 1)
-        vor_vertices = centroids.copy()
         i = node_i
         j = renumber(j)
 

@@ -289,4 +289,47 @@ def test_projected_vertices_on_edge():
     )
     grid = xu.Ugrid2d(nodes[:, 0], nodes[:, 1], -1, faces)
     voronoi_grid = grid.tesselate_circumcenter_voronoi()
-    assert voronoi_grid.n_face
+    assert voronoi_grid.n_face == 5
+
+
+def test_isolated_face():
+    """
+    The centroid of the left-most face should not be included.
+
+          +--+
+          |  |
+    +--+--+--+
+    |  |  |  |
+    +--+--+--+
+          |  |
+          +--+
+
+    """
+    nodes = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [1.0, 0.0],  # 1
+            [2.0, 0.0],  # 2
+            [3.0, 0.0],  # 3
+            [0.0, 1.0],  # 4
+            [1.0, 1.0],  # 5
+            [2.0, 1.0],  # 6
+            [3.0, 1.0],  # 7
+            [2.0, -1.0],  # 8
+            [3.0, -1.0],  # 9
+            [2.0, 2.0],  # 10
+            [3.0, 2.0],  # 11
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 4, 5],
+            [1, 2, 5, 6],
+            [2, 3, 7, 6],
+            [8, 9, 3, 2],
+            [6, 7, 11, 10],
+        ]
+    )
+    grid = xu.Ugrid2d(nodes[:, 0], nodes[:, 1], -1, faces)
+    voronoi_grid = grid.tesselate_centroidal_voronoi(False, False)
+    assert voronoi_grid.n_node == 4
