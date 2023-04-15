@@ -522,6 +522,10 @@ def pcolormesh(grid, da, ax, **kwargs):
     vmin = kwargs.pop("vmin", None)
     vmax = kwargs.pop("vmax", None)
     kwargs["closed"] = False  # Vertices are closing.
+    # Set edgecolor to face by default, since we get a lot of white lines,
+    # especially for larger grids.
+    if "edgecolors" not in kwargs:
+        kwargs["edgecolors"] = "face"
 
     collection = PolyCollection(vertices, **kwargs)
     collection.set_array(da.values.ravel())
