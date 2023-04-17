@@ -8,6 +8,8 @@ from xugrid.ugrid.ugrid2d import Ugrid2d
 
 class UnstructuredGrid2d:
     """
+    Stores only the grid topology.
+
     e.g. face -> face
 
     Parameters
@@ -47,6 +49,15 @@ class UnstructuredGrid2d:
         Parameters
         ----------
         other: UnstructuredGrid2d
+        relative: bool
+            Whether to divide by the original area. Used for e.g.
+            first-order-conservative methods.
+
+        Returns
+        -------
+        source_index: 1d np.ndarray of int
+        target_index: 1d np.ndarray of int
+        weights: 1d np.ndarray of float
         """
         (
             target_index,

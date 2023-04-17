@@ -22,6 +22,7 @@ import xugrid
 from xugrid.constants import FloatArray
 from xugrid.core.wrap import UgridDataArray
 from xugrid.regrid import reduce
+from xugrid.regrid.structured import StructuredGrid2d
 from xugrid.regrid.unstructured import UnstructuredGrid2d
 from xugrid.regrid.weight_matrix import (
     WeightMatrixCOO,
@@ -61,7 +62,12 @@ class BaseRegridder(abc.ABC):
         source: "xugrid.Ugrid2d",
         target: "xugrid.Ugrid2d",
     ):
-        self._target = UnstructuredGrid2d(target)
+        if isinstance(target, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+            self._target = UnstructuredGrid2d(target)
+        elif isinstance(target, (xr.DataArray, xr.Dataset)):
+            self._target = StructuredGrid2d(target)
+        else:
+            raise TypeError()
         self._compute_weights(UnstructuredGrid2d(source), self._target)
         return
 
@@ -166,6 +172,8 @@ class BaseRegridder(abc.ABC):
         regridded: UgridDataArray
         """
         source_dims = (object.ugrid.grid.face_dimension,)
+        # TODO: if structured: source_dims = ("y", "x")
+        # TODO: stack y, x instead to simplify
         regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
         return UgridDataArray(
             regridded,

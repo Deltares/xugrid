@@ -21,6 +21,15 @@ def broadcast(
     target_indices,
     weights,
 ):
+    """
+    Parameters
+    ----------
+    source_shape: tuple of int
+    target_shape: tuple of int
+    source_indices: tuple of numpy arrays of int
+    target_indices: tuple of numpy arrays of int
+    weights: tuple of numpy arrays of floats
+    """
     source_index = create_linear_index(source_indices, source_shape)
     target_index = create_linear_index(target_indices, target_shape)
     weights = create_weights(weights)
