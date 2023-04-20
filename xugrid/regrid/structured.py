@@ -116,6 +116,8 @@ class StructuredGrid1d:
                 "source index must larger than 2. Cannot interpolate with one point"
             )
         source_index, target_index = self.valid_nodes_index(other)
+        source_index = self.flip_if_needed(source_index)
+        target_index = other.flip_if_needed(target_index)
         source_index = source_index - 1
         weights = (
             target_index_midpoints[target_index] - source_index_midpoints[source_index]
