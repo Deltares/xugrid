@@ -87,12 +87,12 @@ class StructuredGrid1d:
         valid = (
             (start == (end + 1))
             & (self.midpoints > other.bounds[0, 0])
-            & (self.midpoints <= other.bounds[-1, 1])
+            & (self.midpoints < other.bounds[-1, 1])
         )
         valid_other_index = end[valid]
         valid_self_index = np.arange(self.size)[valid]
         return valid_self_index, valid_other_index
-    
+
     def overlap(self, other: "StructuredGrid1d", relative: bool):
         source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
         source_index = self.flip_if_needed(source_index)
@@ -127,9 +127,9 @@ class StructuredGrid1d:
         )
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
-        source_index = np.repeat(source_index,2)
-        target_index = np.column_stack((target_index,target_index+1)).ravel()
-        weights = np.column_stack((weights,1.0 - weights)).ravel()
+        source_index = np.repeat(source_index + 1, 2)
+        target_index = np.column_stack((target_index, target_index + 1)).ravel()
+        weights = np.column_stack((weights, 1.0 - weights)).ravel()
         return source_index, target_index, weights
 
 
@@ -141,9 +141,11 @@ class StructuredGrid2d:
     def __init__(
         self,
         obj: Union[xr.DataArray, xr.Dataset],
+        name_x: str,
+        name_y: str,
     ):
-        self.xbounds = StructuredGrid1d(obj, "x")
-        self.ybounds = StructuredGrid1d(obj, "y")
+        self.xbounds = StructuredGrid1d(obj, name_x)
+        self.ybounds = StructuredGrid1d(obj, name_y)
 
     @property
     def shape(self):
@@ -189,8 +191,22 @@ class StructuredGrid2d:
             (target_index_y, target_index_x),
             (weights_y, weights_x),
         )
-
-
+        
+    def linear_weights(self, other):
+        source_index_x, target_index_x, weights_x = self.xbounds.linear_weights(
+            other.xbounds
+        )
+        source_index_y, target_index_y, weights_y = self.ybounds.linear_weights(
+            other.ybounds
+        )
+        return broadcast(
+            self.shape,
+            other.shape,
+            (source_index_y, source_index_x),
+            (target_index_y, target_index_x),
+            (weights_y, weights_x),
+        )
+        
 class StructuredGrid3d(StructuredGrid2d):
     """
     e.g. (x,y,z) -> (x,y,z)
@@ -201,10 +217,13 @@ class StructuredGrid3d(StructuredGrid2d):
     def __init__(
         self,
         obj: Union[xr.DataArray, xr.Dataset],
+        name_x: str,
+        name_y: str,
+        name_z: str,
     ):
-        self.xbounds = StructuredGrid1d(obj, "x")
-        self.ybounds = StructuredGrid1d(obj, "y")
-        self.zbounds = StructuredGrid1d(obj, "z")
+        self.xbounds = StructuredGrid1d(obj, name_x)
+        self.ybounds = StructuredGrid1d(obj, name_y)
+        self.zbounds = StructuredGrid1d(obj, name_z)
 
     @property
     def shape(self):
@@ -228,8 +247,44 @@ class StructuredGrid3d(StructuredGrid2d):
         source_index_y, target_index_y, weights_y = self.ybounds.overlap(
             other.ybounds, relative
         )
-        source_index_z, target_index_z, weights_z = self.ybounds.overlap(
-            other.ybounds, relative
+        source_index_z, target_index_z, weights_z = self.zbounds.overlap(
+            other.zbounds, relative
+        )
+        return broadcast(
+            self.shape,
+            other.shape,
+            (source_index_z, source_index_y, source_index_x),
+            (target_index_z, target_index_y, target_index_x),
+            (weights_z, weights_y, weights_x),
+        )
+        
+    def locate_centroids(self, other):
+        source_index_x, target_index_x, weights_x = self.xbounds.locate_centroids(
+            other.xbounds
+        )
+        source_index_y, target_index_y, weights_y = self.ybounds.locate_centroids(
+            other.ybounds
+        )
+        source_index_z, target_index_z, weights_z = self.zbounds.locate_centroids(
+            other.zbounds
+        )
+        return broadcast(
+            self.shape,
+            other.shape,
+            (source_index_z, source_index_y, source_index_x),
+            (target_index_z, target_index_y, target_index_x),
+            (weights_z, weights_y, weights_x),
+        )
+  
+    def linear_weights(self, other):
+        source_index_x, target_index_x, weights_x = self.xbounds.linear_weights(
+            other.xbounds
+        )
+        source_index_y, target_index_y, weights_y = self.ybounds.linear_weights(
+            other.ybounds
+        )
+        source_index_z, target_index_z, weights_z = self.zbounds.linear_weights(
+            other.zbounds
         )
         return broadcast(
             self.shape,

@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 
 import xarray as xr
-from xugrid.regrid.structured import StructuredGrid1d
+from xugrid.regrid.structured import StructuredGrid1d,StructuredGrid2d
 
 # Testgrids
 # --------
-# grid a:         |______50_____|_____100_____|_____150_____|   
-# grid b:  |______25_____|______75_____|_____125_____|_____175_____|
+# grid a(x):               |______50_____|_____100_____|_____150_____|   
+# grid b(x):        |______25_____|______75_____|_____125_____|_____175_____|  
 # --------
 
 @pytest.fixture
@@ -37,28 +37,36 @@ def grid_b():
 @pytest.fixture
 def grid_a_1d(grid_a):
     return StructuredGrid1d(grid_a, "x")
-    
+@pytest.fixture
+def grid_a_2d(grid_a):
+    return StructuredGrid2d(grid_a, "x","y")
+ 
 @pytest.fixture
 def grid_b_1d(grid_b):
     return StructuredGrid1d(grid_b, "x")
+@pytest.fixture
+def grid_b_2d(grid_b):
+    return StructuredGrid2d(grid_b, "x","y")
 
-
-def test_init(grid_a):
+def test_init_1d(grid_a):
     assert isinstance(StructuredGrid1d(grid_a, "x"), StructuredGrid1d)
     with pytest.raises(TypeError):
         StructuredGrid1d(1)
         
+def test_init_2d(grid_a):
+    assert isinstance(StructuredGrid2d(grid_a, "x","y"), StructuredGrid2d)
+    with pytest.raises(TypeError):
+        StructuredGrid2d(1)
         
-
-def test_overlap(grid_a_1d,grid_b_1d):
+def test_overlap_1d(grid_a_1d,grid_b_1d):
     # test overlap grid_b (target) with grid_a(source)
     # --------
-    # node 0 -> node 0 (50%) = 25 m, sum = 25 m
+    # node 0 -> node 0 (50%) = 25 m should be not valid?
     # node 1 -> node 0 (50%) = 25 m
-    # node 1 -> node 1 (50%) = 25 m, sum = 50 m
+    # node 1 -> node 1 (50%) = 25 m
     # node 2 -> node 1 (50%) = 25 m
-    # node 2 -> node 2 (50%) = 25 m, sum = 50 m
-    # node 3 -> node 2 (50%) = 25 m, sum = 25 m
+    # node 2 -> node 2 (50%) = 25 m
+    # node 3 -> node 2 (50%) = 25 m should be not valid?
     # --------
     source, target, weights = grid_b_1d.overlap(grid_a_1d, relative=False)
     sorter = np.argsort(source)
@@ -66,59 +74,63 @@ def test_overlap(grid_a_1d,grid_b_1d):
     assert np.array_equal(target[sorter], np.array([0,0,1,1,2,2]))
     assert np.array_equal(weights[sorter], np.array([25,25,25,25,25,25]))
 
-
-def test_locate_centroids(grid_a_1d,grid_b_1d):
+def test_overlap_2d(grid_a_1d,grid_b_1d):
+    # test overlap grid_b (target) with grid_a(source)
+    # --------
+    # node 0 -> node 0 (50%) = 25 m should be not valid?
+    # node 1 -> node 0 (50%) = 25 m
+    # node 1 -> node 1 (50%) = 25 m
+    # node 2 -> node 1 (50%) = 25 m
+    # node 2 -> node 2 (50%) = 25 m
+    # node 3 -> node 2 (50%) = 25 m should be not valid?
+    # --------
+    source, target, weights = grid_b_1d.overlap(grid_a_1d, relative=False)
+    sorter = np.argsort(source)
+    assert np.array_equal(source[sorter], np.array([0,1,1,2,2,3]))
+    assert np.array_equal(target[sorter], np.array([0,0,1,1,2,2]))
+    assert np.array_equal(weights[sorter], np.array([25,25,25,25,25,25]))
+    
+def test_locate_centroids_1d(grid_a_1d,grid_b_1d):
     # test centroids grid_b (target) with grid_a(source), left aligned
     # --------
-    # node 0 -> none
+    # node 0 -> not valid
     # node 1 -> node 0 
     # node 2 -> node 1 
-    # node 3 -> node 2 
+    # node 3 -> not valid
     # --------
     source, target, weights = grid_b_1d.locate_centroids(grid_a_1d)
     sorter = np.argsort(source)
-    assert np.array_equal(source[sorter], np.array([1,2,3]))
-    assert np.array_equal(target[sorter], np.array([0,1,2]))
-    assert np.allclose(weights[sorter], np.ones(grid_a_1d.size))
+    assert np.array_equal(source[sorter], np.array([1,2]))
+    assert np.array_equal(target[sorter], np.array([0,1]))
+    assert np.allclose(weights[sorter], np.ones(2))
 
-
-def test_linear_weights(grid_a_1d,grid_b_1d):
+def test_locate_centroids_1d(grid_a_1d,grid_c_1d):
+    # test centroids grid_b (target) with grid_a(source), left aligned
+    # --------
+    # node 0 -> not valid
+    # node 1 -> node 0 
+    # node 2 -> node 1 
+    # node 3 -> not valid
+    # --------
+    source, target, weights = grid_c_1d.locate_centroids(grid_a_1d)
+    sorter = np.argsort(source)
+    assert np.array_equal(source[sorter], np.array([1,2]))
+    assert np.array_equal(target[sorter], np.array([0,1]))
+    assert np.allclose(weights[sorter], np.ones(2))
+    
+    
+def test_linear_weights_1d(grid_a_1d,grid_b_1d):
     # test linear_weights grid_b (target) with grid_a(source)
     # --------
-    # node 0 -> node 0 = 0.5
+    # node 0 -> not valid
     # node 1 -> node 0 = 0.5
     # node 1 -> node 1 = 0.5
     # node 2 -> node 1 = 0.5
     # node 2 -> node 2 = 0.5
-    # node 3 -> node 2 = 0.5
+    # node 3 -> not valid
     # --------
     source, target, weights = grid_b_1d.linear_weights(grid_a_1d)
     sorter = np.argsort(target)
-    assert np.array_equal(source[sorter], np.array([0,0,1,1,2,2]))
-    assert np.array_equal(target[sorter], np.array([0,1,1,2,2,3]))
-    assert np.allclose(weights[sorter], np.array([0.5,0.5,0.5,0.5,0.5,0.5]))
-
-
-# def test_grid_properties(circle):
-#     assert circle.dims == ("mesh2d_nFaces",)
-#     assert circle.shape == (384,)
-#     assert circle.size == 384
-#     assert isinstance(circle.area, np.ndarray)
-#     assert circle.area.size == 384
-#
-#
-# @pytest.mark.parametrize("relative", [True, False])
-# def test_overlap(circle, relative):
-#     source, target, weights = circle.overlap(other=circle, relative=relative)
-#     valid = weights > 1.0e-5
-#     source = source[valid]
-#     target = target[valid]
-#     weights = weights[valid]
-#     sorter = np.argsort(source)
-#     assert np.array_equal(source[sorter], np.arange(circle.size))
-#     assert np.array_equal(target[sorter], np.arange(circle.size))
-#     if relative:
-#         assert np.allclose(weights[sorter], np.ones(circle.size))
-#     else:
-#         assert np.allclose(weights[sorter], circle.area)
-#
+    assert np.array_equal(source[sorter], np.array([1,1,2,2]))
+    assert np.array_equal(target[sorter], np.array([0,1,1,2]))
+    assert np.allclose(weights[sorter], np.array([0.5,0.5,0.5,0.5]))
