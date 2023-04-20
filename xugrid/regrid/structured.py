@@ -29,7 +29,7 @@ class StructuredGrid1d:
         size_name = f"d{name}"  # e.g. dx
 
         index = obj.indexes[name]
-        if not index.is_monotonic:
+        if not index.is_monotonic_increasing:
             raise ValueError(f"{name} is not monotonic")
         # take care of potentially decreasing coordinate values
         if index.is_monotonic_decreasing:
@@ -65,6 +65,7 @@ class StructuredGrid1d:
         self.midpoints = midpoints
         self.bounds = bounds
         self.flipped = flipped
+        self.grid = obj
 
     @property
     def size(self):
@@ -80,6 +81,18 @@ class StructuredGrid1d:
         else:
             return index
 
+    def valid_nodes_index(self, other):
+        start = np.searchsorted(other.bounds[:, 0], self.midpoints, side="left")
+        end = np.searchsorted(other.bounds[:, 1], self.midpoints, side="left")
+        valid = (
+            (start == (end + 1))
+            & (self.midpoints > other.bounds[0, 0])
+            & (self.midpoints <= other.bounds[-1, 1])
+        )
+        valid_other_index = end[valid]
+        valid_self_index = np.arange(self.size)[valid]
+        return valid_self_index, valid_other_index
+    
     def overlap(self, other: "StructuredGrid1d", relative: bool):
         source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
         source_index = self.flip_if_needed(source_index)
@@ -89,25 +102,33 @@ class StructuredGrid1d:
         return source_index, target_index, weights
 
     def locate_centroids(self, other: "StructuredGrid1d"):
-        start = np.searchsorted(self.bounds[:, 0], other.midpoints, side="left")
-        end = np.searchsorted(self.bounds[:, 1], other.midpoints, side="left")
-        valid = (
-            (start == (end + 1))
-            & (self.midpoints >= self.bounds[0, 0])
-            & (self.midpoints < self.bounds[-1, 1])
-        )
-        source_index = end[valid]
-        target_index = np.arange(other.size)[valid]
+        source_index, target_index = self.valid_nodes_index(other)
         source_index = self.flip_if_needed(source_index)
         target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
         return source_index, target_index, weights
 
-    def barycentric(self, other):
-        # TODO: multi-linear interpolation
-        # Rename to linear_interp? (lerp)
-        # See: https://gitlab.com/deltares/imod/imod-python/-/blob/master/imod/prepare/interpolate.py
-        pass
+    def linear_weights(self, other: "StructuredGrid1d"):
+        source_index_midpoints = self.midpoints
+        target_index_midpoints = other.midpoints
+        if not source_index_midpoints.size > 2:
+            raise ValueError(
+                "source index must larger than 2. Cannot interpolate with one point"
+            )
+        source_index, target_index = self.valid_nodes_index(other)
+        source_index = source_index - 1
+        weights = (
+            target_index_midpoints[target_index] - source_index_midpoints[source_index]
+        ) / (
+            source_index_midpoints[source_index + 1]
+            - source_index_midpoints[source_index]
+        )
+        weights[weights < 0.0] = 0.0
+        weights[weights > 1.0] = 1.0
+        source_index = np.repeat(source_index,2)
+        target_index = np.column_stack((target_index,target_index+1)).ravel()
+        weights = np.column_stack((weights,1.0 - weights)).ravel()
+        return source_index, target_index, weights
 
 
 class StructuredGrid2d:
