@@ -286,7 +286,7 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
@@ -312,12 +312,14 @@
         <span class="n">JoinOptions</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">T_DataVars</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConcatOptions</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span>
+
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;different&quot;</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -332,7 +334,7 @@
 <span class="k">def</span> <span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_DataArray</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;different&quot;</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -346,7 +348,7 @@
 <div class="viewcode-block" id="concat"><a class="viewcode-back" href="../../../api/xugrid.concat.html#xugrid.concat">[docs]</a><span class="k">def</span> <span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">,</span>
     <span class="n">dim</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
     <span class="n">coords</span><span class="o">=</span><span class="s2">&quot;different&quot;</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
     <span class="n">positions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -576,7 +578,7 @@
     <span class="k">return</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span>
 
 
-<span class="k">def</span> <span class="nf">_calc_concat_over</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_calc_concat_over</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine which dataset variables need to be concatenated in the result,</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -730,7 +732,7 @@
 <span class="k">def</span> <span class="nf">_dataset_concat</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -950,7 +952,7 @@
 <span class="k">def</span> <span class="nf">_dataarray_concat</span><span class="p">(</span>
     <span class="n">arrays</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_DataArray</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>

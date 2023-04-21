@@ -1178,7 +1178,7 @@ or an OpenDAP URL and opened with python-netCDF4, unless the filename
 ends with .gz, in which case the file is gunzipped and opened with
 scipy.io.netcdf (only netCDF3 supported). Byte-strings or file-like
 objects are opened by scipy.io.netcdf (netCDF3) or h5py (netCDF4/HDF).</p></li>
-<li><p><strong>engine</strong> (<em>{&quot;netcdf4&quot;</em><em>, </em><em>&quot;scipy&quot;</em><em>, </em><em>&quot;pydap&quot;</em><em>, </em><em>&quot;h5netcdf&quot;</em><em>, </em><em>&quot;pynio&quot;</em><em>, </em><em>&quot;cfgrib&quot;</em><em>,         </em><em>&quot;pseudonetcdf&quot;</em><em>, </em><em>&quot;zarr&quot;</em><em>, </em><em>None}</em><em>, </em><em>installed backend</em><em>         or </em><em>subclass</em><em> of </em><em>xarray.backends.BackendEntrypoint</em><em>, </em><em>optional</em>) – Engine to use when reading files. If not provided, the default engine
+<li><p><strong>engine</strong> (<em>{&quot;netcdf4&quot;</em><em>, </em><em>&quot;scipy&quot;</em><em>, </em><em>&quot;pydap&quot;</em><em>, </em><em>&quot;h5netcdf&quot;</em><em>, </em><em>&quot;pynio&quot;</em><em>,         </em><em>&quot;pseudonetcdf&quot;</em><em>, </em><em>&quot;zarr&quot;</em><em>, </em><em>None}</em><em>, </em><em>installed backend</em><em>         or </em><em>subclass</em><em> of </em><em>xarray.backends.BackendEntrypoint</em><em>, </em><em>optional</em>) – Engine to use when reading files. If not provided, the default engine
 is chosen based on available dependencies, with a preference for
 “netcdf4”. A custom backend class (a subclass of <code class="docutils literal notranslate"><span class="pre">BackendEntrypoint</span></code>)
 can also be used.</p></li>
@@ -1256,7 +1256,7 @@ a str,supported by “netcdf4”, “h5netcdf”, “zarr”.</p></li>
 relevant when using dask or another form of parallelism. By default,
 appropriate locks are chosen to safely read and write files with the
 currently active dask scheduler. Supported by “netcdf4”, “h5netcdf”,
-“scipy”, “pynio”, “pseudonetcdf”, “cfgrib”.</p></li>
+“scipy”, “pynio”, “pseudonetcdf”.</p></li>
 </ul>
 <p>See engine open function for kwargs accepted by each specific engine.</p>
 </p></li>
