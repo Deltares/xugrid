@@ -24,20 +24,20 @@ class StructuredGrid1d:
     bounds: (n, 2)
     """
 
-    def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name: str):
-        bounds_name = f"{name}bounds"  # e.g. xbounds
-        size_name = f"d{name}"  # e.g. dx
+    def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name_x: str):
+        bounds_name = f"{name_x}bounds"  # e.g. xbounds
+        size_name = f"d{name_x}"  # e.g. dx
 
-        index = obj.indexes[name]
-        if not index.is_monotonic_increasing:
-            raise ValueError(f"{name} is not monotonic")
+        index = obj.indexes[name_x]
         # take care of potentially decreasing coordinate values
         if index.is_monotonic_decreasing:
             midpoints = index.values[::-1]
             flipped = True
-        else:
+        elif index.is_monotonic_increasing:
             midpoints = index.values
             flipped = False
+        else:
+            raise ValueError(f"{name_x} is not monotonic for array {obj.name}")
 
         if bounds_name in obj.coords:
             bounds = obj[bounds_name].values
@@ -53,9 +53,9 @@ class StructuredGrid1d:
                 atolx = 1.0e-4 * size[0]
                 if not np.allclose(size, size[0], atolx):
                     raise ValueError(
-                        f"DataArray has to be equidistant along {name}, or "
-                        f'explicit bounds must be given as "{name}bounds", or '
-                        f'cellsizes must be as "d{name}"'
+                        f"DataArray has to be equidistant along {name_x}, or "
+                        f'explicit bounds must be given as "{name_x}bounds", or '
+                        f'cellsizes must be as "d{name_x}"'
                     )
 
             start = midpoints - 0.5 * size
@@ -103,8 +103,8 @@ class StructuredGrid1d:
 
     def locate_centroids(self, other: "StructuredGrid1d"):
         source_index, target_index = self.valid_nodes_index(other)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
+        # source_index = self.flip_if_needed(source_index)
+        # target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
         return source_index, target_index, weights
 
@@ -116,8 +116,8 @@ class StructuredGrid1d:
                 "source index must larger than 2. Cannot interpolate with one point"
             )
         source_index, target_index = self.valid_nodes_index(other)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
+        # source_index = self.flip_if_needed(source_index)
+        # target_index = other.flip_if_needed(target_index)
         source_index = source_index - 1
         weights = (
             target_index_midpoints[target_index] - source_index_midpoints[source_index]
@@ -207,7 +207,7 @@ class StructuredGrid2d:
             (weights_y, weights_x),
         )
         
-class StructuredGrid3d(StructuredGrid2d):
+class StructuredGrid3d:
     """
     e.g. (x,y,z) -> (x,y,z)
 
@@ -295,7 +295,7 @@ class StructuredGrid3d(StructuredGrid2d):
         )
 
 
-class ExplicitStructuredGrid3d(StructuredGrid2d):
+class ExplicitStructuredGrid3d:
     """
     e.g. (x,y,z) -> (x,y,z)
 
