@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-
 import xarray as xr
+
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 
 # Testgrids
