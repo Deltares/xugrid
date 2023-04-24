@@ -252,7 +252,7 @@ def test_linear_weights_2d(grid_a_2d, grid_b_2d):
     # --------
     # node 0-4    ->  not valid
     # node 5      ->  nodes 0, 1, 3, 4
-    # node 6      ->  nodes 1, 2, 4, 5 
+    # node 6      ->  nodes 1, 2, 4, 5
     # node 9      ->  nodes 3, 4, 6, 7
     # node 10     ->  nodes 4, 5, 7, 8
     # node 11-15  ->  not valid
