@@ -171,9 +171,12 @@ class BaseRegridder(abc.ABC):
         -------
         regridded: UgridDataArray
         """
-        source_dims = (object.ugrid.grid.face_dimension,)
         # TODO: if structured: source_dims = ("y", "x")
         # TODO: stack y, x instead to simplify
+        if type(object) is UgridDataArray:
+            source_dims = (object.ugrid.grid.face_dimension,)
+        else:
+            source_dims = ("y", "x")
         regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
         return UgridDataArray(
             regridded,

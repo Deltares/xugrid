@@ -82,8 +82,20 @@ class StructuredGrid1d:
             return index
 
     def valid_nodes_index(self, other):
-        start = np.searchsorted(other.bounds[:, 0], self.midpoints, side="left")
-        end = np.searchsorted(other.bounds[:, 1], self.midpoints, side="left")
+        """retruns all nodes that are within the bounding box of overlaying grid
+        Args:
+            other (StructuredGrid1d): overlaying grid from wich bounding boxes are checked
+
+        Returns:
+            valid_self_index (np.array): valid self indexes
+            valid_other_index (np.array): corresponding other indexes
+        """
+        # left aligned to nodes, not to coordinates
+        side = "left"
+        if self.flipped:
+            side = "right"
+        start = np.searchsorted(other.bounds[:, 0], self.midpoints, side=side)
+        end = np.searchsorted(other.bounds[:, 1], self.midpoints, side=side)
         valid = (
             (start == (end + 1))
             & (self.midpoints > other.bounds[0, 0])
@@ -94,6 +106,17 @@ class StructuredGrid1d:
         return valid_self_index, valid_other_index
 
     def overlap(self, other: "StructuredGrid1d", relative: bool):
+        """returns nodes and length of overlaying other grid
+        This function has no checks for validity of nodes by bounding boxes at this point
+        Args:
+            other (StructuredGrid1d): overlaying grid
+            relative (bool): True: lenght of overlap, False: lenght of overlap as fraction
+
+        Returns:
+            source_index (np.array): overlaying self indexes
+            target_index (np.array): overlaying other indexes
+            weights (np.array): lenght or fraction of overlap
+        """
         source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
         source_index = self.flip_if_needed(source_index)
         target_index = other.flip_if_needed(target_index)
@@ -102,13 +125,36 @@ class StructuredGrid1d:
         return source_index, target_index, weights
 
     def locate_centroids(self, other: "StructuredGrid1d"):
+        """returns valid nodes and there overlapping other grid id's
+
+        Args:
+            other (StructuredGrid1d): overlaying grid
+
+        Returns:
+            source_index (np.array): overlaying self indexes
+            target_index (np.array): overlaying other indexes
+            weights (np.array): array of ones
+        """
         source_index, target_index = self.valid_nodes_index(other)
-        # source_index = self.flip_if_needed(source_index)
-        # target_index = other.flip_if_needed(target_index)
+        source_index = self.flip_if_needed(source_index)
+        target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
         return source_index, target_index, weights
 
     def linear_weights(self, other: "StructuredGrid1d"):
+        """returns valid nodes and there linear weights
+
+        Args:
+            other (StructuredGrid1d): overlaying grid
+
+        Raises:
+            ValueError: when number of nodes is to small to compute linear weights
+
+        Returns:
+            source_index (np.array): overlaying self indexes
+            target_index (np.array): overlaying other indexes
+            weights (np.array): array linear weights
+        """
         source_index_midpoints = self.midpoints
         target_index_midpoints = other.midpoints
         if not source_index_midpoints.size > 2:
@@ -116,24 +162,21 @@ class StructuredGrid1d:
                 "source index must larger than 2. Cannot interpolate with one point"
             )
         source_index, target_index = self.valid_nodes_index(other)
-        # source_index = self.flip_if_needed(source_index)
-        # target_index = other.flip_if_needed(target_index)
-        source_index = source_index - 1
+        source_index = self.flip_if_needed(source_index)
+        target_index = other.flip_if_needed(target_index)
+        isource = source_index - 1
         weights = (
-            target_index_midpoints[target_index] - source_index_midpoints[source_index]
-        ) / (
-            source_index_midpoints[source_index + 1]
-            - source_index_midpoints[source_index]
-        )
+            target_index_midpoints[target_index] - source_index_midpoints[isource]
+        ) / (source_index_midpoints[isource + 1] - source_index_midpoints[isource])
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
-        source_index = np.repeat(source_index + 1, 2)
+        source_index = np.repeat(source_index, 2)
         target_index = np.column_stack((target_index, target_index + 1)).ravel()
         weights = np.column_stack((weights, 1.0 - weights)).ravel()
         return source_index, target_index, weights
 
 
-class StructuredGrid2d:
+class StructuredGrid2d(StructuredGrid1d):
     """
     e.g. (x,y) -> (x,y)
     """
@@ -191,7 +234,7 @@ class StructuredGrid2d:
             (target_index_y, target_index_x),
             (weights_y, weights_x),
         )
-        
+
     def linear_weights(self, other):
         source_index_x, target_index_x, weights_x = self.xbounds.linear_weights(
             other.xbounds
@@ -206,7 +249,8 @@ class StructuredGrid2d:
             (target_index_y, target_index_x),
             (weights_y, weights_x),
         )
-        
+
+
 class StructuredGrid3d:
     """
     e.g. (x,y,z) -> (x,y,z)
@@ -257,7 +301,7 @@ class StructuredGrid3d:
             (target_index_z, target_index_y, target_index_x),
             (weights_z, weights_y, weights_x),
         )
-        
+
     def locate_centroids(self, other):
         source_index_x, target_index_x, weights_x = self.xbounds.locate_centroids(
             other.xbounds
@@ -275,7 +319,7 @@ class StructuredGrid3d:
             (target_index_z, target_index_y, target_index_x),
             (weights_z, weights_y, weights_x),
         )
-  
+
     def linear_weights(self, other):
         source_index_x, target_index_x, weights_x = self.xbounds.linear_weights(
             other.xbounds
