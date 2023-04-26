@@ -64,11 +64,13 @@ class BaseRegridder(abc.ABC):
     ):
         if isinstance(target, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
             self._target = UnstructuredGrid2d(target)
+            self._source = UnstructuredGrid2d(source)
         elif isinstance(target, (xr.DataArray, xr.Dataset)):
             self._target = StructuredGrid2d(target)
+            self._source = StructuredGrid2d(source)
         else:
             raise TypeError()
-        self._compute_weights(UnstructuredGrid2d(source), self._target)
+        self._compute_weights(self._source, self._target)
         return
 
     @abc.abstractproperty
@@ -153,6 +155,13 @@ class BaseRegridder(abc.ABC):
             output_dtypes=[source.dtype],
         )
         return out
+    
+    def stack_xy(self,object, name : str):
+        nrow = object.y.size
+        ncol = object.x.size
+        x = np.tile(object.x.values,nrow)
+        y = np.repeat(object.y.values,ncol)
+        return object.grid.assign_coords({ name: np.column_stack((x,y))})
 
     def regrid(self, object) -> UgridDataArray:
         """
@@ -174,7 +183,8 @@ class BaseRegridder(abc.ABC):
 
         # TODO: stack y, x instead to simplify
         if type(self._target) is StructuredGrid2d:
-            source_dims = ("y", "x")
+            source_dims = ("yx")
+            self.stack_xy(object,source_dims)
         else:
             source_dims = (object.ugrid.grid.face_dimension,)
         regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
