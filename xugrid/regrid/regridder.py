@@ -66,8 +66,8 @@ class BaseRegridder(abc.ABC):
             self._target = UnstructuredGrid2d(target)
             self._source = UnstructuredGrid2d(source)
         elif isinstance(target, (xr.DataArray, xr.Dataset)):
-            self._target = StructuredGrid2d(target)
-            self._source = StructuredGrid2d(source)
+            self._target = StructuredGrid2d(target,name_y = "y",name_x="x")
+            self._source = StructuredGrid2d(source,name_y = "y",name_x="x")
         else:
             raise TypeError()
         self._compute_weights(self._source, self._target)
@@ -183,11 +183,12 @@ class BaseRegridder(abc.ABC):
 
         # TODO: stack y, x instead to simplify
         if type(self._target) is StructuredGrid2d:
-            source_dims = ("yx")
-            self.stack_xy(object,source_dims)
+            source_dims = ("y","x")
+            regridded = self.regrid_dataarray(object, source_dims)
         else:
             source_dims = (object.ugrid.grid.face_dimension,)
-        regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
+            regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
+        
         return UgridDataArray(
             regridded,
             self._target.ugrid_topology,

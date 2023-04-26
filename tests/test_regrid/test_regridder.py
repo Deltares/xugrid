@@ -32,6 +32,33 @@ def quads(dx):
     return xu.UgridDataArray.from_structured(da)
 
 
+@pytest.fixture
+def grid_a():
+    return xr.DataArray(
+        data=np.arange(9).reshape((3, 3)),
+        dims=["y", "x"],
+        coords={
+            "y": np.array([150, 100, 50]),
+            "x": np.array([50, 100, 150]),
+            "dx": 50.0,
+            "dy": -50.0,
+        },
+    )
+
+@pytest.fixture
+def grid_b():
+    return xr.DataArray(
+        data=np.arange(16).reshape((4, 4)),
+        dims=["y", "x"],
+        coords={
+            "y": np.array([175, 125, 75, 25]),
+            "x": np.array([25, 75, 125, 175]),
+            "dx": 50.0,
+            "dy": -50.0,
+        },
+    )
+
+
 @pytest.mark.parametrize(
     "cls",
     [
@@ -47,6 +74,11 @@ def test_check_source_target_types(disk, cls):
     with pytest.raises(TypeError):
         cls(source=1.0, target=disk)
 
+
+def test_centroid_locator_regridder_structured(grid_a,grid_b):
+    # structured
+    regridder = CentroidLocatorRegridder(source=grid_a, target=grid_b)
+    result = regridder.regrid(grid_a)
 
 def test_centroid_locator_regridder(disk):
     square = quads(1.0)
