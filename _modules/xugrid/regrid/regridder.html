@@ -349,11 +349,13 @@
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">StructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">StructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
@@ -438,6 +440,13 @@
             <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
+    
+    <span class="k">def</span> <span class="nf">stack_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">object</span><span class="p">,</span> <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">nrow</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">ncol</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">nrow</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">ncol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span> <span class="n">name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))})</span>
 
     <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -459,7 +468,8 @@
 
         <span class="c1"># TODO: stack y, x instead to simplify</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">)</span> <span class="ow">is</span> <span class="n">StructuredGrid2d</span><span class="p">:</span>
-            <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;yx&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack_xy</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span><span class="n">source_dims</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
         <span class="n">regridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">)</span>
@@ -821,7 +831,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.2.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.2.1.<br>
 </p>
 
   </div>
