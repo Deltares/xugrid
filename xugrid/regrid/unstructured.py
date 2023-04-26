@@ -29,6 +29,10 @@ class UnstructuredGrid2d:
             )
 
     @property
+    def ndim(self):
+        return 1
+
+    @property
     def dims(self):
         return (self.ugrid_topology.face_dimension,)
 
@@ -43,6 +47,12 @@ class UnstructuredGrid2d:
     @property
     def area(self):
         return self.ugrid_topology.area
+
+    def convert_to(self, matched_type):
+        if type(self) == matched_type:
+            return self
+        else:
+            TypeError(f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}")
 
     def overlap(self, other, relative: bool):
         """

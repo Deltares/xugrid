@@ -24,11 +24,11 @@ class StructuredGrid1d:
     bounds: (n, 2)
     """
 
-    def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name_x: str):
-        bounds_name = f"{name_x}bounds"  # e.g. xbounds
-        size_name = f"d{name_x}"  # e.g. dx
+    def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name: str):
+        bounds_name = f"{name}bounds"  # e.g. xbounds
+        size_name = f"d{name}"  # e.g. dx
 
-        index = obj.indexes[name_x]
+        index = obj.indexes[name]
         # take care of potentially decreasing coordinate values
         if index.is_monotonic_decreasing:
             midpoints = index.values[::-1]
@@ -37,7 +37,7 @@ class StructuredGrid1d:
             midpoints = index.values
             flipped = False
         else:
-            raise ValueError(f"{name_x} is not monotonic for array {obj.name}")
+            raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
         if bounds_name in obj.coords:
             bounds = obj[bounds_name].values
@@ -53,19 +53,28 @@ class StructuredGrid1d:
                 atolx = 1.0e-4 * size[0]
                 if not np.allclose(size, size[0], atolx):
                     raise ValueError(
-                        f"DataArray has to be equidistant along {name_x}, or "
-                        f'explicit bounds must be given as "{name_x}bounds", or '
-                        f'cellsizes must be as "d{name_x}"'
+                        f"DataArray has to be equidistant along {name}, or "
+                        f'explicit bounds must be given as "{name}bounds", or '
+                        f'cellsizes must be as "d{name}"'
                     )
 
             start = midpoints - 0.5 * size
             end = midpoints + 0.5 * size
             bounds = np.column_stack((start, end))
 
+        self.name = name
         self.midpoints = midpoints
         self.bounds = bounds
         self.flipped = flipped
         self.grid = obj
+
+    @property
+    def ndim(self):
+        return 1
+
+    @property
+    def dims(self):
+        return (self.name,)
 
     @property
     def size(self):
@@ -191,12 +200,32 @@ class StructuredGrid2d(StructuredGrid1d):
         self.ybounds = StructuredGrid1d(obj, name_y)
 
     @property
+    def ndim(self):
+        return 2
+
+    @property
+    def dims(self):
+        return self.ybounds.dims + self.xbounds.dims  # ("y", "x")
+
+    @property
+    def size(self):
+        return self.ybounds.size * self.xbounds.size
+
+    @property
     def shape(self):
         return (self.ybounds.size, self.xbounds.size)
 
     @property
     def area(self):
         return np.multiply.outer(self.ybounds.length, self.xbounds.length)
+    
+    def convert_to(self, matched_type):
+        if isinstance(self, matched_type):
+            return self
+        elif isinstance(UnstructuredGrid2d):
+            return Ugrid2d.from_structured(self.xbounds, self.ybounds)
+        else:
+            raise TypeError(f"Cannot convert StructuredGrid2d to {matched_type.__name__}")
 
     def overlap(self, other, relative: bool):
         """

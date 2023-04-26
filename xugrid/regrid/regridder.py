@@ -54,6 +54,30 @@ def make_regrid(func):
     return numba.njit(_regrid, parallel=True, cache=True)
 
 
+def setup_grid(obj):
+    if isinstance(target, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+        return UnstructuredGrid2d(obj)
+    elif isinstance(target, (xr.DataArray, xr.Dataset)):
+        return StructuredGrid2d(target, name_y = "y", name_x="x")
+    else:
+        raise TypeError()
+
+
+def match(source, target):
+    PROMOTIONS = {
+        {StructuredGrid2d}: StructuredGrid2d,
+        {StructuredGrid2d, UnstructuredGrid2d}: UnstructuredGrid2d,
+    #    {StructuredGrid3d, ExplicitStructuredGrid3d}: ExplicitStructuredGrid3d,
+    #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
+    #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
+    #    {StructuredGrid3d, StructuredGrid2d}: StructuredGrid2d,
+    #    # etc.
+    }
+    matched_type = set(type(grid), type(other))
+    matched_type = PROMOTIONS[types]
+    return source.convert_to(matched_type), target.convert_to(matched_type)
+
+
 class BaseRegridder(abc.ABC):
     _JIT_FUNCTIONS = {}
 
@@ -62,14 +86,8 @@ class BaseRegridder(abc.ABC):
         source: "xugrid.Ugrid2d",
         target: "xugrid.Ugrid2d",
     ):
-        if isinstance(target, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
-            self._target = UnstructuredGrid2d(target)
-            self._source = UnstructuredGrid2d(source)
-        elif isinstance(target, (xr.DataArray, xr.Dataset)):
-            self._target = StructuredGrid2d(target,name_y = "y",name_x="x")
-            self._source = StructuredGrid2d(source,name_y = "y",name_x="x")
-        else:
-            raise TypeError()
+        self._source = setup_grid(source)
+        self._target = setup_grid(target)
         self._compute_weights(self._source, self._target)
         return
 
@@ -101,27 +119,29 @@ class BaseRegridder(abc.ABC):
         return
 
     def regrid_array(self, source):
-        first_dims = source.shape[:-1]
-        last_dims = source.shape[-1:]
+        source_grid = self._source
+        first_dims_shape = source.shape[:-source_grid.ndim]
 
-        # TODO: store source and do some checking.
-        # Alternatively, check by weights.
-        # if last_dims != self._source.shape:
-        #    raise ValueError(
-        #        "Shape of last source dimensions does not match regridder "
-        #        f"shape: {last_dims} versus {self._source.shape}"
-        #    )
-
-        if source.ndim == 1:
+        # The regridding can be mapped over additional dimensions (e.g. for every time slice).
+        # This is the `extra_index` iteration in _regrid().
+        # But it should work consistently even if no additional present: in that case we create
+        # a 1-sized additional dimension in front, so the `extra_index` iteration always applies.
+        if source.ndim == source_grid.ndim:
             source = source[np.newaxis]
-        elif source.ndim > 2:
-            source = source.reshape((-1,) + last_dims)
+
+        # All additional dimension are flattened into one, in front.
+        # E.g.:
+        #
+        #   * ("dummy", "face") -> ("dummy", "face")
+        #   * ("time", "layer", "y", "x") -> ("stacked_time_layer", "stacked_y_x")
+        #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
+        #
+        # Source is always 2D after this step, sized: (n_extra, size).
+        source = source.reshape((-1,) + self._source.size)
 
         size = self._target.size
-        out_shape = first_dims + self._target.shape
-
         if isinstance(source, DaskArray):
-            chunks = source.chunks[:-1] + (self._target.shape,)
+            chunks = source.chunks[:-source_grid.ndim] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
@@ -139,6 +159,8 @@ class BaseRegridder(abc.ABC):
                 f"{type(source).__name__}"
             )
 
+        # E.g.: sizes of ("time", "layer") + ("y", "x")
+        out_shape = first_dims_shape + self._target.shape
         return out.reshape(out_shape)
 
     def regrid_dataarray(self, source: xr.DataArray, source_dims: Tuple[str]):
@@ -265,6 +287,7 @@ class CentroidLocatorRegridder(BaseRegridder):
     """
 
     def _compute_weights(self, source, target):
+        source, target = match(source, target)
         source_index, target_index, weight_values = source.locate_centroids(target)
         self._weights = weight_matrix_coo(source_index, target_index, weight_values)
         return
@@ -300,6 +323,7 @@ class CentroidLocatorRegridder(BaseRegridder):
 
 class BaseOverlapRegridder(BaseRegridder, abc.ABC):
     def _compute_weights(self, source, target, relative: bool) -> None:
+        source, target = match(source, target)
         source_index, target_index, weight_values = source.overlap(
             target, relative=relative
         )
@@ -461,6 +485,7 @@ class BarycentricInterpolator(BaseRegridder):
         self._setup_regrid("mean")
 
     def _compute_weights(self, source, target):
+        source, target = match(source, target)
         source_index, target_index, weights = source.barycentric(target)
         self._weights = weight_matrix_csr(source_index, target_index, weights)
         return
