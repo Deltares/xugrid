@@ -203,18 +203,16 @@ class BaseRegridder(abc.ABC):
         regridded: UgridDataArray
         """
 
-        # TODO: stack y, x instead to simplify
         if type(self._target) is StructuredGrid2d:
             source_dims = ("y","x")
-            regridded = self.regrid_dataarray(object, source_dims)
+            return self.regrid_dataarray(object, source_dims)
         else:
             source_dims = (object.ugrid.grid.face_dimension,)
             regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
-        
-        return UgridDataArray(
-            regridded,
-            self._target.ugrid_topology,
-        )
+            return UgridDataArray(
+                regridded,
+                self._target.ugrid_topology,
+            )
 
     def to_dataset(self) -> xr.Dataset:
         """
