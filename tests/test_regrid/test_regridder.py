@@ -1,3 +1,4 @@
+import imod
 import numpy as np
 import pytest
 import xarray as xr
@@ -45,10 +46,59 @@ def grid_a():
         },
     )
 
+
 @pytest.fixture
 def grid_b():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
+        dims=["y", "x"],
+        coords={
+            "y": np.array([175, 125, 75, 25]),
+            "x": np.array([25, 75, 125, 175]),
+            "dx": 50.0,
+            "dy": -50.0,
+        },
+    )
+
+
+@pytest.fixture
+def grid_c():
+    return xr.DataArray(
+        data=np.arange(18).reshape((2, 3, 3)),
+        dims=["layer", "y", "x"],
+        coords={
+            "layer": np.arange(2) + 1,
+            "y": np.array([150, 100, 50]),
+            "x": np.array([50, 100, 150]),
+            "dx": 50.0,
+            "dy": -50.0,
+        },
+    )
+
+
+@pytest.fixture
+def expected_results_centroid():
+    return xr.DataArray(
+        data=np.array(
+            [
+                0,
+                1,
+                2,
+                np.nan,
+                3,
+                4,
+                5,
+                np.nan,
+                6,
+                7,
+                8,
+                np.nan,
+                np.nan,
+                np.nan,
+                np.nan,
+                np.nan,
+            ]
+        ).reshape((4, 4)),
         dims=["y", "x"],
         coords={
             "y": np.array([175, 125, 75, 25]),
@@ -75,10 +125,18 @@ def test_check_source_target_types(disk, cls):
         cls(source=1.0, target=disk)
 
 
-def test_centroid_locator_regridder_structured(grid_a,grid_b):
-    # structured
+def test_centroid_locator_regridder_structured(
+    grid_a, grid_b, grid_c, expected_results_centroid
+):
     regridder = CentroidLocatorRegridder(source=grid_a, target=grid_b)
     result = regridder.regrid(grid_a)
+    assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
+
+    # With broadcasting
+    regridder = CentroidLocatorRegridder(source=grid_c, target=grid_b)
+    broadcasted = regridder.regrid(grid_c)
+    assert broadcasted.dims == ("layer", "y", "x")
+
 
 def test_centroid_locator_regridder(disk):
     square = quads(1.0)
@@ -108,6 +166,13 @@ def test_centroid_locator_regridder(disk):
     assert broadcasted.dims == ("layer", disk.grid.face_dimension)
 
 
+def test_overlap_regridder_structured(grid_a, grid_b):
+    regridder = OverlapRegridder(source=grid_a, target=grid_b)
+    result = regridder.regrid(grid_a)
+    imod.idf.save("overlap_result.idf", result)
+    # assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
+
+
 def test_overlap_regridder(disk):
     square = quads(1.0)
     regridder = OverlapRegridder(disk, square, method="mean")
@@ -124,6 +189,12 @@ def test_overlap_regridder(disk):
     broadcasted = regridder.regrid(obj)
     assert broadcasted.dims == ("layer", square.grid.face_dimension)
     assert broadcasted.shape == (5, 100)
+
+
+def test_lineair_interpolator_structured(grid_a, grid_b):
+    regridder = BarycentricInterpolator(source=grid_a, target=grid_b)
+    result = regridder.regrid(grid_a)
+    imod.idf.save("linear_result.idf", result)
 
 
 def test_barycentric_interpolator(disk):

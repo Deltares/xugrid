@@ -55,26 +55,27 @@ def make_regrid(func):
 
 
 def setup_grid(obj):
-    if isinstance(target, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+    if isinstance(obj, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
         return UnstructuredGrid2d(obj)
-    elif isinstance(target, (xr.DataArray, xr.Dataset)):
-        return StructuredGrid2d(target, name_y = "y", name_x="x")
+    elif isinstance(obj, (xr.DataArray, xr.Dataset)):
+        return StructuredGrid2d(obj, name_y="y", name_x="x")
     else:
         raise TypeError()
 
 
 def match(source, target):
     PROMOTIONS = {
-        {StructuredGrid2d}: StructuredGrid2d,
-        {StructuredGrid2d, UnstructuredGrid2d}: UnstructuredGrid2d,
-    #    {StructuredGrid3d, ExplicitStructuredGrid3d}: ExplicitStructuredGrid3d,
-    #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
-    #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
-    #    {StructuredGrid3d, StructuredGrid2d}: StructuredGrid2d,
-    #    # etc.
+        frozenset({StructuredGrid2d}): StructuredGrid2d,
+        frozenset({StructuredGrid2d, UnstructuredGrid2d}): UnstructuredGrid2d,
+        frozenset({UnstructuredGrid2d, UnstructuredGrid2d}): UnstructuredGrid2d,
+        #    {StructuredGrid3d, ExplicitStructuredGrid3d}: ExplicitStructuredGrid3d,
+        #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
+        #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
+        #    {StructuredGrid3d, StructuredGrid2d}: StructuredGrid2d,
+        #    # etc.
     }
-    matched_type = set(type(grid), type(other))
-    matched_type = PROMOTIONS[types]
+    types = set({type(source), type(target)})
+    matched_type = PROMOTIONS[frozenset(types)]
     return source.convert_to(matched_type), target.convert_to(matched_type)
 
 
@@ -120,7 +121,7 @@ class BaseRegridder(abc.ABC):
 
     def regrid_array(self, source):
         source_grid = self._source
-        first_dims_shape = source.shape[:-source_grid.ndim]
+        first_dims_shape = source.shape[: -source_grid.ndim]
 
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
         # This is the `extra_index` iteration in _regrid().
@@ -137,11 +138,11 @@ class BaseRegridder(abc.ABC):
         #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
         #
         # Source is always 2D after this step, sized: (n_extra, size).
-        source = source.reshape((-1,) + self._source.size)
+        source = source.reshape((-1, self._source.size))
 
         size = self._target.size
         if isinstance(source, DaskArray):
-            chunks = source.chunks[:-source_grid.ndim] + (self._target.shape,)
+            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
@@ -177,13 +178,6 @@ class BaseRegridder(abc.ABC):
             output_dtypes=[source.dtype],
         )
         return out
-    
-    def stack_xy(self,object, name : str):
-        nrow = object.y.size
-        ncol = object.x.size
-        x = np.tile(object.x.values,nrow)
-        y = np.repeat(object.y.values,ncol)
-        return object.grid.assign_coords({ name: np.column_stack((x,y))})
 
     def regrid(self, object) -> UgridDataArray:
         """
@@ -196,16 +190,23 @@ class BaseRegridder(abc.ABC):
 
         Parameters
         ----------
-        object: UgridDataArray
+        object: UgridDataArray or xarray.DataArray
 
         Returns
         -------
-        regridded: UgridDataArray
+        regridded: UgridDataArray or xarray.DataArray
         """
 
         if type(self._target) is StructuredGrid2d:
-            source_dims = ("y","x")
-            return self.regrid_dataarray(object, source_dims)
+            source_dims = ("y", "x")
+            regridded = self.regrid_dataarray(object, source_dims)
+            regridded = regridded.assign_coords(
+                coords={
+                    "y": np.flip(self._target.ybounds.midpoints),
+                    "x": self._target.xbounds.midpoints,
+                }
+            )
+            return regridded
         else:
             source_dims = (object.ugrid.grid.face_dimension,)
             regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
@@ -484,7 +485,10 @@ class BarycentricInterpolator(BaseRegridder):
 
     def _compute_weights(self, source, target):
         source, target = match(source, target)
-        source_index, target_index, weights = source.barycentric(target)
+        if type(source) == StructuredGrid2d:
+            source_index, target_index, weights = source.linear_weights(target)
+        else:
+            source_index, target_index, weights = source.barycentric(target)
         self._weights = weight_matrix_csr(source_index, target_index, weights)
         return
 

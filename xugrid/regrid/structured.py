@@ -12,7 +12,10 @@ import numpy as np
 import xarray as xr
 
 from xugrid.regrid.overlap_1d import overlap_1d, overlap_1d_nd
+from xugrid.regrid.unstructured import UnstructuredGrid2d
 from xugrid.regrid.utils import broadcast
+
+# from xugrid import Ugrid2d
 
 
 class StructuredGrid1d:
@@ -103,15 +106,15 @@ class StructuredGrid1d:
         side = "left"
         if self.flipped:
             side = "right"
-        start = np.searchsorted(other.bounds[:, 0], self.midpoints, side=side)
-        end = np.searchsorted(other.bounds[:, 1], self.midpoints, side=side)
+        start = np.searchsorted(self.bounds[:, 0], other.midpoints, side=side)
+        end = np.searchsorted(self.bounds[:, 1], other.midpoints, side=side)
         valid = (
             (start == (end + 1))
-            & (self.midpoints > other.bounds[0, 0])
-            & (self.midpoints < other.bounds[-1, 1])
+            & (other.midpoints > self.bounds[0, 0])
+            & (other.midpoints < self.bounds[-1, 1])
         )
-        valid_other_index = end[valid]
-        valid_self_index = np.arange(self.size)[valid]
+        valid_other_index = np.arange(other.size)[valid]
+        valid_self_index = end[valid]
         return valid_self_index, valid_other_index
 
     def overlap(self, other: "StructuredGrid1d", relative: bool):
@@ -170,19 +173,60 @@ class StructuredGrid1d:
             raise ValueError(
                 "source index must larger than 2. Cannot interpolate with one point"
             )
+        # add boundary point for cases where source_index + 1 or -1 is out of bounds
         source_index, target_index = self.valid_nodes_index(other)
         source_index = self.flip_if_needed(source_index)
         target_index = other.flip_if_needed(target_index)
-        isource = source_index - 1
+        source_index_midpoints, boundary_point_in_front = self.append_boundary_points(
+            source_index_midpoints,
+            target_index_midpoints[target_index[0]],
+            target_index_midpoints[target_index[-1]],
+        )
         weights = (
-            target_index_midpoints[target_index] - source_index_midpoints[isource]
-        ) / (source_index_midpoints[isource + 1] - source_index_midpoints[isource])
+            target_index_midpoints[target_index] - source_index_midpoints[source_index]
+        ) / (
+            source_index_midpoints[source_index + 1]
+            - source_index_midpoints[source_index]
+        )
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
-        source_index = np.repeat(source_index, 2)
-        target_index = np.column_stack((target_index, target_index + 1)).ravel()
-        weights = np.column_stack((weights, 1.0 - weights)).ravel()
-        return source_index, target_index, weights
+
+        target_index = np.repeat(target_index, 2)
+        source_index = np.column_stack((source_index, source_index + 1)).ravel()
+        if boundary_point_in_front:
+            weights = np.column_stack((1.0 - weights, weights)).ravel()
+        else:
+            weights = np.column_stack((weights, 1.0 - weights)).ravel()
+        # correct for out of bound due to column-stack source_index + 1
+        valid = source_index <= self.size - 1
+        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
+        sorter = np.argsort(target_index)
+        return (
+            source_index[valid][sorter],
+            target_index[valid][sorter],
+            weights[valid][sorter],
+        )
+
+    def append_boundary_points(
+        self, source_index_midpoints, target_midpoint_min, target_midpoint_max
+    ):
+        boundary_point_in_front = False
+        if source_index_midpoints[0] > target_midpoint_min:
+            point_out_of_bounds = self.midpoints[0] - (
+                (self.midpoints[0] - self.bounds[0, 0]) * 2
+            )
+            source_index_midpoints = np.insert(
+                source_index_midpoints, obj=0, values=point_out_of_bounds, axis=None
+            )
+            boundary_point_in_front = True
+        if source_index_midpoints[-1] < target_midpoint_max:
+            point_out_of_bounds = self.midpoints[-1] + (
+                (self.bounds[-1, 1] - self.midpoints[-1]) * 2
+            )
+            source_index_midpoints = np.append(
+                source_index_midpoints, values=point_out_of_bounds, axis=None
+            )
+        return source_index_midpoints, boundary_point_in_front
 
 
 class StructuredGrid2d(StructuredGrid1d):
@@ -218,14 +262,16 @@ class StructuredGrid2d(StructuredGrid1d):
     @property
     def area(self):
         return np.multiply.outer(self.ybounds.length, self.xbounds.length)
-    
+
     def convert_to(self, matched_type):
         if isinstance(self, matched_type):
             return self
         elif isinstance(UnstructuredGrid2d):
             return Ugrid2d.from_structured(self.xbounds, self.ybounds)
         else:
-            raise TypeError(f"Cannot convert StructuredGrid2d to {matched_type.__name__}")
+            raise TypeError(
+                f"Cannot convert StructuredGrid2d to {matched_type.__name__}"
+            )
 
     def overlap(self, other, relative: bool):
         """
@@ -271,13 +317,16 @@ class StructuredGrid2d(StructuredGrid1d):
         source_index_y, target_index_y, weights_y = self.ybounds.linear_weights(
             other.ybounds
         )
-        return broadcast(
+        source_index, target_index, weights = broadcast(
             self.shape,
             other.shape,
             (source_index_y, source_index_x),
             (target_index_y, target_index_x),
             (weights_y, weights_x),
         )
+        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
+        sorter = np.argsort(target_index)
+        return source_index[sorter], target_index[sorter], weights[sorter]
 
 
 class StructuredGrid3d:
