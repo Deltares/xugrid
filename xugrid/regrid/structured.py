@@ -97,11 +97,11 @@ class StructuredGrid1d:
             return index
 
     def valid_nodes_index(self, other):
-        """ 
+        """
         Retruns all nodes that are within bounding box of overlaying grid.
-        In cases that midpoints (and bounding boxes) are flipped, computed indexes 
+        In cases that midpoints (and bounding boxes) are flipped, computed indexes
         are fliped as well.
-        
+
         Args:
             self (StructuredGrid1d): source grid
             other (StructuredGrid1d): target grid
@@ -125,9 +125,9 @@ class StructuredGrid1d:
 
     def valid_lineair_nodes_index(self, other):
         """
-        returns all valid nodes for linear interpolation. In addition to valid_nodes_index() 
-        is checked if target midpoints are not outside source boundary midpoints. In that case 
-        there is no interpolation possible. 
+        returns all valid nodes for linear interpolation. In addition to valid_nodes_index()
+        is checked if target midpoints are not outside source boundary midpoints. In that case
+        there is no interpolation possible.
 
         Args:
             self (StructuredGrid1d): source grid
@@ -145,8 +145,8 @@ class StructuredGrid1d:
 
     def overlap_1d_structured(self, other):
         """
-        Returns source and target nodes and overlapping length. It utilises overlap_1d() 
-        and does an aditional flip in cases of reversed midpoints 
+        Returns source and target nodes and overlapping length. It utilises overlap_1d()
+        and does an aditional flip in cases of reversed midpoints
 
         Args:
             self (StructuredGrid1d): source grid
@@ -166,8 +166,8 @@ class StructuredGrid1d:
         self, source_index: np.array, target_index: np.array, weights: np.array
     ):
         """
-        Returns for every target node an pair of connected source nodes based on 
-        centroids connection inputs   
+        Returns for every target node an pair of connected source nodes based on
+        centroids connection inputs
 
         Args:
             self (StructuredGrid1d): source grid
@@ -177,7 +177,7 @@ class StructuredGrid1d:
             weights (np.array): weights (centroids)
 
         Returns:biliniar
-        
+
             source_index (np.array): source index (linear)
             target_index (np.array): target index (linear)
             weights (np.array): weights (linear)
@@ -188,10 +188,10 @@ class StructuredGrid1d:
         # correct for possibility of out of bound due to column-stack source_index + 1
         valid = source_index <= self.size - 1
         return source_index[valid], target_index[valid], weights[valid]
-    
-    def compute_linear_weights(self,other, source_index, target_index):
+
+    def compute_linear_weights(self, other, source_index, target_index):
         """
-        computes linear weights bases on centroid indexes. 
+        computes linear weights bases on centroid indexes.
 
         Args:
             self (StructuredGrid1d): source grid
@@ -204,7 +204,7 @@ class StructuredGrid1d:
             ValueError: for not enought midpoints
 
         Returns:
-            weights (np.array): weights 
+            weights (np.array): weights
         """
         source_index_midpoints = self.midpoints
         target_index_midpoints = other.midpoints
@@ -224,20 +224,20 @@ class StructuredGrid1d:
 
     def sorted_output(
         self, source_index: np.array, target_index: np.array, weights: np.array
-    ):  
+    ):
         """
-        Returns sorted input based on target index. The regridder needs input sorted on 
+        Returns sorted input based on target index. The regridder needs input sorted on
         row index of WeightMatrixCOO (target index)
 
         Args:
             source_index (np.array): source index
             target_index (np.array): target index
-            weights (np.array): weights 
+            weights (np.array): weights
 
         Returns:
             source_index (np.array): source index
             target_index (np.array): target index
-            weights (np.array): weights 
+            weights (np.array): weights
         """
         sorter_target = np.argsort(target_index)
         return (
@@ -253,7 +253,7 @@ class StructuredGrid1d:
         Args:
             self (StructuredGrid1d): source grid
             other (StructuredGrid1d): target grid
-            relative (bool): overlapping length target relative to source length 
+            relative (bool): overlapping length target relative to source length
 
         Returns:
             source_index (np.array): source indexes
