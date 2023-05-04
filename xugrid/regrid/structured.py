@@ -138,8 +138,8 @@ class StructuredGrid1d:
             valid_other_index (np.array): valid target indexes
         """
         source_index, target_index = self.valid_nodes_index(other)
-        valid = (self.midpoints[source_index] > other.midpoints[0]) & (
-            self.midpoints[source_index] < other.midpoints[-1]
+        valid = (other.midpoints[target_index] > self.midpoints[0]) & (
+            (other.midpoints[target_index] < self.midpoints[-1])
         )
         return source_index[valid], target_index[valid]
 
