@@ -134,7 +134,9 @@ class StructuredGrid1d:
         target_index = other.flip_if_needed(target_index)
         if relative:
             weights /= self.length()[source_index]
-        return source_index, target_index, weights
+        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
+        sorter = np.argsort(target_index)
+        return source_index[sorter], target_index[sorter], weights[sorter]
 
     def locate_centroids(self, other: "StructuredGrid1d"):
         """returns valid nodes and there overlapping other grid id's
@@ -151,7 +153,9 @@ class StructuredGrid1d:
         source_index = self.flip_if_needed(source_index)
         target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
-        return source_index, target_index, weights
+        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
+        sorter = np.argsort(target_index)
+        return source_index[sorter], target_index[sorter], weights[sorter]
 
     def linear_weights(self, other: "StructuredGrid1d"):
         """returns valid nodes and there linear weights
@@ -272,6 +276,26 @@ class StructuredGrid2d(StructuredGrid1d):
             raise TypeError(
                 f"Cannot convert StructuredGrid2d to {matched_type.__name__}"
             )
+            
+    def broadcast_sorted(
+        self,
+        other,
+        source_index_y: np.array[int],
+        source_index_x: np.array[int],
+        target_index_y: np.array[int],
+        target_index_x: np.array[int],
+        weights_y: np.array[np.float],
+        weights_x: np.array[np.float],
+    ):
+        source_index, target_index, weights = broadcast(
+            self.shape,
+            other.shape,
+            (source_index_y, source_index_x),
+            (target_index_y, target_index_x),
+            (weights_y, weights_x),
+        )
+        sorter = np.argsort(target_index)
+        return source_index[sorter], target_index[sorter], weights[sorter]
 
     def overlap(self, other, relative: bool):
         """
@@ -287,12 +311,14 @@ class StructuredGrid2d(StructuredGrid1d):
         source_index_y, target_index_y, weights_y = self.ybounds.overlap(
             other.ybounds, relative
         )
-        return broadcast(
-            self.shape,
-            other.shape,
-            (source_index_y, source_index_x),
-            (target_index_y, target_index_x),
-            (weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_y,
+            source_index_x,
+            target_index_y,
+            target_index_x,
+            weights_y,
+            weights_x,
         )
 
     def locate_centroids(self, other):
@@ -302,12 +328,14 @@ class StructuredGrid2d(StructuredGrid1d):
         source_index_y, target_index_y, weights_y = self.ybounds.locate_centroids(
             other.ybounds
         )
-        return broadcast(
-            self.shape,
-            other.shape,
-            (source_index_y, source_index_x),
-            (target_index_y, target_index_x),
-            (weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_y,
+            source_index_x,
+            target_index_y,
+            target_index_x,
+            weights_y,
+            weights_x,
         )
 
     def linear_weights(self, other):
@@ -317,17 +345,15 @@ class StructuredGrid2d(StructuredGrid1d):
         source_index_y, target_index_y, weights_y = self.ybounds.linear_weights(
             other.ybounds
         )
-        source_index, target_index, weights = broadcast(
-            self.shape,
-            other.shape,
-            (source_index_y, source_index_x),
-            (target_index_y, target_index_x),
-            (weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_y,
+            source_index_x,
+            target_index_y,
+            target_index_x,
+            weights_y,
+            weights_x,
         )
-        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
-        sorter = np.argsort(target_index)
-        return source_index[sorter], target_index[sorter], weights[sorter]
-
 
 class StructuredGrid3d:
     """
@@ -354,6 +380,29 @@ class StructuredGrid3d:
     @property
     def volume(self):
         return np.multiply.outer(self.zbounds.length, self.area)
+    
+    def broadcast_sorted(
+        self,
+        other,
+        source_index_z: np.array[int],
+        source_index_y: np.array[int],
+        source_index_x: np.array[int],
+        target_index_z: np.array[int],
+        target_index_y: np.array[int],
+        target_index_x: np.array[int],
+        weights_z: np.array[np.float],
+        weights_y: np.array[np.float],
+        weights_x: np.array[np.float],
+    ):
+        source_index, target_index, weights = broadcast(
+            self.shape,
+            other.shape,
+            (source_index_z, source_index_y, source_index_x),
+            (target_index_z, target_index_y, target_index_x),
+            (weights_z, weights_y, weights_x),
+        )
+        sorter = np.argsort(target_index)
+        return source_index[sorter], target_index[sorter], weights[sorter]
 
     def overlap(self, other, relative: bool):
         """
@@ -372,12 +421,17 @@ class StructuredGrid3d:
         source_index_z, target_index_z, weights_z = self.zbounds.overlap(
             other.zbounds, relative
         )
-        return broadcast(
-            self.shape,
-            other.shape,
-            (source_index_z, source_index_y, source_index_x),
-            (target_index_z, target_index_y, target_index_x),
-            (weights_z, weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_z,
+            source_index_y,
+            source_index_x,
+            target_index_z,
+            target_index_y,
+            target_index_x,
+            weights_z,
+            weights_y,
+            weights_x,
         )
 
     def locate_centroids(self, other):
@@ -390,12 +444,17 @@ class StructuredGrid3d:
         source_index_z, target_index_z, weights_z = self.zbounds.locate_centroids(
             other.zbounds
         )
-        return broadcast(
-            self.shape,
-            other.shape,
-            (source_index_z, source_index_y, source_index_x),
-            (target_index_z, target_index_y, target_index_x),
-            (weights_z, weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_z,
+            source_index_y,
+            source_index_x,
+            target_index_z,
+            target_index_y,
+            target_index_x,
+            weights_z,
+            weights_y,
+            weights_x,
         )
 
     def linear_weights(self, other):
@@ -408,12 +467,17 @@ class StructuredGrid3d:
         source_index_z, target_index_z, weights_z = self.zbounds.linear_weights(
             other.zbounds
         )
-        return broadcast(
-            self.shape,
-            other.shape,
-            (source_index_z, source_index_y, source_index_x),
-            (target_index_z, target_index_y, target_index_x),
-            (weights_z, weights_y, weights_x),
+        return self.broadcast_sorted(
+            other,
+            source_index_z,
+            source_index_y,
+            source_index_x,
+            target_index_z,
+            target_index_y,
+            target_index_x,
+            weights_z,
+            weights_y,
+            weights_x,
         )
 
 
