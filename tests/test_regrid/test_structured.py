@@ -97,125 +97,60 @@ def test_init_2d(grid_a):
 
 def test_overlap_1d(grid_a_1d, grid_b_1d):
     # --------
-    # node 0 -> nodes 0      -> should be not valid?
-    # node 1 -> nodes 0, 1
-    # node 2 -> nodes 1, 2
-    # node 3 -> nodes 2      ->should be not valid?
+    # node 0 -> 0      -> should be not valid?
+    # node 1 -> 0, 1
+    # node 2 -> 1, 2
+    # node 3 -> 2      ->should be not valid?
     # --------
-    source, target, weights = grid_b_1d.overlap(grid_a_1d, relative=False)
+    source, target, weights = grid_a_1d.overlap(grid_b_1d, relative=False)
     sorter = np.argsort(source)
-    assert np.array_equal(source[sorter], np.array([0, 1, 1, 2, 2, 3]))
-    assert np.array_equal(target[sorter], np.array([0, 0, 1, 1, 2, 2]))
+    assert np.array_equal(source[sorter], np.array([0, 0, 1, 1, 2, 2]))
+    assert np.array_equal(target[sorter], np.array([0, 1, 1, 2, 2, 3]))
     assert np.array_equal(weights[sorter], np.array([25, 25, 25, 25, 25, 25]))
 
 
 def test_overlap_2d(grid_a_2d, grid_b_2d):
     # test overlap grid_b (target) with grid_a(source)
     # --------
-    # node 0  -> nodes 0
-    # node 1  -> nodes 0, 1
-    # node 2  -> nodes 1, 2
-    # node 3  -> nodes 2
-    # node 4  -> nodes 0, 3
-    # node 5  -> nodes 0, 1, 3, 4
-    # node 6  -> nodes 1, 2, 4, 5
-    # node 7  -> nodes 2, 5
-    # node 8  -> nodes 3, 6
-    # node 9  -> nodes 3, 4, 6, 7
-    # node 10 -> nodes 4, 5, 7, 8
-    # node 11 -> nodes 5, 8
-    # node 12 -> nodes 6
-    # node 13 -> nodes 6, 7
-    # node 14 -> nodes 7
-    # node 14 -> nodes 8
-    # node 15 -> nodes 8
+    # node 0  -> 0,   1,  4,  5
+    # node 1  -> 1,   2,  5,  6
+    # node 2  -> 2,   3,  5,  6
+    # node 3  -> 4,   5,  8,  9
+    # node 4  -> 5,   6,  9, 10
+    # node 5  -> 6,   7, 10, 11
+    # node 6  -> 8,   9, 12, 13
+    # node 7  -> 9,  10, 13, 14
+    # node 8  -> 10, 11, 14, 15
+    # node 9  -> 
     # --------
-    source, target, weights = grid_b_2d.overlap(grid_a_2d, relative=False)
+    source, target, weights = grid_a_2d.overlap(grid_b_2d, relative=False)
     sorter = np.argsort(source)
     assert np.array_equal(
         source[sorter],
         np.array(
-            [
-                0,
-                1,
-                1,
-                2,
-                2,
-                3,
-                4,
-                4,
-                5,
-                5,
-                5,
-                5,
-                6,
-                6,
-                6,
-                6,
-                7,
-                7,
-                8,
-                8,
-                9,
-                9,
-                9,
-                9,
-                10,
-                10,
-                10,
-                10,
-                11,
-                11,
-                12,
-                13,
-                13,
-                14,
-                14,
-                15,
-            ]
+            [0,0,0,0,
+             1,1,1,1,
+             2,2,2,2,
+             3,3,3,3,
+             4,4,4,4,
+             5,5,5,5,
+             6,6,6,6,
+             7,7,7,7,
+             8,8,8,8]
         ),
     )
     assert np.array_equal(
         target[sorter],
         np.array(
-            [
-                0,
-                1,
-                0,
-                1,
-                2,
-                2,
-                0,
-                3,
-                0,
-                4,
-                3,
-                1,
-                5,
-                4,
-                1,
-                2,
-                5,
-                2,
-                3,
-                6,
-                7,
-                6,
-                4,
-                3,
-                4,
-                5,
-                8,
-                7,
-                5,
-                8,
-                6,
-                7,
-                6,
-                8,
-                7,
-                8,
-            ]
+            [0,1,4,5,
+             1,2,6,5,
+             6,7,3,2,
+             5,4,9,8,
+             10,9,6,5,
+             7,6,10,11,
+             8,9,13,12,
+             13,10,14,9,
+             10,14,11,15]
         ),
     )
     assert np.array_equal(weights[sorter], np.array([625] * source.size))
@@ -224,8 +159,8 @@ def test_overlap_2d(grid_a_2d, grid_b_2d):
 def test_locate_centroids_1d(grid_a_1d, grid_b_1d):
     # --------
     # node 0 -> not valid
-    # node 1 -> node 0
-    # node 2 -> node 1
+    # node 1 -> 0
+    # node 2 -> 1
     # node 3 -> not valid
     # --------
     source, target, weights = grid_a_1d.locate_centroids(grid_b_1d)
@@ -238,10 +173,10 @@ def test_locate_centroids_1d(grid_a_1d, grid_b_1d):
 def test_locate_centroids_2d(grid_a_2d, grid_b_2d):
     # --------
     # node 0-4   -> not valid
-    # node 5     -> node 0
-    # node 6     -> node 1
-    # node 9     -> node 3
-    # node 10    -> node 4
+    # node 5     -> 0
+    # node 6     -> 1
+    # node 9     -> 3
+    # node 10    -> 4
     # node 11-15 -> not valid
     # --------
     source, target, weights = grid_a_2d.locate_centroids(grid_b_2d)
@@ -254,10 +189,10 @@ def test_locate_centroids_2d(grid_a_2d, grid_b_2d):
 def test_linear_weights_1d(grid_a_1d, grid_b_1d):
     # --------
     # node 0 -> not valid
-    # node 1 -> node 0 = 0.5
-    # node 1 -> node 1 = 0.5
-    # node 2 -> node 1 = 0.5
-    # node 2 -> node 2 = 0.5
+    # node 1 -> 0 (50%)
+    # node 1 -> 1 (50%)
+    # node 2 -> 1 (50%)
+    # node 2 -> 2 (50%)
     # node 3 -> not valid
     # --------
     source, target, weights = grid_a_1d.linear_weights(grid_b_1d)
@@ -270,10 +205,10 @@ def test_linear_weights_1d(grid_a_1d, grid_b_1d):
 def test_linear_weights_2d(grid_a_2d, grid_b_2d):
     # --------
     # node 0-4    ->  not valid
-    # node 5      ->  nodes 0, 1, 3, 4
-    # node 6      ->  nodes 1, 2, 4, 5
-    # node 9      ->  nodes 3, 4, 6, 7
-    # node 10     ->  nodes 4, 5, 7, 8
+    # node 5      ->  0, 1, 3, 4 (25%)
+    # node 6      ->  1, 2, 4, 5 (25%)
+    # node 9      ->  3, 4, 6, 7 (25%)
+    # node 10     ->  4, 5, 7, 8 (25%)
     # node 11-15  ->  not valid
     # --------
     source, target, weights = grid_a_2d.linear_weights(grid_b_2d)

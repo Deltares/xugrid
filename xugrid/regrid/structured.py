@@ -115,7 +115,22 @@ class StructuredGrid1d:
         )
         valid_other_index = np.arange(other.size)[valid]
         valid_self_index = end[valid]
+        valid_self_index = self.flip_if_needed(valid_self_index)
+        valid_other_index = other.flip_if_needed(valid_other_index)
         return valid_self_index, valid_other_index
+
+    def overlap_1d_structured(self, other):
+        source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
+        source_index = self.flip_if_needed(source_index)
+        target_index = other.flip_if_needed(target_index)
+        return source_index, target_index, weights
+
+    def sorted_output(self, source_index: np.array, target_index: np.array, weights: np.array):
+        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
+        # ordering along source index is for convenience
+        sorter_target = np.argsort(target_index)
+        sorter_source = np.argsort(source_index[sorter_target])
+        return source_index[sorter_target][sorter_source], target_index[sorter_target][sorter_source], weights[sorter_target][sorter_source]
 
     def overlap(self, other: "StructuredGrid1d", relative: bool):
         """returns nodes and length of overlaying other grid
@@ -129,14 +144,10 @@ class StructuredGrid1d:
             target_index (np.array): overlaying other indexes
             weights (np.array): lenght or fraction of overlap
         """
-        source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
+        source_index, target_index, weights = self.overlap_1d_structured(other)
         if relative:
             weights /= self.length()[source_index]
-        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
-        sorter = np.argsort(target_index)
-        return source_index[sorter], target_index[sorter], weights[sorter]
+        return self.sorted_output(source_index, target_index, weights)
 
     def locate_centroids(self, other: "StructuredGrid1d"):
         """returns valid nodes and there overlapping other grid id's
@@ -150,12 +161,10 @@ class StructuredGrid1d:
             weights (np.array): array of ones
         """
         source_index, target_index = self.valid_nodes_index(other)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
+        # source_index = self.flip_if_needed(source_index)
+        # target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
-        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
-        sorter = np.argsort(target_index)
-        return source_index[sorter], target_index[sorter], weights[sorter]
+        return self.sorted_output(source_index, target_index, weights)
 
     def linear_weights(self, other: "StructuredGrid1d"):
         """returns valid nodes and there linear weights
@@ -179,8 +188,8 @@ class StructuredGrid1d:
             )
         # add boundary point for cases where source_index + 1 or -1 is out of bounds
         source_index, target_index = self.valid_nodes_index(other)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
+        # source_index = self.flip_if_needed(source_index)
+        # target_index = other.flip_if_needed(target_index)
         source_index_midpoints, boundary_point_in_front = self.append_boundary_points(
             source_index_midpoints,
             target_index_midpoints[target_index[0]],
@@ -203,13 +212,7 @@ class StructuredGrid1d:
             weights = np.column_stack((weights, 1.0 - weights)).ravel()
         # correct for out of bound due to column-stack source_index + 1
         valid = source_index <= self.size - 1
-        # regridder needs input to be orderd by target index (row index of WeightMatrixCOO)
-        sorter = np.argsort(target_index)
-        return (
-            source_index[valid][sorter],
-            target_index[valid][sorter],
-            weights[valid][sorter],
-        )
+        return self.sorted_output(source_index[valid], target_index[valid], weights[valid])
 
     def append_boundary_points(
         self, source_index_midpoints, target_midpoint_min, target_midpoint_max
@@ -276,16 +279,16 @@ class StructuredGrid2d(StructuredGrid1d):
             raise TypeError(
                 f"Cannot convert StructuredGrid2d to {matched_type.__name__}"
             )
-            
+
     def broadcast_sorted(
         self,
         other,
-        source_index_y: np.array[int],
-        source_index_x: np.array[int],
-        target_index_y: np.array[int],
-        target_index_x: np.array[int],
-        weights_y: np.array[np.float],
-        weights_x: np.array[np.float],
+        source_index_y: np.array,
+        source_index_x: np.array,
+        target_index_y: np.array,
+        target_index_x: np.array,
+        weights_y: np.array,
+        weights_x: np.array,
     ):
         source_index, target_index, weights = broadcast(
             self.shape,
@@ -355,6 +358,7 @@ class StructuredGrid2d(StructuredGrid1d):
             weights_x,
         )
 
+
 class StructuredGrid3d:
     """
     e.g. (x,y,z) -> (x,y,z)
@@ -380,19 +384,19 @@ class StructuredGrid3d:
     @property
     def volume(self):
         return np.multiply.outer(self.zbounds.length, self.area)
-    
+
     def broadcast_sorted(
         self,
         other,
-        source_index_z: np.array[int],
-        source_index_y: np.array[int],
-        source_index_x: np.array[int],
-        target_index_z: np.array[int],
-        target_index_y: np.array[int],
-        target_index_x: np.array[int],
-        weights_z: np.array[np.float],
-        weights_y: np.array[np.float],
-        weights_x: np.array[np.float],
+        source_index_z: np.array,
+        source_index_y: np.array,
+        source_index_x: np.array,
+        target_index_z: np.array,
+        target_index_y: np.array,
+        target_index_x: np.array,
+        weights_z: np.array,
+        weights_y: np.array,
+        weights_x: np.array,
     ):
         source_index, target_index, weights = broadcast(
             self.shape,

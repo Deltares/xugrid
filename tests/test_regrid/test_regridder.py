@@ -169,9 +169,10 @@ def test_centroid_locator_regridder(disk):
 def test_overlap_regridder_structured(grid_a, grid_b):
     regridder = OverlapRegridder(source=grid_a, target=grid_b)
     result = regridder.regrid(grid_a)
+    imod.idf.save("grid_a.idf", grid_a)
+    imod.idf.save("grid_b.idf", grid_b)
     imod.idf.save("overlap_result.idf", result)
     # assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
-
 
 def test_overlap_regridder(disk):
     square = quads(1.0)
