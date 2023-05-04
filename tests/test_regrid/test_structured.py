@@ -121,36 +121,94 @@ def test_overlap_2d(grid_a_2d, grid_b_2d):
     # node 6  -> 8,   9, 12, 13
     # node 7  -> 9,  10, 13, 14
     # node 8  -> 10, 11, 14, 15
-    # node 9  -> 
+    # node 9  ->
     # --------
     source, target, weights = grid_a_2d.overlap(grid_b_2d, relative=False)
     sorter = np.argsort(source)
     assert np.array_equal(
         source[sorter],
         np.array(
-            [0,0,0,0,
-             1,1,1,1,
-             2,2,2,2,
-             3,3,3,3,
-             4,4,4,4,
-             5,5,5,5,
-             6,6,6,6,
-             7,7,7,7,
-             8,8,8,8]
+            [
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                2,
+                2,
+                2,
+                2,
+                3,
+                3,
+                3,
+                3,
+                4,
+                4,
+                4,
+                4,
+                5,
+                5,
+                5,
+                5,
+                6,
+                6,
+                6,
+                6,
+                7,
+                7,
+                7,
+                7,
+                8,
+                8,
+                8,
+                8,
+            ]
         ),
     )
     assert np.array_equal(
         target[sorter],
         np.array(
-            [0,1,4,5,
-             1,2,6,5,
-             6,7,3,2,
-             5,4,9,8,
-             10,9,6,5,
-             7,6,10,11,
-             8,9,13,12,
-             13,10,14,9,
-             10,14,11,15]
+            [
+                0,
+                1,
+                4,
+                5,
+                1,
+                2,
+                6,
+                5,
+                6,
+                7,
+                3,
+                2,
+                5,
+                4,
+                9,
+                8,
+                10,
+                9,
+                6,
+                5,
+                7,
+                6,
+                10,
+                11,
+                8,
+                9,
+                13,
+                12,
+                13,
+                10,
+                14,
+                9,
+                10,
+                14,
+                11,
+                15,
+            ]
         ),
     )
     assert np.array_equal(weights[sorter], np.array([625] * source.size))

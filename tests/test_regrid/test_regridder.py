@@ -174,6 +174,7 @@ def test_overlap_regridder_structured(grid_a, grid_b):
     imod.idf.save("overlap_result.idf", result)
     # assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
 
+
 def test_overlap_regridder(disk):
     square = quads(1.0)
     regridder = OverlapRegridder(disk, square, method="mean")
