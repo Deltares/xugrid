@@ -14,6 +14,7 @@ import xarray as xr
 from xugrid.regrid.overlap_1d import overlap_1d, overlap_1d_nd
 from xugrid.regrid.unstructured import UnstructuredGrid2d
 from xugrid.regrid.utils import broadcast
+from xugrid.ugrid.ugrid2d import Ugrid2d
 
 # from xugrid import Ugrid2d
 

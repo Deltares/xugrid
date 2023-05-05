@@ -144,7 +144,7 @@ def test_overlap_2d(grid_a_2d, grid_b_2d):
     # source   targets            weights
     # node 0   0,   1,  4,  5     625 m
     # node 1   1,   2,  5,  6     625 m
-    # node 2   2,   3,  5,  6     625 m
+    # node 2   2,   3,  6,  7     625 m
     # node 3   4,   5,  8,  9     625 m
     # node 4   5,   6,  9, 10     625 m
     # node 5   6,   7, 10, 11     625 m
@@ -287,12 +287,10 @@ def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d):
 
     # --------
     # source   target  weight
-    # 0   ->   0       *not valid
-    # 0   ->   1       20%
-    # 1   ->   1       80%
-    # 1   ->   2       20%
-    # 2   ->   2       80%
-    # 2   ->   3       *not valid
+    # 0        1       20%
+    # 1        1       80%
+    # 1        2       20%
+    # 2        2       80%
     # --------
     source, target, weights = grid_aa_1d.linear_weights(grid_bb_1d)
     sorter = np.argsort(target)
