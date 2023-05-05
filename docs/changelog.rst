@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.4.0] 2023-05-05
+------------------
 
 Fixed
 ~~~~~
@@ -18,6 +18,8 @@ Fixed
   ``add_exterior=False``. Previously, a scrambled voronoi grid could result
   from the tesselation when the original grid contained cells with only one
   neighbor.
+- ``import xugrid`` now does not throw ``ImportError`` anymore when the
+  optional package ``geopandas`` was missing in the environment.
 
 Changed
 ~~~~~~~
