@@ -1,7 +1,7 @@
 """
 Snapes nodes at an arbitrary distance together.
 """
-from typing import Tuple, Union
+from typing import Tuple, TypeVar, Union
 
 import numba as nb
 import numpy as np
@@ -28,8 +28,12 @@ from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
     import geopandas as gpd
+
+    GeoDataFrameType = gpd.GeoDataFrame
 except ImportError:
     gpd = MissingOptionalModule("geopandas")
+    # https://stackoverflow.com/questions/61384752/how-to-type-hint-with-an-optional-import
+    GeoDataFrameType = TypeVar("GeoDataFrameType")  # avoid ImportError in typehints
 
 try:
     import shapely
@@ -215,7 +219,7 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
     return U.x * (a.y - p.y) > U.y * (a.x - p.x)
 
 
-def coerce_geometry(lines: gpd.GeoDataFrame) -> LineArray:
+def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
     geometry = lines.geometry.values
     geom_type = shapely.get_type_id(geometry)
     if not (geom_type == 1).all():
@@ -305,7 +309,7 @@ def _find_largest_edges(
 
 
 def _create_output_dataset(
-    lines: gpd.GeoDataFrame,
+    lines: GeoDataFrameType,
     topology: "xu.Ugrid2d",
     edges: IntArray,
     line_index: IntArray,
@@ -344,10 +348,10 @@ def _create_output_gdf(
 
 
 def snap_to_grid(
-    lines: gpd.GeoDataFrame,
+    lines: GeoDataFrameType,
     grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
-) -> Tuple[IntArray, Union[pd.DataFrame, gpd.GeoDataFrame]]:
+) -> Tuple[IntArray, Union[pd.DataFrame, GeoDataFrameType]]:
     """
     Snap a collection of lines to a grid.
 
