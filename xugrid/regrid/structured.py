@@ -164,7 +164,7 @@ class StructuredGrid1d:
         return source_index, target_index, weights
 
     def centroids_to_linear_indexes(
-        self, source_index: np.array, target_index: np.array, weights: np.array
+        self, other, source_index: np.array, target_index: np.array, weights: np.array
     ):
         """
         Returns for every target node an pair of connected source nodes based on
@@ -183,14 +183,18 @@ class StructuredGrid1d:
             target_index (np.array): target index (linear)
             weights (np.array): weights (linear)
         """
+        # in cases where midpoint(target) < midpoint(source), within bounding box of source,
+        # neighbor will be -1. All other cases +1
+        neighbour = np.ones(source_index.size)
+        neighbour[other.midpoints[target_index] < self.midpoints[source_index]] = -1
+        source_index = np.column_stack((source_index, source_index + neighbour)).ravel()
         target_index = np.repeat(target_index, 2)
-        source_index = np.column_stack((source_index, source_index + 1)).ravel()
         weights = np.column_stack((weights, 1.0 - weights)).ravel()
-        # correct for possibility of out of bound due to column-stack source_index + 1
-        valid = source_index <= self.size - 1
+        # correct for possibility of out of bound due to column-stack source_index + 1 and -1
+        valid = np.logical_and(source_index <= self.size - 1, source_index >= 0)
         return source_index[valid], target_index[valid], weights[valid]
 
-    def compute_linear_weights(self, other, source_index, target_index):
+    def compute_weights(self, other, source_index, target_index):
         """
         computes linear weights bases on centroid indexes.
 
@@ -219,6 +223,11 @@ class StructuredGrid1d:
             source_index_midpoints[source_index + 1]
             - source_index_midpoints[source_index]
         )
+        # in cases where midpoint(target) < midpoint(source), within bounding box of source,
+        # weights = 1 - weights (since we will stack using -1 in centroids_to_linear_indexes)
+        mask = other.midpoints[target_index] < self.midpoints[source_index]
+        weights[mask] = 1 + weights[mask]
+        
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
         return weights
@@ -301,8 +310,8 @@ class StructuredGrid1d:
         """
 
         source_index, target_index = self.valid_lineair_nodes_index(other)
-        weights = self.compute_linear_weights(other, source_index, target_index)
-        source_index, target_index, weights = self.centroids_to_linear_indexes(
+        weights = self.compute_weights(other, source_index, target_index)
+        source_index, target_index, weights = self.centroids_to_linear_indexes(other,
             source_index, target_index, weights
         )
         return self.sorted_output(source_index, target_index, weights)

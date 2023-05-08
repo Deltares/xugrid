@@ -12,6 +12,9 @@ from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 # grid aa(x):                       |______80_____|_____130_____|_____180_____|      -> source
 # grid bb(x):            |______40_____|______90_____|_____140_____|____190_____|    -> target
 # --------
+# grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
+# grid bbb(x):              |__30__|__55__|__80_|__105__|                            -> target
+# --------
 
 
 @pytest.fixture
@@ -69,7 +72,21 @@ def grid_bb():
         },
     )
 
+@pytest.fixture
+def grid_bbb():
+    return xr.DataArray(
+        data=np.arange(16).reshape((4, 4)),
+        dims=["y", "x"],
+        coords={
+            "y": np.array([175, 125, 75, 25]),
+            "x": np.array([30, 55, 80 , 105]),
+            "dx": 25.0,
+            "dy": -50.0,
+        },
+    )
 
+    
+    
 @pytest.fixture
 def grid_a_1d(grid_a):
     return StructuredGrid1d(grid_a, "x")
@@ -99,6 +116,9 @@ def grid_b_1d(grid_b):
 def grid_bb_1d(grid_bb):
     return StructuredGrid1d(grid_bb, "x")
 
+@pytest.fixture
+def grid_bbb_1d(grid_bbb):
+    return StructuredGrid1d(grid_bbb, "x")
 
 @pytest.fixture
 def grid_b_2d(grid_b):
@@ -271,7 +291,7 @@ def test_locate_centroids_2d(grid_a_2d, grid_b_2d):
     assert np.allclose(weights[sorter], np.ones(4))
 
 
-def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d):
+def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d, grid_bbb_1d):
     # --------
     # source   target  weight
     # 0   ->   1       50%
@@ -298,6 +318,18 @@ def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d):
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
     assert np.allclose(weights[sorter], np.array([0.2, 0.8, 0.2, 0.8]))
 
+    # --------
+    # source   target  weight
+    # 0   ->   1       50%
+    # 1   ->   1       50%
+    # 1   ->   2       50%
+    # 2   ->   2       50%
+    # --------
+    source, target, weights = grid_a_1d.linear_weights(grid_bbb_1d)
+    sorter = np.argsort(target)
+    assert np.array_equal(source[sorter], np.array([0, 1, 1, 0,1,2]))
+    assert np.array_equal(target[sorter], np.array([1, 1, 2, 2,3,3]))
+    assert np.allclose(weights[sorter], np.array([0.1, 0.9, 0.6, 0.4,0.1,0.9]))
 
 def test_linear_weights_2d(grid_a_2d, grid_aa_2d, grid_b_2d, grid_bb_2d):
     # --------
