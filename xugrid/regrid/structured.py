@@ -97,9 +97,9 @@ class StructuredGrid1d:
         else:
             return index
 
-    def valid_nodes_index(self, other):
+    def valid_nodes_within_bounds(self, other):
         """
-        Retruns all nodes that are within bounding box of overlaying grid.
+        Retruns nodes when midpoints are within bounding box of overlaying grid.
         In cases that midpoints (and bounding boxes) are flipped, computed indexes
         are fliped as well.
 
@@ -124,10 +124,10 @@ class StructuredGrid1d:
         valid_other_index = other.flip_if_needed(valid_other_index)
         return valid_self_index, valid_other_index
 
-    def valid_lineair_nodes_index(self, other):
+    def valid_nodes_within_bounds_and_extend(self, other):
         """
-        returns all valid nodes for linear interpolation. In addition to valid_nodes_index()
-        is checked if target midpoints are not outside source boundary midpoints. In that case
+        returns all valid nodes for linear interpolation. In addition to valid_nodes_within_bounds()
+        is checked if target midpoints are not outside outer source boundary midpoints. In that case
         there is no interpolation possible.
 
         Args:
@@ -138,7 +138,7 @@ class StructuredGrid1d:
             valid_self_index (np.array): valid source indexes
             valid_other_index (np.array): valid target indexes
         """
-        source_index, target_index = self.valid_nodes_index(other)
+        source_index, target_index = self.valid_nodes_within_bounds(other)
         valid = (other.midpoints[target_index] > self.midpoints[0]) & (
             (other.midpoints[target_index] < self.midpoints[-1])
         )
@@ -163,7 +163,7 @@ class StructuredGrid1d:
         target_index = other.flip_if_needed(target_index)
         return source_index, target_index, weights
 
-    def centroids_to_linear_indexes(
+    def centroids_to_linear_sets(
         self, other, source_index: np.array, target_index: np.array, weights: np.array
     ):
         """
@@ -194,7 +194,7 @@ class StructuredGrid1d:
         valid = np.logical_and(source_index <= self.size - 1, source_index >= 0)
         return source_index[valid], target_index[valid], weights[valid]
 
-    def compute_weights(self, other, source_index, target_index):
+    def compute_distance_to_centroids(self, other, source_index, target_index):
         """
         computes linear weights bases on centroid indexes.
 
@@ -288,7 +288,7 @@ class StructuredGrid1d:
             target_index (np.array): target indexes
             weights (np.array): array of ones
         """
-        source_index, target_index = self.valid_nodes_index(other)
+        source_index, target_index = self.valid_nodes_within_bounds(other)
         weights = np.ones(source_index.size, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
 
@@ -309,9 +309,9 @@ class StructuredGrid1d:
             weights (np.array): array linear weights
         """
 
-        source_index, target_index = self.valid_lineair_nodes_index(other)
-        weights = self.compute_weights(other, source_index, target_index)
-        source_index, target_index, weights = self.centroids_to_linear_indexes(
+        source_index, target_index = self.valid_nodes_within_bounds_and_extend(other)
+        weights = self.compute_distance_to_centroids(other, source_index, target_index)
+        source_index, target_index, weights = self.centroids_to_linear_sets(
             other, source_index, target_index, weights
         )
         return self.sorted_output(source_index, target_index, weights)
@@ -354,7 +354,7 @@ class StructuredGrid2d(StructuredGrid1d):
     def convert_to(self, matched_type):
         if isinstance(self, matched_type):
             return self
-        elif isinstance(UnstructuredGrid2d):
+        elif isinstance(self,UnstructuredGrid2d):
             return Ugrid2d.from_structured(self.xbounds, self.ybounds)
         else:
             raise TypeError(
