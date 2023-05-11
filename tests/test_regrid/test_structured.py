@@ -4,6 +4,17 @@ import xarray as xr
 
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 
+from fixtures.fixture_regridder import (
+    grid_a,
+    grid_a_1d,
+    grid_b_1d,
+    grid_a_2d,
+    grid_b_2d,
+    grid_aa_1d,
+    grid_bb_1d,
+    grid_bbb_1d,
+)
+
 # Testgrids
 # --------
 # grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
@@ -15,122 +26,6 @@ from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 # grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
 # grid bbb(x):              |__30__|__55__|__80_|__105__|                            -> target
 # --------
-
-
-@pytest.fixture
-def grid_a():
-    return xr.DataArray(
-        data=np.arange(9).reshape((3, 3)),
-        dims=["y", "x"],
-        coords={
-            "y": np.array([150, 100, 50]),
-            "x": np.array([50, 100, 150]),
-            "dx": 50.0,
-            "dy": -50.0,
-        },
-    )
-
-
-@pytest.fixture
-def grid_aa():
-    return xr.DataArray(
-        data=np.arange(9).reshape((3, 3)),
-        dims=["y", "x"],
-        coords={
-            "y": np.array([150, 100, 50]),
-            "x": np.array([80, 130, 180]),
-            "dx": 50.0,
-            "dy": -50.0,
-        },
-    )
-
-
-@pytest.fixture
-def grid_b():
-    return xr.DataArray(
-        data=np.arange(16).reshape((4, 4)),
-        dims=["y", "x"],
-        coords={
-            "y": np.array([175, 125, 75, 25]),
-            "x": np.array([25, 75, 125, 175]),
-            "dx": 50.0,
-            "dy": -50.0,
-        },
-    )
-
-
-@pytest.fixture
-def grid_bb():
-    return xr.DataArray(
-        data=np.arange(16).reshape((4, 4)),
-        dims=["y", "x"],
-        coords={
-            "y": np.array([175, 125, 75, 25]),
-            "x": np.array([40, 90, 140, 190]),
-            "dx": 50.0,
-            "dy": -50.0,
-        },
-    )
-
-
-@pytest.fixture
-def grid_bbb():
-    return xr.DataArray(
-        data=np.arange(16).reshape((4, 4)),
-        dims=["y", "x"],
-        coords={
-            "y": np.array([175, 125, 75, 25]),
-            "x": np.array([30, 55, 80, 105]),
-            "dx": 25.0,
-            "dy": -50.0,
-        },
-    )
-
-
-@pytest.fixture
-def grid_a_1d(grid_a):
-    return StructuredGrid1d(grid_a, "x")
-
-
-@pytest.fixture
-def grid_aa_1d(grid_aa):
-    return StructuredGrid1d(grid_aa, "x")
-
-
-@pytest.fixture
-def grid_a_2d(grid_a):
-    return StructuredGrid2d(grid_a, "x", "y")
-
-
-@pytest.fixture
-def grid_aa_2d(grid_aa):
-    return StructuredGrid2d(grid_aa, "x", "y")
-
-
-@pytest.fixture
-def grid_b_1d(grid_b):
-    return StructuredGrid1d(grid_b, "x")
-
-
-@pytest.fixture
-def grid_bb_1d(grid_bb):
-    return StructuredGrid1d(grid_bb, "x")
-
-
-@pytest.fixture
-def grid_bbb_1d(grid_bbb):
-    return StructuredGrid1d(grid_bbb, "x")
-
-
-@pytest.fixture
-def grid_b_2d(grid_b):
-    return StructuredGrid2d(grid_b, "x", "y")
-
-
-@pytest.fixture
-def grid_bb_2d(grid_bb):
-    return StructuredGrid2d(grid_bb, "x", "y")
-
 
 def test_init_1d(grid_a):
     grid_1d = StructuredGrid1d(grid_a, "x")

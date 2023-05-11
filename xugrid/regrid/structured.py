@@ -185,7 +185,7 @@ class StructuredGrid1d:
         """
         # in cases where midpoint(target) < midpoint(source), within bounding box of source,
         # neighbor will be -1. All other cases +1
-        neighbour = np.ones(source_index.size,dtype=int)
+        neighbour = np.ones(source_index.size, dtype=int)
         neighbour[other.midpoints[target_index] < self.midpoints[source_index]] = -1
         source_index = np.column_stack((source_index, source_index + neighbour)).ravel()
         target_index = np.repeat(target_index, 2)
