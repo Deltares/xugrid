@@ -13,9 +13,9 @@ from xugrid import (
 from fixtures.fixture_regridder import (
     disk,
     quads,
-    grid_a,
-    grid_aa,
-    grid_b,
+    grid_data_a,
+    grid_data_a_layered,
+    grid_data_b,
     expected_results_centroid,
     expected_results_overlap,
     expected_results_linear,
@@ -39,15 +39,15 @@ def test_check_source_target_types(disk, cls):
 
 
 def test_centroid_locator_regridder_structured(
-    grid_a, grid_aa, grid_b, expected_results_centroid
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_centroid
 ):
-    regridder = CentroidLocatorRegridder(source=grid_a, target=grid_b)
-    result = regridder.regrid(grid_a)
+    regridder = CentroidLocatorRegridder(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
     assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
 
     # With broadcasting
-    regridder = CentroidLocatorRegridder(source=grid_aa, target=grid_b)
-    broadcasted = regridder.regrid(grid_aa)
+    regridder = CentroidLocatorRegridder(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
     assert broadcasted.dims == ("layer", "y", "x")
     assert (
         broadcasted.fillna(0.0).isel(layer=0) == expected_results_centroid.fillna(0.0)
@@ -83,15 +83,15 @@ def test_centroid_locator_regridder(disk):
 
 
 def test_overlap_regridder_structured(
-    grid_a, grid_aa, grid_b, expected_results_overlap
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_overlap
 ):
-    regridder = OverlapRegridder(source=grid_a, target=grid_b)
-    result = regridder.regrid(grid_a)
+    regridder = OverlapRegridder(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
     assert (result == expected_results_overlap).any()
 
     # With broadcasting
-    regridder = OverlapRegridder(source=grid_aa, target=grid_b)
-    broadcasted = regridder.regrid(grid_aa)
+    regridder = OverlapRegridder(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
     assert broadcasted.dims == ("layer", "y", "x")
     assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
 
@@ -115,15 +115,15 @@ def test_overlap_regridder(disk):
 
 
 def test_lineair_interpolator_structured(
-    grid_a, grid_aa, grid_b, expected_results_linear
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_linear
 ):
-    regridder = BarycentricInterpolator(source=grid_a, target=grid_b)
-    result = regridder.regrid(grid_a)
+    regridder = BarycentricInterpolator(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
     assert (result.fillna(0.0) == expected_results_linear.fillna(0.0)).any()
 
     # With broadcasting
-    regridder = BarycentricInterpolator(source=grid_aa, target=grid_b)
-    broadcasted = regridder.regrid(grid_aa)
+    regridder = BarycentricInterpolator(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
     assert broadcasted.dims == ("layer", "y", "x")
     assert (
         broadcasted.fillna(0.0).isel(layer=0) == expected_results_linear.fillna(0.0)

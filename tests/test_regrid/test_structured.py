@@ -5,14 +5,14 @@ import xarray as xr
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 
 from fixtures.fixture_regridder import (
-    grid_a,
-    grid_a_1d,
-    grid_b_1d,
-    grid_a_2d,
-    grid_b_2d,
-    grid_aa_1d,
-    grid_bb_1d,
-    grid_bbb_1d,
+    grid_data_a,
+    grid_data_a_1d,
+    grid_data_b_1d,
+    grid_data_a_2d,
+    grid_data_b_2d,
+    grid_data_a_layered_1d,
+    grid_data_c_1d,
+    grid_data_d_1d,
 )
 
 # Testgrids
@@ -20,28 +20,26 @@ from fixtures.fixture_regridder import (
 # grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
 # grid b(x):        |______25_____|______75_____|_____125_____|_____175_____|        -> target
 # --------
-# grid aa(x):                       |______80_____|_____130_____|_____180_____|      -> source
-# grid bb(x):            |______40_____|______90_____|_____140_____|____190_____|    -> target
+# grid c(x):            |______40_____|______90_____|_____140_____|____190_____|     -> target
 # --------
-# grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
-# grid bbb(x):              |__30__|__55__|__80_|__105__|                            -> target
+# grid d(x):              |__30__|__55__|__80_|__105__|                              -> target
 # --------
 
-def test_init_1d(grid_a):
-    grid_1d = StructuredGrid1d(grid_a, "x")
+def test_init_1d(grid_data_a):
+    grid_1d = StructuredGrid1d(grid_data_a, "x")
     assert isinstance(grid_1d, StructuredGrid1d)
     with pytest.raises(TypeError):
         StructuredGrid1d(1)
 
 
-def test_init_2d(grid_a):
-    grid_2d = StructuredGrid2d(grid_a, "x", "y")
+def test_init_2d(grid_data_a):
+    grid_2d = StructuredGrid2d(grid_data_a, "x", "y")
     assert isinstance(grid_2d, StructuredGrid2d)
     with pytest.raises(TypeError):
         StructuredGrid2d(1)
 
 
-def test_overlap_1d(grid_a_1d, grid_b_1d):
+def test_overlap_1d(grid_data_a_1d, grid_data_b_1d):
     # --------
     # source   targets  weight
     # node 0   0        25 m      -> should be not valid?
@@ -49,14 +47,14 @@ def test_overlap_1d(grid_a_1d, grid_b_1d):
     # node 2   1, 2     25 m
     # node 3   2        25 m      -> should be not valid?
     # --------
-    source, target, weights = grid_a_1d.overlap(grid_b_1d, relative=False)
+    source, target, weights = grid_data_a_1d.overlap(grid_data_b_1d, relative=False)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1, 2, 2]))
     assert np.array_equal(target[sorter], np.array([0, 1, 1, 2, 2, 3]))
     assert np.array_equal(weights[sorter], np.array([25, 25, 25, 25, 25, 25]))
 
 
-def test_overlap_2d(grid_a_2d, grid_b_2d):
+def test_overlap_2d(grid_data_a_2d, grid_data_b_2d):
     # --------
     # source   targets            weights
     # node 0   0,   1,  4,  5     625 m
@@ -69,7 +67,7 @@ def test_overlap_2d(grid_a_2d, grid_b_2d):
     # node 7   9,  10, 13, 14     625 m
     # node 8   10, 11, 14, 15     625 m
     # --------
-    source, target, weights = grid_a_2d.overlap(grid_b_2d, relative=False)
+    source, target, weights = grid_data_a_2d.overlap(grid_data_b_2d, relative=False)
     sorter = np.argsort(source)
     assert np.array_equal(
         source[sorter],
@@ -160,20 +158,20 @@ def test_overlap_2d(grid_a_2d, grid_b_2d):
     assert np.array_equal(weights[sorter], np.array([625] * source.size))
 
 
-def test_locate_centroids_1d(grid_a_1d, grid_b_1d):
+def test_locate_centroids_1d(grid_data_a_1d, grid_data_b_1d):
     # --------
     # source   target  weight
     # 0        1       1
     # 1        2       1
     # --------
-    source, target, weights = grid_a_1d.locate_centroids(grid_b_1d)
+    source, target, weights = grid_data_a_1d.locate_centroids(grid_data_b_1d)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.array([0, 1]))
     assert np.array_equal(target[sorter], np.array([1, 2]))
     assert np.allclose(weights[sorter], np.ones(2))
 
 
-def test_locate_centroids_2d(grid_a_2d, grid_b_2d):
+def test_locate_centroids_2d(grid_data_a_2d, grid_data_b_2d):
     # --------
     # source   target  weight
     # 0        5       1
@@ -181,14 +179,14 @@ def test_locate_centroids_2d(grid_a_2d, grid_b_2d):
     # 3        9       1
     # 4        10      1
     # --------
-    source, target, weights = grid_a_2d.locate_centroids(grid_b_2d)
+    source, target, weights = grid_data_a_2d.locate_centroids(grid_data_b_2d)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.array([0, 1, 3, 4]))
     assert np.array_equal(target[sorter], np.array([5, 6, 9, 10]))
     assert np.allclose(weights[sorter], np.ones(4))
 
 
-def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d, grid_bbb_1d):
+def test_linear_weights_1d(grid_data_a_1d, grid_data_a_layered_1d, grid_data_b_1d, grid_data_c_1d, grid_data_d_1d):
     # --------
     # source   target  weight
     # 0   ->   1       50%
@@ -196,7 +194,7 @@ def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d, grid_bb
     # 1   ->   2       50%
     # 2   ->   2       50%
     # --------
-    source, target, weights = grid_a_1d.linear_weights(grid_b_1d)
+    source, target, weights = grid_data_a_1d.linear_weights(grid_data_b_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
@@ -209,7 +207,7 @@ def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d, grid_bb
     # 1        2       20%
     # 2        2       80%
     # --------
-    source, target, weights = grid_aa_1d.linear_weights(grid_bb_1d)
+    source, target, weights = grid_data_a_layered_1d.linear_weights(grid_data_c_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
@@ -222,14 +220,14 @@ def test_linear_weights_1d(grid_a_1d, grid_aa_1d, grid_b_1d, grid_bb_1d, grid_bb
     # 1   ->   2       50%
     # 2   ->   2       50%
     # --------
-    source, target, weights = grid_a_1d.linear_weights(grid_bbb_1d)
+    source, target, weights = grid_data_a_1d.linear_weights(grid_data_d_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 0, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2, 3, 3]))
     assert np.allclose(weights[sorter], np.array([0.1, 0.9, 0.6, 0.4, 0.1, 0.9]))
 
 
-def test_linear_weights_2d(grid_a_2d, grid_aa_2d, grid_b_2d, grid_bb_2d):
+def test_linear_weights_2d(grid_data_a_2d, grid_data_a_layered_2d, grid_data_b_2d, grid_data_c_2d):
     # --------
     # source   targets     weight
     # 5        0, 1, 3, 4  25%
@@ -237,7 +235,7 @@ def test_linear_weights_2d(grid_a_2d, grid_aa_2d, grid_b_2d, grid_bb_2d):
     # 9        3, 4, 6, 7  25%
     # 10       4, 5, 7, 8  25%
     # --------
-    source, target, weights = grid_a_2d.linear_weights(grid_b_2d)
+    source, target, weights = grid_data_a_2d.linear_weights(grid_data_b_2d)
     sorter = np.argsort(target)
     assert np.array_equal(
         source[sorter], np.array([0, 1, 3, 4, 1, 2, 4, 5, 3, 4, 6, 7, 4, 5, 7, 8])
@@ -254,7 +252,7 @@ def test_linear_weights_2d(grid_a_2d, grid_aa_2d, grid_b_2d, grid_bb_2d):
     # 9        3, 4, 6, 7   10%	40%	10%	40%
     # 10       4, 5, 7, 8   10%	40%	10%	40%
     # --------
-    source, target, weights = grid_aa_2d.linear_weights(grid_bb_2d)
+    source, target, weights = grid_data_a_layered_2d.linear_weights(grid_data_c_2d)
     sorter = np.argsort(target)
     assert np.array_equal(
         source[sorter], np.array([0, 1, 3, 4, 1, 2, 4, 5, 3, 4, 6, 7, 4, 5, 7, 8])

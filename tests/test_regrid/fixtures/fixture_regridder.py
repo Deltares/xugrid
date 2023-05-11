@@ -6,16 +6,15 @@ import xarray as xr
 import xugrid as xu
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 
+
 # Testgrids
 # --------
 # grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
 # grid b(x):        |______25_____|______75_____|_____125_____|_____175_____|        -> target
 # --------
-# grid aa(x):                       |______80_____|_____130_____|_____180_____|      -> source
-# grid bb(x):            |______40_____|______90_____|_____140_____|____190_____|    -> target
+# grid c(x):            |______40_____|______90_____|_____140_____|____190_____|     -> target
 # --------
-# grid a(x):               |______50_____|_____100_____|_____150_____|               -> source
-# grid bbb(x):              |__30__|__55__|__80_|__105__|                            -> target
+# grid d(x):              |__30__|__55__|__80_|__105__|                              -> target
 # --------
 
 
@@ -42,7 +41,7 @@ def quads(dx):
 
 
 @pytest.fixture
-def grid_a():
+def grid_data_a():
     return xr.DataArray(
         data=np.arange(9).reshape((3, 3)),
         dims=["y", "x"],
@@ -56,7 +55,7 @@ def grid_a():
 
 
 @pytest.fixture
-def grid_aa():
+def grid_data_a_layered():
     return xr.DataArray(
         data=np.arange(18).reshape((2, 3, 3)),
         dims=["layer", "y", "x"],
@@ -71,7 +70,7 @@ def grid_aa():
 
 
 @pytest.fixture
-def grid_b():
+def grid_data_b():
     return xr.DataArray(
         data=np.zeros(16).reshape((4, 4)),
         dims=["y", "x"],
@@ -85,7 +84,7 @@ def grid_b():
 
 
 @pytest.fixture
-def grid_bb():
+def grid_data_c():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
         dims=["y", "x"],
@@ -99,7 +98,7 @@ def grid_bb():
 
 
 @pytest.fixture
-def grid_bbb():
+def grid_data_d():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
         dims=["y", "x"],
@@ -110,6 +109,51 @@ def grid_bbb():
             "dy": -50.0,
         },
     )
+
+
+@pytest.fixture
+def grid_data_a_1d(grid_data_a):
+    return StructuredGrid1d(grid_data_a, "x")
+
+
+@pytest.fixture
+def grid_data_a_layered_1d(grid_data_a_layered):
+    return StructuredGrid1d(grid_data_a_layered, "x")
+
+
+@pytest.fixture
+def grid_data_a_2d(grid_data_a):
+    return StructuredGrid2d(grid_data_a, "x", "y")
+
+
+@pytest.fixture
+def grid_data_a_layered_2d(grid_data_a_layered):
+    return StructuredGrid2d(grid_data_a_layered, "x", "y")
+
+
+@pytest.fixture
+def grid_data_b_1d(grid_data_b):
+    return StructuredGrid1d(grid_data_b, "x")
+
+
+@pytest.fixture
+def grid_data_c_1d(grid_data_c):
+    return StructuredGrid1d(grid_data_c, "x")
+
+
+@pytest.fixture
+def grid_data_d_1d(grid_data_d):
+    return StructuredGrid1d(grid_data_d, "x")
+
+
+@pytest.fixture
+def grid_data_b_2d(grid_data_b):
+    return StructuredGrid2d(grid_data_b, "x", "y")
+
+
+@pytest.fixture
+def grid_data_c_2d(grid_data_c):
+    return StructuredGrid2d(grid_data_c, "x", "y")
 
 
 @pytest.fixture
@@ -237,46 +281,3 @@ def expected_results_linear():
     )
 
 
-@pytest.fixture
-def grid_a_1d(grid_a):
-    return StructuredGrid1d(grid_a, "x")
-
-
-@pytest.fixture
-def grid_aa_1d(grid_aa):
-    return StructuredGrid1d(grid_aa, "x")
-
-
-@pytest.fixture
-def grid_a_2d(grid_a):
-    return StructuredGrid2d(grid_a, "x", "y")
-
-
-@pytest.fixture
-def grid_aa_2d(grid_aa):
-    return StructuredGrid2d(grid_aa, "x", "y")
-
-
-@pytest.fixture
-def grid_b_1d(grid_b):
-    return StructuredGrid1d(grid_b, "x")
-
-
-@pytest.fixture
-def grid_bb_1d(grid_bb):
-    return StructuredGrid1d(grid_bb, "x")
-
-
-@pytest.fixture
-def grid_bbb_1d(grid_bbb):
-    return StructuredGrid1d(grid_bbb, "x")
-
-
-@pytest.fixture
-def grid_b_2d(grid_b):
-    return StructuredGrid2d(grid_b, "x", "y")
-
-
-@pytest.fixture
-def grid_bb_2d(grid_bb):
-    return StructuredGrid2d(grid_bb, "x", "y")
