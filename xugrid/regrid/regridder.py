@@ -63,7 +63,7 @@ def setup_grid(obj):
         raise TypeError()
 
 
-def match(source, target):
+def convert_to_match(source, target):
     PROMOTIONS = {
         frozenset({StructuredGrid2d}): StructuredGrid2d,
         frozenset({StructuredGrid2d, UnstructuredGrid2d}): UnstructuredGrid2d,
@@ -119,7 +119,7 @@ class BaseRegridder(abc.ABC):
             )
         return
 
-    def regrid_array(self, source):
+    def _regrid_array(self, source):
         source_grid = self._source
         first_dims_shape = source.shape[: -source_grid.ndim]
 
@@ -168,7 +168,7 @@ class BaseRegridder(abc.ABC):
         # Do not set vectorize=True: numba will run the for loop more
         # efficiently, and guarantees a single large allocation.
         out = xr.apply_ufunc(
-            self.regrid_array,
+            self._regrid_array,
             source,
             input_core_dims=[source_dims],
             exclude_dims=set(source_dims),
@@ -286,7 +286,7 @@ class CentroidLocatorRegridder(BaseRegridder):
     """
 
     def _compute_weights(self, source, target):
-        source, target = match(source, target)
+        source, target = convert_to_match(source, target)
         source_index, target_index, weight_values = source.locate_centroids(target)
         self._weights = weight_matrix_coo(source_index, target_index, weight_values)
         return
@@ -322,7 +322,7 @@ class CentroidLocatorRegridder(BaseRegridder):
 
 class BaseOverlapRegridder(BaseRegridder, abc.ABC):
     def _compute_weights(self, source, target, relative: bool) -> None:
-        source, target = match(source, target)
+        source, target = convert_to_match(source, target)
         source_index, target_index, weight_values = source.overlap(
             target, relative=relative
         )
@@ -484,7 +484,7 @@ class BarycentricInterpolator(BaseRegridder):
         self._setup_regrid("mean")
 
     def _compute_weights(self, source, target):
-        source, target = match(source, target)
+        source, target = convert_to_match(source, target)
         if type(source) == StructuredGrid2d:
             source_index, target_index, weights = source.linear_weights(target)
         else:
