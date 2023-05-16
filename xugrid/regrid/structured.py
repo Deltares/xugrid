@@ -164,7 +164,7 @@ class StructuredGrid1d:
         return source_index, target_index, weights
 
     def centroids_to_linear_sets(
-        self, other, source_index: np.array, target_index: np.array, weights: np.array
+        self, other, source_index: np.array, target_index: np.array, weights: np.array, neighbour: np.array,
     ):
         """
         Returns for every target node an pair of connected source nodes based on
@@ -183,16 +183,32 @@ class StructuredGrid1d:
             target_index (np.array): target index (linear)
             weights (np.array): weights (linear)
         """
-        # in cases where midpoint(target) < midpoint(source), within bounding box of source,
-        # neighbor will be -1. All other cases +1
-        neighbour = np.ones(source_index.size, dtype=int)
-        neighbour[other.midpoints[target_index] < self.midpoints[source_index]] = -1
+        # if source_index is flipped, source-index is decreasing and neighbour need to be flipped
+        if self.flipped:
+            neighbour = -neighbour
         source_index = np.column_stack((source_index, source_index + neighbour)).ravel()
         target_index = np.repeat(target_index, 2)
         weights = np.column_stack((weights, 1.0 - weights)).ravel()
+        
         # correct for possibility of out of bound due to column-stack source_index + 1 and -1
         valid = np.logical_and(source_index <= self.size - 1, source_index >= 0)
         return source_index[valid], target_index[valid], weights[valid]
+    
+    def get_midpoint_index(self,array_index):
+        """
+        Returns midpoint array indexes for given array_index.
+
+        Args:
+            array_index (np.array): array_index
+
+        Returns:biliniar
+            midpoint_index (np.array): midpoint_index
+            
+        """
+        if self.flipped :
+            return self.size - array_index - 1
+        else:
+            return array_index
 
     def compute_distance_to_centroids(self, other, source_index, target_index):
         """
@@ -211,26 +227,28 @@ class StructuredGrid1d:
         Returns:
             weights (np.array): weights
         """
-        source_index_midpoints = self.midpoints
-        target_index_midpoints = other.midpoints
-        if not source_index_midpoints.size > 2:
+
+        source_midpoint_index = self.get_midpoint_index(source_index)
+        target_midpoints_index = other.get_midpoint_index(target_index)
+        neighbour = np.ones(target_midpoints_index.size,dtype=int)
+        # cases where midpoint target < midpoint source
+        condition = other.midpoints[target_midpoints_index] < self.midpoints[source_midpoint_index]
+        neighbour[condition] = -neighbour[condition]
+        
+        if not self.midpoints.size > 2:
             raise ValueError(
                 "source index must larger than 2. Cannot interpolate with one point"
             )
         weights = (
-            target_index_midpoints[target_index] - source_index_midpoints[source_index]
+            other.midpoints[target_midpoints_index] - self.midpoints[source_midpoint_index]
         ) / (
-            source_index_midpoints[source_index + 1]
-            - source_index_midpoints[source_index]
+            self.midpoints[source_midpoint_index + neighbour]
+            - self.midpoints[source_midpoint_index]
         )
-        # in cases where midpoint(target) < midpoint(source), within bounding box of source,
-        # weights = 1 - weights (since we will stack using -1 in centroids_to_linear_indexes)
-        mask = other.midpoints[target_index] < self.midpoints[source_index]
-        weights[mask] = 1 + weights[mask]
-
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
-        return weights
+        
+        return weights, neighbour
 
     def sorted_output(
         self, source_index: np.array, target_index: np.array, weights: np.array
@@ -310,9 +328,9 @@ class StructuredGrid1d:
         """
 
         source_index, target_index = self.valid_nodes_within_bounds_and_extend(other)
-        weights = self.compute_distance_to_centroids(other, source_index, target_index)
+        weights, neighbour = self.compute_distance_to_centroids(other, source_index, target_index)
         source_index, target_index, weights = self.centroids_to_linear_sets(
-            other, source_index, target_index, weights
+            other, source_index, target_index, weights, neighbour,
         )
         return self.sorted_output(source_index, target_index, weights)
 
@@ -354,7 +372,7 @@ class StructuredGrid2d(StructuredGrid1d):
     def convert_to(self, matched_type):
         if isinstance(self, matched_type):
             return self
-        elif isinstance(self,UnstructuredGrid2d):
+        elif isinstance(self, UnstructuredGrid2d):
             return Ugrid2d.from_structured(self.xbounds, self.ybounds)
         else:
             raise TypeError(

@@ -137,6 +137,11 @@ def grid_data_b_1d(grid_data_b):
 
 
 @pytest.fixture
+def grid_data_b_flipped_1d(grid_data_b):
+    return StructuredGrid1d(grid_data_b, "y")
+
+
+@pytest.fixture
 def grid_data_c_1d(grid_data_c):
     return StructuredGrid1d(grid_data_c, "x")
 
@@ -279,5 +284,3 @@ def expected_results_linear():
             "dy": -50.0,
         },
     )
-
-
