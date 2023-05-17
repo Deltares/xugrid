@@ -10,17 +10,6 @@ from xugrid import (
     RelativeOverlapRegridder,
 )
 
-from fixtures.fixture_regridder import (
-    disk,
-    quads,
-    grid_data_a,
-    grid_data_a_layered,
-    grid_data_b,
-    expected_results_centroid,
-    expected_results_overlap,
-    expected_results_linear,
-)
-
 
 @pytest.mark.parametrize(
     "cls",
@@ -54,8 +43,8 @@ def test_centroid_locator_regridder_structured(
     ).any()
 
 
-def test_centroid_locator_regridder(disk):
-    square = quads(1.0)
+def test_centroid_locator_regridder(disk, quads_1):
+    square = quads_1
     regridder = CentroidLocatorRegridder(source=disk, target=square)
     result = regridder.regrid(disk)
     assert isinstance(result, xu.UgridDataArray)
@@ -96,8 +85,8 @@ def test_overlap_regridder_structured(
     assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
 
 
-def test_overlap_regridder(disk):
-    square = quads(1.0)
+def test_overlap_regridder(disk, quads_1):
+    square = quads_1
     regridder = OverlapRegridder(disk, square, method="mean")
     result = regridder.regrid(disk)
     assert result.notnull().any()
@@ -130,8 +119,8 @@ def test_lineair_interpolator_structured(
     ).any()
 
 
-def test_barycentric_interpolator(disk):
-    square = quads(0.25)
+def test_barycentric_interpolator(disk, quads_0_25):
+    square = quads_0_25
     regridder = BarycentricInterpolator(source=disk, target=square)
     result = regridder.regrid(disk)
     assert result.notnull().any()
@@ -157,8 +146,8 @@ def test_barycentric_interpolator(disk):
         BarycentricInterpolator,
     ],
 )
-def test_regridder_from_weights(cls, disk):
-    square = quads(1.0)
+def test_regridder_from_weights(cls, disk, quads_1):
+    square = quads_1
     regridder = cls(source=disk, target=square)
     result = regridder.regrid(disk)
     weights = regridder.weights
@@ -176,8 +165,8 @@ def test_regridder_from_weights(cls, disk):
         BarycentricInterpolator,
     ],
 )
-def test_regridder_from_dataset(cls, disk):
-    square = quads(1.0)
+def test_regridder_from_dataset(cls, disk, quads_1):
+    square = quads_1
     regridder = cls(source=disk, target=square)
     result = regridder.regrid(disk)
     dataset = regridder.to_dataset()

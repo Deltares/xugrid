@@ -1,28 +1,7 @@
 import numpy as np
 import pytest
-import xarray as xr
 
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
-
-from fixtures.fixture_regridder import (
-    grid_data_a,
-    grid_data_a_layered,
-    grid_data_a_1d,
-    grid_data_a_layered_1d,
-    grid_data_b,
-    grid_data_b_1d,
-    grid_data_b_flipped_1d,
-    grid_data_c,
-    grid_data_d,
-    grid_data_a_2d,
-    grid_data_a_layered_2d,
-    grid_data_b_2d,
-    grid_data_c_1d,
-    grid_data_c_2d,
-    grid_data_d_1d,
-    grid_data_e_1d,
-    grid_data_e,
-)
 
 # Testgrids
 # --------
@@ -33,7 +12,7 @@ from fixtures.fixture_regridder import (
 # --------
 # grid d(x):              |__30__|__55__|__80_|__105__|                              -> target
 # --------
-# grid e(x):              |__30__|_____67.5___|__105__|                              -> target
+# grid e(x):              |__30__|____67.5____|__105__|                              -> target
 # --------
 
 
@@ -49,10 +28,12 @@ def test_init_2d(grid_data_a_2d):
         StructuredGrid2d(1)
 
 
-def test_overlap_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d,grid_data_e_1d):
+def test_overlap_1d(
+    grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d, grid_data_e_1d
+):
     # --------
     # source   targets  weight
-    # node 0   0, 1     25 m    
+    # node 0   0, 1     25 m
     # node 1   1, 2     25 m
     # node 2   2, 3     25 m
     # --------
@@ -61,11 +42,11 @@ def test_overlap_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d,grid_
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1, 2, 2]))
     assert np.array_equal(target[sorter], np.array([0, 1, 1, 2, 2, 3]))
     assert np.array_equal(weights[sorter], np.array([25, 25, 25, 25, 25, 25]))
-    
+
     # flipped axis (y-axis)
     # --------
     # source   targets  weight
-    # 0        0, 1     25 m 
+    # 0        0, 1     25 m
     # 1        1, 2     25 m
     # 2        2, 3     25 m
     # --------
@@ -76,22 +57,20 @@ def test_overlap_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d,grid_
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1, 2, 2]))
     assert np.array_equal(target[sorter], np.array([2, 3, 1, 2, 0, 1]))
     assert np.array_equal(weights[sorter], np.array([25, 25, 25, 25, 25, 25]))
-    
+
     # non-equidistant
     # --------
     # source   targets  weight
     # node 0   0, 1     17.5 m, 32.5 m
-    # node 1   1, 2     17.5 m, 25.0 m   
+    # node 1   1, 2     17.5 m, 25.0 m
     # --------
-    source, target, weights = grid_data_a_1d.overlap(
-        grid_data_e_1d, relative=False
-    )
+    source, target, weights = grid_data_a_1d.overlap(grid_data_e_1d, relative=False)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1]))
     assert np.array_equal(target[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(weights[sorter], np.array([17.5, 32.5, 17.5, 25.0]))
-    
-    
+
+
 def test_overlap_2d(grid_data_a_2d, grid_data_b_2d):
     # --------
     # source   targets            weights
@@ -196,7 +175,9 @@ def test_overlap_2d(grid_data_a_2d, grid_data_b_2d):
     assert np.array_equal(weights[sorter], np.array([625] * source.size))
 
 
-def test_locate_centroids_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d, grid_data_e_1d):
+def test_locate_centroids_1d(
+    grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d, grid_data_e_1d
+):
     # --------
     # source   target  weight
     # 0        1       1
@@ -207,7 +188,7 @@ def test_locate_centroids_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped
     assert np.array_equal(source[sorter], np.array([0, 1]))
     assert np.array_equal(target[sorter], np.array([1, 2]))
     assert np.allclose(weights[sorter], np.ones(2))
-    
+
     # flipped axis (y-axis)
     # --------
     # source   target  weight
@@ -231,7 +212,8 @@ def test_locate_centroids_1d(grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped
     assert np.array_equal(source[sorter], np.array([0, 0, 1]))
     assert np.array_equal(target[sorter], np.array([0, 1, 2]))
     assert np.allclose(weights[sorter], np.ones(3))
-    
+
+
 def test_locate_centroids_2d(grid_data_a_2d, grid_data_b_2d):
     # --------
     # source   target  weight
@@ -299,9 +281,9 @@ def test_linear_weights_1d(
     # source   target  weight
     # 0        1       10%
     # 1        1       90%
-    # 0        2       60% 
+    # 0        2       60%
     # 1        2       40% *reversed in output
-    # 1        3       10%    
+    # 1        3       10%
     # 2        3       90%
     # --------
     source, target, weights = grid_data_a_1d.linear_weights(grid_data_d_1d)
@@ -309,27 +291,24 @@ def test_linear_weights_1d(
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 0, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2, 3, 3]))
     assert np.allclose(weights[sorter], np.array([0.1, 0.9, 0.4, 0.6, 0.1, 0.9]))
-    
+
     # non-equidistant
     # --------
     # source   target  weight
     # 0        1       35%
     # 1        1       65%
-    # 1        2       10% 
-    # 2        2       90% 
+    # 1        2       10%
+    # 2        2       90%
     # --------
     source, target, weights = grid_data_a_1d.linear_weights(grid_data_e_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
     assert np.allclose(weights[sorter], np.array([0.35, 0.65, 0.1, 0.9]))
-    
-    
+
+
 def test_linear_weights_2d(
-    grid_data_a_2d, 
-    grid_data_a_layered_2d, 
-    grid_data_b_2d, 
-    grid_data_c_2d
+    grid_data_a_2d, grid_data_a_layered_2d, grid_data_b_2d, grid_data_c_2d
 ):
     # --------
     # source   targets     weight
@@ -358,7 +337,7 @@ def test_linear_weights_2d(
     source, target, weights = grid_data_a_layered_2d.linear_weights(grid_data_c_2d)
     sorter = np.argsort(target)
     assert np.array_equal(
-        source[sorter], np.array([1, 0, 4, 3, 2, 1, 5, 4, 4, 3, 7, 6, 5, 4, 8, 7])                           
+        source[sorter], np.array([1, 0, 4, 3, 2, 1, 5, 4, 4, 3, 7, 6, 5, 4, 8, 7])
     )
     assert np.array_equal(
         target[sorter], np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10])

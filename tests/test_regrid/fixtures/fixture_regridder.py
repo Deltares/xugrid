@@ -2,10 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
-
 import xugrid as xu
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
-
 
 # Testgrids
 # --------
@@ -16,6 +14,8 @@ from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 # --------
 # grid d(x):              |__30__|__55__|__80_|__105__|                              -> target
 # --------
+# grid e(x):              |__30__|_____67.5___|__105__|                              -> target
+# --------
 
 
 @pytest.fixture(scope="function")
@@ -24,7 +24,8 @@ def disk():
 
 
 @pytest.fixture(scope="function")
-def quads(dx):
+def quads_0_25():
+    dx = 0.25
     xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     y = np.arange(ymin, ymax, dx) + 0.5 * dx
@@ -40,7 +41,25 @@ def quads(dx):
     return xu.UgridDataArray.from_structured(da)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
+def quads_1():
+    dx = 1.0
+    xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    y = np.arange(ymin, ymax, dx) + 0.5 * dx
+
+    da = xr.DataArray(
+        data=np.full((y.size, x.size), np.nan),
+        coords={"y": y, "x": x},
+        dims=[
+            "y",
+            "x",
+        ],
+    )
+    return xu.UgridDataArray.from_structured(da)
+
+
+@pytest.fixture(scope="function")
 def grid_data_a():
     return xr.DataArray(
         data=np.arange(9).reshape((3, 3)),
@@ -54,7 +73,7 @@ def grid_data_a():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_a_layered():
     return xr.DataArray(
         data=np.arange(18).reshape((2, 3, 3)),
@@ -69,7 +88,7 @@ def grid_data_a_layered():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_b():
     return xr.DataArray(
         data=np.zeros(16).reshape((4, 4)),
@@ -83,7 +102,7 @@ def grid_data_b():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_c():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
@@ -97,7 +116,7 @@ def grid_data_c():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_d():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
@@ -110,7 +129,8 @@ def grid_data_d():
         },
     )
 
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def grid_data_e():
     return xr.DataArray(
         data=np.arange(12).reshape((4, 3)),
@@ -120,66 +140,68 @@ def grid_data_e():
             "x": np.array([30, 67.5, 105]),
             "dx": 25,
             "dy": -50.0,
-            "xbounds_left": ("x",np.array([17.5, 42.5, 92.5])),
-            "xbounds_right": ("x",np.array([42.5, 92.5, 117.5])),
+            "xbounds_left": ("x", np.array([17.5, 42.5, 92.5])),
+            "xbounds_right": ("x", np.array([42.5, 92.5, 117.5])),
         },
     )
-    
-@pytest.fixture
+
+
+@pytest.fixture(scope="function")
 def grid_data_a_1d(grid_data_a):
     return StructuredGrid1d(grid_data_a, "x")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_a_layered_1d(grid_data_a_layered):
     return StructuredGrid1d(grid_data_a_layered, "x")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_a_2d(grid_data_a):
     return StructuredGrid2d(grid_data_a, "x", "y")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_a_layered_2d(grid_data_a_layered):
     return StructuredGrid2d(grid_data_a_layered, "x", "y")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_b_1d(grid_data_b):
     return StructuredGrid1d(grid_data_b, "x")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_b_flipped_1d(grid_data_b):
     return StructuredGrid1d(grid_data_b, "y")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_c_1d(grid_data_c):
     return StructuredGrid1d(grid_data_c, "x")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_d_1d(grid_data_d):
     return StructuredGrid1d(grid_data_d, "x")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_b_2d(grid_data_b):
     return StructuredGrid2d(grid_data_b, "x", "y")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_c_2d(grid_data_c):
     return StructuredGrid2d(grid_data_c, "x", "y")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def grid_data_e_1d(grid_data_e):
     return StructuredGrid1d(grid_data_e, "x")
 
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def expected_results_centroid():
     return xr.DataArray(
         data=np.array(
@@ -212,7 +234,7 @@ def expected_results_centroid():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def expected_results_overlap():
     # --------
     # target | source            | ntarget | sum(source)/ntaget
@@ -264,7 +286,7 @@ def expected_results_overlap():
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def expected_results_linear():
     # --------
     # target | source            | weights                | sum(source x weight)

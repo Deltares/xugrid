@@ -167,7 +167,12 @@ class StructuredGrid1d:
         return source_index, target_index, weights
 
     def centroids_to_linear_sets(
-        self, other, source_index: np.array, target_index: np.array, weights: np.array, neighbour: np.array,
+        self,
+        other,
+        source_index: np.array,
+        target_index: np.array,
+        weights: np.array,
+        neighbour: np.array,
     ):
         """
         Returns for every target node an pair of connected source nodes based on
@@ -192,12 +197,12 @@ class StructuredGrid1d:
         source_index = np.column_stack((source_index, source_index + neighbour)).ravel()
         target_index = np.repeat(target_index, 2)
         weights = np.column_stack((weights, 1.0 - weights)).ravel()
-        
+
         # correct for possibility of out of bound due to column-stack source_index + 1 and -1
         valid = np.logical_and(source_index <= self.size - 1, source_index >= 0)
         return source_index[valid], target_index[valid], weights[valid]
-    
-    def get_midpoint_index(self,array_index):
+
+    def get_midpoint_index(self, array_index):
         """
         Returns midpoint array indexes for given array_index.
 
@@ -206,9 +211,9 @@ class StructuredGrid1d:
 
         Returns:biliniar
             midpoint_index (np.array): midpoint_index
-            
+
         """
-        if self.flipped :
+        if self.flipped:
             return self.size - array_index - 1
         else:
             return array_index
@@ -233,24 +238,28 @@ class StructuredGrid1d:
 
         source_midpoint_index = self.get_midpoint_index(source_index)
         target_midpoints_index = other.get_midpoint_index(target_index)
-        neighbour = np.ones(target_midpoints_index.size,dtype=int)
+        neighbour = np.ones(target_midpoints_index.size, dtype=int)
         # cases where midpoint target < midpoint source
-        condition = other.midpoints[target_midpoints_index] < self.midpoints[source_midpoint_index]
+        condition = (
+            other.midpoints[target_midpoints_index]
+            < self.midpoints[source_midpoint_index]
+        )
         neighbour[condition] = -neighbour[condition]
-        
+
         if not self.midpoints.size > 2:
             raise ValueError(
                 "source index must larger than 2. Cannot interpolate with one point"
             )
         weights = (
-            other.midpoints[target_midpoints_index] - self.midpoints[source_midpoint_index]
+            other.midpoints[target_midpoints_index]
+            - self.midpoints[source_midpoint_index]
         ) / (
             self.midpoints[source_midpoint_index + neighbour]
             - self.midpoints[source_midpoint_index]
         )
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
-        
+
         return weights, neighbour
 
     def sorted_output(
@@ -331,9 +340,15 @@ class StructuredGrid1d:
         """
 
         source_index, target_index = self.valid_nodes_within_bounds_and_extend(other)
-        weights, neighbour = self.compute_distance_to_centroids(other, source_index, target_index)
+        weights, neighbour = self.compute_distance_to_centroids(
+            other, source_index, target_index
+        )
         source_index, target_index, weights = self.centroids_to_linear_sets(
-            other, source_index, target_index, weights, neighbour,
+            other,
+            source_index,
+            target_index,
+            weights,
+            neighbour,
         )
         return self.sorted_output(source_index, target_index, weights)
 
@@ -665,4 +680,3 @@ class ExplicitStructuredGrid3d:
         # TODO: check array dims
         weights_zyx = weights_z * weights_yx
         return source_index_zyx, target_index_zyx, weights_zyx
-    
