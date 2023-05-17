@@ -110,7 +110,21 @@ def grid_data_d():
         },
     )
 
-
+@pytest.fixture
+def grid_data_e():
+    return xr.DataArray(
+        data=np.arange(12).reshape((4, 3)),
+        dims=["y", "x"],
+        coords={
+            "y": np.array([175, 125, 75, 25]),
+            "x": np.array([30, 67.5, 105]),
+            "dx": 25,
+            "dy": -50.0,
+            "xbounds_left": ("x",np.array([17.5, 42.5, 92.5])),
+            "xbounds_right": ("x",np.array([42.5, 92.5, 117.5])),
+        },
+    )
+    
 @pytest.fixture
 def grid_data_a_1d(grid_data_a):
     return StructuredGrid1d(grid_data_a, "x")
@@ -160,6 +174,10 @@ def grid_data_b_2d(grid_data_b):
 def grid_data_c_2d(grid_data_c):
     return StructuredGrid2d(grid_data_c, "x", "y")
 
+
+@pytest.fixture
+def grid_data_e_1d(grid_data_e):
+    return StructuredGrid1d(grid_data_e, "x")
 
 @pytest.fixture
 def expected_results_centroid():

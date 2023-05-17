@@ -29,7 +29,8 @@ class StructuredGrid1d:
     """
 
     def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name: str):
-        bounds_name = f"{name}bounds"  # e.g. xbounds
+        bounds_name_left = f"{name}bounds_left"  # e.g. xbounds
+        bounds_name_right = f"{name}bounds_right"  # e.g. xbounds
         size_name = f"d{name}"  # e.g. dx
 
         index = obj.indexes[name]
@@ -45,8 +46,10 @@ class StructuredGrid1d:
         else:
             raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
-        if bounds_name in obj.coords:
-            bounds = obj[bounds_name].values
+        if bounds_name_left in obj.coords:
+            start = obj[bounds_name_left].values
+            end = obj[bounds_name_right].values
+            bounds = np.column_stack((start, end))
         else:
             if size_name in obj.coords:
                 # works for scalar size and array size
@@ -662,3 +665,4 @@ class ExplicitStructuredGrid3d:
         # TODO: check array dims
         weights_zyx = weights_z * weights_yx
         return source_index_zyx, target_index_zyx, weights_zyx
+    
