@@ -1,4 +1,3 @@
-import pytest
 from fixtures.fixture_regridder import (
     disk,
     expected_results_centroid,
@@ -23,4 +22,4 @@ from fixtures.fixture_regridder import (
     grid_data_e_1d,
     quads_0_25,
     quads_1,
-)
+)  # noqa
