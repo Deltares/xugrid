@@ -59,7 +59,7 @@ def quads_1():
     return xu.UgridDataArray.from_structured(da)
 
 
-@pytest.fixture(scope="function")
+
 def grid_data_a():
     return xr.DataArray(
         data=np.arange(9).reshape((3, 3)),
@@ -73,7 +73,7 @@ def grid_data_a():
     )
 
 
-@pytest.fixture(scope="function")
+
 def grid_data_a_layered():
     return xr.DataArray(
         data=np.arange(18).reshape((2, 3, 3)),
@@ -88,7 +88,6 @@ def grid_data_a_layered():
     )
 
 
-@pytest.fixture(scope="function")
 def grid_data_b():
     return xr.DataArray(
         data=np.zeros(16).reshape((4, 4)),
@@ -102,7 +101,6 @@ def grid_data_b():
     )
 
 
-@pytest.fixture(scope="function")
 def grid_data_c():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
@@ -116,7 +114,6 @@ def grid_data_c():
     )
 
 
-@pytest.fixture(scope="function")
 def grid_data_d():
     return xr.DataArray(
         data=np.arange(16).reshape((4, 4)),
@@ -130,7 +127,6 @@ def grid_data_d():
     )
 
 
-@pytest.fixture(scope="function")
 def grid_data_e():
     return xr.DataArray(
         data=np.arange(12).reshape((4, 3)),
