@@ -59,7 +59,6 @@ def quads_1():
     return xu.UgridDataArray.from_structured(da)
 
 
-
 def grid_data_a():
     return xr.DataArray(
         data=np.arange(9).reshape((3, 3)),
@@ -71,7 +70,6 @@ def grid_data_a():
             "dy": -50.0,
         },
     )
-
 
 
 def grid_data_a_layered():
