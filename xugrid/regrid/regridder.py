@@ -120,9 +120,9 @@ class BaseRegridder(abc.ABC):
         return
 
     def _regrid_array(self, source):
-        if hasattr(self,"_source"):
+        if hasattr(self, "_source"):
             source_grid = self._source
-        else: 
+        else:
             source_grid = source
         first_dims_shape = source.shape[: -source_grid.ndim]
 
