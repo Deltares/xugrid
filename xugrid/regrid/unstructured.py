@@ -8,6 +8,8 @@ from xugrid.ugrid.ugrid2d import Ugrid2d
 
 class UnstructuredGrid2d:
     """
+    Stores only the grid topology.
+
     e.g. face -> face
 
     Parameters
@@ -27,6 +29,10 @@ class UnstructuredGrid2d:
             )
 
     @property
+    def ndim(self):
+        return 1
+
+    @property
     def dims(self):
         return (self.ugrid_topology.face_dimension,)
 
@@ -42,11 +48,26 @@ class UnstructuredGrid2d:
     def area(self):
         return self.ugrid_topology.area
 
+    def convert_to(self, matched_type):
+        if type(self) == matched_type:
+            return self
+        else:
+            TypeError(f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}")
+
     def overlap(self, other, relative: bool):
         """
         Parameters
         ----------
         other: UnstructuredGrid2d
+        relative: bool
+            Whether to divide by the original area. Used for e.g.
+            first-order-conservative methods.
+
+        Returns
+        -------
+        source_index: 1d np.ndarray of int
+        target_index: 1d np.ndarray of int
+        weights: 1d np.ndarray of float
         """
         (
             target_index,

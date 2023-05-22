@@ -11,27 +11,6 @@ from xugrid import (
 )
 
 
-@pytest.fixture(scope="function")
-def disk():
-    return xu.data.disk()["face_z"]
-
-
-def quads(dx):
-    xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    y = np.arange(ymin, ymax, dx) + 0.5 * dx
-
-    da = xr.DataArray(
-        data=np.full((y.size, x.size), np.nan),
-        coords={"y": y, "x": x},
-        dims=[
-            "y",
-            "x",
-        ],
-    )
-    return xu.UgridDataArray.from_structured(da)
-
-
 @pytest.mark.parametrize(
     "cls",
     [
@@ -48,8 +27,24 @@ def test_check_source_target_types(disk, cls):
         cls(source=1.0, target=disk)
 
 
-def test_centroid_locator_regridder(disk):
-    square = quads(1.0)
+def test_centroid_locator_regridder_structured(
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_centroid
+):
+    regridder = CentroidLocatorRegridder(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
+    assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
+
+    # With broadcasting
+    regridder = CentroidLocatorRegridder(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
+    assert broadcasted.dims == ("layer", "y", "x")
+    assert (
+        broadcasted.fillna(0.0).isel(layer=0) == expected_results_centroid.fillna(0.0)
+    ).any()
+
+
+def test_centroid_locator_regridder(disk, quads_1):
+    square = quads_1
     regridder = CentroidLocatorRegridder(source=disk, target=square)
     result = regridder.regrid(disk)
     assert isinstance(result, xu.UgridDataArray)
@@ -76,8 +71,22 @@ def test_centroid_locator_regridder(disk):
     assert broadcasted.dims == ("layer", disk.grid.face_dimension)
 
 
-def test_overlap_regridder(disk):
-    square = quads(1.0)
+def test_overlap_regridder_structured(
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_overlap
+):
+    regridder = OverlapRegridder(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
+    assert (result == expected_results_overlap).any()
+
+    # With broadcasting
+    regridder = OverlapRegridder(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
+    assert broadcasted.dims == ("layer", "y", "x")
+    assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
+
+
+def test_overlap_regridder(disk, quads_1):
+    square = quads_1
     regridder = OverlapRegridder(disk, square, method="mean")
     result = regridder.regrid(disk)
     assert result.notnull().any()
@@ -94,8 +103,24 @@ def test_overlap_regridder(disk):
     assert broadcasted.shape == (5, 100)
 
 
-def test_barycentric_interpolator(disk):
-    square = quads(0.25)
+def test_lineair_interpolator_structured(
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_linear
+):
+    regridder = BarycentricInterpolator(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
+    assert (result.fillna(0.0) == expected_results_linear.fillna(0.0)).any()
+
+    # With broadcasting
+    regridder = BarycentricInterpolator(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
+    assert broadcasted.dims == ("layer", "y", "x")
+    assert (
+        broadcasted.fillna(0.0).isel(layer=0) == expected_results_linear.fillna(0.0)
+    ).any()
+
+
+def test_barycentric_interpolator(disk, quads_0_25):
+    square = quads_0_25
     regridder = BarycentricInterpolator(source=disk, target=square)
     result = regridder.regrid(disk)
     assert result.notnull().any()
@@ -121,8 +146,8 @@ def test_barycentric_interpolator(disk):
         BarycentricInterpolator,
     ],
 )
-def test_regridder_from_weights(cls, disk):
-    square = quads(1.0)
+def test_regridder_from_weights(cls, disk, quads_1):
+    square = quads_1
     regridder = cls(source=disk, target=square)
     result = regridder.regrid(disk)
     weights = regridder.weights
@@ -140,8 +165,8 @@ def test_regridder_from_weights(cls, disk):
         BarycentricInterpolator,
     ],
 )
-def test_regridder_from_dataset(cls, disk):
-    square = quads(1.0)
+def test_regridder_from_dataset(cls, disk, quads_1):
+    square = quads_1
     regridder = cls(source=disk, target=square)
     result = regridder.regrid(disk)
     dataset = regridder.to_dataset()
