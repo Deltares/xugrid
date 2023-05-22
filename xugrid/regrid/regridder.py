@@ -120,7 +120,10 @@ class BaseRegridder(abc.ABC):
         return
 
     def _regrid_array(self, source):
-        source_grid = self._source
+        if hasattr(self,"_source"):
+            source_grid = self._source
+        else: 
+            source_grid = source
         first_dims_shape = source.shape[: -source_grid.ndim]
 
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
@@ -138,7 +141,7 @@ class BaseRegridder(abc.ABC):
         #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
         #
         # Source is always 2D after this step, sized: (n_extra, size).
-        source = source.reshape((-1, self._source.size))
+        source = source.reshape((-1, source_grid.size))
 
         size = self._target.size
         if isinstance(source, DaskArray):
