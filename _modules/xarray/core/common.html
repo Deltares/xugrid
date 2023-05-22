@@ -297,8 +297,9 @@
 <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
 <span class="kn">from</span> <span class="nn">xarray.core.indexing</span> <span class="kn">import</span> <span class="n">BasicIndexer</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span>
 <span class="kn">from</span> <span class="nn">xarray.core.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
+<span class="kn">from</span> <span class="nn">xarray.core.parallelcompat</span> <span class="kn">import</span> <span class="n">get_chunked_array_type</span><span class="p">,</span> <span class="n">guess_chunkmanager</span>
 <span class="kn">from</span> <span class="nn">xarray.core.pdcompat</span> <span class="kn">import</span> <span class="n">_convert_base_to_offset</span>
-<span class="kn">from</span> <span class="nn">xarray.core.pycompat</span> <span class="kn">import</span> <span class="n">is_duck_dask_array</span>
+<span class="kn">from</span> <span class="nn">xarray.core.pycompat</span> <span class="kn">import</span> <span class="n">is_chunked_array</span>
 <span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Frozen</span><span class="p">,</span>
     <span class="n">either_dict_or_kwargs</span><span class="p">,</span>
@@ -330,6 +331,7 @@
         <span class="n">DTypeLikeSave</span><span class="p">,</span>
         <span class="n">ScalarOrArray</span><span class="p">,</span>
         <span class="n">SideOptions</span><span class="p">,</span>
+        <span class="n">T_Chunks</span><span class="p">,</span>
         <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">T_Variable</span><span class="p">,</span>
     <span class="p">)</span>
@@ -443,7 +445,7 @@
     <span class="k">def</span> <span class="fm">__complex__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__array__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__array__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -1233,7 +1235,7 @@
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
         <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">TimeResampleGrouper</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">ResolvedTimeResampleGrouper</span><span class="p">,</span> <span class="n">TimeResampleGrouper</span>
         <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1296,11 +1298,13 @@
         <span class="n">group</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
             <span class="n">dim_coord</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span>
         <span class="p">)</span>
+
+        <span class="n">rgrouper</span> <span class="o">=</span> <span class="n">ResolvedTimeResampleGrouper</span><span class="p">(</span><span class="n">grouper</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">resample_cls</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">rgrouper</span><span class="p">,),</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">dim_name</span><span class="p">,</span>
-            <span class="n">grouper</span><span class="o">=</span><span class="n">grouper</span><span class="p">,</span>
             <span class="n">resample_dim</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span><span class="p">,</span>
             <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1678,28 +1682,52 @@
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -1708,7 +1736,11 @@
 <span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="o">...</span>
 
@@ -1716,9 +1748,16 @@
 <div class="viewcode-block" id="full_like"><a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a><span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object with the same shape and type as a given object.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a new object with the same shape and type as a given object.</span>
+
+<span class="sd">    Returned object will be chunked if if the given object is chunked, or if chunks or chunked_array_type are specified.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1731,6 +1770,18 @@
 <span class="sd">    dtype : dtype or dict-like of dtype, optional</span>
 <span class="sd">        dtype of the new array. If a dict-like, maps dtypes to</span>
 <span class="sd">        variables. If omitted, it defaults to other.dtype.</span>
+<span class="sd">    chunks : int, &quot;auto&quot;, tuple of int or mapping of Hashable to int, optional</span>
+<span class="sd">        Chunk sizes along each dimension, e.g., ``5``, ``&quot;auto&quot;``, ``(5, 5)`` or</span>
+<span class="sd">        ``{&quot;x&quot;: 5, &quot;y&quot;: 5}``.</span>
+<span class="sd">    chunked_array_type: str, optional</span>
+<span class="sd">        Which chunked array type to coerce the underlying data array to.</span>
+<span class="sd">        Defaults to &#39;dask&#39; if installed, else whatever is registered via the `ChunkManagerEnetryPoint` system.</span>
+<span class="sd">        Experimental API that should not be relied upon.</span>
+<span class="sd">    from_array_kwargs: dict, optional</span>
+<span class="sd">        Additional keyword arguments passed on to the `ChunkManagerEntrypoint.from_array` method used to create</span>
+<span class="sd">        chunked arrays, via whichever chunk manager is specified through the `chunked_array_type` kwarg.</span>
+<span class="sd">        For example, with dask as the default chunked array type, this method would pass additional kwargs</span>
+<span class="sd">        to :py:func:`dask.array.from_array`. Experimental API that should not be relied upon.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1844,7 +1895,12 @@
 
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">_full_like_variable</span><span class="p">(</span>
-                <span class="n">v</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">),</span> <span class="n">dtype_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">),</span>
+                <span class="n">dtype_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="n">chunks</span><span class="p">,</span>
+                <span class="n">chunked_array_type</span><span class="p">,</span>
+                <span class="n">from_array_kwargs</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
@@ -1853,7 +1909,14 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;dtype&#39; cannot be dict-like when passing a DataArray&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">_full_like_variable</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span>
+            <span class="n">_full_like_variable</span><span class="p">(</span>
+                <span class="n">other</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="p">,</span>
+                <span class="n">chunks</span><span class="p">,</span>
+                <span class="n">chunked_array_type</span><span class="p">,</span>
+                <span class="n">from_array_kwargs</span><span class="p">,</span>
+            <span class="p">),</span>
             <span class="n">dims</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
             <span class="n">coords</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
             <span class="n">attrs</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
@@ -1862,13 +1925,20 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;dtype&#39; cannot be dict-like when passing a Variable&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_full_like_variable</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_full_like_variable</span><span class="p">(</span>
+            <span class="n">other</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">chunked_array_type</span><span class="p">,</span> <span class="n">from_array_kwargs</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected DataArray, Dataset, or Variable&quot;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
@@ -1876,13 +1946,28 @@
     <span class="k">if</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
         <span class="n">fill_value</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">get_fill_value</span><span class="p">(</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">is_duck_dask_array</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">dask.array</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_chunked_array</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">chunked_array_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="n">chunks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">chunked_array_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">chunkmanager</span> <span class="o">=</span> <span class="n">get_chunked_array_type</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chunkmanager</span> <span class="o">=</span> <span class="n">guess_chunkmanager</span><span class="p">(</span><span class="n">chunked_array_type</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-            <span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">chunks</span>
+
+        <span class="k">if</span> <span class="n">from_array_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">from_array_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">chunkmanager</span><span class="o">.</span><span class="n">array_api</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span> <span class="k">if</span> <span class="n">chunks</span> <span class="k">else</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">chunks</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">from_array_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
@@ -1891,36 +1976,72 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <div class="viewcode-block" id="zeros_like"><a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a><span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object of zeros with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
@@ -1931,6 +2052,18 @@
 <span class="sd">        The reference object. The output will have the same dimensions and coordinates as this object.</span>
 <span class="sd">    dtype : dtype, optional</span>
 <span class="sd">        dtype of the new array. If omitted, it defaults to other.dtype.</span>
+<span class="sd">    chunks : int, &quot;auto&quot;, tuple of int or mapping of Hashable to int, optional</span>
+<span class="sd">        Chunk sizes along each dimension, e.g., ``5``, ``&quot;auto&quot;``, ``(5, 5)`` or</span>
+<span class="sd">        ``{&quot;x&quot;: 5, &quot;y&quot;: 5}``.</span>
+<span class="sd">    chunked_array_type: str, optional</span>
+<span class="sd">        Which chunked array type to coerce the underlying data array to.</span>
+<span class="sd">        Defaults to &#39;dask&#39; if installed, else whatever is registered via the `ChunkManagerEnetryPoint` system.</span>
+<span class="sd">        Experimental API that should not be relied upon.</span>
+<span class="sd">    from_array_kwargs: dict, optional</span>
+<span class="sd">        Additional keyword arguments passed on to the `ChunkManagerEntrypoint.from_array` method used to create</span>
+<span class="sd">        chunked arrays, via whichever chunk manager is specified through the `chunked_array_type` kwarg.</span>
+<span class="sd">        For example, with dask as the default chunked array type, this method would pass additional kwargs</span>
+<span class="sd">        to :py:func:`dask.array.from_array`. Experimental API that should not be relied upon.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1974,40 +2107,83 @@
 <span class="sd">    full_like</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">full_like</span><span class="p">(</span>
+        <span class="n">other</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">,</span>
+        <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span>
+        <span class="n">chunked_array_type</span><span class="o">=</span><span class="n">chunked_array_type</span><span class="p">,</span>
+        <span class="n">from_array_kwargs</span><span class="o">=</span><span class="n">from_array_kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-    <span class="o">...</span>
-
-
-<span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+    <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
     <span class="o">...</span>
 
 
 <div class="viewcode-block" id="ones_like"><a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a><span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
-    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">T_Chunks</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunked_array_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a new object of ones with the same shape and</span>
 <span class="sd">    type as a given dataarray or dataset.</span>
@@ -2018,6 +2194,18 @@
 <span class="sd">        The reference object. The output will have the same dimensions and coordinates as this object.</span>
 <span class="sd">    dtype : dtype, optional</span>
 <span class="sd">        dtype of the new array. If omitted, it defaults to other.dtype.</span>
+<span class="sd">    chunks : int, &quot;auto&quot;, tuple of int or mapping of Hashable to int, optional</span>
+<span class="sd">        Chunk sizes along each dimension, e.g., ``5``, ``&quot;auto&quot;``, ``(5, 5)`` or</span>
+<span class="sd">        ``{&quot;x&quot;: 5, &quot;y&quot;: 5}``.</span>
+<span class="sd">    chunked_array_type: str, optional</span>
+<span class="sd">        Which chunked array type to coerce the underlying data array to.</span>
+<span class="sd">        Defaults to &#39;dask&#39; if installed, else whatever is registered via the `ChunkManagerEnetryPoint` system.</span>
+<span class="sd">        Experimental API that should not be relied upon.</span>
+<span class="sd">    from_array_kwargs: dict, optional</span>
+<span class="sd">        Additional keyword arguments passed on to the `ChunkManagerEntrypoint.from_array` method used to create</span>
+<span class="sd">        chunked arrays, via whichever chunk manager is specified through the `chunked_array_type` kwarg.</span>
+<span class="sd">        For example, with dask as the default chunked array type, this method would pass additional kwargs</span>
+<span class="sd">        to :py:func:`dask.array.from_array`. Experimental API that should not be relied upon.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -2053,7 +2241,14 @@
 <span class="sd">    full_like</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">full_like</span><span class="p">(</span>
+        <span class="n">other</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="p">,</span>
+        <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span>
+        <span class="n">chunked_array_type</span><span class="o">=</span><span class="n">chunked_array_type</span><span class="p">,</span>
+        <span class="n">from_array_kwargs</span><span class="o">=</span><span class="n">from_array_kwargs</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">get_chunksizes</span><span class="p">(</span>
@@ -2167,7 +2362,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br>
 </p>
 
   </div>

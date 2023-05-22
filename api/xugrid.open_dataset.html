@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>xugrid.open_dataset &#8212; Xugrid 0.4.0 documentation</title>
   <script>
@@ -1244,6 +1244,13 @@ By default(<code class="docutils literal notranslate"><span class="pre">inline_a
 itself, and each chunk refers to that task by its key. With
 <code class="docutils literal notranslate"><span class="pre">inline_array=True</span></code>, Dask will instead inline the array directly
 in the values of the task graph. See <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.from_array()</span></code>.</p></li>
+<li><p><strong>chunked_array_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Which chunked array type to coerce this datasets’ arrays to.
+Defaults to ‘dask’ if installed, else whatever is registered via the <cite>ChunkManagerEnetryPoint</cite> system.
+Experimental API that should not be relied upon.</p></li>
+<li><p><strong>from_array_kwargs</strong> (<em>dict</em>) – Additional keyword arguments passed on to the <cite>ChunkManagerEntrypoint.from_array</cite> method used to create
+chunked arrays, via whichever chunk manager is specified through the <cite>chunked_array_type</cite> kwarg.
+For example if <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.Array()</span></code> objects are used for chunking, additional kwargs will be passed
+to <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.from_array()</span></code>. Experimental API that should not be relied upon.</p></li>
 <li><p><strong>backend_kwargs</strong> (<em>dict</em>) – Additional keyword arguments passed on to the engine open function,
 equivalent to <cite>**kwargs</cite>.</p></li>
 <li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Additional keyword arguments passed on to the engine open function.
@@ -1381,7 +1388,7 @@ is never touched.</p>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br>
 </p>
 
   </div>

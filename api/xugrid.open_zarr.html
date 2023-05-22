@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>xugrid.open_zarr &#8212; Xugrid 0.4.0 documentation</title>
   <script>
@@ -1232,6 +1232,13 @@ raise an error.</p></li>
 <li><p><strong>zarr_version</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The desired zarr spec version to target (currently 2 or 3). The default
 of None will attempt to determine the zarr version from <code class="docutils literal notranslate"><span class="pre">store</span></code> when
 possible, otherwise defaulting to 2.</p></li>
+<li><p><strong>chunked_array_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Which chunked array type to coerce this datasets’ arrays to.
+Defaults to ‘dask’ if installed, else whatever is registered via the <cite>ChunkManagerEnetryPoint</cite> system.
+Experimental API that should not be relied upon.</p></li>
+<li><p><strong>from_array_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional keyword arguments passed on to the <cite>ChunkManagerEntrypoint.from_array</cite> method used to create
+chunked arrays, via whichever chunk manager is specified through the <cite>chunked_array_type</cite> kwarg.
+Defaults to {‘manager’: ‘dask’}, meaning additional kwargs will be passed eventually to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.from_array()</span></code>. Experimental API that should not be relied upon.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1351,7 +1358,7 @@ possible, otherwise defaulting to 2.</p></li>
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br>
 </p>
 
   </div>

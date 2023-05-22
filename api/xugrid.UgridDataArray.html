@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>xugrid.UgridDataArray &#8212; Xugrid 0.4.0 documentation</title>
   <script>
@@ -1497,58 +1497,61 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_cdms2</span></code>()</p></td>
 <td><p>Convert this array into a cdms2.Variable</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([name, dim_order])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dask_dataframe</span></code>([dim_order, set_index])</p></td>
+<td><p>Convert this array into a dask.dataframe.DataFrame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([name, dim_order])</p></td>
 <td><p>Convert this array and its coordinates into a tidy pandas.DataFrame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>([dim, name, promote_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>([dim, name, promote_attrs])</p></td>
 <td><p>Convert a DataArray to a Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([data, encoding])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([data, encoding])</p></td>
 <td><p>Convert this xarray.DataArray into a dictionary following xarray naming conventions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_index</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_index</span></code>()</p></td>
 <td><p>Convert this variable to a pandas.Index.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_iris</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_iris</span></code>()</p></td>
 <td><p>Convert this array into a iris.cube.Cube</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_masked_array</span></code>([copy])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_masked_array</span></code>([copy])</p></td>
 <td><p>Convert this array into a numpy.ma.MaskedArray</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>([path, mode, format, group, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>([path, mode, format, group, ...])</p></td>
 <td><p>Write DataArray contents to a netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_numpy</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_numpy</span></code>()</p></td>
 <td><p>Coerces wrapped data to numpy and returns a numpy.ndarray.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>()</p></td>
 <td><p>Convert this array into a pandas object with the same shape.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_series</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_series</span></code>()</p></td>
 <td><p>Convert this array into a pandas.Series.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_unstacked_dataset</span></code>(dim[, level])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_unstacked_dataset</span></code>(dim[, level])</p></td>
 <td><p>Unstack DataArray expanding to Dataset along a given level of a stacked coordinate.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code>([store, chunk_store, mode, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code>([store, chunk_store, mode, ...])</p></td>
 <td><p>Write DataArray contents to a Zarr store</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(*dims[, transpose_coords, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(*dims[, transpose_coords, ...])</p></td>
 <td><p>Return a new DataArray object with transposed dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unify_chunks</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unify_chunks</span></code>()</p></td>
 <td><p>Unify chunk size along all chunked dimensions of this DataArray.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstack</span></code>([dim, fill_value, sparse])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstack</span></code>([dim, fill_value, sparse])</p></td>
 <td><p>Unstack existing dimensions corresponding to MultiIndexes into multiple new dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
 <td><p>Reduce this DataArray's data by applying <code class="docutils literal notranslate"><span class="pre">var</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted</span></code>(weights)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted</span></code>(weights)</p></td>
 <td><p>Weighted DataArray operations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">where</span></code>(cond[, other, drop])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">where</span></code>(cond[, other, drop])</p></td>
 <td><p>Filter elements from this object according to a condition.</p></td>
 </tr>
 </tbody>
@@ -1754,7 +1757,7 @@
   <div class="footer-item">
     
 <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br>
 </p>
 
   </div>
