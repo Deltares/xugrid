@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[0.5.0] 2023-05-25
+------------------
+
+Added
+~~~~~
+
+- :class:`xugrid.BarycentricInterpolator`,
+  :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
+  and :class:`RelativeOverlapRegridder`, now accept structured grids, in the
+  form of a ``xr.DataArray`` with a ``"x"`` and a ``"y"`` coordinate.
+
+
 [0.4.0] 2023-05-05
 ------------------
 
