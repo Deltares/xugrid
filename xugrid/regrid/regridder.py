@@ -122,15 +122,27 @@ class BaseRegridder(abc.ABC):
     def _regrid_array(self, source):
         if hasattr(self, "_source"):
             source_grid = self._source
+            ndim = source_grid.ndim
+            size = source_grid.size
         else:
+            # regrid from weights, source grid is not a structured or unstructured 2d grid
+            # use ndim = 1 for unstructured, 2 for structured
+            
+            #UnstructuredGrid2d(obj)
+            
             source_grid = source
-        first_dims_shape = source.shape[: -source_grid.ndim]
-
+            ndim = 1
+            #if(isinstance(obj, (xr.DataArray, xr.Dataset)):)
+            _, size = source.shape
+            # if structured, ndim = 2
+            
+        first_dims_shape = source.shape[: -ndim]
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
         # This is the `extra_index` iteration in _regrid().
         # But it should work consistently even if no additional present: in that case we create
         # a 1-sized additional dimension in front, so the `extra_index` iteration always applies.
-        if source.ndim == source_grid.ndim:
+        # source.ndim: grid dims, source_grid.ndim: ndim from structured2d (=2) or unstructured2d(=1)
+        if source.ndim == ndim:
             source = source[np.newaxis]
 
         # All additional dimension are flattened into one, in front.
@@ -141,7 +153,7 @@ class BaseRegridder(abc.ABC):
         #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
         #
         # Source is always 2D after this step, sized: (n_extra, size).
-        source = source.reshape((-1, source_grid.size))
+        source = source.reshape((-1, size))
 
         size = self._target.size
         if isinstance(source, DaskArray):
@@ -170,6 +182,7 @@ class BaseRegridder(abc.ABC):
     def regrid_dataarray(self, source: xr.DataArray, source_dims: Tuple[str]):
         # Do not set vectorize=True: numba will run the for loop more
         # efficiently, and guarantees a single large allocation.
+        # TODO: check whats going wrong with dimensions
         out = xr.apply_ufunc(
             self._regrid_array,
             source,
@@ -259,7 +272,7 @@ class BaseRegridder(abc.ABC):
     def from_weights(cls, weights, target: "xugrid.Ugrid2d"):
         instance = cls.__new__(cls)
         instance._weights = weights
-        instance._target = UnstructuredGrid2d(target)
+        instance._target = setup_grid(target)
         return instance
 
     @classmethod
