@@ -120,19 +120,13 @@ class BaseRegridder(abc.ABC):
         return
 
     def _regrid_array(self, source):
-        if hasattr(self, "_source"):
-            ndim = self._source.ndim
-            size = self._source.size
-        else:
-            ndim = self._source_ndim
-            size = self._source_size
-        first_dims_shape = source.shape[:-ndim]
+        first_dims_shape = source.shape[:-self._source_regrid_ndim]
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
         # This is the `extra_index` iteration in _regrid().
         # But it should work consistently even if no additional present: in that case we create
         # a 1-sized additional dimension in front, so the `extra_index` iteration always applies.
         # source.ndim: grid dims, source_grid.ndim: ndim from structured2d (=2) or unstructured2d(=1)
-        if source.ndim == ndim:
+        if source.ndim == self._source_regrid_ndim:
             source = source[np.newaxis]
 
         # All additional dimension are flattened into one, in front.
@@ -143,16 +137,16 @@ class BaseRegridder(abc.ABC):
         #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
         #
         # Source is always 2D after this step, sized: (n_extra, size).
-        source = source.reshape((-1, size))
+        source = source.reshape((-1, self._source_regrid_size ))
 
         size = self._target.size
         if isinstance(source, DaskArray):
-            chunks = source.chunks[:-ndim] + (self._target.shape,)
+            chunks = source.chunks[:-self._source_regrid_ndim] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
                 self._weights,  # *argsfrom
-                size,  # *args
+                self._source_regrid_size ,  # *args
                 dtype=np.float64,
                 chunks=chunks,
                 meta=np.array((), dtype=source.dtype),
@@ -204,11 +198,14 @@ class BaseRegridder(abc.ABC):
         """
         if not hasattr(self, "_source"):
             if isinstance(object, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
-                self._source_ndim = 1
-                self._source_size = object[object.ugrid.grid.face_dimension].size
+                self._source_regrid_ndim = 1
+                self._source_regrid_size = object[object.ugrid.grid.face_dimension].size
             else:
-                self._source_size = object["x"].size * object["y"].size
-                self._source_ndim = 2
+                self._source_regrid_ndim = 2
+                self._source_regrid_size = object["x"].size * object["y"].size
+        else:
+            self._source_regrid_ndim = self._source.ndim
+            self._source_regrid_size = self._source.size
 
         if type(self._target) is StructuredGrid2d:
             source_dims = ("y", "x")
