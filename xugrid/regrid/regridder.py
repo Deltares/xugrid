@@ -120,7 +120,7 @@ class BaseRegridder(abc.ABC):
         return
 
     def _regrid_array(self, source):
-        first_dims_shape = source.shape[:-self._source_regrid_ndim]
+        first_dims_shape = source.shape[: -self._source_regrid_ndim]
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
         # This is the `extra_index` iteration in _regrid().
         # But it should work consistently even if no additional present: in that case we create
@@ -137,16 +137,16 @@ class BaseRegridder(abc.ABC):
         #   * ("time", "layer", "face") -> ("stacked_time_layer", "face")
         #
         # Source is always 2D after this step, sized: (n_extra, size).
-        source = source.reshape((-1, self._source_regrid_size ))
+        source = source.reshape((-1, self._source_regrid_size))
 
         size = self._target.size
         if isinstance(source, DaskArray):
-            chunks = source.chunks[:-self._source_regrid_ndim] + (self._target.shape,)
+            chunks = source.chunks[: -self._source_regrid_ndim] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
                 self._weights,  # *argsfrom
-                self._source_regrid_size ,  # *args
+                self._source_regrid_size,  # *args
                 dtype=np.float64,
                 chunks=chunks,
                 meta=np.array((), dtype=source.dtype),
