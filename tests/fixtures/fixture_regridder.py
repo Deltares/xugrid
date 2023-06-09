@@ -18,10 +18,10 @@ from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 # --------
 
 
-
 @pytest.fixture(scope="function")
 def disk():
     return xu.data.disk()["face_z"]
+
 
 @pytest.fixture(scope="function")
 def disk_layered(disk):
@@ -29,6 +29,7 @@ def disk_layered(disk):
     # Disk is first in multiplication, to ensure that object is promoted to UgridDataArray
     disk_layered = disk * layer
     return disk_layered.transpose("layer", disk.ugrid.grid.face_dimension)
+
 
 @pytest.fixture(scope="function")
 def quads_0_25():

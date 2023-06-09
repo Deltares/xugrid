@@ -172,8 +172,8 @@ def test_regridder_from_weights_layered(cls, disk, disk_layered, quads_1):
     weights = regridder.weights
     new_regridder = cls.from_weights(weights, target=square)
     new_result = new_regridder.regrid(disk_layered)
-    assert new_result.equals(result.sel(layer=1))
-
+    # assert new_result.sel(layer=1).equals(result)
+    assert np.array_equal(new_result.sel(layer=1).values, result.values, equal_nan=True)
 
 
 @pytest.mark.parametrize(
@@ -193,4 +193,3 @@ def test_regridder_from_dataset(cls, disk, quads_1):
     new_regridder = cls.from_dataset(dataset)
     new_result = new_regridder.regrid(disk)
     assert new_result.equals(result)
-

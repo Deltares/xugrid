@@ -121,22 +121,12 @@ class BaseRegridder(abc.ABC):
 
     def _regrid_array(self, source):
         if hasattr(self, "_source"):
-            source_grid = self._source
-            ndim = source_grid.ndim
-            size = source_grid.size
+            ndim = self._source.ndim
+            size = self._source.size
         else:
-            # regrid from weights, source grid is not a structured or unstructured 2d grid
-            # use ndim = 1 for unstructured, 2 for structured
-            
-            #UnstructuredGrid2d(obj)
-            
-            source_grid = source
-            ndim = 1
-            #if(isinstance(obj, (xr.DataArray, xr.Dataset)):)
-            _, size = source.shape
-            # if structured, ndim = 2
-            
-        first_dims_shape = source.shape[: -ndim]
+            ndim = self._source_ndim
+            size = self._source_size
+        first_dims_shape = source.shape[:-ndim]
         # The regridding can be mapped over additional dimensions (e.g. for every time slice).
         # This is the `extra_index` iteration in _regrid().
         # But it should work consistently even if no additional present: in that case we create
@@ -157,11 +147,11 @@ class BaseRegridder(abc.ABC):
 
         size = self._target.size
         if isinstance(source, DaskArray):
-            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape,)
+            chunks = source.chunks[:-ndim] + (self._target.shape,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
-                self._weights,  # *args
+                self._weights,  # *argsfrom
                 size,  # *args
                 dtype=np.float64,
                 chunks=chunks,
@@ -212,6 +202,13 @@ class BaseRegridder(abc.ABC):
         -------
         regridded: UgridDataArray or xarray.DataArray
         """
+        if not hasattr(self, "_source"):
+            if isinstance(object, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+                self._source_ndim = 1
+                self._source_size = object[object.ugrid.grid.face_dimension].size
+            else:
+                self._source_size = object["x"].size * object["y"].size
+                self._source_ndim = 2
 
         if type(self._target) is StructuredGrid2d:
             source_dims = ("y", "x")
