@@ -351,8 +351,11 @@ class StructuredGrid1d:
             neighbour,
         )
         return self.sorted_output(source_index, target_index, weights)
+    
 
-
+    def to_dataset(self):
+        pass
+    
 class StructuredGrid2d(StructuredGrid1d):
     """
     e.g. (x,y) -> (x,y)
@@ -488,6 +491,13 @@ class StructuredGrid2d(StructuredGrid1d):
             weights_y,
             weights_x,
         )
+
+    def to_dataset(self, name: str):
+        ds_x = self.xbounds.to_dataset()
+        ds_y = self.ybounds.to_dataset()
+        ds = xr.merge([ds_x, ds_y])
+        ds[name] = xr.DataArray(-1, attrs={"type": "StructuredGrid2d"})
+        return ds
 
 
 class StructuredGrid3d:
