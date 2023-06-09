@@ -1,4 +1,5 @@
 import numpy as np
+import xarray as xr
 
 import xugrid as xu
 from xugrid.constants import FloatDType
@@ -138,3 +139,8 @@ class UnstructuredGrid2d:
 
         order = np.argsort(target_index)
         return source_index[order], target_index[order], weights[order]
+
+    def to_dataset(self, name: str):
+        ds = self.ugrid_topology.to_dataset()
+        ds[name] = xr.DataArray(-1, attrs={"type": "UnstructuredGrid2d"})
+        return ds

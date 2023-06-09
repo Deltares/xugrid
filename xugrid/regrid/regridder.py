@@ -222,11 +222,12 @@ class BaseRegridder(abc.ABC):
         """
         Store the computed weights and target in a dataset for re-use.
         """
-        ds = xr.Dataset(
+        weights_ds = xr.Dataset(
             {f"__regrid_{k}": v for k, v in zip(self._weights._fields, self._weights)}
         )
-        ugrid_ds = self._target.ugrid_topology.to_dataset()
-        return xr.merge((ds, ugrid_ds))
+        source_ds = self._source.to_dataset("source")
+        target_ds = self._target.to_dataset("target")
+        return xr.merge((weights_ds, source_ds, target_ds))
 
     @staticmethod
     def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
