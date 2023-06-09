@@ -404,7 +404,7 @@
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_regrid_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
-        <span class="n">first_dims_shape</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_ndim</span><span class="p">]</span>
+        <span class="n">first_dims_shape</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_ndim</span><span class="p">]</span>
         <span class="c1"># The regridding can be mapped over additional dimensions (e.g. for every time slice).</span>
         <span class="c1"># This is the `extra_index` iteration in _regrid().</span>
         <span class="c1"># But it should work consistently even if no additional present: in that case we create</span>
@@ -421,16 +421,16 @@
         <span class="c1">#   * (&quot;time&quot;, &quot;layer&quot;, &quot;face&quot;) -&gt; (&quot;stacked_time_layer&quot;, &quot;face&quot;)</span>
         <span class="c1">#</span>
         <span class="c1"># Source is always 2D after this step, sized: (n_extra, size).</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_size</span> <span class="p">))</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_size</span><span class="p">))</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">size</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">DaskArray</span><span class="p">):</span>
-            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_ndim</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span><span class="p">,)</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_ndim</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span><span class="p">,)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">,</span>  <span class="c1"># func</span>
                 <span class="n">source</span><span class="p">,</span>  <span class="c1"># *args</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">,</span>  <span class="c1"># *argsfrom</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_size</span> <span class="p">,</span>  <span class="c1"># *args</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_source_regrid_size</span><span class="p">,</span>  <span class="c1"># *args</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
                 <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
