@@ -95,6 +95,14 @@ class AbstractUgrid(abc.ABC):
     def dimensions():
         """ """
 
+    @abc.abstractproperty
+    def mesh():
+        """ """
+
+    @abc.abstractproperty
+    def meshkernel():
+        """ """
+
     @abc.abstractstaticmethod
     def from_dataset():
         """ """

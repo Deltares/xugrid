@@ -251,8 +251,8 @@ class Ugrid1d(AbstractUgrid):
     def dimensions(self):
         return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
-    # These are all optional UGRID attributes. They are not computed by
-    # default, only when called upon.
+    # These are all optional attributes. They are not computed by default, only
+    # when called upon.
 
     @property
     def mesh(self) -> "mk.Mesh1d":  # type: ignore # noqa
@@ -265,9 +265,8 @@ class Ugrid1d(AbstractUgrid):
         """
         import meshkernel as mk
 
-        edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
-
         if self._mesh is None:
+            edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
                 node_y=self.node_y,

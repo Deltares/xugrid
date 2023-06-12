@@ -9,6 +9,7 @@ from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 from xarray.core.utils import either_dict_or_kwargs
 
+import xugrid
 from xugrid import conversion
 from xugrid import meshkernel_utils as mku
 from xugrid.constants import (
@@ -1269,6 +1270,63 @@ class Ugrid2d(AbstractUgrid):
                 f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
             )
         return f(obj, x, y)
+
+    def label_partitions(self, n_part: int) -> "xugrid.UgridDataArray":
+        """
+        Generate partition labesl for this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partition_labels: UgridDataArray of integers
+        """
+        import pymetis
+
+        adjacency_matrix = self.face_face_connectivity
+        _, partition_index = pymetis.part_graph(
+            nparts=n_part,
+            xadj=adjacency_matrix.indptr,
+            adjncy=adjacency_matrix.indices,
+        )
+        return xugrid.UgridDataArray(
+            obj=xr.DataArray(
+                data=np.array(partition_index),
+                dims=(self.core_dimension,),
+                name="labels",
+            ),
+            grid=self,
+        )
+
+    def partition(self, n_part: int):
+        """
+        Partition this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partitions
+        """
+        from xugrid.ugrid.partitioning import labels_to_indices
+
+        labels = self.label_partitions(n_part)
+        indices = labels_to_indices(labels.values)
+        return [self.topology_subset(index) for index in indices]
 
     @staticmethod
     def merge_partitions(grids):
