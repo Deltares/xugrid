@@ -73,6 +73,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
+    UgridDatasetAccessor.partition
+    UgridDatasetAccessor.partition_by_label
     UgridDatasetAccessor.to_geodataframe
     UgridDatasetAccessor.to_dataset
     UgridDatasetAccessor.to_netcdf
@@ -90,6 +92,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.to_crs
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points
+    UgridDataArrayAccessor.partition
+    UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
     UgridDataArrayAccessor.to_geodataframe
@@ -187,6 +191,7 @@ UGRID1D Topology
     Ugrid1d.isel
     Ugrid1d.sel
     Ugrid1d.topology_subset
+    Ugrid1d.merge_partitions
 
     Ugrid1d.from_meshkernel
     Ugrid1d.mesh
@@ -270,6 +275,9 @@ UGRID2D Topology
     Ugrid2d.rasterize
     Ugrid2d.rasterize_like
     Ugrid2d.topology_subset
+    Ugrid2d.label_partitions
+    Ugrid2d.partition
+    Ugrid2d.merge_partitions
 
     Ugrid2d.from_meshkernel
     Ugrid2d.mesh

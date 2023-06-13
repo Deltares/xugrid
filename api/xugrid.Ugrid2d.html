@@ -424,6 +424,16 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDatasetAccessor.partition.html">
+   xugrid.UgridDatasetAccessor.partition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDatasetAccessor.partition_by_label.html">
+   xugrid.UgridDatasetAccessor.partition_by_label
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="xugrid.UgridDatasetAccessor.to_geodataframe.html">
    xugrid.UgridDatasetAccessor.to_geodataframe
   </a>
@@ -501,6 +511,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel_points.html">
    xugrid.UgridDataArrayAccessor.sel_points
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArrayAccessor.partition.html">
+   xugrid.UgridDataArrayAccessor.partition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.UgridDataArrayAccessor.partition_by_label.html">
+   xugrid.UgridDataArrayAccessor.partition_by_label
   </a>
  </li>
  <li class="toctree-l1">
@@ -739,6 +759,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="xugrid.Ugrid1d.topology_subset.html">
    xugrid.Ugrid1d.topology_subset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid1d.merge_partitions.html">
+   xugrid.Ugrid1d.merge_partitions
   </a>
  </li>
  <li class="toctree-l1">
@@ -1054,6 +1079,21 @@
   </a>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.label_partitions.html">
+   xugrid.Ugrid2d.label_partitions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.partition.html">
+   xugrid.Ugrid2d.partition
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="xugrid.Ugrid2d.merge_partitions.html">
+   xugrid.Ugrid2d.merge_partitions
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="xugrid.Ugrid2d.from_meshkernel.html">
    xugrid.Ugrid2d.from_meshkernel
   </a>
@@ -1249,14 +1289,20 @@ A name entry is ignored, as name is given explicitly.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.isel.html#xugrid.Ugrid2d.isel" title="xugrid.Ugrid2d.isel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code></a>([indexers, return_index])</p></td>
 <td><p>Select based on node, edge, or face.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box" title="xugrid.Ugrid2d.locate_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_bounding_box</span></code></a>(xmin, ymin, xmax, ymax)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions" title="xugrid.Ugrid2d.label_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">label_partitions</span></code></a>(n_part)</p></td>
+<td><p>Generate partition labesl for this grid topology using METIS: <a class="reference external" href="https://github.com/KarypisLab/METIS">https://github.com/KarypisLab/METIS</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box" title="xugrid.Ugrid2d.locate_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_bounding_box</span></code></a>(xmin, ymin, xmax, ymax)</p></td>
 <td><p>Find which faces are located in the bounding box.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points" title="xugrid.Ugrid2d.locate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_points</span></code></a>(points)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points" title="xugrid.Ugrid2d.locate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_points</span></code></a>(points)</p></td>
 <td><p>Find in which face points are located.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_partitions</span></code>(grids)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions" title="xugrid.Ugrid2d.merge_partitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_partitions</span></code></a>(grids)</p></td>
+<td><p>Merge grid partitions into a single whole.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.partition.html#xugrid.Ugrid2d.partition" title="xugrid.Ugrid2d.partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partition</span></code></a>(n_part)</p></td>
+<td><p>Partition this grid topology using METIS: <a class="reference external" href="https://github.com/KarypisLab/METIS">https://github.com/KarypisLab/METIS</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.plot.html#xugrid.Ugrid2d.plot" title="xugrid.Ugrid2d.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</p></td>
 <td><p>Plots the edges of the mesh.</p></td>
