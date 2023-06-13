@@ -249,6 +249,13 @@ class TestUgridDataArray:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    def test_partitioning(self):
+        partitions = self.uda.ugrid.partition(n_part=2)
+        assert len(partitions) == 2
+        for partition in partitions:
+            assert isinstance(partition, xugrid.UgridDataArray)
+            assert partition.name == self.uda.name
+
     def test_crs(self):
         uda = self.uda
         crs = uda.ugrid.crs
@@ -511,6 +518,14 @@ class TestUgridDataset:
         assert actual["b"].shape == (4, 4)
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
+
+    def test_partitioning(self):
+        partitions = self.uds.ugrid.partition(n_part=2)
+        assert len(partitions) == 2
+        for partition in partitions:
+            assert isinstance(partition, xugrid.UgridDataset)
+            assert "a" in partition
+            assert "b" in partition
 
     def test_crs(self):
         uds = self.uds
