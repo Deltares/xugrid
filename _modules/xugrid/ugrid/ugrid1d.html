@@ -376,7 +376,7 @@ document.write(`
                   
   <h1>Source code for xugrid.ugrid.ugrid1d</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -628,8 +628,8 @@ document.write(`
     <span class="k">def</span> <span class="nf">dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">}</span>
 
-    <span class="c1"># These are all optional UGRID attributes. They are not computed by</span>
-    <span class="c1"># default, only when called upon.</span>
+    <span class="c1"># These are all optional attributes. They are not computed by default, only</span>
+    <span class="c1"># when called upon.</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
@@ -642,9 +642,8 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
 
-        <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">Mesh1d</span><span class="p">(</span>
                 <span class="n">node_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="n">node_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
@@ -896,8 +895,22 @@ document.write(`
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid1d.merge_partitions"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.merge_partitions.html#xugrid.Ugrid1d.merge_partitions">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge grid partitions into a single whole.</span>
+
+<span class="sd">        Duplicate edges are included only once, and removed from subsequent</span>
+<span class="sd">        partitions before merging.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grids: sequence of Ugrid1d</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        merged: Ugrid1d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">partitioning</span>
 
         <span class="c1"># Grab a sample grid</span>
@@ -919,7 +932,7 @@ document.write(`
             <span class="n">crs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
             <span class="n">attrs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_attrs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div>
+        <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div></div>
 </pre></div>
 
                 </article>

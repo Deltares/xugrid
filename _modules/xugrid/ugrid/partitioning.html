@@ -380,50 +380,76 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">accumulate</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">IntDType</span>
+<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">renumber</span>
 
 
-<span class="k">def</span> <span class="nf">partition_by_label</span><span class="p">(</span><span class="n">xugrid_obj</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">IntArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a 1D array of N labels into a N arrays of indices.</span>
+
+<span class="sd">    E.g. [0, 1, 0, 2, 2] -&gt; [[0, 2], [1], [3, 4]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">split_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labels</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sorter</span><span class="p">,</span> <span class="n">split_indices</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="n">index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">indices</span>
+
+
+<span class="k">def</span> <span class="nf">partition_by_label</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used by UgridDataArray.partition_by_label and</span>
+<span class="sd">    UgridDataset.partition_by_label.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grid: Ugrid1d, Ugrid2d</span>
+<span class="sd">    obj: DataArray or Dataset</span>
+<span class="sd">    labels: UgridDataArray of integers</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    partitions: List of (grid, obj)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;labels must be a UgridDataArray, received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;labels must be a UgridDataArray, &quot;</span> <span class="sa">f</span><span class="s2">&quot;received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;labels must have integer dtype, received </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xugrid_obj</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Can only partition a single UGRID topology&quot;</span><span class="p">)</span>
 
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">xugrid_obj</span><span class="o">.</span><span class="n">grid</span>
-    <span class="n">coredim</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span>
     <span class="k">if</span> <span class="n">labels</span><span class="o">.</span><span class="n">grid</span> <span class="o">!=</span> <span class="n">grid</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;grid of labels does not match xugrid object&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">labels</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">coredim</span><span class="p">,):</span>
+    <span class="k">if</span> <span class="n">labels</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Can only partition this topology by </span><span class="si">{</span><span class="n">coredim</span><span class="si">}</span><span class="s2">, found in labels &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;the dimensions: </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Can only partition this topology by </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="si">}</span><span class="s2">, found&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; the dimensions: </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-    <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="nb">sorted</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">sorted</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-    <span class="n">slices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
-        <span class="p">(</span>
-            <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="p">[</span><span class="n">sorter</span><span class="o">.</span><span class="n">size</span><span class="p">],</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+        <span class="n">obj_type</span> <span class="o">=</span> <span class="n">UgridDataset</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">obj_type</span> <span class="o">=</span> <span class="n">UgridDataArray</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected DataArray or Dataset, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-    <span class="p">)</span>
 
-    <span class="n">partitions</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">xugrid_obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="p">:</span> <span class="n">sorter</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]})</span>
-        <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">slices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">slices</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
-    <span class="p">]</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">partitions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="n">new_grid</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">partitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_type</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">new_grid</span><span class="p">))</span>
+
     <span class="k">return</span> <span class="n">partitions</span>
 
 
@@ -511,7 +537,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;same type, received: </span><span class="si">{</span><span class="n">types</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">griddims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">)</span>
+        <span class="n">griddims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">griddims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dimension names on UGRID topology </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> do not match &quot;</span>
@@ -533,7 +559,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">validate_partition_objects</span><span class="p">(</span><span class="n">data_objects</span><span class="p">):</span>
     <span class="c1"># Check presence of variables.</span>
-    <span class="n">allvars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">)</span>
+    <span class="n">allvars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">))</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">allvars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;These variables are present in some partitions, but not in &quot;</span>
@@ -541,7 +567,7 @@ document.write(`
         <span class="p">)</span>
     <span class="c1"># Check dimensions</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">allvars</span><span class="o">.</span><span class="n">pop</span><span class="p">():</span>
-        <span class="n">vardims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">)</span>
+        <span class="n">vardims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vardims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dimensions for </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> do not match across partitions: &quot;</span>
@@ -651,7 +677,7 @@ document.write(`
         <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">vars</span> <span class="o">=</span> <span class="n">vars_by_dim</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
             <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span>
+                <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_objects</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">)</span>
             <span class="p">]</span>
             <span class="n">merged_selection</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
