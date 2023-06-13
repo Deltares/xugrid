@@ -184,6 +184,7 @@ UGRID1D Topology
     Ugrid1d.node_edge_connectivity
 
     Ugrid1d.copy
+    Ugrid1d.rename
 
     Ugrid1d.isel
     Ugrid1d.sel
@@ -214,7 +215,7 @@ UGRID2D Topology
 
     Ugrid2d.topology_dimension
     Ugrid2d.dimensions
-    Ugrid1d.attrs
+    Ugrid2d.attrs
 
     Ugrid2d.n_node
     Ugrid2d.node_dimension
@@ -252,6 +253,7 @@ UGRID2D Topology
     Ugrid2d.exterior_faces
 
     Ugrid2d.copy
+    Ugrid2d.rename
 
     Ugrid2d.triangulate
     Ugrid2d.triangulation

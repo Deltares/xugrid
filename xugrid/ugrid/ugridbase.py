@@ -166,6 +166,46 @@ class AbstractUgrid(abc.ABC):
         self._attrs["name"] = name
         return
 
+    def rename(self, name: str):
+        """
+        Create a new grid with all variables named according to the default
+        naming conventions.
+        """
+        # Get the old and the new names. Their keys are the same.
+        old_attrs = self._attrs
+        new_attrs = conventions.default_topology_attrs(name, self.topology_dimension)
+
+        # The attrs will have some roles joined together, e.g. node_coordinates
+        # will contain x and y as "mesh2d_node_x mesh2d_node_y".
+        name_dict = {self.name: name}
+        skip = ("cf_role", "long_name", "topology_dimension")
+        for key, value in old_attrs.items():
+            if key in new_attrs and key not in skip:
+                split_new = new_attrs[key].split()
+                split_old = value.split()
+                if len(split_new) != len(split_old):
+                    raise ValueError(
+                        f"Number of entries does not match on {key}: "
+                        f"{split_new} versus {split_old}"
+                    )
+                for name_key, name_value in zip(split_old, split_new):
+                    name_dict[name_key] = name_value
+
+        new = self.copy()
+        new._attrs = new_attrs
+        new._indexes = {k: name_dict[v] for k, v in new._indexes.items()}
+        if new._dataset is not None:
+            to_rename = (
+                tuple(new._dataset.data_vars)
+                + tuple(new._dataset.coords)
+                + tuple(new._dataset.dims)
+            )
+            new._dataset = new._dataset.rename(
+                {k: v for k, v in name_dict.items() if k in to_rename}
+            )
+
+        return new
+
     @staticmethod
     def _single_topology(dataset: xr.Dataset):
         topologies = dataset.ugrid_roles.topology

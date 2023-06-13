@@ -20,6 +20,9 @@ Added
   :meth:`xugrid.UgridDatasetAccessor.partition`, and
   :meth:`xugrid.UgridDatasetAccessor.partition_by_label` have been added to
   part a grid and its associated data.
+- :meth:`xugrid.Ugrid1d.rename` and :meth:`xugrid.Ugrid2d.rename` have been
+  added to rename a grid, including the attributes that are created when the
+  grid is converted into an xarray dataset.
 
 [0.5.0] 2023-05-25
 ------------------
