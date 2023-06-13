@@ -160,7 +160,7 @@ def validate_partition_topology(grouped, n_partition: int):
                 f"same type, received: {types}"
             )
 
-        griddims = set(tuple(grid.dimensions) for grid in grids)
+        griddims = list(set(tuple(grid.dimensions) for grid in grids))
         if len(griddims) > 1:
             raise ValueError(
                 f"Dimension names on UGRID topology {name} do not match "
@@ -182,7 +182,7 @@ def group_grids_by_name(partitions):
 
 def validate_partition_objects(data_objects):
     # Check presence of variables.
-    allvars = set(tuple(sorted(ds.dims)) for ds in data_objects)
+    allvars = list(set(tuple(sorted(ds.data_vars)) for ds in data_objects))
     if len(allvars) > 1:
         raise ValueError(
             "These variables are present in some partitions, but not in "
@@ -190,7 +190,7 @@ def validate_partition_objects(data_objects):
         )
     # Check dimensions
     for var in allvars.pop():
-        vardims = set(ds[var].dims for ds in data_objects)
+        vardims = list(set(ds[var].dims for ds in data_objects))
         if len(vardims) > 1:
             raise ValueError(
                 f"Dimensions for {var} do not match across partitions: "

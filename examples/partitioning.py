@@ -9,6 +9,7 @@ and its associated data, and for merging partitions back into a single whole.
 # %%
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 import xugrid as xu
 
@@ -75,9 +76,9 @@ for partition, ax in zip(partitions, axes.ravel()):
 # model in parallel. Many model codes produce output per process. Xugrid can
 # merge these partitions back into one whole for post-processing:
 
-merged = xu.merge_partitions(partitions)
+merged = xu.merge_partitions(partitions)["elevation"]
 
-merged["elevation"].ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
+merged.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
 # Partitioning grids without data
 # -------------------------------
@@ -99,5 +100,33 @@ merged_grid, _ = xu.Ugrid2d.merge_partitions(grid_parts)
 merged_grid.plot()
 
 # %%
+# Preserving order
+# ----------------
+#
+# Note that partioning and merging does not preserve order!
+
+uda == merged
+
+# %%
+# The topology is equivalent, but the nodes, edges, and faces are in a
+# different order. This is because ``merge_partitions`` concatenates the
+# partitions. To preserve order, we can assign an ID to the partitions, and
+# reorder the data after merging.
+
+uds = xu.UgridDataset(grids=[uda.ugrid.grid])
+uds["elevation"] = uda
+uds["cell_id"] = ("mesh2d_nFaces", np.arange(len(uda)))
+
+partitions = uds.ugrid.partition(n_part=4)
+merged = xu.merge_partitions(partitions)
+order = np.argsort(merged["cell_id"].values)
+reordered = merged.isel(mesh2d_nFaces=order)
+
+uds["elevation"] == reordered["elevation"]
+
+# %%
+# This is required if results are compared with the input, or with results
+# stemming from another partitioning.
+#
 # .. _METIS library: https://github.com/KarypisLab/METIS
 # .. _pymetis bindings: https://github.com/inducer/pymetis

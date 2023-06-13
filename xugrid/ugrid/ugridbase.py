@@ -43,8 +43,10 @@ def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
             "index contains repeated values; only subsets will result "
             "in valid UGRID topology."
         )
-    if not pd_index.is_monotonic_increasing:
-        raise NotImplementedError("UGRID indexes must be sorted and unique.")
+    #    # TODO?
+    #    # Uniqueness is required, but sorting arguably not.
+    #    if not pd_index.is_monotonic_increasing:
+    #        raise NotImplementedError("UGRID indexes must be sorted and unique.")
 
     return pd_index
 
