@@ -3,50 +3,76 @@ Create and merge partitioned UGRID topologies.
 """
 from collections import defaultdict
 from itertools import accumulate
+from typing import List
 
 import numpy as np
 import xarray as xr
 
-from xugrid.constants import IntDType
+from xugrid.constants import IntArray, IntDType
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.ugrid.connectivity import renumber
 
 
-def partition_by_label(xugrid_obj, labels):
+def labels_to_indices(labels: IntArray) -> List[IntArray]:
+    """
+    Convert a 1D array of N labels into a N arrays of indices.
+
+    E.g. [0, 1, 0, 2, 2] -> [[0, 2], [1], [3, 4]]
+    """
+    sorter = np.argsort(labels)
+    split_indices = np.cumsum(np.bincount(labels)[:-1])
+    indices = np.split(sorter, split_indices)
+    for index in indices:
+        index.sort()
+    return indices
+
+
+def partition_by_label(grid, obj, labels: IntArray):
+    """
+    This function is used by UgridDataArray.partition_by_label and
+    UgridDataset.partition_by_label.
+
+    Parameters
+    ----------
+    grid: Ugrid1d, Ugrid2d
+    obj: DataArray or Dataset
+    labels: UgridDataArray of integers
+
+    Returns
+    -------
+    partitions: List of (grid, obj)
+    """
     if not isinstance(labels, UgridDataArray):
         raise TypeError(
-            f"labels must be a UgridDataArray, received {type(labels).__name__}"
+            "labels must be a UgridDataArray, " f"received: {type(labels).__name__}"
         )
     if not np.issubdtype(labels.dtype, np.integer):
         raise TypeError(f"labels must have integer dtype, received {labels.dtype}")
-    if len(xugrid_obj.grids) > 1:
-        raise NotImplementedError("Can only partition a single UGRID topology")
 
-    grid = xugrid_obj.grid
-    coredim = grid.core_dimension
     if labels.grid != grid:
         raise ValueError("grid of labels does not match xugrid object")
-    if labels.dims != (coredim,):
+    if labels.dims != (grid.core_dimension,):
         raise ValueError(
-            f"Can only partition this topology by {coredim}, found in labels "
-            f"the dimensions: {labels.dims}"
+            f"Can only partition this topology by {grid.core_dimension}, found"
+            f" the dimensions: {labels.dims}"
         )
 
-    sorter = np.argsort(labels.values)
-    sorted = labels[sorter]
-    flag = sorted[:-1] != sorted[1:]
-    slices = np.concatenate(
-        (
-            [0],
-            np.flatnonzero(flag) + 1,
-            [sorter.size],
+    if isinstance(obj, xr.Dataset):
+        obj_type = UgridDataset
+    elif isinstance(obj, xr.DataArray):
+        obj_type = UgridDataArray
+    else:
+        raise TypeError(
+            f"Expected DataArray or Dataset, received: {type(obj).__name__}"
         )
-    )
 
-    partitions = [
-        xugrid_obj.isel({grid.core_dimension: sorter[start:end]})
-        for start, end in zip(slices[:-1, slices[1:]])
-    ]
+    indices = labels_to_indices(labels.values)
+    partitions = []
+    for index in indices:
+        new_grid, indexes = grid.topology_subset(index, return_index=True)
+        new_obj = obj.isel(indexes, missing_dims="ignore")
+        partitions.append(obj_type(new_obj, new_grid))
+
     return partitions
 
 
@@ -134,7 +160,7 @@ def validate_partition_topology(grouped, n_partition: int):
                 f"same type, received: {types}"
             )
 
-        griddims = set(tuple(grid.dimensions) for grid in grids)
+        griddims = list(set(tuple(grid.dimensions) for grid in grids))
         if len(griddims) > 1:
             raise ValueError(
                 f"Dimension names on UGRID topology {name} do not match "
@@ -156,7 +182,7 @@ def group_grids_by_name(partitions):
 
 def validate_partition_objects(data_objects):
     # Check presence of variables.
-    allvars = set(tuple(sorted(ds.dims)) for ds in data_objects)
+    allvars = list(set(tuple(sorted(ds.data_vars)) for ds in data_objects))
     if len(allvars) > 1:
         raise ValueError(
             "These variables are present in some partitions, but not in "
@@ -164,7 +190,7 @@ def validate_partition_objects(data_objects):
         )
     # Check dimensions
     for var in allvars.pop():
-        vardims = set(ds[var].dims for ds in data_objects)
+        vardims = list(set(ds[var].dims for ds in data_objects))
         if len(vardims) > 1:
             raise ValueError(
                 f"Dimensions for {var} do not match across partitions: "
@@ -274,7 +300,7 @@ def merge_partitions(partitions):
         for dim, dim_indexes in indexes.items():
             vars = vars_by_dim[dim]
             selection = [
-                obj[vars].isel({dim: index})
+                obj[vars].isel({dim: index}, missing_dims="ignore")
                 for obj, index in zip(data_objects, dim_indexes)
             ]
             merged_selection = xr.concat(selection, dim=dim)

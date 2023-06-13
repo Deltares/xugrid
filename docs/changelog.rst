@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Added
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.label_partitions`, :meth:`xugrid.Ugrid2d.partition`,
+  :meth:`xugrid.Ugrid2d.merge_partitions` have been added to partition and merge
+  a grid.
+- :meth:`xugrid.UgridDataArrayAccessor.partition`,
+  :meth:`xugrid.UgridDataArrayAccessor.partition_by_label`,
+  :meth:`xugrid.UgridDatasetAccessor.partition`, and
+  :meth:`xugrid.UgridDatasetAccessor.partition_by_label` have been added to
+  part a grid and its associated data.
+
 [0.5.0] 2023-05-25
 ------------------
 
@@ -16,7 +31,6 @@ Added
   :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
   and :class:`RelativeOverlapRegridder`, now accept structured grids, in the
   form of a ``xr.DataArray`` with a ``"x"`` and a ``"y"`` coordinate.
-
 
 [0.4.0] 2023-05-05
 ------------------
