@@ -321,3 +321,42 @@ def test_ugrid1d_plot():
     grid = grid1d()
     primitive = grid.plot()
     assert isinstance(primitive, LineCollection)
+
+
+def test_ugrid1d_rename():
+    grid = grid1d()
+    original_indexes = grid._indexes.copy()
+    original_attrs = grid._attrs.copy()
+
+    renamed = grid.rename("__renamed")
+
+    # Check that original is unchanged
+    assert grid._attrs == original_attrs
+    assert grid._indexes == original_indexes
+    assert renamed._attrs == {
+        "cf_role": "mesh_topology",
+        "long_name": "Topology data of 1D network",
+        "topology_dimension": 1,
+        "node_dimension": "__renamed_nNodes",
+        "edge_dimension": "__renamed_nEdges",
+        "edge_node_connectivity": "__renamed_edge_nodes",
+        "node_coordinates": "__renamed_node_x __renamed_node_y",
+        "edge_coordinates": "__renamed_edge_x __renamed_edge_y",
+    }
+    assert renamed._indexes == {
+        "node_x": "__renamed_node_x",
+        "node_y": "__renamed_node_y",
+    }
+
+
+def test_ugrid1d_rename_with_dataset():
+    grid = grid1d()
+    grid2 = xugrid.Ugrid1d.from_dataset(grid.to_dataset())
+    original_dataset = grid2._dataset.copy()
+
+    renamed2 = grid2.rename("__renamed")
+    dataset = renamed2._dataset
+    assert grid2._dataset.equals(original_dataset)
+    assert sorted(dataset.data_vars) == ["__renamed", "__renamed_edge_nodes"]
+    assert sorted(dataset.dims) == ["__renamed_nEdges", "__renamed_nNodes", "two"]
+    assert sorted(dataset.coords) == ["__renamed_node_x", "__renamed_node_y"]

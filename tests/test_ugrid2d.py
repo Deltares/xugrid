@@ -949,3 +949,61 @@ def test_ugrid2d_plot():
     grid = grid2d()
     primitive = grid.plot()
     assert isinstance(primitive, LineCollection)
+
+
+def test_ugrid2d_rename():
+    grid = grid2d()
+    original_indexes = grid._indexes.copy()
+    original_attrs = grid._attrs.copy()
+
+    renamed = grid.rename("__renamed")
+
+    # Check that original is unchanged
+    assert grid._attrs == original_attrs
+    assert grid._indexes == original_indexes
+    assert renamed._attrs == {
+        "cf_role": "mesh_topology",
+        "long_name": "Topology data of 2D mesh",
+        "topology_dimension": 2,
+        "node_dimension": "__renamed_nNodes",
+        "edge_dimension": "__renamed_nEdges",
+        "face_dimension": "__renamed_nFaces",
+        "max_face_nodes_dimension": "__renamed_nMax_face_nodes",
+        "boundary_edge_dimension": "__renamed_nBoundary_edges",
+        "edge_node_connectivity": "__renamed_edge_nodes",
+        "face_node_connectivity": "__renamed_face_nodes",
+        "face_edge_connectivity": "__renamed_face_edges",
+        "edge_face_connectivity": "__renamed_edge_faces",
+        "boundary_node_connectivity": "__renamed_boundary_nodes",
+        "face_face_connectivity": "__renamed_face_faces",
+        "node_coordinates": "__renamed_node_x __renamed_node_y",
+        "edge_coordinates": "__renamed_edge_x __renamed_edge_y",
+        "face_coordinates": "__renamed_face_x __renamed_face_y",
+    }
+    assert renamed._indexes == {
+        "node_x": "__renamed_node_x",
+        "node_y": "__renamed_node_y",
+    }
+
+
+def test_ugrid2d_rename_with_dataset():
+    grid = grid2d()
+    grid2 = xugrid.Ugrid2d.from_dataset(grid.to_dataset())
+    original_dataset = grid2._dataset.copy()
+
+    renamed2 = grid2.rename("__renamed")
+    dataset = renamed2._dataset
+    assert grid2._dataset.equals(original_dataset)
+    assert sorted(dataset.data_vars) == [
+        "__renamed",
+        "__renamed_edge_nodes",
+        "__renamed_face_nodes",
+    ]
+    assert sorted(dataset.dims) == [
+        "__renamed_nEdges",
+        "__renamed_nFaces",
+        "__renamed_nMax_face_nodes",
+        "__renamed_nNodes",
+        "two",
+    ]
+    assert sorted(dataset.coords) == ["__renamed_node_x", "__renamed_node_y"]
