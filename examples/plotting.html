@@ -1,27 +1,32 @@
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Plot unstructured mesh data &#8212; Xugrid 0.5.0 documentation</title>
-  <script>
+  
+  
+  
+  <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/6.1.2/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
@@ -31,7 +36,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -41,119 +47,148 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Regridding overview" href="regridder_overview.html" />
     <link rel="prev" title="Quick overview" href="quick_overview.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="docsearch:language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
-  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
   <label class="overlay overlay-primary" for="__primary"></label>
-
   
-  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
   <label class="overlay overlay-secondary" for="__secondary"></label>
-
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
-      
-<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-    </div>
+</form></div>
   </div>
-
   
-  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
-      <span class="fas fa-bars"></span>
+    <span class="fa-solid fa-bars"></span>
   </label>
-  <div id="navbar-start">
-    
-    
   
-
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
 
 <a class="navbar-brand logo" href="../index.html">
-
   
   
   
   
+    
+    
+      
+    
+    
+    <img src="../_static/xugrid-logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/xugrid-logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
+    <p class="title logo__title">Xugrid</p>
   
-
-  
-    <img src="../_static/xugrid-low-res.svg" class="logo__image only-light" alt="Logo image">
-    <img src="../_static/xugrid-low-res.svg" class="logo__image only-dark" alt="Logo image">
-  
-  
-</a>
+</a></div>
     
   </div>
-
+  
   
   <div class="col-lg-9 navbar-header-items">
-    <div id="navbar-center" class="mr-auto">
+    
+    <div class="me-auto navbar-header-items__center">
       
-      <div class="navbar-center-item">
-        <nav class="navbar-nav">
-    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
-        Site Navigation
-    </p>
-    <ul id="navbar-main-elements" class="navbar-nav">
-        
-                <li class="nav-item current active">
-                    <a class="nav-link" href="../user_guide.html">
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="../api.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API Reference
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="../dev_docs.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../dev_docs.html">
                         Development
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
-    </ul>
-</nav>
-      </div>
+  </ul>
+</nav></div>
       
     </div>
-
-    <div id="navbar-end">
-      <div class="navbar-end-item navbar-end__search-button-container">
-        
-<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
-  <i class="fas fa-search"></i>
-</button>
-      </div>
+    
+    
+    <div class="navbar-header-items__end">
       
-      <div class="navbar-end-item">
-        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
-    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
-</span>
-      </div>
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
       
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
         <li class="nav-item">
           
           
@@ -161,91 +196,111 @@
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          
+          
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
-      </ul>
-      </div>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
       
     </div>
+    
   </div>
-
-
   
-  <div class="search-button-container--mobile">
-<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
-  <i class="fas fa-search"></i>
-</button>
-  </div>
-
   
-  <label class="sidebar-toggle secondary-toggle" for="__secondary">
-      <span class="fas fa-outdent"></span>
-  </label>
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
   
 
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
 </div>
-  </nav>
-  
 
+    </nav>
+  
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
       <div class="bd-sidebar-primary bd-sidebar">
         
+
   
   <div class="sidebar-header-items sidebar-primary__section">
     
     
       <div class="sidebar-header-items__center">
-      
-      <div class="navbar-center-item">
-        <nav class="navbar-nav">
-    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
-        Site Navigation
-    </p>
-    <ul id="navbar-main-elements" class="navbar-nav">
         
-                <li class="nav-item current active">
-                    <a class="nav-link" href="../user_guide.html">
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../user_guide.html">
                         User Guide
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="../api.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API Reference
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
 
-                <li class="nav-item">
-                    <a class="nav-link" href="../dev_docs.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../dev_docs.html">
                         Development
-                    </a>
-                </li>
+                      </a>
+                    </li>
                 
-    </ul>
-</nav>
-      </div>
-      
+  </ul>
+</nav></div>
+        
       </div>
     
-
     
     
-    <div class="sidebar-header-items__end">
-      
-      <div class="navbar-end-item">
-        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
-    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
-</span>
-      </div>
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
         <li class="nav-item">
           
           
@@ -253,108 +308,102 @@
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          
+          
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
-      </ul>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
       </div>
-      
-    </div>
     
   </div>
-
   
-  <div class="sidebar-start-items sidebar-primary__section">
-    <div class="sidebar-start-items__item"><nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">
-    Section Navigation
-  </p>
-  <div class="bd-toc-item navbar-nav">
-    <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../terminology.html">
-   Terminology
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="quick_overview.html">
-   Quick overview
-  </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Plot unstructured mesh data
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="regridder_overview.html">
-   Regridding overview
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="overlap_regridder.html">
-   OverlapRegridder
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="connectivity.html">
-   Connectivity
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../sample_data/index.html">
-   Sample Data
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label class="toctree-toggle" for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../sample_data/xoxo.html">
-     Xoxo
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../sample_data/adh_san_diego.html">
-     ADH San Diego
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../sample_data/disk.html">
-     Disk
-    </a>
-   </li>
-  </ul>
- </li>
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_overview.html">Quick overview</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Plot unstructured mesh data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regridder_overview.html">Regridding overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overlap_regridder.html">OverlapRegridder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/xoxo.html">Xoxo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/elevation_nl.html">Elevation NL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/adh_san_diego.html">ADH San Diego</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/disk.html">Disk</a></li>
 </ul>
-
-  </div>
-</nav>
+</li>
+</ul>
+</div>
+</nav></div>
     </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
   
+  <div id="rtd-footer-container"></div>
 
-  
-  <div class="sidebar-end-items sidebar-primary__section">
-    <div class="sidebar-end-items__item">
-    </div>
-  </div>
 
       </div>
-      <main class="bd-main">
+      
+      <main id="main-content" class="bd-main">
         
         
-        <div class="bd-content">
-          <div class="bd-article-container">
-            
-            <div class="bd-header-article">
-                
-            </div>
-            
-            
-            <article class="bd-article" role="main">
+          <div class="bd-content">
+            <div class="bd-article-container">
               
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Plot unstructured mesh data</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-plotting-py"><span class="std std-ref">Go to the end</span></a>
@@ -768,7 +817,7 @@ Coordinates:
 Data variables:
     node_z         (mesh2d_nNodes) float64 1.933 2.091 1.875 ... 5.688 7.491
     face_z         (mesh2d_nFaces) float64 1.737 1.918 2.269 ... 5.408 6.424
-    edge_z         (mesh2d_nEdges) float64 1.989 1.875 1.8 ... 3.929 4.909 6.544</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-e06e9735-456f-4c47-850f-a6e1f89b0e03' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e06e9735-456f-4c47-850f-a6e1f89b0e03' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nNodes</span>: 217</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 384</li><li><span class='xr-has-index'>mesh2d_nEdges</span>: 600</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-6ae49493-3b69-4f3f-b25b-b699be62e524' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6ae49493-3b69-4f3f-b25b-b699be62e524' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nNodes</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 212 213 214 215 216</div><input id='attrs-58d4c8c1-faed-43cf-bb0c-9cd207c76ac0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-58d4c8c1-faed-43cf-bb0c-9cd207c76ac0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3bb92498-09e0-40d5-bc19-86086c48d5d8' class='xr-var-data-in' type='checkbox'><label for='data-3bb92498-09e0-40d5-bc19-86086c48d5d8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 214, 215, 216])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nEdges</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 595 596 597 598 599</div><input id='attrs-7b79d34b-765d-41f4-bb93-b71daa2d18fb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7b79d34b-765d-41f4-bb93-b71daa2d18fb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-1b527ec2-a620-4531-99dd-50c1adf99a57' class='xr-var-data-in' type='checkbox'><label for='data-1b527ec2-a620-4531-99dd-50c1adf99a57' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 597, 598, 599])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 379 380 381 382 383</div><input id='attrs-3db08f04-8f01-4c32-add2-11cfea39faf6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3db08f04-8f01-4c32-add2-11cfea39faf6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4084f0a0-00d1-423c-997d-308990dc33b4' class='xr-var-data-in' type='checkbox'><label for='data-4084f0a0-00d1-423c-997d-308990dc33b4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 381, 382, 383])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-70595fd2-0472-4256-89ee-63c7f240f73b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-70595fd2-0472-4256-89ee-63c7f240f73b' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_z</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.933 2.091 1.875 ... 5.688 7.491</div><input id='attrs-39d8c9e6-af3a-475c-b4ac-2c44f1a501c9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-39d8c9e6-af3a-475c-b4ac-2c44f1a501c9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-828e94e5-2603-45cf-9db7-315abd922b00' class='xr-var-data-in' type='checkbox'><label for='data-828e94e5-2603-45cf-9db7-315abd922b00' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.93329198,  2.09140061,  1.87484204,  1.71955236,  1.71961656,
+    edge_z         (mesh2d_nEdges) float64 1.989 1.875 1.8 ... 3.929 4.909 6.544</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-9084cfdb-a90e-4902-86f5-f18b596ffd01' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-9084cfdb-a90e-4902-86f5-f18b596ffd01' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nNodes</span>: 217</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 384</li><li><span class='xr-has-index'>mesh2d_nEdges</span>: 600</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-fcf675d7-15a0-4729-9a2e-308ca0486749' class='xr-section-summary-in' type='checkbox'  checked><label for='section-fcf675d7-15a0-4729-9a2e-308ca0486749' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nNodes</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 212 213 214 215 216</div><input id='attrs-8f3f42d4-b591-455b-9b28-a28a4d5ca367' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8f3f42d4-b591-455b-9b28-a28a4d5ca367' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b488b297-baca-4283-84c9-8fdab6713651' class='xr-var-data-in' type='checkbox'><label for='data-b488b297-baca-4283-84c9-8fdab6713651' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 214, 215, 216])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nEdges</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 595 596 597 598 599</div><input id='attrs-4a3b9f4e-29a3-414d-a87c-4cd0bb03a4f5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4a3b9f4e-29a3-414d-a87c-4cd0bb03a4f5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0ea1c76f-5844-4b00-ad88-865f688a14bf' class='xr-var-data-in' type='checkbox'><label for='data-0ea1c76f-5844-4b00-ad88-865f688a14bf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 597, 598, 599])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 379 380 381 382 383</div><input id='attrs-c1f48c57-acae-4fcf-923b-e3e520105374' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c1f48c57-acae-4fcf-923b-e3e520105374' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a6891493-b971-449d-833e-ccfc3504b8ee' class='xr-var-data-in' type='checkbox'><label for='data-a6891493-b971-449d-833e-ccfc3504b8ee' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 381, 382, 383])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c941d2ee-f725-46ce-a096-f8f7fd0bd981' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c941d2ee-f725-46ce-a096-f8f7fd0bd981' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>node_z</span></div><div class='xr-var-dims'>(mesh2d_nNodes)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.933 2.091 1.875 ... 5.688 7.491</div><input id='attrs-49287fe6-b049-468b-aa95-82d22d8ff9c4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-49287fe6-b049-468b-aa95-82d22d8ff9c4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a0bdf717-aea6-403c-9dfb-8c555935f062' class='xr-var-data-in' type='checkbox'><label for='data-a0bdf717-aea6-403c-9dfb-8c555935f062' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.93329198,  2.09140061,  1.87484204,  1.71955236,  1.71961656,
         1.87394091,  2.14519674,  2.30021006,  2.24185487,  2.02372336,
         1.68192173,  1.51366054,  1.49636083,  1.42590672,  1.4384199 ,
         1.61206453,  1.98452218,  2.34631843,  2.38859332,  2.67626878,
@@ -808,7 +857,7 @@ Data variables:
         7.75144002,  7.88800553,  7.04359085,  5.35779319,  3.29726906,
         1.5076096 ,  0.54807376,  0.63361455,  1.53104833,  2.68784153,
         3.53975332,  3.82702868,  3.73040836,  3.74099464,  4.34093488,
-        5.68812411,  7.49116681])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_z</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.737 1.918 2.269 ... 5.408 6.424</div><input id='attrs-6fc014c2-69f1-42b0-9b20-b06fb7289a6c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6fc014c2-69f1-42b0-9b20-b06fb7289a6c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e86285ab-a062-4d18-8e2f-503a7f9c8540' class='xr-var-data-in' type='checkbox'><label for='data-e86285ab-a062-4d18-8e2f-503a7f9c8540' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.73730009,  1.91825084,  2.26876665,  5.31052091,  1.78990802,
+        5.68812411,  7.49116681])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>face_z</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.737 1.918 2.269 ... 5.408 6.424</div><input id='attrs-b694e89a-8a58-456c-97f9-62dfb082e23f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b694e89a-8a58-456c-97f9-62dfb082e23f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-10336b29-5565-4840-9795-163fa254d045' class='xr-var-data-in' type='checkbox'><label for='data-10336b29-5565-4840-9795-163fa254d045' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.73730009,  1.91825084,  2.26876665,  5.31052091,  1.78990802,
         0.56592199,  2.0239473 ,  1.20054259,  1.50084278,  4.2032856 ,
         3.82037735,  3.69611343,  2.34307619,  2.45189748,  2.05010445,
         1.23173146,  1.24293922,  4.96369209,  1.23243737,  1.31070306,
@@ -848,7 +897,7 @@ Data variables:
         1.91611618,  0.93777886,  0.82127919,  0.82409913,  0.93548072,
         0.94143233,  0.96785184,  5.94683372,  6.36476797,  4.85117403,
         5.39410053,  4.05700573,  4.22359378,  5.59335232,  4.86883751,
-        7.30890722,  7.04320847,  5.40762661,  6.42392991])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>edge_z</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.989 1.875 1.8 ... 4.909 6.544</div><input id='attrs-45d4b346-6e54-400b-a008-45c770cb5794' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-45d4b346-6e54-400b-a008-45c770cb5794' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ab37b33d-a76b-463b-9efc-96c771ebe6c8' class='xr-var-data-in' type='checkbox'><label for='data-ab37b33d-a76b-463b-9efc-96c771ebe6c8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.98860502,  1.87511577,  1.7999506 ,  1.81179977,  1.90641372,
+        7.30890722,  7.04320847,  5.40762661,  6.42392991])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>edge_z</span></div><div class='xr-var-dims'>(mesh2d_nEdges)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.989 1.875 1.8 ... 4.909 6.544</div><input id='attrs-b4d05c03-03d7-4310-a998-03a79bed435d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b4d05c03-03d7-4310-a998-03a79bed435d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d1bc21ad-75e9-448c-836c-6f87b1b4d78d' class='xr-var-data-in' type='checkbox'><label for='data-d1bc21ad-75e9-448c-836c-6f87b1b4d78d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 1.98860502,  1.87511577,  1.7999506 ,  1.81179977,  1.90641372,
         2.01522135,  1.95483397,  2.10396573,  2.1578564 ,  2.07770379,
         2.21438924,  1.76492656,  1.9903005 ,  1.87706115,  1.74001569,
         1.71509433,  1.64090366,  1.58755786,  1.5894138 ,  1.77229325,
@@ -888,7 +937,7 @@ Data variables:
         3.32923738,  4.69300073,  6.14800061,  7.35257773,  7.91736337,
         7.55634316,  6.24399649,  4.29381546,  2.28970536,  0.86825983,
         0.43934876,  0.99050549,  2.09805846,  3.16064474,  3.73547458,
-        3.7830263 ,  3.6705139 ,  3.92869759,  4.90866681,  6.54446841])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-04525189-997c-45ec-bddb-74eeb344487f' class='xr-section-summary-in' type='checkbox'  ><label for='section-04525189-997c-45ec-bddb-74eeb344487f' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-d37894a9-2756-4527-bc3e-359a93742958' class='xr-index-data-in' type='checkbox'/><label for='index-d37894a9-2756-4527-bc3e-359a93742958' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=217, step=1, name=&#x27;mesh2d_nNodes&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nEdges</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-0e92f12e-a253-4391-be47-61db28edeb2e' class='xr-index-data-in' type='checkbox'/><label for='index-0e92f12e-a253-4391-be47-61db28edeb2e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=600, step=1, name=&#x27;mesh2d_nEdges&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-d763f458-181c-4d09-ae18-a9f0c88a2916' class='xr-index-data-in' type='checkbox'/><label for='index-d763f458-181c-4d09-ae18-a9f0c88a2916' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=384, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a1219aa7-6a06-4ac3-a915-005caf04630c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a1219aa7-6a06-4ac3-a915-005caf04630c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+        3.7830263 ,  3.6705139 ,  3.92869759,  4.90866681,  6.54446841])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-708d1fbf-76e4-4263-b550-83759068f124' class='xr-section-summary-in' type='checkbox'  ><label for='section-708d1fbf-76e4-4263-b550-83759068f124' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-dbe8718d-d302-4ef1-80c5-82cf001ee14b' class='xr-index-data-in' type='checkbox'/><label for='index-dbe8718d-d302-4ef1-80c5-82cf001ee14b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=217, step=1, name=&#x27;mesh2d_nNodes&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nEdges</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-7c361b6a-7b99-45d5-b7b2-060c25e1ce70' class='xr-index-data-in' type='checkbox'/><label for='index-7c361b6a-7b99-45d5-b7b2-060c25e1ce70' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=600, step=1, name=&#x27;mesh2d_nEdges&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-b31ab558-6179-40d3-b4f2-d6ace7149c0b' class='xr-index-data-in' type='checkbox'/><label for='index-b31ab558-6179-40d3-b4f2-d6ace7149c0b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=384, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-aa16bfcd-e7fd-4cd6-9895-e3f25b27d363' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-aa16bfcd-e7fd-4cd6-9895-e3f25b27d363' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /></section>
@@ -900,7 +949,7 @@ Dataset and calling the <code class="xref py py-meth docutils literal notranslat
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_001.png" srcset="../_images/sphx_glr_plotting_001.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcec06adc40&gt;
+<img src="../_images/sphx_glr_plotting_001.png" srcset="../_images/sphx_glr_plotting_001.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7abf286430&gt;
 </pre></div>
 </div>
 <p>Like Xarray, the axes and the colorbar are labeled automatically using the
@@ -912,7 +961,7 @@ the edges results in a different kind of plot:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;edge_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_002.png" srcset="../_images/sphx_glr_plotting_002.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcebfdc8880&gt;
+<img src="../_images/sphx_glr_plotting_002.png" srcset="../_images/sphx_glr_plotting_002.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f7abe950970&gt;
 </pre></div>
 </div>
 <p>The method called by default depends on the type of the data:</p>
@@ -941,7 +990,7 @@ the edges results in a different kind of plot:</p>
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_003.png" srcset="../_images/sphx_glr_plotting_003.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcec8d0cac0&gt;
+<img src="../_images/sphx_glr_plotting_003.png" srcset="../_images/sphx_glr_plotting_003.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7ac78e2c40&gt;
 </pre></div>
 </div>
 <p>We can also exactly control the type of plot we want. For example, to plot
@@ -949,7 +998,7 @@ filled contours for data associated with the face dimension:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_004.png" srcset="../_images/sphx_glr_plotting_004.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x7fcec8a71400&gt;
+<img src="../_images/sphx_glr_plotting_004.png" srcset="../_images/sphx_glr_plotting_004.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x7f7ac7646580&gt;
 </pre></div>
 </div>
 <p>We can also overlay this data with the edges:</p>
@@ -958,7 +1007,7 @@ filled contours for data associated with the face dimension:</p>
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_005.png" srcset="../_images/sphx_glr_plotting_005.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcec898d580&gt;
+<img src="../_images/sphx_glr_plotting_005.png" srcset="../_images/sphx_glr_plotting_005.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f7ac7561700&gt;
 </pre></div>
 </div>
 <p>In general, there has to be data associated with the mesh topology before a
@@ -1009,7 +1058,7 @@ location of the edges is meaningful on its own: for this reason
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_006.png" srcset="../_images/sphx_glr_plotting_006.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fcec8a1ef40&gt;
+<img src="../_images/sphx_glr_plotting_006.png" srcset="../_images/sphx_glr_plotting_006.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f7ac75f8220&gt;
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">surface</span></code> methods generate 3D surface plots:</p>
@@ -1020,7 +1069,7 @@ location of the edges is meaningful on its own: for this reason
 <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;node_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">surface</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_007.png" srcset="../_images/sphx_glr_plotting_007.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;mpl_toolkits.mplot3d.art3d.Poly3DCollection object at 0x7fcebf5736d0&gt;
+<img src="../_images/sphx_glr_plotting_007.png" srcset="../_images/sphx_glr_plotting_007.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;mpl_toolkits.mplot3d.art3d.Poly3DCollection object at 0x7f7abe149850&gt;
 </pre></div>
 </div>
 </section>
@@ -1032,7 +1081,7 @@ used:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;face_z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu&quot;</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_008.png" srcset="../_images/sphx_glr_plotting_008.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcebf3d1160&gt;
+<img src="../_images/sphx_glr_plotting_008.png" srcset="../_images/sphx_glr_plotting_008.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7abdfa62e0&gt;
 </pre></div>
 </div>
 </section>
@@ -1046,7 +1095,7 @@ take an xarray DataArray and a xugrid grid as arguments.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_009.png" srcset="../_images/sphx_glr_plotting_009.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcebf321a30&gt;
+<img src="../_images/sphx_glr_plotting_009.png" srcset="../_images/sphx_glr_plotting_009.png" alt="plotting" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f7abdef7bb0&gt;
 </pre></div>
 </div>
 </section>
@@ -1060,10 +1109,10 @@ somewhere in the unstructured topology, and plot the resulting timeseries:</p>
 <span class="n">depth</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plotting_010.png" srcset="../_images/sphx_glr_plotting_010.png" alt="node = 1000, node_x = 4.84e+05, node_y = 3.614e+06" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x7fcebf2b3eb0&gt;]
+<img src="../_images/sphx_glr_plotting_010.png" srcset="../_images/sphx_glr_plotting_010.png" alt="node = 1000, node_x = 4.84e+05, node_y = 3.614e+06" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x7f7abde98070&gt;]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.746 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  20.084 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-plotting-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9a3a701ba63d3606a9cbb3896162541d/plotting.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plotting.py</span></code></a></p>
@@ -1077,132 +1126,119 @@ somewhere in the unstructured topology, and plot the resulting timeseries:</p>
 </section>
 
 
-            </article>
-            
-            
-            
-            <footer class="bd-footer-article">
-                <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="quick_overview.html" title="previous page">
-      <i class="fas fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Quick overview</p>
-      </div>
-  </a>
-  <a class='right-next' id="next-link" href="regridder_overview.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Regridding overview</p>
-  </div>
-  <i class="fas fa-angle-right"></i>
-  </a>
-</div>
-            </footer>
-            
-          </div>
-          
-          
-          
-            <div class="bd-sidebar-secondary bd-toc">
+                </article>
               
-<div class="toc-item">
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
   
-<div class="tocsection onthispage">
-    <i class="fas fa-list"></i> On this page
-</div>
-<nav id="bd-toc-nav" class="page-toc">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#imports">
-   Imports
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#ugriddataarray">
-   UgridDataArray
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#other-types-of-plot">
-   Other types of plot
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#additional-arguments">
-   Additional Arguments
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#as-a-function">
-   As a function
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#xarray-dataarray-plots">
-   Xarray DataArray plots
-  </a>
- </li>
-</ul>
-
-</nav>
-</div>
-
-<div class="toc-item">
-  
-</div>
-
-<div class="toc-item">
-  
-<div class="tocsection sourcelink">
-    <a href="../_sources/examples/plotting.rst.txt">
-        <i class="fas fa-file-alt"></i> Show Source
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="quick_overview.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Quick overview</p>
+      </div>
     </a>
+    <a class="right-next"
+       href="regridder_overview.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Regridding overview</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
 </div>
 
-</div>
-
+                </footer>
+              
             </div>
-          
-          
-        </div>
-        <footer class="bd-footer-content">
-          <div class="bd-footer-content__inner">
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ugriddataarray">UgridDataArray</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-types-of-plot">Other types of plot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-arguments">Additional Arguments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#as-a-function">As a function</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xarray-dataarray-plots">Xarray DataArray plots</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/examples/plotting.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
             
           </div>
-        </footer>
+          <footer class="bd-footer-content">
+            
+          </footer>
         
       </main>
     </div>
   </div>
-
   
-    
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
-  <footer class="bd-footer"><div class="bd-footer__inner container">
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
   
-  <div class="footer-item">
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
     
-<p class="copyright">
-
-    &copy; Copyright Deltares.<br>
-
-</p>
-
-  </div>
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
   
-  <div class="footer-item">
-    
-<p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br>
-</p>
-
-  </div>
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
   
 </div>
+
   </footer>
   </body>
 </html>
