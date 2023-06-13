@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -519,7 +519,21 @@ class Ugrid1d(AbstractUgrid):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
     @staticmethod
-    def merge_partitions(grids):
+    def merge_partitions(grids: Sequence["Ugrid1d"]) -> "Ugrid1d":
+        """
+        Merge grid partitions into a single whole.
+
+        Duplicate edges are included only once, and removed from subsequent
+        partitions before merging.
+
+        Parameters
+        ----------
+        grids: sequence of Ugrid1d
+
+        Returns
+        -------
+        merged: Ugrid1d
+        """
         from xugrid.ugrid import partitioning
 
         # Grab a sample grid

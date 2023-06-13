@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -1329,7 +1329,22 @@ class Ugrid2d(AbstractUgrid):
         return [self.topology_subset(index) for index in indices]
 
     @staticmethod
-    def merge_partitions(grids):
+    def merge_partitions(grids: Sequence["Ugrid2d"]) -> "Ugrid2d":
+        """
+        Merge grid partitions into a single whole.
+
+        Duplicate faces are included only once, and removed from subsequent
+        partitions before merging.
+
+        Parameters
+        ----------
+        grids: sequence of Ugrid2d
+
+        Returns
+        -------
+        merged: Ugrid2d
+        """
+
         from xugrid.ugrid import partitioning
 
         # Grab a sample grid
