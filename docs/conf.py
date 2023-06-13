@@ -111,6 +111,12 @@ html_theme_options = {
     "navbar_align": "content",
     "icon_links": [
         {
+            "name": "GitHub",
+            "url": "https://github.com/Deltares/xugrid",  # required
+            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "type": "url",
+        },
+        {
             "name": "Deltares",
             "url": "https://deltares.nl/en/",
             "icon": "_static/deltares-white.svg",
@@ -118,107 +124,12 @@ html_theme_options = {
         },
     ],
     "logo": {
-        "image_light": "xugrid-low-res.svg",
-        "image_dark": "xugrid-low-res.svg",
+        "text": "Xugrid",
+        "image_light": "xugrid-logo.svg",
+        "image_dark": "xugrid-logo.svg",
     },
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
 }
-
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
-#
-# html_sidebars = {}
-
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-html_logo = "_static/xugrid-low-res.svg"
-
-# -- Options for HTMLHelp output ---------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = "xugrid_doc"
-
-
-# -- Options for LaTeX output ------------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (
-        master_doc,
-        "xugrid.tex",
-        "Xugrid Documentation",
-        "Author",
-        "manual",
-    )
-]
-
-
-# -- Options for manual page output ------------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "xugrid", "Xugrid Documentation", [author], 1)]
-
-
-# -- Options for Texinfo output ----------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (
-        master_doc,
-        "xugrid",
-        "Xugrid Documentation",
-        author,
-        "xugrid",
-        "Xugrid",
-        "Miscellaneous",
-    )
-]
-
-
-# -- Options for Epub output -------------------------------------------------
-
-# Bibliographic Dublin Core info.
-epub_title = project
-epub_author = author
-epub_publisher = author
-epub_copyright = copyright
-
-# The unique identifier of the text. This can be a ISBN number
-# or the project homepage.
-#
-# epub_identifier = ''
-
-# A unique identification for the text.
-#
-# epub_uid = ''
-
-# A list of files that should not be packed into the epub file.
-epub_exclude_files = ["search.html"]
-
 
 # -- Extension configuration -------------------------------------------------
 
