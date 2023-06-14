@@ -17,7 +17,7 @@ import xugrid as xu
 # Create partitions
 # -----------------
 #
-# Xugrid wraps the well known `METIS library`_ via the `pymetis` bindings.
+# Xugrid wraps the well known `METIS library`_ via the `pymetis bindings`_.
 # METIS is generally used to partition a grid in such a manner that
 # communication between parallel processes is minimized.
 #
@@ -40,7 +40,7 @@ for partition, ax in zip(partitions, axes.ravel()):
 # Partition the grid
 # ------------------
 #
-# Calling `.partition` on a UgridDataArray or UgridDataset will automatically
+# Calling ``.partition`` on a UgridDataArray or UgridDataset will automatically
 # partition the grid topology, select all associated data, and create a new
 # UgridDataArray or UgridDataset for each partition.
 #
@@ -80,6 +80,7 @@ merged = xu.merge_partitions(partitions)["elevation"]
 
 merged.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
+# %%
 # Partitioning grids without data
 # -------------------------------
 #
@@ -126,7 +127,8 @@ uds["elevation"] == reordered["elevation"]
 
 # %%
 # This is required if results are compared with the input, or with results
-# stemming from another partitioning.
+# stemming from another partitioning, e.g. one with a different number of
+# partitions.
 #
 # .. _METIS library: https://github.com/KarypisLab/METIS
 # .. _pymetis bindings: https://github.com/inducer/pymetis
