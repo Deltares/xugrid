@@ -10,7 +10,7 @@ and column numbers; unstructured grids require explicit connectivity lists.
 
 Xugrid provides a number of methods to derive and extract different kinds of
 connectivities, as well as a number of operations which require connectivity
-information. These methods and there interrelations are briefly introduced here.
+information. These methods and their interrelations are briefly introduced here.
 
 For 2D meshes, the fundamental topological information consists of:
 
