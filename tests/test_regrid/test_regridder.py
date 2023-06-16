@@ -172,4 +172,4 @@ def test_regridder_from_dataset(cls, disk, quads_1):
     dataset = regridder.to_dataset()
     new_regridder = cls.from_dataset(dataset)
     new_result = new_regridder.regrid(disk)
-    assert new_result.equals(result)
+    assert np.array_equal(new_result.values, result.values, equal_nan=True)

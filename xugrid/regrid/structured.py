@@ -29,8 +29,7 @@ class StructuredGrid1d:
     """
 
     def __init__(self, obj: Union[xr.DataArray, xr.Dataset], name: str):
-        bounds_name_left = f"{name}bounds_left"  # e.g. xbounds
-        bounds_name_right = f"{name}bounds_right"  # e.g. xbounds
+        bounds_name = f"{name}bounds"  # e.g. xbounds
         size_name = f"d{name}"  # e.g. dx
 
         index = obj.indexes[name]
@@ -46,10 +45,8 @@ class StructuredGrid1d:
         else:
             raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
-        if bounds_name_left in obj.coords:
-            start = obj[bounds_name_left].values
-            end = obj[bounds_name_right].values
-            bounds = np.column_stack((start, end))
+        if bounds_name in obj.coords:
+            bounds = obj[bounds_name].values
         else:
             if size_name in obj.coords:
                 # works for scalar size and array size
@@ -351,11 +348,22 @@ class StructuredGrid1d:
             neighbour,
         )
         return self.sorted_output(source_index, target_index, weights)
-    
 
-    def to_dataset(self):
-        pass
-    
+    def to_dataset(self, name: str):
+        export_name = name + "_" + self.name
+        return xr.DataArray(
+            name=name,
+            data=np.nan,
+            dims=[export_name, export_name + "nbounds"],
+            coords={
+                export_name: self.midpoints,
+                export_name
+                + "bounds": ([export_name, export_name + "nbounds"], self.bounds),
+                export_name + "nbounds": np.arange(2),
+            },
+        )
+
+
 class StructuredGrid2d(StructuredGrid1d):
     """
     e.g. (x,y) -> (x,y)
@@ -493,10 +501,10 @@ class StructuredGrid2d(StructuredGrid1d):
         )
 
     def to_dataset(self, name: str):
-        ds_x = self.xbounds.to_dataset()
-        ds_y = self.ybounds.to_dataset()
+        ds_x = self.xbounds.to_dataset(name)
+        ds_y = self.ybounds.to_dataset(name)
         ds = xr.merge([ds_x, ds_y])
-        ds[name] = xr.DataArray(-1, attrs={"type": "StructuredGrid2d"})
+        ds[name + "_type"] = xr.DataArray(-1, attrs={"type": "StructuredGrid2d"})
         return ds
 
 

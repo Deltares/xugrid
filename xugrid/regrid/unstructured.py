@@ -141,6 +141,6 @@ class UnstructuredGrid2d:
         return source_index[order], target_index[order], weights[order]
 
     def to_dataset(self, name: str):
-        ds = self.ugrid_topology.to_dataset()
-        ds[name] = xr.DataArray(-1, attrs={"type": "UnstructuredGrid2d"})
+        ds = self.ugrid_topology.rename(name).to_dataset()
+        ds[name + "_type"] = xr.DataArray(-1, attrs={"type": "UnstructuredGrid2d"})
         return ds
