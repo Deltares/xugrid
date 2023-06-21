@@ -431,13 +431,11 @@ document.write(`
     <span class="k">return</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">_regrid</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">setup_grid</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">setup_grid</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">StructuredGrid2d</span><span class="p">(</span>
-            <span class="n">obj</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name_y&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">),</span> <span class="n">name_x</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name_x&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">StructuredGrid2d</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
 
@@ -499,7 +497,10 @@ document.write(`
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_regrid_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
-        <span class="n">source_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_source&quot;</span><span class="p">):</span>
+            <span class="n">source_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">source_grid</span> <span class="o">=</span> <span class="n">source</span>
         <span class="n">first_dims_shape</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span> <span class="o">-</span><span class="n">source_grid</span><span class="o">.</span><span class="n">ndim</span><span class="p">]</span>
 
         <span class="c1"># The regridding can be mapped over additional dimensions (e.g. for every time slice).</span>
@@ -598,12 +599,11 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store the computed weights and target in a dataset for re-use.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">weights_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;__regrid_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">_fields</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">)}</span>
         <span class="p">)</span>
-        <span class="n">source_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;__source&quot;</span><span class="p">)</span>
-        <span class="n">target_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;__target&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">weights_ds</span><span class="p">,</span> <span class="n">source_ds</span><span class="p">,</span> <span class="n">target_ds</span><span class="p">))</span>
+        <span class="n">ugrid_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">ugrid_topology</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">ds</span><span class="p">,</span> <span class="n">ugrid_ds</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCSR</span><span class="p">:</span>
@@ -633,19 +633,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_weights_from_dataset</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">setup_grid</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="n">unstructured</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="s2">&quot;__source_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;UnstructuredGrid2d&quot;</span>
-        <span class="k">if</span> <span class="n">unstructured</span><span class="p">:</span>
-            <span class="n">instance</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">setup_grid</span><span class="p">(</span><span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="s2">&quot;__source&quot;</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">instance</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">setup_grid</span><span class="p">(</span>
-                <span class="n">weights</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="s2">&quot;__source_x&quot;</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s2">&quot;__source_y&quot;</span>
-            <span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">UnstructuredGrid2d</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span>
 
     <span class="nd">@classmethod</span>
@@ -654,12 +645,9 @@ document.write(`
 <span class="sd">        Reconstruct the regridder from a dataset with source, target indices</span>
 <span class="sd">        and weights.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">unstructured</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__target_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;UnstructuredGrid2d&quot;</span>
-        <span class="k">if</span> <span class="n">unstructured</span><span class="p">:</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;__target&quot;</span><span class="p">)</span>
-
-        <span class="c1"># weights = cls._weights_from_dataset(dataset)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_weights_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CentroidLocatorRegridder"><a class="viewcode-back" href="../../../api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder">[docs]</a><span class="k">class</span> <span class="nc">CentroidLocatorRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
@@ -696,7 +684,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
@@ -723,7 +711,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
@@ -787,8 +775,8 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
-        <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
@@ -886,7 +874,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
