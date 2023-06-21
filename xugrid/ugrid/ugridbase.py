@@ -367,16 +367,19 @@ class AbstractUgrid(abc.ABC):
         if start_index not in (0, 1):
             raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
 
-        data = da.values
+        data = da.to_numpy()
+        # If xarray detects a _FillValue, it converts the array to floats and
+        # replaces the fill value by NaN, and moves the _FillValue to
+        # da.encoding.
         if "_FillValue" in da.attrs:
             is_fill = data == da.attrs["_FillValue"]
         else:
             is_fill = np.isnan(data)
+        data[is_fill] = fill_value
 
         cast = data.astype(dtype, copy=True)
         if start_index:
             cast -= start_index
-        cast[is_fill] = fill_value
         if (cast[~is_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)

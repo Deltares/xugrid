@@ -1,3 +1,5 @@
+import warnings
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -682,6 +684,17 @@ def test_open_dataset(tmp_path):
     assert "b" in back
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
+
+
+def test_open_dataset_cast_invalid(tmp_path):
+    grid = GRID()
+    vorgrid = grid.tesselate_centroidal_voronoi()
+    path = tmp_path / "voronoi-grid.nc"
+    vorgrid.to_dataset().to_netcdf(path)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        xugrid.open_dataset(path)
 
 
 def test_open_dataarray_roundtrip(tmp_path):
