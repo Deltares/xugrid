@@ -588,6 +588,8 @@ def plot(
     **kwargs : optional
         Additional keyword arguments for Matplotlib.
     """
+    darray = darray.squeeze().compute()
+
     dim = darray.dims[0]
     kwargs["ax"] = ax
     if grid.topology_dimension == 1:
