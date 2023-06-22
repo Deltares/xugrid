@@ -353,6 +353,43 @@ def test_edge_connectivity(mixed_mesh):
     assert np.array_equal(face_edges, expected_face_edges)
 
 
+def test_node_node_connectivity():
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 0],
+            [1, 4],
+            [4, 5],
+            [5, 2],
+            [2, 1],
+        ]
+    )
+    csr = connectivity.node_node_connectivity(edge_nodes)
+    coo = csr.tocoo()
+    actual = np.column_stack([coo.row, coo.col])
+    expected = np.array(
+        [
+            [0, 1],
+            [0, 3],
+            [1, 0],
+            [1, 2],
+            [1, 4],
+            [2, 1],
+            [2, 3],
+            [2, 5],
+            [3, 0],
+            [3, 2],
+            [4, 1],
+            [4, 5],
+            [5, 2],
+            [5, 4],
+        ]
+    )
+    assert np.array_equal(actual, expected)
+
+
 def test_face_face_connectivity():
     edge_faces = np.array(
         [

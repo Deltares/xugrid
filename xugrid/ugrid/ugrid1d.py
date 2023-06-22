@@ -81,6 +81,7 @@ class Ugrid1d(AbstractUgrid):
         self._edge_x = None
         self._edge_y = None
         # Connectivity
+        self._node_node_connectivity = None
         self._node_edge_connectivity = None
         # crs
         if crs is None:

@@ -138,6 +138,7 @@ class Ugrid2d(AbstractUgrid):
         # Connectivity
         self.edge_node_connectivity = edge_node_connectivity
         self._edge_face_connectivity = None
+        self._node_node_connectivity = None
         self._node_edge_connectivity = None
         self._node_face_connectivity = None
         self._face_edge_connectivity = None

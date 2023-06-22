@@ -160,8 +160,8 @@ def test_ugrid2d_properties():
     assert np.array_equal(grid.n_node_per_face, [4, 4, 3, 3])
     assert np.allclose(grid.node_coordinates, VERTICES)
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
-    node_edges = grid.node_edge_connectivity
-    assert isinstance(node_edges, sparse.csr_matrix)
+    assert isinstance(grid.node_node_connectivity, sparse.csr_matrix)
+    assert isinstance(grid.node_edge_connectivity, sparse.csr_matrix)
     edge_node_coords = grid.edge_node_coordinates
     face_node_coords = grid.face_node_coordinates
     assert edge_node_coords.shape == (10, 2, 2)
