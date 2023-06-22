@@ -182,6 +182,7 @@ UGRID1D Topology
     Ugrid1d.edge_bounds
 
     Ugrid1d.node_edge_connectivity
+    Ugrid1d.node_node_connectivity
 
     Ugrid1d.copy
     Ugrid1d.rename
@@ -243,6 +244,7 @@ UGRID2D Topology
     Ugrid2d.edge_bounds
     Ugrid2d.face_bounds
 
+    Ugrid2d.node_node_connectivity
     Ugrid2d.node_edge_connectivity
     Ugrid2d.node_face_connectivity
     Ugrid2d.edge_node_connectivity
