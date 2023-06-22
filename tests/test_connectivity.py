@@ -36,7 +36,8 @@ def test_neighbors():
     j = [0, 1, 2, 1, 3, 2]
     coo_content = (j, (i, j))
     A = sparse.coo_matrix(coo_content).tocsr()
-    A = connectivity.AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+    n, m = A.shape
+    A = connectivity.AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
     assert np.array_equal(connectivity.neighbors(A, 0), [0, 1, 2])
     assert np.array_equal(connectivity.neighbors(A, 1), [1, 2, 3])
 

@@ -11,6 +11,8 @@ class AdjacencyMatrix(NamedTuple):
     indices: IntArray
     indptr: IntArray
     nnz: int
+    n: int
+    m: int
 
 
 @nb.njit(inline="always")
@@ -18,6 +20,63 @@ def neighbors(A: AdjacencyMatrix, cell: int) -> IntArray:
     start = A.indptr[cell]
     end = A.indptr[cell + 1]
     return A.indices[start:end]
+
+
+nb.njit(inline="always")
+def pop(array, size):
+    return array[size - 1], size - 1
+
+
+@nb.njit(inline="always")
+def push(array, value, size):
+    array[size] = value
+    return size + 1
+
+
+@nb.njit
+def _topological_sort_by_dfs(A: AdjacencyMatrix):
+    vcolor = np.zeros(A.n, dtype=np.uint8)
+    verts = np.empty(A.n, dtype=np.int64)
+    verts_size = 0
+    S = np.empty(A.n, dtype=np.int64)
+    S_size = 0
+
+    for v in range(A.n):
+        if vcolor[v] != 0:
+            continue
+        S_size = 0
+        S_size = push(S, v, S_size)
+        vcolor[v] = 1
+        while S_size > 0:
+            u = S[S_size - 1]
+            w = 0
+            for n in neighbors(A, u):
+                if vcolor[n] == 1:
+                    raise ValueError("The graph contains at least one cycle")
+                elif vcolor[n] == 0:
+                    w = n
+                    break
+ 
+            if w != 0:
+                vcolor[w] = 1
+                S_size = push(S, w, S_size)
+            else:
+                vcolor[u] = 2
+                verts_size = push(verts, u, verts_size)
+                S_size -= 1
+
+    return verts[::-1]
+
+
+def topological_sort_by_dfs(A: sparse.csr_matrix):
+    if not isinstance(A, sparse.csr_matrix):
+        raise TypeError(
+            f"Expected scipy.sparse.csr_matrix, received: {type(A).__name__}"
+        )
+    
+    n, m = A.shape
+    adj = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
+    return _topological_sort_by_dfs(adj)
 
 
 # Conversion between dense and sparse
@@ -278,6 +337,14 @@ def face_face_connectivity(
     return coo_matrix.tocsr()
 
 
+def directed_node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matrix:
+    i = edge_node_connectivity[:, 0]
+    j = edge_node_connectivity[:, 1]
+    coo_content = (j, (i, j))
+    coo_matrix = sparse.coo_matrix(coo_content)
+    return coo_matrix.tocsr()
+
+
 def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matrix:
     i = edge_node_connectivity[:, 0]
     j = edge_node_connectivity[:, 1]
@@ -308,7 +375,8 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     j = renumber(np.concatenate([right, left, back, front]))
     coo_content = (j, (i, j))
     A = sparse.coo_matrix(coo_content).tocsr()
-    return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+    n, m = A.shape
+    return AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 
 
 def area(
