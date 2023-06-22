@@ -86,8 +86,8 @@ def test_ugrid1d_properties():
     assert np.allclose(grid.edge_y, [0.5, 1.5])
     assert np.allclose(grid.edge_coordinates, np.column_stack([[0.5, 1.5], [0.5, 1.5]]))
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
-    node_edges = grid.node_edge_connectivity
-    assert isinstance(node_edges, sparse.csr_matrix)
+    assert isinstance(grid.node_edge_connectivity, sparse.csr_matrix)
+    assert isinstance(grid.node_node_connectivity, sparse.csr_matrix)
 
     expected_coords = [
         [[0.0, 0.0], [1.0, 1.0]],
