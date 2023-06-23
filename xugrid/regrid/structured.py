@@ -273,7 +273,7 @@ class StructuredGrid1d:
         if self.midpoints.size < 2:
             raise ValueError(
                 f"Coordinate {self.name} has size: {self.midpoints.size}. "
-                "At least two points are required for interpolation." 
+                "At least two points are required for interpolation."
             )
         weights = (
             other.midpoints[target_midpoints_index]

@@ -125,10 +125,11 @@ class BaseRegridder(abc.ABC):
         source_grid = self._source
         first_dims_shape = source.shape[: -source_grid.ndim]
 
-        # The regridding can be mapped over additional dimensions (e.g. for every time slice).
-        # This is the `extra_index` iteration in _regrid().
-        # But it should work consistently even if no additional present: in that case we create
-        # a 1-sized additional dimension in front, so the `extra_index` iteration always applies.
+        # The regridding can be mapped over additional dimensions, e.g. for
+        # every time slice. This is the `extra_index` iteration in _regrid().
+        # But it should work consistently even if no additional present: in
+        # that case we create a 1-sized additional dimension in front, so the
+        # `extra_index` iteration always applies.
         if source.ndim == source_grid.ndim:
             source = source[np.newaxis]
 
