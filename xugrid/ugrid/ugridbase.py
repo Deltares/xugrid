@@ -192,6 +192,7 @@ class AbstractUgrid(abc.ABC):
                     name_dict[name_key] = name_value
 
         new = self.copy()
+        new.name = name
         new._attrs = new_attrs
         new._indexes = {k: name_dict[v] for k, v in new._indexes.items()}
         if new._dataset is not None:

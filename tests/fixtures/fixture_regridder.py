@@ -133,15 +133,20 @@ def grid_data_d():
 @pytest.fixture(scope="function")
 def grid_data_e():
     return xr.DataArray(
-        data=np.arange(12).reshape((4, 3)),
-        dims=["y", "x"],
+        data=np.zeros((4, 3, 2)),
+        dims=["y", "x", "nbounds"],
         coords={
             "y": np.array([175, 125, 75, 25]),
             "x": np.array([30, 67.5, 105]),
             "dx": 25,
             "dy": -50.0,
-            "xbounds_left": ("x", np.array([17.5, 42.5, 92.5])),
-            "xbounds_right": ("x", np.array([42.5, 92.5, 117.5])),
+            "xbounds": (
+                ["x", "nbounds"],
+                np.column_stack(
+                    (np.array([17.5, 42.5, 92.5]), np.array([42.5, 92.5, 117.5]))
+                ),
+            ),
+            "nbounds": np.arange(2),
         },
     )
 
