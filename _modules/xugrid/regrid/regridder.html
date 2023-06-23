@@ -502,11 +502,10 @@ document.write(`
         <span class="n">source_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
         <span class="n">first_dims_shape</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span> <span class="o">-</span><span class="n">source_grid</span><span class="o">.</span><span class="n">ndim</span><span class="p">]</span>
 
-        <span class="c1"># The regridding can be mapped over additional dimensions, e.g. for</span>
-        <span class="c1"># every time slice. This is the `extra_index` iteration in _regrid().</span>
-        <span class="c1"># But it should work consistently even if no additional present: in</span>
-        <span class="c1"># that case we create a 1-sized additional dimension in front, so the</span>
-        <span class="c1"># `extra_index` iteration always applies.</span>
+        <span class="c1"># The regridding can be mapped over additional dimensions (e.g. for every time slice).</span>
+        <span class="c1"># This is the `extra_index` iteration in _regrid().</span>
+        <span class="c1"># But it should work consistently even if no additional present: in that case we create</span>
+        <span class="c1"># a 1-sized additional dimension in front, so the `extra_index` iteration always applies.</span>
         <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="n">source_grid</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
