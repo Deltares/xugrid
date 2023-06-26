@@ -19,26 +19,26 @@ import xugrid as xu
 
 def test_domain_structured():
     # %%
-    # We will take a look at a sample dataset: a triangular grid with the surface
+    # load a  sample dataset: a triangular grid with the surface
     # elevation of the Netherlands.
 
     uda = xu.data.elevation_nl()
-    uda.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
+
 
     # %%
     # Xugrid provides several "regridder" classes which can convert gridded data
     # from one grid to another grid. Let's generate a 2d  mesh that
     # covers the entire Netherlands. The node positions are random with a uniform distribution.
 
-    def create_grid(bounds, amount):
+    def create_grid(bounds, amount_of_cells):
         """
         Create a simple grid of triangles covering a rectangle.
         """
         import numpy as np
 
         xmin, ymin, xmax, ymax = bounds
-        dx = (xmax - xmin) / amount
-        dy = (ymax - ymin) / amount
+        dx = (xmax - xmin) / amount_of_cells
+        dy = (ymax - ymin) / amount_of_cells
         x = np.arange(xmin, xmax + dx, dx)
         y = np.arange(ymax, ymin - dy, -dy)
         return xr.DataArray(
