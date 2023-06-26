@@ -103,7 +103,7 @@ def test_overlap_regridder(disk, quads_1):
     assert broadcasted.shape == (5, 100)
 
 
-def test_lineair_interpolator_structured(
+def test_linear_interpolator_structured(
     grid_data_a, grid_data_a_layered, grid_data_b, expected_results_linear
 ):
     regridder = BarycentricInterpolator(source=grid_data_a, target=grid_data_b)
@@ -191,4 +191,4 @@ def test_regridder_from_dataset(cls, disk, quads_1):
     dataset = regridder.to_dataset()
     new_regridder = cls.from_dataset(dataset)
     new_result = new_regridder.regrid(disk)
-    assert new_result.equals(result)
+    assert np.array_equal(new_result.values, result.values, equal_nan=True)

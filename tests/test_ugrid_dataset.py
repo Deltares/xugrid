@@ -1,3 +1,5 @@
+import warnings
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -249,6 +251,13 @@ class TestUgridDataArray:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    def test_partitioning(self):
+        partitions = self.uda.ugrid.partition(n_part=2)
+        assert len(partitions) == 2
+        for partition in partitions:
+            assert isinstance(partition, xugrid.UgridDataArray)
+            assert partition.name == self.uda.name
+
     def test_crs(self):
         uda = self.uda
         crs = uda.ugrid.crs
@@ -356,6 +365,17 @@ class TestUgridDataArray:
         with_coords = self.uda.ugrid.assign_face_coords()
         assert "mesh2d_face_x" in with_coords.coords
         assert "mesh2d_face_y" in with_coords.coords
+
+    def test_plot_with_chunks(self, tmp_path):
+        time = xr.DataArray([0.0, 1.0, 2.0], coords={"time": [0, 1, 2]})
+        uda = (self.uda * time).transpose()
+        uda.name = "test"
+
+        path = tmp_path / "test.nc"
+        uda.ugrid.to_netcdf(path)
+        back = xugrid.open_dataarray(path, chunks={"time": 1})
+        primitive = back.isel(time=0).ugrid.plot()
+        assert primitive is not None
 
 
 class TestUgridDataset:
@@ -512,6 +532,14 @@ class TestUgridDataset:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    def test_partitioning(self):
+        partitions = self.uds.ugrid.partition(n_part=2)
+        assert len(partitions) == 2
+        for partition in partitions:
+            assert isinstance(partition, xugrid.UgridDataset)
+            assert "a" in partition
+            assert "b" in partition
+
     def test_crs(self):
         uds = self.uds
         crs = uds.ugrid.crs
@@ -656,6 +684,17 @@ def test_open_dataset(tmp_path):
     assert "b" in back
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
+
+
+def test_open_dataset_cast_invalid(tmp_path):
+    grid = GRID()
+    vorgrid = grid.tesselate_centroidal_voronoi()
+    path = tmp_path / "voronoi-grid.nc"
+    vorgrid.to_dataset().to_netcdf(path)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        xugrid.open_dataset(path)
 
 
 def test_open_dataarray_roundtrip(tmp_path):

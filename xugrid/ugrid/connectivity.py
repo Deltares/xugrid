@@ -278,6 +278,16 @@ def face_face_connectivity(
     return coo_matrix.tocsr()
 
 
+def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matrix:
+    i = edge_node_connectivity[:, 0]
+    j = edge_node_connectivity[:, 1]
+    ij = np.concatenate([i, j])
+    ji = np.concatenate([j, i])
+    coo_content = (ji, (ij, ji))
+    coo_matrix = sparse.coo_matrix(coo_content)
+    return coo_matrix.tocsr()
+
+
 def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     nrow, ncol = active.shape
     nodes = np.arange(nrow * ncol).reshape(nrow, ncol)

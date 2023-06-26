@@ -73,6 +73,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
+    UgridDatasetAccessor.partition
+    UgridDatasetAccessor.partition_by_label
     UgridDatasetAccessor.to_geodataframe
     UgridDatasetAccessor.to_dataset
     UgridDatasetAccessor.to_netcdf
@@ -90,6 +92,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.to_crs
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points
+    UgridDataArrayAccessor.partition
+    UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
     UgridDataArrayAccessor.to_geodataframe
@@ -112,9 +116,6 @@ nodes/edges/faces if within a certain range.
 .. autosummary::
       :toctree: api/
 
-       snap_nodes
-       snap_to_nodes
-       snap_to_edges
        snap_to_grid
 
 
@@ -181,12 +182,15 @@ UGRID1D Topology
     Ugrid1d.edge_bounds
 
     Ugrid1d.node_edge_connectivity
+    Ugrid1d.node_node_connectivity
 
     Ugrid1d.copy
+    Ugrid1d.rename
 
     Ugrid1d.isel
     Ugrid1d.sel
     Ugrid1d.topology_subset
+    Ugrid1d.merge_partitions
 
     Ugrid1d.from_meshkernel
     Ugrid1d.mesh
@@ -212,7 +216,7 @@ UGRID2D Topology
 
     Ugrid2d.topology_dimension
     Ugrid2d.dimensions
-    Ugrid1d.attrs
+    Ugrid2d.attrs
 
     Ugrid2d.n_node
     Ugrid2d.node_dimension
@@ -240,6 +244,7 @@ UGRID2D Topology
     Ugrid2d.edge_bounds
     Ugrid2d.face_bounds
 
+    Ugrid2d.node_node_connectivity
     Ugrid2d.node_edge_connectivity
     Ugrid2d.node_face_connectivity
     Ugrid2d.edge_node_connectivity
@@ -250,6 +255,7 @@ UGRID2D Topology
     Ugrid2d.exterior_faces
 
     Ugrid2d.copy
+    Ugrid2d.rename
 
     Ugrid2d.triangulate
     Ugrid2d.triangulation
@@ -270,6 +276,9 @@ UGRID2D Topology
     Ugrid2d.rasterize
     Ugrid2d.rasterize_like
     Ugrid2d.topology_subset
+    Ugrid2d.label_partitions
+    Ugrid2d.partition
+    Ugrid2d.merge_partitions
 
     Ugrid2d.from_meshkernel
     Ugrid2d.mesh

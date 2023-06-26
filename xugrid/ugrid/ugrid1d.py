@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -81,6 +81,7 @@ class Ugrid1d(AbstractUgrid):
         self._edge_x = None
         self._edge_y = None
         # Connectivity
+        self._node_node_connectivity = None
         self._node_edge_connectivity = None
         # crs
         if crs is None:
@@ -251,8 +252,8 @@ class Ugrid1d(AbstractUgrid):
     def dimensions(self):
         return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
-    # These are all optional UGRID attributes. They are not computed by
-    # default, only when called upon.
+    # These are all optional attributes. They are not computed by default, only
+    # when called upon.
 
     @property
     def mesh(self) -> "mk.Mesh1d":  # type: ignore # noqa
@@ -265,9 +266,8 @@ class Ugrid1d(AbstractUgrid):
         """
         import meshkernel as mk
 
-        edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
-
         if self._mesh is None:
+            edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
             self._mesh = mk.Mesh1d(
                 node_x=self.node_x,
                 node_y=self.node_y,
@@ -520,7 +520,21 @@ class Ugrid1d(AbstractUgrid):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
     @staticmethod
-    def merge_partitions(grids):
+    def merge_partitions(grids: Sequence["Ugrid1d"]) -> "Ugrid1d":
+        """
+        Merge grid partitions into a single whole.
+
+        Duplicate edges are included only once, and removed from subsequent
+        partitions before merging.
+
+        Parameters
+        ----------
+        grids: sequence of Ugrid1d
+
+        Returns
+        -------
+        merged: Ugrid1d
+        """
         from xugrid.ugrid import partitioning
 
         # Grab a sample grid

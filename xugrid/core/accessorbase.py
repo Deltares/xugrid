@@ -1,8 +1,10 @@
 import abc
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import xarray as xr
+
+import xugrid
 
 
 class AbstractUgridAccessor(abc.ABC):
@@ -95,6 +97,42 @@ class AbstractUgridAccessor(abc.ABC):
             xugrid.UgridDataArray or xugrid.UgridDataset
         """
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
+
+    def partition_by_label(
+        self, labels: np.ndarray
+    ) -> Union["xugrid.UgridDataArray", "xugrid.UgridDataset"]:
+        """
+        Partition a grid by labels.
+
+        Parameters
+        ----------
+        labels: np.ndarray of integers labeling each face.
+
+        Returns
+        -------
+        partitioned: list of partitions
+        """
+        from xugrid.ugrid import partitioning
+
+        return partitioning.partition_by_label(self.grid, self.obj, labels)
+
+    def partition(
+        self, n_part: int
+    ) -> Union["xugrid.UgridDataArray", "xugrid.UgridDataset"]:
+        """
+        Partition a grid into a given number of parts.
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partitioned: list of partitions
+        """
+        labels = self.grid.label_partitions(n_part)
+        return self.partition_by_label(labels)
 
     def to_netcdf(self, *args, **kwargs):
         """

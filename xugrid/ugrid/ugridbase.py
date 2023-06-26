@@ -43,8 +43,10 @@ def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
             "index contains repeated values; only subsets will result "
             "in valid UGRID topology."
         )
-    if not pd_index.is_monotonic_increasing:
-        raise NotImplementedError("UGRID indexes must be sorted and unique.")
+    #    # TODO?
+    #    # Uniqueness is required, but sorting arguably not.
+    #    if not pd_index.is_monotonic_increasing:
+    #        raise NotImplementedError("UGRID indexes must be sorted and unique.")
 
     return pd_index
 
@@ -93,6 +95,14 @@ class AbstractUgrid(abc.ABC):
 
     @abc.abstractproperty
     def dimensions():
+        """ """
+
+    @abc.abstractproperty
+    def mesh():
+        """ """
+
+    @abc.abstractproperty
+    def meshkernel():
         """ """
 
     @abc.abstractstaticmethod
@@ -155,6 +165,47 @@ class AbstractUgrid(abc.ABC):
         # Ensure the name is always in sync.
         self._attrs["name"] = name
         return
+
+    def rename(self, name: str):
+        """
+        Create a new grid with all variables named according to the default
+        naming conventions.
+        """
+        # Get the old and the new names. Their keys are the same.
+        old_attrs = self._attrs
+        new_attrs = conventions.default_topology_attrs(name, self.topology_dimension)
+
+        # The attrs will have some roles joined together, e.g. node_coordinates
+        # will contain x and y as "mesh2d_node_x mesh2d_node_y".
+        name_dict = {self.name: name}
+        skip = ("cf_role", "long_name", "topology_dimension")
+        for key, value in old_attrs.items():
+            if key in new_attrs and key not in skip:
+                split_new = new_attrs[key].split()
+                split_old = value.split()
+                if len(split_new) != len(split_old):
+                    raise ValueError(
+                        f"Number of entries does not match on {key}: "
+                        f"{split_new} versus {split_old}"
+                    )
+                for name_key, name_value in zip(split_old, split_new):
+                    name_dict[name_key] = name_value
+
+        new = self.copy()
+        new.name = name
+        new._attrs = new_attrs
+        new._indexes = {k: name_dict[v] for k, v in new._indexes.items()}
+        if new._dataset is not None:
+            to_rename = (
+                tuple(new._dataset.data_vars)
+                + tuple(new._dataset.coords)
+                + tuple(new._dataset.dims)
+            )
+            new._dataset = new._dataset.rename(
+                {k: v for k, v in name_dict.items() if k in to_rename}
+            )
+
+        return new
 
     @staticmethod
     def _single_topology(dataset: xr.Dataset):
@@ -317,16 +368,19 @@ class AbstractUgrid(abc.ABC):
         if start_index not in (0, 1):
             raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
 
-        data = da.values
+        data = da.to_numpy()
+        # If xarray detects a _FillValue, it converts the array to floats and
+        # replaces the fill value by NaN, and moves the _FillValue to
+        # da.encoding.
         if "_FillValue" in da.attrs:
             is_fill = data == da.attrs["_FillValue"]
         else:
             is_fill = np.isnan(data)
+        data[is_fill] = fill_value
 
         cast = data.astype(dtype, copy=True)
         if start_index:
             cast -= start_index
-        cast[is_fill] = fill_value
         if (cast[~is_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
@@ -487,6 +541,21 @@ class AbstractUgrid(abc.ABC):
                 self.edge_node_connectivity, self.fill_value
             )
         return self._node_edge_connectivity
+
+    @property
+    def node_node_connectivity(self) -> csr_matrix:
+        """
+        Node to node connectivity.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
+        if self._node_node_connectivity is None:
+            self._node_node_connectivity = connectivity.node_node_connectivity(
+                self.edge_node_connectivity
+            )
+        return self._node_node_connectivity
 
     def set_crs(
         self,

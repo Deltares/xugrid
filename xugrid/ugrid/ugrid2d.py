@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -9,6 +9,7 @@ from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 from xarray.core.utils import either_dict_or_kwargs
 
+import xugrid
 from xugrid import conversion
 from xugrid import meshkernel_utils as mku
 from xugrid.constants import (
@@ -137,6 +138,7 @@ class Ugrid2d(AbstractUgrid):
         # Connectivity
         self.edge_node_connectivity = edge_node_connectivity
         self._edge_face_connectivity = None
+        self._node_node_connectivity = None
         self._node_edge_connectivity = None
         self._node_face_connectivity = None
         self._face_edge_connectivity = None
@@ -1270,8 +1272,80 @@ class Ugrid2d(AbstractUgrid):
             )
         return f(obj, x, y)
 
+    def label_partitions(self, n_part: int) -> "xugrid.UgridDataArray":
+        """
+        Generate partition labesl for this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partition_labels: UgridDataArray of integers
+        """
+        import pymetis
+
+        adjacency_matrix = self.face_face_connectivity
+        _, partition_index = pymetis.part_graph(
+            nparts=n_part,
+            xadj=adjacency_matrix.indptr,
+            adjncy=adjacency_matrix.indices,
+        )
+        return xugrid.UgridDataArray(
+            obj=xr.DataArray(
+                data=np.array(partition_index),
+                dims=(self.core_dimension,),
+                name="labels",
+            ),
+            grid=self,
+        )
+
+    def partition(self, n_part: int):
+        """
+        Partition this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partitions
+        """
+        from xugrid.ugrid.partitioning import labels_to_indices
+
+        labels = self.label_partitions(n_part)
+        indices = labels_to_indices(labels.values)
+        return [self.topology_subset(index) for index in indices]
+
     @staticmethod
-    def merge_partitions(grids):
+    def merge_partitions(grids: Sequence["Ugrid2d"]) -> "Ugrid2d":
+        """
+        Merge grid partitions into a single whole.
+
+        Duplicate faces are included only once, and removed from subsequent
+        partitions before merging.
+
+        Parameters
+        ----------
+        grids: sequence of Ugrid2d
+
+        Returns
+        -------
+        merged: Ugrid2d
+        """
+
         from xugrid.ugrid import partitioning
 
         # Grab a sample grid
