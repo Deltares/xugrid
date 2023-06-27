@@ -440,7 +440,8 @@ def directed_node_node_connectivity(
     i = edge_node_connectivity[:, 0]
     j = edge_node_connectivity[:, 1]
     coo_content = (j, (i, j))
-    coo_matrix = sparse.coo_matrix(coo_content)
+    n = max(i.max(), j.max()) + 1
+    coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
     return coo_matrix.tocsr()
 
 

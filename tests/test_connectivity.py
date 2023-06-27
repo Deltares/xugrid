@@ -578,7 +578,7 @@ def dag() -> sparse.csr_matrix:
     #
     i = [0, 1, 0, 2]
     j = [1, 2, 2, 3]
-    csr = sparse.coo_matrix((j, (i, j))).tocsr()
+    csr = sparse.coo_matrix((j, (i, j)), shape=(4, 4)).tocsr()
     return csr
 
 
@@ -589,7 +589,7 @@ def cycle() -> sparse.csr_matrix:
     j = [1, 2, 2, 3]
     ij = np.concatenate((i, j))
     ji = np.concatenate((j, i))
-    csr = sparse.coo_matrix((ji, (ij, ji))).tocsr()
+    csr = sparse.coo_matrix((ji, (ij, ji)), shape=(4, 4)).tocsr()
     return csr
 
 
