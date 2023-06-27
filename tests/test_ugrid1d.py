@@ -347,6 +347,7 @@ def test_ugrid1d_rename():
         "node_x": "__renamed_node_x",
         "node_y": "__renamed_node_y",
     }
+    assert renamed.name == "__renamed"
 
 
 def test_ugrid1d_rename_with_dataset():
