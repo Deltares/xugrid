@@ -557,6 +557,17 @@ class AbstractUgrid(abc.ABC):
             )
         return self._node_node_connectivity
 
+    @property
+    def directed_node_node_connectivity(self) -> csr_matrix:
+        """
+        Directed node to node connectivity.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
+        return connectivity.directed_node_node_connectivity(self.edge_node_connectivity)
+
     def set_crs(
         self,
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa

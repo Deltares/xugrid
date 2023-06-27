@@ -191,6 +191,8 @@ UGRID1D Topology
     Ugrid1d.sel
     Ugrid1d.topology_subset
     Ugrid1d.merge_partitions
+    Ugrid1d.topological_sort_by_dfs
+    Ugrid1d.contract_vertices
 
     Ugrid1d.from_meshkernel
     Ugrid1d.mesh

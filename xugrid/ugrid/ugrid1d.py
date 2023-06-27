@@ -519,6 +519,48 @@ class Ugrid1d(AbstractUgrid):
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
+    def topological_sort_by_dfs(self) -> IntArray:
+        """
+        Returns an array of vertices in topological order.
+
+        Returns
+        -------
+        sorted_vertices: np.ndarray of integer
+        """
+        return connectivity.topological_sort_by_dfs(
+            self.directed_node_node_connectivity
+        )
+
+    def contract_vertices(self, indices: IntArray) -> "Ugrid1d":
+        """
+        Returns a simplified network topology by removing all nodes that are
+        not listed in ``indices``.
+
+        Parameters
+        ----------
+        indices: np.ndarray of integers
+
+        Returns
+        -------
+        contracted: Ugrid1d
+        """
+        edges = connectivity.contract_vertices(
+            self.directed_node_node_connectivity, indices
+        )
+        node_index = np.unique(edges.ravel())
+        new_edges = connectivity.renumber(edges)
+        return Ugrid1d(
+            node_x=self.node_x[node_index],
+            node_y=self.node_y[node_index],
+            fill_value=self.fill_value,
+            edge_node_connectivity=new_edges,
+            name=self.name,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self._attrs,
+        )
+
     @staticmethod
     def merge_partitions(grids: Sequence["Ugrid1d"]) -> "Ugrid1d":
         """

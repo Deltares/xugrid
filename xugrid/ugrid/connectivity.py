@@ -11,6 +11,19 @@ class AdjacencyMatrix(NamedTuple):
     indices: IntArray
     indptr: IntArray
     nnz: int
+    n: int
+    m: int
+
+
+def _csr_to_adjacency(A: sparse.csr_matrix) -> AdjacencyMatrix:
+    if not isinstance(A, sparse.csr_matrix):
+        raise TypeError(
+            f"Expected scipy.sparse.csr_matrix, received: {type(A).__name__}"
+        )
+
+    n, m = A.shape
+    adj = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
+    return adj
 
 
 @nb.njit(inline="always")
@@ -18,6 +31,149 @@ def neighbors(A: AdjacencyMatrix, cell: int) -> IntArray:
     start = A.indptr[cell]
     end = A.indptr[cell + 1]
     return A.indices[start:end]
+
+
+@nb.njit(inline="always")
+def pop(array, size):
+    return array[size - 1], size - 1
+
+
+@nb.njit(inline="always")
+def push(array, value, size):
+    array[size] = value
+    return size + 1
+
+
+@nb.njit
+def _topological_sort_by_dfs(A: AdjacencyMatrix):
+    # This code is almost a direct port of the BSD-2 licensed code in Graphs.jl:
+    #
+    # https://github.com/JuliaGraphs/Graphs.jl/blob/master/LICENSE.md
+    #
+    # Copyright (c) 2015: Seth Bromberger and other contributors. Copyright (c)
+    # 2012: John Myles White and other contributors.
+    #
+    # Redistribution and use in source and binary forms, with or without
+    # modification, are permitted provided that the following conditions are met:
+    #
+    # Redistributions of source code must retain the above copyright notice, this
+    # list of conditions and the following disclaimer. Redistributions in binary
+    # form must reproduce the above copyright notice, this list of conditions and
+    # the following disclaimer in the documentation and/or other materials provided
+    # with the distribution. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+    # CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    # NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+    # CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    # EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+    # OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+    # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+    # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    vcolor = np.zeros(A.m, dtype=np.uint8)
+    verts = np.empty(A.m, dtype=np.int64)
+    verts_size = 0
+    S = np.empty(A.m, dtype=np.int64)
+    S_size = 0
+
+    for v in range(A.m):
+        if vcolor[v] != 0:
+            continue
+        S_size = 0
+        S_size = push(S, v, S_size)
+        vcolor[v] = 1
+        while S_size > 0:
+            u = S[S_size - 1]
+            w = 0
+            for n in neighbors(A, u):
+                if vcolor[n] == 1:
+                    raise ValueError("The graph contains at least one cycle")
+                elif vcolor[n] == 0:
+                    w = n
+                    break
+
+            if w != 0:
+                vcolor[w] = 1
+                S_size = push(S, w, S_size)
+            else:
+                vcolor[u] = 2
+                verts_size = push(verts, u, verts_size)
+                S_size -= 1
+
+    return verts[::-1]
+
+
+def topological_sort_by_dfs(A: sparse.csr_matrix) -> IntArray:
+    """
+    Returns an array of vertices in topological order.
+
+    Parameters
+    ----------
+    A: sparse.csr_matrix
+        CSR adjacency matrix of the directed acyclical graph.
+
+    Returns
+    -------
+    sorted_vertices: np.ndarray of integer
+    """
+    return _topological_sort_by_dfs(_csr_to_adjacency(A))
+
+
+@nb.njit
+def _contract_vertices(A: AdjacencyMatrix, indices: IntArray) -> IntArray:
+    vcolor = np.zeros(A.m, dtype=np.uint8)
+    vcolor[indices] = 2
+
+    edge_node_connectivity = np.empty((A.m, 2), dtype=np.int64)
+    n_edge = 0
+
+    S = np.empty(A.m, dtype=np.int64)
+    size = 0
+
+    for v in indices:
+        size = 0
+        size = push(S, v, size)
+        while size > 0:
+            u, size = pop(S, size)
+
+            # Do not paint over the marked indices
+            if vcolor[u] == 0:
+                vcolor[u] == 1
+
+            for n in neighbors(A, u):
+                if (n == v) or (vcolor[n] == 1):
+                    raise ValueError("The graph contains at least one cycle")
+                elif vcolor[n] == 2:
+                    edge_node_connectivity[n_edge, 0] = v
+                    edge_node_connectivity[n_edge, 1] = n
+                    n_edge += 1
+                    size -= 1
+                else:
+                    size = push(S, n, size)
+
+    return edge_node_connectivity[:n_edge]
+
+
+def contract_vertices(A: sparse.csr_matrix, indices: IntArray) -> IntArray:
+    """
+    Contract vertices to the set defined by indices.
+
+    Parameters
+    ----------
+    A: AdjacencyMatrix
+        CSR adjacency matrix of the directed acyclical graph.
+    indices: np.ndarray of integer
+        Which vertices to preserve.
+
+    Returns
+    -------
+    edge_node_connectivity: np.ndarray of shape (n_edge, 2)
+        New edge_node_connectivity containing edges of the vertices contained
+        in indices.
+    """
+    return _contract_vertices(_csr_to_adjacency(A), np.array(indices))
 
 
 # Conversion between dense and sparse
@@ -278,6 +434,17 @@ def face_face_connectivity(
     return coo_matrix.tocsr()
 
 
+def directed_node_node_connectivity(
+    edge_node_connectivity: IntArray,
+) -> sparse.csr_matrix:
+    i = edge_node_connectivity[:, 0]
+    j = edge_node_connectivity[:, 1]
+    coo_content = (j, (i, j))
+    n = max(i.max(), j.max()) + 1
+    coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
+    return coo_matrix.tocsr()
+
+
 def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matrix:
     i = edge_node_connectivity[:, 0]
     j = edge_node_connectivity[:, 1]
@@ -308,7 +475,8 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     j = renumber(np.concatenate([right, left, back, front]))
     coo_content = (j, (i, j))
     A = sparse.coo_matrix(coo_content).tocsr()
-    return AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+    n, m = A.shape
+    return AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 
 
 def area(

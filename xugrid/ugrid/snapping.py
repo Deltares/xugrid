@@ -399,7 +399,8 @@ def snap_to_grid(
         faces, -1
     )
     A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
-    face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz)
+    n, m = A.shape
+    face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 
     # Create geometric data
     edge_centroids = vertices[edge_node_connectivity].mean(axis=1)

@@ -113,7 +113,6 @@ def test_edges_geos_roundtrip(line):
 def _faces_geos_roundtrip(mesh):
     x, y, c, fv = mesh
     actual = cv.faces_to_polygons(x, y, c, fv)
-    print(actual)
     x_back, y_back, c_back, fv_back = cv.polygons_to_faces(actual)
     polygons_back = cv.faces_to_polygons(x_back, y_back, c_back, fv_back)
     assert np.array_equal(x, x_back)
