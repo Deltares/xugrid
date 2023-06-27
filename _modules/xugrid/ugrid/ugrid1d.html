@@ -896,6 +896,48 @@ document.write(`
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
 
+<div class="viewcode-block" id="Ugrid1d.topological_sort_by_dfs"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs">[docs]</a>    <span class="k">def</span> <span class="nf">topological_sort_by_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an array of vertices in topological order.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sorted_vertices: np.ndarray of integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">topological_sort_by_dfs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">directed_node_node_connectivity</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ugrid1d.contract_vertices"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a simplified network topology by removing all nodes that are</span>
+<span class="sd">        not listed in ``indices``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        indices: np.ndarray of integers</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        contracted: Ugrid1d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">contract_vertices</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">directed_node_node_connectivity</span><span class="p">,</span> <span class="n">indices</span>
+        <span class="p">)</span>
+        <span class="n">node_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">edges</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="n">new_edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span>
+            <span class="n">node_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">node_index</span><span class="p">],</span>
+            <span class="n">node_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">node_index</span><span class="p">],</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">new_edges</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">,</span>
+            <span class="n">projected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projected</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
 <div class="viewcode-block" id="Ugrid1d.merge_partitions"><a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.merge_partitions.html#xugrid.Ugrid1d.merge_partitions">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

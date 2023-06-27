@@ -572,11 +572,11 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">merge_collected</span><span class="p">(</span>
-    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
+    <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
-    <span class="n">equals</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">equals</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge dicts of variables, while resolving conflicts appropriately.</span>
 
@@ -683,7 +683,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">collect_variables_and_indexes</span><span class="p">(</span>
-    <span class="n">list_of_mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
+    <span class="n">list_of_mappings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect variables and indexes from list of mappings of xarray objects.</span>
@@ -933,7 +933,12 @@ document.write(`
     <span class="k">return</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_indexes</span>
 
 
-<span class="k">def</span> <span class="nf">merge_data_and_coords</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">merge_data_and_coords</span><span class="p">(</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Used in Dataset.__init__.&quot;&quot;&quot;</span>
     <span class="n">indexes</span><span class="p">,</span> <span class="n">coords</span> <span class="o">=</span> <span class="n">_create_indexes_from_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">)</span>
     <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">]</span>
@@ -947,7 +952,9 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_create_indexes_from_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_create_indexes_from_coords</span><span class="p">(</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">data_vars</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Maybe create default indexes from a mapping of coordinates.</span>
 
 <span class="sd">    Return those indexes and updated coordinates.</span>
@@ -982,7 +989,11 @@ document.write(`
     <span class="k">return</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">updated_coords</span>
 
 
-<span class="k">def</span> <span class="nf">assert_valid_explicit_coords</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">explicit_coords</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">assert_valid_explicit_coords</span><span class="p">(</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">explicit_coords</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate explicit coordinate names/dims.</span>
 
 <span class="sd">    Raise a MergeError if an explicit coord shares a name with a dimension</span>
@@ -1065,7 +1076,7 @@ document.write(`
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">priority_arg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">explicit_coords</span><span class="p">:</span> <span class="n">Sequence</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">explicit_coords</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
@@ -1412,7 +1423,7 @@ document.write(`
     <span class="c1"># method due for backwards compatibility</span>
     <span class="c1"># TODO: consider deprecating it?</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_vars</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_vars</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite_vars</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
         <span class="n">overwrite_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">overwrite_vars</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">overwrite_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">overwrite_vars</span><span class="p">}</span>

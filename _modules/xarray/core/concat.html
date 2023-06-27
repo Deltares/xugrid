@@ -380,6 +380,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
@@ -894,7 +895,7 @@ document.write(`
     <span class="k">if</span> <span class="n">variables_to_merge</span><span class="p">:</span>
         <span class="n">grouped</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">collect_variables_and_indexes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">datasets</span><span class="p">))</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">collect_variables_and_indexes</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">variables_to_merge</span>
         <span class="p">}</span>
         <span class="n">merged_vars</span><span class="p">,</span> <span class="n">merged_indexes</span> <span class="o">=</span> <span class="n">merge_collected</span><span class="p">(</span>
@@ -920,7 +921,7 @@ document.write(`
         <span class="c1"># ensure each variable with the given name shares the same</span>
         <span class="c1"># dimensions and the same shape for all of them except along the</span>
         <span class="c1"># concat dimension</span>
-        <span class="n">common_dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">dims</span><span class="p">]))</span>
+        <span class="n">common_dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">OrderedSet</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common_dims</span><span class="p">:</span>
             <span class="n">common_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim</span><span class="p">,)</span> <span class="o">+</span> <span class="n">common_dims</span>
         <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">dim_len</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">):</span>
@@ -945,38 +946,45 @@ document.write(`
                     <span class="k">yield</span> <span class="n">PandasIndex</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">coord_dtype</span><span class="o">=</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># create concatenation index, needed for later reindexing</span>
-    <span class="n">concat_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">)))</span>
+    <span class="n">file_start_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">))</span>
+    <span class="n">concat_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">file_start_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">concat_index_size</span> <span class="o">=</span> <span class="n">concat_index</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">variable_index_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">concat_index_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="c1"># stack up each variable and/or index to fill-out the dataset (in order)</span>
     <span class="c1"># n.b. this loop preserves variable order, needed for groupby.</span>
+    <span class="n">ndatasets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">vars_order</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">concat_over</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_indexes</span><span class="p">:</span>
             <span class="n">variables</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">variable_index</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Initialize the mask to all True then set False if any name is missing in</span>
+            <span class="c1"># the datasets:</span>
+            <span class="n">variable_index_mask</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">var_concat_dim_length</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
                     <span class="n">variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span><span class="p">)</span>
-                    <span class="c1"># add to variable index, needed for reindexing</span>
-                    <span class="n">var_idx</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="nb">sum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">k</span>
-                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                    <span class="p">]</span>
-                    <span class="n">variable_index</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">var_idx</span><span class="p">)</span>
-                    <span class="n">var_concat_dim_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_idx</span><span class="p">))</span>
+                    <span class="n">var_concat_dim_length</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># raise if coordinate not in all datasets</span>
                     <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">coord_names</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;coordinate </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> not present in all datasets.&quot;</span>
                         <span class="p">)</span>
+
+                    <span class="c1"># Mask out the indexes without the name:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">file_start_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">file_start_indexes</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">variable_index_mask</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">variable_index</span> <span class="o">=</span> <span class="n">concat_index</span><span class="p">[</span><span class="n">variable_index_mask</span><span class="p">]</span>
             <span class="nb">vars</span> <span class="o">=</span> <span class="n">ensure_common_dims</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">var_concat_dim_length</span><span class="p">)</span>
 
             <span class="c1"># Try to concatenate the indexes, concatenate the variables when no index</span>
             <span class="c1"># is found on all datasets.</span>
             <span class="n">indexes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_indexes</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">indexes</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ndatasets</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> must have either an index or no index in all datasets, &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets with an index.&quot;</span>
@@ -1000,7 +1008,7 @@ document.write(`
                     <span class="nb">vars</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
                 <span class="p">)</span>
                 <span class="c1"># reindex if variable is not present in all datasets</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">concat_index</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">concat_index_size</span><span class="p">:</span>
                     <span class="n">combined_var</span> <span class="o">=</span> <span class="n">reindex_variables</span><span class="p">(</span>
                         <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">combined_var</span><span class="p">},</span>
                         <span class="n">dim_pos_indexers</span><span class="o">=</span><span class="p">{</span>
