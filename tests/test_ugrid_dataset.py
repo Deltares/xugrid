@@ -634,7 +634,6 @@ def test_multiple_coordinates():
     )
     ds["mesh2d_node_lon"].attrs["standard_name"] = "longitude"
     ds["mesh2d_node_lat"].attrs["standard_name"] = "latitude"
-    print(ds.ugrid_roles.coordinates)
     assert ds.ugrid_roles.coordinates == {
         "mesh2d": {
             "node_coordinates": (

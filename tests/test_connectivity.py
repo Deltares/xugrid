@@ -566,3 +566,49 @@ def test_binary_dilation():
     actual = connectivity.binary_dilation(con, a)
     expected = np.array([False, True, True, True, False])
     assert np.array_equal(actual, expected)
+
+
+@pytest.fixture(scope="function")
+def dag() -> sparse.csr_matrix:
+    #
+    #    0──►2──►3
+    #    │   ▲
+    #    │   │
+    #    └──►1
+    #
+    i = [0, 1, 0, 2]
+    j = [1, 2, 2, 3]
+    csr = sparse.coo_matrix((j, (i, j))).tocsr()
+    return csr
+
+
+@pytest.fixture(scope="function")
+def cycle() -> sparse.csr_matrix:
+    # same as dag fixture, but bidirectional
+    i = [0, 1, 0, 2]
+    j = [1, 2, 2, 3]
+    ij = np.concatenate((i, j))
+    ji = np.concatenate((j, i))
+    csr = sparse.coo_matrix((ji, (ij, ji))).tocsr()
+    return csr
+
+
+def test_topological_sort_by_dfs(dag):
+    actual = connectivity.topological_sort_by_dfs(dag)
+    assert np.array_equal(actual, [0, 1, 2, 3])
+
+
+def test_topological_sort_by_dfs__cycle_error(cycle):
+    with pytest.raises(ValueError, match="The graph contains at least one cycle"):
+        connectivity.topological_sort_by_dfs(cycle)
+
+
+def test_contract_vertices(dag):
+    actual = connectivity.contract_vertices(dag, [0, 1, 3])
+    expected = np.array([[0, 1], [1, 3]])
+    assert np.array_equal(actual, expected)
+
+
+def test_contract_vertices__cycle_error(cycle):
+    with pytest.raises(ValueError, match="The graph contains at least one cycle"):
+        connectivity.contract_vertices(cycle, indices=[1, 3])

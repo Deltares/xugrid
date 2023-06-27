@@ -360,3 +360,19 @@ def test_ugrid1d_rename_with_dataset():
     assert sorted(dataset.data_vars) == ["__renamed", "__renamed_edge_nodes"]
     assert sorted(dataset.dims) == ["__renamed_nEdges", "__renamed_nNodes", "two"]
     assert sorted(dataset.coords) == ["__renamed_node_x", "__renamed_node_y"]
+
+
+def test_topology_sort_by_dfs():
+    grid = grid1d()
+    vertices = grid.topological_sort_by_dfs()
+    assert isinstance(vertices, np.ndarray)
+    assert np.array_equal(vertices, [0, 1, 2])
+
+
+def test_contract_vertices():
+    grid = grid1d()
+    new = grid.contract_vertices(indices=[0, 2])
+    assert isinstance(new, xugrid.Ugrid1d)
+    assert new.n_node == 2
+    # The nodes have been renumbered
+    assert np.array_equal(new.edge_node_connectivity, [[0, 1]])

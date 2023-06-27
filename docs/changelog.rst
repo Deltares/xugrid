@@ -23,6 +23,10 @@ Added
 - :meth:`xugrid.Ugrid1d.rename` and :meth:`xugrid.Ugrid2d.rename` have been
   added to rename a grid, including the attributes that are created when the
   grid is converted into an xarray dataset.
+- :meth:`xugrid.Ugrid1d.node_node_connectivity` and
+  :meth:`xugrid.Ugrid2.node_node_connectivity` properties have been added.
+- :meth:`xugrid.Ugrid1d.topological_sort_by_dfs` has been added.
+- :meth:`xugrid.Ugrid1d.contract_vertices` has been added.
 
 [0.5.0] 2023-05-25
 ------------------
