@@ -263,10 +263,10 @@ class StructuredGrid1d:
         source_midpoint_index = self.maybe_reverse_index(source_index)
         target_midpoints_index = other.maybe_reverse_index(target_index)
         neighbor = np.ones(target_midpoints_index.size, dtype=int)
-        # cases where midpoint target < midpoint source
+        # cases where midpoint target <= midpoint source
         condition = (
             other.midpoints[target_midpoints_index]
-            < self.midpoints[source_midpoint_index]
+            <= self.midpoints[source_midpoint_index]
         )
         neighbor[condition] = -neighbor[condition]
 
