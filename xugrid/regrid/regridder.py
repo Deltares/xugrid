@@ -235,8 +235,8 @@ class BaseRegridder(abc.ABC):
             dataset["__regrid_data"].values,
             dataset["__regrid_indices"].values,
             dataset["__regrid_indptr"].values,
-            dataset["__regrid_n"].values,
-            dataset["__regrid_nnz"].values,
+            dataset["__regrid_n"].values[()],
+            dataset["__regrid_nnz"].values[()],
         )
 
     @staticmethod
@@ -245,7 +245,7 @@ class BaseRegridder(abc.ABC):
             dataset["__regrid_data"].values,
             dataset["__regrid_row"].values,
             dataset["__regrid_col"].values,
-            dataset["__regrid_nnz"].values,
+            dataset["__regrid_nnz"].values[()],
         )
 
     @abc.abstractclassmethod
