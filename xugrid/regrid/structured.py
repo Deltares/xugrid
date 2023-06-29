@@ -334,6 +334,8 @@ class StructuredGrid1d:
         source_index, target_index, weights = self.overlap_1d_structured(other)
         if relative:
             weights /= self.length()[source_index]
+            # weights = np.reshape(weights, (-1, 1))
+            # weights /= self.length[source_index]
         return self.sorted_output(source_index, target_index, weights)
 
     def locate_centroids(

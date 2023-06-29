@@ -84,6 +84,18 @@ def test_overlap_regridder_structured(
     assert broadcasted.dims == ("layer", "y", "x")
     assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
 
+def test_RelativeOverlap_regridder_structured(
+    grid_data_a, grid_data_a_layered, grid_data_b, expected_results_overlap
+):
+    regridder = RelativeOverlapRegridder(source=grid_data_a, target=grid_data_b)
+    result = regridder.regrid(grid_data_a)
+    assert (result == expected_results_overlap).any()
+
+    # With broadcasting
+    regridder = OverlapRegridder(source=grid_data_a_layered, target=grid_data_b)
+    broadcasted = regridder.regrid(grid_data_a_layered)
+    assert broadcasted.dims == ("layer", "y", "x")
+    assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
 
 def test_overlap_regridder(disk, quads_1):
     square = quads_1
