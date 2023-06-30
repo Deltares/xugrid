@@ -306,6 +306,20 @@ def test_linear_weights_1d(
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
     assert np.allclose(weights[sorter], np.array([0.65, 0.35, 0.9, 0.1]))
 
+    # 1-1 grid
+    # --------
+    # source   target  weight
+    # 1        1       100%
+    # 0        1       0%
+    # 2        2       100%
+    # 1        2       0%
+    # --------
+    source, target, weights = grid_data_b_1d.linear_weights(grid_data_b_1d)
+    sorter = np.argsort(target)
+    assert np.array_equal(source[sorter], np.array([1, 0, 2, 1]))
+    assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
+    assert np.allclose(weights[sorter], np.array([1.0, 0.0, 1.0, 0.0]))
+
 
 def test_linear_weights_2d(
     grid_data_a_2d, grid_data_a_layered_2d, grid_data_b_2d, grid_data_c_2d
@@ -343,3 +357,23 @@ def test_linear_weights_2d(
         target[sorter], np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10])
     )
     assert np.allclose(weights[sorter], np.array([0.4, 0.1, 0.4, 0.1] * 4))
+
+    # 1-1
+    # --------
+    # source   targets      weight
+    # 5        4, 5, 8, 9   0% 100% 0% 0%
+    # 6        5, 6, 9,10   0% 100% 0% 0%
+    # 9        8, 9,12,13   0% 100% 0% 0%
+    # 10       9,10,13,14   0% 100% 0% 0%
+    # --------
+    source, target, weights = grid_data_b_2d.linear_weights(grid_data_b_2d)
+    sorter = np.argsort(target)
+    assert np.array_equal(
+        source[sorter], np.array([5, 4, 9, 8, 6, 5, 10, 9, 9, 8, 13, 12, 10, 9, 14, 13])
+    )
+    assert np.array_equal(
+        target[sorter], np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10])
+    )
+    assert np.allclose(
+        weights[sorter], np.array([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0])
+    )
