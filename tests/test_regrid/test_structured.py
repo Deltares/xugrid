@@ -266,45 +266,45 @@ def test_linear_weights_1d(
 
     # --------
     # source   target  weight
-    # 1        1       20%
-    # 0        1       80%
-    # 2        2       20%
-    # 1        2       80%
+    # 1        1       80%
+    # 0        1       20%
+    # 2        2       80%
+    # 1        2       20%
     # --------
     source, target, weights = grid_data_a_1d.linear_weights(grid_data_c_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([1, 0, 2, 1]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
-    assert np.allclose(weights[sorter], np.array([0.2, 0.8, 0.2, 0.8]))
+    assert np.allclose(weights[sorter], np.array([0.8, 0.2, 0.8, 0.2]))
 
     # --------
     # source   target  weight
-    # 0        1       10%
-    # 1        1       90%
-    # 0        2       60%
-    # 1        2       40% *reversed in output
-    # 1        3       10%
-    # 2        3       90%
+    # 0        1       90%
+    # 1        1       10%
+    # 0        2       40%
+    # 1        2       60% *reversed in output
+    # 1        3       90%
+    # 2        3       10%
     # --------
     source, target, weights = grid_data_a_1d.linear_weights(grid_data_d_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 0, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2, 3, 3]))
-    assert np.allclose(weights[sorter], np.array([0.1, 0.9, 0.4, 0.6, 0.1, 0.9]))
+    assert np.allclose(weights[sorter], np.array([0.9, 0.1, 0.6, 0.4, 0.9, 0.1]))
 
     # non-equidistant
     # --------
     # source   target  weight
-    # 0        1       35%
-    # 1        1       65%
-    # 1        2       10%
-    # 2        2       90%
+    # 0        1       65%
+    # 1        1       55%
+    # 1        2       90%
+    # 2        2       10%
     # --------
     source, target, weights = grid_data_a_1d.linear_weights(grid_data_e_1d)
     sorter = np.argsort(target)
     assert np.array_equal(source[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(target[sorter], np.array([1, 1, 2, 2]))
-    assert np.allclose(weights[sorter], np.array([0.35, 0.65, 0.1, 0.9]))
+    assert np.allclose(weights[sorter], np.array([0.65, 0.35, 0.9, 0.1]))
 
 
 def test_linear_weights_2d(
@@ -342,4 +342,4 @@ def test_linear_weights_2d(
     assert np.array_equal(
         target[sorter], np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10])
     )
-    assert np.allclose(weights[sorter], np.array([0.1, 0.4, 0.1, 0.4] * 4))
+    assert np.allclose(weights[sorter], np.array([0.4, 0.1, 0.4, 0.1] * 4))

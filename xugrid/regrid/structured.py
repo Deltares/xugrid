@@ -275,12 +275,15 @@ class StructuredGrid1d:
                 f"Coordinate {self.name} has size: {self.midpoints.size}. "
                 "At least two points are required for interpolation."
             )
-        weights = (
-            other.midpoints[target_midpoints_index]
-            - self.midpoints[source_midpoint_index]
-        ) / (
-            self.midpoints[source_midpoint_index + neighbor]
-            - self.midpoints[source_midpoint_index]
+        weights = 1 - (
+            (
+                other.midpoints[target_midpoints_index]
+                - self.midpoints[source_midpoint_index]
+            )
+            / (
+                self.midpoints[source_midpoint_index + neighbor]
+                - self.midpoints[source_midpoint_index]
+            )
         )
         weights[weights < 0.0] = 0.0
         weights[weights > 1.0] = 1.0
