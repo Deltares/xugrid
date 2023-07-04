@@ -608,6 +608,9 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCSR</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        variable n and nnz are expected to be scalar variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">WeightMatrixCSR</span><span class="p">(</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_indices&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
@@ -618,6 +621,9 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        variable nnz is expected to be scalar variable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">WeightMatrixCOO</span><span class="p">(</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_row&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
