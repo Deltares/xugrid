@@ -24,6 +24,14 @@ def disk():
 
 
 @pytest.fixture(scope="function")
+def disk_layered(disk):
+    layer = xr.DataArray([1.0, 2.0, 3.0], coords={"layer": [1, 2, 3]}, dims=("layer",))
+    # Disk is first in multiplication, to ensure that object is promoted to UgridDataArray
+    disk_layered = disk * layer
+    return disk_layered.transpose("layer", disk.ugrid.grid.face_dimension)
+
+
+@pytest.fixture(scope="function")
 def quads_0_25():
     dx = 0.25
     xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds

@@ -1,5 +1,6 @@
 from tests.fixtures.fixture_regridder import (
     disk,
+    disk_layered,
     expected_results_centroid,
     expected_results_linear,
     expected_results_overlap,

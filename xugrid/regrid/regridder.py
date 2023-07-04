@@ -231,21 +231,27 @@ class BaseRegridder(abc.ABC):
 
     @staticmethod
     def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
+        """
+        variable n and nnz are expected to be scalar variable
+        """
         return WeightMatrixCSR(
             dataset["__regrid_data"].values,
             dataset["__regrid_indices"].values,
             dataset["__regrid_indptr"].values,
-            dataset["__regrid_n"].values,
-            dataset["__regrid_nnz"].values,
+            dataset["__regrid_n"].values[()],
+            dataset["__regrid_nnz"].values[()],
         )
 
     @staticmethod
     def _coo_from_dataset(dataset: xr.Dataset) -> WeightMatrixCOO:
+        """
+        variable nnz is expected to be scalar variable
+        """
         return WeightMatrixCOO(
             dataset["__regrid_data"].values,
             dataset["__regrid_row"].values,
             dataset["__regrid_col"].values,
-            dataset["__regrid_nnz"].values,
+            dataset["__regrid_nnz"].values[()],
         )
 
     @abc.abstractclassmethod

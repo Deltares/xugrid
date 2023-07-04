@@ -165,6 +165,25 @@ def test_regridder_from_weights(cls, disk, quads_1):
         BarycentricInterpolator,
     ],
 )
+def test_regridder_from_weights_layered(cls, disk, disk_layered, quads_1):
+    square = quads_1
+    regridder = cls(source=disk, target=square)
+    result = regridder.regrid(disk)
+    weights = regridder.weights
+    new_regridder = cls.from_weights(weights, target=square)
+    new_result = new_regridder.regrid(disk_layered)
+    assert np.array_equal(new_result.sel(layer=1).values, result.values, equal_nan=True)
+
+
+@pytest.mark.parametrize(
+    "cls",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
+)
 def test_regridder_from_dataset(cls, disk, quads_1):
     square = quads_1
     regridder = cls(source=disk, target=square)
