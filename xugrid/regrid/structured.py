@@ -238,7 +238,7 @@ class StructuredGrid1d:
         else:
             return index
 
-    def compute_distance_to_centroids(
+    def compute_linear_weights_to_centroids(
         self, other: "StructuredGrid1d", source_index: IntArray, target_index: IntArray
     ) -> Tuple[FloatArray, IntArray]:
         """
@@ -285,8 +285,11 @@ class StructuredGrid1d:
                 - self.midpoints[source_midpoint_index]
             )
         )
-        weights[weights < 0.0] = 0.0
-        weights[weights > 1.0] = 1.0
+        condition = np.logical_and(weights < 0.0, weights > 1.0)
+        if condition.any():
+            raise ValueError(
+                f"Computed invalid weights for dimensions: {self.name} at coords: {self.midpoints[condition]}"
+            )
         return weights, neighbor
 
     def sorted_output(
@@ -377,7 +380,7 @@ class StructuredGrid1d:
         weights: np.array
         """
         source_index, target_index = self.valid_nodes_within_bounds_and_extend(other)
-        weights, neighbour = self.compute_distance_to_centroids(
+        weights, neighbour = self.compute_linear_weights_to_centroids(
             other, source_index, target_index
         )
         source_index, target_index, weights = self.centroids_to_linear_sets(

@@ -296,7 +296,7 @@ def test_linear_weights_1d(
     # --------
     # source   target  weight
     # 0        1       65%
-    # 1        1       55%
+    # 1        1       35%
     # 1        2       90%
     # 2        2       10%
     # --------
