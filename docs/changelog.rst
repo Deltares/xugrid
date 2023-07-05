@@ -9,6 +9,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.6.0] 2023-07-05
+------------------
+
 Added
 ~~~~~
 
@@ -27,6 +30,25 @@ Added
   :meth:`xugrid.Ugrid2.node_node_connectivity` properties have been added.
 - :meth:`xugrid.Ugrid1d.topological_sort_by_dfs` has been added.
 - :meth:`xugrid.Ugrid1d.contract_vertices` has been added.
+
+Fixed
+~~~~~
+
+- Regridding is possible again with regridders initiated ``from_weights``.
+  See `#90 <https://github.com/Deltares/xugrid/issues/90>`_. 
+  This was a broken feature in the 0.5.0 release.
+- Computed weights for structured grids regridders now decrease with distance
+  instead of increase.
+- Fixed edge case for regridding structured grids, where midpoints of the
+  source and target grid are equal.
+- Fixed numba typing error for regridders.
+
+Changed
+~~~~~~~
+
+- Regridding structured grids now throws error if computed weights < 0.0 or >
+  1.0, before these weights were clipped to 0.0 and 1.0 respectively.
+
 
 [0.5.0] 2023-05-25
 ------------------
