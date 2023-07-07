@@ -14,7 +14,7 @@ Fixed
 
 - fillvalue was not properly replaced in cast.
   See `#113 <https://github.com/Deltares/xugrid/issues/113>`_,
-  which was introduced by fixing `#113 <https://github.com/Deltares/xugrid/issues/113>`_. 
+  which was introduced by fixing `#101 <https://github.com/Deltares/xugrid/issues/101>`_. 
 
 
 [0.6.0] 2023-07-05
