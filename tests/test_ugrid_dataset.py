@@ -950,6 +950,7 @@ def get_ugrid_fillvaluem999_startindex1():
     nodevar = np.ones(shape=(ds2.dims[mesh2d_attrs["node_dimension"]]))
     ds2["mesh2d_nodevar"] = xr.DataArray(nodevar, dims=(mesh2d_attrs["node_dimension"]))
 
+    # upon loading a dataset from a file, xarray decodes it, so we also do it here
     ds2_enc = xr.decode_cf(ds2)
 
     uds = xugrid.UgridDataset(ds2_enc)
