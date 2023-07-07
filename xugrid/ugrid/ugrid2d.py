@@ -266,10 +266,7 @@ class Ugrid2d(AbstractUgrid):
         node_y_coordinates = ds[y_index].astype(FloatDType).values
 
         face_nodes = connectivity["face_node_connectivity"]
-        if "_FillValue" in ds[face_nodes].encoding.keys():
-            fill_value = ds[face_nodes].encoding["_FillValue"]
-        else:
-            fill_value = -1
+        fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         face_node_connectivity = cls._prepare_connectivity(
             ds[face_nodes], fill_value, dtype=IntDType
         ).values
