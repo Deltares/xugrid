@@ -787,3 +787,196 @@ def test_merge():
     merged = xugrid.merge([uds2d, uds1d])
     assert isinstance(merged, xugrid.UgridDataset)
     assert len(merged.grids) == 2
+
+
+def get_ugrid_fillvaluem999_startindex1():
+    """
+    this is a very minimal but comparable dataset to Grevelingen_0002_map.nc (FM output)
+    It contains triangles and squares
+    the fillvalue of the connectivity arrays is -999
+    the start_index of the connectivity arrays is 1
+
+    """
+
+    ds2 = xr.Dataset()
+
+    mesh2d_attrs = {
+        "cf_role": "mesh_topology",
+        "topology_dimension": 2,
+        "node_dimension": "nmesh2d_node",
+        "edge_dimension": "nmesh2d_edge",
+        "face_dimension": "nmesh2d_face",
+        "max_face_nodes_dimension": "max_nmesh2d_face_nodes",
+        "face_node_connectivity": "mesh2d_face_nodes",
+        "edge_node_connectivity": "mesh2d_edge_nodes",
+        "node_coordinates": "mesh2d_node_x mesh2d_node_y",
+        "name": "mesh2d",
+    }
+    ds2["mesh2d"] = xr.DataArray(np.array(0, dtype=int), attrs=mesh2d_attrs)
+
+    node_x = np.array(
+        [
+            48231.65428822,
+            48264.81400401,
+            48350.0,
+            48450.0,
+            48235.96727817,
+            48287.80875187,
+            48306.85396605,
+            48400.0,
+            48500.0,
+            48273.38390534,
+            48450.0,
+            48350.77800678,
+            48342.73889736,
+        ]
+    )
+    node_x_attrs = {
+        "units": "m",
+        "standard_name": "projection_x_coordinate",
+        "long_name": "x-coordinate of mesh nodes",
+        "mesh": "mesh2d",
+        "location": "node",
+    }
+    ds2["mesh2d_node_x"] = xr.DataArray(
+        node_x, dims=(mesh2d_attrs["node_dimension"]), attrs=node_x_attrs
+    )
+
+    node_y = np.array(
+        [
+            419541.94243367,
+            419605.7455447,
+            419605.94894,
+            419605.94894,
+            419454.05602638,
+            419488.96173469,
+            419552.39342675,
+            419519.3464,
+            419519.3464,
+            419418.34074563,
+            419432.74386,
+            419447.63359856,
+            419378.75075546,
+        ]
+    )
+    node_y_attrs = {
+        "units": "m",
+        "standard_name": "projection_y_coordinate",
+        "long_name": "y-coordinate of mesh nodes",
+        "mesh": "mesh2d",
+        "location": "node",
+    }
+    ds2["mesh2d_node_y"] = xr.DataArray(
+        node_y, dims=(mesh2d_attrs["node_dimension"]), attrs=node_y_attrs
+    )
+
+    fnc = np.array(
+        [
+            [1, 7, 2, -999],
+            [3, 2, 7, -999],
+            [8, 4, 3, -999],
+            [1, 6, 7, -999],
+            [8, 3, 7, -999],
+            [9, 4, 8, -999],
+            [5, 10, 6, -999],
+            [8, 7, 6, 12],
+            [11, 9, 8, -999],
+            [10, 12, 6, -999],
+            [11, 8, 12, -999],
+            [10, 13, 12, -999],
+            [11, 12, 13, -999],
+        ],
+        dtype=int,
+    )
+    fnc_attrs = {
+        "_FillValue": -999,
+        "cf_role": "face_node_connectivity",
+        "start_index": 1,
+        "coordinates": "mesh2d_face_x mesh2d_face_y",
+    }
+    ds2["mesh2d_face_nodes"] = xr.DataArray(
+        fnc,
+        dims=(mesh2d_attrs["face_dimension"], mesh2d_attrs["max_face_nodes_dimension"]),
+        attrs=fnc_attrs,
+    )
+
+    enc = np.array(
+        [
+            [1, 2],
+            [1, 6],
+            [1, 7],
+            [2, 3],
+            [2, 7],
+            [3, 4],
+            [3, 7],
+            [3, 8],
+            [4, 8],
+            [4, 9],
+            [5, 6],
+            [5, 10],
+            [6, 7],
+            [6, 10],
+            [6, 12],
+            [7, 8],
+            [8, 9],
+            [8, 11],
+            [8, 12],
+            [9, 11],
+            [10, 12],
+            [10, 13],
+            [11, 12],
+            [11, 13],
+            [12, 13],
+        ],
+        dtype=int,
+    )
+    enc_attrs = {
+        "cf_role": "edge_node_connectivity",
+        "mesh": "mesh2d",
+        "location": "edge",
+        "long_name": "Mapping from every edge to the two nodes that it connects",
+        "start_index": 1,
+        "_FillValue": -999,
+    }
+    ds2["mesh2d_edge_nodes"] = xr.DataArray(
+        enc, dims=(mesh2d_attrs["edge_dimension"], "two"), attrs=enc_attrs
+    )
+
+    # add dummy face variable in order to have a face dimension in the uds
+    facevar = np.ones(shape=(ds2.dims[mesh2d_attrs["face_dimension"]]))
+    ds2["mesh2d_facevar"] = xr.DataArray(facevar, dims=(mesh2d_attrs["face_dimension"]))
+
+    # add dummy nodevar to plot and trigger triangulation procedure
+    nodevar = np.ones(shape=(ds2.dims[mesh2d_attrs["node_dimension"]]))
+    ds2["mesh2d_nodevar"] = xr.DataArray(nodevar, dims=(mesh2d_attrs["node_dimension"]))
+
+    # upon loading a dataset from a file, xarray decodes it, so we also do it here
+    ds2_enc = xr.decode_cf(ds2)
+
+    uds = xugrid.UgridDataset(ds2_enc)
+
+    return uds
+
+
+def test_fm_fillvalue_startindex_isel():
+    """
+    FM data has 1-based starting index and _FillValue -999, this raises several issues. Since it is not possible to generate a Ugrid2d with these attributes, we are testing with raw data
+    """
+
+    # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
+    uds = get_ugrid_fillvaluem999_startindex1()
+
+    # xugrid 0.6.0 raises "ValueError: Invalid edge_node_connectivity"
+    uds.isel({uds.grid.face_dimension: [1]})
+
+
+def test_fm_facenodeconnectivity_fillvalue():
+    """
+    FM data has 1-based starting index and _FillValue -999, this raises several issues. Since it is not possible to generate a Ugrid2d with these attributes, we are testing with raw data
+    """
+
+    # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
+    uds = get_ugrid_fillvaluem999_startindex1()
+
+    # xugrid 0.6.0 has -2 values in the array
+    assert (uds.grid.face_node_connectivity != -2).all()

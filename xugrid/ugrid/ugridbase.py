@@ -381,6 +381,7 @@ class AbstractUgrid(abc.ABC):
         cast = data.astype(dtype, copy=True)
         if start_index:
             cast -= start_index
+        cast[is_fill] = fill_value
         if (cast[~is_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
