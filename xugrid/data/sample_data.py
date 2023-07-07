@@ -66,18 +66,3 @@ def elevation_nl(xarray=False):
     else:
         grid = xugrid.Ugrid2d.from_dataset(ds)
         return xugrid.UgridDataArray(ds["elevation"], grid)
-
-
-def grevelingen(xarray=False):
-    """
-    Fetch time varying output of a hydraulic FM simulation.
-    """
-    fname = REGISTRY.fetch("Grevelingen_map.nc")
-    ds = xr.open_dataset(fname)
-    ds["node_x"].attrs["standard_name"] = "projection_x_coordinate"
-    ds["node_y"].attrs["standard_name"] = "projection_y_coordinate"
-    if xarray:
-        return ds
-    else:
-        grid = xugrid.Ugrid2d.from_dataset(ds)
-        return xugrid.UgridDataset(ds, grid)
