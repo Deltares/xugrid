@@ -794,7 +794,7 @@ def test_fm_fillvalue_startindex_isel():
     FM data has 1-based starting index and _FillValue -999, this raises several issues. Since it is not possible to generate a Ugrid2d with these attributes, we are testing with raw data
     """
     uds = xu.open_dataset(file_nc)
-    
+
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
     uds = xu.data.grevelingen()
 
@@ -810,6 +810,6 @@ def test_fm_facenodeconnectivity_fillvalue():
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
     uds = xu.data.grevelingen()
-    
+
     # xugrid 0.6.0 has -2 values in the array
-    assert not uds.grid.face_node_connectivity < 0).any()  
+    assert not (uds.grid.face_node_connectivity < 0).any()
