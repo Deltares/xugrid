@@ -15,8 +15,12 @@ try:
     import dask.array
 
     DaskArray = dask.array.Array
+    DaskRechunk = dask.array.rechunk
+    DaskReshape = dask.array.reshape
 except ImportError:
     DaskArray = ()
+    DaskRechunk = ()
+    DaskReshape = ()
 
 import xugrid
 from xugrid.constants import FloatArray
@@ -144,8 +148,14 @@ class BaseRegridder(abc.ABC):
         source = source.reshape((-1, source_grid.size))
 
         size = self._target.size
+        # E.g.: sizes of ("time", "layer") + ("y", "x")
+        out_shape = first_dims_shape + self._target.shape
+
         if isinstance(source, DaskArray):
-            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape,)
+            # for DaskArray's from multiple partitions, rechunk first to single size per dimension
+            # for now always rechunk, could be optional only when explicit chunks in single dimension
+            source = DaskRechunk(source, source.shape)
+            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
@@ -155,17 +165,16 @@ class BaseRegridder(abc.ABC):
                 chunks=chunks,
                 meta=np.array((), dtype=source.dtype),
             )
+            out = out.compute().reshape(out_shape)
         elif isinstance(source, np.ndarray):
             out = self._regrid(source, self._weights, size)
+            out.reshape(out_shape)
         else:
             raise TypeError(
                 "Expected dask.array.Array or numpy.ndarray. Received: "
                 f"{type(source).__name__}"
             )
-
-        # E.g.: sizes of ("time", "layer") + ("y", "x")
-        out_shape = first_dims_shape + self._target.shape
-        return out.reshape(out_shape)
+        return out
 
     def regrid_dataarray(self, source: xr.DataArray, source_dims: Tuple[str]):
         # Do not set vectorize=True: numba will run the for loop more
@@ -203,12 +212,7 @@ class BaseRegridder(abc.ABC):
         if type(self._target) is StructuredGrid2d:
             source_dims = ("y", "x")
             regridded = self.regrid_dataarray(object, source_dims)
-            regridded = regridded.assign_coords(
-                coords={
-                    "y": np.flip(self._target.ybounds.midpoints),
-                    "x": self._target.xbounds.midpoints,
-                }
-            )
+            regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
             source_dims = (object.ugrid.grid.face_dimension,)

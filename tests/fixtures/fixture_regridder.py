@@ -1,3 +1,4 @@
+import dask.array as da
 import numpy as np
 import pytest
 import xarray as xr
@@ -337,3 +338,74 @@ def expected_results_linear():
             "dy": -50.0,
         },
     )
+
+
+@pytest.fixture(scope="function")
+def grid_data_dask_source():
+    data = np.arange(10000).reshape((100, 100))
+    data = da.from_array(data, chunks=(10, (10, 30, 60)))
+    return xr.DataArray(
+        data=data,
+        dims=["y", "x"],
+        coords={
+            "y": -np.arange(100),
+            "x": np.arange(100),
+            "dx": 1.0,
+            "dy": -1.0,
+        },
+    )
+
+
+@pytest.fixture(scope="function")
+def grid_data_dask_source_layered():
+    data = np.arange(30000).reshape((3, 100, 100))
+    data = da.from_array(data, chunks=(3, 10, (10, 30, 60)))
+    return xr.DataArray(
+        data=data,
+        dims=["layer", "y", "x"],
+        coords={
+            "layer": np.arange(3),
+            "y": -np.arange(100),
+            "x": np.arange(100),
+            "dx": 1.0,
+            "dy": -1.0,
+        },
+    )
+
+
+@pytest.fixture(scope="function")
+def grid_data_dask_target():
+    data = np.zeros(100).reshape((10, 10))
+    data = da.from_array(data, chunks=(10, (5, 5)))
+    return xr.DataArray(
+        data=data,
+        dims=["y", "x"],
+        coords={
+            "y": -np.arange(10) * 10,
+            "x": np.arange(10) * 10,
+            "dx": 10.0,
+            "dy": -10.0,
+        },
+    )
+
+
+@pytest.fixture(scope="function")
+def grid_data_dask_expected():
+    data1 = np.tile(np.arange(0.0, 100.0, 10.0), reps=10).reshape((10, 10))
+    data2 = np.repeat(np.arange(0.0, 10000.0, 1000.0), repeats=10).reshape((10, 10))
+    data = data1 + data2
+    return xr.DataArray(
+        data=data,
+        dims=["y", "x"],
+        coords={
+            "y": -np.arange(10) * 10,
+            "x": np.arange(10) * 10,
+            "dx": 10.0,
+            "dy": -10.0,
+        },
+    )
+
+
+@pytest.fixture(scope="function")
+def grid_data_dask_expected_layered(grid_data_dask_expected):
+    return grid_data_dask_expected.expand_dims(dim={"layer": np.arange(3)})
