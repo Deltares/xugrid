@@ -392,8 +392,12 @@ document.write(`
     <span class="kn">import</span> <span class="nn">dask.array</span>
 
     <span class="n">DaskArray</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">Array</span>
+    <span class="n">DaskRechunk</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">rechunk</span>
+    <span class="n">DaskReshape</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">DaskArray</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">DaskRechunk</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">DaskReshape</span> <span class="o">=</span> <span class="p">()</span>
 
 <span class="kn">import</span> <span class="nn">xugrid</span>
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FloatArray</span>
@@ -521,8 +525,14 @@ document.write(`
         <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">source_grid</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">size</span>
+        <span class="c1"># E.g.: sizes of (&quot;time&quot;, &quot;layer&quot;) + (&quot;y&quot;, &quot;x&quot;)</span>
+        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">first_dims_shape</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">DaskArray</span><span class="p">):</span>
-            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span> <span class="o">-</span><span class="n">source_grid</span><span class="o">.</span><span class="n">ndim</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span><span class="p">,)</span>
+            <span class="c1"># for DaskArray&#39;s from multiple partitions, rechunk first to single size per dimension</span>
+            <span class="c1"># for now always rechunk, could be optional only when explicit chunks in single dimension</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">DaskRechunk</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">chunks</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">chunks</span><span class="p">[:</span> <span class="o">-</span><span class="n">source_grid</span><span class="o">.</span><span class="n">ndim</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">,</span>  <span class="c1"># func</span>
                 <span class="n">source</span><span class="p">,</span>  <span class="c1"># *args</span>
@@ -532,17 +542,16 @@ document.write(`
                 <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
             <span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out_shape</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out_shape</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Expected dask.array.Array or numpy.ndarray. Received: &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-
-        <span class="c1"># E.g.: sizes of (&quot;time&quot;, &quot;layer&quot;) + (&quot;y&quot;, &quot;x&quot;)</span>
-        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">first_dims_shape</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">shape</span>
-        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out_shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span> <span class="nf">regrid_dataarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
         <span class="c1"># Do not set vectorize=True: numba will run the for loop more</span>
@@ -580,12 +589,7 @@ document.write(`
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="p">)</span> <span class="ow">is</span> <span class="n">StructuredGrid2d</span><span class="p">:</span>
             <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
             <span class="n">regridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">)</span>
-            <span class="n">regridded</span> <span class="o">=</span> <span class="n">regridded</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span>
-                <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">ybounds</span><span class="o">.</span><span class="n">midpoints</span><span class="p">),</span>
-                    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">xbounds</span><span class="o">.</span><span class="n">midpoints</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+            <span class="n">regridded</span> <span class="o">=</span> <span class="n">regridded</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">regridded</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
