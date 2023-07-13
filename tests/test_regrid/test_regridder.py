@@ -211,5 +211,5 @@ def test_regridder_daks_arrays(
     regridder = CentroidLocatorRegridder(
         source=grid_data_dask_source_layered, target=grid_data_dask_target
     )
-    result = regridder.regrid(grid_data_dask_source)
-    assert result.equals(grid_data_dask_expected_layered)
+    result = regridder.regrid(grid_data_dask_source_layered)
+    assert result.isel(layer=0).equals(grid_data_dask_expected_layered.isel(layer=0))

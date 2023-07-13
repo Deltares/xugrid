@@ -168,7 +168,7 @@ class BaseRegridder(abc.ABC):
             out = out.compute().reshape(out_shape)
         elif isinstance(source, np.ndarray):
             out = self._regrid(source, self._weights, size)
-            out.reshape(out_shape)
+            out = out.reshape(out_shape)
         else:
             raise TypeError(
                 "Expected dask.array.Array or numpy.ndarray. Received: "
