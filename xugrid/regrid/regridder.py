@@ -16,11 +16,9 @@ try:
 
     DaskArray = dask.array.Array
     DaskRechunk = dask.array.rechunk
-    DaskReshape = dask.array.reshape
 except ImportError:
     DaskArray = ()
     DaskRechunk = ()
-    DaskReshape = ()
 
 import xugrid
 from xugrid.constants import FloatArray
@@ -148,8 +146,6 @@ class BaseRegridder(abc.ABC):
         source = source.reshape((-1, source_grid.size))
 
         size = self._target.size
-        # E.g.: sizes of ("time", "layer") + ("y", "x")
-        out_shape = first_dims_shape + self._target.shape
 
         if isinstance(source, DaskArray):
             # for DaskArray's from multiple partitions, rechunk first to single size per dimension
@@ -165,16 +161,19 @@ class BaseRegridder(abc.ABC):
                 chunks=chunks,
                 meta=np.array((), dtype=source.dtype),
             )
-            out = out.compute().reshape(out_shape)
+            # TODO: for now we compute first, since .reshape and  dask.array.reshape
+            # does not reshapes the underlying data somehow. This need to be evaluated.
+            out = out.compute()
         elif isinstance(source, np.ndarray):
             out = self._regrid(source, self._weights, size)
-            out = out.reshape(out_shape)
         else:
             raise TypeError(
                 "Expected dask.array.Array or numpy.ndarray. Received: "
                 f"{type(source).__name__}"
             )
-        return out
+        # E.g.: sizes of ("time", "layer") + ("y", "x")
+        out_shape = first_dims_shape + self._target.shape
+        return out.reshape(out_shape)
 
     def regrid_dataarray(self, source: xr.DataArray, source_dims: Tuple[str]):
         # Do not set vectorize=True: numba will run the for loop more
