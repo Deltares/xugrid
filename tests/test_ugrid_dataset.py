@@ -377,6 +377,17 @@ class TestUgridDataArray:
         primitive = back.isel(time=0).ugrid.plot()
         assert primitive is not None
 
+    def test_plot_contourf_with_chunks(self, tmp_path):
+        time = xr.DataArray([0.0, 1.0, 2.0], coords={"time": [0, 1, 2]})
+        uda = (self.uda * time).transpose()
+        uda.name = "test"
+
+        path = tmp_path / "test.nc"
+        uda.ugrid.to_netcdf(path)
+        back = xugrid.open_dataarray(path, chunks={"time": 1})
+        primitive = back.isel(time=0).ugrid.plot.contourf()
+        assert primitive is not None
+
 
 class TestUgridDataset:
     @pytest.fixture(autouse=True)

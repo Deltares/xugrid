@@ -588,7 +588,6 @@ def plot(
     **kwargs : optional
         Additional keyword arguments for Matplotlib.
     """
-    darray = darray.squeeze().compute()
 
     dim = darray.dims[0]
     kwargs["ax"] = ax
@@ -634,7 +633,7 @@ class _PlotMethods:
             )
 
         self.grid = grid
-        self.darray = darray
+        self.darray = darray.squeeze().compute()
 
     def __call__(self, **kwargs):
         return plot(self.grid, self.darray, **kwargs)
