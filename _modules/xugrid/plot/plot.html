@@ -965,7 +965,6 @@ document.write(`
 <span class="sd">    **kwargs : optional</span>
 <span class="sd">        Additional keyword arguments for Matplotlib.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">darray</span> <span class="o">=</span> <span class="n">darray</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 
     <span class="n">dim</span> <span class="o">=</span> <span class="n">darray</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;ax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ax</span>
@@ -1011,7 +1010,7 @@ document.write(`
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">darray</span> <span class="o">=</span> <span class="n">darray</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">darray</span> <span class="o">=</span> <span class="n">darray</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">darray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
