@@ -69,7 +69,7 @@ def test_overlap_1d(
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1]))
     assert np.array_equal(target[sorter], np.array([0, 1, 1, 2]))
     assert np.array_equal(weights[sorter], np.array([17.5, 32.5, 17.5, 25.0]))
-    
+
     # relative
     # --------
     # source   targets  weight
@@ -80,7 +80,9 @@ def test_overlap_1d(
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.array([0, 0, 1, 1]))
     assert np.array_equal(target[sorter], np.array([0, 1, 1, 2]))
-    assert np.array_equal(weights[sorter], np.array([17.5/50.0, 32.5/50.0, 17.5/50.0, 25.0/50.0]))
+    assert np.array_equal(
+        weights[sorter], np.array([17.5 / 50.0, 32.5 / 50.0, 17.5 / 50.0, 25.0 / 50.0])
+    )
 
 
 def test_overlap_2d(grid_data_a_2d, grid_data_b_2d):
