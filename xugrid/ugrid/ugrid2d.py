@@ -6,7 +6,7 @@ import pandas as pd
 import xarray as xr
 from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
-from scipy.sparse.csgraph import reverse_cuthill_mckee
+from scipy.sparse.csgraph import connected_components, reverse_cuthill_mckee
 from xarray.core.utils import either_dict_or_kwargs
 
 import xugrid
@@ -1474,6 +1474,17 @@ class Ugrid2d(AbstractUgrid):
             self.face_node_connectivity[reordering],
         )
         return reordered_grid, reordering
+
+    def connected_components(self) -> IntArray:
+        """
+        Analyze the connected components of the topology.
+
+        Returns
+        -------
+        labels: np.ndarray of int of size n_face
+        """
+        _, labels = connected_components(self.face_face_connectivity)
+        return labels
 
     def refine_polygon(
         self,

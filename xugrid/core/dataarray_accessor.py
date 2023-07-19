@@ -1,7 +1,6 @@
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
-import scipy.sparse
 import xarray as xr
 from xarray.core.utils import UncachedAccessor
 
@@ -393,11 +392,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         labelled: UgridDataArray
         """
-        _, labels = scipy.sparse.csgraph.connected_components(
-            self.grid.face_face_connectivity
-        )
+        labels = self.grid.connected_components()
         return UgridDataArray(
-            xr.DataArray(labels, dims=[self.grid.face_dimension]),
+            xr.DataArray(labels, dims=[self.grid.core_dimension]),
             self.grid,
         )
 
