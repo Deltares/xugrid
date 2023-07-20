@@ -154,7 +154,7 @@ class BaseRegridder(abc.ABC):
             # in a single contiguous chunk.
             contiguous_chunks = (source.chunks[0], (source.shape[-1],))
             source = source.rechunk(contiguous_chunks)
-            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape)
+            chunks = source.chunks[:-1] + (self._target.size,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
