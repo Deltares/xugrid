@@ -383,7 +383,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">numba_celltree</span> <span class="kn">import</span> <span class="n">CellTree2d</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">csr_matrix</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span><span class="p">,</span> <span class="n">reverse_cuthill_mckee</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">reverse_cuthill_mckee</span>
 <span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
 
 <span class="kn">import</span> <span class="nn">xugrid</span>
@@ -1851,17 +1851,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">reordering</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">reordered_grid</span><span class="p">,</span> <span class="n">reordering</span></div>
-
-    <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Analyze the connected components of the topology.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        labels: np.ndarray of int of size n_face</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">labels</span>
 
     <span class="k">def</span> <span class="nf">refine_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
