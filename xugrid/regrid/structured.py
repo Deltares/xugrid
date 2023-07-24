@@ -99,7 +99,7 @@ class StructuredGrid1d:
 
     @property
     def length(self) -> FloatArray:
-        return abs(np.diff(self.bounds, axis=1))
+        return np.squeeze(abs(np.diff(self.bounds, axis=1)))
 
     def flip_if_needed(self, index: IntArray) -> IntArray:
         if self.flipped:
@@ -348,7 +348,7 @@ class StructuredGrid1d:
         """
         source_index, target_index, weights = self.overlap_1d_structured(other)
         if relative:
-            weights /= self.length()[source_index]
+            weights /= self.length[source_index]
         return self.sorted_output(source_index, target_index, weights)
 
     def locate_centroids(
