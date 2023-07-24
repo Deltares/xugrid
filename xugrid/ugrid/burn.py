@@ -11,8 +11,6 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
-ShapelyArray = np.ndarray
-
 
 def _locate_polygon(
     xy: FloatArray,
@@ -29,7 +27,7 @@ def _locate_polygon(
 
 
 def _burn_polygons(
-    polygons: ShapelyArray,
+    polygons: "geopandas.GeoSeries",  # type: ignore # noqa
     like: "xugrid.Ugrid2d",
     values: np.ndarray,
     all_touched: bool,
@@ -57,11 +55,11 @@ def _burn_polygons(
 
     """
     exterior_coordinates = [
-        shapely.get_coordinates(exterior) for exterior in polygons.geometry.exterior
+        shapely.get_coordinates(exterior) for exterior in polygons.exterior
     ]
     interior_coordinates = [
         [shapely.get_coordinates(p_interior) for p_interior in p_interiors]
-        for p_interiors in polygons.geometry.interiors
+        for p_interiors in polygons.interiors
     ]
 
     if all_touched:
@@ -95,7 +93,10 @@ def _burn_polygons(
 
 
 def _burn_points(
-    points: ShapelyArray, like: "xugrid.Ugrid2d", values: np.ndarray, output: FloatArray
+    points: "geopandas.GeoSeries",  # type: ignore # noqa
+    like: "xugrid.Ugrid2d",
+    values: np.ndarray,
+    output: FloatArray,
 ) -> None:
     """
     Simply searches the points in the ``like`` 2D topology.
@@ -107,7 +108,10 @@ def _burn_points(
 
 
 def _burn_lines(
-    lines: ShapelyArray, like: "xugrid.Ugrid2d", values: np.ndarray, output: FloatArray
+    lines: "geopandas.GeoSeries",  # type: ignore # noqa
+    like: "xugrid.Ugrid2d",
+    values: np.ndarray,
+    output: FloatArray,
 ) -> None:
     """
     This algorithm breaks any linestring down into edges (two x, y points). We
@@ -194,11 +198,11 @@ def burn_vector_geometry(
 
     output = np.full(like.n_face, fill)
     if len(points) > 0:
-        _burn_points(points.geometry.to_numpy(), like, values, output)
+        _burn_points(points.geometry, like, values, output)
     if len(lines) > 0:
-        _burn_lines(lines.geometry.to_numpy(), like, values, output)
+        _burn_lines(lines.geometry, like, values, output)
     if len(polygons) > 0:
-        _burn_polygons(polygons.geometry.to_numpy(), like, values, all_touched, output)
+        _burn_polygons(polygons.geometry, like, values, all_touched, output)
 
     return xugrid.UgridDataArray(
         obj=xr.DataArray(output, dims=[like.face_dimension], name=column),
