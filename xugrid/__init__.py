@@ -22,6 +22,7 @@ from xugrid.regrid.regridder import (
     OverlapRegridder,
     RelativeOverlapRegridder,
 )
+from xugrid.ugrid.burn import burn_vector_geometry
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
 from xugrid.ugrid.snapping import snap_to_grid
