@@ -192,3 +192,24 @@ def test_regridder_from_dataset(cls, disk, quads_1):
     new_regridder = cls.from_dataset(dataset)
     new_result = new_regridder.regrid(disk)
     assert np.array_equal(new_result.values, result.values, equal_nan=True)
+
+
+def test_regridder_daks_arrays(
+    grid_data_dask_source,
+    grid_data_dask_source_layered,
+    grid_data_dask_target,
+    grid_data_dask_expected,
+    grid_data_dask_expected_layered,
+):
+    regridder = CentroidLocatorRegridder(
+        source=grid_data_dask_source, target=grid_data_dask_target
+    )
+    result = regridder.regrid(grid_data_dask_source)
+    assert result.equals(grid_data_dask_expected)
+
+    # with broadcasting
+    regridder = CentroidLocatorRegridder(
+        source=grid_data_dask_source_layered, target=grid_data_dask_target
+    )
+    result = regridder.regrid(grid_data_dask_source_layered)
+    assert result.isel(layer=0).equals(grid_data_dask_expected_layered.isel(layer=0))

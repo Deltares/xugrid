@@ -74,7 +74,16 @@ class StructuredGrid1d:
         self.bounds = bounds
         self.flipped = flipped
         self.side = side
-        self.grid = obj
+        self.dname = size_name
+        self.dvalue = obj[size_name].values
+        self.index = obj.indexes[name].values
+
+    @property
+    def coords(self) -> dict:
+        return {
+            self.name: self.index,
+            self.dname: self.dvalue,
+        }
 
     @property
     def ndim(self) -> int:
@@ -419,6 +428,10 @@ class StructuredGrid2d(StructuredGrid1d):
     ):
         self.xbounds = StructuredGrid1d(obj, name_x)
         self.ybounds = StructuredGrid1d(obj, name_y)
+
+    @property
+    def coords(self) -> dict:
+        return self.ybounds.coords | self.xbounds.coords
 
     @property
     def ndim(self) -> int:

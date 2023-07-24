@@ -144,8 +144,17 @@ class BaseRegridder(abc.ABC):
         source = source.reshape((-1, source_grid.size))
 
         size = self._target.size
+
         if isinstance(source, DaskArray):
-            chunks = source.chunks[: -source_grid.ndim] + (self._target.shape,)
+            # It's possible that the topology dimensions are chunked (e.g. from
+            # reading multiple partitions). The regrid operation does not
+            # support this, since we might need multiple source chunks for a
+            # single target chunk, which destroys the 1:1 relation between
+            # chunks. Here we ensure that the topology dimensions are contained
+            # in a single contiguous chunk.
+            contiguous_chunks = (source.chunks[0], (source.shape[-1],))
+            source = source.rechunk(contiguous_chunks)
+            chunks = source.chunks[:-1] + (self._target.size,)
             out = dask.array.map_blocks(
                 self._regrid,  # func
                 source,  # *args
@@ -162,7 +171,6 @@ class BaseRegridder(abc.ABC):
                 "Expected dask.array.Array or numpy.ndarray. Received: "
                 f"{type(source).__name__}"
             )
-
         # E.g.: sizes of ("time", "layer") + ("y", "x")
         out_shape = first_dims_shape + self._target.shape
         return out.reshape(out_shape)
@@ -203,12 +211,7 @@ class BaseRegridder(abc.ABC):
         if type(self._target) is StructuredGrid2d:
             source_dims = ("y", "x")
             regridded = self.regrid_dataarray(object, source_dims)
-            regridded = regridded.assign_coords(
-                coords={
-                    "y": np.flip(self._target.ybounds.midpoints),
-                    "x": self._target.xbounds.midpoints,
-                }
-            )
+            regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
             source_dims = (object.ugrid.grid.face_dimension,)
