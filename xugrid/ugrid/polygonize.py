@@ -1,5 +1,5 @@
 """
-The functions in this module serve to polygonize   
+The functions in this module serve to polygonize
 """
 from typing import Tuple
 
@@ -39,16 +39,20 @@ def _classify(
     # vj holds the value of the second face.
     vi = face_values[i]
     vj = face_values[j]
+    n = face_values.size
     # For labelling, only those parts of the mesh that have the same value
     # should be connected with each other.
     # Since we dropped NaN values before, we needn't worry about those.
-    is_connection = (j != fill_value) & (vi == vj)
+    is_connection = (i != fill_value) & (j != fill_value) & (vi == vj)
     i = i[is_connection]
     j = j[is_connection]
     ij = np.concatenate([i, j])
     ji = np.concatenate([j, i])
     coo_content = (ji, (ij, ji))
-    coo_matrix = sparse.coo_matrix(coo_content)
+    # Make sure to explicitly set the matrix shape: otherwise, isolated
+    # elements witout any connection might disappear, and connected_components
+    # will not return a value for every face.
+    coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
     # We can classify the grid faces using this (reduced) connectivity
     return sparse.csgraph.connected_components(coo_matrix)
 
@@ -59,11 +63,11 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
     (faces) in the Ugrid2d topology sharing a common value.
 
     The produced polygon edges will follow exactly the cell boundaries. When
-    the data consists of many unique values (e.g. elevation data), the result
-    will essentially be one polygon per face. In such cases, it is much more
-    efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which directly
-    converts every cell to a polygon. This function is meant for data with
-    relatively few unique values such as classification results.
+    the data consists of many unique values (e.g. unbinned elevation data), the
+    result will essentially be one polygon per face. In such cases, it is much
+    more efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which
+    directly converts every cell to a polygon. This function is meant for data
+    with relatively few unique values such as classification results.
 
     Parameters
     ----------
@@ -101,7 +105,11 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
     data_i = face_values[i]
     vi = polygon_id[i]
     vj = polygon_id[j]
-    boundary = (vi != vj) | (j == fill_value)
+    # Ensure that no result thas has been created by indexing with the
+    # fill_value remains. Since polygon_id starts counting a 0, we may use -1.
+    vi[i == fill_value] = -1
+    vj[j == fill_value] = -1
+    boundary = vi != vj
 
     polygons = []
     values = []
@@ -109,8 +117,8 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
         keep = ((vi == label) | (vj == label)) & boundary
         # The result of shapely polygonize is always a GeometryCollection.
         # Holes are included twice: once as holes in the largest body, and once
-        # more as polygons. We are interested in the largest polygon, which we
-        # identify through its bounding box.
+        # more as polygons on their own. We are interested in the largest
+        # polygon, which we identify through its bounding box.
         edges = grid.edge_node_connectivity[keep]
         collection = shapely.polygonize(shapely.linestrings(coordinates[edges]))
         polygon = max(collection.geoms, key=lambda x: _bbox_area(x.bounds))

@@ -8,14 +8,11 @@ these geometries and their associated data are generally represented by a
 geopandas GeoDataFrame.
 
 Xugrid provides a number of utilities to use such data in combination with
-unstructured grids.
-
-#
+unstructured grids. These are demonstrated below.
 """
 # %%
 
 import geopandas as gpd
-import matplotlib.pyplot as plt
 
 import xugrid as xu
 
@@ -38,27 +35,34 @@ gdf = uda.ugrid.to_geodataframe()
 gdf
 
 # %%
+# We see that a GeoDataFrame with 5248 rows is created: one row for each face.
+#
 # Conversion from GeoDataFrame
 # ----------------------------
 #
 # We can also make the opposite conversion: we can create a UgridDataSet from a
 # GeoDataFrame.
 #
-# .. note::
-#   Not every GeoDataFrame can be converted to a ``xugrid`` representation!
-#   While an unstructured grid topology is generally always a valid collection
-#   of polygon geometries, not every collection of polygon geometries is valid
-#   grid: polygons should be convex and non-overlapping to create a valid
-#   unstructured grid.
-#
-#   Hence, the ``.from_geodataframe()`` is primarily meant to create ``xugrid``
-#   objects from data that were originally created as triangulation or
-#   unstructured grid, but that were converted to vector geometry form.
-
 back = xu.UgridDataset.from_geodataframe(gdf)
 back
 
 # %%
+# .. note::
+#   Not every GeoDataFrame can be converted to a ``xugrid`` representation!
+#   While an unstructured grid topology is generally always a valid collection
+#   of polygon geometries, not every collection of polygon geometries is a
+#   valid grid: polygons should be convex and non-overlapping to create a valid
+#   unstructured grid.
+#
+#   Secondly, each polygon fully owns its vertices (nodes), while the face of a
+#   UGRID topology shares its nodes with its neighbors. All the vertices of the
+#   polygons must therefore be exactly snapped together to form a connected
+#   mesh.
+#
+#   Hence, the ``.from_geodataframe()`` is primarily meant to create ``xugrid``
+#   objects from data that were originally created as triangulation or
+#   unstructured grid, but that were converted to vector geometry form.
+#
 # "Rasterizing", or "burning" vector geometries
 # ---------------------------------------------
 #
@@ -67,14 +71,29 @@ back
 # unstructured grids, there is a clearly equivalent operation where we mark
 # cells that are covered or touched by a polygon.
 #
-# In this example, we mark the cells that are covered by a certain province.
+# In this example, we mark the faces that are covered by a certain province.
 
-
-# %%
-
-provinces = gpd.read_file(r"c:\src\pandamesh\data\provinces-nl.geojson").to_crs(28992)
+provinces = xu.data.provinces_nl.to_crs(28992)
 provinces["value"] = range(len(provinces))
 burned = xu.burn_vector_geometry(provinces, uda, column="value")
+burned.ugrid.plot()
+
+# %%
+# This is a convenient way to create masks and such:
+
+utrecht = provinces[provinces["name"] == "Utrecht"]
+burned = xu.burn_vector_geometry(utrecht, uda)
+burned.ugrid.plot()
+
+# %%
+# This function can also be used to burn points or lines into the faces of an
+# unstructured grid.
+#
+# The exterior boundaries of the province polygons will provide
+# a collection of linestrings that we can burn into the grid:
+
+lines = gpd.GeoDataFrame(geometry=provinces.exterior)
+burned = xu.burn_vector_geometry(lines, uda)
 burned.ugrid.plot()
 
 # %%
@@ -82,7 +101,7 @@ burned.ugrid.plot()
 # ------------
 #
 # We can also do the opposite operation: turn collections of same-valued grid
-# cells into vector polygons. Let's classify the elevation data into below and
+# faces into vector polygons. Let's classify the elevation data into below and
 # above the boundary of 5 m above mean sea level:
 
 classified = uda > 5
@@ -90,3 +109,14 @@ polygonized = xu.polygonize(classified)
 polygonized.plot(facecolor="none")
 
 # %%
+# We see that the results consists of two large polygons, in which the
+# triangles of the triangular grid have been merged to form a single polygon,
+# and many smaller polygons, some of which correspond one-to-one to the
+# triangles of the grid.
+#
+# .. note::
+#   The produced polygon edges will follow exactly the face boundaries. When
+#   the data consists of many unique values (e.g. unbinned elevation data), the
+#   result will essentially be one polygon per face. In such cases, it is much
+#   more efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which
+#   directly converts every face to a polygon.

@@ -192,7 +192,7 @@ def burn_vector_geometry(
     polygons = gdf.loc[geometry_id == shapely.GeometryType.POLYGON]
 
     if column is not None:
-        values = gdf["column"].to_numpy()
+        values = gdf[column].to_numpy()
     else:
         values = np.ones(len(gdf), dtype=float)
 
