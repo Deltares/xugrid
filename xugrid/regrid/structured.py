@@ -74,7 +74,16 @@ class StructuredGrid1d:
         self.bounds = bounds
         self.flipped = flipped
         self.side = side
-        self.grid = obj
+        self.dname = size_name
+        self.dvalue = obj[size_name].values
+        self.index = obj.indexes[name].values
+
+    @property
+    def coords(self) -> dict:
+        return {
+            self.name: self.index,
+            self.dname: self.dvalue,
+        }
 
     @property
     def ndim(self) -> int:
@@ -90,7 +99,7 @@ class StructuredGrid1d:
 
     @property
     def length(self) -> FloatArray:
-        return abs(np.diff(self.bounds, axis=1))
+        return np.squeeze(abs(np.diff(self.bounds, axis=1)))
 
     def flip_if_needed(self, index: IntArray) -> IntArray:
         if self.flipped:
@@ -339,7 +348,7 @@ class StructuredGrid1d:
         """
         source_index, target_index, weights = self.overlap_1d_structured(other)
         if relative:
-            weights /= self.length()[source_index]
+            weights /= self.length[source_index]
         return self.sorted_output(source_index, target_index, weights)
 
     def locate_centroids(
@@ -419,6 +428,10 @@ class StructuredGrid2d(StructuredGrid1d):
     ):
         self.xbounds = StructuredGrid1d(obj, name_x)
         self.ybounds = StructuredGrid1d(obj, name_y)
+
+    @property
+    def coords(self) -> dict:
+        return self.ybounds.coords | self.xbounds.coords
 
     @property
     def ndim(self) -> int:

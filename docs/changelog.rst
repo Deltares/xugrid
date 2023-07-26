@@ -9,11 +9,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.6.2] 2023-07-26
+------------------
+
 Fixed
 ~~~~~
 
 - Computing indexer to avoid dask array of unknown shape upon plotting.
   See `#117 <https://github.com/Deltares/xugrid/issues/117>`_.
+- Bug where chunked dask arrays could not be regridded. 
+  See `#119 <https://github.com/Deltares/xugrid/issues/99>`_.
+- Bug where error was thrown in the RelativeOverlapRegridder upon 
+  flipping the y coordinate.
 
 
 [0.6.1] 2023-07-07

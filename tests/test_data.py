@@ -37,3 +37,10 @@ def test_elevation_nl():
     assert isinstance(ds, xugrid.UgridDataArray)
     ds = xugrid.data.elevation_nl(xarray=True)
     assert isinstance(ds, xr.Dataset)
+
+
+def test_provinces_nl():
+    import geopandas as gpd
+
+    gdf = xugrid.data.provinces_nl()
+    assert isinstance(gdf, gpd.GeoDataFrame)

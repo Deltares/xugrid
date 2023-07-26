@@ -66,3 +66,14 @@ def elevation_nl(xarray=False):
     else:
         grid = xugrid.Ugrid2d.from_dataset(ds)
         return xugrid.UgridDataArray(ds["elevation"], grid)
+
+
+def provinces_nl():
+    """
+    Fetch provinces polygons for the Netherlands.
+    """
+    import geopandas as gpd
+
+    fname = REGISTRY.fetch("provinces-nl.geojson")
+    gdf = gpd.read_file(fname)
+    return gdf
