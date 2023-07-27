@@ -13,6 +13,7 @@ unstructured grids. These are demonstrated below.
 # %%
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
 
 import xugrid as xu
 
@@ -32,7 +33,7 @@ uda.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 # ``.to_geodataframe``, a shapely Polygon is created for every face (cell).
 
 gdf = uda.ugrid.to_geodataframe()
-gdf
+print(gdf)
 
 # %%
 # We see that a GeoDataFrame with 5248 rows is created: one row for each face.
@@ -73,7 +74,7 @@ back
 #
 # In this example, we mark the faces that are covered by a certain province.
 
-provinces = xu.data.provinces_nl.to_crs(28992)
+provinces = xu.data.provinces_nl().to_crs(28992)
 provinces["value"] = range(len(provinces))
 burned = xu.burn_vector_geometry(provinces, uda, column="value")
 burned.ugrid.plot()
@@ -83,7 +84,49 @@ burned.ugrid.plot()
 
 utrecht = provinces[provinces["name"] == "Utrecht"]
 burned = xu.burn_vector_geometry(utrecht, uda)
-burned.ugrid.plot()
+xmin, ymin, xmax, ymax = utrecht.buffer(10_000).total_bounds
+
+fig, ax = plt.subplots()
+burned.ugrid.plot(ax=ax)
+burned.ugrid.plot.line(ax=ax, edgecolor="black", linewidth=0.5)
+utrecht.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=1.5)
+ax.set_xlim(xmin, xmax)
+ax.set_ylim(ymin, ymax)
+
+# %%
+# By default, ``burn_vector_geometry`` will only include grid faces whose
+# centroid are located in a polygon. We can also mark all intersected faces
+# by setting ``all_touched=True``:
+
+burned = xu.burn_vector_geometry(utrecht, uda, all_touched=True)
+
+fig, ax = plt.subplots()
+burned.ugrid.plot(ax=ax)
+burned.ugrid.plot.line(ax=ax, edgecolor="black", linewidth=0.5)
+utrecht.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=1.5)
+ax.set_xlim(xmin, xmax)
+ax.set_ylim(ymin, ymax)
+
+# %%
+# Note that ``all_touched=True`` is less suitable when differently valued
+# polygons are present that share borders. While the centroid of a face is
+# contained by only a single polygon, the area of the polygon may be located
+# in more than one polygon. In this case, the results of each polygon will
+# overwrite each other (in arbitrary order).
+
+by_centroid = xu.burn_vector_geometry(provinces, uda, column="value")
+by_touch = xu.burn_vector_geometry(provinces, uda, column="value", all_touched=True)
+
+fig, axes = plt.subplots(ncols=2, figsize=(10, 5))
+by_centroid.ugrid.plot(ax=axes[0], add_colorbar=False)
+by_touch.ugrid.plot(ax=axes[1], add_colorbar=False)
+
+for ax, title in zip(axes, ("centroid", "all touched")):
+    burned.ugrid.plot.line(ax=ax, edgecolor="black", linewidth=0.5)
+    utrecht.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=1.5)
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_title(title)
 
 # %%
 # This function can also be used to burn points or lines into the faces of an
@@ -94,7 +137,13 @@ burned.ugrid.plot()
 
 lines = gpd.GeoDataFrame(geometry=provinces.exterior)
 burned = xu.burn_vector_geometry(lines, uda)
-burned.ugrid.plot()
+
+fig, ax = plt.subplots()
+burned.ugrid.plot(ax=ax)
+burned.ugrid.plot.line(ax=ax, edgecolor="black", linewidth=0.5)
+provinces.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=1.5)
+ax.set_xlim(xmin, xmax)
+ax.set_ylim(ymin, ymax)
 
 # %%
 # Polygonizing
@@ -111,12 +160,12 @@ polygonized.plot(facecolor="none")
 # %%
 # We see that the results consists of two large polygons, in which the
 # triangles of the triangular grid have been merged to form a single polygon,
-# and many smaller polygons, some of which correspond one-to-one to the
+# and many smaller polygons, some of which correspond one to one to the
 # triangles of the grid.
 #
 # .. note::
 #   The produced polygon edges will follow exactly the face boundaries. When
 #   the data consists of many unique values (e.g. unbinned elevation data), the
-#   result will essentially be one polygon per face. In such cases, it is much
-#   more efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which
-#   directly converts every face to a polygon.
+#   result will essentially be one polygon per face. In such cases, it is more
+#   efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which directly
+#   converts every face to a polygon.

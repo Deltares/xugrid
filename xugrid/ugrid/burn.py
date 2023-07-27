@@ -1,10 +1,18 @@
 from typing import List, Union
 
+import numba as nb
 import numpy as np
 import xarray as xr
+from numba_celltree.constants import Point, Triangle
+from numba_celltree.geometry_utils import (
+    as_point,
+    as_triangle,
+    cross_product,
+    to_vector,
+)
 
 import xugrid
-from xugrid.constants import BoolArray, FloatArray, MissingOptionalModule
+from xugrid.constants import FloatArray, IntArray, MissingOptionalModule
 
 try:
     import shapely
@@ -12,18 +20,83 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
+@nb.njit(inline="always")
+def point_in_triangle(p: Point, triangle: Triangle) -> bool:
+    """Unrolled half-plane check."""
+    # TODO: move this in numba_celltree instead?
+    a = cross_product(to_vector(triangle.a, triangle.b), to_vector(triangle.a, p)) > 0
+    b = cross_product(to_vector(triangle.b, triangle.c), to_vector(triangle.b, p)) > 0
+    c = cross_product(to_vector(triangle.c, triangle.a), to_vector(triangle.c, p)) > 0
+    return (a == b) and (b == c)
+
+
+@nb.njit(inline="always", parallel=True, cache=True)
+def points_in_triangles(
+    points: FloatArray,
+    face_indices: IntArray,
+    faces: IntArray,
+    vertices: FloatArray,
+):
+    # TODO: move this in numba_celltree instead?
+    n_points = len(points)
+    inside = np.empty(n_points, dtype=np.bool_)
+    for i in nb.prange(n_points):
+        face_index = face_indices[i]
+        face = faces[face_index]
+        triangle = as_triangle(vertices, face)
+        point = as_point(points[i])
+        inside[i] = point_in_triangle(point, triangle)
+    return inside
+
+
 def _locate_polygon(
-    xy: FloatArray,
+    grid: "xu.Ugrid2d",  # type: ignore # noqa
     exterior: FloatArray,
     interiors: List[FloatArray],
-) -> BoolArray:
+    all_touched: bool,
+) -> IntArray:
+    """
+    This algorithm burns polygon vector geometries in a 2d topology by:
+
+    * Extracting the exterior and interiors (holes) coordinates from the
+      polygons.
+    * Breaking every polygon down into a triangles using an "earcut" algorithm.
+    * Searching the grid for these triangles.
+
+    Due to the use of the separating axes theorem, _locate_faces finds all
+    intersecting triangles, including those who only touch the edge.
+    To enable all_touched=False, we have to search the centroids of candidates
+    in the intersecting triangles.
+
+    Parameters
+    ----------
+    grid: Ugrid2d
+    exterior: FloatArray
+        Exterior of the polygon.
+    interiors: List[FloatArray]
+        Interior holes of the polygon.
+    all_touched: bool
+        Whether to include include cells whose centroid falls inside, of every
+        cell that is touched.
+    """
+
     import mapbox_earcut
 
     rings = np.cumsum([len(exterior)] + [len(interior) for interior in interiors])
     vertices = np.vstack([exterior] + interiors).astype(np.float64)
     triangles = mapbox_earcut.triangulate_float64(vertices, rings).reshape((-1, 3))
-    grid = xugrid.Ugrid2d(*vertices.T, -1, triangles)
-    return grid.locate_points(xy) != -1
+    triangle_indices, grid_indices = grid.celltree._locate_faces(vertices, triangles)
+    if all_touched:
+        return grid_indices
+    else:
+        centroids = grid.centroids[grid_indices]
+        inside = points_in_triangles(
+            points=centroids,
+            face_indices=triangle_indices,
+            faces=triangles,
+            vertices=vertices,
+        )
+        return grid_indices[inside]
 
 
 def _burn_polygons(
@@ -33,27 +106,6 @@ def _burn_polygons(
     all_touched: bool,
     output: FloatArray,
 ) -> None:
-    """
-    This algorithm burns polygon vector geometries in a 2d topology by:
-
-    * Extracting the exterior and interiors (holes) coordinates from the
-      polygons.
-    * Breaking every polygon down into a triangles using an "earcut" algorithm.
-    * Building a Ugrid2d from the triangles.
-
-    When all_touched=False:
-
-    * The grid created from the polygon is searched for every centroid of the
-      ``like`` grid.
-
-    When all_touched=True:
-
-    * The grid created from the polygon is searched for every node of the
-      ``like`` grid.
-    * If any of the associated nodes of a face is found in the polygon, the
-      value is burned into the face.
-
-    """
     exterior_coordinates = [
         shapely.get_coordinates(exterior) for exterior in polygons.exterior
     ]
@@ -61,33 +113,13 @@ def _burn_polygons(
         [shapely.get_coordinates(p_interior) for p_interior in p_interiors]
         for p_interiors in polygons.interiors
     ]
+    to_burn = np.empty(like.n_face, dtype=bool)
 
-    if all_touched:
-        # Pre-allocate work arrays so we don't have re-allocate for every
-        # polygon.
-        to_burn2d = np.empty_like(like.face_node_connectivity, dtype=bool)
-        to_burn = np.empty(like.n_face, dtype=bool)
-        # These data are static:
-        mask = like.face_node_connectivity == like.fill_value
-        xy = like.node_coordinates
-        for exterior, interiors, value in zip(
-            exterior_coordinates, interior_coordinates, values
-        ):
-            location = _locate_polygon(xy, exterior, interiors)
-            # Equal to: to_burn2d = location[like.face_node_connectivity]
-            location.take(like.face_node_connectivity, out=to_burn2d)
-            to_burn2d[mask] = False
-            # Equal to: to_burn = to_burn2d.any(axis=1)
-            np.bitwise_or.reduce(to_burn2d, axis=1, out=to_burn)
-            output[to_burn] = value
-
-    else:
-        xy = like.centroids
-        for exterior, interiors, value in zip(
-            exterior_coordinates, interior_coordinates, values
-        ):
-            to_burn = _locate_polygon(xy, exterior, interiors)
-            output[to_burn] = value
+    for exterior, interiors, value in zip(
+        exterior_coordinates, interior_coordinates, values
+    ):
+        to_burn = _locate_polygon(like, exterior, interiors, all_touched)
+        output[to_burn] = value
 
     return
 
