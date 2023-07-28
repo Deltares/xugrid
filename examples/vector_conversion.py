@@ -112,7 +112,7 @@ ax.set_ylim(ymin, ymax)
 # polygons are present that share borders. While the centroid of a face is
 # contained by only a single polygon, the area of the polygon may be located
 # in more than one polygon. In this case, the results of each polygon will
-# overwrite each other (in arbitrary order).
+# overwrite each other.
 
 by_centroid = xu.burn_vector_geometry(provinces, uda, column="value")
 by_touch = xu.burn_vector_geometry(provinces, uda, column="value", all_touched=True)

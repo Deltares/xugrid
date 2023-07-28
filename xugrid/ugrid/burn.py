@@ -3,7 +3,7 @@ from typing import List, Union
 import numba as nb
 import numpy as np
 import xarray as xr
-from numba_celltree.constants import Point, Triangle
+from numba_celltree.constants import TOLERANCE_ON_EDGE, Point, Triangle, Vector
 from numba_celltree.geometry_utils import (
     as_point,
     as_triangle,
@@ -21,13 +21,59 @@ except ImportError:
 
 
 @nb.njit(inline="always")
-def point_in_triangle(p: Point, triangle: Triangle) -> bool:
-    """Unrolled half-plane check."""
-    # TODO: move this in numba_celltree instead?
-    a = cross_product(to_vector(triangle.a, triangle.b), to_vector(triangle.a, p)) > 0
-    b = cross_product(to_vector(triangle.b, triangle.c), to_vector(triangle.b, p)) > 0
-    c = cross_product(to_vector(triangle.c, triangle.a), to_vector(triangle.c, p)) > 0
-    return (a == b) and (b == c)
+def on_edge(p: Point, a: Point, ab: Vector, twice_area: float):
+    if abs(twice_area) < TOLERANCE_ON_EDGE:
+        if ab.x != 0.0:
+            t = (p.x - a.x) / ab.x
+        elif ab.y != 0.0:
+            t = (p.y - a.y) / ab.y
+        else:
+            return False
+        if 0 <= t <= 1:
+            # It's on the edge.
+            return True
+    return False
+
+
+@nb.njit(inline="always")
+def on_edge(p: Point, a: Point, b: Point, ab: Vector, twice_area: float):
+    if abs(twice_area) < TOLERANCE_ON_EDGE:
+        if abs(ab.x) >= abs(ab.y):
+            if ab.x > 0:
+                return a.x <= p.x and p.x <= b.x
+            return b.x <= p.x and p.x <= a.x
+        else:
+            if ab.y > 0:
+                return a.y <= p.y and p.y <= b.y
+            return b.y <= p.y and p.y <= a.y
+
+    return False
+
+
+@nb.njit(inline="always")
+def point_in_triangle(p: Point, t: Triangle) -> bool:
+    ap = to_vector(t.a, p)
+    bp = to_vector(t.b, p)
+    cp = to_vector(t.c, p)
+    ab = to_vector(t.a, t.b)
+    bc = to_vector(t.b, t.c)
+    ca = to_vector(t.c, t.a)
+    # Do a half plane check.
+    A = cross_product(ab, ap)
+    B = cross_product(bc, bp)
+    C = cross_product(ca, cp)
+    signA = A > 0
+    signB = B > 0
+    signC = C > 0
+    if (signA == signB) and (signB == signC):
+        return True
+    if (
+        on_edge(p, t.a, t.b, ab, A)
+        or on_edge(p, t.b, t.c, bc, B)
+        or on_edge(p, t.c, t.a, ca, C)
+    ):
+        return True
+    return False
 
 
 @nb.njit(inline="always", parallel=True, cache=True)
