@@ -2,6 +2,7 @@ from typing import NamedTuple, Tuple
 
 import numba as nb
 import numpy as np
+import pandas as pd
 from scipy import sparse
 
 from xugrid.constants import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
@@ -403,7 +404,9 @@ def edge_connectivity(
         unique, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
         # Check whether everything looks okay:
         if not np.array_equal(unique, edge_node_connectivity):
-            raise ValueError("Invalid edge_node_connectivity")
+            raise ValueError(
+                "Invalid edge_node_connectivity. Run .validate_edge_node_connectivity()."
+            )
         inverse_indices = index[inverse_indices]
         edge_node_connectivity = prior
 
@@ -412,6 +415,34 @@ def edge_connectivity(
     isnode = ~isfill[:, :-1]
     face_edge_connectivity[isnode] = inverse_indices
     return edge_node_connectivity, face_edge_connectivity
+
+
+def validate_edge_node_connectivity(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    edge_node_connectivity: IntArray,
+) -> BoolArray:
+    """
+    * Is the edge defined by the face_node_connectivity?
+    * Are the edges unique?
+    """
+    new, _ = edge_connectivity(face_node_connectivity, fill_value)
+    old = np.sort(edge_node_connectivity, axis=1)
+
+    new1d = new.astype(np.int32).view(np.int64).ravel()
+    old1d = old.astype(np.int32).view(np.int64).ravel()
+
+    s = pd.Series(old1d)
+    n_edge = len(new1d)
+    n_old = s.nunique()
+    if n_old < n_edge:
+        raise ValueError(
+            f"face_node_connectivity defines {n_edge} edges, but "
+            f"edge_node_connectivity defines only {n_old} edges."
+        )
+
+    valid = np.isin(old1d, new1d) & (~s.duplicated().to_numpy())
+    return valid
 
 
 def face_face_connectivity(

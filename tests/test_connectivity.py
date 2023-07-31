@@ -354,6 +354,30 @@ def test_edge_connectivity(mixed_mesh):
     assert np.array_equal(face_edges, expected_face_edges)
 
 
+def test_validate_edge_connectivity(mixed_mesh):
+    faces, fill_value = mixed_mesh
+    edges = np.array([[0, 1]])
+    with pytest.raises(ValueError, match="face_node_connectivity defines 6 edges"):
+        connectivity.validate_edge_node_connectivity(faces, fill_value, edges)
+
+    edges = np.array(
+        [
+            [0, 1],  # T
+            [0, 1],  # F
+            [1, 0],  # F
+            [0, 2],  # T
+            [1, 2],  # T
+            [1, 3],  # T
+            [2, 4],  # T
+            [3, 4],  # T
+            [0, 4],  # F
+        ]
+    )
+    actual = connectivity.validate_edge_node_connectivity(faces, fill_value, edges)
+    expected = np.array([True, False, False, True, True, True, True, True, False])
+    assert np.array_equal(actual, expected)
+
+
 def test_node_node_connectivity():
     edge_nodes = np.array(
         [

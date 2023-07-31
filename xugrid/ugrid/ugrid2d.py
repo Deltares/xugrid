@@ -442,14 +442,6 @@ class Ugrid2d(AbstractUgrid):
 
     @edge_node_connectivity.setter
     def edge_node_connectivity(self, value):
-        if value is not None:
-            associated = np.isin(value, self.face_node_connectivity)
-            associated = associated[:, 0] & associated[:, 1]
-            if not associated.all():
-                raise ValueError(
-                    "edge_node_connectivity is invalid, the following edges are not "
-                    f"associated with any face: {np.flatnonzero(~associated)}"
-                )
         self._edge_node_connectivity = value
 
     @property
@@ -781,6 +773,36 @@ class Ugrid2d(AbstractUgrid):
                 self.node_coordinates, self.face_node_connectivity, self.fill_value
             )
         return self._celltree
+
+    def validate_edge_node_connectivity(self):
+        """
+        Mark valid edges, by comparing face_node_connectivity and
+        edge_node_connectivity. Edges that are not part of a face, as well as
+        duplicate edges are marked ``False``.
+
+        An error is raised if the face_node_connectivity defines more unique
+        edges than the edge_node_connectivity.
+
+        Returns
+        -------
+        valid: np.ndarray of bool
+            Marks for every edge whether it is valid.
+
+        Examples
+        --------
+
+        To purge invalid edges and associated data from a dataset that contains
+        un-associated or duplicate edges:
+
+        >>> uds = xugrid.open_dataset("example.nc")
+        >>> valid = uds.ugrid.grid.validate_edge_node_connectivity()
+        >>> purged = uds.isel({grid.edge_dimension: valid})
+        """
+        return connectivity.validate_edge_node_connectivity(
+            self.face_node_connectivity,
+            self.fill_value,
+            self.edge_node_connectivity,
+        )
 
     def assign_face_coords(
         self,
