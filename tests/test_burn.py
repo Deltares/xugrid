@@ -1,11 +1,9 @@
-import os
-
-os.environ["NUMBA_DISABLE_JIT"] = "1"
 import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
 from numba_celltree.constants import Point, Triangle
+from shapely.geometry import Polygon
 
 import xugrid as xu
 from xugrid.ugrid import burn
@@ -22,6 +20,61 @@ def grid():
     v = (np.add.outer(np.arange(nx), nx * np.arange(ny)) + np.arange(ny)).T.ravel()
     faces = np.column_stack((v, v + 1, v + nx + 2, v + nx + 1))
     return xu.Ugrid2d(node_x, node_y, -1, faces)
+
+
+@pytest.fixture(scope="function")
+def points_and_values():
+    xy = np.array(
+        [
+            [0.5, 0.5],
+            [1.5, 0.5],
+            [2.5, 2.5],
+        ]
+    )
+    points = gpd.points_from_xy(*xy.T)
+    values = np.array([0.0, 1.0, 3.0])
+    return points, values
+
+
+@pytest.fixture(scope="function")
+def lines_and_values():
+    xy = np.array(
+        [
+            [0.5, 0.5],
+            [2.5, 0.5],
+            [1.2, 1.5],
+            [1.8, 1.5],
+            [0.2, 2.2],
+            [0.8, 2.8],
+            [1.2, 2.2],
+            [1.8, 2.8],
+        ]
+    )
+    indices = np.array([0, 0, 1, 1, 2, 2, 2, 2])
+    values = np.array([0, 1, 2])
+    lines = gpd.GeoSeries(shapely.linestrings(xy, indices=indices))
+    return lines, values
+
+
+@pytest.fixture(scope="function")
+def polygons_and_values():
+    values = [0, 1]
+    polygons = gpd.GeoSeries(
+        [
+            shapely.Polygon(shell=[(0.0, 0.0), (2.0, 0.0), (2.0, 2.0), (0.0, 2.0)]),
+            shapely.Polygon(
+                shell=[
+                    (0.0, 2.0),
+                    (2.0, 2.0),
+                    (2.0, 0.0),
+                    (3.0, 0.0),
+                    (3.0, 3.0),
+                    (0.0, 3.0),
+                ]
+            ),
+        ]
+    )
+    return polygons, values
 
 
 def test_point_in_triangle():
@@ -111,24 +164,77 @@ def test_locate_polygon_with_hole(grid):
     assert np.array_equal(np.unique(actual), [0, 1, 2, 3, 4, 5, 7])
 
 
-def test_burn_polygons(grid):
+def test_burn_polygons(grid, polygons_and_values):
+    polygons, values = polygons_and_values
     output = np.full(grid.n_face, np.nan)
-    values = [0, 1]
-    polygons = gpd.GeoSeries(
-        [
-            shapely.Polygon(shell=[(0.0, 0.0), (2.0, 0.0), (2.0, 2.0), (0.0, 2.0)]),
-            shapely.Polygon(
-                shell=[
-                    (0.0, 2.0),
-                    (2.0, 2.0),
-                    (2.0, 0.0),
-                    (3.0, 0.0),
-                    (3.0, 3.0),
-                    (0.0, 3.0),
-                ]
-            ),
-        ]
-    )
     burn._burn_polygons(polygons, grid, values, all_touched=False, output=output)
     expected = np.array([0, 0, 1, 0, 0, 1, 1, 1, 1])
     assert np.allclose(output, expected)
+
+
+def test_burn_points(grid, points_and_values):
+    points, values = points_and_values
+    output = np.full(grid.n_face, -1.0)
+
+    burn._burn_points(points, grid, values, output=output)
+    expected = np.array([0, 1, -1, -1, -1, -1, -1, -1, 3])
+    assert np.allclose(output, expected)
+
+
+def test_burn_lines(grid, lines_and_values):
+    lines, values = lines_and_values
+    output = np.full(grid.n_face, -1.0)
+
+    burn._burn_lines(lines, grid, values, output=output)
+    expected = np.array([0, 0, 0, -1, 1, -1, 2, 2, -1])
+    assert np.allclose(output, expected)
+
+
+def test_burn_vector_geometry__errors(grid, points_and_values):
+    with pytest.raises(TypeError, match="gdf must be GeoDataFrame"):
+        xu.burn_vector_geometry(0, grid)
+
+    points, values = points_and_values
+    gdf = gpd.GeoDataFrame({"values": values}, geometry=points)
+    with pytest.raises(TypeError, match="Like must be Ugrid2d, UgridDataArray"):
+        xu.burn_vector_geometry(gdf, gdf)
+
+    # This seems like the easiest way to generate a multi-polygon inside a
+    # GeoDataFrame, since it won't initialize with a multi-polygon.
+    p1 = Polygon([(0, 0), (1, 0), (1, 1)])
+    p2 = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+    p3 = Polygon([(2, 0), (3, 0), (3, 1), (2, 1)])
+    gdf = gpd.GeoDataFrame({"values": [0, 0, 0]}, geometry=[p1, p2, p3]).dissolve(
+        by="values"
+    )
+    with pytest.raises(
+        TypeError, match="GeoDataFrame contains unsupported geometry types"
+    ):
+        xu.burn_vector_geometry(gdf, grid)
+
+
+def test_burn_vector_geometry(
+    grid, points_and_values, lines_and_values, polygons_and_values
+):
+    polygons, poly_values = polygons_and_values
+    gdf = gpd.GeoDataFrame({"values": poly_values}, geometry=polygons)
+    actual = xu.burn_vector_geometry(gdf, grid)
+    assert isinstance(actual, xu.UgridDataArray)
+    assert np.allclose(actual.to_numpy(), 1)
+
+    expected = np.array([0, 0, 1, 0, 0, 1, 1, 1, 1])
+    actual = xu.burn_vector_geometry(gdf, grid, column="values")
+    assert np.allclose(actual.to_numpy(), expected)
+
+    points, point_values = points_and_values
+    lines, line_values = lines_and_values
+    line_values += 10
+    point_values += 20
+    values = np.concatenate([poly_values, line_values, point_values])
+    geometry = np.concatenate(
+        [polygons.to_numpy(), lines.to_numpy(), points.to_numpy()]
+    )
+    gdf = gpd.GeoDataFrame({"values": values}, geometry=geometry)
+    actual = xu.burn_vector_geometry(gdf, grid, column="values")
+    expected = np.array([20.0, 21.0, 10.0, 0.0, 11.0, 1.0, 12.0, 12.0, 23.0])
+    assert np.allclose(actual.to_numpy(), expected)

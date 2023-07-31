@@ -86,7 +86,7 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
     facedim = uda.ugrid.grid.face_dimension
     if uda.dims != (facedim,):
         raise ValueError(
-            "Cannot polygonize non-xy spatial dimensions. Expected only"
+            "Cannot polygonize non-face dimensions. Expected only"
             f"({facedim},), but received {uda.dims}."
         )
 

@@ -3,7 +3,7 @@ from typing import List, Union
 import numba as nb
 import numpy as np
 import xarray as xr
-from numba_celltree.constants import TOLERANCE_ON_EDGE, Point, Triangle, Vector
+from numba_celltree.constants import TOLERANCE_ON_EDGE, Point, Triangle
 from numba_celltree.geometry_utils import (
     as_point,
     as_triangle,
@@ -21,33 +21,27 @@ except ImportError:
 
 
 @nb.njit(inline="always")
-def on_edge(p: Point, a: Point, ab: Vector, twice_area: float):
-    if abs(twice_area) < TOLERANCE_ON_EDGE:
-        if ab.x != 0.0:
-            t = (p.x - a.x) / ab.x
-        elif ab.y != 0.0:
-            t = (p.y - a.y) / ab.y
-        else:
-            return False
-        if 0 <= t <= 1:
-            # It's on the edge.
-            return True
-    return False
+def in_bounds(p: Point, a: Point, b: Point) -> bool:
+    """
+    Check whether point p falls within the bounding box created by a and b
+    (after we've checked the size of the cross product).
 
+    However, we must take into account that a line may be either vertical
+    (dx=0) or horizontal (dy=0) and only evaluate the non-zero value.
 
-@nb.njit(inline="always")
-def on_edge(p: Point, a: Point, b: Point, ab: Vector, twice_area: float):
-    if abs(twice_area) < TOLERANCE_ON_EDGE:
-        if abs(ab.x) >= abs(ab.y):
-            if ab.x > 0:
-                return a.x <= p.x and p.x <= b.x
-            return b.x <= p.x and p.x <= a.x
-        else:
-            if ab.y > 0:
-                return a.y <= p.y and p.y <= b.y
-            return b.y <= p.y and p.y <= a.y
-
-    return False
+    If the area created by p, a, b is tiny AND p is within the bounds of a and
+    b, the point lies very close to the edge.
+    """
+    dx = b.x - a.x
+    dy = b.y - a.y
+    if abs(dx) >= abs(dy):
+        if dx > 0:
+            return a.x <= p.x and p.x <= b.x
+        return b.x <= p.x and p.x <= a.x
+    else:
+        if dy > 0:
+            return a.y <= p.y and p.y <= b.y
+        return b.y <= p.y and p.y <= a.y
 
 
 @nb.njit(inline="always")
@@ -67,12 +61,18 @@ def point_in_triangle(p: Point, t: Triangle) -> bool:
     signC = C > 0
     if (signA == signB) and (signB == signC):
         return True
+
+    # Test whether p is located on/very close to edges.
     if (
-        on_edge(p, t.a, t.b, ab, A)
-        or on_edge(p, t.b, t.c, bc, B)
-        or on_edge(p, t.c, t.a, ca, C)
+        (abs(A) < TOLERANCE_ON_EDGE)
+        and in_bounds(p, t.a, t.b)
+        or (abs(B) < TOLERANCE_ON_EDGE)
+        and in_bounds(p, t.b, t.c)
+        or (abs(C) < TOLERANCE_ON_EDGE)
+        and in_bounds(p, t.c, t.a)
     ):
         return True
+
     return False
 
 
@@ -83,7 +83,7 @@ def points_in_triangles(
     faces: IntArray,
     vertices: FloatArray,
 ):
-    # TODO: move this in numba_celltree instead?
+    # TODO: move this into numba_celltree instead?
     n_points = len(points)
     inside = np.empty(n_points, dtype=np.bool_)
     for i in nb.prange(n_points):
@@ -265,22 +265,27 @@ def burn_vector_geometry(
             "GeoDataFrame contains unsupported geometry types. Can only burn "
             "Point, LineString, and Polygon geometries."
         )
+
     points = gdf.loc[geometry_id == shapely.GeometryType.POINT]
     lines = gdf.loc[geometry_id == shapely.GeometryType.LINESTRING]
     polygons = gdf.loc[geometry_id == shapely.GeometryType.POLYGON]
 
-    if column is not None:
-        values = gdf[column].to_numpy()
+    if column is None:
+        point_values = np.ones(len(points), dtype=float)
+        line_values = np.ones(len(lines), dtype=float)
+        poly_values = np.ones(len(polygons), dtype=float)
     else:
-        values = np.ones(len(gdf), dtype=float)
+        point_values = points[column].to_numpy()
+        line_values = lines[column].to_numpy()
+        poly_values = polygons[column].to_numpy()
 
     output = np.full(like.n_face, fill)
-    if len(points) > 0:
-        _burn_points(points.geometry, like, values, output)
-    if len(lines) > 0:
-        _burn_lines(lines.geometry, like, values, output)
     if len(polygons) > 0:
-        _burn_polygons(polygons.geometry, like, values, all_touched, output)
+        _burn_polygons(polygons.geometry, like, poly_values, all_touched, output)
+    if len(lines) > 0:
+        _burn_lines(lines.geometry, like, line_values, output)
+    if len(points) > 0:
+        _burn_points(points.geometry, like, point_values, output)
 
     return xugrid.UgridDataArray(
         obj=xr.DataArray(output, dims=[like.face_dimension], name=column),
