@@ -221,6 +221,8 @@ def test_burn_vector_geometry(
     actual = xu.burn_vector_geometry(gdf, grid)
     assert isinstance(actual, xu.UgridDataArray)
     assert np.allclose(actual.to_numpy(), 1)
+    actual = xu.burn_vector_geometry(gdf, grid, all_touched=True)
+    assert np.allclose(actual.to_numpy(), 1)
 
     expected = np.array([0, 0, 1, 0, 0, 1, 1, 1, 1])
     actual = xu.burn_vector_geometry(gdf, grid, column="values")
@@ -237,4 +239,8 @@ def test_burn_vector_geometry(
     gdf = gpd.GeoDataFrame({"values": values}, geometry=geometry)
     actual = xu.burn_vector_geometry(gdf, grid, column="values")
     expected = np.array([20.0, 21.0, 10.0, 0.0, 11.0, 1.0, 12.0, 12.0, 23.0])
+    assert np.allclose(actual.to_numpy(), expected)
+
+    # All touched should give the same answer for this specific example.
+    actual = xu.burn_vector_geometry(gdf, grid, column="values", all_touched=True)
     assert np.allclose(actual.to_numpy(), expected)

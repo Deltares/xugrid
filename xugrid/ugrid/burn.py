@@ -39,6 +39,7 @@ def in_bounds(p: Point, a: Point, b: Point) -> bool:
     If the area created by p, a, b is tiny AND p is within the bounds of a and
     b, the point lies very close to the edge.
     """
+    # Already in numba_celltree, unreleased.
     dx = b.x - a.x
     dy = b.y - a.y
     if abs(dx) >= abs(dy):
@@ -53,6 +54,7 @@ def in_bounds(p: Point, a: Point, b: Point) -> bool:
 
 @nb.njit(inline="always")
 def point_in_triangle(p: Point, t: Triangle) -> bool:
+    # TODO: move this into numba_celltree instead?
     ap = to_vector(t.a, p)
     bp = to_vector(t.b, p)
     cp = to_vector(t.c, p)
@@ -223,7 +225,7 @@ def _burn_lines(
 
 def burn_vector_geometry(
     gdf: "geopandas.GeoDataframe",  # type: ignore # noqa
-    like: "xugrid.Ugrid2d",
+    like: Union["xugrid.Ugrid2d", "xugrid.UgridDataArray", "xugrid.UgridDataset"],
     column: str = None,
     fill: Union[int, float] = np.nan,
     all_touched: bool = False,
@@ -237,9 +239,12 @@ def burn_vector_geometry(
     Parameters
     ----------
     gdf: geopandas.GeoDataFrame
+        Polygons, points, and/or lines to be burned into the grid.
     like: UgridDataArray, UgridDataset, or Ugrid2d
+        Grid to burn the vector data into.
     column: str
-        Column name of geodataframe to burn into mesh
+        Name of the geodataframe column of which to the values to burn into
+        grid.
     fill: int, float, optional, default value ``np.nan``.
         Fill value for nodata areas.
     all_touched: bool, optional, default value ``False``.
