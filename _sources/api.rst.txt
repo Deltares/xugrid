@@ -31,6 +31,8 @@ Top-level functions
     concat
     merge
     merge_partitions
+    burn_vector_geometry
+    polygonize
 
 UgridDataArray
 --------------

@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Added
+~~~~~
+
+- Added :func:`xugrid.burn_vector_geometries` to burn vector geometries in the
+  form of geopandas GeoDataFrames into a Ugrid2d topology.
+- Added :func:`xugrid.polygonize` to create vector polygons for all connected
+  regions of a Ugrid2d topology sharing a common value. The result is a
+  geopandas GeoDataFrame.
+
 [0.6.2] 2023-07-26
 ------------------
 
