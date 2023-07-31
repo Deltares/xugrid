@@ -20,6 +20,13 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
+POINT = shapely.GeometryType.POINT
+LINESTRING = shapely.GeometryType.LINESTRING
+LINEARRING = shapely.GeometryType.LINEARRING
+POLYGON = shapely.GeometryType.POLYGON
+GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
+
+
 @nb.njit(inline="always")
 def in_bounds(p: Point, a: Point, b: Point) -> bool:
     """
@@ -255,20 +262,20 @@ def burn_vector_geometry(
             f"received: {type(like).__name__}"
         )
     geometry_id = shapely.get_type_id(gdf.geometry)
-    allowed_types = (
-        shapely.GeometryType.POINT,
-        shapely.GeometryType.LINESTRING,
-        shapely.GeometryType.POLYGON,
-    )
+    allowed_types = (POINT, LINESTRING, LINEARRING, POLYGON)
     if not np.isin(geometry_id, allowed_types).all():
+        received = ", ".join(
+            [GEOM_NAMES[geom_id] for geom_id in np.unique(geometry_id)]
+        )
         raise TypeError(
             "GeoDataFrame contains unsupported geometry types. Can only burn "
-            "Point, LineString, and Polygon geometries."
+            "Point, LineString, LinearRing, and Polygon geometries. Received: "
+            f"{received}"
         )
 
-    points = gdf.loc[geometry_id == shapely.GeometryType.POINT]
-    lines = gdf.loc[geometry_id == shapely.GeometryType.LINESTRING]
-    polygons = gdf.loc[geometry_id == shapely.GeometryType.POLYGON]
+    points = gdf.loc[geometry_id == POINT]
+    lines = gdf.loc[(geometry_id == LINESTRING) | (geometry_id == LINEARRING)]
+    polygons = gdf.loc[geometry_id == POLYGON]
 
     if column is None:
         point_values = np.ones(len(points), dtype=float)
