@@ -416,6 +416,7 @@ document.write(`
 <span class="sd">    If the area created by p, a, b is tiny AND p is within the bounds of a and</span>
 <span class="sd">    b, the point lies very close to the edge.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Already in numba_celltree, unreleased.</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span>
     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">):</span>
@@ -430,6 +431,7 @@ document.write(`
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">point_in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Triangle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># TODO: move this into numba_celltree instead?</span>
     <span class="n">ap</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
     <span class="n">bp</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
     <span class="n">cp</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
@@ -600,7 +602,7 @@ document.write(`
 
 <div class="viewcode-block" id="burn_vector_geometry"><a class="viewcode-back" href="../../../api/xugrid.burn_vector_geometry.html#xugrid.burn_vector_geometry">[docs]</a><span class="k">def</span> <span class="nf">burn_vector_geometry</span><span class="p">(</span>
     <span class="n">gdf</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataframe&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
-    <span class="n">like</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
+    <span class="n">like</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">,</span> <span class="s2">&quot;xugrid.UgridDataset&quot;</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
     <span class="n">all_touched</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -614,9 +616,12 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    gdf: geopandas.GeoDataFrame</span>
+<span class="sd">        Polygons, points, and/or lines to be burned into the grid.</span>
 <span class="sd">    like: UgridDataArray, UgridDataset, or Ugrid2d</span>
+<span class="sd">        Grid to burn the vector data into.</span>
 <span class="sd">    column: str</span>
-<span class="sd">        Column name of geodataframe to burn into mesh</span>
+<span class="sd">        Name of the geodataframe column of which to the values to burn into</span>
+<span class="sd">        grid.</span>
 <span class="sd">    fill: int, float, optional, default value ``np.nan``.</span>
 <span class="sd">        Fill value for nodata areas.</span>
 <span class="sd">    all_touched: bool, optional, default value ``False``.</span>

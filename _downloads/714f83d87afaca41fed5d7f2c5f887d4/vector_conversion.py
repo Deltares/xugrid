@@ -14,6 +14,7 @@ unstructured grids. These are demonstrated below.
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import xugrid as xu
 
@@ -73,14 +74,27 @@ back
 # cells that are covered or touched by a polygon.
 #
 # In this example, we mark the faces that are covered by a certain province.
+#
+# We start by re-projecting the provinces dataset to the coordinate reference
+# system (CRS), from WGS84 (EPSG:4326) to the Dutch National coordinate system
+# (RD New, EPSG: 28992). Then, we give each province a unique id, which we
+# burn into the grid.
 
 provinces = xu.data.provinces_nl().to_crs(28992)
-provinces["value"] = range(len(provinces))
-burned = xu.burn_vector_geometry(provinces, uda, column="value")
+provinces["id"] = range(len(provinces))
+burned = xu.burn_vector_geometry(provinces, uda, column="id")
 burned.ugrid.plot()
 
 # %%
-# This is a convenient way to create masks and such:
+# This makes it very easy to classify and group data. Let's say
+# we want to compute the average surface elevation per province:
+
+burned = xu.burn_vector_geometry(provinces, uda, column="id")
+uda.groupby(burned).mean()
+
+
+# %%
+# This is a convenient way to create masks for specific regions:
 
 utrecht = provinces[provinces["name"] == "Utrecht"]
 burned = xu.burn_vector_geometry(utrecht, uda)
@@ -108,14 +122,20 @@ ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)
 
 # %%
+# We can also use such "masks" to e.g. modify specific parts of the grid data:
+
+modified = (uda + 50.0).where(burned == 1, other=uda)
+modified.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
+
+# %%
 # Note that ``all_touched=True`` is less suitable when differently valued
 # polygons are present that share borders. While the centroid of a face is
 # contained by only a single polygon, the area of the polygon may be located
 # in more than one polygon. In this case, the results of each polygon will
 # overwrite each other.
 
-by_centroid = xu.burn_vector_geometry(provinces, uda, column="value")
-by_touch = xu.burn_vector_geometry(provinces, uda, column="value", all_touched=True)
+by_centroid = xu.burn_vector_geometry(provinces, uda, column="id")
+by_touch = xu.burn_vector_geometry(provinces, uda, column="id", all_touched=True)
 
 fig, axes = plt.subplots(ncols=2, figsize=(10, 5))
 by_centroid.ugrid.plot(ax=axes[0], add_colorbar=False)
@@ -144,6 +164,24 @@ burned.ugrid.plot.line(ax=ax, edgecolor="black", linewidth=0.5)
 provinces.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=1.5)
 ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)
+
+# %%
+# We can also burn points.
+
+province_centroids = gpd.GeoDataFrame(geometry=provinces.centroid)
+burned = xu.burn_vector_geometry(province_centroids, uda)
+
+fig, ax = plt.subplots()
+burned.ugrid.plot(ax=ax)
+provinces.plot(ax=ax, edgecolor="red", facecolor="none")
+
+# %%
+# Finally, it's also possible to combine multiple geometry types in a single
+# burn operation.
+
+combined = pd.concat([lines, province_centroids])
+burned = xu.burn_vector_geometry(combined, uda)
+burned.ugrid.plot()
 
 # %%
 # Polygonizing
