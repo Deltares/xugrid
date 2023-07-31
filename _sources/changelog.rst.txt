@@ -17,6 +17,15 @@ Added
 - Added :func:`xugrid.polygonize` to create vector polygons for all connected
   regions of a Ugrid2d topology sharing a common value. The result is a
   geopandas GeoDataFrame.
+- :meth:`xugrid.Ugrid2d.validate_edge_node_connectivity` has been added to
+  validate edge_node_connectivity by comparing with the face_node_connectivity.
+  The result can be used to define a valid subselection.
+
+Changed
+~~~~~~~
+
+- Initializing a Ugrid2d topology with an invalid edge_node_connectivity will
+  no longer raise an error.
 
 [0.6.2] 2023-07-26
 ------------------
@@ -30,7 +39,7 @@ Fixed
   See `#119 <https://github.com/Deltares/xugrid/issues/99>`_.
 - Bug where error was thrown in the RelativeOverlapRegridder upon 
   flipping the y coordinate.
-
+  
 
 [0.6.1] 2023-07-07
 ------------------

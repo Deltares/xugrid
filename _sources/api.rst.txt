@@ -254,6 +254,8 @@ UGRID2D Topology
     Ugrid2d.edge_node_connectivity
     Ugrid2d.face_edge_connectivity
     Ugrid2d.face_face_connectivity
+    
+    Ugrid2d.validate_edge_node_connectivity
 
     Ugrid2d.exterior_edges
     Ugrid2d.exterior_faces

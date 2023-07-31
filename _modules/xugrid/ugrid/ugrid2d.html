@@ -819,14 +819,6 @@ document.write(`
 
     <span class="nd">@edge_node_connectivity</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">associated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">)</span>
-            <span class="n">associated</span> <span class="o">=</span> <span class="n">associated</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">associated</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">associated</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;edge_node_connectivity is invalid, the following edges are not &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;associated with any face: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="o">~</span><span class="n">associated</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
@@ -1158,6 +1150,36 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span>
+
+<div class="viewcode-block" id="Ugrid2d.validate_edge_node_connectivity"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.validate_edge_node_connectivity.html#xugrid.Ugrid2d.validate_edge_node_connectivity">[docs]</a>    <span class="k">def</span> <span class="nf">validate_edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mark valid edges, by comparing face_node_connectivity and</span>
+<span class="sd">        edge_node_connectivity. Edges that are not part of a face, as well as</span>
+<span class="sd">        duplicate edges are marked ``False``.</span>
+
+<span class="sd">        An error is raised if the face_node_connectivity defines more unique</span>
+<span class="sd">        edges than the edge_node_connectivity.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        valid: np.ndarray of bool</span>
+<span class="sd">            Marks for every edge whether it is valid.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        To purge invalid edges and associated data from a dataset that contains</span>
+<span class="sd">        un-associated or duplicate edges:</span>
+
+<span class="sd">        &gt;&gt;&gt; uds = xugrid.open_dataset(&quot;example.nc&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; valid = uds.ugrid.grid.validate_edge_node_connectivity()</span>
+<span class="sd">        &gt;&gt;&gt; purged = uds.isel({grid.edge_dimension: valid})</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">validate_edge_node_connectivity</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Ugrid2d.assign_face_coords"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.assign_face_coords.html#xugrid.Ugrid2d.assign_face_coords">[docs]</a>    <span class="k">def</span> <span class="nf">assign_face_coords</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
