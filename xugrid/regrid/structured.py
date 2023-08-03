@@ -454,9 +454,9 @@ class StructuredGrid2d(StructuredGrid1d):
         return np.multiply.outer(self.ybounds.length, self.xbounds.length)
 
     def convert_to(self, matched_type: Any) -> Any:
-        if isinstance(self, matched_type):
+        if matched_type == StructuredGrid2d:
             return self
-        elif isinstance(self, UnstructuredGrid2d):
+        elif matched_type == UnstructuredGrid2d:
             return Ugrid2d.from_structured(self.xbounds, self.ybounds)
         else:
             raise TypeError(
