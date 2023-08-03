@@ -334,12 +334,12 @@ def _create_output_gdf(
     vertices,
     edge_node_connectivity,
     edges,
-    line_index,
+    shapely_index,
 ):
     edge_vertices = vertices[edge_node_connectivity[edges]]
     geometry = shapely.linestrings(edge_vertices)
     return gpd.GeoDataFrame(
-        lines.drop(columns="geometry").iloc[line_index], geometry=geometry
+        lines.drop(columns="geometry").iloc[shapely_index], geometry=geometry
     )
 
 
@@ -401,12 +401,14 @@ def snap_to_grid(
     # Create geometric data
     edge_centroids = vertices[edge_node_connectivity].mean(axis=1)
     line_geometry = coerce_geometry(lines)
-    line_coords, line_index = shapely.get_coordinates(line_geometry, return_index=True)
+    line_coords, shapely_index = shapely.get_coordinates(
+        line_geometry, return_index=True
+    )
     # Snap line_coords to grid
     x, y = snap_to_nodes(
         *line_coords.T, *vertices.T, max_snap_distance, tiebreaker="nearest"
     )
-    line_edges = lines_as_edges(np.column_stack([x, y]), line_index)
+    line_edges = lines_as_edges(np.column_stack([x, y]), shapely_index)
 
     # Search for intersections. Every edge is potentially divided into smaller
     # segments: The segment_indices contain (repeated) values of the
@@ -443,7 +445,10 @@ def snap_to_grid(
     # When multiple line parts are snapped to the same edge, use the ones with
     # the greatest length inside the cell.
     edges, line_index = _find_largest_edges(segment_edges, edge_index, line_index)
+    shapely_index = shapely_index[line_index]
 
     uds = _create_output_dataset(lines, topology, edges, line_index)
-    gdf = _create_output_gdf(lines, vertices, edge_node_connectivity, edges, line_index)
+    gdf = _create_output_gdf(
+        lines, vertices, edge_node_connectivity, edges, shapely_index
+    )
     return uds, gdf

@@ -207,3 +207,31 @@ polygonized.plot(facecolor="none")
 #   result will essentially be one polygon per face. In such cases, it is more
 #   efficient to use ``xugrid.UgridDataArray.to_geodataframe``, which directly
 #   converts every face to a polygon.
+#
+# Snap to grid
+# ------------
+#
+# The examples above deal with data on the faces of the grid. However, data can
+# also be associated with the nodes or edges of the grid. For example, we can
+# snap line data to exactly follow the edges (the face boundaries):
+
+linestrings = gpd.GeoDataFrame(geometry=utrecht.exterior)
+snapped_uds, snapped_gdf = xu.snap_to_grid(linestrings, uda, max_snap_distance=1.0)
+
+fig, ax = plt.subplots()
+snapped_gdf.plot(ax=ax)
+snapped_uds.ugrid.grid.plot(ax=ax, edgecolor="gray", linewidth=0.5)
+utrecht.plot(ax=ax, edgecolor="red", facecolor="none", linewidth=0.75)
+ax.set_xlim(xmin, xmax)
+ax.set_ylim(ymin, ymax)
+
+# %%
+# There are (arguably) many ways in which a linestring could be snapped to
+# edges. The function above uses the criterion the following criterion: if a
+# part of the linestring is located between the centroid of a face and the
+# centroid of an edge, it is snapped to that edge.
+#
+# This sometimes result in less (visually) pleasing results, such as the two
+# triangles in the lower left corner which are surrounded by the snapped edges.
+# In general, results are best when the line segments are relatively large
+# compare to the grid faces.
