@@ -20,6 +20,15 @@ Added
 - :meth:`xugrid.Ugrid2d.validate_edge_node_connectivity` has been added to
   validate edge_node_connectivity by comparing with the face_node_connectivity.
   The result can be used to define a valid subselection.
+- :meth:`xugrid.Ugrid2d.from_structured_bounds` can be used to generate
+  a Ugrid2d topology from x and y bounds arrays.
+
+Fixed
+~~~~~
+
+- :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
+  and :class:`xugrid.BarycentricInterpolator` will now also regrid structured
+  to unstructured grid topologies.
 
 Changed
 ~~~~~~~

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>xugrid.UgridRolesAccessor &#8212; Xugrid 0.6.2 documentation</title>
+    <title>xugrid.Ugrid2d.from_structured_bounds &#8212; Xugrid 0.6.2 documentation</title>
   
   
   
@@ -42,11 +42,11 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2c9945de"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.UgridRolesAccessor';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.Ugrid2d.from_structured_bounds';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="xugrid.UgridRolesAccessor.topology" href="xugrid.UgridRolesAccessor.topology.html" />
-    <link rel="prev" title="xugrid.Ugrid2d.plot" href="xugrid.Ugrid2d.plot.html" />
+    <link rel="next" title="xugrid.Ugrid2d.to_shapely" href="xugrid.Ugrid2d.to_shapely.html" />
+    <link rel="prev" title="xugrid.Ugrid2d.from_structured" href="xugrid.Ugrid2d.from_structured.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -463,7 +463,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.to_shapely.html">xugrid.Ugrid1d.to_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.plot.html">xugrid.Ugrid1d.plot</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.html">xugrid.Ugrid2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.topology_dimension.html">xugrid.Ugrid2d.topology_dimension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.dimensions.html">xugrid.Ugrid2d.dimensions</a></li>
@@ -531,12 +531,12 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured.html">xugrid.Ugrid2d.from_structured</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_bounds.html">xugrid.Ugrid2d.from_structured_bounds</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.Ugrid2d.from_structured_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html">xugrid.Ugrid2d.to_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.plot.html">xugrid.Ugrid2d.plot</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.UgridRolesAccessor</a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.html">xugrid.UgridRolesAccessor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.topology.html">xugrid.UgridRolesAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.connectivity.html">xugrid.UgridRolesAccessor.connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.coordinates.html">xugrid.UgridRolesAccessor.coordinates</a></li>
@@ -581,7 +581,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">xugrid.UgridRolesAccessor</li>
+    <li class="breadcrumb-item active" aria-current="page">xugrid.Ugrid2d.from_structured_bounds</li>
   </ul>
 </nav>
 </div>
@@ -598,56 +598,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="xugrid-ugridrolesaccessor">
-<h1>xugrid.UgridRolesAccessor<a class="headerlink" href="#xugrid-ugridrolesaccessor" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="xugrid.UgridRolesAccessor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">UgridRolesAccessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid/conventions.html#UgridRolesAccessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridRolesAccessor" title="Permalink to this definition">#</a></dt>
-<dd><p>Xarray Dataset “accessor” to retrieve the names of UGRID variables.</p>
-<p class="rubric">Examples</p>
-<p>To get a list of the UGRID dummy variables in the dataset:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span>
-</pre></div>
-</div>
-<p>To get the names of the connectivity variables in the dataset:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">connectivity</span>
-</pre></div>
-</div>
-<p>Names can also be accessed directly through the topology:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="p">[</span><span class="s2">&quot;mesh2d&quot;</span><span class="p">][</span><span class="s2">&quot;node_dimension&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
+  <section id="xugrid-ugrid2d-from-structured-bounds">
+<h1>xugrid.Ugrid2d.from_structured_bounds<a class="headerlink" href="#xugrid-ugrid2d-from-structured-bounds" title="Permalink to this heading">#</a></h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="xugrid.UgridRolesAccessor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid/conventions.html#UgridRolesAccessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridRolesAccessor.__init__" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="xugrid.Ugrid2d.from_structured_bounds">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">from_structured_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.ugrid.ugrid2d.Ugrid2d"><span class="pre">Ugrid2d</span></a></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/ugrid2d.html#Ugrid2d.from_structured_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.from_structured_bounds" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
-
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#xugrid.UgridRolesAccessor.__init__" title="xugrid.UgridRolesAccessor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(ds)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridRolesAccessor.connectivity.html#xugrid.UgridRolesAccessor.connectivity" title="xugrid.UgridRolesAccessor.connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connectivity</span></code></a></p></td>
-<td><p>Get the names of the variables containing the UGRID connectivity data.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridRolesAccessor.coordinates.html#xugrid.UgridRolesAccessor.coordinates" title="xugrid.UgridRolesAccessor.coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coordinates</span></code></a></p></td>
-<td><p>Get the names of the coordinate variables from the topology attributes.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridRolesAccessor.dimensions.html#xugrid.UgridRolesAccessor.dimensions" title="xugrid.UgridRolesAccessor.dimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dimensions</span></code></a></p></td>
-<td><p>Get the dimension names from the topology attributes and infer them from connectivity arrays or coordinates.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridRolesAccessor.topology.html#xugrid.UgridRolesAccessor.topology" title="xugrid.UgridRolesAccessor.topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topology</span></code></a></p></td>
-<td><p>Get the names of the topology dummy variables, marked by a CF-role of <code class="docutils literal notranslate"><span class="pre">mesh_topology</span></code>.</p></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
 
 </section>
 
@@ -663,20 +619,20 @@ document.write(`
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="xugrid.Ugrid2d.plot.html"
+       href="xugrid.Ugrid2d.from_structured.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">xugrid.Ugrid2d.plot</p>
+        <p class="prev-next-title">xugrid.Ugrid2d.from_structured</p>
       </div>
     </a>
     <a class="right-next"
-       href="xugrid.UgridRolesAccessor.topology.html"
+       href="xugrid.Ugrid2d.to_shapely.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">xugrid.UgridRolesAccessor.topology</p>
+        <p class="prev-next-title">xugrid.Ugrid2d.to_shapely</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -698,16 +654,13 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xugrid.UgridRolesAccessor"><code class="docutils literal notranslate"><span class="pre">UgridRolesAccessor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#xugrid.UgridRolesAccessor.__init__"><code class="docutils literal notranslate"><span class="pre">UgridRolesAccessor.__init__()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xugrid.Ugrid2d.from_structured_bounds"><code class="docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_bounds()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/xugrid.UgridRolesAccessor.rst.txt">
+    <a href="../_sources/api/xugrid.Ugrid2d.from_structured_bounds.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
