@@ -229,7 +229,6 @@ def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
 
 @nb.njit(cache=True)
 def snap_to_edges(
-    segment_indices: IntArray,
     face_indices: IntArray,
     intersection_edges: FloatArray,
     face_edge_connectivity: AdjacencyMatrix,
@@ -243,7 +242,7 @@ def snap_to_edges(
 
     * It takes the intersected edges; any edge (p to q) to test falls fully
       within a single face.
-    * For a face, we take it centroid (a).
+    * For a face, we take the centroid (a).
     * We loop through every edge of the face.
     * If the edge separates the centroid (a) from the centroid of the edge (b)
       we store that edge as a separating edge.
@@ -257,11 +256,10 @@ def snap_to_edges(
     * The separation test will return False if the lines are collinear. This is
       desirable here, if U runs collinear with V, U doesn't separate a from b.
 
-    Do the minimum amount of work: reuse a_left, only compute V if needed.
+    Do a minimum amount of work: reuse a_left, only compute V if needed.
     """
     count = 0
-    for i in range(len(segment_indices)):
-        segment = segment_indices[i]
+    for i in range(len(face_indices)):
         face = face_indices[i]
         a = as_point(centroids[face])
         p = as_point(intersection_edges[i, 0])
@@ -277,35 +275,33 @@ def snap_to_edges(
             if a_left != b_left:
                 V = to_vector(a, b)
                 if left_of(p, a, V) != left_of(q, a, V):
+                    segment_index[count] = i
                     edges[count] = edge
-                    segment_index[count] = segment
                     count += 1
 
     return edges[:count], segment_index[:count]
 
 
 def _find_largest_edges(
-    intersection_edges: FloatArray,
-    segment_index: IntArray,
-    edges: IntArray,
+    edges: FloatArray,
+    edge_index: IntArray,
     line_index: IntArray,
 ):
-    valid_edges = intersection_edges[segment_index]
     max_edge_index = (
         pd.DataFrame(
             data={
-                "edges": edges,
-                "length": ((valid_edges[:, 1] - valid_edges[:, 0]) ** 2).sum(axis=1),
+                "edge_index": edge_index,
+                "length": ((edges[:, 1] - edges[:, 0]) ** 2).sum(axis=1),
             }
         )
-        .groupby("edges")
+        .groupby("edge_index")
         .idxmax()["length"]
         .values
     )
 
-    edges = edges[max_edge_index]
+    edge_index = edge_index[max_edge_index]
     line_index = line_index[max_edge_index]
-    return edges, line_index
+    return edge_index, line_index
 
 
 def _create_output_dataset(
@@ -412,36 +408,41 @@ def snap_to_grid(
     )
     line_edges = lines_as_edges(np.column_stack([x, y]), line_index)
 
-    # Search for intersections
+    # Search for intersections. Every edge is potentially divided into smaller
+    # segments: The segment_indices contain (repeated) values of the
+    #
+    # * line_index: for each segment, the index of the shapely geometry.
+    # * face_indices: for each segment, the index of the topology face.
+    # * segment_edges: for each segment, start and end xy-coordinates.
+    #
     celltree = CellTree2d(vertices, faces, -1)
-    segment_indices, face_indices, intersection_edges = celltree.intersect_edges(
-        line_edges
-    )
+    line_index, face_indices, segment_edges = celltree.intersect_edges(line_edges)
 
-    # Create edges from the intersected lines a: line can only snap to two
-    # edges of a quad. Pre-allocate the arrays here. For some reason, recent
-    # versions of numba refuse np.empty or np.zeros calls in this module (!).
+    # Create edges from the intersected lines a: line can only snap to N - 1
+    # edges for N edges of a face. Pre-allocate the arrays here. For some
+    # reason, recent versions of numba refuse np.empty or np.zeros calls in
+    # this module (!).
     # TODO: investigate...
-    max_n_new_edges = len(face_indices) * 2
-    edges = np.empty(max_n_new_edges, dtype=IntDType)
+    #
+    # * edge_index: which
+    max_n_new_edges = len(face_indices) * (faces.shape[1] - 1)
+    edge_index = np.empty(max_n_new_edges, dtype=IntDType)
     segment_index = np.empty(max_n_new_edges, dtype=IntDType)
-    edges, segment_index = snap_to_edges(
-        segment_indices,
+    edge_index, segment_index = snap_to_edges(
         face_indices,
-        intersection_edges,
+        segment_edges,
         face_edge_connectivity,
         topology.centroids,
         edge_centroids,
-        edges,
-        segment_index,
+        edge_index,  # out
+        segment_index,  # out
     )
     line_index = line_index[segment_index]
+    segment_edges = segment_edges[segment_index]
 
     # When multiple line parts are snapped to the same edge, use the ones with
     # the greatest length inside the cell.
-    edges, line_index = _find_largest_edges(
-        intersection_edges, segment_index, edges, line_index
-    )
+    edges, line_index = _find_largest_edges(segment_edges, edge_index, line_index)
 
     uds = _create_output_dataset(lines, topology, edges, line_index)
     gdf = _create_output_gdf(lines, vertices, edge_node_connectivity, edges, line_index)
