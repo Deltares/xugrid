@@ -27,6 +27,25 @@ def test_check_source_target_types(disk, cls):
         cls(source=1.0, target=disk)
 
 
+@pytest.mark.parametrize(
+    "regridder_class",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
+)
+def test_structured_to_unstructured(
+    regridder_class,
+    disk,
+    quads_structured,
+):
+    regridder = regridder_class(quads_structured, disk)
+    actual = regridder.regrid(quads_structured)
+    assert isinstance(actual, xu.UgridDataArray)
+
+
 def test_centroid_locator_regridder_structured(
     grid_data_a, grid_data_a_layered, grid_data_b, expected_results_centroid
 ):

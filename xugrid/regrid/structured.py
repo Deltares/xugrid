@@ -48,10 +48,11 @@ class StructuredGrid1d:
 
         if bounds_name in obj.coords:
             bounds = obj[bounds_name].values
+            size = bounds[:, 1] - bounds[:, 0]
         else:
             if size_name in obj.coords:
                 # works for scalar size and array size
-                size = np.abs(obj[size_name].values)
+                size = obj[size_name].to_numpy()
             else:
                 # no bounds defined, no dx defined
                 # make an estimate of cell size
@@ -64,9 +65,11 @@ class StructuredGrid1d:
                         f'explicit bounds must be given as "{name}bounds", or '
                         f'cellsizes must be as "d{name}"'
                     )
+                size = np.full_like(midpoints, size[0])
 
-            start = midpoints - 0.5 * size
-            end = midpoints + 0.5 * size
+            abs_size = np.abs(size)
+            start = midpoints - 0.5 * abs_size
+            end = midpoints + 0.5 * abs_size
             bounds = np.column_stack((start, end))
 
         self.name = name
@@ -75,8 +78,8 @@ class StructuredGrid1d:
         self.flipped = flipped
         self.side = side
         self.dname = size_name
-        self.dvalue = obj[size_name].values
-        self.index = obj.indexes[name].values
+        self.dvalue = size
+        self.index = index.to_numpy()
 
     @property
     def coords(self) -> dict:
@@ -457,7 +460,11 @@ class StructuredGrid2d(StructuredGrid1d):
         if matched_type == StructuredGrid2d:
             return self
         elif matched_type == UnstructuredGrid2d:
-            return Ugrid2d.from_structured(self.xbounds, self.ybounds)
+            ugrid2d = Ugrid2d.from_structured_bounds(
+                self.xbounds.bounds,
+                self.ybounds.bounds,
+            )
+            return UnstructuredGrid2d(ugrid2d)
         else:
             raise TypeError(
                 f"Cannot convert StructuredGrid2d to {matched_type.__name__}"

@@ -202,8 +202,8 @@ def infer_xy_coords(obj):
     return x, y
 
 
-def bounds_to_vertices(bounds):
-    diff = np.diff(bounds.values, axis=0)
+def bounds_to_vertices(bounds: np.ndarray):
+    diff = np.diff(bounds, axis=0)
     ascending = (diff >= 0.0).all()
     descending = (diff <= 0.0).all()
     if ascending:

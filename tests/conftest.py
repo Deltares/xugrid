@@ -28,4 +28,5 @@ from tests.fixtures.fixture_regridder import (
     grid_data_e_1d,
     quads_0_25,
     quads_1,
+    quads_structured,
 )

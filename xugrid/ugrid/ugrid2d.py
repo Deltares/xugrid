@@ -1577,24 +1577,10 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(x, y, fill_value, face_node_connectivity)
 
     @staticmethod
-    def from_structured(
-        data: Union[xr.DataArray, xr.Dataset],
-        x_bounds: str = None,
-        y_bounds: str = None,
+    def from_structured_bounds(
+        x_bounds: np.ndarray,
+        y_bounds: np.ndarray,
     ) -> "Ugrid2d":
-        if x_bounds is not None and y_bounds is not None:
-            x_bounds = data[x_bounds]
-            y_bounds = data[y_bounds]
-        else:
-            x_coord, y_coord = conversion.infer_xy_coords(data)
-            x_bounds = conversion.infer_bounds(data, x_coord)
-            y_bounds = conversion.infer_bounds(data, y_coord)
-            if x_bounds is None or y_bounds is None:
-                raise ValueError(
-                    "Could not infer bounds. Please provide x_bounds and"
-                    " y_bounds explicitly."
-                )
-
         nx, _ = x_bounds.shape
         ny, _ = y_bounds.shape
         nfaces = ny * nx
@@ -1612,6 +1598,29 @@ class Ugrid2d(AbstractUgrid):
         face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
         face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
         return Ugrid2d(node_x, node_y, -1, face_nodes)
+
+    @staticmethod
+    def from_structured(
+        data: Union[xr.DataArray, xr.Dataset],
+        x_bounds: str = None,
+        y_bounds: str = None,
+    ) -> "Ugrid2d":
+        if x_bounds is not None and y_bounds is not None:
+            x_bounds = data[x_bounds]
+            y_bounds = data[y_bounds]
+        else:
+            x_coord, y_coord = conversion.infer_xy_coords(data)
+            x_bounds = conversion.infer_bounds(data, x_coord)
+            y_bounds = conversion.infer_bounds(data, y_coord)
+            if x_bounds is None or y_bounds is None:
+                raise ValueError(
+                    "Could not infer bounds. Please provide x_bounds and"
+                    " y_bounds explicitly."
+                )
+        return Ugrid2d.from_structured_bounds(
+            x_bounds.to_numpy(),
+            y_bounds.to_numpy(),
+        )
 
     def to_shapely(self, dim):
         """

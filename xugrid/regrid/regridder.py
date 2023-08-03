@@ -208,14 +208,31 @@ class BaseRegridder(abc.ABC):
         regridded: UgridDataArray or xarray.DataArray
         """
 
-        if type(self._target) is StructuredGrid2d:
+        # FIXME: this should work:
+        # source_dims = self._source.dims
+        #
+        # But it causes problems with initializing a regridder
+        # from_dataset, because the name has been changed to
+        # __source_nFace.
+        if isinstance(object, UgridDataArray):
+            obj = object.ugrid.obj
+            source_dims = (object.ugrid.grid.face_dimension,)
+        else:
+            obj = object
             source_dims = ("y", "x")
-            regridded = self.regrid_dataarray(object, source_dims)
+
+        missing_dims = set(source_dims).difference(object.dims)
+        if missing_dims:
+            raise ValueError(
+                f"object does not contain regridder source dimensions: {missing_dims}"
+            )
+
+        regridded = self.regrid_dataarray(obj, source_dims)
+
+        if type(self._target) is StructuredGrid2d:
             regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
-            source_dims = (object.ugrid.grid.face_dimension,)
-            regridded = self.regrid_dataarray(object.ugrid.obj, source_dims)
             return UgridDataArray(
                 regridded,
                 self._target.ugrid_topology,

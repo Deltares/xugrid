@@ -51,6 +51,24 @@ def quads_0_25():
 
 
 @pytest.fixture(scope="function")
+def quads_structured():
+    dx = 1.0
+    xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    y = np.arange(ymin, ymax, dx) + 0.5 * dx
+
+    da = xr.DataArray(
+        data=np.full((y.size, x.size), 1.0),
+        coords={"y": y, "x": x},
+        dims=[
+            "y",
+            "x",
+        ],
+    )
+    return da
+
+
+@pytest.fixture(scope="function")
 def quads_1():
     dx = 1.0
     xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
@@ -251,7 +269,7 @@ def expected_results_centroid():
 @pytest.fixture(scope="function")
 def expected_results_overlap():
     # --------
-    # target | source            | ntarget | sum(source)/ntaget
+    # target | source            | ntarget | sum(source)/ntarget
     # 0      | 0                 | 1       | 0.0
     # 1      | 0 1               | 2       | 0.5
     # 2      |   1 2             | 2       | 1.5
