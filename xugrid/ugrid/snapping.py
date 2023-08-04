@@ -222,8 +222,8 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
 def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
     geometry = lines.geometry.values
     geom_type = shapely.get_type_id(geometry)
-    if not (geom_type == 1).all():
-        raise ValueError("Geometry should contain only LineStrings")
+    if not (geom_type == 1 | geom_type == 2).all():
+        raise ValueError("Geometry should contain only LineStrings and/or LinearRings")
     return geometry
 
 
@@ -384,7 +384,8 @@ def snap_to_grid(
         topology = grid.ugrid.grid
     else:
         raise TypeError(
-            f"Expected xarray.DataArray or xugrid.UgridDataArray, received: {type(grid).__name__}"
+            "Expected xarray.DataArray or xugrid.UgridDataArray, received: "
+            f" {type(grid).__name__}"
         )
 
     vertices = topology.node_coordinates
