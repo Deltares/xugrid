@@ -7,7 +7,6 @@ import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba_celltree import CellTree2d
 from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
@@ -222,7 +221,7 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
 def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
     geometry = lines.geometry.values
     geom_type = shapely.get_type_id(geometry)
-    if not (geom_type == 1 | geom_type == 2).all():
+    if not ((geom_type == 1) | (geom_type == 2)).all():
         raise ValueError("Geometry should contain only LineStrings and/or LinearRings")
     return geometry
 
@@ -389,18 +388,14 @@ def snap_to_grid(
         )
 
     vertices = topology.node_coordinates
-    faces = topology.face_node_connectivity
-
-    # Derive connectivity
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
+    edge_centroids = topology.edge_coordinates
+    edge_node_connectivity = topology.edge_node_connectivity
+    face_edge_connectivity = topology.face_edge_connectivity
     A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
     n, m = A.shape
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 
     # Create geometric data
-    edge_centroids = vertices[edge_node_connectivity].mean(axis=1)
     line_geometry = coerce_geometry(lines)
     line_coords, shapely_index = shapely.get_coordinates(
         line_geometry, return_index=True
@@ -418,8 +413,9 @@ def snap_to_grid(
     # * face_indices: for each segment, the index of the topology face.
     # * segment_edges: for each segment, start and end xy-coordinates.
     #
-    celltree = CellTree2d(vertices, faces, -1)
-    line_index, face_indices, segment_edges = celltree.intersect_edges(line_edges)
+    line_index, face_indices, segment_edges = topology.celltree.intersect_edges(
+        line_edges
+    )
 
     # Create edges from the intersected lines a: line can only snap to N - 1
     # edges for N edges of a face. Pre-allocate the arrays here. For some
@@ -427,8 +423,10 @@ def snap_to_grid(
     # this module (!).
     # TODO: investigate...
     #
-    # * edge_index: which
-    max_n_new_edges = len(face_indices) * (faces.shape[1] - 1)
+    # * edge_index: which edge of the topology (may contain duplicates)
+    # * segment_index: which segment
+
+    max_n_new_edges = len(face_indices) * topology.n_max_node_per_face - 1
     edge_index = np.empty(max_n_new_edges, dtype=IntDType)
     segment_index = np.empty(max_n_new_edges, dtype=IntDType)
     edge_index, segment_index = snap_to_edges(
