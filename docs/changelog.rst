@@ -22,6 +22,13 @@ Added
   The result can be used to define a valid subselection.
 - :meth:`xugrid.Ugrid2d.from_structured_bounds` can be used to generate
   a Ugrid2d topology from x and y bounds arrays.
+- :attr:`xugrid.UgridDatasetAccessor.name`,
+  :attr:`xugrid.UgridDatasetAccessor.names`,
+  :attr:`xugrid.UgridDatasetAccessor.topology`; and
+  :attr:`xugrid.UgridDataArrayAccessor.name`,
+  :attr:`xugrid.UgridDataArrayAccessor.names`,
+  :attr:`xugrid.UgridDataArrayAccessor.topology` have been added to provide
+  easier access to the names of the UGRID topologies.
 
 Fixed
 ~~~~~

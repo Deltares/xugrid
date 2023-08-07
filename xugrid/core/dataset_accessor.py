@@ -17,6 +17,10 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     @property
     def grid(self) -> UgridType:
+        """
+        Returns the single UGRID topology in this dataset. Raises a TypeError if
+        the dataset contains more than one topology.
+        """
         ngrid = len(self.grids)
         if ngrid == 1:
             return self.grids[0]
@@ -29,6 +33,10 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     @property
     def name(self) -> str:
+        """
+        Returns name of the single UGRID topology in this dataset. Raises a
+        TypeError if the dataset contains more than one topology.
+        """
         ngrid = len(self.grids)
         if ngrid == 1:
             return self.grid.name
@@ -41,10 +49,12 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     @property
     def names(self) -> List[str]:
+        """Names of all the UGRID topologies in the dataset."""
         return [grid.name for grid in self.grids]
 
     @property
     def topology(self) -> Dict[str, UgridType]:
+        """Mapping from names to UGRID topologies."""
         return {grid.name: grid for grid in self.grids}
 
     @property

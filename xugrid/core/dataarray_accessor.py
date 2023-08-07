@@ -26,18 +26,28 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     @property
     def grids(self) -> List[UgridType]:
+        """
+        The UGRID topology of this DataArry, as a list. Included for
+        consistency with UgridDataset.
+        """
         return [self.grid]
 
     @property
     def name(self) -> str:
+        """Name of the UGRID topology of this DataArray."""
         return self.grid.name
 
     @property
     def names(self) -> List[str]:
+        """
+        Name of the UGRID topology, as a list. Included for consistency with
+        UgridDataset.
+        """
         return [self.grid.name]
 
     @property
     def topology(self) -> Dict[str, UgridType]:
+        """Mapping from name to UGRID topology."""
         return {self.name: self.grid}
 
     @property
