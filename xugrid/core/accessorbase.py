@@ -40,6 +40,18 @@ class AbstractUgridAccessor(abc.ABC):
     def total_bounds():
         """ """
 
+    @abc.abstractproperty
+    def name():
+        """ """
+
+    @abc.abstractproperty
+    def names():
+        """ """
+
+    @abc.abstractproperty
+    def topology():
+        """ """
+
     @staticmethod
     def _sel(obj, grid, x, y):
         from xugrid.core.wrap import maybe_xugrid

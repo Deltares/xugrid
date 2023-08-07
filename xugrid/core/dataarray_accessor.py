@@ -29,6 +29,18 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         return [self.grid]
 
     @property
+    def name(self) -> str:
+        return self.grid.name
+
+    @property
+    def names(self) -> List[str]:
+        return [self.grid.name]
+
+    @property
+    def topology(self) -> Dict[str, UgridType]:
+        return {self.name: self.grid}
+
+    @property
     def bounds(self) -> Dict[str, Tuple]:
         """
         Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``

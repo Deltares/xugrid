@@ -113,6 +113,11 @@ class TestUgridDataArray:
     def setup(self):
         self.uda = xugrid.UgridDataArray(DARRAY(), GRID())
 
+    def test_properties(self):
+        assert self.uda.ugrid.name == "mesh2d"
+        assert self.uda.ugrid.names == ["mesh2d"]
+        assert self.uda.ugrid.topology == {"mesh2d": self.uda.ugrid.grid}
+
     def test_init(self):
         assert isinstance(self.uda.ugrid.obj, xr.DataArray)
         assert isinstance(self.uda.ugrid.grid, xugrid.Ugrid2d)
@@ -396,6 +401,11 @@ class TestUgridDataset:
         ds["a"] = DARRAY()
         ds["b"] = DARRAY() * 2
         self.uds = xugrid.UgridDataset(ds, GRID())
+
+    def test_properties(self):
+        assert self.uds.ugrid.name == "mesh2d"
+        assert self.uds.ugrid.names == ["mesh2d"]
+        assert self.uds.ugrid.topology == {"mesh2d": self.uds.ugrid.grid}
 
     def test_init(self):
         assert isinstance(self.uds.ugrid.obj, xr.Dataset)
@@ -790,6 +800,18 @@ def test_concat():
     uda3 = uds1d["a1d"].assign_coords(layer=2)
     with pytest.raises(ValueError, match="All UgridDataArrays must have the same grid"):
         xugrid.concat([uda1, uda3], dim="layer")
+
+
+def test_multiple_topology_property_errors():
+    # Create a dataset with two UGRID topologies:
+    uds = ugrid1d_ds()
+    uds["a"] = xugrid.UgridDataset(UGRID_DS())["a"]
+
+    with pytest.raises(TypeError, match="Can only access grid topology"):
+        uds.ugrid.grid
+
+    with pytest.raises(TypeError, match="Can only access grid name"):
+        uds.ugrid.name
 
 
 def test_merge():

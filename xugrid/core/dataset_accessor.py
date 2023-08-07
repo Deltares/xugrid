@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -26,6 +26,26 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 f"exactly one grid. Dataset contains {ngrid} grids. Use "
                 "`.grids` instead."
             )
+
+    @property
+    def name(self) -> str:
+        ngrid = len(self.grids)
+        if ngrid == 1:
+            return self.grid.name
+        else:
+            raise TypeError(
+                "Can only access grid name via `.name` if dataset contains "
+                f"exactly one grid. Dataset contains {ngrid} grids. Use "
+                "`.names` instead."
+            )
+
+    @property
+    def names(self) -> List[str]:
+        return [grid.name for grid in self.grids]
+
+    @property
+    def topology(self) -> Dict[str, UgridType]:
+        return {grid.name: grid for grid in self.grids}
 
     @property
     def bounds(self) -> Dict[str, Tuple]:
