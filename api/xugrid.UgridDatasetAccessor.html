@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
@@ -366,6 +366,10 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.set_node_coords.html">xugrid.UgridDatasetAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.grid.html">xugrid.UgridDatasetAccessor.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.name.html">xugrid.UgridDatasetAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.names.html">xugrid.UgridDatasetAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.topology.html">xugrid.UgridDatasetAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.bounds.html">xugrid.UgridDatasetAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.total_bounds.html">xugrid.UgridDatasetAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.crs.html">xugrid.UgridDatasetAccessor.crs</a></li>
@@ -381,9 +385,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.to_zarr.html">xugrid.UgridDatasetAccessor.to_zarr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.html">xugrid.UgridDataArrayAccessor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_node_coords.html">xugrid.UgridDataArrayAccessor.assign_node_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_edge_coords.html">xugrid.UgridDataArrayAccessor.assign_edge_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_face_coords.html">xugrid.UgridDataArrayAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_node_coords.html">xugrid.UgridDataArrayAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.grids.html">xugrid.UgridDataArrayAccessor.grids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.name.html">xugrid.UgridDataArrayAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.names.html">xugrid.UgridDataArrayAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.topology.html">xugrid.UgridDataArrayAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.bounds.html">xugrid.UgridDataArrayAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.total_bounds.html">xugrid.UgridDataArrayAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.crs.html">xugrid.UgridDataArrayAccessor.crs</a></li>
@@ -676,10 +684,19 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.crs.html#xugrid.UgridDatasetAccessor.crs" title="xugrid.UgridDatasetAccessor.crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crs</span></code></a></p></td>
 <td><p>The Coordinate Reference System (CRS) represented as a <code class="docutils literal notranslate"><span class="pre">pyproj.CRS</span></code> object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.grid.html#xugrid.UgridDatasetAccessor.grid" title="xugrid.UgridDatasetAccessor.grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid</span></code></a></p></td>
+<td><p>Returns the single UGRID topology in this dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.total_bounds.html#xugrid.UgridDatasetAccessor.total_bounds" title="xugrid.UgridDatasetAccessor.total_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_bounds</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.name.html#xugrid.UgridDatasetAccessor.name" title="xugrid.UgridDatasetAccessor.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p>Returns name of the single UGRID topology in this dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.names.html#xugrid.UgridDatasetAccessor.names" title="xugrid.UgridDatasetAccessor.names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">names</span></code></a></p></td>
+<td><p>Names of all the UGRID topologies in the dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.topology.html#xugrid.UgridDatasetAccessor.topology" title="xugrid.UgridDatasetAccessor.topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topology</span></code></a></p></td>
+<td><p>Mapping from names to UGRID topologies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDatasetAccessor.total_bounds.html#xugrid.UgridDatasetAccessor.total_bounds" title="xugrid.UgridDatasetAccessor.total_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_bounds</span></code></a></p></td>
 <td><p>Returns a tuple containing <code class="docutils literal notranslate"><span class="pre">minx,</span> <span class="pre">miny,</span> <span class="pre">maxx,</span> <span class="pre">maxy</span></code> values for the bounds of the dataset as a whole.</p></td>
 </tr>
 </tbody>

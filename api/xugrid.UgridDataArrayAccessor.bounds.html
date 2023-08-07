@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=e5fbc548" />
@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="xugrid.UgridDataArrayAccessor.total_bounds" href="xugrid.UgridDataArrayAccessor.total_bounds.html" />
-    <link rel="prev" title="xugrid.UgridDataArrayAccessor.set_node_coords" href="xugrid.UgridDataArrayAccessor.set_node_coords.html" />
+    <link rel="prev" title="xugrid.UgridDataArrayAccessor.topology" href="xugrid.UgridDataArrayAccessor.topology.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -366,6 +366,10 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.set_node_coords.html">xugrid.UgridDatasetAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.grid.html">xugrid.UgridDatasetAccessor.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.name.html">xugrid.UgridDatasetAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.names.html">xugrid.UgridDatasetAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.topology.html">xugrid.UgridDatasetAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.bounds.html">xugrid.UgridDatasetAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.total_bounds.html">xugrid.UgridDatasetAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.crs.html">xugrid.UgridDatasetAccessor.crs</a></li>
@@ -381,9 +385,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.to_zarr.html">xugrid.UgridDatasetAccessor.to_zarr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.html">xugrid.UgridDataArrayAccessor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_node_coords.html">xugrid.UgridDataArrayAccessor.assign_node_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_edge_coords.html">xugrid.UgridDataArrayAccessor.assign_edge_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.assign_face_coords.html">xugrid.UgridDataArrayAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_node_coords.html">xugrid.UgridDataArrayAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.grids.html">xugrid.UgridDataArrayAccessor.grids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.name.html">xugrid.UgridDataArrayAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.names.html">xugrid.UgridDataArrayAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.topology.html">xugrid.UgridDataArrayAccessor.topology</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.UgridDataArrayAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.total_bounds.html">xugrid.UgridDataArrayAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.crs.html">xugrid.UgridDataArrayAccessor.crs</a></li>
@@ -621,12 +629,12 @@ values of the grid’s node coordinates.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="xugrid.UgridDataArrayAccessor.set_node_coords.html"
+       href="xugrid.UgridDataArrayAccessor.topology.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">xugrid.UgridDataArrayAccessor.set_node_coords</p>
+        <p class="prev-next-title">xugrid.UgridDataArrayAccessor.topology</p>
       </div>
     </a>
     <a class="right-next"

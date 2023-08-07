@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=e5fbc548" />
@@ -366,6 +366,10 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.set_node_coords.html">xugrid.UgridDatasetAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.grid.html">xugrid.UgridDatasetAccessor.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.name.html">xugrid.UgridDatasetAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.names.html">xugrid.UgridDatasetAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.topology.html">xugrid.UgridDatasetAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.bounds.html">xugrid.UgridDatasetAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.total_bounds.html">xugrid.UgridDatasetAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.crs.html">xugrid.UgridDatasetAccessor.crs</a></li>
@@ -381,9 +385,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_zarr.html">xugrid.UgridDatasetAccessor.to_zarr</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.html">xugrid.UgridDataArrayAccessor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_node_coords.html">xugrid.UgridDataArrayAccessor.assign_node_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_edge_coords.html">xugrid.UgridDatasetAccessor.assign_edge_coords</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_face_coords.html">xugrid.UgridDatasetAccessor.assign_face_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_edge_coords.html">xugrid.UgridDataArrayAccessor.assign_edge_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_face_coords.html">xugrid.UgridDataArrayAccessor.assign_face_coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.set_node_coords.html">xugrid.UgridDataArrayAccessor.set_node_coords</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.grids.html">xugrid.UgridDataArrayAccessor.grids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.name.html">xugrid.UgridDataArrayAccessor.name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.names.html">xugrid.UgridDataArrayAccessor.names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.topology.html">xugrid.UgridDataArrayAccessor.topology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.bounds.html">xugrid.UgridDataArrayAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.total_bounds.html">xugrid.UgridDataArrayAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.crs.html">xugrid.UgridDataArrayAccessor.crs</a></li>
@@ -701,6 +709,18 @@ UgridDataArray or UgridDataset.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.set_node_coords.html#xugrid.UgridDatasetAccessor.set_node_coords" title="xugrid.UgridDatasetAccessor.set_node_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.set_node_coords</span></code></a>(node_x, ...)</p></td>
 <td><p>Given names of x and y coordinates of the nodes of an object, set them as the coordinates in the grid.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.grid.html#xugrid.UgridDatasetAccessor.grid" title="xugrid.UgridDatasetAccessor.grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.grid</span></code></a></p></td>
+<td><p>Returns the single UGRID topology in this dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.name.html#xugrid.UgridDatasetAccessor.name" title="xugrid.UgridDatasetAccessor.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.name</span></code></a></p></td>
+<td><p>Returns name of the single UGRID topology in this dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.names.html#xugrid.UgridDatasetAccessor.names" title="xugrid.UgridDatasetAccessor.names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.names</span></code></a></p></td>
+<td><p>Names of all the UGRID topologies in the dataset.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.topology.html#xugrid.UgridDatasetAccessor.topology" title="xugrid.UgridDatasetAccessor.topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.topology</span></code></a></p></td>
+<td><p>Mapping from names to UGRID topologies.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.bounds.html#xugrid.UgridDatasetAccessor.bounds" title="xugrid.UgridDatasetAccessor.bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.bounds</span></code></a></p></td>
 <td><p>Mapping from grid name to tuple containing <code class="docutils literal notranslate"><span class="pre">minx,</span> <span class="pre">miny,</span> <span class="pre">maxx,</span> <span class="pre">maxy</span></code> values of the grid's node coordinates for every grid in the dataset.</p></td>
 </tr>
@@ -746,14 +766,26 @@ UgridDataArray or UgridDataset.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_node_coords.html#xugrid.UgridDataArrayAccessor.assign_node_coords" title="xugrid.UgridDataArrayAccessor.assign_node_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.assign_node_coords</span></code></a>()</p></td>
 <td><p>Assign node coordinates from the grid to the object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_edge_coords.html#xugrid.UgridDatasetAccessor.assign_edge_coords" title="xugrid.UgridDatasetAccessor.assign_edge_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.assign_edge_coords</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_edge_coords.html#xugrid.UgridDataArrayAccessor.assign_edge_coords" title="xugrid.UgridDataArrayAccessor.assign_edge_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.assign_edge_coords</span></code></a>()</p></td>
 <td><p>Assign edge coordinates from the grid to the object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.assign_face_coords.html#xugrid.UgridDatasetAccessor.assign_face_coords" title="xugrid.UgridDatasetAccessor.assign_face_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.assign_face_coords</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.assign_face_coords.html#xugrid.UgridDataArrayAccessor.assign_face_coords" title="xugrid.UgridDataArrayAccessor.assign_face_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.assign_face_coords</span></code></a>()</p></td>
 <td><p>Assign face coordinates from the grid to the object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.set_node_coords.html#xugrid.UgridDataArrayAccessor.set_node_coords" title="xugrid.UgridDataArrayAccessor.set_node_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.set_node_coords</span></code></a>(...)</p></td>
 <td><p>Given names of x and y coordinates of the nodes of an object, set them as the coordinates in the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.grids.html#xugrid.UgridDataArrayAccessor.grids" title="xugrid.UgridDataArrayAccessor.grids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.grids</span></code></a></p></td>
+<td><p>The UGRID topology of this DataArry, as a list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.name.html#xugrid.UgridDataArrayAccessor.name" title="xugrid.UgridDataArrayAccessor.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.name</span></code></a></p></td>
+<td><p>Name of the UGRID topology of this DataArray.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.names.html#xugrid.UgridDataArrayAccessor.names" title="xugrid.UgridDataArrayAccessor.names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.names</span></code></a></p></td>
+<td><p>Name of the UGRID topology, as a list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.topology.html#xugrid.UgridDataArrayAccessor.topology" title="xugrid.UgridDataArrayAccessor.topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.topology</span></code></a></p></td>
+<td><p>Mapping from name to UGRID topology.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.bounds.html#xugrid.UgridDataArrayAccessor.bounds" title="xugrid.UgridDataArrayAccessor.bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.bounds</span></code></a></p></td>
 <td><p>Mapping from grid name to tuple containing <code class="docutils literal notranslate"><span class="pre">minx,</span> <span class="pre">miny,</span> <span class="pre">maxx,</span> <span class="pre">maxy</span></code> values of the grid's node coordinates.</p></td>
