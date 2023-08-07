@@ -215,7 +215,7 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("Dataset contains no UGRID topology variable.")
         elif n_topology > 1:
             raise ValueError(
-                "Dataset contains {n_topology} topology variables, "
+                f"Dataset contains {n_topology} topology variables, "
                 "please specify the topology variable name to use."
             )
         return topologies[0]
