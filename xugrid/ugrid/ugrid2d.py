@@ -1578,7 +1578,7 @@ class Ugrid2d(AbstractUgrid):
         x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
             geodataframe.geometry.values
         )
-        return Ugrid2d(x, y, fill_value, face_node_connectivity)
+        return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=geodataframe.crs)
 
     @staticmethod
     def from_structured_bounds(

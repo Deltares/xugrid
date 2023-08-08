@@ -312,7 +312,7 @@ class Ugrid1d(AbstractUgrid):
             geodataframe.geometry
         )
         fill_value = -1
-        return Ugrid1d(x, y, fill_value, edge_node_connectivity)
+        return Ugrid1d(x, y, fill_value, edge_node_connectivity, crs=geodataframe.crs)
 
     def to_pygeos(self, dim):
         from warnings import warn

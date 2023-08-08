@@ -344,7 +344,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         # Call reset_index on multi-index to generate them as regular columns.
         df = ds[variables].to_dataframe(dim_order=dim_order)
         geometry = self.grid.to_shapely(dim)
-        return gpd.GeoDataFrame(df, geometry=geometry)
+        return gpd.GeoDataFrame(df, geometry=geometry, crs=self.grid.crs)
 
     def _binary_iterate(self, iterations: int, mask, value, border_value):
         if border_value == value:

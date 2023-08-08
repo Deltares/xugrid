@@ -288,9 +288,11 @@ class TestUgridDataArray:
             self.uda.ugrid.to_geodataframe()
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
+        uda2.ugrid.set_crs(epsg=28992)
         gdf = uda2.ugrid.to_geodataframe("mesh2d")
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
+        assert gdf.crs.to_epsg() == 28992
 
     def test_binary_dilation(self):
         a = self.uda > 0
@@ -618,6 +620,14 @@ class TestUgridDataset:
         gdf = self.uds.ugrid.to_geodataframe()
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert (gdf.geometry.geom_type == "Polygon").all()
+
+        # Now test with an empty dataset
+        grid = self.uds.grid
+        empty = xugrid.UgridDataset(grid.to_dataset())
+        empty.ugrid.set_crs(epsg=28992)
+        gdf = empty.ugrid.to_geodataframe()
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert gdf.crs.to_epsg() == 28992
 
     def test_bounds(self):
         assert self.uds.ugrid.bounds == {"mesh2d": (0.0, 0.0, 2.0, 2.0)}
