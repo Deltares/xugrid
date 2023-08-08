@@ -417,9 +417,9 @@ document.write(`
         <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">,</span>
         <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">,</span>
         <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">,</span>
-        <span class="c1"># &quot;face_face_connectivity&quot;,</span>
+        <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">,</span>
         <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">,</span>
-        <span class="c1">#        &quot;boundary_node_connectivity&quot;,</span>
+        <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">}</span>
 
@@ -427,9 +427,9 @@ document.write(`
     <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
     <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="c1"># &quot;face_face_connectivity&quot;: (&quot;face_dimension&quot;, None),</span>
+    <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="c1"># &quot;boundary_node_connectivity&quot;: (&quot;???&quot;,&quot;???&quot;),</span>
+    <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;boundary_edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">X_STANDARD_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">)</span>
@@ -638,7 +638,7 @@ document.write(`
         <span class="n">expected_dims</span> <span class="o">=</span> <span class="n">_CONNECTIVITY_DIMS</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
         <span class="n">var_dims</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">expected_dims</span><span class="p">,</span> <span class="n">var_dims</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># skip None or integer</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">prev_dim</span> <span class="o">=</span> <span class="n">inferred</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
                 <span class="c1"># Not specified: default order can be used to infer dimensions.</span>
                 <span class="k">if</span> <span class="n">prev_dim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -649,6 +649,16 @@ document.write(`
                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">prev_dim</span><span class="si">}</span><span class="s2"> not in </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2">&quot;</span>
                             <span class="sa">f</span><span class="s2">&quot; with dimensions: </span><span class="si">{</span><span class="n">var_dims</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">dim_size</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">dim_size</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">UgridDimensionError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Expected size </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> for dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> in variable &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> with role </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">, found instead: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim_size</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># If key is None, we don&#39;t do any checking.</span>
 
     <span class="k">for</span> <span class="n">role</span><span class="p">,</span> <span class="n">varnames</span> <span class="ow">in</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">_COORD_DIMS</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>

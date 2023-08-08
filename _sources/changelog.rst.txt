@@ -36,7 +36,10 @@ Fixed
 - :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
   and :class:`xugrid.BarycentricInterpolator` will now also regrid structured
   to unstructured grid topologies.
-
+- :meth:`xugrid.Ugrid1d.to_dataset` and :meth:`xugrid.Ugrid2d.to_dataset` no
+  longer write unused connectivity variables into the attributes of the UGRID
+  dummy variable.
+  
 Changed
 ~~~~~~~
 
