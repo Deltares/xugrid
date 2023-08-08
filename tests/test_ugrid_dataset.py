@@ -750,6 +750,18 @@ def test_open_mfdataset(tmp_path):
         back = xugrid.open_mfdataset([path1, path2], data_vars="all")
 
 
+def test_keep_attrs():
+    uds = xugrid.UgridDataset(UGRID_DS())
+    uds.attrs["date_created"] = "today"
+    ds = uds.ugrid.to_dataset()
+    assert ds.attrs["date_created"] == "today"
+
+    uds = ugrid1d_ds()
+    uds.attrs["date_created"] = "today"
+    ds = uds.ugrid.to_dataset()
+    assert ds.attrs["date_created"] == "today"
+
+
 def test_zarr_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.zarr"
     uds = xugrid.UgridDataset(UGRID_DS())

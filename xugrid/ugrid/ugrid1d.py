@@ -225,8 +225,12 @@ class Ugrid1d(AbstractUgrid):
                 dims=(self.edge_dimension, "two"),
             ),
         }
-        dataset = xr.Dataset(data_vars, attrs={"Conventions": "CF-1.8 UGRID-1.0"})
 
+        attrs = {"Conventions": "CF-1.9 UGRID-1.0"}
+        if other is not None:
+            attrs = {**attrs, **other.attrs}
+
+        dataset = xr.Dataset(data_vars, attrs=attrs)
         if self._dataset:
             dataset.update(self._dataset)
         if other is not None:
