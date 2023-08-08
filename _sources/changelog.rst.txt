@@ -42,7 +42,11 @@ Fixed
 - :meth:`xugrid.Ugrid1d.to_dataset` and :meth:`xugrid.Ugrid2d.to_dataset` no
   longer write unused connectivity variables into the attributes of the UGRID
   dummy variable.
-  
+- Conversion from and to GeoDataFrame will now conserve the CRS (coordinate
+  reference system).
+- :meth:`xugrid.UgridDatasetAccessor.to_geodataframe` will no longer error when
+  converting a UgridDataset that does not contain any variables.
+
 Changed
 ~~~~~~~
 
@@ -57,11 +61,11 @@ Fixed
 
 - Computing indexer to avoid dask array of unknown shape upon plotting.
   See `#117 <https://github.com/Deltares/xugrid/issues/117>`_.
-- Bug where chunked dask arrays could not be regridded. 
+- Bug where chunked dask arrays could not be regridded.
   See `#119 <https://github.com/Deltares/xugrid/issues/99>`_.
-- Bug where error was thrown in the RelativeOverlapRegridder upon 
+- Bug where error was thrown in the RelativeOverlapRegridder upon
   flipping the y coordinate.
-  
+
 
 [0.6.1] 2023-07-07
 ------------------
@@ -70,7 +74,7 @@ Fixed
 ~~~~~
 
 - Fillvalue was not properly replaced in cast.
-  See `#113 <https://github.com/Deltares/xugrid/issues/113>`_. 
+  See `#113 <https://github.com/Deltares/xugrid/issues/113>`_.
 
 
 [0.6.0] 2023-07-05
@@ -99,7 +103,7 @@ Fixed
 ~~~~~
 
 - Regridding is possible again with regridders initiated ``from_weights``.
-  See `#90 <https://github.com/Deltares/xugrid/issues/90>`_. 
+  See `#90 <https://github.com/Deltares/xugrid/issues/90>`_.
   This was a broken feature in the 0.5.0 release.
 - Computed weights for structured grids regridders now decrease with distance
   instead of increase.
@@ -145,7 +149,7 @@ Changed
 
 - :meth:`xugrid.Ugrid2d.sel_points` and
   :meth:`xugrid.UgridDataArrayAccessor.sel_points` now return a result with an
-  "index" coordinate, containing the (integer) index of the points. 
+  "index" coordinate, containing the (integer) index of the points.
 - :class:`xugrid.Ugrid2d` will now error during initialization if the
   node_edge_connectivity is invalid (i.e. contains nodes that are not used in
   any face).
@@ -208,7 +212,7 @@ Fixed
 - Setting wrapped properties of the xarray object (such as ``name``) now works.
 - Creating new (subset) topologies via e.g. selection will no longer error when
   datasets contains multiple coordinates systems (such as both longitude and
-  latitude next to projected x and y coordinates). 
+  latitude next to projected x and y coordinates).
 
 Changed
 ~~~~~~~
@@ -237,7 +241,7 @@ Fixed
   :meth:`xugrid.UgridDatasetAccessor.sel` now propagate UGRID attributes.
   Before this fix, dimension of the UGRID topology would go out of sync with
   the DataArray, as a subset would return a new UGRID topology with default
-  UGRID names. 
+  UGRID names.
 - :meth:`xugrid.Ugrid2d.topology_subset`, :meth:`xugrid.UgridDataArrayAccessor.sel`
   :meth:`xugrid.UgridDatasetAccessor.sel` will now return a correct UGRID 2D
   topology when fill values are present in the face node connectivity.
@@ -302,7 +306,7 @@ Fixed
 ~~~~~
 
 - Move matplotlib import into a function body so matplotlib remains an optional
-  dependency. 
+  dependency.
 
 [0.1.9] 2022-12-13
 ------------------
@@ -424,7 +428,7 @@ Added
 - :class:`xugrid.UgridRolesAccessor` has been added to extract UGRID variables
   from xarray Datasets.
 - :func:`xugrid.merge` and :func:`xugrid.concat` have been added, since the
-  xarray functions raise a TypeError on non-xarray objects. 
+  xarray functions raise a TypeError on non-xarray objects.
 - :meth:`xugrid.UgridDataArrayAccessor.assign_node_coords` and
   :meth:`xugrid.UgridDatasetAccessor.assign_node_coords` have been added to add
   the UGRID node coordinates to the xarray object.
