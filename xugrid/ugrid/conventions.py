@@ -40,9 +40,9 @@ _CONNECTIVITY_NAMES = {
         "face_node_connectivity",
         "edge_node_connectivity",
         "face_edge_connectivity",
-        # "face_face_connectivity",
+        "face_face_connectivity",
         "edge_face_connectivity",
-        #        "boundary_node_connectivity",
+        "boundary_node_connectivity",
     ),
 }
 
@@ -50,9 +50,9 @@ _CONNECTIVITY_DIMS = {
     "face_node_connectivity": ("face_dimension", None),
     "edge_node_connectivity": ("edge_dimension", 2),
     "face_edge_connectivity": ("face_dimension", None),
-    # "face_face_connectivity": ("face_dimension", None),
+    "face_face_connectivity": ("face_dimension", None),
     "edge_face_connectivity": ("edge_dimension", 2),
-    # "boundary_node_connectivity": ("???","???"),
+    "boundary_node_connectivity": ("boundary_edge_dimension", 2),
 }
 
 X_STANDARD_NAMES = ("projection_x_coordinate", "longitude")
@@ -261,7 +261,7 @@ def _infer_dims(
         expected_dims = _CONNECTIVITY_DIMS[role]
         var_dims = ds[varname].dims
         for key, dim in zip(expected_dims, var_dims):
-            if isinstance(key, str):  # skip None or integer
+            if isinstance(key, str):
                 prev_dim = inferred.get(key)
                 # Not specified: default order can be used to infer dimensions.
                 if prev_dim is None:
@@ -272,6 +272,16 @@ def _infer_dims(
                             f"{key}: {prev_dim} not in {role}: {varname}"
                             f" with dimensions: {var_dims}"
                         )
+            elif isinstance(key, int):
+                dim_size = ds.dims[dim]
+                if not dim_size == key:
+                    raise UgridDimensionError(
+                        f"Expected size {key} for dimension {dim} in variable "
+                        f"{varname} with role {role}, found instead: "
+                        f"{dim_size}"
+                    )
+
+            # If key is None, we don't do any checking.
 
     for role, varnames in coordinates.items():
         key = _COORD_DIMS[role]

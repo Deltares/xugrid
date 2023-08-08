@@ -227,15 +227,16 @@ class AbstractUgrid(abc.ABC):
         topodim = self.topology_dimension
         attrs = self._attrs.copy()
 
-        for key in conventions._DIM_NAMES[topodim]:
-            if key in attrs:
-                if attrs[key] not in dataset.dims:
-                    attrs.pop(key)
+        ugrid_dims = conventions._DIM_NAMES[topodim] + tuple(
+            [dims[0] for dims in conventions._CONNECTIVITY_DIMS.values()]
+        )
+        for key in ugrid_dims:
+            if key in attrs and attrs[key] not in dataset.dims:
+                attrs.pop(key)
 
         for key in conventions._CONNECTIVITY_NAMES[topodim]:
-            if key in attrs:
-                if attrs[key] not in dataset:
-                    attrs.pop(key)
+            if key in attrs and attrs[key] not in dataset:
+                attrs.pop(key)
 
         for coord in conventions._COORD_NAMES[topodim]:
             if coord in attrs:

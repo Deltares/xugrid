@@ -157,6 +157,17 @@ def test_to_crs():
 
 
 def test_to_dataset():
+    def check_attrs(ds):
+        attrs = ds[NAME].attrs.copy()
+        attrs.pop("cf_role")
+        attrs.pop("long_name")
+        attrs.pop("topology_dimension")
+        ds_contents = tuple(ds.dims) + tuple(ds.coords) + tuple(ds.data_vars)
+        for values in attrs.values():
+            # e.g node_coordinates are joined by a whitespace.
+            for value in values.split(" "):
+                assert value in ds_contents
+
     grid = grid1d()
     ds = grid.to_dataset()
     assert isinstance(ds, xr.Dataset)
@@ -166,10 +177,12 @@ def test_to_dataset():
     assert f"{NAME}_node_x" in ds.coords
     assert f"{NAME}_node_y" in ds.coords
     assert f"{NAME}_edge_nodes" in ds
+    check_attrs(ds)
 
     ds = grid.to_dataset(optional_attributes=True)
     assert f"{NAME}_edge_x" in ds.coords
     assert f"{NAME}_edge_y" in ds.coords
+    check_attrs(ds)
 
 
 def test_ugrid1d_dataset_roundtrip():

@@ -294,3 +294,40 @@ class TestCompleteSpecification:
 
     def test_connectivity(self):
         assert self.ds.ugrid_roles.connectivity == self.connectivity
+
+    def test_dimension_name_mismatch_error(self):
+        ds = self.ds.copy()
+
+        ds["mesh2d_edge_nodes"] = xr.DataArray(
+            data=[
+                [0, 1],
+                [1, 2],
+                [2, 3],
+                [3, 0],
+            ],
+            dims=["nEdges", "Two"],
+            attrs={"_FillValue": -1, "start_index": 0},
+        )
+
+        with pytest.raises(
+            cv.UgridDimensionError,
+            match="edge_dimension: nEdges not in edge_face_connectivity",
+        ):
+            ds.ugrid_roles.dimensions
+
+    def test_dimension_size_error(self):
+        ds = self.ds.copy()
+
+        ds["mesh2d_edge_nodes"] = xr.DataArray(
+            data=[
+                [0, 1, -1],
+                [1, 2, -1],
+                [2, 3, -1],
+                [3, 0, -1],
+            ],
+            dims=["mesh2d_nEdges", "Three"],
+            attrs={"_FillValue": -1, "start_index": 0},
+        )
+
+        with pytest.raises(cv.UgridDimensionError, match="Expected size 2"):
+            ds.ugrid_roles.dimensions
