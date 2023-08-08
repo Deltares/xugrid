@@ -445,6 +445,22 @@ document.write(`
 
     <span class="n">plot</span> <span class="o">=</span> <span class="n">UncachedAccessor</span><span class="p">(</span><span class="n">_PlotMethods</span><span class="p">)</span>
 
+<div class="viewcode-block" id="UgridDataArrayAccessor.rename"><a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.rename.html#xugrid.UgridDataArrayAccessor.rename">[docs]</a>    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Give a new name to the UGRID topology and update the associated</span>
+<span class="sd">        coordinate and dimension names in the DataArray.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">            The new name of the topology.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">new_grid</span><span class="p">,</span> <span class="n">name_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">return_name_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">to_rename</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">name_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_rename</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">new_grid</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="UgridDataArrayAccessor.assign_node_coords"><a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.assign_node_coords.html#xugrid.UgridDataArrayAccessor.assign_node_coords">[docs]</a>    <span class="k">def</span> <span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign node coordinates from the grid to the object.</span>

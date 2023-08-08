@@ -457,6 +457,55 @@ document.write(`
             <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
         <span class="p">)</span>
 
+<div class="viewcode-block" id="UgridDatasetAccessor.rename"><a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rename.html#xugrid.UgridDatasetAccessor.rename">[docs]</a>    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name_or_name_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Give a new name to the UGRID topology and update the associated</span>
+<span class="sd">        coordinate and dimension names in the Dataset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_name_or_name_dict: str or dict</span>
+<span class="sd">            If the argument is a string, the new name of the topology. This</span>
+<span class="sd">            only works if the dataset contains a single UGRID topology. If the</span>
+<span class="sd">            argument is a dict, it used as a mapping from old names to new</span>
+<span class="sd">            names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ngrid</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Can only rename with a single name if dataset contains &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Provide &quot;</span>
+                    <span class="s2">&quot;a dictionary of old name to new name instead.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">name</span> <span class="o">=</span> <span class="n">new_name_or_name_dict</span>
+            <span class="n">new_grid</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">return_name_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">new_grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_grid</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">new_grids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">new_name_or_name_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_grid</span> <span class="o">=</span> <span class="n">grid</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_grid</span><span class="p">,</span> <span class="n">name_dict</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">return_name_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name_dict</span><span class="p">)</span>
+                <span class="n">new_grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_grid</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;new_name_or_name_dict should be str or dict, received instead: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">to_rename</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">to_rename</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">new_grids</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_node_coords"><a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_node_coords.html#xugrid.UgridDatasetAccessor.assign_node_coords">[docs]</a>    <span class="k">def</span> <span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign node coordinates from the grid to the object.</span>

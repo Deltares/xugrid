@@ -373,6 +373,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.bounds.html">xugrid.UgridDatasetAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.total_bounds.html">xugrid.UgridDatasetAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.crs.html">xugrid.UgridDatasetAccessor.crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.rename.html">xugrid.UgridDatasetAccessor.rename</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.set_crs.html">xugrid.UgridDatasetAccessor.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.to_crs.html">xugrid.UgridDatasetAccessor.to_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.sel.html">xugrid.UgridDatasetAccessor.sel</a></li>
@@ -395,6 +396,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.bounds.html">xugrid.UgridDataArrayAccessor.bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.total_bounds.html">xugrid.UgridDataArrayAccessor.total_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.crs.html">xugrid.UgridDataArrayAccessor.crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rename.html">xugrid.UgridDataArrayAccessor.rename</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_crs.html">xugrid.UgridDataArrayAccessor.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_crs.html">xugrid.UgridDataArrayAccessor.to_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel.html">xugrid.UgridDataArrayAccessor.sel</a></li>
@@ -660,34 +662,37 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rasterize_like.html#xugrid.UgridDataArrayAccessor.rasterize_like" title="xugrid.UgridDataArrayAccessor.rasterize_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rasterize_like</span></code></a>(other)</p></td>
 <td><p>Rasterize unstructured grid by sampling on the x and y coordinates of <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee.html#xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee" title="xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_cuthill_mckee</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rename.html#xugrid.UgridDataArrayAccessor.rename" title="xugrid.UgridDataArrayAccessor.rename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code></a>(name)</p></td>
+<td><p>Give a new name to the UGRID topology and update the associated coordinate and dimension names in the DataArray.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee.html#xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee" title="xugrid.UgridDataArrayAccessor.reverse_cuthill_mckee"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_cuthill_mckee</span></code></a>()</p></td>
 <td><p>Reduces bandwith of the connectivity matrix.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel.html#xugrid.UgridDataArrayAccessor.sel" title="xugrid.UgridDataArrayAccessor.sel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code></a>([x, y])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel.html#xugrid.UgridDataArrayAccessor.sel" title="xugrid.UgridDataArrayAccessor.sel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code></a>([x, y])</p></td>
 <td><p>Returns a new object, a subselection in the UGRID x and y coordinates.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel_points</span></code></a>(x, y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel_points</span></code></a>(x, y)</p></td>
 <td><p>Select points in the unstructured grid.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_crs.html#xugrid.UgridDataArrayAccessor.set_crs" title="xugrid.UgridDataArrayAccessor.set_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_crs</span></code></a>([crs, epsg, allow_override])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_crs.html#xugrid.UgridDataArrayAccessor.set_crs" title="xugrid.UgridDataArrayAccessor.set_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_crs</span></code></a>([crs, epsg, allow_override])</p></td>
 <td><p>Set the Coordinate Reference System (CRS) of a UGRID topology.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_node_coords.html#xugrid.UgridDataArrayAccessor.set_node_coords" title="xugrid.UgridDataArrayAccessor.set_node_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_node_coords</span></code></a>(node_x, node_y)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.set_node_coords.html#xugrid.UgridDataArrayAccessor.set_node_coords" title="xugrid.UgridDataArrayAccessor.set_node_coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_node_coords</span></code></a>(node_x, node_y)</p></td>
 <td><p>Given names of x and y coordinates of the nodes of an object, set them as the coordinates in the grid.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_crs.html#xugrid.UgridDataArrayAccessor.to_crs" title="xugrid.UgridDataArrayAccessor.to_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_crs</span></code></a>([crs, epsg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_crs.html#xugrid.UgridDataArrayAccessor.to_crs" title="xugrid.UgridDataArrayAccessor.to_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_crs</span></code></a>([crs, epsg])</p></td>
 <td><p>Transform geometries to a new coordinate reference system.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_dataset.html#xugrid.UgridDataArrayAccessor.to_dataset" title="xugrid.UgridDataArrayAccessor.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code></a>([optional_attributes])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_dataset.html#xugrid.UgridDataArrayAccessor.to_dataset" title="xugrid.UgridDataArrayAccessor.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code></a>([optional_attributes])</p></td>
 <td><p>Converts this UgridDataArray or UgridDataset into a standard xarray.Dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_geodataframe.html#xugrid.UgridDataArrayAccessor.to_geodataframe" title="xugrid.UgridDataArrayAccessor.to_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_geodataframe</span></code></a>([name, dim_order])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_geodataframe.html#xugrid.UgridDataArrayAccessor.to_geodataframe" title="xugrid.UgridDataArrayAccessor.to_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_geodataframe</span></code></a>([name, dim_order])</p></td>
 <td><p>Convert data and topology of one facet (node, edge, face) of the grid to a geopandas GeoDataFrame.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_netcdf.html#xugrid.UgridDataArrayAccessor.to_netcdf" title="xugrid.UgridDataArrayAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_netcdf.html#xugrid.UgridDataArrayAccessor.to_netcdf" title="xugrid.UgridDataArrayAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant Zarr file.</p></td>
 </tr>
 </tbody>

@@ -75,6 +75,7 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.bounds
     UgridDatasetAccessor.total_bounds
     UgridDatasetAccessor.crs
+    UgridDatasetAccessor.rename
     UgridDatasetAccessor.set_crs
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
@@ -98,6 +99,7 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.bounds
     UgridDataArrayAccessor.total_bounds
     UgridDataArrayAccessor.crs
+    UgridDataArrayAccessor.rename
     UgridDataArrayAccessor.set_crs
     UgridDataArrayAccessor.to_crs
     UgridDataArrayAccessor.sel

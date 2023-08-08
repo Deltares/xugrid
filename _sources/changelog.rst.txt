@@ -29,6 +29,9 @@ Added
   :attr:`xugrid.UgridDataArrayAccessor.names`,
   :attr:`xugrid.UgridDataArrayAccessor.topology` have been added to provide
   easier access to the names of the UGRID topologies.
+- :meth:`xugrid.UgridDatasetAccessor.rename` and
+  :meth:`xugrid.UgridDataArrayAccessor.rename` to rename both topology and the
+  associated dimensions.
 
 Fixed
 ~~~~~
