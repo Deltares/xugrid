@@ -80,6 +80,55 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             bounds[3].max(),
         )
 
+    def rename(self, new_name_or_name_dict: Union[str, Dict[str, str]]) -> UgridDataset:
+        """
+        Give a new name to the UGRID topology and update the associated
+        coordinate and dimension names in the Dataset.
+
+        Parameters
+        ----------
+        new_name_or_name_dict: str or dict
+            If the argument is a string, the new name of the topology. This
+            only works if the dataset contains a single UGRID topology. If the
+            argument is a dict, it used as a mapping from old names to new
+            names.
+        """
+        if isinstance(new_name_or_name_dict, str):
+            ngrid = len(self.grids)
+            if ngrid != 1:
+                raise TypeError(
+                    "Can only rename with a single name if dataset contains "
+                    f"exactly one grid. Dataset contains {ngrid} grids. Provide "
+                    "a dictionary of old name to new name instead."
+                )
+
+            name = new_name_or_name_dict
+            new_grid, names = self.grid.rename(name, return_name_dict=True)
+            new_grids = [new_grid]
+
+        elif isinstance(new_name_or_name_dict, dict):
+            names = {}
+            new_grids = []
+            for grid in self.grids:
+                name = new_name_or_name_dict.get(grid.name)
+                if name is None:
+                    new_grid = grid
+                else:
+                    new_grid, name_dict = grid.rename(name, return_name_dict=True)
+                    names.update(name_dict)
+                new_grids.append(new_grid)
+
+        else:
+            raise TypeError(
+                "new_name_or_name_dict should be str or dict, received instead: "
+                f"{type(new_name_or_name_dict).__name__}"
+            )
+
+        obj = self.obj
+        to_rename = tuple(obj.data_vars) + tuple(obj.coords) + tuple(obj.dims)
+        new_obj = obj.rename({k: v for k, v in names.items() if k in to_rename})
+        return UgridDataset(new_obj, new_grids)
+
     def assign_node_coords(self) -> UgridDataset:
         """
         Assign node coordinates from the grid to the object.

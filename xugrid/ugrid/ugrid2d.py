@@ -359,7 +359,7 @@ class Ugrid2d(AbstractUgrid):
 
         attrs = {"Conventions": "CF-1.9 UGRID-1.0"}
         if other is not None:
-            attrs = {**attrs, **other.attrs}
+            attrs.update(other.attrs)
 
         dataset = xr.Dataset(data_vars, attrs=attrs)
         if self._dataset:

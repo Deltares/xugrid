@@ -151,6 +151,10 @@ class TestUgridDataArray:
     def test_ugrid_accessor(self):
         assert isinstance(self.uda.ugrid, xugrid.UgridDataArrayAccessor)
 
+    def test_rename(self):
+        renamed = self.uda.ugrid.rename("renamed")
+        assert "renamed_nFaces" in renamed.dims
+
     def test_from_structured(self):
         da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
         with pytest.raises(ValueError, match="Last two dimensions of da"):
@@ -472,6 +476,20 @@ class TestUgridDataset:
 
     def test_ugrid_accessor(self):
         assert isinstance(self.uds.ugrid, xugrid.UgridDatasetAccessor)
+
+    def test_rename(self):
+        renamed = self.uds.ugrid.rename("renamed")
+        assert "renamed_nFaces" in renamed.dims
+
+        renamed = self.uds.ugrid.rename({"mesh2d": "renamed"})
+        assert "renamed_nFaces" in renamed.dims
+
+        # This name doesn't exist, shouldn't change
+        renamed = self.uds.ugrid.rename({"mesh1d": "renamed"})
+        assert "mesh2d_nFaces" in renamed.dims
+
+        with pytest.raises(TypeError):
+            self.uds.ugrid.rename(["mesh1d", "mesh2d"])
 
     def test_from_geodataframe(self):
         xy = np.array(
@@ -814,7 +832,7 @@ def test_concat():
         xugrid.concat([uda1, uda3], dim="layer")
 
 
-def test_multiple_topology_property_errors():
+def test_multiple_topology_errors():
     # Create a dataset with two UGRID topologies:
     uds = ugrid1d_ds()
     uds["a"] = xugrid.UgridDataset(UGRID_DS())["a"]
@@ -824,6 +842,9 @@ def test_multiple_topology_property_errors():
 
     with pytest.raises(TypeError, match="Can only access grid name"):
         uds.ugrid.name
+
+    with pytest.raises(TypeError, match="Can only rename with a single name"):
+        uds.ugrid.rename("renamed")
 
 
 def test_merge():

@@ -166,7 +166,7 @@ class AbstractUgrid(abc.ABC):
         self._attrs["name"] = name
         return
 
-    def rename(self, name: str):
+    def rename(self, name: str, return_name_dict: bool = False):
         """
         Create a new grid with all variables named according to the default
         naming conventions.
@@ -205,7 +205,10 @@ class AbstractUgrid(abc.ABC):
                 {k: v for k, v in name_dict.items() if k in to_rename}
             )
 
-        return new
+        if return_name_dict:
+            return new, name_dict
+        else:
+            return new
 
     @staticmethod
     def _single_topology(dataset: xr.Dataset):

@@ -68,6 +68,22 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     plot = UncachedAccessor(_PlotMethods)
 
+    def rename(self, name: str) -> UgridDataArray:
+        """
+        Give a new name to the UGRID topology and update the associated
+        coordinate and dimension names in the DataArray.
+
+        Parameters
+        ----------
+        name: str
+            The new name of the topology.
+        """
+        obj = self.obj
+        new_grid, name_dict = self.grid.rename(name, return_name_dict=True)
+        to_rename = tuple(obj.coords) + tuple(obj.dims)
+        new_obj = obj.rename({k: v for k, v in name_dict.items() if k in to_rename})
+        return UgridDataArray(new_obj, new_grid)
+
     def assign_node_coords(self) -> UgridDataArray:
         """
         Assign node coordinates from the grid to the object.
