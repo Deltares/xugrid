@@ -52,6 +52,12 @@ Changed
 
 - Initializing a Ugrid2d topology with an invalid edge_node_connectivity will
   no longer raise an error.
+- :attr:`xugrid.Ugrid1d.node_node_connectivity`,
+  :attr:`xugrid.Ugrid1d.directed_node_node_connectivity`,
+  :attr:`xugrid.Ugrid2d.node_node_connectivity`,
+  :attr:`xugrid.Ugrid2d.directed_node_node_connectivity`, and
+  :attr:`xugrid.Ugrid2d.face_face_connectivity` now contain the associated edge
+  index in the ``.data`` attribute of the resulting CSR matrix.
 
 [0.6.2] 2023-07-26
 ------------------
