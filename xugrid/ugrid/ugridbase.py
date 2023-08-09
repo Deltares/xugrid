@@ -552,6 +552,11 @@ class AbstractUgrid(abc.ABC):
         """
         Node to node connectivity.
 
+        The connectivity is represented as an adjacency matrix in CSR format,
+        with the row and column indices as a (0-based) node index. The data of
+        the matrix contains the edge index as every connection is formed by an
+        edge.
+
         Returns
         -------
         connectivity: csr_matrix
@@ -566,6 +571,11 @@ class AbstractUgrid(abc.ABC):
     def directed_node_node_connectivity(self) -> csr_matrix:
         """
         Directed node to node connectivity.
+
+        The connectivity is represented as an adjacency matrix in CSR format,
+        with the row and column indices as a (0-based) node index. The data of
+        the matrix contains the edge index as every connection is formed by an
+        edge.
 
         Returns
         -------

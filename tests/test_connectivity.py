@@ -381,14 +381,13 @@ def test_validate_edge_connectivity(mixed_mesh):
 def test_node_node_connectivity():
     edge_nodes = np.array(
         [
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [3, 0],
-            [1, 4],
-            [4, 5],
-            [5, 2],
-            [2, 1],
+            [0, 1],  # 0
+            [1, 2],  # 1
+            [2, 3],  # 2
+            [3, 0],  # 3
+            [1, 4],  # 4
+            [4, 5],  # 5
+            [5, 2],  # 6
         ]
     )
     csr = connectivity.node_node_connectivity(edge_nodes)
@@ -412,7 +411,42 @@ def test_node_node_connectivity():
             [5, 4],
         ]
     )
+    expected_edges = np.array([0, 3, 0, 1, 4, 1, 2, 6, 3, 2, 4, 5, 6, 5])
     assert np.array_equal(actual, expected)
+    assert np.array_equal(expected_edges, coo.data)
+
+
+def test_directed_node_node_connectivity():
+    edge_nodes = np.array(
+        [
+            [0, 1],  # 0
+            [1, 2],  # 1
+            [2, 3],  # 2
+            [3, 0],  # 3
+            [1, 4],  # 4
+            [4, 5],  # 5
+            [5, 2],  # 6
+            [0, 6],  # 7
+        ]
+    )
+    csr = connectivity.directed_node_node_connectivity(edge_nodes)
+    coo = csr.tocoo()
+    actual = np.column_stack([coo.row, coo.col])
+    expected = np.array(
+        [
+            [0, 1],
+            [0, 6],
+            [1, 2],
+            [1, 4],
+            [2, 3],
+            [3, 0],
+            [4, 5],
+            [5, 2],
+        ]
+    )
+    expected_edges = np.array([0, 7, 1, 4, 2, 3, 5, 6])
+    assert np.array_equal(actual, expected)
+    assert np.array_equal(expected_edges, coo.data)
 
 
 def test_face_face_connectivity():
@@ -430,6 +464,7 @@ def test_face_face_connectivity():
     assert isinstance(face_face, sparse.csr_matrix)
     assert np.array_equal(face_face.indices, [1, 0])
     assert np.array_equal(face_face.indptr, [0, 1, 2])
+    assert np.array_equal(face_face.data, [2, 2])
 
 
 def test_centroids(mixed_mesh):

@@ -458,9 +458,11 @@ def face_face_connectivity(
     is_connection = j != fill_value
     i = i[is_connection]
     j = j[is_connection]
+    edge_index = np.arange(len(edge_face_connectivity))[is_connection]
     ij = np.concatenate([i, j])
     ji = np.concatenate([j, i])
-    coo_content = (ji, (ij, ji))
+    edge_index = np.concatenate([edge_index, edge_index])
+    coo_content = (edge_index, (ij, ji))
     coo_matrix = sparse.coo_matrix(coo_content)
     return coo_matrix.tocsr()
 
@@ -470,7 +472,8 @@ def directed_node_node_connectivity(
 ) -> sparse.csr_matrix:
     i = edge_node_connectivity[:, 0]
     j = edge_node_connectivity[:, 1]
-    coo_content = (j, (i, j))
+    edge_index = np.arange(len(edge_node_connectivity))
+    coo_content = (edge_index, (i, j))
     n = max(i.max(), j.max()) + 1
     coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
     return coo_matrix.tocsr()
@@ -479,9 +482,11 @@ def directed_node_node_connectivity(
 def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matrix:
     i = edge_node_connectivity[:, 0]
     j = edge_node_connectivity[:, 1]
+    edge_index = np.arange(len(edge_node_connectivity))
     ij = np.concatenate([i, j])
     ji = np.concatenate([j, i])
-    coo_content = (ji, (ij, ji))
+    edge_index = np.concatenate([edge_index, edge_index])
+    coo_content = (edge_index, (ij, ji))
     coo_matrix = sparse.coo_matrix(coo_content)
     return coo_matrix.tocsr()
 

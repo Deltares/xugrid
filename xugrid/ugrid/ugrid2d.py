@@ -605,6 +605,11 @@ class Ugrid2d(AbstractUgrid):
         """
         Face to face connectivity. Derived from shared edges.
 
+        The connectivity is represented as an adjacency matrix in CSR format,
+        with the row and column indices as a (0-based) face index. The data of
+        the matrix contains the edge index as every connection is formed by a
+        shared edge.
+
         Returns
         -------
         connectivity: csr_matrix
