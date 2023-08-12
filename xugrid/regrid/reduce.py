@@ -105,14 +105,10 @@ def maximum(values, indices, weights):
 
 
 def mode(values, indices, weights):
-    # Area weighted mode
-    # Reuse weights to do counting: no allocations
-    # The alternative is defining a separate frequency array in which to add
-    # the weights. This implementation is less efficient in terms of looping.
-    # With many unique values, it keeps having to loop through a big part of
-    # the weights array... but it would do so with a separate frequency array
-    # as well. There are somewhat more elements to traverse in this case.
-    s = indices.size
+    # Area weighted mode. We use a linear search to accumulate weights, as we
+    # generally expect a relatively small number of elements in the indices and
+    # weights arrays.
+    accum = weights.copy()
     w_sum = 0
     for running_total, (i, w) in enumerate(zip(indices, weights)):
         v = values[i]
@@ -121,17 +117,17 @@ def mode(values, indices, weights):
         w_sum += 1
         for j in range(running_total):  # Compare with previously found values
             if values[j] == v:  # matches previous value
-                weights[j] += w  # increase previous weight
+                accum[j] += w  # increase previous weight sum
                 break
 
     if w_sum == 0:  # It skipped everything: only nodata values
         return np.nan
     else:  # Find value with highest frequency
         w_max = 0
-        for i in range(s):
-            w = weights[i]
-            if w > w_max:
-                w_max = w
+        for i in range(accum.size):
+            w_accum = accum[i]
+            if w_accum > w_max:
+                w_max = w_accum
                 v = values[i]
         return v
 

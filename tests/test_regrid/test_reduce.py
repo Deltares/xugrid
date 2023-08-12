@@ -52,6 +52,8 @@ def test_mode(args):
     args = (values, indices, weights)
     actual = reduce.mode(*args)
     assert np.allclose(actual, 1.0)
+    # The weights shouldn't be mutated!
+    assert np.allclose(weights, 0.5)
 
 
 def test_median(args):
