@@ -1671,3 +1671,19 @@ class Ugrid2d(AbstractUgrid):
                 f"Dimension {dim} is not a face, node, or edge dimension of the"
                 " Ugrid2d topology."
             )
+
+    def bounding_polygon(self) -> "shapely.Polygon":  # type: ignore # noqa
+        """
+        Construct the bounding polygon of the grid.
+        
+        This polygon may include holes if the grid also contains holes.
+        """
+        import shapely
+
+        def _bbox_area(bounds):
+            return (bounds[2] - bounds[0]) * (bounds[3] - bounds[1])
+
+        edges = self.node_coordinates[self.boundary_node_connectivity]
+        collection = shapely.polygonize(shapely.linestrings(edges))
+        polygon = max(collection.geoms, key=lambda x: _bbox_area(x.bounds))
+        return polygon

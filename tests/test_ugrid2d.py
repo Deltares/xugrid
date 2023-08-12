@@ -901,6 +901,13 @@ def test_from_geodataframe():
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
+def test_bounding_polygon():
+    grid = grid2d()
+    polygon = grid.bounding_polygon()
+    assert isinstance(polygon, shapely.Polygon)
+    assert np.allclose(grid.bounds, polygon.bounds)
+
+
 def test_to_shapely():
     grid = grid2d()
 

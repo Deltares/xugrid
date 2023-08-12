@@ -32,6 +32,8 @@ Added
 - :meth:`xugrid.UgridDatasetAccessor.rename` and
   :meth:`xugrid.UgridDataArrayAccessor.rename` to rename both topology and the
   associated dimensions.
+- :meth:`xugrid.Ugrid2d.polygon_bounds` has been added to get a polygon
+  describing the bounds of the grid.
 
 Fixed
 ~~~~~
@@ -46,6 +48,8 @@ Fixed
   reference system).
 - :meth:`xugrid.UgridDatasetAccessor.to_geodataframe` will no longer error when
   converting a UgridDataset that does not contain any variables.
+- :meth:`xugrid.OverlapRegridder.regrid` will no longer give incorrect results
+  on repeated calls with the "mode" method.
 
 Changed
 ~~~~~~~
