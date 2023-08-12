@@ -1674,9 +1674,8 @@ class Ugrid2d(AbstractUgrid):
 
     def bounding_polygon(self) -> "shapely.Polygon":  # type: ignore # noqa
         """
-        Construct the bounding polygon of the grid.
-        
-        This polygon may include holes if the grid also contains holes.
+        Construct the bounding polygon of the grid. This polygon may include
+        holes if the grid also contains holes.
         """
         import shapely
 
