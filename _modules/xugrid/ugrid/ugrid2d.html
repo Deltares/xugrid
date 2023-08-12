@@ -2047,7 +2047,23 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> is not a face, node, or edge dimension of the&quot;</span>
                 <span class="s2">&quot; Ugrid2d topology.&quot;</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">bounding_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;shapely.Polygon&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct the bounding polygon of the grid.</span>
+<span class="sd">        </span>
+<span class="sd">        This polygon may include holes if the grid also contains holes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">shapely</span>
+
+        <span class="k">def</span> <span class="nf">_bbox_area</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">]</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">polygonize</span><span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
+        <span class="n">polygon</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_bbox_area</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">bounds</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">polygon</span></div>
 </pre></div>
 
                 </article>
