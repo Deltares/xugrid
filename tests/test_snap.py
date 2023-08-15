@@ -1,6 +1,7 @@
 import geopandas as gpd
 import numpy as np
 import pytest
+import shapely
 import shapely.geometry as sg
 import xarray as xr
 
@@ -122,3 +123,37 @@ def test_snap_to_grid():
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["resistance"].dims == (uds.ugrid.grid.edge_dimension,)
     # TODO test for returned values...
+
+
+def test_snap_to_grid_with_data():
+    # This caused a failure in 0.6.3
+
+    shape = nlay, nrow, ncol = 3, 9, 9
+    dx = 10.0
+    dy = -10.0
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+    dims = ("layer", "y", "x")
+
+    layer = np.arange(1, nlay + 1)
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"layer": layer, "y": y, "x": x}
+
+    structured = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
+
+    line_x = [2.2, 2.2, 2.2]
+    line_y = [82.0, 40.0, 0.0]
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
+    )
+
+    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+    assert uds["a"].notnull().sum() == 8
+    assert uds["line_index"].notnull().sum() == 8
+    assert uds["line_index"].sum() == 0  # all values should be 0

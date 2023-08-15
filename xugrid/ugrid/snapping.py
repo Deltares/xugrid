@@ -446,7 +446,7 @@ def snap_to_grid(
     edges, line_index = _find_largest_edges(segment_edges, edge_index, line_index)
     shapely_index = shapely_index[line_index]
 
-    uds = _create_output_dataset(lines, topology, edges, line_index)
+    uds = _create_output_dataset(lines, topology, edges, shapely_index)
     gdf = _create_output_gdf(
         lines, vertices, edge_node_connectivity, edges, shapely_index
     )
