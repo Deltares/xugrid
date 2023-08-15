@@ -515,6 +515,22 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     return AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 
 
+def perimeter(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+):
+    nodes = np.column_stack([node_x, node_y])
+    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    coordinates = nodes[closed]
+    # Shift coordinates to avoid precision loss
+    coordinates[..., 0] -= node_x.mean()
+    coordinates[..., 1] -= node_y.mean()
+    dxy = np.diff(coordinates, axis=1)
+    return np.linalg.norm(dxy, axis=-1).sum(axis=1)
+
+
 def area(
     face_node_connectivity: IntArray,
     fill_value: int,

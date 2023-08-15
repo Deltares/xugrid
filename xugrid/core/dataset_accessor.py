@@ -281,6 +281,23 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             datasets.append(self._raster(xx, yy, index))
         return xr.merge(datasets)
 
+    def to_aperiodic(self, xmax: float):
+        """
+        Convert this grid from a periodic grid (where the rightmost boundary shares its
+        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes
+        are separate from the rightmost nodes.
+
+        Parameters
+        ----------
+        xmax: float
+            The x-value of the newly created rightmost boundary nodes.
+        """
+        grids = []
+        for grid in self.grids:
+            grid, obj = self.grid.to_aperiodic(xmax=xmax, obj=self.obj)
+            grids.append(grid)
+        return UgridDataset(obj, grids)
+
     def to_dataset(self, optional_attributes: bool = False):
         """
         Converts this UgridDataArray or UgridDataset into a standard

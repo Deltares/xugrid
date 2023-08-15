@@ -122,6 +122,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Perimeter
+        self._perimeter = None
         # Area
         self._area = None
         # Centroids
@@ -163,6 +165,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Perimeter
+        self._perimeter = None
         # Area
         self._area = None
         # Centroids
@@ -517,6 +521,17 @@ class Ugrid2d(AbstractUgrid):
                 self.node_y,
             )
         return self._area
+
+    @property
+    def perimeter(self) -> FloatArray:
+        if self._perimeter is None:
+            self._perimeter = connectivity.perimeter(
+                self.face_node_connectivity,
+                self.fill_value,
+                self.node_x,
+                self.node_y,
+            )
+        return self._perimeter
 
     @property
     def face_bounds(self):
@@ -1409,6 +1424,82 @@ class Ugrid2d(AbstractUgrid):
             attrs=grid._attrs,
         )
         return merged_grid, indexes
+
+    def to_aperiodic(self, xmax: float, obj=None):
+        """
+        Convert this grid from a periodic grid (where the rightmost boundary shares its
+        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes
+        are separate from the rightmost nodes.
+
+        Parameters
+        ----------
+        xmax: float
+            The x-value of the newly created rightmost boundary nodes.
+        obj: xr.DataArray or xr.Dataset
+
+        Returns
+        -------
+        aperiodic_grid: Ugrid2d
+        aligned: xr.DataArray or xr.Dataset
+        """
+        xmin, _, xmax, _ = self.bounds
+        half_domain = 0.5 * (xmax - xmin)
+
+        x = self.face_node_coordinates[..., 0]
+        is_periodic = (np.nanmax(x, axis=1)[:, np.newaxis] - x) > half_domain
+        periodic_nodes = self.face_node_connectivity[is_periodic]
+
+        uniques, new_nodes = np.unique(periodic_nodes, return_inverse=True)
+        new_nodes += self.n_node
+        new_x = np.full(uniques.size, xmax)
+        new_y = self.node_y[uniques]
+        new_faces = self.face_node_connectivity.copy()
+        new_faces[is_periodic] = new_nodes
+
+        # edge_node_connectivity must be rederived!
+        new = Ugrid2d(
+            node_x=np.concatenate((self.node_x, new_x)),
+            node_y=np.concatenate((self.node_y, new_y)),
+            face_node_connectivity=new_faces,
+            fill_value=self.fill_value,
+            name=self.name,
+            edge_node_connectivity=None,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self.attrs,
+        )
+
+        edge_index = None
+        if self._edge_node_connectivity is not None:
+            # Use a casting trick so we can use numpy isin.
+            edges = (
+                np.sort(self.edge_node_connectivity.astype(np.int32), axis=1)
+                .view(np.int64)
+                .ravel()
+            )
+            sorter = np.argsort(edges)
+            new_edges = (
+                new.edge_node_connectivity.astype(np.int32).view(np.int64).ravel()
+            )
+            is_old = np.isin(new_edges, edges)
+            edge_index = np.full(new.n_edge, -1)
+            edge_index[is_old] = np.searchsorted(
+                edges, new_edges[is_old], sorter=sorter
+            )
+
+        if obj is not None:
+            indexes = {
+                self.face_dimension: pd.RangeIndex(0, self.n_face),
+                self.node_dimension: pd.Index(
+                    np.concatenate((np.arange(self.n_node), new_nodes))
+                ),
+            }
+            if edge_index is not None:
+                indexes[self.edge_dimension] = pd.Index(edge_index)
+            return new, obj.isel(**indexes)
+        else:
+            return new
 
     def triangulate(self):
         """
