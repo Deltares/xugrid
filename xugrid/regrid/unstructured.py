@@ -50,7 +50,7 @@ class UnstructuredGrid2d:
         return self.ugrid_topology.area
 
     def convert_to(self, matched_type):
-        if type(self) == matched_type:
+        if isinstance(self, matched_type):
             return self
         else:
             TypeError(f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}")

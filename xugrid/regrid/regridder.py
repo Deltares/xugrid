@@ -229,7 +229,7 @@ class BaseRegridder(abc.ABC):
 
         regridded = self.regrid_dataarray(obj, source_dims)
 
-        if type(self._target) is StructuredGrid2d:
+        if isinstance(self._target, StructuredGrid2d):
             regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
@@ -527,7 +527,7 @@ class BarycentricInterpolator(BaseRegridder):
 
     def _compute_weights(self, source, target):
         source, target = convert_to_match(source, target)
-        if type(source) == StructuredGrid2d:
+        if isinstance(source, StructuredGrid2d):
             source_index, target_index, weights = source.linear_weights(target)
         else:
             source_index, target_index, weights = source.barycentric(target)
