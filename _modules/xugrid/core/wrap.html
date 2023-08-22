@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xugrid.core.wrap &#8212; Xugrid 0.6.3 documentation</title>
+    <title>xugrid.core.wrap &#8212; Xugrid 0.6.4 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
@@ -38,9 +38,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=85d931b8"></script>
+    <script src="../../../_static/documentation_options.js?v=153a81be"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/core/wrap';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -564,8 +564,12 @@ document.write(`
     <span class="k">return</span> <span class="n">obj</span>
 
 
-<div class="viewcode-block" id="UgridDataArray"><a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray">[docs]</a><span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">(</span><span class="n">DataArrayForwardMixin</span><span class="p">):</span>
-<div class="viewcode-block" id="UgridDataArray.__init__"><a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">):</span>
+<div class="viewcode-block" id="UgridDataArray">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray">[docs]</a>
+<span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">(</span><span class="n">DataArrayForwardMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="UgridDataArray.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;obj must be xarray.DataArray. Received instead: &quot;</span>
@@ -579,6 +583,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">grid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
@@ -606,7 +611,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="UgridDataArray.from_structured"><a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="UgridDataArray.from_structured">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a UgridDataArray from a (structured) xarray DataArray.</span>
@@ -633,11 +640,17 @@ document.write(`
             <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">],</span>
             <span class="n">name</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">face_da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">face_da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="UgridDataset"><a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset">[docs]</a><span class="k">class</span> <span class="nc">UgridDataset</span><span class="p">(</span><span class="n">DatasetForwardMixin</span><span class="p">):</span>
-<div class="viewcode-block" id="UgridDataset.__init__"><a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+
+<div class="viewcode-block" id="UgridDataset">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset">[docs]</a>
+<span class="k">class</span> <span class="nc">UgridDataset</span><span class="p">(</span><span class="n">DatasetForwardMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="UgridDataset.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">grids</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -679,6 +692,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_grids</span> <span class="o">=</span> <span class="n">grids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -736,7 +750,9 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="UgridDataset.from_geodataframe"><a class="viewcode-back" href="../../../api/xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="UgridDataset.from_geodataframe">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe into the appropriate Ugrid topology and dataset.</span>
@@ -749,7 +765,9 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="n">grid_from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div></div>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div>
+</div>
+
 </pre></div>
 
                 </article>
@@ -802,7 +820,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

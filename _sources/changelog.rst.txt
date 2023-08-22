@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.6.4] 2023-08-22
+------------------
+
+Fixed
+~~~~~
+
+- Bug in :func:`xugrid.snap_to_grid`, which caused an ``IndexError``. 
+  See `#122 <https://github.com/Deltares/xugrid/issues/122>`_.
+
 
 [0.6.3] 2023-08-12
 ------------------

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xugrid.ugrid.ugrid2d &#8212; Xugrid 0.6.3 documentation</title>
+    <title>xugrid.ugrid.ugrid2d &#8212; Xugrid 0.6.4 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
@@ -38,9 +38,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=85d931b8"></script>
+    <script src="../../../_static/documentation_options.js?v=153a81be"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/ugrid/ugrid2d';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -424,7 +424,9 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
 
-<div class="viewcode-block" id="Ugrid2d"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d">[docs]</a><span class="k">class</span> <span class="nc">Ugrid2d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid2d">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d">[docs]</a>
+<span class="k">class</span> <span class="nc">Ugrid2d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores the topological data of a 2-D unstructured grid.</span>
 
@@ -455,7 +457,9 @@ document.write(`
 <span class="sd">        A name entry is ignored, as name is given explicitly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Ugrid2d.__init__"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Ugrid2d.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.html#xugrid.Ugrid2d.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
         <span class="n">node_y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
@@ -533,6 +537,7 @@ document.write(`
 
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
         <span class="c1"># Meshkernel</span>
@@ -558,7 +563,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_voronoi_topology</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_centroid_triangulation</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Ugrid2d.from_meshkernel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_meshkernel.html#xugrid.Ugrid2d.from_meshkernel">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Ugrid2d.from_meshkernel">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_meshkernel.html#xugrid.Ugrid2d.from_meshkernel">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_meshkernel</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">mesh</span><span class="p">,</span>
@@ -603,7 +610,10 @@ document.write(`
             <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.from_dataset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_dataset.html#xugrid.Ugrid2d.from_dataset">[docs]</a>    <span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Ugrid2d.from_dataset">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_dataset.html#xugrid.Ugrid2d.from_dataset">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the 2D UGRID topology information from an xarray Dataset.</span>
@@ -673,6 +683,7 @@ document.write(`
             <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">_get_name_and_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_connectivity&quot;</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="n">conventions</span><span class="o">.</span><span class="n">DEFAULT_ATTRS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -680,7 +691,9 @@ document.write(`
             <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;_FillValue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">attrs</span>
 
-<div class="viewcode-block" id="Ugrid2d.to_dataset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_dataset.html#xugrid.Ugrid2d.to_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span>
+<div class="viewcode-block" id="Ugrid2d.to_dataset">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_dataset.html#xugrid.Ugrid2d.to_dataset">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span>
@@ -751,6 +764,7 @@ document.write(`
 
         <span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_attrs</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
+
 
     <span class="c1"># These are all optional/derived UGRID attributes. They are not computed by</span>
     <span class="c1"># default, only when called upon.</span>
@@ -1160,7 +1174,9 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span>
 
-<div class="viewcode-block" id="Ugrid2d.validate_edge_node_connectivity"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.validate_edge_node_connectivity.html#xugrid.Ugrid2d.validate_edge_node_connectivity">[docs]</a>    <span class="k">def</span> <span class="nf">validate_edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid2d.validate_edge_node_connectivity">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.validate_edge_node_connectivity.html#xugrid.Ugrid2d.validate_edge_node_connectivity">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_edge_node_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mark valid edges, by comparing face_node_connectivity and</span>
 <span class="sd">        edge_node_connectivity. Edges that are not part of a face, as well as</span>
@@ -1190,7 +1206,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.assign_face_coords"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.assign_face_coords.html#xugrid.Ugrid2d.assign_face_coords">[docs]</a>    <span class="k">def</span> <span class="nf">assign_face_coords</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.assign_face_coords">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.assign_face_coords.html#xugrid.Ugrid2d.assign_face_coords">[docs]</a>
+    <span class="k">def</span> <span class="nf">assign_face_coords</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
@@ -1226,7 +1245,10 @@ document.write(`
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.locate_points"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points">[docs]</a>    <span class="k">def</span> <span class="nf">locate_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.locate_points">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">locate_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face points are located.</span>
 
@@ -1240,7 +1262,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.intersect_edges"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_edges.html#xugrid.Ugrid2d.intersect_edges">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.intersect_edges">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_edges.html#xugrid.Ugrid2d.intersect_edges">[docs]</a>
+    <span class="k">def</span> <span class="nf">intersect_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face edges are located and compute the intersection with</span>
 <span class="sd">        the face edges.</span>
@@ -1260,7 +1285,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.locate_bounding_box"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box">[docs]</a>    <span class="k">def</span> <span class="nf">locate_bounding_box</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.locate_bounding_box">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box">[docs]</a>
+    <span class="k">def</span> <span class="nf">locate_bounding_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1285,7 +1313,10 @@ document.write(`
             <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_y</span> <span class="o">&lt;</span> <span class="n">ymax</span><span class="p">)</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.compute_barycentric_weights"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.compute_barycentric_weights.html#xugrid.Ugrid2d.compute_barycentric_weights">[docs]</a>    <span class="k">def</span> <span class="nf">compute_barycentric_weights</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.compute_barycentric_weights">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.compute_barycentric_weights.html#xugrid.Ugrid2d.compute_barycentric_weights">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_barycentric_weights</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1303,7 +1334,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">compute_barycentric_weights</span><span class="p">(</span><span class="n">points</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.rasterize_like"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize_like.html#xugrid.Ugrid2d.rasterize_like">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.rasterize_like">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize_like.html#xugrid.Ugrid2d.rasterize_like">[docs]</a>
+    <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1325,7 +1359,10 @@ document.write(`
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">index</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.rasterize"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize.html#xugrid.Ugrid2d.rasterize">[docs]</a>    <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.rasterize">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.rasterize.html#xugrid.Ugrid2d.rasterize">[docs]</a>
+    <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1361,7 +1398,10 @@ document.write(`
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ymax</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="o">-</span><span class="n">d</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rasterize_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.topology_subset"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset">[docs]</a>    <span class="k">def</span> <span class="nf">topology_subset</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Ugrid2d.topology_subset">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset">[docs]</a>
+    <span class="k">def</span> <span class="nf">topology_subset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">face_index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoolArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">],</span> <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1437,6 +1477,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">grid</span></div>
 
+
     <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1449,7 +1490,9 @@ document.write(`
         <span class="n">face_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_bounding_box</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">face_index</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Ugrid2d.isel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.isel.html#xugrid.Ugrid2d.isel">[docs]</a>    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid2d.isel">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.isel.html#xugrid.Ugrid2d.isel">[docs]</a>
+    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select based on node, edge, or face.</span>
 
@@ -1509,6 +1552,7 @@ document.write(`
             <span class="k">return</span> <span class="n">grid</span><span class="p">,</span> <span class="n">finalized_indexers</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">grid</span></div>
+
 
     <span class="k">def</span> <span class="nf">_validate_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">slice</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
@@ -1599,7 +1643,9 @@ document.write(`
         <span class="n">coords</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">section_coordinates</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Ugrid2d.sel_points"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points">[docs]</a>    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid2d.sel_points">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
@@ -1634,7 +1680,10 @@ document.write(`
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.sel"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel">[docs]</a>    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.sel">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel">[docs]</a>
+    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find selection in the UGRID x and y coordinates.</span>
 
@@ -1680,7 +1729,10 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.label_partitions"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions">[docs]</a>    <span class="k">def</span> <span class="nf">label_partitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Ugrid2d.label_partitions">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions">[docs]</a>
+    <span class="k">def</span> <span class="nf">label_partitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate partition labesl for this grid topology using METIS:</span>
 <span class="sd">        https://github.com/KarypisLab/METIS</span>
@@ -1714,7 +1766,10 @@ document.write(`
             <span class="n">grid</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.partition"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.partition.html#xugrid.Ugrid2d.partition">[docs]</a>    <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.partition">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.partition.html#xugrid.Ugrid2d.partition">[docs]</a>
+    <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Partition this grid topology using METIS:</span>
 <span class="sd">        https://github.com/KarypisLab/METIS</span>
@@ -1737,7 +1792,10 @@ document.write(`
         <span class="n">indices</span> <span class="o">=</span> <span class="n">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.merge_partitions"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Ugrid2d.merge_partitions">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid2d&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Merge grid partitions into a single whole.</span>
@@ -1787,7 +1845,10 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.triangulate"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>    <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.triangulate">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>
+    <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Triangulate this UGRID2D topology, breaks more complex polygons down</span>
 <span class="sd">        into triangles.</span>
@@ -1800,6 +1861,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">add_exterior</span><span class="p">:</span>
@@ -1822,7 +1884,9 @@ document.write(`
         <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>
+    <span class="k">def</span> <span class="nf">tesselate_centroidal_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a centroidal Voronoi tesselation of this UGRID2D topology.</span>
 
@@ -1841,7 +1905,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.tesselate_circumcenter_voronoi"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi">[docs]</a>    <span class="k">def</span> <span class="nf">tesselate_circumcenter_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.tesselate_circumcenter_voronoi">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi">[docs]</a>
+    <span class="k">def</span> <span class="nf">tesselate_circumcenter_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a circumcenter Voronoi tesselation of this UGRID2D topology.</span>
 
@@ -1860,7 +1927,10 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.reverse_cuthill_mckee"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.reverse_cuthill_mckee.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.reverse_cuthill_mckee">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.reverse_cuthill_mckee.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>
+    <span class="k">def</span> <span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reduces bandwith of the connectivity matrix.</span>
 
@@ -1882,6 +1952,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">reordering</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">reordered_grid</span><span class="p">,</span> <span class="n">reordering</span></div>
+
 
     <span class="k">def</span> <span class="nf">refine_polygon</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1948,7 +2019,9 @@ document.write(`
         <span class="n">ugrid</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="n">_mesh_kernel</span>
         <span class="k">return</span> <span class="n">ugrid</span>
 
-<div class="viewcode-block" id="Ugrid2d.from_geodataframe"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Ugrid2d.from_geodataframe">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe of polygons to UGRID2D topology.</span>
@@ -1962,7 +2035,10 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.from_structured_bounds"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured_bounds.html#xugrid.Ugrid2d.from_structured_bounds">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Ugrid2d.from_structured_bounds">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured_bounds.html#xugrid.Ugrid2d.from_structured_bounds">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_structured_bounds</span><span class="p">(</span>
         <span class="n">x_bounds</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">y_bounds</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -1985,7 +2061,10 @@ document.write(`
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>  <span class="c1"># lower right</span>
         <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.from_structured"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Ugrid2d.from_structured">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
         <span class="n">x_bounds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2008,7 +2087,10 @@ document.write(`
             <span class="n">y_bounds</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Ugrid2d.to_shapely"><a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_shapely.html#xugrid.Ugrid2d.to_shapely">[docs]</a>    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ugrid2d.to_shapely">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_shapely.html#xugrid.Ugrid2d.to_shapely">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert UGRID topology to shapely objects.</span>
 
@@ -2049,6 +2131,7 @@ document.write(`
                 <span class="s2">&quot; Ugrid2d topology.&quot;</span>
             <span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">bounding_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;shapely.Polygon&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct the bounding polygon of the grid. This polygon may include</span>
@@ -2063,6 +2146,7 @@ document.write(`
         <span class="n">collection</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">polygonize</span><span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
         <span class="n">polygon</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_bbox_area</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">bounds</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">polygon</span></div>
+
 </pre></div>
 
                 </article>
@@ -2115,7 +2199,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

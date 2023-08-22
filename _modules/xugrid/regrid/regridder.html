@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xugrid.regrid.regridder &#8212; Xugrid 0.6.3 documentation</title>
+    <title>xugrid.regrid.regridder &#8212; Xugrid 0.6.4 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
@@ -38,9 +38,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=85d931b8"></script>
+    <script src="../../../_static/documentation_options.js?v=153a81be"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/regrid/regridder';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -689,7 +689,9 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CentroidLocatorRegridder"><a class="viewcode-back" href="../../../api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder">[docs]</a><span class="k">class</span> <span class="nc">CentroidLocatorRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
+<div class="viewcode-block" id="CentroidLocatorRegridder">
+<a class="viewcode-back" href="../../../api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder">[docs]</a>
+<span class="k">class</span> <span class="nc">CentroidLocatorRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The CentroidLocatorRegridded regrids by searching the source grid for the</span>
 <span class="sd">    centroids of the target grid.</span>
@@ -739,6 +741,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
 
+
 <span class="k">class</span> <span class="nc">BaseOverlapRegridder</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">convert_to_match</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
@@ -766,7 +769,9 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="OverlapRegridder"><a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder">[docs]</a><span class="k">class</span> <span class="nc">OverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
+<div class="viewcode-block" id="OverlapRegridder">
+<a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder">[docs]</a>
+<span class="k">class</span> <span class="nc">OverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The OverlapRegridder regrids by computing which target faces overlap with</span>
 <span class="sd">    which source faces. It stores the area of overlap, which can be used in</span>
@@ -799,7 +804,9 @@ document.write(`
         <span class="n">k</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">reduce</span><span class="o">.</span><span class="n">ASBOLUTE_OVERLAP_METHODS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
 
-<div class="viewcode-block" id="OverlapRegridder.__init__"><a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="OverlapRegridder.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
@@ -807,6 +814,7 @@ document.write(`
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -823,7 +831,10 @@ document.write(`
         <span class="k">return</span> <span class="n">instance</span></div>
 
 
-<div class="viewcode-block" id="RelativeOverlapRegridder"><a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder">[docs]</a><span class="k">class</span> <span class="nc">RelativeOverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RelativeOverlapRegridder">
+<a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder">[docs]</a>
+<span class="k">class</span> <span class="nc">RelativeOverlapRegridder</span><span class="p">(</span><span class="n">BaseOverlapRegridder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The RelativeOverlapRegridder regrids by computing which target faces</span>
 <span class="sd">    overlap with which source faces. It stores the area of overlap, which can</span>
@@ -851,7 +862,9 @@ document.write(`
         <span class="n">k</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">reduce</span><span class="o">.</span><span class="n">RELATIVE_OVERLAP_METHODS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
 
-<div class="viewcode-block" id="RelativeOverlapRegridder.__init__"><a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="RelativeOverlapRegridder.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
@@ -859,6 +872,7 @@ document.write(`
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_compute_weights</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -875,7 +889,10 @@ document.write(`
         <span class="k">return</span> <span class="n">instance</span></div>
 
 
-<div class="viewcode-block" id="BarycentricInterpolator"><a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator">[docs]</a><span class="k">class</span> <span class="nc">BarycentricInterpolator</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BarycentricInterpolator">
+<a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator">[docs]</a>
+<span class="k">class</span> <span class="nc">BarycentricInterpolator</span><span class="p">(</span><span class="n">BaseRegridder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The BaryCentricInterpolator searches the centroid of every face of the</span>
 <span class="sd">    target grid in the source grid. It finds by which source faces the centroid</span>
@@ -892,7 +909,9 @@ document.write(`
 
     <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">make_regrid</span><span class="p">(</span><span class="n">reduce</span><span class="o">.</span><span class="n">mean</span><span class="p">)}</span>
 
-<div class="viewcode-block" id="BarycentricInterpolator.__init__"><a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="BarycentricInterpolator.__init__">
+<a class="viewcode-back" href="../../../api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="n">UgridDataArray</span><span class="p">,</span>
@@ -901,6 +920,7 @@ document.write(`
         <span class="c1"># Since the weights for a target face sum up to 1.0, a weight mean is</span>
         <span class="c1"># appropriate, and takes care of NaN values in the source data.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">convert_to_match</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
@@ -933,6 +953,7 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
+
 </pre></div>
 
                 </article>
@@ -985,7 +1006,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>

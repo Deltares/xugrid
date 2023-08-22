@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xarray.core.common &#8212; Xugrid 0.6.3 documentation</title>
+    <title>xarray.core.common &#8212; Xugrid 0.6.4 documentation</title>
   
   
   
@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
@@ -38,9 +38,9 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=85d931b8"></script>
+    <script src="../../../_static/documentation_options.js?v=153a81be"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/common';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -391,7 +391,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">xarray.core.indexing</span> <span class="kn">import</span> <span class="n">BasicIndexer</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span>
 <span class="kn">from</span> <span class="nn">xarray.core.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
 <span class="kn">from</span> <span class="nn">xarray.core.parallelcompat</span> <span class="kn">import</span> <span class="n">get_chunked_array_type</span><span class="p">,</span> <span class="n">guess_chunkmanager</span>
-<span class="kn">from</span> <span class="nn">xarray.core.pdcompat</span> <span class="kn">import</span> <span class="n">_convert_base_to_offset</span>
 <span class="kn">from</span> <span class="nn">xarray.core.pycompat</span> <span class="kn">import</span> <span class="n">is_chunked_array</span>
 <span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Frozen</span><span class="p">,</span>
@@ -684,9 +683,7 @@ document.write(`
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Don&#39;t accidentally shadow custom AttributeErrors, e.g.</span>
             <span class="c1"># DataArray.dims.setter</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="si">{!r}</span><span class="s2"> object has no attribute </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">name</span>
-            <span class="p">):</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">:</span>
                 <span class="k">raise</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;cannot set attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> on a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object. Use __setitem__ style&quot;</span>
@@ -986,9 +983,17 @@ document.write(`
 <span class="sd">        Dataset.swap_dims</span>
 <span class="sd">        Dataset.set_coords</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
+
         <span class="n">coords_combined</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coords_kwargs</span><span class="p">,</span> <span class="s2">&quot;assign_coords&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_assign_results</span><span class="p">(</span><span class="n">coords_combined</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="p">:</span> <span class="n">Coordinates</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_assign_results</span><span class="p">(</span><span class="n">coords_combined</span><span class="p">)</span>
+
         <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
@@ -1005,6 +1010,36 @@ document.write(`
 <span class="sd">            positional arguments passed into ``attrs.update``.</span>
 <span class="sd">        **kwargs</span>
 <span class="sd">            keyword arguments passed into ``attrs.update``.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; dataset = xr.Dataset({&quot;temperature&quot;: [25, 30, 27]})</span>
+<span class="sd">        &gt;&gt;&gt; dataset</span>
+<span class="sd">        &lt;xarray.Dataset&gt;</span>
+<span class="sd">        Dimensions:      (temperature: 3)</span>
+<span class="sd">        Coordinates:</span>
+<span class="sd">          * temperature  (temperature) int64 25 30 27</span>
+<span class="sd">        Data variables:</span>
+<span class="sd">            *empty*</span>
+
+<span class="sd">        &gt;&gt;&gt; new_dataset = dataset.assign_attrs(</span>
+<span class="sd">        ...     units=&quot;Celsius&quot;, description=&quot;Temperature data&quot;</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; new_dataset</span>
+<span class="sd">        &lt;xarray.Dataset&gt;</span>
+<span class="sd">        Dimensions:      (temperature: 3)</span>
+<span class="sd">        Coordinates:</span>
+<span class="sd">          * temperature  (temperature) int64 25 30 27</span>
+<span class="sd">        Data variables:</span>
+<span class="sd">            *empty*</span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            units:        Celsius</span>
+<span class="sd">            description:  Temperature data</span>
+
+<span class="sd">        # Attributes of the new dataset</span>
+
+<span class="sd">        &gt;&gt;&gt; new_dataset.attrs</span>
+<span class="sd">        {&#39;units&#39;: &#39;Celsius&#39;, &#39;description&#39;: &#39;Temperature data&#39;}</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1329,6 +1364,7 @@ document.write(`
 
         <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
         <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">ResolvedTimeResampleGrouper</span><span class="p">,</span> <span class="n">TimeResampleGrouper</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.pdcompat</span> <span class="kn">import</span> <span class="n">_convert_base_to_offset</span>
         <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1670,9 +1706,7 @@ document.write(`
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_elements</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;isin() argument must be convertible to an array: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">test_elements</span>
-                <span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;isin() argument must be convertible to an array: </span><span class="si">{</span><span class="n">test_elements</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_elements</span><span class="p">,</span> <span class="p">(</span><span class="n">Variable</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)):</span>
             <span class="c1"># need to explicitly pull out data to support dask arrays as the</span>
@@ -1838,7 +1872,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="full_like"><a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a><span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<div class="viewcode-block" id="full_like">
+<a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a>
+<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2025,6 +2061,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected DataArray, Dataset, or Variable&quot;</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -2128,7 +2165,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="zeros_like"><a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a><span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<div class="viewcode-block" id="zeros_like">
+<a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a>
+<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2210,6 +2249,7 @@ document.write(`
     <span class="p">)</span></div>
 
 
+
 <span class="nd">@overload</span>
 <span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
@@ -2270,7 +2310,9 @@ document.write(`
     <span class="o">...</span>
 
 
-<div class="viewcode-block" id="ones_like"><a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a><span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<div class="viewcode-block" id="ones_like">
+<a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a>
+<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2342,6 +2384,7 @@ document.write(`
         <span class="n">chunked_array_type</span><span class="o">=</span><span class="n">chunked_array_type</span><span class="p">,</span>
         <span class="n">from_array_kwargs</span><span class="o">=</span><span class="n">from_array_kwargs</span><span class="p">,</span>
     <span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">get_chunksizes</span><span class="p">(</span>
@@ -2447,7 +2490,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
     <br/>
   </p>
 </div>
