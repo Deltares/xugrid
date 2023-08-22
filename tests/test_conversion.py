@@ -208,7 +208,8 @@ def test_infer_bounds(
 
 def test_infer_bounds_errors(structured_mesh_ascending):
     up = structured_mesh_ascending
-    up["x"].values[2] = 3.0
+    up = up.assign_coords(x=[2.0, 4.0, 3.0, 8.0])
+
     with pytest.raises(ValueError, match="x is not monotonic"):
         cv.infer_bounds(up, "x")
 
