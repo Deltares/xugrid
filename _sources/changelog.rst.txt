@@ -45,7 +45,7 @@ Added
 - :meth:`xugrid.UgridDatasetAccessor.rename` and
   :meth:`xugrid.UgridDataArrayAccessor.rename` to rename both topology and the
   associated dimensions.
-- :meth:`xugrid.Ugrid2d.polygon_bounds` has been added to get a polygon
+- :meth:`xugrid.Ugrid2d.bounding_polygon` has been added to get a polygon
   describing the bounds of the grid.
 
 Fixed

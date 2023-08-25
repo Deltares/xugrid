@@ -2132,6 +2132,8 @@ document.write(`
             <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Ugrid2d.bounding_polygon">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.bounding_polygon.html#xugrid.Ugrid2d.bounding_polygon">[docs]</a>
     <span class="k">def</span> <span class="nf">bounding_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;shapely.Polygon&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct the bounding polygon of the grid. This polygon may include</span>
@@ -2146,6 +2148,7 @@ document.write(`
         <span class="n">collection</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">polygonize</span><span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
         <span class="n">polygon</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_bbox_area</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">bounds</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">polygon</span></div>
+</div>
 
 </pre></div>
 
@@ -2199,7 +2202,7 @@ document.write(`
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
     <br/>
   </p>
 </div>
