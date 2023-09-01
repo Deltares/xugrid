@@ -9,10 +9,11 @@ underlying arrays. This orthogonality does not exist for unstructured grids, as
 the data for all faces cannot be stored in a two-dimensional array and is
 stored in a one-dimensional array instead.
 
-Xugrid provides tools for efficient spatial selection, via ``.ugrid.sel``.
-Additionally, xugrid makes sure that the regular ``.sel`` and ``.isel``
-operations on a UGRID dimension always return a valid grid topology. Finally
-xugrid provides utilities to select data at points and lines.
+Xugrid provides tools for convenient spatial selection, primarily via the
+``.ugrid.sel`` method; its behavior is comparable to xarray's ``.sel`` method.
+The ``.ugrid.sel`` method should only be used for selection in the x or y
+dimension. Selections along other dimension (such as time) should be performed
+by xarray's ``.sel`` instead (without the ``ugrid`` accessor).
 
 The examples below demonstrate the various ways to select data.
 
@@ -23,6 +24,7 @@ The following imports suffice for the examples.
 """
 # %%
 import matplotlib.pyplot as plt
+import numpy as np
 import shapely
 
 import xugrid as xu
@@ -39,6 +41,14 @@ uda.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 # takes several types of arguments, like its xarray equivalent. The return type
 # and shape of the selection operation depends on the argument given.
 #
+# ========== ===========
+# Selection  Result type
+# ========== ===========
+# Subset     xugrid
+# Point      xarray
+# Line       xarray
+# ========== ===========
+#
 # Grid subset selection
 # ---------------------
 #
@@ -49,7 +59,7 @@ subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
 # %%
 # The default arguments of ``x`` and ``y`` are: ``slice(None, None)``.
-# In such a case a copy of the entire grid is returned.
+# In such a case the entire grid is returned.
 
 subset = uda.ugrid.sel()
 subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
@@ -57,8 +67,8 @@ subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 # %%
 # .. note::
 #
-#   ``None`` in a Python slice can be interpreted as "from the start" or "until
-#   the end".
+#   ``None`` in a Python slice can be interpreted as "from the start" or "up to
+#   and including the end".
 #
 # This means we can easily select along a single dimension:
 
@@ -145,6 +155,9 @@ da
 # and y coordinates, all line selection result in xarray DataArrays rather
 # than UgridDataArrays with an associated unstructured grid topology.
 #
+# Line selection is performed by finding all faces that are intersected by
+# the line.
+#
 # We start by defining a utility to show the selection again:
 
 
@@ -162,12 +175,12 @@ def show_line_selection(uda, da, line_x=None, line_y=None):
 
 
 # %%
-# A single value for either x or y will select values along a line:
+# A single value for either x or y in ``.ugrid.sel`` will select values along a
+# line:
 
 da = uda.ugrid.sel(y=465_000.0)
 show_line_selection(uda, da, line_y=465_000.0)
 
-# %%
 # %%
 # Line segments that are not axis aligned can be selected with
 # ``.ugrid.intersect_line``:
@@ -197,3 +210,26 @@ ring = shapely.geometry.Point(155_000.0, 463_000).buffer(50_000.0).exterior
 show_line_selection(uda, da, *shapely.get_coordinates(ring).T)
 
 # %%
+# Index selection
+# ---------------
+#
+# We may also use ordinary index selection to create a subset. This does not
+# require the ``.ugrid`` accessor. For example, to take only the first
+# thousands faces:
+
+subset = uda.isel(mesh2d_nFaces=np.arange(1000))
+subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain", aspect=1, size=5)
+
+# %%
+# For a 2D topology, selecting faces by an index always results in a valid
+# topology. However, selecting by node or edge does not give a guarantee that
+# the result forms a valid 2D topology: e.g. if we only select two nodes, or
+# only two edges from a face, the result cannot form a valid 2D face.
+#
+# To avoid generating invalid topologies, xugrid always checks whether the
+# result of a selection results in a valid 2D topology and raises an error if
+# the result is invalid.
+#
+# In general, index selection should only be performed on the "core" dimension
+# of the UGRID topology. This is the edge dimension for 1D topologies, and the
+# face dimension for 2D topologies.
