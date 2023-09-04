@@ -758,6 +758,12 @@ A name entry is ignored, as name is given explicitly.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.to_dataset.html#xugrid.Ugrid2d.to_dataset" title="xugrid.Ugrid2d.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code></a>([other, optional_attributes])</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nonperiodic</span></code>(xmax[, obj])</p></td>
+<td><p>Convert this grid from a periodic grid (where the rightmost boundary shares its nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes are separate from the rightmost nodes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodic</span></code>([obj])</p></td>
+<td><p>Convert this grid to a periodic grid, where the rightmost nodes are equal to the leftmost nodes.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html#xugrid.Ugrid2d.to_shapely" title="xugrid.Ugrid2d.to_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_shapely</span></code></a>(dim)</p></td>
 <td><p>Convert UGRID topology to shapely objects.</p></td>
 </tr>
@@ -898,13 +904,16 @@ A name entry is ignored, as name is given explicitly.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.node_node_connectivity.html#xugrid.Ugrid2d.node_node_connectivity" title="xugrid.Ugrid2d.node_node_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_node_connectivity</span></code></a></p></td>
 <td><p>Node to node connectivity.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.topology_dimension.html#xugrid.Ugrid2d.topology_dimension" title="xugrid.Ugrid2d.topology_dimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topology_dimension</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">perimeter</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.topology_dimension.html#xugrid.Ugrid2d.topology_dimension" title="xugrid.Ugrid2d.topology_dimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">topology_dimension</span></code></a></p></td>
 <td><p>2</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.triangulation.html#xugrid.Ugrid2d.triangulation" title="xugrid.Ugrid2d.triangulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangulation</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.triangulation.html#xugrid.Ugrid2d.triangulation" title="xugrid.Ugrid2d.triangulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">triangulation</span></code></a></p></td>
 <td><p>Triangulation of the UGRID2D topology.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid2d.voronoi_topology.html#xugrid.Ugrid2d.voronoi_topology" title="xugrid.Ugrid2d.voronoi_topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">voronoi_topology</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid2d.voronoi_topology.html#xugrid.Ugrid2d.voronoi_topology" title="xugrid.Ugrid2d.voronoi_topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">voronoi_topology</span></code></a></p></td>
 <td><p>Centroidal Voronoi tesselation of this UGRID2D topology.</p></td>
 </tr>
 </tbody>
@@ -1007,7 +1016,7 @@ A name entry is ignored, as name is given explicitly.</p></li>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     <br/>
   </p>
 </div>
