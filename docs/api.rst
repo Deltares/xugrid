@@ -257,7 +257,7 @@ UGRID2D Topology
     Ugrid2d.bounds
     Ugrid2d.edge_bounds
     Ugrid2d.face_bounds
-    Ugrid2d.polygon_bounds
+    Ugrid2d.bounding_polygon
 
     Ugrid2d.node_node_connectivity
     Ugrid2d.node_edge_connectivity
