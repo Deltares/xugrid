@@ -401,6 +401,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_crs.html">xugrid.UgridDataArrayAccessor.to_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel.html">xugrid.UgridDataArrayAccessor.sel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.sel_points.html">xugrid.UgridDataArrayAccessor.sel_points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.intersect_line.html">xugrid.UgridDataArrayAccessor.intersect_line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.intersect_linestring.html">xugrid.UgridDataArrayAccessor.intersect_linestring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.partition.html">xugrid.UgridDataArrayAccessor.partition</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.partition_by_label.html">xugrid.UgridDataArrayAccessor.partition_by_label</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rasterize.html">xugrid.UgridDataArrayAccessor.rasterize</a></li>
@@ -523,6 +525,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.isel.html">xugrid.Ugrid2d.isel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.sel.html">xugrid.Ugrid2d.sel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.sel_points.html">xugrid.Ugrid2d.sel_points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_line.html">xugrid.Ugrid2d.intersect_line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_linestring.html">xugrid.Ugrid2d.intersect_linestring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.celltree.html">xugrid.Ugrid2d.celltree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_points.html">xugrid.Ugrid2d.locate_points</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_edges.html">xugrid.Ugrid2d.intersect_edges</a></li>
@@ -648,6 +652,12 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.connected_components.html#xugrid.UgridDataArrayAccessor.connected_components" title="xugrid.UgridDataArrayAccessor.connected_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connected_components</span></code></a>()</p></td>
 <td><p>Every edge or face is given a component number.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.intersect_line.html#xugrid.UgridDataArrayAccessor.intersect_line" title="xugrid.UgridDataArrayAccessor.intersect_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersect_line</span></code></a>(start, end)</p></td>
+<td><p>Intersect a line with the grid of this data, and fetch the values of the intersected faces.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.intersect_linestring.html#xugrid.UgridDataArrayAccessor.intersect_linestring" title="xugrid.UgridDataArrayAccessor.intersect_linestring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intersect_linestring</span></code></a>(linestring)</p></td>
+<td><p>Intersect the grid along a collection of linestrings.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.laplace_interpolate.html#xugrid.UgridDataArrayAccessor.laplace_interpolate" title="xugrid.UgridDataArrayAccessor.laplace_interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">laplace_interpolate</span></code></a>([xy_weights, ...])</p></td>
 <td><p>Fill gaps in <code class="docutils literal notranslate"><span class="pre">data</span></code> (<code class="docutils literal notranslate"><span class="pre">np.nan</span></code> values) using Laplace interpolation.</p></td>
 </tr>
@@ -693,10 +703,7 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_netcdf.html#xugrid.UgridDataArrayAccessor.to_netcdf" title="xugrid.UgridDataArrayAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant netCDF file.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nonperiodic</span></code>(xmax)</p></td>
-<td><p>Convert this grid from a periodic grid (where the rightmost boundary shares its nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes are separate from the rightmost nodes.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant Zarr file.</p></td>
 </tr>
 </tbody>

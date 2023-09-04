@@ -684,23 +684,6 @@ document.write(`
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert this grid from a periodic grid (where the rightmost boundary shares its</span>
-<span class="sd">        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes</span>
-<span class="sd">        are separate from the rightmost nodes.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        xmax: float</span>
-<span class="sd">            The x-value of the newly created rightmost boundary nodes.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
-            <span class="n">grid</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_nonperiodic</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
-            <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span>
-
 <div class="viewcode-block" id="UgridDatasetAccessor.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>

@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Added
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.intersect_line`,
+  :meth:`xugrid.Ugrid2d.intersect_linestring`
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_line`, and
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_linestring` have been added to
+  intersect line and linestrings and extract the associated face data.
+
 [0.6.4] 2023-08-22
 ------------------
 
