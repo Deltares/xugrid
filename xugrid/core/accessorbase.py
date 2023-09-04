@@ -32,6 +32,18 @@ class AbstractUgridAccessor(abc.ABC):
     def to_crs():
         """ """
 
+    @abc.abstractmethod
+    def sel_points():
+        """ """
+
+    @abc.abstractmethod
+    def intersect_line():
+        """ """
+
+    @abc.abstractmethod
+    def intersect_linestring():
+        """ """
+
     @abc.abstractproperty
     def bounds():
         """ """

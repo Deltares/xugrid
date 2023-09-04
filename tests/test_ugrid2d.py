@@ -608,9 +608,9 @@ class TestUgrid2dSelection:
         expected = xr.DataArray(
             data=[0, 3],
             coords={
-                "index": (dim, [0, 1]),
-                "x": (dim, x),
-                "y": (dim, y),
+                f"{NAME}_index": (dim, [0, 1]),
+                f"{NAME}_x": (dim, x),
+                f"{NAME}_y": (dim, y),
             },
             dims=[dim],
         )
@@ -620,7 +620,7 @@ class TestUgrid2dSelection:
         x = [-10.0, 0.5, -20.0, 1.5, -30.0]
         y = [-10.0, 0.5, -20.0, 1.25, -30.0]
         actual = self.grid.sel_points(obj=self.obj, x=x, y=y)
-        assert np.array_equal(actual["index"], [1, 3])
+        assert np.array_equal(actual[f"{NAME}_index"], [1, 3])
 
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):
@@ -701,9 +701,9 @@ class TestUgrid2dSelection:
             expected = xr.DataArray(
                 data=[0],
                 coords={
-                    "index": (dim, [0]),
-                    "x": (dim, [0.5]),
-                    "y": (dim, [0.5]),
+                    f"{NAME}_index": (dim, [0]),
+                    f"{NAME}_x": (dim, [0.5]),
+                    f"{NAME}_y": (dim, [0.5]),
                 },
                 dims=[dim],
             )
@@ -725,8 +725,8 @@ class TestUgrid2dSelection:
             expected = xr.DataArray(
                 data=[0, 0, 1, 2, 2, 3],
                 coords={
-                    "x": (dim, [0.4, 0.8, 1.2, 0.4, 0.8, 1.2]),
-                    "y": (dim, [0.5, 0.5, 0.5, 1.1, 1.1, 1.1]),
+                    f"{NAME}_x": (dim, [0.4, 0.8, 1.2, 0.4, 0.8, 1.2]),
+                    f"{NAME}_y": (dim, [0.5, 0.5, 0.5, 1.1, 1.1, 1.1]),
                 },
                 dims=[dim],
             )
@@ -734,8 +734,10 @@ class TestUgrid2dSelection:
             # assert expected.equals(actual)
             assert np.array_equal(expected.values, actual.values)
             assert expected.dims == actual.dims
-            assert np.allclose(expected["y"].values, actual["y"].values)
-            assert np.allclose(expected["x"].values, actual["x"].values)
+            x = f"{NAME}_x"
+            y = f"{NAME}_y"
+            assert np.allclose(expected[y].values, actual[y].values)
+            assert np.allclose(expected[x].values, actual[x].values)
 
         x = [0.4, 0.8, 1.2]
         y = [0.5, 1.1]
@@ -760,9 +762,9 @@ class TestUgrid2dSelection:
         expected = xr.DataArray(
             data=[0, 1],
             coords={
-                "x": (dim, [0.5, 1.5]),
-                "y": (dim, [0.5, 0.5]),
-                "s": (dim, [0.5, 1.5]),
+                f"{NAME}_x": (dim, [0.5, 1.5]),
+                f"{NAME}_y": (dim, [0.5, 0.5]),
+                f"{NAME}_s": (dim, [0.5, 1.5]),
             },
             dims=[dim],
         )
@@ -773,13 +775,55 @@ class TestUgrid2dSelection:
         expected = xr.DataArray(
             data=[0, 2],
             coords={
-                "x": (dim, [0.5, 0.5]),
-                "y": (dim, [0.5, 1.25]),
-                "s": (dim, [0.5, 1.25]),
+                f"{NAME}_x": (dim, [0.5, 0.5]),
+                f"{NAME}_y": (dim, [0.5, 1.25]),
+                f"{NAME}_s": (dim, [0.5, 1.25]),
             },
             dims=[dim],
         )
         assert expected.equals(actual)
+
+    def test_intersect_line_error(self):
+        with pytest.raises(ValueError, match="Start and end coordinate pairs"):
+            self.grid.intersect_line(
+                obj=None, start=(0.0, 0.0, 0.0), end=(1.0, 1.0, 1.0)
+            )
+
+    def test_intersect_line(self):
+        grid = self.grid
+        obj = xr.DataArray([0, 1, 2, 3], dims=[grid.face_dimension])
+
+        p0 = (0.0, 0.0)
+        p1 = (2.0, 2.0)
+        actual = grid.intersect_line(obj, start=p0, end=p1)
+        sqrt2 = np.sqrt(2.0)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == (grid.face_dimension,)
+        assert np.array_equal(actual.to_numpy(), [0, 3])
+        assert np.allclose(actual[f"{NAME}_x"], [0.5, 1.25])
+        assert np.allclose(actual[f"{NAME}_y"], [0.5, 1.25])
+        assert np.allclose(actual[f"{NAME}_s"], [0.5 * sqrt2, 1.25 * sqrt2])
+
+        actual = grid.intersect_line(obj, start=p1, end=p0)
+        assert np.array_equal(actual.to_numpy(), [3, 0])
+
+    def test_intersect_linestring(self):
+        grid = self.grid
+        obj = xr.DataArray([0, 1, 2, 3], dims=[grid.face_dimension])
+        linestring = shapely.geometry.LineString(
+            [
+                [0.5, 0.5],
+                [1.5, 0.5],
+                [1.5, 1.5],
+            ]
+        )
+        actual = grid.intersect_linestring(obj, linestring)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == (grid.face_dimension,)
+        assert np.array_equal(actual.to_numpy(), [0, 1, 1, 3])
+        assert np.allclose(actual[f"{NAME}_x"], [0.75, 1.25, 1.5, 1.5])
+        assert np.allclose(actual[f"{NAME}_y"], [0.5, 0.5, 0.75, 1.25])
+        assert np.allclose(actual[f"{NAME}_s"], [0.25, 0.75, 1.25, 1.75])
 
 
 def test_topology_subset():

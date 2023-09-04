@@ -26,16 +26,16 @@ from xugrid.ugrid.voronoi import voronoi_topology
 
 
 def section_coordinates(
-    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray
+    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
 ) -> Tuple[IntArray, dict]:
     # TODO: add boundaries xy[:, 0] and xy[:, 1]
     xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
     s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
     order = np.argsort(s)
     coords = {
-        "x": (dim, xy_mid[order, 0]),
-        "y": (dim, xy_mid[order, 1]),
-        "s": (dim, s[order]),
+        f"{name}_x": (dim, xy_mid[order, 0]),
+        f"{name}_y": (dim, xy_mid[order, 1]),
+        f"{name}_s": (dim, s[order]),
     }
     return coords, index[order]
 
@@ -1192,7 +1192,9 @@ class Ugrid2d(AbstractUgrid):
     ):
         edges = np.array([[start, end]])
         _, index, xy = self.intersect_edges(edges)
-        coords, index = section_coordinates(edges, xy, self.face_dimension, index)
+        coords, index = section_coordinates(
+            edges, xy, self.face_dimension, index, self.name
+        )
         return obj.isel({self.face_dimension: index}).assign_coords(coords)
 
     def _sel_yline(
@@ -1243,6 +1245,7 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates.
         """
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
@@ -1256,9 +1259,9 @@ class Ugrid2d(AbstractUgrid):
         valid = index != -1
         index = index[valid]
         coords = {
-            "index": (dim, np.arange(len(valid))[valid]),
-            "x": (dim, xy[valid, 0]),
-            "y": (dim, xy[valid, 1]),
+            f"{self.name}_index": (dim, np.arange(len(valid))[valid]),
+            f"{self.name}_x": (dim, xy[valid, 0]),
+            f"{self.name}_y": (dim, xy[valid, 1]),
         }
         return obj.isel({dim: index}).assign_coords(coords)
 
@@ -1278,6 +1281,8 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
         """
         if (len(start) != 2) or (len(end) != 2):
             raise ValueError("Start and end coordinate pairs must have length two")
@@ -1298,6 +1303,8 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
         """
         import shapely
 
@@ -1326,9 +1333,9 @@ class Ugrid2d(AbstractUgrid):
 
         facedim = self.face_dimension
         coords = {
-            "s": (facedim, s[sorter]),
-            "x": (facedim, intersection_centroid[:, 0]),
-            "y": (facedim, intersection_centroid[:, 1]),
+            f"{self.name}_s": (facedim, s[sorter]),
+            f"{self.name}_x": (facedim, intersection_centroid[:, 0]),
+            f"{self.name}_y": (facedim, intersection_centroid[:, 1]),
         }
         return obj.isel({facedim: face_index}).assign_coords(coords)
 

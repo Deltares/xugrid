@@ -244,6 +244,32 @@ class TestUgridDataArray:
         assert actual.shape == (1,)
         assert actual.ugrid.grid.n_face == 1
 
+    def test_intersect_line(self):
+        p0 = (0.0, 0.0)
+        p1 = (2.0, 2.0)
+        actual = self.uda.ugrid.intersect_line(start=p0, end=p1)
+        sqrt2 = np.sqrt(2.0)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == ("mesh2d_nFaces",)
+        assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
+
+    def test_intersect_linestring(self):
+        linestring = shapely.geometry.LineString(
+            [
+                [0.5, 0.5],
+                [1.5, 0.5],
+                [1.5, 1.5],
+            ]
+        )
+        actual = self.uda.ugrid.intersect_linestring(linestring)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == ("mesh2d_nFaces",)
+        assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
+
     def test_rasterize(self):
         actual = self.uda.ugrid.rasterize(resolution=0.5)
         x = [0.25, 0.75, 1.25, 1.75]
@@ -572,6 +598,36 @@ class TestUgridDataset:
         assert actual["b"].shape == (4, 4)
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
+
+    def test_intersect_line(self):
+        p0 = (0.0, 0.0)
+        p1 = (2.0, 2.0)
+        actual = self.uds.ugrid.intersect_line(start=p0, end=p1)
+        sqrt2 = np.sqrt(2.0)
+        assert isinstance(actual, xr.Dataset)
+        assert actual.dims == {"mesh2d_nFaces": 2}
+        assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
+        assert "a" in actual
+        assert "b" in actual
+
+    def test_intersect_linestring(self):
+        linestring = shapely.geometry.LineString(
+            [
+                [0.5, 0.5],
+                [1.5, 0.5],
+                [1.5, 1.5],
+            ]
+        )
+        actual = self.uds.ugrid.intersect_linestring(linestring)
+        assert isinstance(actual, xr.Dataset)
+        assert actual.dims == {"mesh2d_nFaces": 4}
+        assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
+        assert "a" in actual
+        assert "b" in actual
 
     def test_partitioning(self):
         partitions = self.uds.ugrid.partition(n_part=2)
