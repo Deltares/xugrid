@@ -1508,11 +1508,10 @@ class Ugrid2d(AbstractUgrid):
         periodic_nodes = self.face_node_connectivity[is_periodic]
 
         uniques, new_nodes = np.unique(periodic_nodes, return_inverse=True)
-        new_nodes += self.n_node
         new_x = np.full(uniques.size, xmax)
         new_y = self.node_y[uniques]
         new_faces = self.face_node_connectivity.copy()
-        new_faces[is_periodic] = new_nodes
+        new_faces[is_periodic] = new_nodes + self.n_node
 
         # edge_node_connectivity must be rederived, since we've added a number
         # of new edges and new nodes.
@@ -1570,7 +1569,7 @@ class Ugrid2d(AbstractUgrid):
             indexes = {
                 self.face_dimension: pd.RangeIndex(0, self.n_face),
                 self.node_dimension: pd.Index(
-                    np.concatenate((np.arange(self.n_node), new_nodes))
+                    np.concatenate((np.arange(self.n_node), uniques))
                 ),
             }
             if edge_index is not None:

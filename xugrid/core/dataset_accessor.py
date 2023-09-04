@@ -294,8 +294,8 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         """
         grids = []
         for grid in self.grids:
-            grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
-            grids.append(grid)
+            new_grid, obj = grid.to_nonperiodic(xmax=xmax, obj=self.obj)
+            grids.append(new_grid)
         return UgridDataset(obj, grids)
 
     def to_dataset(self, optional_attributes: bool = False):
