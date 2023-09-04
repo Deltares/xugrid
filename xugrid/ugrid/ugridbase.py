@@ -126,6 +126,14 @@ class AbstractUgrid(abc.ABC):
         """ """
 
     @abc.abstractmethod
+    def intersect_line():
+        """ """
+
+    @abc.abstractmethod
+    def intersect_linestring():
+        """ """
+
+    @abc.abstractmethod
     def sel():
         """ """
 

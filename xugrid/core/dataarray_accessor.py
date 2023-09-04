@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 import numpy as np
 import scipy.sparse
@@ -225,6 +225,44 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             y=other["y"].values,
         )
         return self._raster(x, y, index)
+
+    def intersect_line(
+        self, start: Sequence[float], end: Sequence[float]
+    ) -> xr.DataArray:
+        """
+        Intersect a line with the grid of this data, and fetch the values of
+        the intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        start: sequence of two floats
+            coordinate pair (x, y), designating the start point of the line.
+        end: sequence of two floats
+            coordinate pair (x, y), designating the end point of the line.
+
+        Returns
+        -------
+        intersection: xr.DataArray
+            The length along the line is returned as the "s" coordinate.
+        """
+        return self.grid.intersect_line(self.obj, start, end)
+
+    def intersect_linestring(self, linestring) -> xr.DataArray:
+        """
+        Intersect the grid along a collection of linestrings. Returns a new DataArray
+        with the values for each intersected segment.
+
+        Parameters
+        ----------
+        linestring: shapely.LineString
+
+        Returns
+        -------
+        intersection: xr.DataArray
+            The length along the linestring is returned as the "s" coordinate.
+        """
+        return self.grid.intersect_linestring(self.obj, linestring)
 
     @property
     def crs(self):

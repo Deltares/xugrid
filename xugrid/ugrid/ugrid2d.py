@@ -26,16 +26,16 @@ from xugrid.ugrid.voronoi import voronoi_topology
 
 
 def section_coordinates(
-    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray
+    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
 ) -> Tuple[IntArray, dict]:
     # TODO: add boundaries xy[:, 0] and xy[:, 1]
     xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
     s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
     order = np.argsort(s)
     coords = {
-        "x": (dim, xy_mid[order, 0]),
-        "y": (dim, xy_mid[order, 1]),
-        "s": (dim, s[order]),
+        f"{name}_x": (dim, xy_mid[order, 0]),
+        f"{name}_y": (dim, xy_mid[order, 1]),
+        f"{name}_s": (dim, s[order]),
     }
     return coords, index[order]
 
@@ -1168,8 +1168,8 @@ class Ugrid2d(AbstractUgrid):
     def _sel_box(
         self,
         obj,
-        x,
-        y,
+        x: slice,
+        y: slice,
     ):
         xmin, ymin, xmax, ymax = self.bounds
         bounds = [
@@ -1184,11 +1184,24 @@ class Ugrid2d(AbstractUgrid):
         new_obj = obj.isel(indexes)
         return new_obj, grid
 
+    def _sel_line(
+        self,
+        obj,
+        start,
+        end,
+    ):
+        edges = np.array([[start, end]])
+        _, index, xy = self.intersect_edges(edges)
+        coords, index = section_coordinates(
+            edges, xy, self.face_dimension, index, self.name
+        )
+        return obj.isel({self.face_dimension: index}).assign_coords(coords)
+
     def _sel_yline(
         self,
         obj,
-        x,
-        y,
+        x: float,
+        y: slice,
     ):
         xmin, _, xmax, _ = self.bounds
         if y.size != 1:
@@ -1198,16 +1211,13 @@ class Ugrid2d(AbstractUgrid):
         y = y[0]
         xstart = numeric_bound(x.start, xmin)
         xstop = numeric_bound(x.stop, xmax)
-        edges = np.array([[[xstart, y], [xstop, y]]])
-        _, index, xy = self.intersect_edges(edges)
-        coords, index = section_coordinates(edges, xy, self.face_dimension, index)
-        return obj.isel({self.face_dimension: index}).assign_coords(coords)
+        return self._sel_line(obj, start=(xstart, y), end=(xstop, y))
 
     def _sel_xline(
         self,
         obj,
-        x,
-        y,
+        x: float,
+        y: slice,
     ):
         _, ymin, _, ymax = self.bounds
         if x.size != 1:
@@ -1217,10 +1227,7 @@ class Ugrid2d(AbstractUgrid):
         x = x[0]
         ystart = numeric_bound(y.start, ymin)
         ystop = numeric_bound(y.stop, ymax)
-        edges = np.array([[[x, ystart], [x, ystop]]])
-        _, index, xy = self.intersect_edges(edges)
-        coords, index = section_coordinates(edges, xy, self.face_dimension, index)
-        return obj.isel({self.face_dimension: index}).assign_coords(coords)
+        return self._sel_line(obj, start=(x, ystart), end=(x, ystop))
 
     def sel_points(self, obj, x: FloatArray, y: FloatArray):
         """
@@ -1238,6 +1245,7 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates.
         """
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
@@ -1251,11 +1259,85 @@ class Ugrid2d(AbstractUgrid):
         valid = index != -1
         index = index[valid]
         coords = {
-            "index": (dim, np.arange(len(valid))[valid]),
-            "x": (dim, xy[valid, 0]),
-            "y": (dim, xy[valid, 1]),
+            f"{self.name}_index": (dim, np.arange(len(valid))[valid]),
+            f"{self.name}_x": (dim, xy[valid, 0]),
+            f"{self.name}_y": (dim, xy[valid, 1]),
         }
         return obj.isel({dim: index}).assign_coords(coords)
+
+    def intersect_line(self, obj, start: Sequence[float], end: Sequence[float]):
+        """
+        Intersect a line with this grid, and fetch the values of the
+        intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        start: sequence of two floats
+            coordinate pair (x, y), designating the start point of the line.
+        end: sequence of two floats
+            coordinate pair (x, y), designating the end point of the line.
+
+        Returns
+        -------
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        if (len(start) != 2) or (len(end) != 2):
+            raise ValueError("Start and end coordinate pairs must have length two")
+        return self._sel_line(obj, start, end)
+
+    def intersect_linestring(
+        self, obj: Union[xr.DataArray, xr.Dataset], linestring: "shapely.geometry.LineString"  # type: ignore # noqa
+    ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Intersect linestrings with this grid, and fetch the values of the
+        intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        linestring: shapely.geometry.lineString
+
+        Returns
+        -------
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        import shapely
+
+        xy = shapely.get_coordinates([linestring])
+        edges = np.stack((xy[:-1], xy[1:]), axis=1)
+        edge_index, face_index, intersections = self.intersect_edges(edges)
+
+        # Compute the cumulative length along the edges
+        edge_length = np.linalg.norm(edges[:, 1] - edges[:, 0], axis=1)
+        cumulative_length = np.empty_like(edge_length)
+        cumulative_length[0] = 0
+        np.cumsum(edge_length[:-1], out=cumulative_length[1:])
+
+        # Compute the distance for every intersection to the start of the linestring.
+        intersection_centroid = intersections.mean(axis=1)
+        distance_node_to_intersection = np.linalg.norm(
+            intersection_centroid - edges[edge_index, 0], axis=1
+        )
+        s = distance_node_to_intersection + cumulative_length[edge_index]
+
+        # Now sort everything according to s.
+        sorter = np.argsort(s)
+        face_index = face_index[sorter]
+        intersection_centroid = intersection_centroid[sorter]
+        intersections = intersections[sorter]
+
+        facedim = self.face_dimension
+        coords = {
+            f"{self.name}_s": (facedim, s[sorter]),
+            f"{self.name}_x": (facedim, intersection_centroid[:, 0]),
+            f"{self.name}_y": (facedim, intersection_centroid[:, 1]),
+        }
+        return obj.isel({facedim: face_index}).assign_coords(coords)
 
     def sel(self, obj, x=None, y=None):
         """

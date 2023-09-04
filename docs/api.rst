@@ -80,6 +80,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
+    UgridDatasetAccessor.intersect_line
+    UgridDatasetAccessor.intersect_linestring
     UgridDatasetAccessor.partition
     UgridDatasetAccessor.partition_by_label
     UgridDatasetAccessor.to_geodataframe
@@ -104,6 +106,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.to_crs
     UgridDataArrayAccessor.sel
     UgridDataArrayAccessor.sel_points
+    UgridDataArrayAccessor.intersect_line
+    UgridDataArrayAccessor.intersect_linestring
     UgridDataArrayAccessor.partition
     UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
@@ -286,6 +290,8 @@ UGRID2D Topology
     Ugrid2d.isel
     Ugrid2d.sel
     Ugrid2d.sel_points
+    Ugrid2d.intersect_line
+    Ugrid2d.intersect_linestring
     Ugrid2d.celltree
     Ugrid2d.locate_points
     Ugrid2d.intersect_edges
