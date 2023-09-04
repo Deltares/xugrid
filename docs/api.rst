@@ -80,6 +80,8 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
+    UgridDatasetAccessor.intersect_line
+    UgridDatasetAccessor.intersect_linestring
     UgridDatasetAccessor.partition
     UgridDatasetAccessor.partition_by_label
     UgridDatasetAccessor.to_geodataframe
