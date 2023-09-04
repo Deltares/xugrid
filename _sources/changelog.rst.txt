@@ -14,10 +14,12 @@ Added
 
 - :meth:`xugrid.Ugrid2d.intersect_line`,
   :meth:`xugrid.Ugrid2d.intersect_linestring`
-  :meth:`xugrid.UgridDataArrayAccessor.intersect_line`, and
-  :meth:`xugrid.UgridDataArrayAccessor.intersect_linestring` have been added to
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_line`,
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_linestring`,
+  :meth:`xugrid.UgridDatasetAccessor.intersect_line`, and
+  :meth:`xugrid.UgridDatasetAccessor.intersect_linestring` have been added to
   intersect line and linestrings and extract the associated face data.
-  
+
 Changed
 ~~~~~~~
 
@@ -31,7 +33,7 @@ Changed
 Fixed
 ~~~~~
 
-- Bug in :func:`xugrid.snap_to_grid`, which caused an ``IndexError``. 
+- Bug in :func:`xugrid.snap_to_grid`, which caused an ``IndexError``.
   See `#122 <https://github.com/Deltares/xugrid/issues/122>`_.
 
 

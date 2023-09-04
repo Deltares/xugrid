@@ -685,6 +685,8 @@ document.write(`
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
 
+<div class="viewcode-block" id="UgridDatasetAccessor.intersect_line">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_line.html#xugrid.UgridDatasetAccessor.intersect_line">[docs]</a>
     <span class="k">def</span> <span class="nf">intersect_line</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
@@ -709,8 +711,11 @@ document.write(`
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
+
+<div class="viewcode-block" id="UgridDatasetAccessor.intersect_linestring">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_linestring.html#xugrid.UgridDatasetAccessor.intersect_linestring">[docs]</a>
     <span class="k">def</span> <span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Intersect the grid along a collection of linestrings. Returns a new Dataset</span>
@@ -729,7 +734,8 @@ document.write(`
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_linestring</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>
