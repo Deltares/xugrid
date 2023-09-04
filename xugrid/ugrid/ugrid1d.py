@@ -4,8 +4,10 @@ from typing import Any, Dict, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import xarray as xr
+from scipy.sparse.csgraph import connected_components
 from xarray.core.utils import either_dict_or_kwargs
 
+import xugrid
 from xugrid import conversion
 from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
 from xugrid.ugrid import connectivity, conventions
@@ -565,6 +567,113 @@ class Ugrid1d(AbstractUgrid):
             attrs=self._attrs,
         )
 
+    def connected_components(self) -> IntArray:
+        """
+        Analyze the connected components of the topology.
+
+        Returns
+        -------
+        labels: np.ndarray of int of size n_node
+        """
+        _, labels = connected_components(self.node_node_connectivity)
+        return labels
+
+    def label_subgraphs(self, node_indices: IntArray = None, edge_indices=None):
+        """
+        Split a graph into subgraph by splitting at the nodes or edges
+        indicated by indices.
+
+        Every subgraph is identified by a unique label.
+
+        Parameters
+        ----------
+        node_indices: np.ndarray of int
+            Indices of edges where to split.
+        edge_indices: np.ndarray of int
+            Indices of edges where to split.
+
+        Returns
+        -------
+        subgraph_id: xu.UgridDataArray
+        """
+        if edge_indices is not None:
+            indices = edge_indices
+        elif node_indices is not None:
+            indices = np.isin(self.edge_node_connectivity[:, 0], node_indices)
+        else:
+            raise ValueError("Either node_indices or edge_indices must be provided.")
+        keep = np.full((self.n_edge), True, dtype=bool)
+        keep[indices] = False
+        disconnected = xugrid.Ugrid1d(
+            self.node_x, self.node_y, self.fill_value, self.edge_node_connectivity[keep]
+        )
+        labels = disconnected.connected_components()
+        return xugrid.UgridDataArray(
+            obj=xr.DataArray(labels, dims=[self.node_dimension]), grid=self
+        )
+
+    def coarsen_by_label(self, labels):
+        """
+        Coarsen this Ugrid1d topology by collapsing subgraphs as identified by
+        labels into a single node.
+
+        Parameters
+        ----------
+        labels: UgridDataArray of integers
+            An integer label for every node.
+
+        Returns
+        -------
+        coarsened: Ugrid1d
+        """
+        if not isinstance(labels, xugrid.UgridDataArray):
+            raise TypeError(
+                "labels must be a UgridDataArray, " f"received: {type(labels).__name__}"
+            )
+        if not np.issubdtype(labels.dtype, np.integer):
+            raise TypeError(f"labels must have integer dtype, received {labels.dtype}")
+
+        if labels.grid != self:
+            raise ValueError("grid of labels does not match xugrid object")
+        if labels.dims != (self.core_dimension,):
+            raise ValueError(
+                f"Can only coarsen this topology by {self.core_dimension}, found"
+                f" the dimensions: {labels.dims}"
+            )
+
+        coo = self.node_node_connectivity.tocoo()
+        i = coo.row
+        j = coo.col
+        v = labels.to_numpy()
+        is_edge = v[i] != v[j]
+        edge_nodes = np.unique(
+            v[np.column_stack((i[is_edge], j[is_edge]))],
+            axis=0,
+        )
+        mean = (
+            xr.Dataset(
+                {
+                    "label": labels.ugrid.obj,
+                    "node_x": (self.node_dimension, self.node_x),
+                    "node_y": (self.node_dimension, self.node_y),
+                }
+            )
+            .groupby("label")
+            .mean()
+        )
+
+        return xugrid.Ugrid1d(
+            mean["node_x"].to_numpy(),
+            mean["node_y"].to_numpy(),
+            self.fill_value,
+            edge_nodes,
+            name=self.name,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self._attrs,
+        )
+
     @staticmethod
     def merge_partitions(grids: Sequence["Ugrid1d"]) -> "Ugrid1d":
         """
@@ -598,6 +707,7 @@ class Ugrid1d(AbstractUgrid):
             fill_value,
             new_edges,
             name=grid.name,
+            indexes=grid._indexes,
             projected=grid.projected,
             crs=grid.crs,
             attrs=grid._attrs,
