@@ -753,9 +753,6 @@ document.write(`
             <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot select points in a UGRID 1D topology&quot;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="Ugrid1d.isel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.isel.html#xugrid.Ugrid1d.isel">[docs]</a>
     <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
@@ -928,6 +925,15 @@ document.write(`
         <span class="n">ymax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">intersect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span>
 
 <div class="viewcode-block" id="Ugrid1d.topological_sort_by_dfs">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs">[docs]</a>

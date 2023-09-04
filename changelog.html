@@ -630,6 +630,14 @@ document.write(`
 intersect line and linestrings and extract the associated face data.</p></li>
 </ul>
 </section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Selection operations along a line, or at point locations, will now prefix the
+name of the grid in the x and y coordinates. This avoids name collisions when
+multiple topologies are present in a dataset.</p></li>
+</ul>
+</section>
 </section>
 <section id="id1">
 <h2>[0.6.4] 2023-08-22<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
@@ -687,8 +695,8 @@ converting a UgridDataset that does not contain any variables.</p></li>
 on repeated calls with the “mode” method.</p></li>
 </ul>
 </section>
-<section id="changed">
-<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">#</a></h3>
+<section id="id6">
+<h3>Changed<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Initializing a Ugrid2d topology with an invalid edge_node_connectivity will
 no longer raise an error.</p></li>
@@ -701,10 +709,10 @@ index in the <code class="docutils literal notranslate"><span class="pre">.data<
 </ul>
 </section>
 </section>
-<section id="id6">
-<h2>[0.6.2] 2023-07-26<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
 <section id="id7">
-<h3>Fixed<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<h2>[0.6.2] 2023-07-26<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<section id="id8">
+<h3>Fixed<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Computing indexer to avoid dask array of unknown shape upon plotting.
 See <a class="reference external" href="https://github.com/Deltares/xugrid/issues/117">#117</a>.</p></li>
@@ -715,20 +723,20 @@ flipping the y coordinate.</p></li>
 </ul>
 </section>
 </section>
-<section id="id10">
-<h2>[0.6.1] 2023-07-07<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
 <section id="id11">
-<h3>Fixed<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<h2>[0.6.1] 2023-07-07<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<section id="id12">
+<h3>Fixed<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fillvalue was not properly replaced in cast.
 See <a class="reference external" href="https://github.com/Deltares/xugrid/issues/113">#113</a>.</p></li>
 </ul>
 </section>
 </section>
-<section id="id13">
-<h2>[0.6.0] 2023-07-05<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
 <section id="id14">
-<h3>Added<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<h2>[0.6.0] 2023-07-05<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<section id="id15">
+<h3>Added<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions" title="xugrid.Ugrid2d.label_partitions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.label_partitions()</span></code></a>, <a class="reference internal" href="api/xugrid.Ugrid2d.partition.html#xugrid.Ugrid2d.partition" title="xugrid.Ugrid2d.partition"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.partition()</span></code></a>,
 <a class="reference internal" href="api/xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions" title="xugrid.Ugrid2d.merge_partitions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.merge_partitions()</span></code></a> have been added to partition and merge
@@ -747,8 +755,8 @@ grid is converted into an xarray dataset.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices" title="xugrid.Ugrid1d.contract_vertices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.contract_vertices()</span></code></a> has been added.</p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>Fixed<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<section id="id16">
+<h3>Fixed<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Regridding is possible again with regridders initiated <code class="docutils literal notranslate"><span class="pre">from_weights</span></code>.
 See <a class="reference external" href="https://github.com/Deltares/xugrid/issues/90">#90</a>.
@@ -760,18 +768,18 @@ source and target grid are equal.</p></li>
 <li><p>Fixed numba typing error for regridders.</p></li>
 </ul>
 </section>
-<section id="id17">
-<h3>Changed<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<section id="id18">
+<h3>Changed<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Regridding structured grids now throws error if computed weights &lt; 0.0 or &gt;
 1.0, before these weights were clipped to 0.0 and 1.0 respectively.</p></li>
 </ul>
 </section>
 </section>
-<section id="id18">
-<h2>[0.5.0] 2023-05-25<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
 <section id="id19">
-<h3>Added<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
+<h2>[0.5.0] 2023-05-25<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<section id="id20">
+<h3>Added<a class="headerlink" href="#id20" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator" title="xugrid.BarycentricInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.BarycentricInterpolator</span></code></a>,
 <a class="reference internal" href="api/xugrid.CentroidLocatorRegridder.html#xugrid.CentroidLocatorRegridder" title="xugrid.CentroidLocatorRegridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.CentroidLocatorRegridder</span></code></a>, <a class="reference internal" href="api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder" title="xugrid.OverlapRegridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.OverlapRegridder</span></code></a>,
@@ -780,10 +788,10 @@ form of a <code class="docutils literal notranslate"><span class="pre">xr.DataAr
 </ul>
 </section>
 </section>
-<section id="id20">
-<h2>[0.4.0] 2023-05-05<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
 <section id="id21">
-<h3>Fixed<a class="headerlink" href="#id21" title="Link to this heading">#</a></h3>
+<h2>[0.4.0] 2023-05-05<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<section id="id22">
+<h3>Fixed<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi" title="xugrid.Ugrid2d.tesselate_centroidal_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_centroidal_voronoi()</span></code></a> and
 <a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> will only include
@@ -795,8 +803,8 @@ neighbor.</p></li>
 optional package <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> was missing in the environment.</p></li>
 </ul>
 </section>
-<section id="id22">
-<h3>Changed<a class="headerlink" href="#id22" title="Link to this heading">#</a></h3>
+<section id="id23">
+<h3>Changed<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points" title="xugrid.Ugrid2d.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel_points()</span></code></a> and
 <a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.sel_points()</span></code></a> now return a result with an
@@ -809,8 +817,8 @@ any face).</p></li>
 dominant in when plotting large grids).</p></li>
 </ul>
 </section>
-<section id="id23">
-<h3>Added<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
+<section id="id24">
+<h3>Added<a class="headerlink" href="#id24" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> has been added to
 provide orthogonal voronoi cells for triangular grids.</p></li>
@@ -827,13 +835,13 @@ rasterize all face variables in a UgridDataset.</p></li>
 </ul>
 </section>
 </section>
-<section id="id24">
-<h2>[0.3.0] 2023-03-14<a class="headerlink" href="#id24" title="Link to this heading">#</a></h2>
 <section id="id25">
-<h3>Fixed<a class="headerlink" href="#id25" title="Link to this heading">#</a></h3>
-</section>
+<h2>[0.3.0] 2023-03-14<a class="headerlink" href="#id25" title="Link to this heading">#</a></h2>
 <section id="id26">
-<h3>Changed<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
+<h3>Fixed<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
+</section>
+<section id="id27">
+<h3>Changed<a class="headerlink" href="#id27" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pygeos</span></code> has been replaced by <code class="docutils literal notranslate"><span class="pre">shapely</span> <span class="pre">&gt;=</span> <span class="pre">2.0</span></code>.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.snap_to_grid.html#xugrid.snap_to_grid" title="xugrid.snap_to_grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_to_grid()</span></code></a> will now return a UgridDataset and a geopandas
@@ -850,18 +858,18 @@ pre-computed weights.</p></li>
 negative data.</p></li>
 </ul>
 </section>
-<section id="id27">
-<h3>Added<a class="headerlink" href="#id27" title="Link to this heading">#</a></h3>
+<section id="id28">
+<h3>Added<a class="headerlink" href="#id28" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> has been added to
 provide orthogonal voronoi cells for triangular grids.</p></li>
 </ul>
 </section>
 </section>
-<section id="id28">
-<h2>[0.2.1] 2023-02-06<a class="headerlink" href="#id28" title="Link to this heading">#</a></h2>
 <section id="id29">
-<h3>Fixed<a class="headerlink" href="#id29" title="Link to this heading">#</a></h3>
+<h2>[0.2.1] 2023-02-06<a class="headerlink" href="#id29" title="Link to this heading">#</a></h2>
+<section id="id30">
+<h3>Fixed<a class="headerlink" href="#id30" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.open_dataarray.html#xugrid.open_dataarray" title="xugrid.open_dataarray"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.open_dataarray()</span></code></a> will now return <a class="reference internal" href="api/xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridDataArray</span></code></a>
 instead of only an xarray DataArray without topology.</p></li>
@@ -871,11 +879,11 @@ datasets contains multiple coordinates systems (such as both longitude and
 latitude next to projected x and y coordinates).</p></li>
 </ul>
 </section>
-<section id="id30">
-<h3>Changed<a class="headerlink" href="#id30" title="Link to this heading">#</a></h3>
-</section>
 <section id="id31">
-<h3>Added<a class="headerlink" href="#id31" title="Link to this heading">#</a></h3>
+<h3>Changed<a class="headerlink" href="#id31" title="Link to this heading">#</a></h3>
+</section>
+<section id="id32">
+<h3>Added<a class="headerlink" href="#id32" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Several regridding methods have been added for face associated data:
 <a class="reference internal" href="api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator" title="xugrid.BarycentricInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.BarycentricInterpolator</span></code></a> have been added to interpolate
@@ -888,10 +896,10 @@ may aggregation methods (e.g. area weighted mean).</p></li>
 </ul>
 </section>
 </section>
-<section id="id32">
-<h2>[0.2.0] 2023-01-19<a class="headerlink" href="#id32" title="Link to this heading">#</a></h2>
 <section id="id33">
-<h3>Fixed<a class="headerlink" href="#id33" title="Link to this heading">#</a></h3>
+<h2>[0.2.0] 2023-01-19<a class="headerlink" href="#id33" title="Link to this heading">#</a></h2>
+<section id="id34">
+<h3>Fixed<a class="headerlink" href="#id34" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.topology_subset.html#xugrid.Ugrid1d.topology_subset" title="xugrid.Ugrid1d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.topology_subset()</span></code></a>,
 <a class="reference internal" href="api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset" title="xugrid.Ugrid2d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.topology_subset()</span></code></a>, and therefore also
@@ -913,8 +921,8 @@ edgecolor is defined, rather than skipping some edges.</p></li>
 face_node_connectivity property is accessed.</p></li>
 </ul>
 </section>
-<section id="id34">
-<h3>Changed<a class="headerlink" href="#id34" title="Link to this heading">#</a></h3>
+<section id="id35">
+<h3>Changed<a class="headerlink" href="#id35" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Forwarding to the internal xarray object is now setup at class definition of
 <code class="xref py py-class docutils literal notranslate"><span class="pre">UgridDataArray</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">UgridDataset</span></code> rather than at runtime.
@@ -940,8 +948,8 @@ connections to other faces) or when “slivers” are present (where cells have 
 only a left or right neighbor).</p></li>
 </ul>
 </section>
-<section id="id35">
-<h3>Added<a class="headerlink" href="#id35" title="Link to this heading">#</a></h3>
+<section id="id36">
+<h3>Added<a class="headerlink" href="#id36" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.html#xugrid.Ugrid1d" title="xugrid.Ugrid1d"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.Ugrid1d</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.Ugrid2d</span></code></a> can now be initialized
 with an <code class="docutils literal notranslate"><span class="pre">attrs</span></code> argument to setup non-default UGRID attributes such as
@@ -961,28 +969,28 @@ been partitioned along UGRID dimensions.</p></li>
 </ul>
 </section>
 </section>
-<section id="id36">
-<h2>[0.1.10] 2022-12-13<a class="headerlink" href="#id36" title="Link to this heading">#</a></h2>
 <section id="id37">
-<h3>Fixed<a class="headerlink" href="#id37" title="Link to this heading">#</a></h3>
+<h2>[0.1.10] 2022-12-13<a class="headerlink" href="#id37" title="Link to this heading">#</a></h2>
+<section id="id38">
+<h3>Fixed<a class="headerlink" href="#id38" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Move matplotlib import into a function body so matplotlib remains an optional
 dependency.</p></li>
 </ul>
 </section>
 </section>
-<section id="id38">
-<h2>[0.1.9] 2022-12-13<a class="headerlink" href="#id38" title="Link to this heading">#</a></h2>
 <section id="id39">
-<h3>Changed<a class="headerlink" href="#id39" title="Link to this heading">#</a></h3>
+<h2>[0.1.9] 2022-12-13<a class="headerlink" href="#id39" title="Link to this heading">#</a></h2>
+<section id="id40">
+<h3>Changed<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Warn instead of error when the UGRID attributes indicate a set of coordinate
 that are not present in the dataset.</p></li>
 <li><p>Use <cite>pyproject.toml</cite> for setuptools instead of <cite>setup.cfg</cite>.</p></li>
 </ul>
 </section>
-<section id="id40">
-<h3>Added<a class="headerlink" href="#id40" title="Link to this heading">#</a></h3>
+<section id="id41">
+<h3>Added<a class="headerlink" href="#id41" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.edge_bounds.html#xugrid.Ugrid1d.edge_bounds" title="xugrid.Ugrid1d.edge_bounds"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.edge_bounds</span></code></a> has been added to get the bounds
 for every edge contained in the grid.</p></li>
@@ -997,18 +1005,18 @@ topology from a meshkernel object.</p></li>
 to plot the edges of the grid.</p></li>
 </ul>
 </section>
-<section id="id41">
-<h3>Fixed<a class="headerlink" href="#id41" title="Link to this heading">#</a></h3>
+<section id="id42">
+<h3>Fixed<a class="headerlink" href="#id42" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured" title="xugrid.UgridDataArray.from_structured"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.from_structured()</span></code></a> will no longer result in
 a flipped grid when the structured coordintes are not ascending.</p></li>
 </ul>
 </section>
 </section>
-<section id="id42">
-<h2>[0.1.7] 2022-09-06<a class="headerlink" href="#id42" title="Link to this heading">#</a></h2>
 <section id="id43">
-<h3>Fixed<a class="headerlink" href="#id43" title="Link to this heading">#</a></h3>
+<h2>[0.1.7] 2022-09-06<a class="headerlink" href="#id43" title="Link to this heading">#</a></h2>
+<section id="id44">
+<h3>Fixed<a class="headerlink" href="#id44" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The setitem method of <a class="reference internal" href="api/xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.UgridDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridDataset</span></code></a> has been updated to check
 the dimensions of grids rather than the dimensions of objects to decide
@@ -1025,25 +1033,25 @@ conflicting dimension names.</p></li>
 </ul>
 </section>
 </section>
-<section id="id44">
-<h2>[0.1.5] 2022-08-22<a class="headerlink" href="#id44" title="Link to this heading">#</a></h2>
 <section id="id45">
-<h3>Fixed<a class="headerlink" href="#id45" title="Link to this heading">#</a></h3>
+<h2>[0.1.5] 2022-08-22<a class="headerlink" href="#id45" title="Link to this heading">#</a></h2>
+<section id="id46">
+<h3>Fixed<a class="headerlink" href="#id46" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">list</span></code> and <code class="docutils literal notranslate"><span class="pre">dict</span></code> type annotations have been replaced with <code class="docutils literal notranslate"><span class="pre">List</span></code> and <code class="docutils literal notranslate"><span class="pre">Dict</span></code>
 from the typing module to support older versions of Python (&lt;3.9).</p></li>
 </ul>
 </section>
-<section id="id46">
-<h3>Changed<a class="headerlink" href="#id46" title="Link to this heading">#</a></h3>
+<section id="id47">
+<h3>Changed<a class="headerlink" href="#id47" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">inplace</span></code> argument has been removed from <a class="reference internal" href="api/xugrid.Ugrid1d.to_crs.html#xugrid.Ugrid1d.to_crs" title="xugrid.Ugrid1d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.to_crs()</span></code></a>
 and <a class="reference internal" href="api/xugrid.Ugrid2d.to_crs.html#xugrid.Ugrid2d.to_crs" title="xugrid.Ugrid2d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.to_crs()</span></code></a>; A copy is returned when the CRS is already
 as requested.</p></li>
 </ul>
 </section>
-<section id="id47">
-<h3>Added<a class="headerlink" href="#id47" title="Link to this heading">#</a></h3>
+<section id="id48">
+<h3>Added<a class="headerlink" href="#id48" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.set_crs.html#xugrid.UgridDataArrayAccessor.set_crs" title="xugrid.UgridDataArrayAccessor.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.set_crs()</span></code></a> has been added to set the CRS.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.to_crs.html#xugrid.UgridDataArrayAccessor.to_crs" title="xugrid.UgridDataArrayAccessor.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.to_crs()</span></code></a> has been added to reproject the
@@ -1062,18 +1070,18 @@ total bounds of all grids contained in the dataset.</p></li>
 </ul>
 </section>
 </section>
-<section id="id48">
-<h2>[0.1.4] 2022-08-16<a class="headerlink" href="#id48" title="Link to this heading">#</a></h2>
 <section id="id49">
-<h3>Fixed<a class="headerlink" href="#id49" title="Link to this heading">#</a></h3>
+<h2>[0.1.4] 2022-08-16<a class="headerlink" href="#id49" title="Link to this heading">#</a></h2>
+<section id="id50">
+<h3>Fixed<a class="headerlink" href="#id50" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>A <code class="docutils literal notranslate"><span class="pre">start_index</span></code> of 1 in connectivity arrays is handled and will no longer
 result in indexing errors.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">levels</span></code> argument is now respected in line and pcolormesh plotting methods.</p></li>
 </ul>
 </section>
-<section id="id50">
-<h3>Changed<a class="headerlink" href="#id50" title="Link to this heading">#</a></h3>
+<section id="id51">
+<h3>Changed<a class="headerlink" href="#id51" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>UGRID variables are now extracted via <a class="reference internal" href="api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor" title="xugrid.UgridRolesAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor</span></code></a> to
 allow for multiple UGRID topologies in a single dataset.</p></li>
@@ -1095,8 +1103,8 @@ as access to the dataset should occur via the <code class="docutils literal notr
 instead, which can check for consistency with the xarray object.</p></li>
 </ul>
 </section>
-<section id="id51">
-<h3>Added<a class="headerlink" href="#id51" title="Link to this heading">#</a></h3>
+<section id="id52">
+<h3>Added<a class="headerlink" href="#id52" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor" title="xugrid.UgridRolesAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor</span></code></a> has been added to extract UGRID variables
 from xarray Datasets.</p></li>
@@ -1112,8 +1120,8 @@ as the active coordinates of the Ugrid topology.</p></li>
 </ul>
 </section>
 </section>
-<section id="id52">
-<h2>[0.1.3] 2021-12-23<a class="headerlink" href="#id52" title="Link to this heading">#</a></h2>
+<section id="id53">
+<h2>[0.1.3] 2021-12-23<a class="headerlink" href="#id53" title="Link to this heading">#</a></h2>
 </section>
 </section>
 
@@ -1166,6 +1174,7 @@ as the active coordinates of the Ugrid topology.</p></li>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">Unreleased</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">[0.6.4] 2023-08-22</a><ul class="nav section-nav flex-column">
@@ -1175,78 +1184,78 @@ as the active coordinates of the Ugrid topology.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">[0.6.3] 2023-08-12</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Added</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">[0.6.2] 2023-07-26</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">[0.6.2] 2023-07-26</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">[0.6.1] 2023-07-07</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">[0.6.1] 2023-07-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">[0.6.0] 2023-07-05</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Changed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">[0.6.0] 2023-07-05</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Changed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">[0.5.0] 2023-05-25</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">[0.5.0] 2023-05-25</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">[0.4.0] 2023-05-05</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">[0.4.0] 2023-05-05</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">[0.3.0] 2023-03-14</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">[0.3.0] 2023-03-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">[0.2.1] 2023-02-06</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">[0.2.1] 2023-02-06</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">[0.2.0] 2023-01-19</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">[0.2.0] 2023-01-19</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">[0.1.10] 2022-12-13</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">[0.1.10] 2022-12-13</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">[0.1.9] 2022-12-13</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">[0.1.9] 2022-12-13</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">[0.1.7] 2022-09-06</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">Fixed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">[0.1.7] 2022-09-06</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Fixed</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">[0.1.5] 2022-08-22</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">[0.1.5] 2022-08-22</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">[0.1.4] 2022-08-16</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Added</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">[0.1.4] 2022-08-16</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">Added</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">[0.1.3] 2021-12-23</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id53">[0.1.3] 2021-12-23</a></li>
 </ul>
   </nav></div>
 

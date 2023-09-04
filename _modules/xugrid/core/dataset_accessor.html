@@ -634,6 +634,7 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        points: Union[xr.DataArray, xr.Dataset]</span>
+<span class="sd">            The name of the topology is prefixed in the x, y coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -683,6 +684,52 @@ document.write(`
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">intersect_line</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intersect a line with the grid of this data, and fetch the values of</span>
+<span class="sd">        the intersected faces.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
+<span class="sd">        start: sequence of two floats</span>
+<span class="sd">            coordinate pair (x, y), designating the start point of the line.</span>
+<span class="sd">        end: sequence of two floats</span>
+<span class="sd">            coordinate pair (x, y), designating the end point of the line.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        intersection: xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
+<span class="sd">            (spatium=distance) coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intersect the grid along a collection of linestrings. Returns a new Dataset</span>
+<span class="sd">        with the values for each intersected segment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        linestring: shapely.LineString</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        intersection: xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
+<span class="sd">            (spatium=distance) coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_linestring</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>

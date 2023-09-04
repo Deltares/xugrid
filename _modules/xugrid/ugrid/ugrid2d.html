@@ -403,16 +403,16 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">section_coordinates</span><span class="p">(</span>
-    <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">xy</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">IntArray</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">xy</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
     <span class="c1"># TODO: add boundaries xy[:, 0] and xy[:, 1]</span>
     <span class="n">xy_mid</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xy_mid</span> <span class="o">-</span> <span class="n">edges</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
-        <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">order</span><span class="p">]),</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">order</span><span class="p">]),</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">index</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
 
@@ -1613,7 +1613,9 @@ document.write(`
     <span class="p">):</span>
         <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">]])</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">section_coordinates</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">coords</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">section_coordinates</span><span class="p">(</span>
+            <span class="n">edges</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_sel_yline</span><span class="p">(</span>
@@ -1666,6 +1668,7 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        selection: xr.DataArray or xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -1679,9 +1682,9 @@ document.write(`
         <span class="n">valid</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid</span><span class="p">))[</span><span class="n">valid</span><span class="p">]),</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_index&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid</span><span class="p">))[</span><span class="n">valid</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">valid</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 
@@ -1704,6 +1707,8 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        selection: xr.DataArray or xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
+<span class="sd">            (spatium=distance) coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Start and end coordinate pairs must have length two&quot;</span><span class="p">)</span>
@@ -1727,6 +1732,8 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        selection: xr.DataArray or xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
+<span class="sd">            (spatium=distance) coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">shapely</span>
 
@@ -1755,9 +1762,9 @@ document.write(`
 
         <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">sorter</span><span class="p">]),</span>
-            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span>
-            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">sorter</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="n">face_index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 

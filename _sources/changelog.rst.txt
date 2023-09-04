@@ -17,6 +17,13 @@ Added
   :meth:`xugrid.UgridDataArrayAccessor.intersect_line`, and
   :meth:`xugrid.UgridDataArrayAccessor.intersect_linestring` have been added to
   intersect line and linestrings and extract the associated face data.
+  
+Changed
+~~~~~~~
+
+- Selection operations along a line, or at point locations, will now prefix the
+  name of the grid in the x and y coordinates. This avoids name collisions when
+  multiple topologies are present in a dataset.
 
 [0.6.4] 2023-08-22
 ------------------

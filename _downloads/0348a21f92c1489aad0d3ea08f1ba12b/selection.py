@@ -95,7 +95,7 @@ subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain", aspect=1, size=5)
 def show_point_selection(uda, da):
     _, ax = plt.subplots()
     uda.ugrid.plot(ax=ax, vmin=-20, vmax=90, cmap="terrain")
-    ax.scatter(da["x"], da["y"], color="red")
+    ax.scatter(da["mesh2d_x"], da["mesh2d_y"], color="red")
     ax.set_aspect(1.0)
 
 
@@ -164,7 +164,7 @@ da
 def show_line_selection(uda, da, line_x=None, line_y=None):
     _, (ax0, ax1) = plt.subplots(ncols=2, figsize=(10, 5))
     uda.ugrid.plot(ax=ax0, vmin=-20, vmax=90, cmap="terrain")
-    da.plot(ax=ax1, x="s")
+    da.plot(ax=ax1, x="mesh2d_s")
     if line_x is None:
         ax0.axhline(line_y, color="red")
     elif line_y is None:
@@ -207,6 +207,7 @@ show_line_selection(uda, da, *shapely.get_coordinates(linestring).T)
 # This will work for any type of shapely line:
 
 ring = shapely.geometry.Point(155_000.0, 463_000).buffer(50_000.0).exterior
+da = uda.ugrid.intersect_linestring(ring)
 show_line_selection(uda, da, *shapely.get_coordinates(ring).T)
 
 # %%
@@ -233,3 +234,5 @@ subset.ugrid.plot(vmin=-20, vmax=90, cmap="terrain", aspect=1, size=5)
 # In general, index selection should only be performed on the "core" dimension
 # of the UGRID topology. This is the edge dimension for 1D topologies, and the
 # face dimension for 2D topologies.
+
+# %%
