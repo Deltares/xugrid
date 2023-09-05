@@ -1500,9 +1500,12 @@ class Ugrid2d(AbstractUgrid):
         nonperiodic_grid: Ugrid2d
         aligned: xr.DataArray or xr.Dataset
         """
-        xmin, _, xmax, _ = self.bounds
-        half_domain = 0.5 * (xmax - xmin)
+        xleft, _, xright, _ = self.bounds
+        half_domain = 0.5 * (xright - xleft)
 
+        # Extract all x coordinates for every face. Then identify the nodes
+        # which have a value of e.g. -180, while the max x value for the face
+        # is 180.0. These nodes should be duplicated.
         x = self.face_node_coordinates[..., 0]
         is_periodic = (np.nanmax(x, axis=1)[:, np.newaxis] - x) > half_domain
         periodic_nodes = self.face_node_connectivity[is_periodic]
