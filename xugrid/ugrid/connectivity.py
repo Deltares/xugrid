@@ -524,11 +524,9 @@ def area(
     nodes = np.column_stack([node_x, node_y])
     closed, _ = close_polygons(face_node_connectivity, fill_value)
     coordinates = nodes[closed]
-    # Shift coordinates to avoid precision loss
-    coordinates[..., 0] -= node_x.mean()
-    coordinates[..., 1] -= node_y.mean()
-    a = coordinates[:, :-1]
-    b = coordinates[:, 1:]
+    xy0 = coordinates[:, 0]
+    a = coordinates[:, :-1] - xy0[:, np.newaxis]
+    b = coordinates[:, 1:] - xy0[:, np.newaxis]
     determinant = np.cross(a, b)
     return 0.5 * abs(determinant.sum(axis=1))
 
