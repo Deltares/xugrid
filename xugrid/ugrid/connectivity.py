@@ -711,6 +711,13 @@ def _binary_iterate(
     if input.dtype != np.bool_:
         raise TypeError("input dtype should be bool")
 
+    ndim = input.ndim
+    if ndim != 1:
+        raise ValueError(
+            "Binary operations are only supported for a single (face)"
+            f"dimension. Found {ndim} dimensions."
+        )
+
     coo = connectivity.tocoo()
     i = coo.row
     j = coo.col
