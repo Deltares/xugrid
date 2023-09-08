@@ -552,14 +552,16 @@ def centroids(
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
         closed, _ = close_polygons(face_node_connectivity, fill_value)
         coordinates = nodes[closed]
-        # Shift coordinates to avoid precision loss
-        a = coordinates[:, :-1]
-        b = coordinates[:, 1:]
+        # Express coordinates relative to first node
+        xy0 = coordinates[:, 0]
+        a = coordinates[:, :-1] - xy0[:, np.newaxis]
+        b = coordinates[:, 1:] - xy0[:, np.newaxis]
         c = a + b
         determinant = np.cross(a, b)
         area_weight = 1.0 / (3.0 * determinant.sum(axis=1))
         centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
         centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
+        centroid_coordinates += xy0
         return centroid_coordinates
 
 
