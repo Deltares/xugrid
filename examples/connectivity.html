@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -36,8 +36,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=927b94d3fcb96560df09" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=927b94d3fcb96560df09" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=927b94d3fcb96560df09"></script>
 
     <script src="../_static/documentation_options.js?v=153a81be"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
@@ -57,6 +58,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -97,7 +107,8 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
   
@@ -121,7 +132,6 @@
 </a></div>
     
   </div>
-  
   
   <div class="col-lg-9 navbar-header-items">
     
@@ -166,23 +176,25 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__kbd-shortcut">Search</span>
+    <span><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -219,18 +231,20 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__kbd-shortcut">Search</span>
+    <span><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
@@ -291,10 +305,10 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -380,8 +394,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -485,7 +499,7 @@ with a grid in which all cells are given a value of <code class="docutils litera
 <span class="n">iter5</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_001.png" srcset="../_images/sphx_glr_connectivity_001.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd10bd2130&gt;
+<img src="../_images/sphx_glr_connectivity_001.png" srcset="../_images/sphx_glr_connectivity_001.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7bfc97a60&gt;
 </pre></div>
 </div>
 <p>By default, the border value for binary dilation is <strong>also</strong> set to
@@ -499,7 +513,7 @@ start by setting a single value in the center of the grid to <code class="docuti
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_002.png" srcset="../_images/sphx_glr_connectivity_002.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd060c1a00&gt;
+<img src="../_images/sphx_glr_connectivity_002.png" srcset="../_images/sphx_glr_connectivity_002.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b70b4550&gt;
 </pre></div>
 </div>
 <p>Now let’s run two dilations: one with the default border, and one with the
@@ -512,7 +526,7 @@ alternative border value:</p>
 <span class="n">iter1_boundary</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_003.png" srcset="../_images/sphx_glr_connectivity_003.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd07d0b8b0&gt;
+<img src="../_images/sphx_glr_connectivity_003.png" srcset="../_images/sphx_glr_connectivity_003.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b520fc70&gt;
 </pre></div>
 </div>
 </section>
@@ -528,7 +542,7 @@ analyse connected parts of the mesh.</p>
 <span class="n">labeled</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdBu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_004.png" srcset="../_images/sphx_glr_connectivity_004.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd10cce610&gt;
+<img src="../_images/sphx_glr_connectivity_004.png" srcset="../_images/sphx_glr_connectivity_004.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b71be550&gt;
 </pre></div>
 </div>
 </section>
@@ -540,7 +554,7 @@ Tesselation.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">voronoi_grid</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_005.png" srcset="../_images/sphx_glr_connectivity_005.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcd10d09be0&gt;
+<img src="../_images/sphx_glr_connectivity_005.png" srcset="../_images/sphx_glr_connectivity_005.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fc7b5600fd0&gt;
 </pre></div>
 </div>
 <p>There are two alternative flavors to consider. We can fully ignore the
@@ -561,7 +575,7 @@ the original.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">convex_exterior</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_006.png" srcset="../_images/sphx_glr_connectivity_006.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcd10accc70&gt;
+<img src="../_images/sphx_glr_connectivity_006.png" srcset="../_images/sphx_glr_connectivity_006.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fc7b65a6100&gt;
 </pre></div>
 </div>
 </section>
@@ -577,7 +591,7 @@ them very attractive for e.g. visualization.</p>
 <span class="n">xugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">triangulation</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_007.png" srcset="../_images/sphx_glr_connectivity_007.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcd06cf8ee0&gt;
+<img src="../_images/sphx_glr_connectivity_007.png" srcset="../_images/sphx_glr_connectivity_007.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fc7b57373d0&gt;
 </pre></div>
 </div>
 </section>
@@ -608,7 +622,7 @@ the upper and lower parts:</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_008.png" srcset="../_images/sphx_glr_connectivity_008.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fcd06e0df10&gt;
+<img src="../_images/sphx_glr_connectivity_008.png" srcset="../_images/sphx_glr_connectivity_008.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fc7b6cc0880&gt;
 </pre></div>
 </div>
 <p>We can now use Laplace interpolation to fill the gaps in the grid.</p>
@@ -616,7 +630,7 @@ the upper and lower parts:</p>
 <span class="n">filled</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gist_rainbow&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">7.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_009.png" srcset="../_images/sphx_glr_connectivity_009.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd0612fc70&gt;
+<img src="../_images/sphx_glr_connectivity_009.png" srcset="../_images/sphx_glr_connectivity_009.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b5237c40&gt;
 </pre></div>
 </div>
 </section>
@@ -634,7 +648,7 @@ grids for bandwith reduction.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_010.png" srcset="../_images/sphx_glr_connectivity_010.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fcd07b71eb0&gt;
+<img src="../_images/sphx_glr_connectivity_010.png" srcset="../_images/sphx_glr_connectivity_010.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fc7b70178b0&gt;
 </pre></div>
 </div>
 <p>The bandwidth of this matrix is poor. Connections are all over the place: low
@@ -648,10 +662,10 @@ locality:</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greys&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_connectivity_011.png" srcset="../_images/sphx_glr_connectivity_011.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fcd05e11ee0&gt;
+<img src="../_images/sphx_glr_connectivity_011.png" srcset="../_images/sphx_glr_connectivity_011.png" alt="connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fc7b7121220&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.740 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.608 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-connectivity-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6b0c084f5a0bb605c9e7dc95a7138aea/connectivity.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">connectivity.py</span></code></a></p>
@@ -669,11 +683,10 @@ locality:</p>
               
               
               
-                <footer class="bd-footer-article">
-                  
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="vector_conversion.html"
@@ -693,10 +706,7 @@ locality:</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -743,8 +753,8 @@ locality:</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=927b94d3fcb96560df09"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=927b94d3fcb96560df09"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -762,7 +772,7 @@ locality:</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>
@@ -770,10 +780,11 @@ locality:</p>
     </div>
   
   
+  
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.0.
 </p></div>
       
     </div>

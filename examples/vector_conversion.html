@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=927b94d3fcb96560df09" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -36,8 +36,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=927b94d3fcb96560df09" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=927b94d3fcb96560df09" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=927b94d3fcb96560df09"></script>
 
     <script src="../_static/documentation_options.js?v=153a81be"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
@@ -57,6 +58,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -97,7 +107,8 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
   
@@ -121,7 +132,6 @@
 </a></div>
     
   </div>
-  
   
   <div class="col-lg-9 navbar-header-items">
     
@@ -166,23 +176,25 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__kbd-shortcut">Search</span>
+    <span><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -219,18 +231,20 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__kbd-shortcut">Search</span>
+    <span><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
@@ -291,10 +305,10 @@ document.write(`
           <div class="navbar-item">
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -380,8 +394,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
@@ -433,7 +447,7 @@ unstructured grids. These are demonstrated below.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd07a05d00&gt;
+<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b6ed9040&gt;
 </pre></div>
 </div>
 <section id="conversion-to-geodataframe">
@@ -844,9 +858,9 @@ Coordinates:
 Data variables:
     elevation      (mesh2d_nFaces) float32 1.17 9.81 54.04 ... 0.28 -15.83 -0.45
     mesh2d_face_x  (mesh2d_nFaces) float64 2.388e+04 1.86e+05 ... 3.03e+04
-    mesh2d_face_y  (mesh2d_nFaces) float64 3.648e+05 4.171e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-05e3d93a-9232-46da-a5df-6dc90986e988' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-05e3d93a-9232-46da-a5df-6dc90986e988' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-f366469a-0c7e-4f4c-abfc-7921987bfd7b' class='xr-section-summary-in' type='checkbox'  checked><label for='section-f366469a-0c7e-4f4c-abfc-7921987bfd7b' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-c80a4c4e-e52e-42a3-ba49-b187af627b74' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c80a4c4e-e52e-42a3-ba49-b187af627b74' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6827ff97-b8dd-4b4f-82b5-c1cd42a470b2' class='xr-var-data-in' type='checkbox'><label for='data-6827ff97-b8dd-4b4f-82b5-c1cd42a470b2' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9a12a508-6e81-49cb-8da6-0369fb054655' class='xr-section-summary-in' type='checkbox'  checked><label for='section-9a12a508-6e81-49cb-8da6-0369fb054655' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-051a722d-8e44-4c73-b19d-af8e20c42d59' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-051a722d-8e44-4c73-b19d-af8e20c42d59' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0c313e52-f3f4-4fb8-a270-36c01b46c0c4' class='xr-var-data-in' type='checkbox'><label for='data-0c313e52-f3f4-4fb8-a270-36c01b46c0c4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-388506ea-ff1c-4f84-aa8d-e8de92d375fe' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-388506ea-ff1c-4f84-aa8d-e8de92d375fe' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e2626b9d-6676-499c-9891-08e432d17041' class='xr-var-data-in' type='checkbox'><label for='data-e2626b9d-6676-499c-9891-08e432d17041' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-4a08163a-8e45-44a2-804f-6356eff88ecd' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4a08163a-8e45-44a2-804f-6356eff88ecd' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-fe631204-01eb-436d-9fb1-7ce8eb618ab0' class='xr-var-data-in' type='checkbox'><label for='data-fe631204-01eb-436d-9fb1-7ce8eb618ab0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2058b45b-fb5b-48c1-b337-2c9abe4ebd2d' class='xr-section-summary-in' type='checkbox'  ><label for='section-2058b45b-fb5b-48c1-b337-2c9abe4ebd2d' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-be295e42-76db-4d6e-8bed-87ccd03590b3' class='xr-index-data-in' type='checkbox'/><label for='index-be295e42-76db-4d6e-8bed-87ccd03590b3' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ac9eaa6a-6abf-4807-912d-a6eb4d9f16e3' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ac9eaa6a-6abf-4807-912d-a6eb4d9f16e3' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    mesh2d_face_y  (mesh2d_nFaces) float64 3.648e+05 4.171e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-afd16a1b-e548-4056-8743-27840c9f2074' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-afd16a1b-e548-4056-8743-27840c9f2074' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-4e7aded8-25f0-4992-82ce-986aebaed500' class='xr-section-summary-in' type='checkbox'  checked><label for='section-4e7aded8-25f0-4992-82ce-986aebaed500' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-f525975e-7095-40f4-a2dc-f7e8e6938dd9' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f525975e-7095-40f4-a2dc-f7e8e6938dd9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-29ca1be0-9c68-494f-80b8-212db8ba177f' class='xr-var-data-in' type='checkbox'><label for='data-29ca1be0-9c68-494f-80b8-212db8ba177f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bba7a9e3-3c55-4a7c-b02e-8f04ce81fc5a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-bba7a9e3-3c55-4a7c-b02e-8f04ce81fc5a' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-4ff85b39-6dd0-4109-a9dd-65a8d60731a7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4ff85b39-6dd0-4109-a9dd-65a8d60731a7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7ea5b135-4422-4b1e-99c0-6bb9bd1534a3' class='xr-var-data-in' type='checkbox'><label for='data-7ea5b135-4422-4b1e-99c0-6bb9bd1534a3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-697f5ab5-b780-4c22-8f94-7a92f1c9a36c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-697f5ab5-b780-4c22-8f94-7a92f1c9a36c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8bece676-a968-4987-8ad1-c0e621ee101b' class='xr-var-data-in' type='checkbox'><label for='data-8bece676-a968-4987-8ad1-c0e621ee101b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-904c7a82-9682-4ac3-8242-7ab8394bf265' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-904c7a82-9682-4ac3-8242-7ab8394bf265' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-39a6289b-a8f6-4346-bf08-4a403e1ccc1b' class='xr-var-data-in' type='checkbox'><label for='data-39a6289b-a8f6-4346-bf08-4a403e1ccc1b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-3f1467a5-f666-42f0-acd9-cdfb980d18a2' class='xr-section-summary-in' type='checkbox'  ><label for='section-3f1467a5-f666-42f0-acd9-cdfb980d18a2' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-daef82ae-e555-4787-b97d-e175fc3a866b' class='xr-index-data-in' type='checkbox'/><label for='index-daef82ae-e555-4787-b97d-e175fc3a866b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8d737c0e-6709-4c70-bea0-8cc9de5a5392' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-8d737c0e-6709-4c70-bea0-8cc9de5a5392' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><div class="admonition note">
@@ -882,7 +896,7 @@ burn into the grid.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd06d80760&gt;
+<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b6673e20&gt;
 </pre></div>
 </div>
 <p>This makes it very easy to classify and group data. Let’s say
@@ -1262,9 +1276,9 @@ array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
 Coordinates:
   * id       (id) float64 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-dbdce648-f7bb-4d81-b8c0-c7ab58b47821' class='xr-array-in' type='checkbox' checked><label for='section-dbdce648-f7bb-4d81-b8c0-c7ab58b47821' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-114c9a04-debc-4114-a8aa-496541a87a2b' class='xr-array-in' type='checkbox' checked><label for='section-114c9a04-debc-4114-a8aa-496541a87a2b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
        52.252567  , 12.194658  , -1.7175047 , 11.021334  ,  3.0442472 ,
-       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-d11c4236-5d70-4e12-868a-19f747522802' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d11c4236-5d70-4e12-868a-19f747522802' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-ae2a23ff-7294-4ef6-a1ce-89c3bf36789d' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ae2a23ff-7294-4ef6-a1ce-89c3bf36789d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6e00a4e8-f85d-48cf-894d-cd9e14f28e71' class='xr-var-data-in' type='checkbox'><label for='data-6e00a4e8-f85d-48cf-894d-cd9e14f28e71' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9ece3853-654b-48de-8d75-4daa09b1a19d' class='xr-section-summary-in' type='checkbox'  ><label for='section-9ece3853-654b-48de-8d75-4daa09b1a19d' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>id</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-f5343520-159e-408f-a332-424a422318ea' class='xr-index-data-in' type='checkbox'/><label for='index-f5343520-159e-408f-a332-424a422318ea' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0], dtype=&#x27;float64&#x27;, name=&#x27;id&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b624f426-21f2-4c56-849e-6c68dd3f95e5' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b624f426-21f2-4c56-849e-6c68dd3f95e5' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-c608b71f-0a1f-4f08-ae13-e46a957463ce' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c608b71f-0a1f-4f08-ae13-e46a957463ce' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-27bd0735-0e3f-45d1-96ad-833dca3b158b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-27bd0735-0e3f-45d1-96ad-833dca3b158b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-68ee2680-1ea7-47fd-8db2-c8fc1b649e68' class='xr-var-data-in' type='checkbox'><label for='data-68ee2680-1ea7-47fd-8db2-c8fc1b649e68' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-329349bf-5852-4f2c-9479-2a25fa4d4cdd' class='xr-section-summary-in' type='checkbox'  ><label for='section-329349bf-5852-4f2c-9479-2a25fa4d4cdd' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>id</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-1081aece-f8a6-4fb7-8aa0-81c262eb428b' class='xr-index-data-in' type='checkbox'/><label for='index-1081aece-f8a6-4fb7-8aa0-81c262eb428b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0], dtype=&#x27;float64&#x27;, name=&#x27;id&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e7d0e50f-4dcd-435a-861d-a1e92bb1a05a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e7d0e50f-4dcd-435a-861d-a1e92bb1a05a' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>This is a convenient way to create masks for specific regions:</p>
@@ -1304,7 +1318,7 @@ by setting <code class="docutils literal notranslate"><span class="pre">all_touc
 <span class="n">modified</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd10bc2e20&gt;
+<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7bfd89f10&gt;
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">all_touched=True</span></code> is less suitable when differently valued
@@ -1364,7 +1378,7 @@ burn operation.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fcd01b5bdc0&gt;
+<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fc7b0f9ae20&gt;
 </pre></div>
 </div>
 </section>
@@ -1421,7 +1435,7 @@ centroid of an edge, it is snapped to that edge.</p>
 triangles in the lower left corner which are surrounded by the snapped edges.
 In general, results are best when the line segments are relatively large
 compare to the grid faces.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.861 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.839 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-vector-conversion-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/714f83d87afaca41fed5d7f2c5f887d4/vector_conversion.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">vector_conversion.py</span></code></a></p>
@@ -1439,11 +1453,10 @@ compare to the grid faces.</p>
               
               
               
-                <footer class="bd-footer-article">
-                  
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="overlap_regridder.html"
@@ -1463,10 +1476,7 @@ compare to the grid faces.</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -1510,8 +1520,8 @@ compare to the grid faces.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=927b94d3fcb96560df09"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=927b94d3fcb96560df09"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1529,7 +1539,7 @@ compare to the grid faces.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>
@@ -1537,10 +1547,11 @@ compare to the grid faces.</p>
     </div>
   
   
+  
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.0.
 </p></div>
       
     </div>
