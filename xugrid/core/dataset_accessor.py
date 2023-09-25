@@ -212,10 +212,20 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         grid.set_node_coords(node_x, node_y, self.obj)
 
     def sel(self, x=None, y=None):
-        result = self.obj
+        new_obj = self.obj
+        new_grids = []
         for grid in self.grids:
-            result = self._sel(result, grid, x, y)
-        return result
+            result = grid.sel(new_obj, x, y)
+            if isinstance(result, tuple):
+                new_obj, new_grid = result
+                new_grids.append(new_grid)
+            else:
+                new_obj = result
+
+        if new_grids:
+            return UgridDataset(new_obj, new_grids)
+        else:
+            return result
 
     def sel_points(self, x, y):
         """

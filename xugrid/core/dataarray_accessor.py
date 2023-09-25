@@ -168,7 +168,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         selection: Union[UgridDataArray, UgridDataset, xr.DataArray, xr.Dataset]
         """
-        return self._sel(self.obj, self.grid, x, y)
+        result = self.grid.sel(self.obj, x, y)
+        if isinstance(result, tuple):
+            return UgridDataArray(*result)
+        else:
+            return result
 
     def sel_points(self, x, y):
         """

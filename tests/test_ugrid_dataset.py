@@ -692,40 +692,45 @@ class TestUgridDataset:
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
 
-def test_multiple_grids():
-    uds = xugrid.UgridDataset(grids=GRID())
-    assert len(uds.grids) == 1
-    uda = xugrid.UgridDataArray(DARRAY(), GRID())
-    uds["a"] = uda
-    assert len(uds.grids) == 1
-    assert isinstance(uds.ugrid.grid, xugrid.Ugrid2d)
+class TestMultiToplogyUgridDataset:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.uds = xugrid.UgridDataset(grids=GRID())
+        uda = xugrid.UgridDataArray(DARRAY(), GRID())
+        self.uds["a"] = uda
 
-    xy = np.array(
-        [
-            [0.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 2.0],
-        ]
-    )
-    grid = xugrid.Ugrid1d(
-        node_x=xy[:, 0],
-        node_y=xy[:, 1],
-        fill_value=-1,
-        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
-    )
-    uda1d = xugrid.UgridDataArray(
-        xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
-        grid,
-    )
+        xy = np.array(
+            [
+                [0.0, 0.0],
+                [1.0, 1.0],
+                [2.0, 2.0],
+            ]
+        )
+        grid = xugrid.Ugrid1d(
+            node_x=xy[:, 0],
+            node_y=xy[:, 1],
+            fill_value=-1,
+            edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+        )
+        self.uds["b"] = xugrid.UgridDataArray(
+            xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
+            grid,
+        )
 
-    uds["b"] = uda1d
-    assert len(uds.grids) == 2
+    def test_grid_membership(self):
+        assert len(self.uds.grids) == 2
 
-    with pytest.raises(TypeError):
-        uds.ugrid.grid
+    def test_grid_accessor__error(self):
+        with pytest.raises(TypeError):
+            self.uds.ugrid.grid
 
-    with pytest.raises(TypeError):
-        uds.grid
+        with pytest.raises(TypeError):
+            self.uds.grid
+
+    def test_multi_topology_sel(self):
+        result = self.uds.ugrid.sel(x=slice(-10, 10), y=slice(-10, 10))
+        # Ensure both grids are still present
+        assert len(result.ugrid.grids) == 2
 
 
 def test_multiple_coordinates():

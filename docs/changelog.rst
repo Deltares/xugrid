@@ -26,6 +26,13 @@ Changed
 - Selection operations along a line, or at point locations, will now prefix the
   name of the grid in the x and y coordinates. This avoids name collisions when
   multiple topologies are present in a dataset.
+  
+Fixed
+~~~~~
+
+- :meth:`xugrid.UgridDatasetAccessor.sel` would return only a single grid
+  topology even when the selection subject contains more than one grid. It now
+  correctly returns subsets of all topologies.
 
 [0.6.4] 2023-08-22
 ------------------
