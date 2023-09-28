@@ -4,7 +4,6 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
-import matplotlib.pyplot as plt
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
