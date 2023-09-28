@@ -392,7 +392,7 @@ document.write(`
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -785,17 +785,20 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unexpected value for </span><span class="si">{</span><span class="n">subset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">invalid_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subset</span><span class="p">)]</span>
+            <span class="n">valid_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subset</span><span class="p">))</span>
+            <span class="n">invalid_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_vars</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">invalid_vars</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;coords&quot;</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;some variables in coords are not coordinates on &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;the first dataset: </span><span class="si">{</span><span class="n">invalid_vars</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;the variables </span><span class="si">{</span><span class="n">invalid_vars</span><span class="si">}</span><span class="s2"> in coords are not &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;found in the coordinates of the first dataset </span><span class="si">{</span><span class="n">valid_vars</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># note: data_vars are not listed in the error message here,</span>
+                    <span class="c1"># because there may be lots of them</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="s2">&quot;some variables in data_vars are not data variables &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;on the first dataset: </span><span class="si">{</span><span class="n">invalid_vars</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;the variables </span><span class="si">{</span><span class="n">invalid_vars</span><span class="si">}</span><span class="s2"> in data_vars are not &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;found in the data variables of the first dataset&quot;</span>
                     <span class="p">)</span>
             <span class="n">concat_over</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
 
@@ -895,8 +898,7 @@ document.write(`
 
     <span class="c1"># case where concat dimension is a coordinate or data_var but not a dimension</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">coord_names</span> <span class="ow">or</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">data_names</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="p">:</span>
-        <span class="c1"># TODO: Overriding type because .expand_dims has incorrect typing:</span>
-        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">T_Dataset</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span>
 
     <span class="c1"># determine which variables to concatenate</span>
     <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span> <span class="o">=</span> <span class="n">_calc_concat_over</span><span class="p">(</span>
@@ -1099,8 +1101,7 @@ document.write(`
             <span class="k">if</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;identical&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;array names not identical&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># TODO: Overriding type because .rename has incorrect typing:</span>
-                <span class="n">arr</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">T_DataArray</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">_to_temp_dataset</span><span class="p">())</span>
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">_dataset_concat</span><span class="p">(</span>

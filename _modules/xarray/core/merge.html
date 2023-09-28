@@ -1114,6 +1114,9 @@ document.write(`
     <span class="n">dims</span> <span class="o">=</span> <span class="n">calculate_dimensions</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
 
     <span class="n">coord_names</span><span class="p">,</span> <span class="n">noncoord_names</span> <span class="o">=</span> <span class="n">determine_coords</span><span class="p">(</span><span class="n">coerced</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
+        <span class="c1"># coordinates may be dropped in merged results</span>
+        <span class="n">coord_names</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">explicit_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">assert_valid_explicit_coords</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">explicit_coords</span><span class="p">)</span>
         <span class="n">coord_names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">explicit_coords</span><span class="p">)</span>

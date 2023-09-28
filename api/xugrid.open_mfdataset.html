@@ -755,7 +755,9 @@ the result.</p></li>
 <p>If a callable, it must expect a sequence of <code class="docutils literal notranslate"><span class="pre">attrs</span></code> dicts and a context object
 as its only parameters.</p>
 </p></li>
-<li><p><strong>**kwargs</strong> (<em>optional</em>) – Additional arguments passed on to <code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_dataset()</span></code>.</p></li>
+<li><p><strong>**kwargs</strong> (<em>optional</em>) – Additional arguments passed on to <code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_dataset()</span></code>. For an
+overview of some of the possible options, see the documentation of
+<code class="xref py py-func docutils literal notranslate"><span class="pre">xarray.open_dataset()</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -783,6 +785,13 @@ to do this is through the use of <code class="docutils literal notranslate"><spa
 <span class="gp">&gt;&gt;&gt; </span><span class="n">partial_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_preprocess</span><span class="p">,</span> <span class="n">lon_bnds</span><span class="o">=</span><span class="n">lon_bnds</span><span class="p">,</span> <span class="n">lat_bnds</span><span class="o">=</span><span class="n">lat_bnds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s2">&quot;file_*.nc&quot;</span><span class="p">,</span> <span class="n">concat_dim</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">preprocess</span><span class="o">=</span><span class="n">partial_func</span>
+<span class="gp">... </span><span class="p">)</span>  
+</pre></div>
+</div>
+<p>It is also possible to use any argument to <code class="docutils literal notranslate"><span class="pre">open_dataset</span></code> together
+with <code class="docutils literal notranslate"><span class="pre">open_mfdataset</span></code>, such as for example <code class="docutils literal notranslate"><span class="pre">drop_variables</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;file.nc&quot;</span><span class="p">,</span> <span class="n">drop_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;varname_1&quot;</span><span class="p">,</span> <span class="s2">&quot;varname_2&quot;</span><span class="p">]</span>  <span class="c1"># any list of vars</span>
 <span class="gp">... </span><span class="p">)</span>  
 </pre></div>
 </div>

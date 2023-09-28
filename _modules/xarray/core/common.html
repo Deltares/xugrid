@@ -436,6 +436,7 @@ document.write(`
         <span class="n">DatetimeLike</span><span class="p">,</span>
         <span class="n">DTypeLikeSave</span><span class="p">,</span>
         <span class="n">ScalarOrArray</span><span class="p">,</span>
+        <span class="n">Self</span><span class="p">,</span>
         <span class="n">SideOptions</span><span class="p">,</span>
         <span class="n">T_Chunks</span><span class="p">,</span>
         <span class="n">T_DataWithCoords</span><span class="p">,</span>
@@ -772,11 +773,11 @@ document.write(`
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_close&quot;</span><span class="p">,)</span>
 
     <span class="k">def</span> <span class="nf">squeeze</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new object with squeezed data.</span>
 
 <span class="sd">        Parameters</span>
@@ -805,12 +806,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="n">drop</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">})</span>
 
     <span class="k">def</span> <span class="nf">clip</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="nb">min</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">max</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array whose values are limited to ``[min, max]``.</span>
 <span class="sd">        At least one of max or min must be given.</span>
@@ -863,10 +864,10 @@ document.write(`
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="k">def</span> <span class="nf">assign_coords</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">coords_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign new coordinates to this object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -1011,9 +1012,7 @@ document.write(`
         <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign new attrs to this object.</span>
 
 <span class="sd">        Returns a new object equivalent to ``self.attrs.update(*args, **kwargs)``.</span>
@@ -1452,10 +1451,11 @@ document.write(`
             <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter elements from this object according to a condition.</span>
+
+<span class="sd">        Returns elements from &#39;DataArray&#39;, where &#39;cond&#39; is True,</span>
+<span class="sd">        otherwise fill in &#39;other&#39;.</span>
 
 <span class="sd">        This operation follows the normal broadcasting and alignment rules that</span>
 <span class="sd">        xarray uses for binary arithmetic.</span>
@@ -1596,9 +1596,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is a missing value.</span>
 
 <span class="sd">        Parameters</span>
@@ -1641,9 +1639,7 @@ document.write(`
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is not a missing value.</span>
 
 <span class="sd">        Parameters</span>
@@ -1686,7 +1682,7 @@ document.write(`
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tests each value in the array for whether it is in test elements.</span>
 
 <span class="sd">        Parameters</span>
@@ -1735,7 +1731,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">astype</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1743,7 +1739,7 @@ document.write(`
         <span class="n">subok</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copy of the xarray object, with data cast to a specified type.</span>
 <span class="sd">        Leaves coordinate dtype unchanged.</span>
@@ -1810,7 +1806,7 @@ document.write(`
             <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataWithCoords</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

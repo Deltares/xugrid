@@ -395,6 +395,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">functools</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">xarray.plot.facetgrid</span> <span class="kn">import</span> <span class="n">_easy_facetgrid</span>
 <span class="kn">from</span> <span class="nn">xarray.plot.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_add_colorbar</span><span class="p">,</span>
@@ -402,7 +403,6 @@ document.write(`
     <span class="n">_process_cmap_cbar_kwargs</span><span class="p">,</span>
     <span class="n">_update_axes</span><span class="p">,</span>
     <span class="n">get_axis</span><span class="p">,</span>
-    <span class="n">import_matplotlib_pyplot</span><span class="p">,</span>
     <span class="n">label_from_attrs</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -641,8 +641,6 @@ document.write(`
             <span class="c1"># Need the decorated plotting function</span>
             <span class="n">allargs</span><span class="p">[</span><span class="s2">&quot;plotfunc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">plotfunc</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">_easy_facetgrid</span><span class="p">(</span><span class="n">darray</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;dataarray&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">allargs</span><span class="p">)</span>
-
-        <span class="n">plt</span> <span class="o">=</span> <span class="n">import_matplotlib_pyplot</span><span class="p">()</span>
 
         <span class="c1"># For 3d plot, ensure given ax is a Axes3D object</span>
         <span class="k">if</span> <span class="p">(</span>
