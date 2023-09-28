@@ -4,6 +4,7 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
+import matplotlib.pyplot as plt
 from xarray.plot.facetgrid import _easy_facetgrid
 from xarray.plot.utils import (
     _add_colorbar,
@@ -11,7 +12,6 @@ from xarray.plot.utils import (
     _process_cmap_cbar_kwargs,
     _update_axes,
     get_axis,
-    import_matplotlib_pyplot,
     label_from_attrs,
 )
 
@@ -250,8 +250,6 @@ def _plot2d(plotfunc):
             # Need the decorated plotting function
             allargs["plotfunc"] = globals()[plotfunc.__name__]
             return _easy_facetgrid(darray, kind="dataarray", **allargs)
-
-        plt = import_matplotlib_pyplot()
 
         # For 3d plot, ensure given ax is a Axes3D object
         if (
