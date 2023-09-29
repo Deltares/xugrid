@@ -5,7 +5,9 @@ import functools
 
 import numpy as np
 from xarray.plot.facetgrid import _easy_facetgrid
-from xarray.plot.utils import (
+
+from xugrid.constants import FloatDType
+from xugrid.plot.utils import (
     _add_colorbar,
     _ensure_plottable,
     _process_cmap_cbar_kwargs,
@@ -13,8 +15,6 @@ from xarray.plot.utils import (
     get_axis,
     label_from_attrs,
 )
-
-from xugrid.constants import FloatDType
 from xugrid.ugrid.connectivity import close_polygons
 
 NODE = 0

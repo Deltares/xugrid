@@ -26,7 +26,10 @@ Changed
 - Selection operations along a line, or at point locations, will now prefix the
   name of the grid in the x and y coordinates. This avoids name collisions when
   multiple topologies are present in a dataset.
-  
+- Xugrid now contains a partial copy of the xarray plot utils module, and its
+  tests. The latest xarray release broke xugrid (on import), since (private)
+  parts of xarray were used which no longer existed.
+ 
 Fixed
 ~~~~~
 
