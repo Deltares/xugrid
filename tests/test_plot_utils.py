@@ -6,6 +6,9 @@ Additionally, the _importorskip has been copied.
 
 We heavily discourage editing this file. Any update should only consist of
 copying updated parts of the xarray module.
+
+Xarray is licensed under Apache License 2.0:
+https://github.com/pydata/xarray/blob/main/LICENSE
 """
 from __future__ import annotations
 
