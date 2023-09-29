@@ -3,6 +3,8 @@ The full content is this module is copied from xarray.plot.utils.py. Unused
 parts are removed, so this module only contains about a third of the original's
 content.
 
+Additionally, _easy_facetgrid has been copied from xarray.plot.facetgrid.
+
 The reason is that these functions are all essentially private methods. Hence,
 Xarray provides no guarantees on breaking changes.
 
@@ -13,16 +15,18 @@ from __future__ import annotations
 
 import textwrap
 import warnings
-from collections.abc import Hashable, Iterable, Mapping
+from collections.abc import Callable, Hashable, Iterable, Mapping
 from datetime import datetime
 from inspect import getfullargspec
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from xarray.core.indexes import PandasMultiIndex
 from xarray.core.options import OPTIONS
 from xarray.core.pycompat import DuckArrayModule
+from xarray.core.types import T_DataArrayOrSet
 from xarray.core.utils import is_scalar, module_available
+from xarray.plot.facetgrid import FacetGrid
 
 nc_time_axis_available = module_available("nc_time_axis")
 
@@ -55,6 +59,7 @@ __all__ = [
     "_update_axes",
     "get_axis",
     "label_from_attrs",
+    "_easy_facetgrid",
 ]
 
 
@@ -750,3 +755,69 @@ def _process_cmap_cbar_kwargs(
         }
 
     return cmap_params, cbar_kwargs
+
+
+def _easy_facetgrid(
+    data: T_DataArrayOrSet,
+    plotfunc: Callable,
+    kind: Literal["line", "dataarray", "dataset", "plot1d"],
+    x: Hashable | None = None,
+    y: Hashable | None = None,
+    row: Hashable | None = None,
+    col: Hashable | None = None,
+    col_wrap: int | None = None,
+    sharex: bool = True,
+    sharey: bool = True,
+    aspect: float | None = None,
+    size: float | None = None,
+    subplot_kws: dict[str, Any] | None = None,
+    ax: Axes | None = None,
+    figsize: Iterable[float] | None = None,
+    **kwargs: Any,
+) -> FacetGrid[T_DataArrayOrSet]:
+    """
+    Convenience method to call xarray.plot.FacetGrid from 2d plotting methods
+
+    kwargs are the arguments to 2d plotting method
+    """
+    if ax is not None:
+        raise ValueError("Can't use axes when making faceted plots.")
+    if aspect is None:
+        aspect = 1
+    if size is None:
+        size = 3
+    elif figsize is not None:
+        raise ValueError("cannot provide both `figsize` and `size` arguments")
+    if kwargs.get("z") is not None:
+        # 3d plots doesn't support sharex, sharey, reset to mpl defaults:
+        sharex = False
+        sharey = False
+
+    g = FacetGrid(
+        data=data,
+        col=col,
+        row=row,
+        col_wrap=col_wrap,
+        sharex=sharex,
+        sharey=sharey,
+        figsize=figsize,
+        aspect=aspect,
+        size=size,
+        subplot_kws=subplot_kws,
+    )
+
+    if kind == "line":
+        return g.map_dataarray_line(plotfunc, x, y, **kwargs)
+
+    if kind == "dataarray":
+        return g.map_dataarray(plotfunc, x, y, **kwargs)
+
+    if kind == "plot1d":
+        return g.map_plot1d(plotfunc, x, y, **kwargs)
+
+    if kind == "dataset":
+        return g.map_dataset(plotfunc, x, y, **kwargs)
+
+    raise ValueError(
+        f"kind must be one of `line`, `dataarray`, `dataset` or `plot1d`, got {kind}"
+    )

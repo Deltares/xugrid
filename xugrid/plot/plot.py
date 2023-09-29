@@ -4,11 +4,11 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
-from xarray.plot.facetgrid import _easy_facetgrid
 
 from xugrid.constants import FloatDType
 from xugrid.plot.utils import (
     _add_colorbar,
+    _easy_facetgrid,
     _ensure_plottable,
     _process_cmap_cbar_kwargs,
     _update_axes,
