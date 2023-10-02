@@ -7,7 +7,6 @@ import xarray as xr
 from numba_celltree import CellTree2d
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
-from xarray.core.utils import either_dict_or_kwargs
 
 import xugrid
 from xugrid import conversion
@@ -20,6 +19,7 @@ from xugrid.constants import (
     IntDType,
     SparseMatrix,
 )
+from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 from xugrid.ugrid.voronoi import voronoi_topology

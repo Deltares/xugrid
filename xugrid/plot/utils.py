@@ -5,33 +5,35 @@ content.
 
 Additionally, _easy_facetgrid has been copied from xarray.plot.facetgrid.
 
-The reason is that these functions are all essentially private methods. Hence,
-Xarray provides no guarantees on breaking changes.
+The reason is that these functions are all private methods. Hence, Xarray
+provides no guarantees on breaking changes.
 
 We heavily discourage editing this file. Any update should only consist of
 copying updated parts of the xarray module.
+
+Some minor edits are necessary. These are marked by an comment with "EDIT:".
 
 Xarray is licensed under Apache License 2.0:
 https://github.com/pydata/xarray/blob/main/LICENSE
 """
 from __future__ import annotations
 
+import importlib
 import textwrap
-import warnings
 from collections.abc import Callable, Hashable, Iterable, Mapping
 from datetime import datetime
 from inspect import getfullargspec
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, Union
 
 import numpy as np
-from xarray.core.indexes import PandasMultiIndex
-from xarray.core.options import OPTIONS
-from xarray.core.pycompat import DuckArrayModule
-from xarray.core.types import T_DataArrayOrSet
-from xarray.core.utils import is_scalar, module_available
+from xarray import DataArray, Dataset
 from xarray.plot.facetgrid import FacetGrid
 
-nc_time_axis_available = module_available("nc_time_axis")
+# EDIT: added these here
+AspectOptions = Union[Literal["auto", "equal"], float, None]
+ScaleOptions = Literal["linear", "symlog", "log", "logit", None]
+T_DataArrayOrSet = TypeVar("T_DataArrayOrSet", bound=Union["Dataset", "DataArray"])
+nc_time_axis_available = importlib.util.find_spec("nc_time_axis") is not None
 
 
 try:
@@ -43,9 +45,6 @@ except ImportError:
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike
-    from xarray.core.dataarray import DataArray
-    from xarray.core.dataset import Dataset
-    from xarray.core.types import AspectOptions, ScaleOptions
 
     try:
         import matplotlib.pyplot as plt
@@ -290,14 +289,18 @@ def _determine_cmap_params(
 
     # Choose default colormaps if not provided
     if cmap is None:
+        # EDIT: replaced OPTIONS
         if divergent:
-            cmap = OPTIONS["cmap_divergent"]
+            cmap = "RdBu_r"
         else:
-            cmap = OPTIONS["cmap_sequential"]
+            cmap = "viridis"
 
     # Handle discrete levels
     if levels is not None:
-        if is_scalar(levels):
+        # EDIT: replaced is_scalar(levels) by np.issubdtype(type(levels), np.integer)
+        # xarray uses a relatelively complicated is_scalar function here. For
+        # the purposes of plotting, checking for an integer should do.
+        if np.issubdtype(type(levels), np.integer):
             if user_minmax:
                 levels = np.linspace(vmin, vmax, levels)
             elif levels == 1:
@@ -328,131 +331,6 @@ def _determine_cmap_params(
     return dict(
         vmin=vmin, vmax=vmax, cmap=cmap, extend=extend, levels=levels, norm=norm
     )
-
-
-def _infer_xy_labels_3d(
-    darray: DataArray | Dataset,
-    x: Hashable | None,
-    y: Hashable | None,
-    rgb: Hashable | None,
-) -> tuple[Hashable, Hashable]:
-    """
-    Determine x and y labels for showing RGB images.
-
-    Attempts to infer which dimension is RGB/RGBA by size and order of dims.
-
-    """
-    assert rgb is None or rgb != x
-    assert rgb is None or rgb != y
-    # Start by detecting and reporting invalid combinations of arguments
-    assert darray.ndim == 3
-    not_none = [a for a in (x, y, rgb) if a is not None]
-    if len(set(not_none)) < len(not_none):
-        raise ValueError(
-            "Dimension names must be None or unique strings, but imshow was "
-            f"passed x={x!r}, y={y!r}, and rgb={rgb!r}."
-        )
-    for label in not_none:
-        if label not in darray.dims:
-            raise ValueError(f"{label!r} is not a dimension")
-
-    # Then calculate rgb dimension if certain and check validity
-    could_be_color = [
-        label
-        for label in darray.dims
-        if darray[label].size in (3, 4) and label not in (x, y)
-    ]
-    if rgb is None and not could_be_color:
-        raise ValueError(
-            "A 3-dimensional array was passed to imshow(), but there is no "
-            "dimension that could be color.  At least one dimension must be "
-            "of size 3 (RGB) or 4 (RGBA), and not given as x or y."
-        )
-    if rgb is None and len(could_be_color) == 1:
-        rgb = could_be_color[0]
-    if rgb is not None and darray[rgb].size not in (3, 4):
-        raise ValueError(
-            f"Cannot interpret dim {rgb!r} of size {darray[rgb].size} as RGB or RGBA."
-        )
-
-    # If rgb dimension is still unknown, there must be two or three dimensions
-    # in could_be_color.  We therefore warn, and use a heuristic to break ties.
-    if rgb is None:
-        assert len(could_be_color) in (2, 3)
-        rgb = could_be_color[-1]
-        warnings.warn(
-            "Several dimensions of this array could be colors.  Xarray "
-            f"will use the last possible dimension ({rgb!r}) to match "
-            "matplotlib.pyplot.imshow.  You can pass names of x, y, "
-            "and/or rgb dimensions to override this guess."
-        )
-    assert rgb is not None
-
-    # Finally, we pick out the red slice and delegate to the 2D version:
-    return _infer_xy_labels(darray.isel({rgb: 0}), x, y)
-
-
-def _infer_xy_labels(
-    darray: DataArray | Dataset,
-    x: Hashable | None,
-    y: Hashable | None,
-    imshow: bool = False,
-    rgb: Hashable | None = None,
-) -> tuple[Hashable, Hashable]:
-    """
-    Determine x and y labels. For use in _plot2d
-
-    darray must be a 2 dimensional data array, or 3d for imshow only.
-    """
-    if (x is not None) and (x == y):
-        raise ValueError("x and y cannot be equal.")
-
-    if imshow and darray.ndim == 3:
-        return _infer_xy_labels_3d(darray, x, y, rgb)
-
-    if x is None and y is None:
-        if darray.ndim != 2:
-            raise ValueError("DataArray must be 2d")
-        y, x = darray.dims
-    elif x is None:
-        _assert_valid_xy(darray, y, "y")
-        x = darray.dims[0] if y == darray.dims[1] else darray.dims[1]
-    elif y is None:
-        _assert_valid_xy(darray, x, "x")
-        y = darray.dims[0] if x == darray.dims[1] else darray.dims[1]
-    else:
-        _assert_valid_xy(darray, x, "x")
-        _assert_valid_xy(darray, y, "y")
-
-        if darray._indexes.get(x, 1) is darray._indexes.get(y, 2):
-            if isinstance(darray._indexes[x], PandasMultiIndex):
-                raise ValueError("x and y cannot be levels of the same MultiIndex")
-
-    return x, y
-
-
-# TODO: Can by used to more than x or y, rename?
-def _assert_valid_xy(
-    darray: DataArray | Dataset, xy: Hashable | None, name: str
-) -> None:
-    """
-    make sure x and y passed to plotting functions are valid
-    """
-
-    # MultiIndex cannot be plotted; no point in allowing them here
-    multiindex_dims = {
-        idx.dim
-        for idx in darray.xindexes.get_unique()
-        if isinstance(idx, PandasMultiIndex)
-    }
-
-    valid_xy = (set(darray.dims) | set(darray.coords)) - multiindex_dims
-
-    if (xy is not None) and (xy not in valid_xy):
-        valid_xy_str = "', '".join(sorted(tuple(str(v) for v in valid_xy)))
-        raise ValueError(
-            f"{name} must be one of None, '{valid_xy_str}'. Received '{xy}' instead."
-        )
 
 
 def get_axis(
@@ -518,10 +396,11 @@ def _maybe_gca(**subplot_kws: Any) -> Axes:
 
 def _get_units_from_attrs(da: DataArray) -> str:
     """Extracts and formats the unit/units from a attributes."""
-    pint_array_type = DuckArrayModule("pint").type
+    # EDIT: removed pint support for now.
+    # pint_array_type = DuckArrayModule("pint").type
     units = " [{}]"
-    if isinstance(da.data, pint_array_type):
-        return units.format(str(da.data.units))
+    # if isinstance(da.data, pint_array_type):
+    #    return units.format(str(da.data.units))
     if "units" in da.attrs:
         return units.format(da.attrs["units"])
     if "unit" in da.attrs:

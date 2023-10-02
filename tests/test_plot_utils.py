@@ -19,7 +19,6 @@ import math
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 from numpy.testing import assert_array_equal  # noqa: F401
 from packaging.version import Version
 from xarray import DataArray
@@ -153,21 +152,7 @@ class TestDetermineCmapParams:
         assert cmap_params["levels"] is None
         assert cmap_params["norm"] is None
 
-    def test_cmap_sequential_option(self) -> None:
-        with xr.set_options(cmap_sequential="magma"):
-            cmap_params = _determine_cmap_params(self.data)
-            assert cmap_params["cmap"] == "magma"
-
-    def test_cmap_sequential_explicit_option(self) -> None:
-        with xr.set_options(cmap_sequential=mpl.colormaps["magma"]):
-            cmap_params = _determine_cmap_params(self.data)
-            assert cmap_params["cmap"] == mpl.colormaps["magma"]
-
-    def test_cmap_divergent_option(self) -> None:
-        with xr.set_options(cmap_divergent="magma"):
-            cmap_params = _determine_cmap_params(self.data, center=0.5)
-            assert cmap_params["cmap"] == "magma"
-
+    # EDIT: removed tests for xr.set_options.
     def test_nan_inf_are_ignored(self) -> None:
         cmap_params1 = _determine_cmap_params(self.data)
         data = self.data

@@ -4,10 +4,10 @@ from typing import Any, Dict, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import either_dict_or_kwargs
 
 from xugrid import conversion
 from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
+from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 

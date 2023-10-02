@@ -1,9 +1,11 @@
 from functools import wraps
 
 import xarray as xr
-from xarray.backends.api import DATAARRAY_NAME, DATAARRAY_VARIABLE
 
 from xugrid.core.wrap import UgridDataArray, UgridDataset
+
+DATAARRAY_NAME = "__xarray_dataarray_name__"
+DATAARRAY_VARIABLE = "__xarray_dataarray_variable__"
 
 
 def open_dataset(*args, **kwargs):
