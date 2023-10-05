@@ -136,8 +136,8 @@ section = bottom.ugrid.sel(y=section_y)
 section_mean = mean_bottom.ugrid.sel(y=section_y)
 
 fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(10, 5), sharex=True, sharey=True)
-section.plot.line(x="s", hue="layer", ax=ax0)
-section_mean.plot.line(x="s", hue="layer", ax=ax1)
+section.plot.line(x="mesh2d_s", hue="layer", ax=ax0)
+section_mean.plot.line(x="mesh2d_s", hue="layer", ax=ax1)
 
 # %%
 # BarycentricInterpolator
@@ -204,3 +204,5 @@ result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 # .. _layered: https://ugrid-conventions.github.io/ugrid-conventions/#3d-layered-mesh-topology
 # .. _xESMF: https://xesmf.readthedocs.io/en/latest/index.html
 # .. _not available: https://github.com/conda-forge/esmf-feedstock/issues/64
+
+# %%

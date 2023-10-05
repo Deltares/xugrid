@@ -4,10 +4,10 @@ from typing import Any, Dict, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import xarray as xr
-from xarray.core.utils import either_dict_or_kwargs
 
 from xugrid import conversion
 from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
+from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 
@@ -356,9 +356,6 @@ class Ugrid1d(AbstractUgrid):
                 " Ugrid1d topology."
             )
 
-    def sel_points(obj, x, y):
-        raise NotImplementedError("Cannot select points in a UGRID 1D topology")
-
     def isel(self, indexers=None, return_index=False, **indexers_kwargs):
         """
         Select based on node or edge.
@@ -522,6 +519,15 @@ class Ugrid1d(AbstractUgrid):
         ymax: float,
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
+
+    def sel_points(obj, x, y):
+        return obj
+
+    def intersect_line(self, obj, start, stop):
+        return obj
+
+    def intersect_linestring(self, obj, linestring):
+        return obj
 
     def topological_sort_by_dfs(self) -> IntArray:
         """

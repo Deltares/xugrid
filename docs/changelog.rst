@@ -9,13 +9,53 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Added
+~~~~~
+
+Changed
+~~~~~~~
+
+Fixed
+~~~~~
+
+[0.6.5] 2023-09-30
+------------------
+
+Added
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.intersect_line`,
+  :meth:`xugrid.Ugrid2d.intersect_linestring`
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_line`,
+  :meth:`xugrid.UgridDataArrayAccessor.intersect_linestring`,
+  :meth:`xugrid.UgridDatasetAccessor.intersect_line`, and
+  :meth:`xugrid.UgridDatasetAccessor.intersect_linestring` have been added to
+  intersect line and linestrings and extract the associated face data.
+
+Changed
+~~~~~~~
+
+- Selection operations along a line, or at point locations, will now prefix the
+  name of the grid in the x and y coordinates. This avoids name collisions when
+  multiple topologies are present in a dataset.
+- Xugrid now contains a partial copy of the xarray plot utils module, and its
+  tests. The latest xarray release broke xugrid (on import), since (private)
+  parts of xarray were used which no longer existed.
+ 
+Fixed
+~~~~~
+
+- :meth:`xugrid.UgridDatasetAccessor.sel` would return only a single grid
+  topology even when the selection subject contains more than one grid. It now
+  correctly returns subsets of all topologies.
+
 [0.6.4] 2023-08-22
 ------------------
 
 Fixed
 ~~~~~
 
-- Bug in :func:`xugrid.snap_to_grid`, which caused an ``IndexError``. 
+- Bug in :func:`xugrid.snap_to_grid`, which caused an ``IndexError``.
   See `#122 <https://github.com/Deltares/xugrid/issues/122>`_.
 
 

@@ -32,6 +32,22 @@ class AbstractUgridAccessor(abc.ABC):
     def to_crs():
         """ """
 
+    @abc.abstractmethod
+    def sel():
+        """ """
+
+    @abc.abstractmethod
+    def sel_points():
+        """ """
+
+    @abc.abstractmethod
+    def intersect_line():
+        """ """
+
+    @abc.abstractmethod
+    def intersect_linestring():
+        """ """
+
     @abc.abstractproperty
     def bounds():
         """ """
@@ -51,19 +67,6 @@ class AbstractUgridAccessor(abc.ABC):
     @abc.abstractproperty
     def topology():
         """ """
-
-    @staticmethod
-    def _sel(obj, grid, x, y):
-        from xugrid.core.wrap import maybe_xugrid
-
-        # TODO: also do vectorized indexing like xarray?
-        # Might not be worth it, as orthogonal and vectorized indexing are
-        # quite confusing.
-        result = grid.sel(obj, x, y)
-        if isinstance(result, tuple):
-            return maybe_xugrid(*result)
-        else:
-            return result
 
     @staticmethod
     def _raster_xy(bounds: Tuple[float, float, float, float], resolution: float):

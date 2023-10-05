@@ -4,18 +4,17 @@ This module is strongly inspired by / copied from xarray/plot/plot.py.
 import functools
 
 import numpy as np
-from xarray.plot.facetgrid import _easy_facetgrid
-from xarray.plot.utils import (
+
+from xugrid.constants import FloatDType
+from xugrid.plot.utils import (
     _add_colorbar,
+    _easy_facetgrid,
     _ensure_plottable,
     _process_cmap_cbar_kwargs,
     _update_axes,
     get_axis,
-    import_matplotlib_pyplot,
     label_from_attrs,
 )
-
-from xugrid.constants import FloatDType
 from xugrid.ugrid.connectivity import close_polygons
 
 NODE = 0
@@ -250,8 +249,6 @@ def _plot2d(plotfunc):
             # Need the decorated plotting function
             allargs["plotfunc"] = globals()[plotfunc.__name__]
             return _easy_facetgrid(darray, kind="dataarray", **allargs)
-
-        plt = import_matplotlib_pyplot()
 
         # For 3d plot, ensure given ax is a Axes3D object
         if (

@@ -212,10 +212,20 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         grid.set_node_coords(node_x, node_y, self.obj)
 
     def sel(self, x=None, y=None):
-        result = self.obj
+        new_obj = self.obj
+        new_grids = []
         for grid in self.grids:
-            result = self._sel(result, grid, x, y)
-        return result
+            result = grid.sel(new_obj, x, y)
+            if isinstance(result, tuple):
+                new_obj, new_grid = result
+                new_grids.append(new_grid)
+            else:
+                new_obj = result
+
+        if new_grids:
+            return UgridDataset(new_obj, new_grids)
+        else:
+            return result
 
     def sel_points(self, x, y):
         """
@@ -232,6 +242,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         Returns
         -------
         points: Union[xr.DataArray, xr.Dataset]
+            The name of the topology is prefixed in the x, y coordinates.
         """
         result = self.obj
         for grid in self.grids:
@@ -297,6 +308,52 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             new_grid, obj = grid.to_nonperiodic(xmax=xmax, obj=self.obj)
             grids.append(new_grid)
         return UgridDataset(obj, grids)
+
+    def intersect_line(
+        self, start: Sequence[float], end: Sequence[float]
+    ) -> xr.Dataset:
+        """
+        Intersect a line with the grid of this data, and fetch the values of
+        the intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        start: sequence of two floats
+            coordinate pair (x, y), designating the start point of the line.
+        end: sequence of two floats
+            coordinate pair (x, y), designating the end point of the line.
+
+        Returns
+        -------
+        intersection: xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        obj = self.obj
+        for grid in self.grids:
+            obj = grid.intersect_line(obj, start, end)
+        return obj
+
+    def intersect_linestring(self, linestring) -> xr.Dataset:
+        """
+        Intersect the grid along a collection of linestrings. Returns a new Dataset
+        with the values for each intersected segment.
+
+        Parameters
+        ----------
+        linestring: shapely.LineString
+
+        Returns
+        -------
+        intersection: xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        obj = self.obj
+        for grid in self.grids:
+            obj = grid.intersect_linestring(obj, linestring)
+        return obj
 
     def to_dataset(self, optional_attributes: bool = False):
         """

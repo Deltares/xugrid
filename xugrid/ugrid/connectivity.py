@@ -540,11 +540,9 @@ def area(
     nodes = np.column_stack([node_x, node_y])
     closed, _ = close_polygons(face_node_connectivity, fill_value)
     coordinates = nodes[closed]
-    # Shift coordinates to avoid precision loss
-    coordinates[..., 0] -= node_x.mean()
-    coordinates[..., 1] -= node_y.mean()
-    a = coordinates[:, :-1]
-    b = coordinates[:, 1:]
+    xy0 = coordinates[:, 0]
+    a = coordinates[:, :-1] - xy0[:, np.newaxis]
+    b = coordinates[:, 1:] - xy0[:, np.newaxis]
     determinant = np.cross(a, b)
     return 0.5 * abs(determinant.sum(axis=1))
 
@@ -568,14 +566,16 @@ def centroids(
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
         closed, _ = close_polygons(face_node_connectivity, fill_value)
         coordinates = nodes[closed]
-        # Shift coordinates to avoid precision loss
-        a = coordinates[:, :-1]
-        b = coordinates[:, 1:]
+        # Express coordinates relative to first node
+        xy0 = coordinates[:, 0]
+        a = coordinates[:, :-1] - xy0[:, np.newaxis]
+        b = coordinates[:, 1:] - xy0[:, np.newaxis]
         c = a + b
         determinant = np.cross(a, b)
         area_weight = 1.0 / (3.0 * determinant.sum(axis=1))
         centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
         centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
+        centroid_coordinates += xy0
         return centroid_coordinates
 
 
@@ -726,6 +726,13 @@ def _binary_iterate(
 ) -> BoolArray:
     if input.dtype != np.bool_:
         raise TypeError("input dtype should be bool")
+
+    ndim = input.ndim
+    if ndim != 1:
+        raise ValueError(
+            "Binary operations are only supported for a single (face)"
+            f"dimension. Found {ndim} dimensions."
+        )
 
     coo = connectivity.tocoo()
     i = coo.row

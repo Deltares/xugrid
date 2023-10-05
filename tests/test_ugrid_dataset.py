@@ -244,6 +244,32 @@ class TestUgridDataArray:
         assert actual.shape == (1,)
         assert actual.ugrid.grid.n_face == 1
 
+    def test_intersect_line(self):
+        p0 = (0.0, 0.0)
+        p1 = (2.0, 2.0)
+        actual = self.uda.ugrid.intersect_line(start=p0, end=p1)
+        sqrt2 = np.sqrt(2.0)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == ("mesh2d_nFaces",)
+        assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
+
+    def test_intersect_linestring(self):
+        linestring = shapely.geometry.LineString(
+            [
+                [0.5, 0.5],
+                [1.5, 0.5],
+                [1.5, 1.5],
+            ]
+        )
+        actual = self.uda.ugrid.intersect_linestring(linestring)
+        assert isinstance(actual, xr.DataArray)
+        assert actual.dims == ("mesh2d_nFaces",)
+        assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
+
     def test_rasterize(self):
         actual = self.uda.ugrid.rasterize(resolution=0.5)
         x = [0.25, 0.75, 1.25, 1.75]
@@ -573,6 +599,36 @@ class TestUgridDataset:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    def test_intersect_line(self):
+        p0 = (0.0, 0.0)
+        p1 = (2.0, 2.0)
+        actual = self.uds.ugrid.intersect_line(start=p0, end=p1)
+        sqrt2 = np.sqrt(2.0)
+        assert isinstance(actual, xr.Dataset)
+        assert actual.dims == {"mesh2d_nFaces": 2}
+        assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
+        assert "a" in actual
+        assert "b" in actual
+
+    def test_intersect_linestring(self):
+        linestring = shapely.geometry.LineString(
+            [
+                [0.5, 0.5],
+                [1.5, 0.5],
+                [1.5, 1.5],
+            ]
+        )
+        actual = self.uds.ugrid.intersect_linestring(linestring)
+        assert isinstance(actual, xr.Dataset)
+        assert actual.dims == {"mesh2d_nFaces": 4}
+        assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
+        assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
+        assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
+        assert "a" in actual
+        assert "b" in actual
+
     def test_partitioning(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         assert len(partitions) == 2
@@ -636,40 +692,45 @@ class TestUgridDataset:
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
 
-def test_multiple_grids():
-    uds = xugrid.UgridDataset(grids=GRID())
-    assert len(uds.grids) == 1
-    uda = xugrid.UgridDataArray(DARRAY(), GRID())
-    uds["a"] = uda
-    assert len(uds.grids) == 1
-    assert isinstance(uds.ugrid.grid, xugrid.Ugrid2d)
+class TestMultiToplogyUgridDataset:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.uds = xugrid.UgridDataset(grids=GRID())
+        uda = xugrid.UgridDataArray(DARRAY(), GRID())
+        self.uds["a"] = uda
 
-    xy = np.array(
-        [
-            [0.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 2.0],
-        ]
-    )
-    grid = xugrid.Ugrid1d(
-        node_x=xy[:, 0],
-        node_y=xy[:, 1],
-        fill_value=-1,
-        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
-    )
-    uda1d = xugrid.UgridDataArray(
-        xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
-        grid,
-    )
+        xy = np.array(
+            [
+                [0.0, 0.0],
+                [1.0, 1.0],
+                [2.0, 2.0],
+            ]
+        )
+        grid = xugrid.Ugrid1d(
+            node_x=xy[:, 0],
+            node_y=xy[:, 1],
+            fill_value=-1,
+            edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+        )
+        self.uds["b"] = xugrid.UgridDataArray(
+            xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
+            grid,
+        )
 
-    uds["b"] = uda1d
-    assert len(uds.grids) == 2
+    def test_grid_membership(self):
+        assert len(self.uds.grids) == 2
 
-    with pytest.raises(TypeError):
-        uds.ugrid.grid
+    def test_grid_accessor__error(self):
+        with pytest.raises(TypeError):
+            self.uds.ugrid.grid
 
-    with pytest.raises(TypeError):
-        uds.grid
+        with pytest.raises(TypeError):
+            self.uds.grid
+
+    def test_multi_topology_sel(self):
+        result = self.uds.ugrid.sel(x=slice(-10, 10), y=slice(-10, 10))
+        # Ensure both grids are still present
+        assert len(result.ugrid.grids) == 2
 
 
 def test_multiple_coordinates():

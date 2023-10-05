@@ -564,6 +564,9 @@ def test_binary_erosion():
     con = sparse.coo_matrix(coo_content).tocsr()
     a = np.full(5, True)
 
+    with pytest.raises(ValueError, match="Binary operations"):
+        connectivity.binary_erosion(con, a[np.newaxis, :])
+
     actual = connectivity.binary_erosion(con, a)
     assert actual.all()
 
@@ -595,6 +598,9 @@ def test_binary_dilation():
     coo_content = (j, (i, j))
     con = sparse.coo_matrix(coo_content).tocsr()
     a = np.full(5, False)
+
+    with pytest.raises(ValueError, match="Binary operations"):
+        connectivity.binary_dilation(con, a[np.newaxis, :])
 
     # No change
     actual = connectivity.binary_dilation(con, a)
