@@ -109,9 +109,13 @@ class Ugrid2d(AbstractUgrid):
                 "face_node_connectivity should be an array of integers or a sparse matrix"
             )
 
-        self.face_node_connectivity = connectivity.counterclockwise(
-            face_node_connectivity, self.fill_value, self.node_coordinates
-        )
+        self.face_node_connectivity = face_node_connectivity
+
+        # TODO: do this in validation instead. While UGRID conventions demand it,
+        # where does it go wrong?
+        # self.face_node_connectivity = connectivity.counterclockwise(
+        #    face_node_connectivity, self.fill_value, self.node_coordinates
+        # )
 
         self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
@@ -1529,16 +1533,28 @@ class Ugrid2d(AbstractUgrid):
                 "y-coordinates of the left and right boundaries do not match"
             )
 
+        # Discard the rightmost nodes. Preserve the order in the faces, and the
+        # order of the nodes.
         coordinates[is_right, 0] = xmin
-        new_xy, node_index, inverse = np.unique(
-            coordinates, return_index=True, return_inverse=True
+        _, node_index, inverse = np.unique(
+            coordinates, return_index=True, return_inverse=True, axis=0
         )
-        new_faces = inverse[self.face_node_connectivity]
+        # Create a mapping of the inverse index to the new node index.
+        new_index = connectivity.renumber(node_index)
+        new_faces = new_index[inverse[self.face_node_connectivity]]
+        # Get the selection of nodes, and keep the order.
+        node_index.sort()
+        new_xy = self.node_coordinates[node_index]
+
+        # Preserve the order of the edge_node_connectivity if it is present.
         new_edges = None
+        edge_index = None
         if self._edge_node_connectivity is not None:
             new_edges = inverse[self.edge_node_connectivity]
             new_edges.sort(axis=1)
-            new_edges, edge_index = np.unique(new_edges, axis=0, return_index=True)
+            _, edge_index = np.unique(new_edges, axis=0, return_index=True)
+            edge_index.sort()
+            new_edges = new_index[new_edges][edge_index]
 
         new = Ugrid2d(
             node_x=new_xy[:, 0],
@@ -1546,7 +1562,7 @@ class Ugrid2d(AbstractUgrid):
             face_node_connectivity=new_faces,
             fill_value=self.fill_value,
             name=self.name,
-            edge_node_connectivity=None,
+            edge_node_connectivity=new_edges,
             indexes=self._indexes,
             projected=self.projected,
             crs=self.crs,
@@ -1649,6 +1665,11 @@ class Ugrid2d(AbstractUgrid):
                 .ravel()
             )
             edge_index = np.searchsorted(edges, new_edges, sorter=np.argsort(edges))
+            # Reshuffle to keep the original order as intact as possible; how
+            # much benefit does this actually give?
+            sorter = np.argsort(edge_index)
+            new._edge_node_connectivity = new._edge_node_connectivity[sorter]
+            edge_index = edge_index[sorter]
 
         if obj is not None:
             indexes = {

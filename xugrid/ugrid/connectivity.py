@@ -354,6 +354,7 @@ def reverse_orientation(face_node_connectivity: IntArray, fill_value: int):
 def counterclockwise(
     face_node_connectivity: IntArray, fill_value: int, nodes: FloatArray
 ) -> IntArray:
+    # TODO: in case of "periodic grids", we need to wrap around the grid.
     closed, _ = close_polygons(face_node_connectivity, fill_value)
     p = nodes[closed]
     dxy = np.diff(p, axis=1)
@@ -525,8 +526,8 @@ def perimeter(
     closed, _ = close_polygons(face_node_connectivity, fill_value)
     coordinates = nodes[closed]
     # Shift coordinates to avoid precision loss
-    coordinates[..., 0] -= node_x.mean()
-    coordinates[..., 1] -= node_y.mean()
+    xy0 = coordinates[:, 0]
+    coordinates -= xy0[:, np.newaxis]
     dxy = np.diff(coordinates, axis=1)
     return np.linalg.norm(dxy, axis=-1).sum(axis=1)
 
