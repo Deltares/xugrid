@@ -504,9 +504,13 @@ document.write(`
                 <span class="s2">&quot;face_node_connectivity should be an array of integers or a sparse matrix&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">counterclockwise</span><span class="p">(</span>
-            <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">face_node_connectivity</span>
+
+        <span class="c1"># TODO: do this in validation instead. While UGRID conventions demand it,</span>
+        <span class="c1"># where does it go wrong?</span>
+        <span class="c1"># self.face_node_connectivity = connectivity.counterclockwise(</span>
+        <span class="c1">#    face_node_connectivity, self.fill_value, self.node_coordinates</span>
+        <span class="c1"># )</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_indexes_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
@@ -517,6 +521,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Celltree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Perimeter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Area</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
@@ -559,6 +565,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Celltree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Perimeter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Area</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Centroids</span>
@@ -922,6 +930,17 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">perimeter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">perimeter</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">face_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1947,6 +1966,180 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div>
 
+
+    <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert this grid to a periodic grid, where the rightmost nodes are</span>
+<span class="sd">        equal to the leftmost nodes. Note: for this to work, the y-coordinates</span>
+<span class="sd">        on the left boundary must match those on the right boundary exactly.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        periodic_grid: Ugrid2d</span>
+<span class="sd">        aligned: xr.DataArray or xr.Dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
+        <span class="n">is_right</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xmax</span><span class="p">)</span>
+        <span class="n">is_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xmin</span><span class="p">)</span>
+
+        <span class="n">node_y</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">node_y</span><span class="p">[</span><span class="n">is_left</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">node_y</span><span class="p">[</span><span class="n">is_right</span><span class="p">])):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;y-coordinates of the left and right boundaries do not match&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Discard the rightmost nodes. Preserve the order in the faces, and the</span>
+        <span class="c1"># order of the nodes.</span>
+        <span class="n">coordinates</span><span class="p">[</span><span class="n">is_right</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="n">coordinates</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="c1"># Create a mapping of the inverse index to the new node index.</span>
+        <span class="n">new_index</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">node_index</span><span class="p">)</span>
+        <span class="n">new_faces</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">]]</span>
+        <span class="c1"># Get the selection of nodes, and keep the order.</span>
+        <span class="n">node_index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">new_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
+
+        <span class="c1"># Preserve the order of the edge_node_connectivity if it is present.</span>
+        <span class="n">new_edges</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_edges</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">]</span>
+            <span class="n">new_edges</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">edge_index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="n">new_edges</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">new_edges</span><span class="p">][</span><span class="n">edge_index</span><span class="p">]</span>
+
+        <span class="n">new</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="p">(</span>
+            <span class="n">node_x</span><span class="o">=</span><span class="n">new_xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">node_y</span><span class="o">=</span><span class="n">new_xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">new_faces</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">new_edges</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">,</span>
+            <span class="n">projected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projected</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">RangeIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_face</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">node_index</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">edge_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">edge_index</span><span class="p">)</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">new</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert this grid from a periodic grid (where the rightmost boundary shares its</span>
+<span class="sd">        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes</span>
+<span class="sd">        are separate from the rightmost nodes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xmax: float</span>
+<span class="sd">            The x-value of the newly created rightmost boundary nodes.</span>
+<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nonperiodic_grid: Ugrid2d</span>
+<span class="sd">        aligned: xr.DataArray or xr.Dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xleft</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">xright</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
+        <span class="n">half_domain</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">xright</span> <span class="o">-</span> <span class="n">xleft</span><span class="p">)</span>
+
+        <span class="c1"># Extract all x coordinates for every face. Then identify the nodes</span>
+        <span class="c1"># which have a value of e.g. -180, while the max x value for the face</span>
+        <span class="c1"># is 180.0. These nodes should be duplicated.</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_coordinates</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">is_periodic</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">half_domain</span>
+        <span class="n">periodic_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">is_periodic</span><span class="p">]</span>
+
+        <span class="n">uniques</span><span class="p">,</span> <span class="n">new_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">periodic_nodes</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">uniques</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
+        <span class="n">new_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">uniques</span><span class="p">]</span>
+        <span class="n">new_faces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_faces</span><span class="p">[</span><span class="n">is_periodic</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_nodes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span>
+
+        <span class="c1"># edge_node_connectivity must be rederived, since we&#39;ve added a number</span>
+        <span class="c1"># of new edges and new nodes.</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="p">(</span>
+            <span class="n">node_x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="n">new_x</span><span class="p">)),</span>
+            <span class="n">node_y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="n">new_y</span><span class="p">)),</span>
+            <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">new_faces</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">,</span>
+            <span class="n">projected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projected</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If there is edge associated data, we need to duplicate the data</span>
+            <span class="c1"># of the edges. It is impossible(?) to do this on the edges</span>
+            <span class="c1"># directly, due to the possible presence of &quot;symmetric&quot; edges:</span>
+            <span class="c1">#     2</span>
+            <span class="c1">#    /|\</span>
+            <span class="c1">#   / | \</span>
+            <span class="c1">#  0__1__0</span>
+            <span class="c1">#</span>
+            <span class="c1"># (0, 1) and (1, 0) are topologically distinct, but only in the</span>
+            <span class="c1"># face definition. In the new grid, the 0 on the right will have</span>
+            <span class="c1"># become node 3, creating distinct edges.</span>
+            <span class="c1">#</span>
+            <span class="c1"># Note that any data with the edge is only stored once, which is</span>
+            <span class="c1"># incorrect(!), but a given for these grids and would be a problem</span>
+            <span class="c1"># for the simulation code producing these results.</span>
+            <span class="c1">#</span>
+            <span class="c1"># We use a casting trick to collapse two integers into one so we</span>
+            <span class="c1"># can use searchsorted easily.</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="c1"># Create a mapping of the new nodes created above, to the original nodes.</span>
+            <span class="c1"># Then, find the new edges in the old using searchsorted.</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">),</span> <span class="n">uniques</span><span class="p">))</span>
+            <span class="n">new_edges</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">new</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">new_edges</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
+            <span class="c1"># Reshuffle to keep the original order as intact as possible; how</span>
+            <span class="c1"># much benefit does this actually give?</span>
+            <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">edge_index</span><span class="p">)</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">_edge_node_connectivity</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">RangeIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_face</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">),</span> <span class="n">uniques</span><span class="p">))</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">edge_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">edge_index</span><span class="p">)</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">}</span>
+            <span class="k">return</span> <span class="n">new</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new</span>
 
 <div class="viewcode-block" id="Ugrid2d.triangulate">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>
