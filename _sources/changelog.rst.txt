@@ -23,6 +23,11 @@ Added
   ordinary grid to a periodic grid.
 - :attr:`xugrid.Ugrid2d.perimeter` has been added the compute the length of the
   face perimeters.
+- :meth:`xugrid.Ugrid1d.reindex_like`,
+  :meth:`xugrid.Ugrid2d.reindex_like`,
+  :meth:`xugrid.UgridDataArrayAccessor.reindex_like` and
+  :meth:`xugrid.UgridDatasetAccessor.reindex_like` have been added to deal with
+  equivalent but differently ordered topologies.
 
 Changed
 ~~~~~~~

@@ -2157,6 +2157,41 @@ document.write(`
             <span class="k">return</span> <span class="n">new</span></div>
 
 
+    <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Conform a DataArray or Dataset to match the topology of another Ugrid2D</span>
+<span class="sd">        topology. The topologies must be exactly equivalent: only the order of</span>
+<span class="sd">        the nodes, edges, and faces may differ.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other: Ugrid2d</span>
+<span class="sd">        obj: DataArray or Dataset</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        reindexed: DataArray or Dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Ugrid2d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">index_like</span><span class="p">(</span>
+                <span class="n">xy_a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+                <span class="n">xy_b</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">index_like</span><span class="p">(</span>
+                <span class="n">xy_a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">face_coordinates</span><span class="p">,</span>
+                <span class="n">xy_b</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">face_coordinates</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indexers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">index_like</span><span class="p">(</span>
+                <span class="n">xy_a</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span><span class="p">,</span>
+                <span class="n">xy_b</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">edge_coordinates</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Ugrid2d.triangulate">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>
     <span class="k">def</span> <span class="nf">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
