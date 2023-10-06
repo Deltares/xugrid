@@ -911,6 +911,10 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">circumcenters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Circumenter (x, y) of every face; only works for fully triangular</span>
+<span class="sd">        grids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
@@ -922,6 +926,9 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Area of every face.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">area</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
@@ -933,6 +940,9 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">perimeter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perimeter length of every face.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">perimeter</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
@@ -1967,6 +1977,8 @@ document.write(`
         <span class="k">return</span> <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span></div>
 
 
+<div class="viewcode-block" id="Ugrid2d.to_periodic">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_periodic.html#xugrid.Ugrid2d.to_periodic">[docs]</a>
     <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert this grid to a periodic grid, where the rightmost nodes are</span>
@@ -2035,8 +2047,11 @@ document.write(`
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">}</span>
             <span class="k">return</span> <span class="n">new</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">new</span>
+            <span class="k">return</span> <span class="n">new</span></div>
 
+
+<div class="viewcode-block" id="Ugrid2d.to_nonperiodic">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.to_nonperiodic.html#xugrid.Ugrid2d.to_nonperiodic">[docs]</a>
     <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert this grid from a periodic grid (where the rightmost boundary shares its</span>
@@ -2139,7 +2154,8 @@ document.write(`
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">}</span>
             <span class="k">return</span> <span class="n">new</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">new</span>
+            <span class="k">return</span> <span class="n">new</span></div>
+
 
 <div class="viewcode-block" id="Ugrid2d.triangulate">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>

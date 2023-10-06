@@ -666,6 +666,8 @@ document.write(`
         <span class="k">return</span> <span class="n">result</span></div>
 
 
+<div class="viewcode-block" id="UgridDatasetAccessor.rasterize">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize.html#xugrid.UgridDatasetAccessor.rasterize">[docs]</a>
     <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize all face data on 2D unstructured grids by sampling.</span>
@@ -683,8 +685,11 @@ document.write(`
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">resolution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">)</span>
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="UgridDatasetAccessor.rasterize_like">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize_like.html#xugrid.UgridDatasetAccessor.rasterize_like">[docs]</a>
     <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize unstructured all face data on 2D unstructured grids by</span>
@@ -707,11 +712,33 @@ document.write(`
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="UgridDatasetAccessor.to_periodic">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_periodic.html#xugrid.UgridDatasetAccessor.to_periodic">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts every grid to a periodic grid, where the rightmost boundary</span>
+<span class="sd">        shares its nodes with the leftmost boundary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        periodic: UgridDataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
+            <span class="n">new_grid</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_periodic</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_grid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDatasetAccessor.to_nonperiodic">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_nonperiodic.html#xugrid.UgridDatasetAccessor.to_nonperiodic">[docs]</a>
     <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert this grid from a periodic grid (where the rightmost boundary shares its</span>
+<span class="sd">        Convert the grid from a periodic grid (where the rightmost boundary shares its</span>
 <span class="sd">        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes</span>
 <span class="sd">        are separate from the rightmost nodes.</span>
 
@@ -719,12 +746,18 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        xmax: float</span>
 <span class="sd">            The x-value of the newly created rightmost boundary nodes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nonperiodic: UgridDataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
-            <span class="n">new_grid</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_nonperiodic</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">new_grid</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_nonperiodic</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
             <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_grid</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="UgridDatasetAccessor.intersect_line">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_line.html#xugrid.UgridDatasetAccessor.intersect_line">[docs]</a>

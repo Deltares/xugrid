@@ -80,6 +80,10 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.to_crs
     UgridDatasetAccessor.sel
     UgridDatasetAccessor.sel_points
+    UgridDatasetAccessor.rasterize
+    UgridDatasetAccessor.rasterize_like
+    UgridDatasetAccessor.to_periodic
+    UgridDatasetAccessor.to_nonperiodic
     UgridDatasetAccessor.intersect_line
     UgridDatasetAccessor.intersect_linestring
     UgridDatasetAccessor.partition
@@ -112,6 +116,8 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
+    UgridDataArrayAccessor.to_periodic
+    UgridDataArrayAccessor.to_nonperiodic
     UgridDataArrayAccessor.to_geodataframe
     UgridDataArrayAccessor.binary_dilation
     UgridDataArrayAccessor.binary_erosion
@@ -254,7 +260,9 @@ UGRID2D Topology
     Ugrid2d.face_dimension
     Ugrid2d.face_coordinates
     Ugrid2d.centroids
+    Ugrid2d.circumcenters
     Ugrid2d.area
+    Ugrid2d.perimeter
     Ugrid2d.face_x
     Ugrid2d.face_y
 
@@ -298,6 +306,8 @@ UGRID2D Topology
     Ugrid2d.locate_bounding_box
     Ugrid2d.rasterize
     Ugrid2d.rasterize_like
+    Ugrid2d.to_periodic
+    Ugrid2d.to_nonperiodic
     Ugrid2d.topology_subset
     Ugrid2d.label_partitions
     Ugrid2d.partition

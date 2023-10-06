@@ -653,6 +653,23 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_periodic">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.to_periodic.html#xugrid.UgridDataArrayAccessor.to_periodic">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert this grid to a periodic grid, where the rightmost boundary</span>
+<span class="sd">        shares its nodes with the leftmost boundary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        periodic: UgridDataArray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grid</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_periodic</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_nonperiodic">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.to_nonperiodic.html#xugrid.UgridDataArrayAccessor.to_nonperiodic">[docs]</a>
     <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert this grid from a periodic grid (where the rightmost boundary shares its</span>
@@ -663,9 +680,14 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        xmax: float</span>
 <span class="sd">            The x-value of the newly created rightmost boundary nodes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nonperiodic: UgridDataArray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">grid</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_nonperiodic</span><span class="p">(</span><span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.intersect_line">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.intersect_line.html#xugrid.UgridDataArrayAccessor.intersect_line">[docs]</a>
