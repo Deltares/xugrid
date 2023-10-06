@@ -230,6 +230,18 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         )
         return self._raster(x, y, index)
 
+    def to_periodic(self):
+        """
+        Convert this grid to a periodic grid, where the rightmost boundary
+        shares its nodes with the leftmost boundary.
+
+        Returns
+        -------
+        periodic: UgridDataArray
+        """
+        grid, obj = self.grid.to_periodic(obj=self.obj)
+        return UgridDataArray(obj, grid)
+
     def to_nonperiodic(self, xmax: float):
         """
         Convert this grid from a periodic grid (where the rightmost boundary shares its
@@ -240,6 +252,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         ----------
         xmax: float
             The x-value of the newly created rightmost boundary nodes.
+
+        Returns
+        -------
+        nonperiodic: UgridDataArray
         """
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
         return UgridDataArray(obj, grid)

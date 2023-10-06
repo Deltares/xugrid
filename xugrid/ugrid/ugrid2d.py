@@ -506,6 +506,10 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def circumcenters(self):
+        """
+        Circumenter (x, y) of every face; only works for fully triangular
+        grids.
+        """
         if self._circumcenters is None:
             self._circumcenters = connectivity.circumcenters(
                 self.face_node_connectivity,
@@ -517,6 +521,9 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def area(self) -> FloatArray:
+        """
+        Area of every face.
+        """
         if self._area is None:
             self._area = connectivity.area(
                 self.face_node_connectivity,
@@ -528,6 +535,9 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def perimeter(self) -> FloatArray:
+        """
+        Perimeter length of every face.
+        """
         if self._perimeter is None:
             self._perimeter = connectivity.perimeter(
                 self.face_node_connectivity,
