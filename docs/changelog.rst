@@ -12,8 +12,23 @@ Unreleased
 Added
 ~~~~~
 
+- :meth:`xugrid.Ugrid2d.to_nonperiodic`,
+  :meth:`xugrid.UgridDataArrayAccessor.to_nonperiodic` and
+  :meth:`xugrid.UgridDatasetAccessor.to_nonperiodic` have been added to convert
+  a "periodid grid" (where the leftmost nodes are the same as the rightmost
+  nodes, e.g. a mesh for the globe) to an "ordinary" grid.
+- Conversely, :meth:`xugrid.Ugrid2d.to_periodic`,
+  :meth:`xugrid.UgridDataArrayAccessor.to_periodic` and
+  :meth:`xugrid.UgridDatasetAccessor.to_periodic` have been added to convert an
+  ordinary grid to a periodic grid.
+- :attr:`xugrid.Ugrid2d.perimeter` has been added the compute the length of the
+  face perimeters.
+
 Changed
 ~~~~~~~
+
+- UGRID 2D topologies are no longer automatically forced in counterclockwise
+  orientation during initialization.
 
 Fixed
 ~~~~~

@@ -109,9 +109,13 @@ class Ugrid2d(AbstractUgrid):
                 "face_node_connectivity should be an array of integers or a sparse matrix"
             )
 
-        self.face_node_connectivity = connectivity.counterclockwise(
-            face_node_connectivity, self.fill_value, self.node_coordinates
-        )
+        self.face_node_connectivity = face_node_connectivity
+
+        # TODO: do this in validation instead. While UGRID conventions demand it,
+        # where does it go wrong?
+        # self.face_node_connectivity = connectivity.counterclockwise(
+        #    face_node_connectivity, self.fill_value, self.node_coordinates
+        # )
 
         self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
@@ -122,6 +126,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Perimeter
+        self._perimeter = None
         # Area
         self._area = None
         # Centroids
@@ -163,6 +169,8 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        # Perimeter
+        self._perimeter = None
         # Area
         self._area = None
         # Centroids
@@ -498,6 +506,10 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def circumcenters(self):
+        """
+        Circumenter (x, y) of every face; only works for fully triangular
+        grids.
+        """
         if self._circumcenters is None:
             self._circumcenters = connectivity.circumcenters(
                 self.face_node_connectivity,
@@ -509,6 +521,9 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def area(self) -> FloatArray:
+        """
+        Area of every face.
+        """
         if self._area is None:
             self._area = connectivity.area(
                 self.face_node_connectivity,
@@ -517,6 +532,20 @@ class Ugrid2d(AbstractUgrid):
                 self.node_y,
             )
         return self._area
+
+    @property
+    def perimeter(self) -> FloatArray:
+        """
+        Perimeter length of every face.
+        """
+        if self._perimeter is None:
+            self._perimeter = connectivity.perimeter(
+                self.face_node_connectivity,
+                self.fill_value,
+                self.node_x,
+                self.node_y,
+            )
+        return self._perimeter
 
     @property
     def face_bounds(self):
@@ -1491,6 +1520,180 @@ class Ugrid2d(AbstractUgrid):
             attrs=grid._attrs,
         )
         return merged_grid, indexes
+
+    def to_periodic(self, obj=None):
+        """
+        Convert this grid to a periodic grid, where the rightmost nodes are
+        equal to the leftmost nodes. Note: for this to work, the y-coordinates
+        on the left boundary must match those on the right boundary exactly.
+
+        Returns
+        -------
+        periodic_grid: Ugrid2d
+        aligned: xr.DataArray or xr.Dataset
+        """
+        xmin, _, xmax, _ = self.bounds
+        coordinates = self.node_coordinates
+        is_right = np.isclose(coordinates[:, 0], xmax)
+        is_left = np.isclose(coordinates[:, 0], xmin)
+
+        node_y = coordinates[:, 1]
+        if not np.allclose(np.sort(node_y[is_left]), np.sort(node_y[is_right])):
+            raise ValueError(
+                "y-coordinates of the left and right boundaries do not match"
+            )
+
+        # Discard the rightmost nodes. Preserve the order in the faces, and the
+        # order of the nodes.
+        coordinates[is_right, 0] = xmin
+        _, node_index, inverse = np.unique(
+            coordinates, return_index=True, return_inverse=True, axis=0
+        )
+        # Create a mapping of the inverse index to the new node index.
+        new_index = connectivity.renumber(node_index)
+        new_faces = new_index[inverse[self.face_node_connectivity]]
+        # Get the selection of nodes, and keep the order.
+        node_index.sort()
+        new_xy = self.node_coordinates[node_index]
+
+        # Preserve the order of the edge_node_connectivity if it is present.
+        new_edges = None
+        edge_index = None
+        if self._edge_node_connectivity is not None:
+            new_edges = inverse[self.edge_node_connectivity]
+            new_edges.sort(axis=1)
+            _, edge_index = np.unique(new_edges, axis=0, return_index=True)
+            edge_index.sort()
+            new_edges = new_index[new_edges][edge_index]
+
+        new = Ugrid2d(
+            node_x=new_xy[:, 0],
+            node_y=new_xy[:, 1],
+            face_node_connectivity=new_faces,
+            fill_value=self.fill_value,
+            name=self.name,
+            edge_node_connectivity=new_edges,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self.attrs,
+        )
+
+        if obj is not None:
+            indexes = {
+                self.face_dimension: pd.RangeIndex(0, self.n_face),
+                self.node_dimension: pd.Index(node_index),
+            }
+            if edge_index is not None:
+                indexes[self.edge_dimension] = pd.Index(edge_index)
+            indexes = {k: v for k, v in indexes.items() if k in obj.dims}
+            return new, obj.isel(**indexes)
+        else:
+            return new
+
+    def to_nonperiodic(self, xmax: float, obj=None):
+        """
+        Convert this grid from a periodic grid (where the rightmost boundary shares its
+        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes
+        are separate from the rightmost nodes.
+
+        Parameters
+        ----------
+        xmax: float
+            The x-value of the newly created rightmost boundary nodes.
+        obj: xr.DataArray or xr.Dataset
+
+        Returns
+        -------
+        nonperiodic_grid: Ugrid2d
+        aligned: xr.DataArray or xr.Dataset
+        """
+        xleft, _, xright, _ = self.bounds
+        half_domain = 0.5 * (xright - xleft)
+
+        # Extract all x coordinates for every face. Then identify the nodes
+        # which have a value of e.g. -180, while the max x value for the face
+        # is 180.0. These nodes should be duplicated.
+        x = self.face_node_coordinates[..., 0]
+        is_periodic = (np.nanmax(x, axis=1)[:, np.newaxis] - x) > half_domain
+        periodic_nodes = self.face_node_connectivity[is_periodic]
+
+        uniques, new_nodes = np.unique(periodic_nodes, return_inverse=True)
+        new_x = np.full(uniques.size, xmax)
+        new_y = self.node_y[uniques]
+        new_faces = self.face_node_connectivity.copy()
+        new_faces[is_periodic] = new_nodes + self.n_node
+
+        # edge_node_connectivity must be rederived, since we've added a number
+        # of new edges and new nodes.
+        new = Ugrid2d(
+            node_x=np.concatenate((self.node_x, new_x)),
+            node_y=np.concatenate((self.node_y, new_y)),
+            face_node_connectivity=new_faces,
+            fill_value=self.fill_value,
+            name=self.name,
+            edge_node_connectivity=None,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self.attrs,
+        )
+
+        edge_index = None
+        if self._edge_node_connectivity is not None:
+            # If there is edge associated data, we need to duplicate the data
+            # of the edges. It is impossible(?) to do this on the edges
+            # directly, due to the possible presence of "symmetric" edges:
+            #     2
+            #    /|\
+            #   / | \
+            #  0__1__0
+            #
+            # (0, 1) and (1, 0) are topologically distinct, but only in the
+            # face definition. In the new grid, the 0 on the right will have
+            # become node 3, creating distinct edges.
+            #
+            # Note that any data with the edge is only stored once, which is
+            # incorrect(!), but a given for these grids and would be a problem
+            # for the simulation code producing these results.
+            #
+            # We use a casting trick to collapse two integers into one so we
+            # can use searchsorted easily.
+            edges = (
+                np.sort(self.edge_node_connectivity, axis=1)
+                .astype(np.int32)
+                .view(np.int64)
+                .ravel()
+            )
+            # Create a mapping of the new nodes created above, to the original nodes.
+            # Then, find the new edges in the old using searchsorted.
+            mapping = np.concatenate((np.arange(self.n_node), uniques))
+            new_edges = (
+                np.sort(mapping[new.edge_node_connectivity], axis=1)
+                .astype(np.int32)
+                .view(np.int64)
+                .ravel()
+            )
+            edge_index = np.searchsorted(edges, new_edges, sorter=np.argsort(edges))
+            # Reshuffle to keep the original order as intact as possible; how
+            # much benefit does this actually give?
+            sorter = np.argsort(edge_index)
+            new._edge_node_connectivity = new._edge_node_connectivity[sorter]
+            edge_index = edge_index[sorter]
+
+        if obj is not None:
+            indexes = {
+                self.face_dimension: pd.RangeIndex(0, self.n_face),
+                self.node_dimension: pd.Index(
+                    np.concatenate((np.arange(self.n_node), uniques))
+                ),
+            }
+            if edge_index is not None:
+                indexes[self.edge_dimension] = pd.Index(edge_index)
+            indexes = {k: v for k, v in indexes.items() if k in obj.dims}
+            return new, obj.isel(**indexes)
+        else:
+            return new
 
     def triangulate(self):
         """

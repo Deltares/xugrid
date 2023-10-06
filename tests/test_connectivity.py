@@ -537,6 +537,20 @@ def test_structured_connectivity():
     assert np.array_equal(connectivity.neighbors(A, 6), [4])
 
 
+def test_area(mixed_mesh):
+    node_x = np.array([0.0, 1.0, 1.0, 2.0, 2.0])
+    node_y = np.array([0.0, 0.0, 1.0, 0.0, 1.0])
+    actual = connectivity.area(*mixed_mesh, node_x, node_y)
+    assert np.allclose(actual, [0.5, 1.0])
+
+
+def test_perimeter(mixed_mesh):
+    node_x = np.array([0.0, 1.0, 1.0, 2.0, 2.0])
+    node_y = np.array([0.0, 0.0, 1.0, 0.0, 1.0])
+    actual = connectivity.perimeter(*mixed_mesh, node_x, node_y)
+    assert np.allclose(actual, [2.0 + np.sqrt(2), 4.0])
+
+
 def test_triangulate(mixed_mesh):
     faces, fill_value = mixed_mesh
     actual_triangles, actual_faces = connectivity.triangulate_dense(faces, fill_value)

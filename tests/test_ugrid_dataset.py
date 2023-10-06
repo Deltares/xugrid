@@ -1117,3 +1117,55 @@ def test_fm_facenodeconnectivity_fillvalue():
 
     # xugrid 0.6.0 has -2 values in the array
     assert (uds.grid.face_node_connectivity != -2).all()
+
+
+def test_periodic_conversion():
+    vertices = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [1.0, 0.0],  # 1
+            [2.0, 0.0],  # 2
+            [3.0, 0.0],  # 3
+            [0.0, 1.0],  # 4
+            [1.0, 1.0],  # 5
+            [2.0, 1.0],  # 6
+            [3.0, 1.0],  # 7
+            [0.0, 2.0],  # 8
+            [1.0, 2.0],  # 9
+            [2.0, 2.0],  # 10
+            [3.0, 2.0],  # 11
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 5, 4],
+            [1, 2, 6, 5],
+            [2, 3, 7, 6],
+            [4, 5, 9, 8],
+            [5, 6, 10, 9],
+            [6, 7, 11, 10],
+        ]
+    )
+    grid = xugrid.Ugrid2d(*vertices.T, -1, faces)
+    da = xr.DataArray([0, 1, 2, 3, 4, 5], dims=(grid.face_dimension,))
+    uda = xugrid.UgridDataArray(da, grid)
+    periodic = uda.ugrid.to_periodic()
+    back = periodic.ugrid.to_nonperiodic(xmax=3.0)
+    assert isinstance(periodic, xugrid.UgridDataArray)
+    assert isinstance(back, xugrid.UgridDataArray)
+    back_grid = back.ugrid.grid
+    assert back_grid.n_face == grid.n_face
+    assert back_grid.n_edge == grid.n_edge
+    assert back_grid.n_node == grid.n_node
+
+    # Also test a multi-topology dataset The 1D grid should be skipped: it
+    # doesn't implement anything for these conversions, but should simply be
+    # added as-is to the result.
+    uds = ugrid1d_ds()
+    uds["a2d"] = uda
+    periodic_ds = uds.ugrid.to_periodic()
+    back_ds = periodic_ds.ugrid.to_nonperiodic(xmax=3.0)
+    assert isinstance(periodic_ds, xugrid.UgridDataset)
+    assert isinstance(back_ds, xugrid.UgridDataset)
+    assert "a1d" in back_ds
+    assert "a2d" in back_ds

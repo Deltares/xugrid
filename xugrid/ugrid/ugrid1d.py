@@ -529,6 +529,12 @@ class Ugrid1d(AbstractUgrid):
     def intersect_linestring(self, obj, linestring):
         return obj
 
+    def to_periodic(self, obj):
+        return self, obj
+
+    def to_nonperiodic(self, xmax, obj):
+        return self, obj
+
     def topological_sort_by_dfs(self) -> IntArray:
         """
         Returns an array of vertices in topological order.

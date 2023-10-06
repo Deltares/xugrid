@@ -131,7 +131,6 @@ def test_ugrid2d_alternative_init():
 
 
 def test_ugrid2d_properties():
-    # These are defined in the base class
     grid = grid2d()
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.node_dimension == f"{NAME}_nNodes"
@@ -149,6 +148,8 @@ def test_ugrid2d_properties():
     face_node_coords = grid.face_node_coordinates
     assert edge_node_coords.shape == (10, 2, 2)
     assert face_node_coords.shape == (4, 4, 2)
+    assert grid.area.shape == (grid.n_face,)
+    assert grid.perimeter.shape == (grid.n_face,)
     are_nan = np.isnan(face_node_coords)
     assert are_nan[2:, -1:, :].all()
     assert not are_nan[:, :-1, :].any()
@@ -1064,3 +1065,145 @@ def test_ugrid2d_rename_with_dataset():
         "two",
     ]
     assert sorted(dataset.coords) == ["__renamed_node_x", "__renamed_node_y"]
+
+
+class TestPeriodicGridConversion:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.vertices = np.array(
+            [
+                [0.0, 0.0],  # 0
+                [1.0, 0.0],  # 1
+                [2.0, 0.0],  # 2
+                [3.0, 0.0],  # 3
+                [0.0, 1.0],  # 4
+                [1.0, 1.0],  # 5
+                [2.0, 1.0],  # 6
+                [3.0, 1.0],  # 7
+                [0.0, 2.0],  # 8
+                [1.0, 2.0],  # 9
+                [2.0, 2.0],  # 10
+                [3.0, 2.0],  # 11
+            ]
+        )
+        self.faces = np.array(
+            [
+                [0, 1, 5, 4],
+                [1, 2, 6, 5],
+                [2, 3, 7, 6],
+                [4, 5, 9, 8],
+                [5, 6, 10, 9],
+                [6, 7, 11, 10],
+            ]
+        )
+        grid = xugrid.Ugrid2d(*self.vertices.T, -1, self.faces)
+        ds = xr.Dataset()
+        ds["a"] = xr.DataArray(np.arange(grid.n_node), dims=(grid.node_dimension,))
+        ds["b"] = xr.DataArray(np.arange(grid.n_edge), dims=(grid.edge_dimension,))
+        ds["c"] = xr.DataArray(np.arange(grid.n_face), dims=(grid.face_dimension,))
+        self.ds = ds
+        self.grid = grid
+
+    def test_to_periodic(self):
+        grid = self.grid.copy()
+
+        # Trigger edge node connectivity
+        _ = grid.edge_node_connectivity
+        # Convert
+        new, new_ds = grid.to_periodic(obj=self.ds)
+
+        # Absent vertices: 3, 7, 11
+        expected_vertices = self.vertices[[0, 1, 2, 4, 5, 6, 8, 9, 10]]
+        expected_faces = np.array(
+            [
+                [0, 1, 4, 3],
+                [1, 2, 5, 4],
+                [2, 0, 3, 5],
+                [3, 4, 7, 6],
+                [4, 5, 8, 7],
+                [5, 3, 6, 8],
+            ]
+        )
+        expected_edges = np.array(
+            [
+                [0, 1],
+                [0, 3],
+                [1, 2],
+                [1, 4],
+                [0, 2],
+                [2, 5],
+                [3, 4],
+                [3, 6],
+                [4, 5],
+                [4, 7],
+                [3, 5],
+                [5, 8],
+                [6, 7],
+                [7, 8],
+                [6, 8],
+            ]
+        )
+        assert np.array_equal(
+            new.face_node_connectivity,
+            expected_faces,
+        )
+        assert np.allclose(
+            new.node_coordinates,
+            expected_vertices,
+        )
+        assert np.array_equal(
+            new.edge_node_connectivity,
+            expected_edges,
+        )
+        # Remove nodes (3 & 7 & 11) and edges (6 & 13)
+        expected_a = np.arange(grid.n_node).tolist()
+        expected_a.remove(3)
+        expected_a.remove(7)
+        expected_a.remove(11)
+        expected_b = np.arange(grid.n_edge).tolist()
+        expected_b.remove(6)
+        expected_b.remove(13)
+        assert np.array_equal(new_ds["a"], expected_a)
+        assert np.array_equal(new_ds["b"], expected_b)
+        assert np.array_equal(new_ds["c"], [0, 1, 2, 3, 4, 5])
+
+        # Test whether it also works without an object provided.
+        new = grid.to_periodic()
+        assert np.array_equal(
+            new.face_node_connectivity,
+            expected_faces,
+        )
+        assert np.allclose(new.node_coordinates, expected_vertices)
+        assert np.array_equal(new.edge_node_connectivity, expected_edges)
+
+    def test_to_nonperiodic(self):
+        grid = self.grid.copy()
+        _ = grid.edge_node_connectivity  # trigger generation of edge nodes
+        periodic_grid, new_ds = grid.to_periodic(obj=self.ds)
+        back = periodic_grid.to_nonperiodic(xmax=3.0)
+
+        expected_vertices = self.vertices[[0, 1, 2, 4, 5, 6, 8, 9, 10, 3, 7, 11]]
+        expected_faces = np.array(
+            [
+                [0, 1, 4, 3],
+                [1, 2, 5, 4],
+                [2, 9, 10, 5],
+                [3, 4, 7, 6],
+                [4, 5, 8, 7],
+                [5, 10, 11, 8],
+            ]
+        )
+        back, back_ds = periodic_grid.to_nonperiodic(xmax=3.0, obj=new_ds)
+        assert np.allclose(back.node_coordinates, expected_vertices)
+        assert np.array_equal(back.face_node_connectivity, expected_faces)
+        assert back.edge_node_connectivity.shape == (17, 2)
+        assert np.array_equal(back_ds["a"], [0, 1, 2, 4, 5, 6, 8, 9, 10, 0, 4, 8])
+        assert np.array_equal(
+            back_ds["b"], [0, 1, 2, 3, 3, 4, 5, 7, 8, 9, 10, 10, 11, 12, 14, 15, 16]
+        )
+        assert np.array_equal(back_ds["c"], [0, 1, 2, 3, 4, 5])
+
+        back = periodic_grid.to_nonperiodic(xmax=3.0)
+        assert np.allclose(back.node_coordinates, expected_vertices)
+        assert np.array_equal(back.face_node_connectivity, expected_faces)
+        assert back.edge_node_connectivity.shape == (17, 2)

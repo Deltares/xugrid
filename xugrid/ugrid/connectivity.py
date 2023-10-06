@@ -354,6 +354,7 @@ def reverse_orientation(face_node_connectivity: IntArray, fill_value: int):
 def counterclockwise(
     face_node_connectivity: IntArray, fill_value: int, nodes: FloatArray
 ) -> IntArray:
+    # TODO: in case of "periodic grids", we need to wrap around the grid.
     closed, _ = close_polygons(face_node_connectivity, fill_value)
     p = nodes[closed]
     dxy = np.diff(p, axis=1)
@@ -513,6 +514,22 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     A = sparse.coo_matrix(coo_content).tocsr()
     n, m = A.shape
     return AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
+
+
+def perimeter(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+):
+    nodes = np.column_stack([node_x, node_y])
+    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    coordinates = nodes[closed]
+    # Shift coordinates to avoid precision loss
+    xy0 = coordinates[:, 0]
+    coordinates -= xy0[:, np.newaxis]
+    dxy = np.diff(coordinates, axis=1)
+    return np.linalg.norm(dxy, axis=-1).sum(axis=1)
 
 
 def area(

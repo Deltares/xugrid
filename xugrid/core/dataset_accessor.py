@@ -292,6 +292,44 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             datasets.append(self._raster(xx, yy, index))
         return xr.merge(datasets)
 
+    def to_periodic(self):
+        """
+        Converts every grid to a periodic grid, where the rightmost boundary
+        shares its nodes with the leftmost boundary.
+
+        Returns
+        -------
+        periodic: UgridDataset
+        """
+        grids = []
+        result = self.obj
+        for grid in self.grids:
+            new_grid, result = grid.to_periodic(obj=result)
+            grids.append(new_grid)
+        return UgridDataset(result, grids)
+
+    def to_nonperiodic(self, xmax: float):
+        """
+        Convert the grid from a periodic grid (where the rightmost boundary shares its
+        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes
+        are separate from the rightmost nodes.
+
+        Parameters
+        ----------
+        xmax: float
+            The x-value of the newly created rightmost boundary nodes.
+
+        Returns
+        -------
+        nonperiodic: UgridDataset
+        """
+        grids = []
+        result = self.obj
+        for grid in self.grids:
+            new_grid, result = grid.to_nonperiodic(xmax=xmax, obj=result)
+            grids.append(new_grid)
+        return UgridDataset(result, grids)
+
     def intersect_line(
         self, start: Sequence[float], end: Sequence[float]
     ) -> xr.Dataset:
