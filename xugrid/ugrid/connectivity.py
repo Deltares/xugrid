@@ -8,6 +8,38 @@ from scipy import sparse
 from xugrid.constants import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
 
 
+def argsort_rows(array: np.ndarray) -> IntArray:
+    if array.ndim != 2:
+        raise ValueError(f"Array is not 2D, but has shape: {array.shape}")
+    dtype = [("f{i}".format(i=i), array.dtype) for i in range(array.shape[1])]
+    arr1d = array.view(dtype).flatten()
+    return np.argsort(arr1d)
+
+
+def index_like(xy_a: FloatArray, xy_b: FloatArray):
+    """
+    Return the index that would transform xy_a into xy_b.
+    """
+    sorter_a = argsort_rows(xy_a)
+    sorter_b = argsort_rows(xy_b)
+    # This should NOT be allclose even if it's operating on floating point
+    # values: the coordinates should be EXACTLY equal if the topology is just a
+    # shuffled one.
+    if not np.array_equal(xy_a[sorter_a], xy_b[sorter_b]):
+        raise ValueError("coordinates are not identical after sorting")
+    #
+    #   a_to_b
+    # a ------> b
+    #
+    # via:
+    #
+    #   sorter_a         inverse_b
+    # a --------> sorted ---------> b
+    #
+    inverse_b = np.argsort(sorter_b)
+    return sorter_a[inverse_b]
+
+
 class AdjacencyMatrix(NamedTuple):
     indices: IntArray
     indptr: IntArray

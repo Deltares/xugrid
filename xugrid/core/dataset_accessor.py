@@ -6,7 +6,9 @@ import xarray as xr
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
-from xugrid.core.wrap import UgridDataset
+from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.ugrid.ugrid1d import Ugrid1d
+from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
@@ -378,7 +380,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     def to_dataset(self, optional_attributes: bool = False):
         """
-        Converts this UgridDataArray or UgridDataset into a standard
+        Converts this UgridDataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
@@ -554,3 +556,44 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             )
 
         return pd.concat(gdfs)
+
+    def reindex_like(self, other: Union[UgridType, UgridDataArray, UgridDataset]):
+        """
+        Conform this object to match the topology of another object. The
+        topologies must be exactly equivalent: only the order of the nodes,
+        edges, and faces may differ.
+
+        Topologies are matched by name, and dimension names must match for
+        equivalent topologies.
+
+        Parameters
+        ----------
+        other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
+        obj: DataArray or Dataset
+
+        Returns
+        -------
+        reindexed: UgridDataset
+        """
+        if isinstance(other, (Ugrid1d, Ugrid2d)):
+            other_grids = [other]
+        elif isinstance(other, (UgridDataArray, UgridDataset)):
+            other_grids = other.ugrid.grids
+        else:
+            raise TypeError(
+                "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
+                f"received instead: {type(other).__name__}"
+            )
+        grids = self.grids
+        other_grids = {grid.name: grid for grid in other_grids}
+
+        new_grids = []
+        result = self.obj
+        for grid in grids:
+            other = other_grids.get(grid.name)
+            if other:
+                result = self.grid.reindex_like(other, obj=result)
+                new_grids.append(other)
+            else:
+                new_grids.append(grid)
+        return UgridDataset(result, new_grids)

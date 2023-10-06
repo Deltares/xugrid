@@ -615,3 +615,33 @@ class Ugrid1d(AbstractUgrid):
             attrs=grid._attrs,
         )
         return merged_grid, indexes
+
+    def reindex_like(self, other: "Ugrid1d", obj: Union[xr.DataArray, xr.Dataset]):
+        """
+        Conform a DataArray or Dataset to match the topology of another Ugrid1D
+        topology. The topologies must be exactly equivalent: only the order of
+        the nodes and edges may differ.
+
+        Parameters
+        ----------
+        other: Ugrid1d
+        obj: DataArray or Dataset
+
+        Returns
+        -------
+        reindexed: DataArray or Dataset
+        """
+        if not isinstance(other, Ugrid1d):
+            raise TypeError(f"Expected Ugrid1d, received: {type(other).__name__}")
+
+        indexers = {
+            self.node_dimension: connectivity.index_like(
+                xy_a=self.node_coordinates,
+                xy_b=other.node_coordinates,
+            ),
+            self.edge_dimension: connectivity.index_like(
+                xy_a=self.edge_coordinates,
+                xy_b=other.edge_coordinates,
+            ),
+        }
+        return obj.isel(indexers, missing_dims="ignore")

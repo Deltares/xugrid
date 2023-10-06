@@ -7,10 +7,12 @@ import xarray as xr
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
 from xugrid.core.utils import UncachedAccessor
-from xugrid.core.wrap import UgridDataArray
+from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
 from xugrid.ugrid.interpolate import laplace_interpolate
+from xugrid.ugrid.ugrid1d import Ugrid1d
+from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
@@ -417,6 +419,35 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         df = ds[variables].to_dataframe(dim_order=dim_order)
         geometry = self.grid.to_shapely(dim)
         return gpd.GeoDataFrame(df, geometry=geometry, crs=self.grid.crs)
+
+    def reindex_like(self, other: Union[UgridType, UgridDataArray, UgridDataset]):
+        """
+        Conform this object to match the topology of another object. The
+        topologies must be exactly equivalent: only the order of the nodes,
+        edges, and faces may differ.
+
+        Dimension names must match for equivalent topologies.
+
+        Parameters
+        ----------
+        other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
+        obj: DataArray or Dataset
+
+        Returns
+        -------
+        reindexed: UgridDataArray
+        """
+        if isinstance(other, (Ugrid1d, Ugrid2d)):
+            other_grid = other
+        elif isinstance(other, (UgridDataArray, UgridDataset)):
+            other_grid = other.ugrid.grid
+        else:
+            raise TypeError(
+                "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
+                f"received instead: {type(other).__name__}"
+            )
+        new_obj = self.grid.reindex_like(other_grid, obj=self.obj)
+        return UgridDataArray(new_obj, other_grid)
 
     def _binary_iterate(self, iterations: int, mask, value, border_value):
         if border_value == value:

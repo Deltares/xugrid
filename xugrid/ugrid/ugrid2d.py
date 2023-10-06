@@ -1695,6 +1695,41 @@ class Ugrid2d(AbstractUgrid):
         else:
             return new
 
+    def reindex_like(self, other: "Ugrid2d", obj: Union[xr.DataArray, xr.Dataset]):
+        """
+        Conform a DataArray or Dataset to match the topology of another Ugrid2D
+        topology. The topologies must be exactly equivalent: only the order of
+        the nodes, edges, and faces may differ.
+
+        Parameters
+        ----------
+        other: Ugrid2d
+        obj: DataArray or Dataset
+
+        Returns
+        -------
+        reindexed: DataArray or Dataset
+        """
+        if not isinstance(other, Ugrid2d):
+            raise TypeError(f"Expected Ugrid2d, received: {type(other).__name__}")
+
+        indexers = {
+            self.node_dimension: connectivity.index_like(
+                xy_a=self.node_coordinates,
+                xy_b=other.node_coordinates,
+            ),
+            self.face_dimension: connectivity.index_like(
+                xy_a=self.face_coordinates,
+                xy_b=other.face_coordinates,
+            ),
+        }
+        if other._edge_node_connectivity is not None:
+            indexers[self.edge_dimension] = connectivity.index_like(
+                xy_a=self.edge_coordinates,
+                xy_b=other.edge_coordinates,
+            )
+        return obj.isel(indexers, missing_dims="ignore")
+
     def triangulate(self):
         """
         Triangulate this UGRID2D topology, breaks more complex polygons down
