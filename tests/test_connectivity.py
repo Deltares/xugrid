@@ -52,13 +52,19 @@ def test_argsort_rows():
 
 def test_index_like():
     xy_a = np.array([[0.0, 0.0], [1.0, 1.0]])
+    xy_b = np.array([[0.0, 0.0]])
+    with pytest.raises(ValueError, match="coordinates do not match in shape"):
+        connectivity.index_like(xy_a, xy_b, tolerance=0.0)
+
     xy_b = np.array([[0.0, 0.0], [1.1, 1.0]])
     with pytest.raises(ValueError, match="coordinates are not identical after sorting"):
-        connectivity.index_like(xy_a, xy_b)
+        connectivity.index_like(xy_a, xy_b, tolerance=0.0)
+    # Now with higher tolerance
+    connectivity.index_like(xy_a, xy_b, tolerance=0.2)
 
     xy_a = np.array([[3.0, 3.0], [1.0, 1.0], [2.0, 2.0], [0.0, 0.0]])
     xy_b = np.array([[0.0, 0.0], [1.0, 1.0], [3.0, 3.0], [2.0, 2.0]])
-    actual = connectivity.index_like(xy_a, xy_b)
+    actual = connectivity.index_like(xy_a, xy_b, tolerance=0.0)
     expected = [3, 1, 0, 2]
     assert np.array_equal(actual, expected)
 

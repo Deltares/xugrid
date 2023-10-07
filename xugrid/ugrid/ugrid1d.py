@@ -474,11 +474,12 @@ class Ugrid1d(AbstractUgrid):
         if not isinstance(edge_index, pd.Index):
             edge_index = as_pandas_index(edge_index, self.n_edge)
 
-        if edge_index.size == self.n_edge:
+        range_index = pd.RangeIndex(0, self.n_edge)
+        if edge_index.size == self.n_edge and edge_index.equals(range_index):
             if return_index:
                 indexes = {
                     self.node_dimension: pd.RangeIndex(0, self.n_node),
-                    self.edge_dimension: pd.RangeIndex(0, self.n_edge),
+                    self.edge_dimension: range_index,
                 }
                 return self, indexes
             else:
@@ -616,7 +617,12 @@ class Ugrid1d(AbstractUgrid):
         )
         return merged_grid, indexes
 
-    def reindex_like(self, other: "Ugrid1d", obj: Union[xr.DataArray, xr.Dataset]):
+    def reindex_like(
+        self,
+        other: "Ugrid1d",
+        obj: Union[xr.DataArray, xr.Dataset],
+        tolerance: float = 0.0,
+    ):
         """
         Conform a DataArray or Dataset to match the topology of another Ugrid1D
         topology. The topologies must be exactly equivalent: only the order of
@@ -626,6 +632,8 @@ class Ugrid1d(AbstractUgrid):
         ----------
         other: Ugrid1d
         obj: DataArray or Dataset
+        tolerance: float, default value 0.0.
+            Maximum distance between inexact coordinate matches.
 
         Returns
         -------
@@ -638,10 +646,12 @@ class Ugrid1d(AbstractUgrid):
             self.node_dimension: connectivity.index_like(
                 xy_a=self.node_coordinates,
                 xy_b=other.node_coordinates,
+                tolerance=tolerance,
             ),
             self.edge_dimension: connectivity.index_like(
                 xy_a=self.edge_coordinates,
                 xy_b=other.edge_coordinates,
+                tolerance=tolerance,
             ),
         }
         return obj.isel(indexers, missing_dims="ignore")

@@ -1037,14 +1037,16 @@ class Ugrid2d(AbstractUgrid):
         if not isinstance(face_index, pd.Index):
             face_index = as_pandas_index(face_index, self.n_face)
 
-        # The pandas index may only contain uniques. So if size matches, it's the identity.
-        if face_index.size == self.n_face:
+        # The pandas index may only contain uniques. So if size matches, it may
+        # be the identity.
+        range_index = pd.RangeIndex(0, self.n_face)
+        if face_index.size == self.n_face and face_index.equals(range_index):
             # TODO: return self.copy instead?
             if return_index:
                 indexes = {
                     self.node_dimension: pd.RangeIndex(0, self.n_node),
                     self.edge_dimension: pd.RangeIndex(0, self.n_edge),
-                    self.face_dimension: pd.RangeIndex(0, self.n_face),
+                    self.face_dimension: range_index,
                 }
                 return self, indexes
             else:
@@ -1695,7 +1697,12 @@ class Ugrid2d(AbstractUgrid):
         else:
             return new
 
-    def reindex_like(self, other: "Ugrid2d", obj: Union[xr.DataArray, xr.Dataset]):
+    def reindex_like(
+        self,
+        other: "Ugrid2d",
+        obj: Union[xr.DataArray, xr.Dataset],
+        tolerance: float = 0.0,
+    ):
         """
         Conform a DataArray or Dataset to match the topology of another Ugrid2D
         topology. The topologies must be exactly equivalent: only the order of
@@ -1705,6 +1712,8 @@ class Ugrid2d(AbstractUgrid):
         ----------
         other: Ugrid2d
         obj: DataArray or Dataset
+        tolerance: float, default value 0.0.
+            Maximum distance between inexact coordinate matches.
 
         Returns
         -------
@@ -1717,16 +1726,19 @@ class Ugrid2d(AbstractUgrid):
             self.node_dimension: connectivity.index_like(
                 xy_a=self.node_coordinates,
                 xy_b=other.node_coordinates,
+                tolerance=tolerance,
             ),
             self.face_dimension: connectivity.index_like(
                 xy_a=self.face_coordinates,
                 xy_b=other.face_coordinates,
+                tolerance=tolerance,
             ),
         }
         if other._edge_node_connectivity is not None:
             indexers[self.edge_dimension] = connectivity.index_like(
                 xy_a=self.edge_coordinates,
                 xy_b=other.edge_coordinates,
+                tolerance=tolerance,
             )
         return obj.isel(indexers, missing_dims="ignore")
 

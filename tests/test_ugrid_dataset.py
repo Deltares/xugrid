@@ -293,6 +293,12 @@ class TestUgridDataArray:
             assert isinstance(partition, xugrid.UgridDataArray)
             assert partition.name == self.uda.name
 
+    def test_reindex_like(self):
+        back = self.uda.ugrid.reindex_like(self.uda)
+        assert isinstance(back, xugrid.UgridDataArray)
+        back = self.uda.ugrid.reindex_like(self.uda.ugrid.grid)
+        assert isinstance(back, xugrid.UgridDataArray)
+
     def test_crs(self):
         uda = self.uda
         crs = uda.ugrid.crs
@@ -637,6 +643,12 @@ class TestUgridDataset:
             assert "a" in partition
             assert "b" in partition
 
+    def test_reindex_like(self):
+        back = self.uds.ugrid.reindex_like(self.uds)
+        assert isinstance(back, xugrid.UgridDataset)
+        back = self.uds.ugrid.reindex_like(self.uds.ugrid.grid)
+        assert isinstance(back, xugrid.UgridDataset)
+
     def test_crs(self):
         uds = self.uds
         crs = uds.ugrid.crs
@@ -731,6 +743,10 @@ class TestMultiToplogyUgridDataset:
         result = self.uds.ugrid.sel(x=slice(-10, 10), y=slice(-10, 10))
         # Ensure both grids are still present
         assert len(result.ugrid.grids) == 2
+
+    def test_reindex_like(self):
+        back = self.uds.ugrid.reindex_like(self.uds)
+        assert isinstance(back, xugrid.UgridDataset)
 
 
 def test_multiple_coordinates():

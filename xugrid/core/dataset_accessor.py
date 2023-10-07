@@ -557,7 +557,11 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         return pd.concat(gdfs)
 
-    def reindex_like(self, other: Union[UgridType, UgridDataArray, UgridDataset]):
+    def reindex_like(
+        self,
+        other: Union[UgridType, UgridDataArray, UgridDataset],
+        tolerance: float = 0.0,
+    ):
         """
         Conform this object to match the topology of another object. The
         topologies must be exactly equivalent: only the order of the nodes,
@@ -570,6 +574,8 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         ----------
         other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
         obj: DataArray or Dataset
+        tolerance: float, default value 0.0.
+            Maximum distance between inexact coordinate matches.
 
         Returns
         -------
@@ -592,7 +598,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         for grid in grids:
             other = other_grids.get(grid.name)
             if other:
-                result = self.grid.reindex_like(other, obj=result)
+                result = self.grid.reindex_like(other, obj=result, tolerance=tolerance)
                 new_grids.append(other)
             else:
                 new_grids.append(grid)

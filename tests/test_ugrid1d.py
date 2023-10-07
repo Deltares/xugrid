@@ -330,6 +330,15 @@ def test_topology_subset():
     assert np.array_equal(actual.node_y, [1.0, 2.0])
 
 
+def test_reindex_like():
+    grid = grid1d()
+    index = np.array([1, 0])
+    reordered = grid.topology_subset(index)
+    obj = xr.DataArray(index, dims=(reordered.edge_dimension))
+    reindexed = reordered.reindex_like(grid, obj=obj)
+    assert np.array_equal(reindexed, [0, 1])
+
+
 def test_ugrid1d_plot():
     grid = grid1d()
     primitive = grid.plot()

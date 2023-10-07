@@ -846,6 +846,14 @@ def test_topology_subset():
     actual = grid.topology_subset(face_index)
     assert actual is grid
 
+    # Reordering
+    face_index = np.array([3, 2, 1, 0])
+    actual = grid.topology_subset(face_index)
+    assert np.array_equal(
+        actual.face_node_connectivity,
+        grid.face_node_connectivity[::-1],
+    )
+
     # Check that alternative attrs are preserved.
     grid = grid2d(
         attrs={"node_dimension": "nNetNode"},
@@ -854,6 +862,26 @@ def test_topology_subset():
     face_index = np.array([1])
     actual = grid.topology_subset(face_index)
     assert actual.node_dimension == "nNetNode"
+
+
+def test_reindex_like():
+    grid = grid2d()
+    # Change face and edge_index.
+    index = np.arange(grid.n_face)
+    rev_index = index[::-1]
+    edge_index = np.arange(grid.n_edge)
+    rev_edge_index = edge_index[::-1]
+    reordered = grid.topology_subset(rev_index)
+    reordered._edge_node_connectivity = reordered._edge_node_connectivity[
+        rev_edge_index
+    ]
+
+    face_da = xr.DataArray(rev_index, dims=(reordered.face_dimension,))
+    edge_da = xr.DataArray(rev_edge_index, dims=(reordered.edge_dimension,))
+    ds = xr.Dataset({"edge": edge_da, "face": face_da})
+    reindexed = reordered.reindex_like(grid, obj=ds)
+    assert np.array_equal(reindexed["face"], index)
+    assert np.array_equal(reindexed["edge"], edge_index)
 
 
 def test_triangulate():

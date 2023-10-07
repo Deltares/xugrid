@@ -16,16 +16,19 @@ def argsort_rows(array: np.ndarray) -> IntArray:
     return np.argsort(arr1d)
 
 
-def index_like(xy_a: FloatArray, xy_b: FloatArray):
+def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
     """
     Return the index that would transform xy_a into xy_b.
     """
+    if xy_a.shape != xy_b.shape:
+        raise ValueError("coordinates do not match in shape")
+
     sorter_a = argsort_rows(xy_a)
     sorter_b = argsort_rows(xy_b)
     # This should NOT be allclose even if it's operating on floating point
     # values: the coordinates should be EXACTLY equal if the topology is just a
     # shuffled one.
-    if not np.array_equal(xy_a[sorter_a], xy_b[sorter_b]):
+    if not np.allclose(xy_a[sorter_a], xy_b[sorter_b], rtol=0.0, atol=tolerance):
         raise ValueError("coordinates are not identical after sorting")
     #
     #   a_to_b

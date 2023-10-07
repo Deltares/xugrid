@@ -27,7 +27,7 @@ Added
   :meth:`xugrid.Ugrid2d.reindex_like`,
   :meth:`xugrid.UgridDataArrayAccessor.reindex_like` and
   :meth:`xugrid.UgridDatasetAccessor.reindex_like` have been added to deal with
-  equivalent but differently ordered topologies.
+  equivalent but differently ordered topologies and data.
 
 Changed
 ~~~~~~~
@@ -37,6 +37,14 @@ Changed
 
 Fixed
 ~~~~~
+
+- Using an index which only reorders but does not change the size in
+  :meth:`xugrid.Ugrid1d.topology_subset` or
+  :meth:`xugrid.Ugrid2d.topology_subset` would erroneously result in the
+  original grid being returned, rather than a new grid with the faces or edges
+  shuffled. This breaks the link the between topology and data when using
+  ``.isel`` on a UgridDataset or UgridDataArray. This has been fixed: both data
+  and the topology are now shuffled accordingly. 
 
 [0.6.5] 2023-09-30
 ------------------

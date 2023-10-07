@@ -420,7 +420,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         geometry = self.grid.to_shapely(dim)
         return gpd.GeoDataFrame(df, geometry=geometry, crs=self.grid.crs)
 
-    def reindex_like(self, other: Union[UgridType, UgridDataArray, UgridDataset]):
+    def reindex_like(
+        self,
+        other: Union[UgridType, UgridDataArray, UgridDataset],
+        tolerance: float = 0.0,
+    ):
         """
         Conform this object to match the topology of another object. The
         topologies must be exactly equivalent: only the order of the nodes,
@@ -432,6 +436,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         ----------
         other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
         obj: DataArray or Dataset
+        tolerance: float, default value 0.0.
+            Maximum distance between inexact coordinate matches.
 
         Returns
         -------
@@ -446,7 +452,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
                 f"received instead: {type(other).__name__}"
             )
-        new_obj = self.grid.reindex_like(other_grid, obj=self.obj)
+        new_obj = self.grid.reindex_like(other_grid, obj=self.obj, tolerance=tolerance)
         return UgridDataArray(new_obj, other_grid)
 
     def _binary_iterate(self, iterations: int, mask, value, border_value):
