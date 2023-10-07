@@ -110,8 +110,18 @@ uda == merged
 
 # %%
 # The topology is equivalent, but the nodes, edges, and faces are in a
-# different order. This is because ``merge_partitions`` concatenates the
-# partitions. To preserve order, we can assign an ID to the partitions, and
+# different order. This is because ``merge_partitions`` simply concatenates the
+# partitions.
+#
+# The easiest way to restore the order is by providing an example of the
+# original topology. ``reindex_like`` looks at the coordinates of both
+# (equivalent!) grids and automatically determines how to reorder:
+
+reordered = merged.ugrid.reindex_like(uda)
+uda == reordered
+
+# %%
+# Alternatively, we can also assign IDs, carry these along, and use these to
 # reorder the data after merging.
 
 uds = xu.UgridDataset(grids=[uda.ugrid.grid])

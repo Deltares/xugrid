@@ -664,7 +664,7 @@ face perimeters.</p></li>
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.reindex_like()</span></code>,
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.reindex_like()</span></code> and
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.reindex_like()</span></code> have been added to deal with
-equivalent but differently ordered topologies.</p></li>
+equivalent but differently ordered topologies and data.</p></li>
 </ul>
 </section>
 <section id="changed">
@@ -676,6 +676,15 @@ orientation during initialization.</p></li>
 </section>
 <section id="fixed">
 <h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Using an index which only reorders but does not change the size in
+<a class="reference internal" href="api/xugrid.Ugrid1d.topology_subset.html#xugrid.Ugrid1d.topology_subset" title="xugrid.Ugrid1d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.topology_subset()</span></code></a> or
+<a class="reference internal" href="api/xugrid.Ugrid2d.topology_subset.html#xugrid.Ugrid2d.topology_subset" title="xugrid.Ugrid2d.topology_subset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.topology_subset()</span></code></a> would erroneously result in the
+original grid being returned, rather than a new grid with the faces or edges
+shuffled. This breaks the link the between topology and data when using
+<code class="docutils literal notranslate"><span class="pre">.isel</span></code> on a UgridDataset or UgridDataArray. This has been fixed: both data
+and the topology are now shuffled accordingly.</p></li>
+</ul>
 </section>
 </section>
 <section id="id1">

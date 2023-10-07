@@ -864,7 +864,11 @@ document.write(`
         <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">],</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Conform this object to match the topology of another object. The</span>
 <span class="sd">        topologies must be exactly equivalent: only the order of the nodes,</span>
@@ -876,6 +880,8 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset</span>
 <span class="sd">        obj: DataArray or Dataset</span>
+<span class="sd">        tolerance: float, default value 0.0.</span>
+<span class="sd">            Maximum distance between inexact coordinate matches.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -890,7 +896,7 @@ document.write(`
                 <span class="s2">&quot;Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">other_grid</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">other_grid</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">other_grid</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_binary_iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">border_value</span><span class="p">):</span>
