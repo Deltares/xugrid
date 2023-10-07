@@ -704,7 +704,7 @@ class TestUgridDataset:
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
 
-class TestMultiToplogyUgridDataset:
+class TestMultiTopologyUgridDataset:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.uds = xugrid.UgridDataset(grids=GRID())

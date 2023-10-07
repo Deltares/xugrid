@@ -590,15 +590,15 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
                 f"received instead: {type(other).__name__}"
             )
-        grids = self.grids
+        # Convert to dict to match by name
         other_grids = {grid.name: grid for grid in other_grids}
 
         new_grids = []
         result = self.obj
-        for grid in grids:
+        for grid in self.grids:
             other = other_grids.get(grid.name)
             if other:
-                result = self.grid.reindex_like(other, obj=result, tolerance=tolerance)
+                result = grid.reindex_like(other, obj=result, tolerance=tolerance)
                 new_grids.append(other)
             else:
                 new_grids.append(grid)
