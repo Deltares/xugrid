@@ -25,16 +25,8 @@ def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
 
     sorter_a = argsort_rows(xy_a)
     sorter_b = argsort_rows(xy_b)
-    # This should NOT be allclose even if it's operating on floating point
-    # values: the coordinates should be EXACTLY equal if the topology is just a
-    # shuffled one.
     if not np.allclose(xy_a[sorter_a], xy_b[sorter_b], rtol=0.0, atol=tolerance):
         raise ValueError("coordinates are not identical after sorting")
-    #
-    #   a_to_b
-    # a ------> b
-    #
-    # via:
     #
     #   sorter_a         inverse_b
     # a --------> sorted ---------> b
