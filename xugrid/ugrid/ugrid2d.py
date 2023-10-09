@@ -1729,8 +1729,8 @@ class Ugrid2d(AbstractUgrid):
                 tolerance=tolerance,
             ),
             self.face_dimension: connectivity.index_like(
-                xy_a=self.face_coordinates,
-                xy_b=other.face_coordinates,
+                xy_a=self.centroids,
+                xy_b=other.centroids,
                 tolerance=tolerance,
             ),
         }
