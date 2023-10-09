@@ -88,6 +88,7 @@ UgridDataArray or UgridDataset.
     UgridDatasetAccessor.intersect_linestring
     UgridDatasetAccessor.partition
     UgridDatasetAccessor.partition_by_label
+    UgridDatasetAccessor.reindex_like
     UgridDatasetAccessor.to_geodataframe
     UgridDatasetAccessor.to_dataset
     UgridDatasetAccessor.to_netcdf
@@ -116,6 +117,7 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
+    UgridDataArrayAccessor.reindex_like
     UgridDataArrayAccessor.to_periodic
     UgridDataArrayAccessor.to_nonperiodic
     UgridDataArrayAccessor.to_geodataframe
@@ -215,6 +217,7 @@ UGRID1D Topology
     Ugrid1d.merge_partitions
     Ugrid1d.topological_sort_by_dfs
     Ugrid1d.contract_vertices
+    Ugrid1d.reindex_like
 
     Ugrid1d.from_meshkernel
     Ugrid1d.mesh
@@ -312,6 +315,7 @@ UGRID2D Topology
     Ugrid2d.label_partitions
     Ugrid2d.partition
     Ugrid2d.merge_partitions
+    Ugrid2d.reindex_like
 
     Ugrid2d.from_meshkernel
     Ugrid2d.mesh
