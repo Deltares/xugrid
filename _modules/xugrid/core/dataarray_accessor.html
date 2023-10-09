@@ -864,6 +864,8 @@ document.write(`
         <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="UgridDataArrayAccessor.reindex_like">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.reindex_like.html#xugrid.UgridDataArrayAccessor.reindex_like">[docs]</a>
     <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">],</span>
@@ -897,7 +899,8 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">reindex_like</span><span class="p">(</span><span class="n">other_grid</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">other_grid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">other_grid</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_binary_iterate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">border_value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">border_value</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
