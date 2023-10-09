@@ -31,6 +31,44 @@ def mixed_mesh():
     return faces, fill_value
 
 
+def test_argsort_rows():
+    with pytest.raises(ValueError, match="Array is not 2D"):
+        connectivity.argsort_rows(np.array([3, 2, 1, 0]))
+
+    array = np.array(
+        [
+            [1, 0],
+            [0, 1],
+            [2, 2],
+            [2, 1],
+            [0, 2],
+            [2, 0],
+        ]
+    )
+    _, expected = np.unique(array, axis=0, return_index=True)
+    actual = connectivity.argsort_rows(array)
+    assert np.array_equal(actual, expected)
+
+
+def test_index_like():
+    xy_a = np.array([[0.0, 0.0], [1.0, 1.0]])
+    xy_b = np.array([[0.0, 0.0]])
+    with pytest.raises(ValueError, match="coordinates do not match in shape"):
+        connectivity.index_like(xy_a, xy_b, tolerance=0.0)
+
+    xy_b = np.array([[0.0, 0.0], [1.1, 1.0]])
+    with pytest.raises(ValueError, match="coordinates are not identical after sorting"):
+        connectivity.index_like(xy_a, xy_b, tolerance=0.0)
+    # Now with higher tolerance
+    connectivity.index_like(xy_a, xy_b, tolerance=0.2)
+
+    xy_a = np.array([[3.0, 3.0], [1.0, 1.0], [2.0, 2.0], [0.0, 0.0]])
+    xy_b = np.array([[0.0, 0.0], [1.0, 1.0], [3.0, 3.0], [2.0, 2.0]])
+    actual = connectivity.index_like(xy_a, xy_b, tolerance=0.0)
+    expected = [3, 1, 0, 2]
+    assert np.array_equal(actual, expected)
+
+
 def test_neighbors():
     i = [0, 0, 0, 1, 1, 1]
     j = [0, 1, 2, 1, 3, 2]

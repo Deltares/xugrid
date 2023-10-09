@@ -145,6 +145,10 @@ class AbstractUgrid(abc.ABC):
     def merge_partitions():
         """ """
 
+    @abc.abstractmethod
+    def reindex_like():
+        """ """
+
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
 
