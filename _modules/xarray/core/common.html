@@ -17,12 +17,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=c5ced968eda925caa686" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=c5ced968eda925caa686" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=c5ced968eda925caa686" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -35,11 +35,11 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
-  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=c5ced968eda925caa686"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b9678aa1"></script>
+    <script src="../../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/common';</script>
@@ -115,13 +115,14 @@
   
   
   
+  
     
     
       
     
     
-    <img src="../../../_static/xugrid-logo.svg" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/xugrid-logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/xugrid-logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/xugrid-logo.svg" class="logo__image only-dark" alt=""/>`);</script>
   
   
     <p class="title logo__title">Xugrid</p>
@@ -614,7 +615,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">!r}</span><span class="s2"> not found in array dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Frozen</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ordered mapping from dimension names to lengths.</span>
 
 <span class="sd">        Immutable.</span>
@@ -1464,10 +1465,12 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        cond : DataArray, Dataset, or callable</span>
 <span class="sd">            Locations at which to preserve this object&#39;s values. dtype must be `bool`.</span>
-<span class="sd">            If a callable, it must expect this object as its only parameter.</span>
-<span class="sd">        other : scalar, DataArray or Dataset, optional</span>
+<span class="sd">            If a callable, the callable is passed this object, and the result is used as</span>
+<span class="sd">            the value for cond.</span>
+<span class="sd">        other : scalar, DataArray, Dataset, or callable, optional</span>
 <span class="sd">            Value to use for locations in this object where ``cond`` is False.</span>
-<span class="sd">            By default, these locations filled with NA.</span>
+<span class="sd">            By default, these locations are filled with NA. If a callable, it must</span>
+<span class="sd">            expect this object as its only parameter.</span>
 <span class="sd">        drop : bool, default: False</span>
 <span class="sd">            If True, coordinate labels that only correspond to False values of</span>
 <span class="sd">            the condition are dropped from the result.</span>
@@ -1515,20 +1518,21 @@ document.write(`
 <span class="sd">               [15., nan, nan, nan]])</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 
-<span class="sd">        &gt;&gt;&gt; a.where(lambda x: x.x + x.y &lt; 4, drop=True)</span>
+<span class="sd">        &gt;&gt;&gt; a.where(lambda x: x.x + x.y &lt; 4, lambda x: -x)</span>
+<span class="sd">        &lt;xarray.DataArray (x: 5, y: 5)&gt;</span>
+<span class="sd">        array([[  0,   1,   2,   3,  -4],</span>
+<span class="sd">               [  5,   6,   7,  -8,  -9],</span>
+<span class="sd">               [ 10,  11, -12, -13, -14],</span>
+<span class="sd">               [ 15, -16, -17, -18, -19],</span>
+<span class="sd">               [-20, -21, -22, -23, -24]])</span>
+<span class="sd">        Dimensions without coordinates: x, y</span>
+
+<span class="sd">        &gt;&gt;&gt; a.where(a.x + a.y &lt; 4, drop=True)</span>
 <span class="sd">        &lt;xarray.DataArray (x: 4, y: 4)&gt;</span>
 <span class="sd">        array([[ 0.,  1.,  2.,  3.],</span>
 <span class="sd">               [ 5.,  6.,  7., nan],</span>
 <span class="sd">               [10., 11., nan, nan],</span>
 <span class="sd">               [15., nan, nan, nan]])</span>
-<span class="sd">        Dimensions without coordinates: x, y</span>
-
-<span class="sd">        &gt;&gt;&gt; a.where(a.x + a.y &lt; 4, -1, drop=True)</span>
-<span class="sd">        &lt;xarray.DataArray (x: 4, y: 4)&gt;</span>
-<span class="sd">        array([[ 0,  1,  2,  3],</span>
-<span class="sd">               [ 5,  6,  7, -1],</span>
-<span class="sd">               [10, 11, -1, -1],</span>
-<span class="sd">               [15, -1, -1, -1]])</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 
 <span class="sd">        See Also</span>
@@ -1542,14 +1546,16 @@ document.write(`
 
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">cond</span><span class="p">):</span>
             <span class="n">cond</span> <span class="o">=</span> <span class="n">cond</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">other</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;cond argument is </span><span class="si">{</span><span class="n">cond</span><span class="si">!r}</span><span class="s2"> but must be a </span><span class="si">{</span><span class="n">Dataset</span><span class="si">!r}</span><span class="s2"> or </span><span class="si">{</span><span class="n">DataArray</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;cond argument is </span><span class="si">{</span><span class="n">cond</span><span class="si">!r}</span><span class="s2"> but must be a </span><span class="si">{</span><span class="n">Dataset</span><span class="si">!r}</span><span class="s2"> or </span><span class="si">{</span><span class="n">DataArray</span><span class="si">!r}</span><span class="s2"> (or a callable than returns one).&quot;</span>
                 <span class="p">)</span>
 
-            <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>
 
             <span class="k">def</span> <span class="nf">_dataarray_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">cond</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">))</span>
@@ -2477,8 +2483,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=c5ced968eda925caa686"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=c5ced968eda925caa686"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2508,7 +2514,7 @@ document.write(`
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.2.
 </p></div>
       
     </div>
