@@ -703,7 +703,7 @@ class Ugrid2d(AbstractUgrid):
 
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel(
-                projection=meshkernel.ProjectionType.CARTESIAN
+                projection=mk.ProjectionType.CARTESIAN
             )
             self._meshkernel.mesh2d_set(self.mesh)
         return self._meshkernel
