@@ -702,7 +702,9 @@ class Ugrid2d(AbstractUgrid):
         import meshkernel as mk
 
         if self._meshkernel is None:
-            self._meshkernel = mk.MeshKernel(projection=meshkernel.ProjectionType.CARTESIAN)
+            self._meshkernel = mk.MeshKernel(
+                projection=meshkernel.ProjectionType.CARTESIAN
+            )
             self._meshkernel.mesh2d_set(self.mesh)
         return self._meshkernel
 
