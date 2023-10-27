@@ -10,9 +10,7 @@ def _importorskip(modname):
 
         # If the DLL/SO fails to load / be found, still skip.
         try:
-            meshkernel.MeshKernel(
-                projection=meshkernel.ProjectionType.CARTESIAN
-            )
+            meshkernel.MeshKernel(projection=meshkernel.ProjectionType.CARTESIAN)
             has = True
         except OSError:
             has = False
