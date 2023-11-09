@@ -33,7 +33,7 @@ def maybe_xugrid(obj, topology, old_indexes=None):
     else:
         grids = {dim: topology for dim in topology.dimensions}
 
-    item_grids = list(set(grids[dim] for dim in obj.dims if dim in grids))
+    item_grids = list({grids[dim] for dim in obj.dims if dim in grids})
 
     if len(item_grids) == 0:
         return obj
@@ -288,8 +288,8 @@ class UgridDataset(DatasetForwardMixin):
             grids = [grid_from_dataset(obj, topology) for topology in topologies]
         else:
             # Make sure it's a new list
-            if isinstance(grids, (list, tuple, set)):
-                grids = [grid for grid in grids]
+            if isinstance(grids, (tuple, set)):
+                grids = list(grids)
             else:  # not iterable
                 grids = [grids]
             # Now typecheck
@@ -363,9 +363,11 @@ class UgridDataset(DatasetForwardMixin):
     def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
         """
         Convert a geodataframe into the appropriate Ugrid topology and dataset.
+
         Parameters
         ----------
         geodataframe: gpd.GeoDataFrame
+
         Returns
         -------
         dataset: UGridDataset

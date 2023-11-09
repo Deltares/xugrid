@@ -1,6 +1,3 @@
-"""
-Functions to load sample data.
-"""
 import numpy as np
 import pkg_resources
 import pooch
@@ -20,9 +17,7 @@ with pkg_resources.resource_stream("xugrid.data", "registry.txt") as registry_fi
 
 
 def xoxo():
-    """
-    Fetch a simple two part synthetic unstructured grid topology.
-    """
+    """Fetch a simple two part synthetic unstructured grid topology."""
     fname_vertices = REGISTRY.fetch("xoxo_vertices.txt")
     fname_triangles = REGISTRY.fetch("xoxo_triangles.txt")
     vertices = np.loadtxt(fname_vertices, dtype=float)
@@ -37,9 +32,7 @@ def xoxo():
 
 
 def adh_san_diego(xarray=False):
-    """
-    Fetch time varying output of a hydraulic simulation.
-    """
+    """Fetch time varying output of a hydraulic simulation."""
     fname = REGISTRY.fetch("ADH_SanDiego.nc")
     ds = xr.open_dataset(fname)
     ds["node_x"].attrs["standard_name"] = "projection_x_coordinate"
@@ -52,9 +45,7 @@ def adh_san_diego(xarray=False):
 
 
 def elevation_nl(xarray=False):
-    """
-    Fetch surface elevation dataset for the Netherlands.
-    """
+    """Fetch surface elevation dataset for the Netherlands."""
     fname = REGISTRY.fetch("elevation_nl.nc")
     ds = xr.open_dataset(fname)
     ds["mesh2d_node_x"].attrs["standard_name"] = "projection_x_coordinate"
@@ -69,9 +60,7 @@ def elevation_nl(xarray=False):
 
 
 def provinces_nl():
-    """
-    Fetch provinces polygons for the Netherlands.
-    """
+    """Fetch provinces polygons for the Netherlands."""
     import geopandas as gpd
 
     fname = REGISTRY.fetch("provinces-nl.geojson")

@@ -7,6 +7,7 @@ import xugrid
 def transform(vertices, minx, maxx, miny):
     """
     Transform vertices to fit within minx to maxx.
+
     Maintains x:y aspect ratio.
     """
     x, y = vertices.T
@@ -63,7 +64,9 @@ def generate_disk(partitions: int, depth: int):
 def disk():
     def function_z(x, y):
         """
-        from https://matplotlib.org/stable/gallery/images_contours_and_fields/tricontour_smooth_user.html
+        Generate a somewhat interesting surface.
+
+        See: https://matplotlib.org/stable/gallery/images_contours_and_fields/tricontour_smooth_user.html
         """
         r1 = np.sqrt((0.5 - x) ** 2 + (0.5 - y) ** 2)
         theta1 = np.arctan2(0.5 - x, 0.5 - y)

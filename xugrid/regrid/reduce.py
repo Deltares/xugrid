@@ -1,6 +1,4 @@
-"""
-Contains common reduction methods.
-"""
+"""Contains common reduction methods."""
 import numpy as np
 
 

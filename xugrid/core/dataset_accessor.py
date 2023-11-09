@@ -74,7 +74,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         bounds of the dataset as a whole. Currently does not check whether the
         coordinate reference systems (CRS) of the grids in the dataset match.
         """
-        bounds = np.column_stack([bound for bound in self.bounds.values()])
+        bounds = np.column_stack(list(self.bounds.values()))
         return (
             bounds[0].min(),
             bounds[1].min(),
@@ -286,8 +286,8 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         rasterized: xr.Dataset
         """
-        x = other["x"].values
-        y = other["y"].values
+        x = other["x"].to_numpy()
+        y = other["y"].to_numpy()
         datasets = []
         for grid in self.grids:
             xx, yy, index = grid.rasterize_like(x, y)
@@ -296,7 +296,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     def to_periodic(self):
         """
-        Converts every grid to a periodic grid, where the rightmost boundary
+        Convert every grid to a periodic grid, where the rightmost boundary
         shares its nodes with the leftmost boundary.
 
         Returns
@@ -380,7 +380,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     def to_dataset(self, optional_attributes: bool = False):
         """
-        Converts this UgridDataset into a standard
+        Convert this UgridDataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.

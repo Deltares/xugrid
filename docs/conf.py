@@ -14,8 +14,6 @@
 #
 import pkg_resources
 
-import xugrid
-
 # -- Project information -----------------------------------------------------
 
 project = "Xugrid"

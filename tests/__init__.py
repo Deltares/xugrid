@@ -1,6 +1,4 @@
 # __init__.py for pytest-cov
-import importlib
-
 import pytest
 
 

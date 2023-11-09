@@ -59,7 +59,7 @@ has_matplotlib, requires_matplotlib = _importorskip("matplotlib")
 
 @contextlib.contextmanager
 def figure_context(*args, **kwargs):
-    """context manager which autocloses a figure (even if the test failed)"""
+    """Context manager which autocloses a figure (even if the test failed)"""
 
     try:
         yield None
@@ -395,5 +395,5 @@ class TestPlot(PlotTestCase):
 
         # Latex strings can be longer without needing a new line:
         long_latex_name = r"$Ra_s = \mathrm{mean}(\epsilon_k) / \mu M^2_\infty$"
-        da.attrs = dict(long_name=long_latex_name)
+        da.attrs = {"long_name": long_latex_name}
         assert label_from_attrs(da) == long_latex_name

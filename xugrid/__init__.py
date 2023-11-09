@@ -35,3 +35,33 @@ try:
 except pkg_resources.DistributionNotFound:
     # package is not installed
     pass
+
+
+__all__ = (
+    "data",
+    "concat",
+    "full_like",
+    "merge",
+    "ones_like",
+    "open_dataarray",
+    "open_dataset",
+    "open_mfdataset",
+    "open_zarr",
+    "zeros_like",
+    "UgridDataArrayAccessor",
+    "UgridDatasetAccessor",
+    "UgridDataArray",
+    "UgridDataset",
+    "plot",
+    "BarycentricInterpolator",
+    "CentroidLocatorRegridder",
+    "OverlapRegridder",
+    "RelativeOverlapRegridder",
+    "burn_vector_geometry",
+    "UgridRolesAccessor",
+    "merge_partitions",
+    "polygonize",
+    "snap_to_grid",
+    "Ugrid1d",
+    "Ugrid2d",
+)

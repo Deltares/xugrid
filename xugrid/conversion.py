@@ -117,7 +117,7 @@ def _scalar_spacing(coords, spacing):
     diff = coords.diff(dim)
     spacing_value = abs(spacing.item())
     if not np.allclose(
-        abs(diff.values), spacing_value, atol=abs(1.0e-4 * spacing.item())
+        abs(diff.to_numpy()), spacing_value, atol=abs(1.0e-4 * spacing.item())
     ):
         raise ValueError(
             f"spacing of {coords.name} does not match value of {spacing.name}"
@@ -140,7 +140,7 @@ def _implicit_spacing(coords):
             f"Cannot derive spacing of 1-sized coordinate: {coords.name} \n"
             f"Set bounds yourself or assign a d{coords.name} variable with spacing"
         )
-    halfdiff = 0.5 * abs(coords.diff(dim)).values
+    halfdiff = 0.5 * abs(coords.diff(dim)).to_numpy()
     return np.insert(halfdiff, 0, halfdiff[0])
 
 

@@ -10,63 +10,63 @@ import xugrid
 class AbstractUgridAccessor(abc.ABC):
     @abc.abstractmethod
     def to_dataset():
-        """ """
+        pass
 
     @abc.abstractmethod
     def assign_node_coords():
-        """ """
+        pass
 
     @abc.abstractmethod
     def set_node_coords():
-        """ """
+        pass
 
     @abc.abstractproperty
     def crs():
-        """ """
+        pass
 
     @abc.abstractmethod
     def set_crs():
-        """ """
+        pass
 
     @abc.abstractmethod
     def to_crs():
-        """ """
+        pass
 
     @abc.abstractmethod
     def sel():
-        """ """
+        pass
 
     @abc.abstractmethod
     def sel_points():
-        """ """
+        pass
 
     @abc.abstractmethod
     def intersect_line():
-        """ """
+        pass
 
     @abc.abstractmethod
     def intersect_linestring():
-        """ """
+        pass
 
     @abc.abstractproperty
     def bounds():
-        """ """
+        pass
 
     @abc.abstractproperty
     def total_bounds():
-        """ """
+        pass
 
     @abc.abstractproperty
     def name():
-        """ """
+        pass
 
     @abc.abstractproperty
     def names():
-        """ """
+        pass
 
     @abc.abstractproperty
     def topology():
-        """ """
+        pass
 
     @staticmethod
     def _raster_xy(bounds: Tuple[float, float, float, float], resolution: float):

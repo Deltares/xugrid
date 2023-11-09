@@ -154,6 +154,6 @@ def test_snap_to_grid_with_data():
     assert isinstance(uds, xu.UgridDataset)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
-    assert uds["a"].notnull().sum() == 8
-    assert uds["line_index"].notnull().sum() == 8
+    assert uds["a"].notna().sum() == 8
+    assert uds["line_index"].notna().sum() == 8
     assert uds["line_index"].sum() == 0  # all values should be 0

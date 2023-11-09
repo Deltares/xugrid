@@ -1,6 +1,4 @@
-"""
-This module is strongly inspired by / copied from xarray/plot/plot.py.
-"""
+"""This module is strongly inspired by / copied from xarray/plot/plot.py."""
 import functools
 
 import numpy as np
@@ -55,7 +53,7 @@ def _plot2d(plotfunc):
     """
     Decorator for common 2d plotting logic
     Also adds the 2d plot method to class _PlotMethods
-    """
+    """  # noqa: D401
     commondoc = """
     Parameters
     ----------
@@ -218,7 +216,7 @@ def _plot2d(plotfunc):
                 add_colorbar = False
 
         if subplot_kws is None:
-            subplot_kws = dict()
+            subplot_kws = {}
 
         if plotfunc.__name__ == "surface" and not kwargs.get("_is_facetgrid", False):
             if ax is None:
@@ -266,7 +264,7 @@ def _plot2d(plotfunc):
 
         # darray may be None when plotting just edges (the mesh)
         if darray is not None:
-            _ensure_plottable(darray.values)
+            _ensure_plottable(darray.to_numpy())
             cmap_params, cbar_kwargs = _process_cmap_cbar_kwargs(
                 plotfunc,
                 darray,
@@ -274,8 +272,8 @@ def _plot2d(plotfunc):
                 _is_facetgrid=kwargs.pop("_is_facetgrid", False),
             )
         else:
-            cmap_params = dict()
-            cbar_kwargs = dict()
+            cmap_params = {}
+            cbar_kwargs = {}
 
         if "contour" in plotfunc.__name__:
             # extend is a keyword argument only for contour and contourf, but
@@ -364,7 +362,7 @@ def _plot2d(plotfunc):
 def scatter(grid, da, ax, **kwargs):
     dim = get_ugrid_dim(grid, da)
     x, y = getattr(grid, COORDS[dim]).T
-    primitive = ax.scatter(x, y, c=da.values.ravel(), **kwargs)
+    primitive = ax.scatter(x, y, c=da.to_numpy().ravel(), **kwargs)
     return primitive
 
 
@@ -374,7 +372,7 @@ def tripcolor(grid, da, ax, **kwargs):
     if dim != NODE:
         raise ValueError("tripcolor only supports data on nodes")
     (x, y, triangles), _ = grid.triangulation
-    primitive = ax.tripcolor(x, y, triangles, da.values.ravel(), **kwargs)
+    primitive = ax.tripcolor(x, y, triangles, da.to_numpy().ravel(), **kwargs)
     return primitive
 
 
@@ -407,7 +405,7 @@ def line(grid, da, ax, **kwargs):
     collection = LineCollection(edge_coords, **kwargs)
 
     if dim == EDGE:
-        collection.set_array(da.values)
+        collection.set_array(da.to_numpy())
         collection._scale_norm(norm, vmin, vmax)
 
     primitive = ax.add_collection(collection, autolim=False)
@@ -451,7 +449,7 @@ def imshow(grid, da, ax, **kwargs):
         resolution = min(dx, dy) / 500
 
     _, _, index = grid.rasterize(resolution)
-    img = da.values[index].astype(float)
+    img = da.to_numpy()[index].astype(float)
     img[index == grid.fill_value] = np.nan
     primitive = ax.imshow(img, **kwargs)
     return primitive
@@ -460,7 +458,8 @@ def imshow(grid, da, ax, **kwargs):
 @_plot2d
 def contour(grid, da, ax, **kwargs):
     """
-    Filled contour plot of 2D UgridDataArray.
+    Create a contour plot of a 2D UgridDataArray.
+
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontour`.
     """
     dim = get_ugrid_dim(grid, da)
@@ -473,14 +472,15 @@ def contour(grid, da, ax, **kwargs):
     else:
         raise ValueError("contour only supports data on nodes or faces")
 
-    primitive = ax.tricontour(x, y, triangles, z.values.ravel(), **kwargs)
+    primitive = ax.tricontour(x, y, triangles, z.to_numpy().ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
 def contourf(grid, da, ax, **kwargs):
     """
-    Filled contour plot of 2D UgridDataArray.
+    Create a filled contour plot of a 2D UgridDataArray.
+
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontourf`.
     """
     dim = get_ugrid_dim(grid, da)
@@ -493,14 +493,14 @@ def contourf(grid, da, ax, **kwargs):
     else:
         raise ValueError("contourf only supports data on nodes or faces")
 
-    primitive = ax.tricontourf(x, y, triangles, z.values.ravel(), **kwargs)
+    primitive = ax.tricontourf(x, y, triangles, z.to_numpy().ravel(), **kwargs)
     return primitive
 
 
 @_plot2d
 def pcolormesh(grid, da, ax, **kwargs):
     """
-    Pseudocolor plot of 2D UgridDataArray.
+    Create a pseudocolor mesh plot of a 2D UgridDataArray.
 
     Wraps matplotlib PolyCollection.
     """
@@ -525,7 +525,7 @@ def pcolormesh(grid, da, ax, **kwargs):
         kwargs["edgecolors"] = "face"
 
     collection = PolyCollection(vertices, **kwargs)
-    collection.set_array(da.values.ravel())
+    collection.set_array(da.to_numpy().ravel())
     collection._scale_norm(norm, vmin, vmax)
     primitive = ax.add_collection(collection, autolim=False)
 
@@ -542,7 +542,8 @@ def pcolormesh(grid, da, ax, **kwargs):
 @_plot2d
 def surface(grid, da, ax, **kwargs):
     """
-    Surface plot of x-y UgridDataArray.
+    Create a surface plot of a 2D UgridDataArray.
+
     Wraps :py:func:`matplotlib:mplot3d:plot_trisurf`.
     """
     dim = get_ugrid_dim(grid, da)
@@ -555,7 +556,7 @@ def surface(grid, da, ax, **kwargs):
     else:
         raise ValueError("surface only supports data on nodes or faces")
 
-    primitive = ax.plot_trisurf(x, y, triangles, z.values.ravel(), **kwargs)
+    primitive = ax.plot_trisurf(x, y, triangles, z.to_numpy().ravel(), **kwargs)
     return primitive
 
 
@@ -566,6 +567,8 @@ def plot(
     **kwargs,
 ):
     """
+    Plot the data of the DataArray on the Ugrid topology.
+
     Default plot of DataArray using :py:mod:`matplotlib:matplotlib.pyplot`.
 
     Calls xarray plotting function based on the topology dimension of the data.

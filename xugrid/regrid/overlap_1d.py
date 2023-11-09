@@ -99,6 +99,9 @@ def _find_indices(side):
         target_index,
     ):
         """
+        Find the indices of target in source. Allocate the result in slices of
+        source_index and target_index.
+
         This is basically a workaround. Numpy searchsorted does not support an axis
         argument to search one nD array on the other.
         See: https://github.com/numpy/numpy/issues/4224

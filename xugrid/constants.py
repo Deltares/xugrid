@@ -43,9 +43,7 @@ T_OFFSET = 1.0e-6
 
 
 class MissingOptionalModule:
-    """
-    Presents a clear error for optional modules.
-    """
+    """Presents a clear error for optional modules."""
 
     def __init__(self, name):
         self.name = name

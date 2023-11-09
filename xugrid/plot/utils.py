@@ -79,9 +79,7 @@ def _determine_extend(calc_data, vmin, vmax):
 
 
 def _build_discrete_cmap(cmap, levels, extend, filled):
-    """
-    Build a discrete colormap and normalization of the data.
-    """
+    """Build a discrete colormap and normalization of the data."""
     import matplotlib as mpl
 
     if len(levels) == 1:
@@ -328,9 +326,14 @@ def _determine_cmap_params(
         vmin = None
         vmax = None
 
-    return dict(
-        vmin=vmin, vmax=vmax, cmap=cmap, extend=extend, levels=levels, norm=norm
-    )
+    return {
+        "vmin": vmin,
+        "vmax": vmax,
+        "cmap": cmap,
+        "extend": extend,
+        "levels": levels,
+        "norm": norm,
+    }
 
 
 def get_axis(
@@ -395,7 +398,7 @@ def _maybe_gca(**subplot_kws: Any) -> Axes:
 
 
 def _get_units_from_attrs(da: DataArray) -> str:
-    """Extracts and formats the unit/units from a attributes."""
+    """Extract and format the unit/units from a attributes."""
     # EDIT: removed pint support for now.
     # pint_array_type = DuckArrayModule("pint").type
     units = " [{}]"
@@ -409,8 +412,10 @@ def _get_units_from_attrs(da: DataArray) -> str:
 
 
 def label_from_attrs(da: DataArray | None, extra: str = "") -> str:
-    """Makes informative labels if variable metadata (attrs) follows
-    CF conventions."""
+    """
+    Make informative labels if variable metadata (attrs) follows CF
+    conventions.
+    """
     if da is None:
         return ""
 
@@ -438,16 +443,12 @@ def label_from_attrs(da: DataArray | None, extra: str = "") -> str:
 def _valid_other_type(
     x: ArrayLike, types: type[object] | tuple[type[object], ...]
 ) -> bool:
-    """
-    Do all elements of x have a type from types?
-    """
+    """Do all elements of x have a type from types?"""
     return all(isinstance(el, types) for el in np.ravel(x))
 
 
 def _valid_numpy_subdtype(x, numpy_types):
-    """
-    Is any dtype from numpy_types superior to the dtype of x?
-    """
+    """Is any dtype from numpy_types superior to the dtype of x?"""
     # If any of the types given in numpy_types is understood as numpy.generic,
     # all possible x will be considered valid.  This is probably unwanted.
     for t in numpy_types:
@@ -529,9 +530,7 @@ def _update_axes(
     xlim: tuple[float, float] | None = None,
     ylim: tuple[float, float] | None = None,
 ) -> None:
-    """
-    Update axes with provided parameters
-    """
+    """Update axes with provided parameters"""
     if xincrease is None:
         pass
     elif xincrease and ax.xaxis_inverted():
@@ -661,7 +660,7 @@ def _easy_facetgrid(
     Convenience method to call xarray.plot.FacetGrid from 2d plotting methods
 
     kwargs are the arguments to 2d plotting method
-    """
+    """  # noqa: D401
     if ax is not None:
         raise ValueError("Can't use axes when making faceted plots.")
     if aspect is None:

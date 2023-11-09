@@ -36,18 +36,18 @@ class StructuredGrid1d:
         index = obj.indexes[name]
         # take care of potentially decreasing coordinate values
         if index.is_monotonic_decreasing:
-            midpoints = index.values[::-1]
+            midpoints = index.to_numpy()[::-1]
             flipped = True
             side = "right"
         elif index.is_monotonic_increasing:
-            midpoints = index.values
+            midpoints = index.to_numpy()
             flipped = False
             side = "left"
         else:
             raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
         if bounds_name in obj.coords:
-            bounds = obj[bounds_name].values
+            bounds = obj[bounds_name].to_numpy()
             size = bounds[:, 1] - bounds[:, 0]
         else:
             if size_name in obj.coords:
@@ -114,7 +114,8 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray]:
         """
-        Retruns nodes when midpoints are within bounding box of overlaying grid.
+        Return nodes when midpoints are within bounding box of overlaying grid.
+
         In cases that midpoints (and bounding boxes) are flipped, computed indexes
         are fliped as well.
 
@@ -147,10 +148,11 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray]:
         """
-        Returns all valid nodes for linear interpolation. In addition to
-        valid_nodes_within_bounds() is checked if target midpoints are not
-        outside outer source boundary midpoints. In that case there is no
-        interpolation possible.
+        Return all valid nodes for linear interpolation.
+        
+        In addition to valid_nodes_within_bounds() is checked if target
+        midpoints are not outside outer source boundary midpoints. In that case
+        there is no interpolation possible.
 
         Parameters
         ----------
@@ -174,7 +176,7 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns source and target nodes and overlapping length. It utilises overlap_1d()
+        Return source and target nodes and overlapping length. It utilises overlap_1d()
         and does an aditional flip in cases of reversed midpoints
 
         Parameters
@@ -204,7 +206,7 @@ class StructuredGrid1d:
         neighbour: np.array,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns for every target node an pair of connected source nodes based
+        Return for every target node an pair of connected source nodes based
         on centroids connection inputs.
 
         Parameters
@@ -254,7 +256,7 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d", source_index: IntArray, target_index: IntArray
     ) -> Tuple[FloatArray, IntArray]:
         """
-        Computes linear weights bases on centroid indexes.
+        Compute linear weights bases on centroid indexes.
 
         Parameters
         ----------
@@ -308,7 +310,7 @@ class StructuredGrid1d:
         self, source_index: IntArray, target_index: IntArray, weights: FloatArray
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns sorted input based on target index. The regridder needs input
+        Return sorted input based on target index. The regridder needs input
         sorted on row index of WeightMatrixCOO (target index).
 
         Parameters
@@ -334,7 +336,7 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d", relative: bool
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns source and target indexes and overlapping length
+        Return source and target indexes and overlapping length
 
         Parameters
         ----------
@@ -358,7 +360,7 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns source and target indexes based on nearest neighbor of
+        Return source and target indexes based on nearest neighbor of
         centroids.
 
         Parameters
@@ -379,7 +381,7 @@ class StructuredGrid1d:
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Returns linear source and target indexes and corresponding weights.
+        Return linear source and target indexes and corresponding weights.
 
         Parameters
         ----------
@@ -419,9 +421,7 @@ class StructuredGrid1d:
 
 
 class StructuredGrid2d(StructuredGrid1d):
-    """
-    e.g. (x,y) -> (x,y)
-    """
+    """Represent e.g. raster data topology."""
 
     def __init__(
         self,
@@ -492,6 +492,8 @@ class StructuredGrid2d(StructuredGrid1d):
 
     def overlap(self, other, relative: bool) -> Tuple[IntArray, IntArray, FloatArray]:
         """
+        Compute (relative) overlap with other.
+
         Returns
         -------
         source_index: 1d np.ndarray of int
@@ -516,6 +518,8 @@ class StructuredGrid2d(StructuredGrid1d):
 
     def locate_centroids(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
         """
+        Locate centroids of other in self.
+
         Returns
         -------
         source_index: 1d np.ndarray of int
@@ -540,6 +544,8 @@ class StructuredGrid2d(StructuredGrid1d):
 
     def linear_weights(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
         """
+        Compute linear interpolation weights with other.
+
         Returns
         -------
         source_index: 1d np.ndarray of int
@@ -621,6 +627,8 @@ class StructuredGrid3d:
 
     def overlap(self, other, relative: bool):
         """
+        Compute (relative) overlap with other.
+
         Returns
         -------
         source_index: 1d np.ndarray of int
@@ -722,6 +730,8 @@ class ExplicitStructuredGrid3d:
 
     def overlap(self, other, relative: bool):
         """
+        Compute (relative) overlap with other.
+
         Returns
         -------
         source_index: 1d np.ndarray of int
