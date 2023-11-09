@@ -503,10 +503,12 @@ document.write(`
     <span class="n">all_touched</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This algorithm burns polygon vector geometries in a 2d topology by:</span>
+<span class="sd">    Locate a single polygon.</span>
+
+<span class="sd">    This algorithm burns a polygon vector geometry in a 2d topology by:</span>
 
 <span class="sd">    * Extracting the exterior and interiors (holes) coordinates from the</span>
-<span class="sd">      polygons.</span>
+<span class="sd">      polygon.</span>
 <span class="sd">    * Breaking every polygon down into a triangles using an &quot;earcut&quot; algorithm.</span>
 <span class="sd">    * Searching the grid for these triangles.</span>
 
@@ -577,9 +579,7 @@ document.write(`
     <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simply searches the points in the ``like`` 2D topology.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simply searches the points in the ``like`` 2D topology.&quot;&quot;&quot;</span>
     <span class="n">xy</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
     <span class="n">to_burn</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
     <span class="n">output</span><span class="p">[</span><span class="n">to_burn</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
@@ -593,6 +593,8 @@ document.write(`
     <span class="n">output</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Burn the line values into the underlying faces.</span>
+
 <span class="sd">    This algorithm breaks any linestring down into edges (two x, y points). We</span>
 <span class="sd">    search and intersect every edge in the ``like`` grid, the intersections are</span>
 <span class="sd">    discarded.</span>

@@ -471,7 +471,7 @@ document.write(`
 <span class="sd">        bounds of the dataset as a whole. Currently does not check whether the</span>
 <span class="sd">        coordinate reference systems (CRS) of the grids in the dataset match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">bound</span> <span class="k">for</span> <span class="n">bound</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
             <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
@@ -709,8 +709,8 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        rasterized: xr.Dataset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -722,7 +722,7 @@ document.write(`
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_periodic.html#xugrid.UgridDatasetAccessor.to_periodic">[docs]</a>
     <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts every grid to a periodic grid, where the rightmost boundary</span>
+<span class="sd">        Convert every grid to a periodic grid, where the rightmost boundary</span>
 <span class="sd">        shares its nodes with the leftmost boundary.</span>
 
 <span class="sd">        Returns</span>
@@ -818,7 +818,7 @@ document.write(`
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts this UgridDataset into a standard</span>
+<span class="sd">        Convert this UgridDataset into a standard</span>
 <span class="sd">        xarray.Dataset.</span>
 
 <span class="sd">        The UGRID topology information is added as standard data variables.</span>
@@ -941,9 +941,7 @@ document.write(`
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_geodataframe.html#xugrid.UgridDatasetAccessor.to_geodataframe">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert data and topology of one facet (node, edge, face) of the grid</span>
 <span class="sd">        to a geopandas GeoDataFrame. This also determines the geometry type of</span>

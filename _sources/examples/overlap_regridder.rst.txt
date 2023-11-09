@@ -56,16 +56,14 @@ We start with the same example as in the quick overview.
 We'll use a part of a triangular grid with the surface elevation (including
 some bathymetry) of the Netherlands, and a coarser target grid.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-52
+.. GENERATED FROM PYTHON SOURCE LINES 28-50
 
 .. code-block:: default
 
 
 
     def create_grid(bounds, nx, ny):
-        """
-        Create a simple grid of triangles covering a rectangle.
-        """
+        """Create a simple grid of triangles covering a rectangle."""
         import numpy as np
         from matplotlib.tri import Triangulation
 
@@ -91,7 +89,7 @@ some bathymetry) of the Netherlands, and a coarser target grid.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-58
+.. GENERATED FROM PYTHON SOURCE LINES 51-56
 
 .. code-block:: default
 
@@ -114,11 +112,11 @@ some bathymetry) of the Netherlands, and a coarser target grid.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7ff9c458daf0>
+    <matplotlib.collections.LineCollection object at 0x7fba737a1e90>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-72
+.. GENERATED FROM PYTHON SOURCE LINES 57-70
 
 Method comparison
 -----------------
@@ -134,7 +132,7 @@ side by side.
   such quantity, as a datum is an arbitrary level. The xugrid geometric mean
   returns NaN if reducing over negative values.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-94
+.. GENERATED FROM PYTHON SOURCE LINES 70-92
 
 .. code-block:: default
 
@@ -172,7 +170,7 @@ side by side.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 93-99
 
 Relative overlap
 ----------------
@@ -181,7 +179,7 @@ For some reductions, the relative degree of overlap with the original source
 cell is required rather than the absolute overlap, e.g. for first-order
 conservative methods, such as conductance:
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-106
+.. GENERATED FROM PYTHON SOURCE LINES 99-104
 
 .. code-block:: default
 
@@ -204,11 +202,11 @@ conservative methods, such as conductance:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7ff9b76b8bb0>
+    <matplotlib.collections.PolyCollection object at 0x7fba7cbd9b50>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-124
+.. GENERATED FROM PYTHON SOURCE LINES 105-122
 
 Custom reductions
 -----------------
@@ -228,7 +226,7 @@ arguments: ``values``, ``indices``, ``weights``.
 Xugrid regridder reduction functions are implemented in such a way. For a example, the area
 could be implemented as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-131
+.. GENERATED FROM PYTHON SOURCE LINES 122-129
 
 .. code-block:: default
 
@@ -246,7 +244,7 @@ could be implemented as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-142
+.. GENERATED FROM PYTHON SOURCE LINES 130-140
 
 .. note::
    * Custom reductions methods must be able to deal with NaN values as these
@@ -259,7 +257,7 @@ could be implemented as follows:
 
 To use our custom method, we provide at initialization of the OverlapRegridder:
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-147
+.. GENERATED FROM PYTHON SOURCE LINES 140-145
 
 .. code-block:: default
 
@@ -282,18 +280,18 @@ To use our custom method, we provide at initialization of the OverlapRegridder:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7ff9c53ad160>
+    <matplotlib.collections.PolyCollection object at 0x7fba72d10c50>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
+.. GENERATED FROM PYTHON SOURCE LINES 146-150
 
 Not every reduction uses the weights argument. For example, computing an
 arbitrary quantile value requires just the values. Again, make sure the
 function can deal with NaN values! -- hence ``nanpercentile`` rather than
 ``percentile`` here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-163
+.. GENERATED FROM PYTHON SOURCE LINES 150-161
 
 .. code-block:: default
 
@@ -322,18 +320,18 @@ function can deal with NaN values! -- hence ``nanpercentile`` rather than
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7ff9c1d740a0>
+    <matplotlib.collections.PolyCollection object at 0x7fba801763d0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 162-163
 
 .. _Numba: https://numba.pydata.org/
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.078 seconds)
+   **Total running time of the script:** (0 minutes 3.992 seconds)
 
 
 .. _sphx_glr_download_examples_overlap_regridder.py:

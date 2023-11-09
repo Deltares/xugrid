@@ -689,7 +689,7 @@ DataArrays and Datasets. Refer to the Xarray documentation.</p>
 <td><p>Burn vector geometries (points, lines, polygons) into a Ugrid2d mesh.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.polygonize.html#xugrid.polygonize" title="xugrid.polygonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">polygonize</span></code></a>(uda)</p></td>
-<td><p>This function creates vector polygons for all connected regions of cells (faces) in the Ugrid2d topology sharing a common value.</p></td>
+<td><p>Polygonize a UgridDataArray.</p></td>
 </tr>
 </tbody>
 </table>
@@ -790,7 +790,7 @@ UgridDataArray or UgridDataset.</p>
 <td><p>Rasterize unstructured all face data on 2D unstructured grids by sampling on the x and y coordinates of <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_periodic.html#xugrid.UgridDatasetAccessor.to_periodic" title="xugrid.UgridDatasetAccessor.to_periodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.to_periodic</span></code></a>()</p></td>
-<td><p>Converts every grid to a periodic grid, where the rightmost boundary shares its nodes with the leftmost boundary.</p></td>
+<td><p>Convert every grid to a periodic grid, where the rightmost boundary shares its nodes with the leftmost boundary.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_nonperiodic.html#xugrid.UgridDatasetAccessor.to_nonperiodic" title="xugrid.UgridDatasetAccessor.to_nonperiodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.to_nonperiodic</span></code></a>(xmax)</p></td>
 <td><p>Convert the grid from a periodic grid (where the rightmost boundary shares its nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes are separate from the rightmost nodes.</p></td>
@@ -814,7 +814,7 @@ UgridDataArray or UgridDataset.</p>
 <td><p>Convert data and topology of one facet (node, edge, face) of the grid to a geopandas GeoDataFrame.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset" title="xugrid.UgridDatasetAccessor.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.to_dataset</span></code></a>([...])</p></td>
-<td><p>Converts this UgridDataset into a standard xarray.Dataset.</p></td>
+<td><p>Convert this UgridDataset into a standard xarray.Dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDatasetAccessor.to_netcdf.html#xugrid.UgridDatasetAccessor.to_netcdf" title="xugrid.UgridDatasetAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDatasetAccessor.to_netcdf</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant netCDF file.</p></td>
@@ -868,7 +868,7 @@ UgridDataArray or UgridDataset.</p>
 <td><p>Transform geometries to a new coordinate reference system.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel.html#xugrid.UgridDataArrayAccessor.sel" title="xugrid.UgridDataArrayAccessor.sel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.sel</span></code></a>([x, y])</p></td>
-<td><p>Returns a new object, a subselection in the UGRID x and y coordinates.</p></td>
+<td><p>Return a new object, a subselection in the UGRID x and y coordinates.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.sel_points</span></code></a>(x, y)</p></td>
 <td><p>Select points in the unstructured grid.</p></td>
@@ -919,7 +919,7 @@ UgridDataArray or UgridDataset.</p>
 <td><p>Fill gaps in <code class="docutils literal notranslate"><span class="pre">data</span></code> (<code class="docutils literal notranslate"><span class="pre">np.nan</span></code> values) using Laplace interpolation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.to_dataset.html#xugrid.UgridDataArrayAccessor.to_dataset" title="xugrid.UgridDataArrayAccessor.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.to_dataset</span></code></a>([...])</p></td>
-<td><p>Converts this UgridDataArray or UgridDataset into a standard xarray.Dataset.</p></td>
+<td><p>Convert this UgridDataArray or UgridDataset into a standard xarray.Dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.to_netcdf.html#xugrid.UgridDataArrayAccessor.to_netcdf" title="xugrid.UgridDataArrayAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.to_netcdf</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant netCDF file.</p></td>
@@ -972,10 +972,10 @@ UgridDataArray.</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.plot.contour.html#xugrid.plot.contour" title="xugrid.plot.contour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.contour</span></code></a>(topology, darray, **kwargs)</p></td>
-<td><p>Filled contour plot of 2D UgridDataArray.</p></td>
+<td><p>Create a contour plot of a 2D UgridDataArray.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.plot.contourf.html#xugrid.plot.contourf" title="xugrid.plot.contourf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.contourf</span></code></a>(topology, darray, **kwargs)</p></td>
-<td><p>Filled contour plot of 2D UgridDataArray.</p></td>
+<td><p>Create a filled contour plot of a 2D UgridDataArray.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.plot.imshow.html#xugrid.plot.imshow" title="xugrid.plot.imshow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.imshow</span></code></a>(topology, darray, **kwargs)</p></td>
 <td><p>Image plot of 2D DataArray.</p></td>
@@ -984,13 +984,13 @@ UgridDataArray.</p>
 <td><p>None</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.plot.pcolormesh.html#xugrid.plot.pcolormesh" title="xugrid.plot.pcolormesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.pcolormesh</span></code></a>(topology, darray, **kwargs)</p></td>
-<td><p>Pseudocolor plot of 2D UgridDataArray.</p></td>
+<td><p>Create a pseudocolor mesh plot of a 2D UgridDataArray.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.plot.scatter.html#xugrid.plot.scatter" title="xugrid.plot.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.scatter</span></code></a>(topology, darray, **kwargs)</p></td>
 <td><p>None</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.plot.surface.html#xugrid.plot.surface" title="xugrid.plot.surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.surface</span></code></a>(topology, darray, **kwargs)</p></td>
-<td><p>Surface plot of x-y UgridDataArray.</p></td>
+<td><p>Create a surface plot of a 2D UgridDataArray.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.plot.tripcolor.html#xugrid.plot.tripcolor" title="xugrid.plot.tripcolor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot.tripcolor</span></code></a>(topology, darray, **kwargs)</p></td>
 <td><p>None</p></td>
@@ -1060,7 +1060,7 @@ UgridDataArray.</p>
 <td><p>Node to node connectivity.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.copy.html#xugrid.Ugrid1d.copy" title="xugrid.Ugrid1d.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.copy</span></code></a>()</p></td>
-<td><p>Creates deepcopy</p></td>
+<td><p>Create a deepcopy.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.rename.html#xugrid.Ugrid1d.rename" title="xugrid.Ugrid1d.rename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.rename</span></code></a>(name[, return_name_dict])</p></td>
 <td><p>Create a new grid with all variables named according to the default naming conventions.</p></td>
@@ -1078,10 +1078,10 @@ UgridDataArray.</p>
 <td><p>Merge grid partitions into a single whole.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs" title="xugrid.Ugrid1d.topological_sort_by_dfs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.topological_sort_by_dfs</span></code></a>()</p></td>
-<td><p>Returns an array of vertices in topological order.</p></td>
+<td><p>Return an array of vertices in topological order.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices" title="xugrid.Ugrid1d.contract_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.contract_vertices</span></code></a>(indices)</p></td>
-<td><p>Returns a simplified network topology by removing all nodes that are not listed in <code class="docutils literal notranslate"><span class="pre">indices</span></code>.</p></td>
+<td><p>Return a simplified network topology by removing all nodes that are not listed in <code class="docutils literal notranslate"><span class="pre">indices</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.reindex_like.html#xugrid.Ugrid1d.reindex_like" title="xugrid.Ugrid1d.reindex_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.reindex_like</span></code></a>(other, obj[, tolerance])</p></td>
 <td><p>Conform a DataArray or Dataset to match the topology of another Ugrid1D topology.</p></td>
@@ -1114,7 +1114,7 @@ UgridDataArray.</p>
 <td><p>Convert UGRID topology to shapely objects.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.plot.html#xugrid.Ugrid1d.plot" title="xugrid.Ugrid1d.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plots the edges of the mesh.</p></td>
+<td><p>Plot the edges of the mesh.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1238,7 +1238,7 @@ UgridDataArray.</p>
 <td><p>Get all exterior faces, i.e. faces with an unshared edge.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.copy.html#xugrid.Ugrid2d.copy" title="xugrid.Ugrid2d.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.copy</span></code></a>()</p></td>
-<td><p>Creates deepcopy</p></td>
+<td><p>Create a deepcopy.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.rename.html#xugrid.Ugrid2d.rename" title="xugrid.Ugrid2d.rename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.rename</span></code></a>(name[, return_name_dict])</p></td>
 <td><p>Create a new grid with all variables named according to the default naming conventions.</p></td>
@@ -1355,7 +1355,7 @@ UgridDataArray.</p>
 <td><p>Convert UGRID topology to shapely objects.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.plot.html#xugrid.Ugrid2d.plot" title="xugrid.Ugrid2d.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.plot</span></code></a>(**kwargs)</p></td>
-<td><p>Plots the edges of the mesh.</p></td>
+<td><p>Plot the edges of the mesh.</p></td>
 </tr>
 </tbody>
 </table>

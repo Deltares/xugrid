@@ -390,9 +390,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for xugrid.plot.plot</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module is strongly inspired by / copied from xarray/plot/plot.py.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module is strongly inspired by / copied from xarray/plot/plot.py.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -447,7 +445,7 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator for common 2d plotting logic</span>
 <span class="sd">    Also adds the 2d plot method to class _PlotMethods</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D401</span>
     <span class="n">commondoc</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    Parameters</span>
 <span class="s2">    ----------</span>
@@ -610,7 +608,7 @@ document.write(`
                 <span class="n">add_colorbar</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">subplot_kws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">subplot_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">subplot_kws</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="n">plotfunc</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;surface&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_is_facetgrid&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -658,7 +656,7 @@ document.write(`
 
         <span class="c1"># darray may be None when plotting just edges (the mesh)</span>
         <span class="k">if</span> <span class="n">darray</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_ensure_plottable</span><span class="p">(</span><span class="n">darray</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">_ensure_plottable</span><span class="p">(</span><span class="n">darray</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
             <span class="n">cmap_params</span><span class="p">,</span> <span class="n">cbar_kwargs</span> <span class="o">=</span> <span class="n">_process_cmap_cbar_kwargs</span><span class="p">(</span>
                 <span class="n">plotfunc</span><span class="p">,</span>
                 <span class="n">darray</span><span class="p">,</span>
@@ -666,8 +664,8 @@ document.write(`
                 <span class="n">_is_facetgrid</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_is_facetgrid&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">cmap_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="n">cbar_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">cmap_params</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">cbar_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="s2">&quot;contour&quot;</span> <span class="ow">in</span> <span class="n">plotfunc</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
             <span class="c1"># extend is a keyword argument only for contour and contourf, but</span>
@@ -758,7 +756,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="n">get_ugrid_dim</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">COORDS</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
 
 
@@ -771,7 +769,7 @@ document.write(`
     <span class="k">if</span> <span class="n">dim</span> <span class="o">!=</span> <span class="n">NODE</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tripcolor only supports data on nodes&quot;</span><span class="p">)</span>
     <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">triangulation</span>
-    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tripcolor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tripcolor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
 
 
@@ -807,7 +805,7 @@ document.write(`
     <span class="n">collection</span> <span class="o">=</span> <span class="n">LineCollection</span><span class="p">(</span><span class="n">edge_coords</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="n">EDGE</span><span class="p">:</span>
-        <span class="n">collection</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">collection</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
         <span class="n">collection</span><span class="o">.</span><span class="n">_scale_norm</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
 
     <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">autolim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -854,7 +852,7 @@ document.write(`
         <span class="n">resolution</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="mi">500</span>
 
     <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">img</span><span class="p">[</span><span class="n">index</span> <span class="o">==</span> <span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
@@ -866,7 +864,8 @@ document.write(`
 <span class="nd">@_plot2d</span>
 <span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filled contour plot of 2D UgridDataArray.</span>
+<span class="sd">    Create a contour plot of a 2D UgridDataArray.</span>
+
 <span class="sd">    Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontour`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="n">get_ugrid_dim</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
@@ -879,7 +878,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;contour only supports data on nodes or faces&quot;</span><span class="p">)</span>
 
-    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tricontour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tricontour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
 
 
@@ -889,7 +888,8 @@ document.write(`
 <span class="nd">@_plot2d</span>
 <span class="k">def</span> <span class="nf">contourf</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filled contour plot of 2D UgridDataArray.</span>
+<span class="sd">    Create a filled contour plot of a 2D UgridDataArray.</span>
+
 <span class="sd">    Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontourf`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="n">get_ugrid_dim</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
@@ -902,7 +902,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;contourf only supports data on nodes or faces&quot;</span><span class="p">)</span>
 
-    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
 
 
@@ -912,7 +912,7 @@ document.write(`
 <span class="nd">@_plot2d</span>
 <span class="k">def</span> <span class="nf">pcolormesh</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Pseudocolor plot of 2D UgridDataArray.</span>
+<span class="sd">    Create a pseudocolor mesh plot of a 2D UgridDataArray.</span>
 
 <span class="sd">    Wraps matplotlib PolyCollection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -937,7 +937,7 @@ document.write(`
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;edgecolors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;face&quot;</span>
 
     <span class="n">collection</span> <span class="o">=</span> <span class="n">PolyCollection</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">collection</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+    <span class="n">collection</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
     <span class="n">collection</span><span class="o">.</span><span class="n">_scale_norm</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
     <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">autolim</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -957,7 +957,8 @@ document.write(`
 <span class="nd">@_plot2d</span>
 <span class="k">def</span> <span class="nf">surface</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Surface plot of x-y UgridDataArray.</span>
+<span class="sd">    Create a surface plot of a 2D UgridDataArray.</span>
+
 <span class="sd">    Wraps :py:func:`matplotlib:mplot3d:plot_trisurf`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dim</span> <span class="o">=</span> <span class="n">get_ugrid_dim</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
@@ -970,7 +971,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;surface only supports data on nodes or faces&quot;</span><span class="p">)</span>
 
-    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_trisurf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_trisurf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primitive</span></div>
 
 
@@ -982,6 +983,8 @@ document.write(`
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the data of the DataArray on the Ugrid topology.</span>
+
 <span class="sd">    Default plot of DataArray using :py:mod:`matplotlib:matplotlib.pyplot`.</span>
 
 <span class="sd">    Calls xarray plotting function based on the topology dimension of the data.</span>

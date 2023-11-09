@@ -390,10 +390,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for xugrid.ugrid.polygonize</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">The functions in this module serve to polygonize</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
@@ -453,6 +450,8 @@ document.write(`
 <a class="viewcode-back" href="../../../api/xugrid.polygonize.html#xugrid.polygonize">[docs]</a>
 <span class="k">def</span> <span class="nf">polygonize</span><span class="p">(</span><span class="n">uda</span><span class="p">:</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Polygonize a UgridDataArray.</span>
+
 <span class="sd">    This function creates vector polygons for all connected regions of cells</span>
 <span class="sd">    (faces) in the Ugrid2d topology sharing a common value.</span>
 

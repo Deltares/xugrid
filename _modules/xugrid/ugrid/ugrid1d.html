@@ -529,13 +529,13 @@ document.write(`
         <span class="c1"># They can be reset with .set_node_coords()</span>
         <span class="n">x_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">y_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">node_x_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">node_y_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">node_x_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">node_y_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
         <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">]</span>
         <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_connectivity</span><span class="p">(</span>
             <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
         <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_index</span>
         <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_index</span>
@@ -697,7 +697,7 @@ document.write(`
         <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">MeshKernel</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">mk</span><span class="o">.</span><span class="n">ProjectionType</span><span class="o">.</span><span class="n">CARTESIAN</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="n">mk</span><span class="o">.</span><span class="n">MeshKernel</span><span class="p">(</span><span class="n">is_geographic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span><span class="o">.</span><span class="n">mesh1d_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span>
 
@@ -961,7 +961,7 @@ document.write(`
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs">[docs]</a>
     <span class="k">def</span> <span class="nf">topological_sort_by_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns an array of vertices in topological order.</span>
+<span class="sd">        Return an array of vertices in topological order.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -976,7 +976,7 @@ document.write(`
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices">[docs]</a>
     <span class="k">def</span> <span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a simplified network topology by removing all nodes that are</span>
+<span class="sd">        Return a simplified network topology by removing all nodes that are</span>
 <span class="sd">        not listed in ``indices``.</span>
 
 <span class="sd">        Parameters</span>
