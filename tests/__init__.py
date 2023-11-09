@@ -8,7 +8,7 @@ def _importorskip(modname):
 
         # If the DLL/SO fails to load / be found, still skip.
         try:
-            meshkernel.MeshKernel(is_geographic=False)
+            meshkernel.MeshKernel()
             has = True
         except OSError:
             has = False
