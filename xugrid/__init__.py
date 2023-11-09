@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib.metadata import version as _version
 
 from xugrid import data
 from xugrid.core.common import (
@@ -31,11 +31,10 @@ from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
-    # package is not installed
-    pass
-
+    __version__ = _version("xugrid")
+except Exception:
+    # Disable minimum version checks on downstream libraries.
+    __version__ = "9999"
 
 __all__ = (
     "data",

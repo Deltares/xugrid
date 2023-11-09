@@ -1,5 +1,6 @@
+import importlib
+
 import numpy as np
-import pkg_resources
 import pooch
 import xarray as xr
 
@@ -12,8 +13,8 @@ REGISTRY = pooch.create(
     version_dev="main",
     env="XUGRID_DATA_DIR",
 )
-with pkg_resources.resource_stream("xugrid.data", "registry.txt") as registry_file:
-    REGISTRY.load_registry(registry_file)
+with importlib.resources.files("xugrid.data") as path:
+    REGISTRY.load_registry(path / "registry.txt")
 
 
 def xoxo():

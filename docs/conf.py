@@ -12,9 +12,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import pkg_resources
 
-import xugrid  # noqa: F401
+import xugrid
 
 # -- Project information -----------------------------------------------------
 
@@ -22,11 +21,10 @@ project = "Xugrid"
 copyright = "Deltares"
 author = "Huite Bootsma"
 
-# The full version, including alpha/beta/rc tags
-release = pkg_resources.get_distribution("xugrid").version
-# The short version which is displayed
-version = ".".join(release.split(".")[:3]) + ".dev"
-
+# The short X.Y version.
+version = xugrid.__version__.split("+")[0]
+# The full version, including alpha/beta/rc tags.
+release = xugrid.__version__
 
 # -- General configuration ---------------------------------------------------
 
