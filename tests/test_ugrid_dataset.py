@@ -144,7 +144,7 @@ class TestUgridDataArray:
         assert self.uda.dims == self.uda.ugrid.obj.dims
         assert isinstance(self.uda.data, np.ndarray)
         # So are functions
-        assert isinstance(self.uda.isna(), xugrid.UgridDataArray)
+        assert isinstance(self.uda.isnull(), xugrid.UgridDataArray)
         # obj should be accessible
         assert isinstance(self.uda.obj, xr.DataArray)
 
@@ -489,7 +489,7 @@ class TestUgridDataset:
     def test_getattr(self):
         assert tuple(self.uds.dims) == ("mesh2d_nFaces",)
         assert isinstance(self.uds.a, xugrid.UgridDataArray)
-        assert isinstance(self.uds.notna(), xugrid.UgridDataset)
+        assert isinstance(self.uds.notnull(), xugrid.UgridDataset)
         # obj should be accessible
         assert isinstance(self.uds.obj, xr.Dataset)
 

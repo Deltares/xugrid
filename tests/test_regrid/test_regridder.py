@@ -67,7 +67,7 @@ def test_centroid_locator_regridder(disk, quads_1):
     regridder = CentroidLocatorRegridder(source=disk, target=square)
     result = regridder.regrid(disk)
     assert isinstance(result, xu.UgridDataArray)
-    assert result.notna().any()
+    assert result.notnull().any()
     assert result.min() >= disk.min()
     assert result.max() <= disk.max()
     assert result.grid.n_face == square.grid.n_face
@@ -76,7 +76,7 @@ def test_centroid_locator_regridder(disk, quads_1):
     regridder = CentroidLocatorRegridder(source=result, target=disk)
     back = regridder.regrid(result)
     assert isinstance(back, xu.UgridDataArray)
-    assert back.notna().any()
+    assert back.notnull().any()
     assert back.min() >= disk.min()
     assert back.max() <= disk.max()
     assert back.grid.n_face == disk.grid.n_face
@@ -108,7 +108,7 @@ def test_overlap_regridder(disk, quads_1):
     square = quads_1
     regridder = OverlapRegridder(disk, square, method="mean")
     result = regridder.regrid(disk)
-    assert result.notna().any()
+    assert result.notnull().any()
     assert result.min() >= disk.min()
     assert result.max() <= disk.max()
 
@@ -142,7 +142,7 @@ def test_barycentric_interpolator(disk, quads_0_25):
     square = quads_0_25
     regridder = BarycentricInterpolator(source=disk, target=square)
     result = regridder.regrid(disk)
-    assert result.notna().any()
+    assert result.notnull().any()
     assert result.min() >= disk.min()
     assert result.max() <= disk.max()
 
