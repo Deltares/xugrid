@@ -12,12 +12,12 @@ documentation = "https://deltares.github.io/xugrid/"
 repository = "https://github.com/Deltares/xugrid"
 
 [tasks]
-install = "pip install --no-deps --editable ."
+install = "python -m pip install --no-deps --editable ."
 install-pre-commit = "pre-commit install"
 pre-commit = "pre-commit run --all-files"
-test = { depends_on = ["install"], cmd = "export NUMBA_DISABLE_JIT=1 && pytest --cov=xugrid --cov-report xml --cov-report term"}
-docs = { depends_on = ["install"], cmd = "export NUMBA_DISABLE_JIT=1 && sphinx-build docs docs/_build"}
-all = { depends_on = ["test", "docs"]}
+test = { depends_on = ["install"], cmd = "NUMBA_DISABLE_JIT=1 pytest --cov=xugrid --cov-report xml --cov-report term"}
+docs = { depends_on = ["install"], cmd = "NUMBA_DISABLE_JIT=1 sphinx-build docs docs/_build"}
+all = { depends_on = ["pre-commit", "test", "docs"]}
 
 [dependencies]
 dask = "*"
@@ -26,6 +26,7 @@ mapbox_earcut = "*"
 matplotlib-base = "*"
 netcdf4 = "*"
 numba_celltree = "*"
+pip = "*"
 pooch = "*"
 pre-commit = "*"
 pydata-sphinx-theme = "*"
@@ -33,7 +34,7 @@ pymetis = "*"
 pyproj = "*"
 pytest = "*"
 pytest-cov = "*"
-python = ">=3.10"
+python = ">=3.9"
 ruff = "*"
 shapely = ">=2.0"
 scipy = "*"
