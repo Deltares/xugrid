@@ -1311,7 +1311,9 @@ class Ugrid2d(AbstractUgrid):
         return self._sel_line(obj, start, end)
 
     def intersect_linestring(
-        self, obj: Union[xr.DataArray, xr.Dataset], linestring: "shapely.geometry.LineString"  # type: ignore # noqa
+        self,
+        obj: Union[xr.DataArray, xr.Dataset],
+        linestring: "shapely.geometry.LineString",  # type: ignore # noqa
     ) -> Union[xr.DataArray, xr.Dataset]:
         """
         Intersect linestrings with this grid, and fetch the values of the

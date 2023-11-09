@@ -149,7 +149,6 @@ class StructuredGrid1d:
     ) -> Tuple[IntArray, IntArray]:
         """
         Return all valid nodes for linear interpolation.
-        
         In addition to valid_nodes_within_bounds() is checked if target
         midpoints are not outside outer source boundary midpoints. In that case
         there is no interpolation possible.
@@ -168,7 +167,7 @@ class StructuredGrid1d:
         """
         source_index, target_index = self.valid_nodes_within_bounds(other)
         valid = (other.midpoints[target_index] > self.midpoints[0]) & (
-            (other.midpoints[target_index] < self.midpoints[-1])
+            other.midpoints[target_index] < self.midpoints[-1]
         )
         return source_index[valid], target_index[valid]
 
@@ -413,8 +412,10 @@ class StructuredGrid1d:
             dims=[export_name, export_name + "nbounds"],
             coords={
                 export_name: self.midpoints,
-                export_name
-                + "bounds": ([export_name, export_name + "nbounds"], self.bounds),
+                export_name + "bounds": (
+                    [export_name, export_name + "nbounds"],
+                    self.bounds,
+                ),
                 export_name + "nbounds": np.arange(2),
             },
         )

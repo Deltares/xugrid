@@ -494,9 +494,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         uds = UgridDataset(self.obj, grids)
         return uds.ugrid.assign_node_coords()
 
-    def to_geodataframe(
-        self, dim_order=None
-    ) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+    def to_geodataframe(self, dim_order=None) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """
         Convert data and topology of one facet (node, edge, face) of the grid
         to a geopandas GeoDataFrame. This also determines the geometry type of

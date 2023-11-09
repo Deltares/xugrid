@@ -288,7 +288,7 @@ class UgridDataset(DatasetForwardMixin):
             grids = [grid_from_dataset(obj, topology) for topology in topologies]
         else:
             # Make sure it's a new list
-            if isinstance(grids, (tuple, set)):
+            if isinstance(grids, (list, tuple, set)):
                 grids = list(grids)
             else:  # not iterable
                 grids = [grids]

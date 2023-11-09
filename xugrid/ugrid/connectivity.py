@@ -613,7 +613,7 @@ def _circumcenters_triangle(xxx: FloatArray, yyy: FloatArray):
     a_x, b_x, c_x = xxx
     a_y, b_y, c_y = yyy
     D_inv = 0.5 / (
-        (a_y * c_x + b_y * a_x - b_y * c_x - a_y * b_x - c_y * a_x + c_y * b_x)
+        a_y * c_x + b_y * a_x - b_y * c_x - a_y * b_x - c_y * a_x + c_y * b_x
     )
     x = ((a_x - c_x) * (a_x + c_x) + (a_y - c_y) * (a_y + c_y)) * (b_y - c_y) - (
         (b_x - c_x) * (b_x + c_x) + (b_y - c_y) * (b_y + c_y)
