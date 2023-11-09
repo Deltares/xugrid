@@ -25,8 +25,9 @@ jobs:
       - name: Setup Pixi
         uses: prefix-dev/setup-pixi@v0.3.0
       - name: Run Tests
-        uses: codecov/codecov-action@v3
         run: pixi run test
+      - name: Publish Code Coverage
+        uses: codecov/codecov-action@v3
       - name: Build Docs
         run: pixi run docs
       - name: Deploy to Github Pages
