@@ -14,6 +14,8 @@
 #
 import pkg_resources
 
+import xugrid  # noqa: F401
+
 # -- Project information -----------------------------------------------------
 
 project = "Xugrid"
