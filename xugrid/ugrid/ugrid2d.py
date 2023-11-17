@@ -694,7 +694,7 @@ class Ugrid2d(AbstractUgrid):
         import meshkernel as mk
 
         if self._meshkernel is None:
-            self._meshkernel = mk.MeshKernel(is_geographic=False)
+            self._meshkernel = mk.MeshKernel()
             self._meshkernel.mesh2d_set(self.mesh)
         return self._meshkernel
 
