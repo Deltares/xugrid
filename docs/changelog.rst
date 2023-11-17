@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[0.7.1] 2023-11-17
+------------------
+
+Fixed
+~~~~~
+- Support for Meshkernel 3 (#171). Initialize Meshkernel
+  with defaults, setting it to cartesian projection.
+
 [0.7.0] 2023-10-19
 ------------------
 
