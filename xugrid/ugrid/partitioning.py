@@ -1,6 +1,4 @@
-"""
-Create and merge partitioned UGRID topologies.
-"""
+"""Create and merge partitioned UGRID topologies."""
 from collections import defaultdict
 from itertools import accumulate
 from typing import List
@@ -29,6 +27,8 @@ def labels_to_indices(labels: IntArray) -> List[IntArray]:
 
 def partition_by_label(grid, obj, labels: IntArray):
     """
+    Partition the grid and xarray object by integer labels.
+
     This function is used by UgridDataArray.partition_by_label and
     UgridDataset.partition_by_label.
 
@@ -153,14 +153,14 @@ def validate_partition_topology(grouped, n_partition: int):
         )
 
     for name, grids in grouped.items():
-        types = set(type(grid) for grid in grids)
+        types = {type(grid) for grid in grids}
         if len(types) > 1:
             raise TypeError(
                 f"All partition topologies with name {name} should be of the "
                 f"same type, received: {types}"
             )
 
-        griddims = list(set(tuple(grid.dimensions) for grid in grids))
+        griddims = list({tuple(grid.dimensions) for grid in grids})
         if len(griddims) > 1:
             raise ValueError(
                 f"Dimension names on UGRID topology {name} do not match "
@@ -182,7 +182,7 @@ def group_grids_by_name(partitions):
 
 def validate_partition_objects(data_objects):
     # Check presence of variables.
-    allvars = list(set(tuple(sorted(ds.data_vars)) for ds in data_objects))
+    allvars = list({tuple(sorted(ds.data_vars)) for ds in data_objects})
     if len(allvars) > 1:
         raise ValueError(
             "These variables are present in some partitions, but not in "
@@ -190,7 +190,7 @@ def validate_partition_objects(data_objects):
         )
     # Check dimensions
     for var in allvars.pop():
-        vardims = list(set(ds[var].dims for ds in data_objects))
+        vardims = list({ds[var].dims for ds in data_objects})
         if len(vardims) > 1:
             raise ValueError(
                 f"Dimensions for {var} do not match across partitions: "
@@ -199,9 +199,7 @@ def validate_partition_objects(data_objects):
 
 
 def separate_variables(data_objects, ugrid_dims):
-    """
-    Separate into UGRID variables grouped by dimension, and other variables.
-    """
+    """Separate into UGRID variables grouped by dimension, and other variables."""
     validate_partition_objects(data_objects)
 
     def assert_single_dim(intersection):
@@ -263,7 +261,7 @@ def merge_partitions(partitions):
     -------
     merged : UgridDataset
     """
-    types = set(type(obj) for obj in partitions)
+    types = {type(obj) for obj in partitions}
     msg = "Expected UgridDataArray or UgridDataset, received: {}"
     if len(types) > 1:
         type_names = [t.__name__ for t in types]
@@ -280,7 +278,7 @@ def merge_partitions(partitions):
     ]
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
-    ugrid_dims = set(dim for grid in grids for dim in grid.dimensions)
+    ugrid_dims = {dim for grid in grids for dim in grid.dimensions}
     grids_by_name = group_grids_by_name(partitions)
     vars_by_dim, other_vars = separate_variables(data_objects, ugrid_dims)
 

@@ -1,6 +1,4 @@
-"""
-This module is heavily inspired by xemsf.frontend.py
-"""
+"""This module is heavily inspired by xemsf.frontend.py"""
 import abc
 from typing import Callable, Optional, Tuple, Union
 
@@ -35,7 +33,7 @@ from xugrid.regrid.weight_matrix import (
 
 def make_regrid(func):
     """
-    Uses a closure to capture func, so numba can compile it efficiently without
+    Use a closure to capture func, so numba can compile it efficiently without
     function call overhead.
     """
     f = numba.njit(func, inline="always")
@@ -96,11 +94,11 @@ class BaseRegridder(abc.ABC):
 
     @abc.abstractproperty
     def weights(self):
-        """ """
+        pass
 
     @abc.abstractmethod
     def _compute_weights(self, source, target):
-        """ """
+        pass
 
     def _setup_regrid(self, func) -> Callable:
         if isinstance(func, str):
@@ -239,9 +237,7 @@ class BaseRegridder(abc.ABC):
             )
 
     def to_dataset(self) -> xr.Dataset:
-        """
-        Store the computed weights and target in a dataset for re-use.
-        """
+        """Store the computed weights and target in a dataset for re-use."""
         weights_ds = xr.Dataset(
             {f"__regrid_{k}": v for k, v in zip(self._weights._fields, self._weights)}
         )
@@ -252,35 +248,37 @@ class BaseRegridder(abc.ABC):
     @staticmethod
     def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
         """
-        variable n and nnz are expected to be scalar variable
+        Create a compressed sparse row matrix from the dataset variables.
+
+        Variables n and nnz are expected to be scalar variables.
         """
         return WeightMatrixCSR(
-            dataset["__regrid_data"].values,
-            dataset["__regrid_indices"].values,
-            dataset["__regrid_indptr"].values,
-            dataset["__regrid_n"].values[()],
-            dataset["__regrid_nnz"].values[()],
+            dataset["__regrid_data"].to_numpy(),
+            dataset["__regrid_indices"].to_numpy(),
+            dataset["__regrid_indptr"].to_numpy(),
+            dataset["__regrid_n"].item(),
+            dataset["__regrid_nnz"].item(),
         )
 
     @staticmethod
     def _coo_from_dataset(dataset: xr.Dataset) -> WeightMatrixCOO:
         """
-        variable nnz is expected to be scalar variable
+        Create a coordinate/triplet sparse row matrix from the dataset variables.
+
+        Variables n and nnz are expected to be scalar variables.
         """
         return WeightMatrixCOO(
-            dataset["__regrid_data"].values,
-            dataset["__regrid_row"].values,
-            dataset["__regrid_col"].values,
-            dataset["__regrid_nnz"].values[()],
+            dataset["__regrid_data"].to_numpy(),
+            dataset["__regrid_row"].to_numpy(),
+            dataset["__regrid_col"].to_numpy(),
+            dataset["__regrid_nnz"].item(),
         )
 
     @abc.abstractclassmethod
     def _weights_from_dataset(
         cls, dataset: xr.Dataset
     ) -> Union[WeightMatrixCOO, WeightMatrixCSR]:
-        """
-        Return either COO or CSR weights.
-        """
+        """Return either COO or CSR weights."""
 
     @classmethod
     def from_weights(

@@ -17,9 +17,7 @@ def argsort_rows(array: np.ndarray) -> IntArray:
 
 
 def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
-    """
-    Return the index that would transform xy_a into xy_b.
-    """
+    """Return the index that would transform xy_a into xy_b."""
     if xy_a.shape != xy_b.shape:
         raise ValueError("coordinates do not match in shape")
 
@@ -135,7 +133,7 @@ def _topological_sort_by_dfs(A: AdjacencyMatrix):
 
 def topological_sort_by_dfs(A: sparse.csr_matrix) -> IntArray:
     """
-    Returns an array of vertices in topological order.
+    Return an array of vertices in topological order.
 
     Parameters
     ----------
@@ -478,6 +476,8 @@ def face_face_connectivity(
     fill_value: int,
 ) -> sparse.csr_matrix:
     """
+    Derive face to face connectivity.
+
     An edge can be shared by two faces at most. If this is the case, they are
     neighbors.
     """
@@ -613,7 +613,7 @@ def _circumcenters_triangle(xxx: FloatArray, yyy: FloatArray):
     a_x, b_x, c_x = xxx
     a_y, b_y, c_y = yyy
     D_inv = 0.5 / (
-        (a_y * c_x + b_y * a_x - b_y * c_x - a_y * b_x - c_y * a_x + c_y * b_x)
+        a_y * c_x + b_y * a_x - b_y * c_x - a_y * b_x - c_y * a_x + c_y * b_x
     )
     x = ((a_x - c_x) * (a_x + c_x) + (a_y - c_y) * (a_y + c_y)) * (b_y - c_y) - (
         (b_x - c_x) * (b_x + c_x) + (b_y - c_y) * (b_y + c_y)
@@ -787,9 +787,7 @@ def binary_erosion(
     exterior: IntArray = None,
     border_value: bool = False,
 ) -> BoolArray:
-    """
-    By default, erodes inwards from the exterior.
-    """
+    """By default, erodes inwards from the exterior."""
     return _binary_iterate(
         connectivity=connectivity,
         input=input,
@@ -809,9 +807,7 @@ def binary_dilation(
     exterior: IntArray = None,
     border_value: bool = False,
 ) -> BoolArray:
-    """
-    By default, does not dilate inward from the exterior.
-    """
+    """By default, does not dilate inward from the exterior."""
     return _binary_iterate(
         connectivity=connectivity,
         input=input,

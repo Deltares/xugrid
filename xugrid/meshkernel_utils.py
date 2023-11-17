@@ -1,6 +1,3 @@
-"""
-Provides a number of utilities for communicating with MeshKernel(Py)
-"""
 from enum import EnumMeta, IntEnum
 from typing import Union
 

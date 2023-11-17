@@ -8,3 +8,14 @@ from xugrid.plot.plot import (
     surface,
     tripcolor,
 )
+
+__all__ = (
+    "contour",
+    "contourf",
+    "imshow",
+    "line",
+    "pcolormesh",
+    "scatter",
+    "surface",
+    "tripcolor",
+)

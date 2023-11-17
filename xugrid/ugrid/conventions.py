@@ -253,9 +253,7 @@ def _infer_dims(
     coordinates: Dict[str, Dict[str, Tuple[List[str]]]],
     vardict: Dict[str, str],
 ) -> Dict[str, str]:
-    """
-    Infer dimensions based on connectivity and coordinates.
-    """
+    """Infer dimensions based on connectivity and coordinates."""
     inferred = {}
     for role, varname in connectivities.items():
         expected_dims = _CONNECTIVITY_DIMS[role]
@@ -350,7 +348,6 @@ class UgridRolesAccessor:
 
     Examples
     --------
-
     To get a list of the UGRID dummy variables in the dataset:
 
     >>> dataset.ugrid_roles.topology

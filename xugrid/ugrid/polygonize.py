@@ -1,6 +1,3 @@
-"""
-The functions in this module serve to polygonize
-"""
 from typing import Tuple
 
 import numpy as np
@@ -59,6 +56,8 @@ def _classify(
 
 def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # noqa
     """
+    Polygonize a UgridDataArray.
+
     This function creates vector polygons for all connected regions of cells
     (faces) in the Ugrid2d topology sharing a common value.
 

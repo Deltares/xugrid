@@ -30,8 +30,8 @@ def dot_product2d(U: FloatArray, V: FloatArray):
 
 def _centroid_pandas(i: IntArray, x: FloatArray, y: FloatArray):
     grouped = pd.DataFrame({"i": i, "x": x, "y": y}).groupby("i").mean()
-    x_centroid = grouped["x"].values
-    y_centroid = grouped["y"].values
+    x_centroid = grouped["x"].to_numpy()
+    y_centroid = grouped["y"].to_numpy()
     return x_centroid, y_centroid
 
 
@@ -144,6 +144,8 @@ def exterior_topology(
     add_vertices: bool,
 ):
     """
+    Create the exterior topology of the voronoi tesselation.
+
     The exterior topology of this voronoi tesselation consists of three kinds
     of vertices:
 

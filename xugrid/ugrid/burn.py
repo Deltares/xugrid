@@ -111,10 +111,12 @@ def _locate_polygon(
     all_touched: bool,
 ) -> IntArray:
     """
-    This algorithm burns polygon vector geometries in a 2d topology by:
+    Locate a single polygon.
+
+    This algorithm burns a polygon vector geometry in a 2d topology by:
 
     * Extracting the exterior and interiors (holes) coordinates from the
-      polygons.
+      polygon.
     * Breaking every polygon down into a triangles using an "earcut" algorithm.
     * Searching the grid for these triangles.
 
@@ -185,9 +187,7 @@ def _burn_points(
     values: np.ndarray,
     output: FloatArray,
 ) -> None:
-    """
-    Simply searches the points in the ``like`` 2D topology.
-    """
+    """Simply searches the points in the ``like`` 2D topology."""
     xy = shapely.get_coordinates(points)
     to_burn = like.locate_points(xy)
     output[to_burn] = values
@@ -201,6 +201,8 @@ def _burn_lines(
     output: FloatArray,
 ) -> None:
     """
+    Burn the line values into the underlying faces.
+
     This algorithm breaks any linestring down into edges (two x, y points). We
     search and intersect every edge in the ``like`` grid, the intersections are
     discarded.

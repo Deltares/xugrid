@@ -28,9 +28,7 @@ import xugrid as xu
 
 
 def create_grid(bounds, nx, ny):
-    """
-    Create a simple grid of triangles covering a rectangle.
-    """
+    """Create a simple grid of triangles covering a rectangle."""
     import numpy as np
     from matplotlib.tri import Triangulation
 

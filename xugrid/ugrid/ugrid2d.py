@@ -270,20 +270,20 @@ class Ugrid2d(AbstractUgrid):
 
         x_index = coordinates["node_coordinates"][0][0]
         y_index = coordinates["node_coordinates"][1][0]
-        node_x_coordinates = ds[x_index].astype(FloatDType).values
-        node_y_coordinates = ds[y_index].astype(FloatDType).values
+        node_x_coordinates = ds[x_index].astype(FloatDType).to_numpy()
+        node_y_coordinates = ds[y_index].astype(FloatDType).to_numpy()
 
         face_nodes = connectivity["face_node_connectivity"]
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         face_node_connectivity = cls._prepare_connectivity(
             ds[face_nodes], fill_value, dtype=IntDType
-        ).values
+        ).to_numpy()
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:
             edge_node_connectivity = cls._prepare_connectivity(
                 ds[edge_nodes], fill_value, dtype=IntDType
-            ).values
+            ).to_numpy()
         else:
             edge_node_connectivity = None
 
@@ -387,9 +387,7 @@ class Ugrid2d(AbstractUgrid):
     # default, only when called upon.
     @property
     def n_face(self) -> int:
-        """
-        Return the number of faces in the UGRID2D topology.
-        """
+        """Return the number of faces in the UGRID2D topology."""
         return self.face_node_connectivity.shape[0]
 
     @property
@@ -423,9 +421,7 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def face_dimension(self):
-        """
-        Return the name of the face dimension.
-        """
+        """Return the name of the face dimension."""
         return self._attrs["face_dimension"]
 
     def _edge_connectivity(self):
@@ -474,8 +470,8 @@ class Ugrid2d(AbstractUgrid):
         """
         Boundary node connectivity
 
-        Returns:
-        --------
+        Returns
+        -------
         connectivity: ndarray of integers with shape ``(n_boundary_edge, 2)``
         """
         if self._boundary_node_connectivity is None:
@@ -521,9 +517,7 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def area(self) -> FloatArray:
-        """
-        Area of every face.
-        """
+        """Area of every face."""
         if self._area is None:
             self._area = connectivity.area(
                 self.face_node_connectivity,
@@ -535,9 +529,7 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def perimeter(self) -> FloatArray:
-        """
-        Perimeter length of every face.
-        """
+        """Perimeter length of every face."""
         if self._perimeter is None:
             self._perimeter = connectivity.perimeter(
                 self.face_node_connectivity,
@@ -828,7 +820,6 @@ class Ugrid2d(AbstractUgrid):
 
         Examples
         --------
-
         To purge invalid edges and associated data from a dataset that contains
         un-associated or duplicate edges:
 
@@ -1052,7 +1043,7 @@ class Ugrid2d(AbstractUgrid):
             else:
                 return self
 
-        index = face_index.values
+        index = face_index.to_numpy()
         face_subset = self.face_node_connectivity[index]
         node_index = np.unique(face_subset.ravel())
         node_index = node_index[node_index != self.fill_value]
@@ -1183,7 +1174,7 @@ class Ugrid2d(AbstractUgrid):
 
         else:  # Convert it into a 1d numpy array
             if isinstance(indexer, xr.DataArray):
-                indexer = indexer.values
+                indexer = indexer.to_numpy()
             if isinstance(indexer, (list, np.ndarray, int, float)):
                 indexer = np.atleast_1d(indexer)
             else:
@@ -1320,7 +1311,9 @@ class Ugrid2d(AbstractUgrid):
         return self._sel_line(obj, start, end)
 
     def intersect_linestring(
-        self, obj: Union[xr.DataArray, xr.Dataset], linestring: "shapely.geometry.LineString"  # type: ignore # noqa
+        self,
+        obj: Union[xr.DataArray, xr.Dataset],
+        linestring: "shapely.geometry.LineString",  # type: ignore # noqa
     ) -> Union[xr.DataArray, xr.Dataset]:
         """
         Intersect linestrings with this grid, and fetch the values of the
@@ -1913,7 +1906,7 @@ class Ugrid2d(AbstractUgrid):
         topology: Ugrid2d
         """
         x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
-            geodataframe.geometry.values
+            geodataframe.geometry.to_numpy()
         )
         return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=geodataframe.crs)
 

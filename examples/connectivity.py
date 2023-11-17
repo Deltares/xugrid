@@ -89,7 +89,7 @@ uda = xugrid.UgridDataArray(
     xr.full_like(ds["face_z"].ugrid.obj, False, dtype=bool),
     ds.grids[0],
 )
-uda.values[0] = True
+uda[0] = True
 uda.ugrid.plot()
 
 # %%

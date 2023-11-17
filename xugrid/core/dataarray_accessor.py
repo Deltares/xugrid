@@ -143,7 +143,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     def sel(self, x=None, y=None):
         """
-        Returns a new object, a subselection in the UGRID x and y coordinates.
+        Return a new object, a subselection in the UGRID x and y coordinates.
 
         The indexing for x and y always occurs orthogonally, i.e.:
         ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For
@@ -227,8 +227,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         rasterized: xr.DataArray
         """
         x, y, index = self.grid.rasterize_like(
-            x=other["x"].values,
-            y=other["y"].values,
+            x=other["x"].to_numpy(),
+            y=other["y"].to_numpy(),
         )
         return self._raster(x, y, index)
 
@@ -461,13 +461,13 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             exterior = None
         if mask is not None:
-            mask = mask.values
+            mask = mask.to_numpy()
 
         obj = self.obj
         if isinstance(obj, xr.DataArray):
             output = connectivity._binary_iterate(
                 self.grid.face_face_connectivity,
-                obj.values,
+                obj.to_numpy(),
                 value,
                 iterations,
                 mask,
@@ -636,7 +636,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         filled = laplace_interpolate(
             connectivity=connectivity,
-            data=da.values,
+            data=da.to_numpy(),
             use_weights=xy_weights,
             direct_solve=direct_solve,
             drop_tol=drop_tol,
@@ -651,7 +651,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     def to_dataset(self, optional_attributes: bool = False):
         """
-        Converts this UgridDataArray or UgridDataset into a standard
+        Convert this UgridDataArray or UgridDataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.

@@ -1,6 +1,4 @@
-"""
-Snapes nodes at an arbitrary distance together.
-"""
+"""Logic for snapping points and lines to face nodes and face edges."""
 from typing import Tuple, TypeVar, Union
 
 import numba as nb
@@ -112,7 +110,7 @@ def snap_nodes(
                 }
             )
         )
-        return inverse, new["x"].values, new["y"].values
+        return inverse, new["x"].to_numpy(), new["y"].to_numpy()
     else:
         return None, x.copy(), y.copy()
 
@@ -178,7 +176,7 @@ def snap_to_nodes(
                 pd.DataFrame({"i": ties.row, "distance": ties.data}, index=ties.col)
                 .groupby("i")["distance"]
                 .idxmin()
-                .values
+                .to_numpy()
             )
             xnew[tie] = to_x[j_nearest]
             ynew[tie] = to_y[j_nearest]
@@ -219,7 +217,7 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
 
 
 def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
-    geometry = lines.geometry.values
+    geometry = lines.geometry.to_numpy()
     geom_type = shapely.get_type_id(geometry)
     if not ((geom_type == 1) | (geom_type == 2)).all():
         raise ValueError("Geometry should contain only LineStrings and/or LinearRings")
@@ -237,6 +235,8 @@ def snap_to_edges(
     segment_index: IntArray,
 ) -> Tuple[IntArray, IntArray]:
     """
+    Snap the intersected edges to the edges of the surrounding face.
+
     This algorithm works as follows:
 
     * It takes the intersected edges; any edge (p to q) to test falls fully
@@ -295,7 +295,7 @@ def _find_largest_edges(
         )
         .groupby("edge_index")
         .idxmax()["length"]
-        .values
+        .to_numpy()
     )
 
     edge_index = edge_index[max_edge_index]

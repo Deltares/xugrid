@@ -130,13 +130,13 @@ class Ugrid1d(AbstractUgrid):
         # They can be reset with .set_node_coords()
         x_index = coordinates["node_coordinates"][0][0]
         y_index = coordinates["node_coordinates"][1][0]
-        node_x_coordinates = ds[x_index].astype(FloatDType).values
-        node_y_coordinates = ds[y_index].astype(FloatDType).values
+        node_x_coordinates = ds[x_index].astype(FloatDType).to_numpy()
+        node_y_coordinates = ds[y_index].astype(FloatDType).to_numpy()
 
         edge_nodes = connectivity["edge_node_connectivity"]
         edge_node_connectivity = cls._prepare_connectivity(
             ds[edge_nodes], fill_value, dtype=IntDType
-        ).values
+        ).to_numpy()
 
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
@@ -538,7 +538,7 @@ class Ugrid1d(AbstractUgrid):
 
     def topological_sort_by_dfs(self) -> IntArray:
         """
-        Returns an array of vertices in topological order.
+        Return an array of vertices in topological order.
 
         Returns
         -------
@@ -550,7 +550,7 @@ class Ugrid1d(AbstractUgrid):
 
     def contract_vertices(self, indices: IntArray) -> "Ugrid1d":
         """
-        Returns a simplified network topology by removing all nodes that are
+        Return a simplified network topology by removing all nodes that are
         not listed in ``indices``.
 
         Parameters

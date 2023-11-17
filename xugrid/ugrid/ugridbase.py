@@ -87,67 +87,67 @@ def align(obj, grids, old_indexes):
 class AbstractUgrid(abc.ABC):
     @abc.abstractproperty
     def topology_dimension():
-        """ """
+        pass
 
     @abc.abstractproperty
     def core_dimension():
-        """ """
+        pass
 
     @abc.abstractproperty
     def dimensions():
-        """ """
+        pass
 
     @abc.abstractproperty
     def mesh():
-        """ """
+        pass
 
     @abc.abstractproperty
     def meshkernel():
-        """ """
+        pass
 
     @abc.abstractstaticmethod
     def from_dataset():
-        """ """
+        pass
 
     @abc.abstractmethod
     def to_dataset():
-        """ """
+        pass
 
     @abc.abstractmethod
     def topology_subset():
-        """ """
+        pass
 
     @abc.abstractmethod
     def clip_box():
-        """ """
+        pass
 
     @abc.abstractmethod
     def sel_points():
-        """ """
+        pass
 
     @abc.abstractmethod
     def intersect_line():
-        """ """
+        pass
 
     @abc.abstractmethod
     def intersect_linestring():
-        """ """
+        pass
 
     @abc.abstractmethod
     def sel():
-        """ """
+        pass
 
     @abc.abstractmethod
     def _clear_geometry_properties():
-        """ """
+        pass
 
     @abc.abstractstaticmethod
     def merge_partitions():
-        """ """
+        pass
 
     @abc.abstractmethod
     def reindex_like():
-        """ """
+        pass
 
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
@@ -236,9 +236,7 @@ class AbstractUgrid(abc.ABC):
         return topologies[0]
 
     def _filtered_attrs(self, dataset: xr.Dataset):
-        """
-        Removes names that are not present in the dataset.
-        """
+        """Remove names that are not present in the dataset."""
         topodim = self.topology_dimension
         attrs = self._attrs.copy()
 
@@ -277,7 +275,7 @@ class AbstractUgrid(abc.ABC):
         return True
 
     def copy(self):
-        """Creates deepcopy"""
+        """Create a deepcopy."""
         return copy.deepcopy(self)
 
     @property
@@ -442,8 +440,8 @@ class AbstractUgrid(abc.ABC):
         if " " in node_x or " " in node_y:
             raise ValueError("coordinate names may not contain spaces")
 
-        x = obj[node_x].values
-        y = obj[node_y].values
+        x = obj[node_x].to_numpy()
+        y = obj[node_y].to_numpy()
 
         if (x.ndim != 1) or (x.size != self.n_node):
             raise ValueError(
@@ -694,7 +692,7 @@ class AbstractUgrid(abc.ABC):
 
     def plot(self, **kwargs):
         """
-        Plots the edges of the mesh.
+        Plot the edges of the mesh.
 
         Parameters
         ----------

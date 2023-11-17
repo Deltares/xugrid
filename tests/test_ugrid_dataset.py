@@ -944,11 +944,14 @@ def test_merge():
 
 def get_ugrid_fillvaluem999_startindex1():
     """
-    this is a very minimal but comparable dataset to Grevelingen_0002_map.nc (FM output)
-    It contains triangles and squares
-    the fillvalue of the connectivity arrays is -999
-    the start_index of the connectivity arrays is 1
+    Return a minimal dataset with a specific fill value.
 
+    This is a very minimal but comparable dataset to Grevelingen_0002_map.nc
+    (FM output).
+
+    * It contains both triangles and squares.
+    * The fillvalue of the connectivity arrays is -999
+    * The start_index of the connectivity arrays is 1
     """
 
     ds2 = xr.Dataset()
@@ -1113,7 +1116,9 @@ def get_ugrid_fillvaluem999_startindex1():
 
 def test_fm_fillvalue_startindex_isel():
     """
-    FM data has 1-based starting index and _FillValue -999, this raises several issues. Since it is not possible to generate a Ugrid2d with these attributes, we are testing with raw data
+    FM data has 1-based starting index and _FillValue -999, this raises several
+    issues. Since it is not possible to generate a Ugrid2d with these
+    attributes, we are testing with raw data
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
@@ -1125,7 +1130,9 @@ def test_fm_fillvalue_startindex_isel():
 
 def test_fm_facenodeconnectivity_fillvalue():
     """
-    FM data has 1-based starting index and _FillValue -999, this raises several issues. Since it is not possible to generate a Ugrid2d with these attributes, we are testing with raw data
+    FM data has 1-based starting index and _FillValue -999, this raises several
+    issues. Since it is not possible to generate a Ugrid2d with these
+    attributes, we are testing with raw data
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"

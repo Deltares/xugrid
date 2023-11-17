@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib.metadata import version as _version
 
 from xugrid import data
 from xugrid.core.common import (
@@ -31,7 +31,36 @@ from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
-    # package is not installed
-    pass
+    __version__ = _version("xugrid")
+except Exception:
+    # Disable minimum version checks on downstream libraries.
+    __version__ = "9999"
+
+__all__ = (
+    "data",
+    "concat",
+    "full_like",
+    "merge",
+    "ones_like",
+    "open_dataarray",
+    "open_dataset",
+    "open_mfdataset",
+    "open_zarr",
+    "zeros_like",
+    "UgridDataArrayAccessor",
+    "UgridDatasetAccessor",
+    "UgridDataArray",
+    "UgridDataset",
+    "plot",
+    "BarycentricInterpolator",
+    "CentroidLocatorRegridder",
+    "OverlapRegridder",
+    "RelativeOverlapRegridder",
+    "burn_vector_geometry",
+    "UgridRolesAccessor",
+    "merge_partitions",
+    "polygonize",
+    "snap_to_grid",
+    "Ugrid1d",
+    "Ugrid2d",
+)

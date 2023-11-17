@@ -22,19 +22,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: install mamba
-        uses: mamba-org/provision-with-micromamba@main
-
-      - name: Test and build with tox
-        run: |
-          pip install "tox>=3.8.1,<4"
-          tox -e build
-      - uses: codecov/codecov-action@v3
-
-      - name: Deploy to github pages
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.3.0
+      - name: Run Tests
+        run: pixi run test
+      - name: Publish Code Coverage
+        uses: codecov/codecov-action@v3
+      - name: Build Docs
+        run: pixi run docs
+      - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .tox/docs_out
+          publish_dir: ./docs/_build
