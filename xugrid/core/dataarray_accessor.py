@@ -632,7 +632,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             coo = connectivity.tocoo()
             i = coo.row
             j = coo.col
-            connectivity.data = 1.0 / np.linalg.norm(xy[j] - xy[i], axis=1)
+            distance = np.linalg.norm(xy[j] - xy[i], axis=1)
+            connectivity.data = distance.mean() / distance
 
         filled = laplace_interpolate(
             connectivity=connectivity,
