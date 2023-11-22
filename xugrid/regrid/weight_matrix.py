@@ -72,10 +72,10 @@ class WeightMatrixCSR(NamedTuple):
 
 
 @numba.njit(inline="always")
-def nzrange(A: WeightMatrixCSR, row: int) -> Tuple[IntArray, FloatArray]:
-    """Return the indices and values of a single row."""
-    start = A.indptr[row]
-    end = A.indptr[row + 1]
+def nzrange(A: WeightMatrixCSR, column: int) -> Tuple[IntArray, FloatArray]:
+    """Return the indices and values of a single column."""
+    start = A.indptr[column]
+    end = A.indptr[column + 1]
     return A.indices[start:end], A.data[start:end]
 
 
