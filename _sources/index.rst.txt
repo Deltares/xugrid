@@ -15,8 +15,7 @@ stored according to `UGRID conventions
 <https://ugrid-conventions.github.io/ugrid-conventions>`_.
 
 Processing structured data with xarray is convenient and efficient. The goal
-of Xugrid (pronounced "kiss you grid" by `visionaries 🗢
-<https://github.com/visr>`_ ) is to extend this ease to unstructured grids.
+of Xugrid is to extend this ease to unstructured grids.
 
 .. code:: python
 
