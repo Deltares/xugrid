@@ -40,7 +40,7 @@ modules, should you not want to rely on more complex dependencies such as
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-27
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     import matplotlib.tri as mtri
@@ -62,7 +62,7 @@ modules. The functions in these modules depend only on ``numpy`` and
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-126
 
-.. code-block:: default
+.. code-block:: Python
 
     from xugrid.ugrid import connectivity, voronoi
 
@@ -175,7 +175,7 @@ Note: ``-1`` functions as the fill value in this example.
 
 .. GENERATED FROM PYTHON SOURCE LINES 131-145
 
-.. code-block:: default
+.. code-block:: Python
 
 
     vertices, faces = generate_disk(5, 2)
@@ -209,7 +209,7 @@ We can compare the two meshes:
 
 .. GENERATED FROM PYTHON SOURCE LINES 152-155
 
-.. code-block:: default
+.. code-block:: Python
 
 
     comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
@@ -242,7 +242,7 @@ this requires more topological information.
 
 .. GENERATED FROM PYTHON SOURCE LINES 161-180
 
-.. code-block:: default
+.. code-block:: Python
 
 
     edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
@@ -290,7 +290,7 @@ Let's take the circular mesh above, and remove a chunk.
 
 .. GENERATED FROM PYTHON SOURCE LINES 185-214
 
-.. code-block:: default
+.. code-block:: Python
 
 
     vertices, faces = generate_disk(5, 2)
@@ -351,7 +351,7 @@ every centroid to exterior edges.
 
 .. GENERATED FROM PYTHON SOURCE LINES 222-242
 
-.. code-block:: default
+.. code-block:: Python
 
 
     node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
@@ -400,7 +400,7 @@ These are the three options, side by side:
 
 .. GENERATED FROM PYTHON SOURCE LINES 247-298
 
-.. code-block:: default
+.. code-block:: Python
 
 
     nodes0, faces0, face_index0 = voronoi.voronoi_topology(
@@ -479,7 +479,7 @@ varies linearly from the lower left to the upper right.
 
 .. GENERATED FROM PYTHON SOURCE LINES 308-311
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data = centroids[:, 0] + centroids[:, 1]
@@ -502,7 +502,7 @@ two faces.
 
 .. GENERATED FROM PYTHON SOURCE LINES 318-354
 
-.. code-block:: default
+.. code-block:: Python
 
 
     triangles0, face_triangles0 = connectivity.triangulate(faces0, -1)
@@ -582,7 +582,7 @@ The figure shows:
 
 .. GENERATED FROM PYTHON SOURCE LINES 374-399
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from scipy.spatial import Voronoi, voronoi_plot_2d
@@ -630,7 +630,7 @@ The figure shows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.323 seconds)
+   **Total running time of the script:** (0 minutes 1.104 seconds)
 
 
 .. _sphx_glr_download_examples-dev_voronoi.py:
@@ -639,16 +639,13 @@ The figure shows:
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: voronoi.ipynb <voronoi.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: voronoi.py <voronoi.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: voronoi.ipynb <voronoi.ipynb>`
 
 
 .. only:: html
