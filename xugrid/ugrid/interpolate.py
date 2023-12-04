@@ -1,5 +1,3 @@
-from __future__ import annotations #TODO: temporary fix, will be implemented in PR #185
-
 import warnings
 
 import numpy as np
