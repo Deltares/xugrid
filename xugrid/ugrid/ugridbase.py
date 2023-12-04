@@ -689,7 +689,7 @@ class AbstractUgrid(abc.ABC):
         grid.crs = crs
 
         return grid
-    
+
     @property
     def is_geographic(self):
         if self.crs is None:

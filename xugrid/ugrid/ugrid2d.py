@@ -692,7 +692,7 @@ class Ugrid2d(AbstractUgrid):
         meshkernel: meshkernel.MeshKernel
         """
         import meshkernel as mk
-        
+
         if self._meshkernel is None:
             if self.is_geographic:
                 mk_projection = mk.ProjectionType.SPHERICAL
