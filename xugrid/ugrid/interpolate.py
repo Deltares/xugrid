@@ -1,3 +1,6 @@
+# to prevent "TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'" in py39
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
