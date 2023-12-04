@@ -412,8 +412,7 @@ class StructuredGrid1d:
             dims=[export_name, export_name + "nbounds"],
             coords={
                 export_name: self.midpoints,
-                export_name
-                + "bounds": (
+                export_name + "bounds": (
                     [export_name, export_name + "nbounds"],
                     self.bounds,
                 ),
