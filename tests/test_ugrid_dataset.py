@@ -317,13 +317,13 @@ class TestUgridDataArray:
 
     def test_is_geographic(self):
         uda = self.uda
-        assert uda.grid.is_geographic == False
+        assert uda.grid.is_geographic is False
 
         uda.ugrid.set_crs(epsg=4326)
-        assert uda.grid.is_geographic == True
+        assert uda.grid.is_geographic is True
 
         result = uda.ugrid.to_crs(epsg=28992)
-        assert result.grid.is_geographic == False
+        assert result.grid.is_geographic is False
 
     def test_to_geodataframe(self):
         with pytest.raises(ValueError, match="unable to convert unnamed"):
