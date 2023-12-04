@@ -18,34 +18,39 @@ jobs:
         uses: actions/setup-python@v2
       - name: Run pre-commit
         uses: pre-commit/action@v2.0.3
-
-  build:
+  
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
           - "3.9"
           - "3.10"
-          - "3.11"
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
       - name: Setup Pixi
         uses: prefix-dev/setup-pixi@v0.3.0
       - name: Setup older Python versions
-        if: ${{ matrix.python-version }} != "3.11"
         run: pixi add python=${{ matrix.python-version }} 
       - name: Run Tests
         run: pixi run test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.3.0
+      - name: Run Tests
+        run: pixi run test
       - name: Publish Code Coverage
-        if: ${{ matrix.python-version }} == "3.11"
         uses: codecov/codecov-action@v3
       - name: Build Docs
-        if: ${{ matrix.python-version }} == "3.11"
         run: pixi run docs
       - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ matrix.python-version }} == "3.11"
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/_build
