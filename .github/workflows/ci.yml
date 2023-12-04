@@ -20,12 +20,18 @@ jobs:
         uses: pre-commit/action@v2.0.3
 
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8, 3.9]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
       - name: Setup Pixi
         uses: prefix-dev/setup-pixi@v0.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
