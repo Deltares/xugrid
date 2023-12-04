@@ -34,7 +34,7 @@ jobs:
         uses: prefix-dev/setup-pixi@v0.3.0
       - name: Setup older Python versions
         if: ${{ matrix.python-version }} != "3.11"
-        uses: pixi add python=${{ matrix.python-version}} 
+        run: pixi add python=${{ matrix.python-version }} 
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
