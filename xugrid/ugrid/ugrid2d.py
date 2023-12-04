@@ -694,7 +694,11 @@ class Ugrid2d(AbstractUgrid):
         import meshkernel as mk
 
         if self._meshkernel is None:
-            self._meshkernel = mk.MeshKernel()
+            if self.is_geographic:
+                mk_projection = mk.ProjectionType.SPHERICAL
+            else:
+                mk_projection = mk.ProjectionType.CARTESIAN
+            self._meshkernel = mk.MeshKernel(mk_projection)
             self._meshkernel.mesh2d_set(self.mesh)
         return self._meshkernel
 

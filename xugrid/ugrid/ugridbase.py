@@ -690,6 +690,12 @@ class AbstractUgrid(abc.ABC):
 
         return grid
 
+    @property
+    def is_geographic(self):
+        if self.crs is None:
+            return False
+        return self.crs.is_geographic
+
     def plot(self, **kwargs):
         """
         Plot the edges of the mesh.
