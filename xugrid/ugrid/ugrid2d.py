@@ -692,7 +692,7 @@ class Ugrid2d(AbstractUgrid):
         meshkernel: meshkernel.MeshKernel
         """
         import meshkernel as mk
-        b
+        
         if self._meshkernel is None:
             self._meshkernel = mk.MeshKernel()
             self._meshkernel.mesh2d_set(self.mesh)
