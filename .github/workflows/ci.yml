@@ -20,18 +20,12 @@ jobs:
         uses: pre-commit/action@v2.0.3
 
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11"]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
       - name: Setup Pixi
         uses: prefix-dev/setup-pixi@v0.3.0
-        with:
-          python-version: ${{ matrix.python-version }}
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
@@ -43,3 +37,30 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/_build
+
+  pytest_plain:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[all]
+          python -m pip install pytest
+      - name: list env contents
+        run: |
+          conda info
+          conda list
+          pip list
+      - name: Test with pytest
+        run: |
+          pytest -m "not requireslocaldata" --cov=dfm_tools --cov-report xml --cov-report term
