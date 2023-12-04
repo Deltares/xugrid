@@ -26,7 +26,17 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Pixi
         uses: prefix-dev/setup-pixi@v0.3.0
-      - name: Run Tests
+      - name: install py3.9
+        run: pixi add python=3.9
+      - name: Run Tests 3.9
+        run: pixi run test
+      - name: install py3.10
+        run: pixi add python=3.10
+      - name: Run Tests 3.10
+        run: pixi run test
+      - name: install py3.11
+        run: pixi add python=3.11
+      - name: Run Tests 3.11
         run: pixi run test
       - name: Publish Code Coverage
         uses: codecov/codecov-action@v3
