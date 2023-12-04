@@ -20,6 +20,10 @@ jobs:
         uses: pre-commit/action@v2.0.3
 
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
