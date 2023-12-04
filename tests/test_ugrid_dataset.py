@@ -315,6 +315,17 @@ class TestUgridDataArray:
         assert not np.array_equal(result.ugrid.grid.node_x, uda.ugrid.grid.node_x)
         assert not np.array_equal(result.ugrid.grid.node_y, uda.ugrid.grid.node_y)
 
+    def test_is_geographic(self):
+        uda = self.uda
+        assert uda.ugrid.is_geographic == False
+        
+        uda.ugrid.set_crs(epsg=4326)
+        assert uda.ugrid.is_geographic == True
+
+        result = uda.ugrid.to_crs(epsg=28992)
+        assert result.ugrid.is_geographic == False
+
+
     def test_to_geodataframe(self):
         with pytest.raises(ValueError, match="unable to convert unnamed"):
             self.uda.ugrid.to_geodataframe()
