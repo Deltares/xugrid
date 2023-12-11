@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[0.8.0] 2023-12-11
+------------------
+
+Changed
+~~~~~~~
+
+- Initialize Meshkernel with a spherical projection if the coordinate reference
+  system (crs) is geographic.
+- Minimum Python version increased to 3.9.
+
 [0.7.1] 2023-11-17
 ------------------
 
