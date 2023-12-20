@@ -129,7 +129,7 @@ By default, the border value for binary erosion is set to ``False`` (equal to
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f90926038d0>
+    <matplotlib.collections.PolyCollection object at 0x7f4af0f87ed0>
 
 
 
@@ -165,7 +165,7 @@ start by setting a single value in the center of the grid to ``True``.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f90926ed5d0>
+    <matplotlib.collections.PolyCollection object at 0x7f4ae78fb710>
 
 
 
@@ -200,7 +200,7 @@ alternative border value:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f909b586310>
+    <matplotlib.collections.PolyCollection object at 0x7f4ae8e53250>
 
 
 
@@ -238,7 +238,7 @@ analyse connected parts of the mesh.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f90929898d0>
+    <matplotlib.collections.PolyCollection object at 0x7f4ae80cb4d0>
 
 
 
@@ -272,7 +272,7 @@ Tesselation.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f909227df90>
+    <matplotlib.collections.LineCollection object at 0x7f4ae7ee8410>
 
 
 
@@ -316,7 +316,7 @@ the original.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f9092b91750>
+    <matplotlib.collections.LineCollection object at 0x7f4ae8283f10>
 
 
 
@@ -355,7 +355,7 @@ We can break down one of the Voronoi tesselations from above into triangles:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f9091fd8fd0>
+    <matplotlib.collections.LineCollection object at 0x7f4ae78a84d0>
 
 
 
@@ -409,7 +409,7 @@ the upper and lower parts:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f909153b490>
+    <matplotlib.collections.LineCollection object at 0x7f4ae7c114d0>
 
 
 
@@ -439,32 +439,29 @@ We can now use Laplace interpolation to fill the gaps in the grid.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f9092110d10>
+    <matplotlib.collections.PolyCollection object at 0x7f4ae7b42090>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-211
+.. GENERATED FROM PYTHON SOURCE LINES 202-205
 
-Reverse-Cuthill McKee
----------------------
+Laplace interpolation can also be used on the nodes of a grid.
+We start by removing 75% of the data. Then we fill it up again using
+interpolation.
 
-For numerical solutions, low "bandwidth" is desirable as this increases
-performance due to more efficient memory access. Xugrid wraps
-:py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee` to reorder
-grids for bandwith reduction.
-
-To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
-
-.. GENERATED FROM PYTHON SOURCE LINES 211-218
+.. GENERATED FROM PYTHON SOURCE LINES 205-215
 
 .. code-block:: default
 
 
-    grid = xugrid.data.xoxo()
-    connectivity = grid.face_face_connectivity.toarray() != 0
+    disk_nodes = xugrid.data.disk()["node_z"]
+    disk_emptied = disk_nodes.where(disk_nodes["mesh2d_nNodes"] % 4 == 0)
+    disk_filled = disk_emptied.ugrid.laplace_interpolate(direct_solve=True)
 
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(connectivity, cmap="Greys")
+    fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(12, 3))
+    disk_emptied.ugrid.plot.scatter(ax=ax0)
+    disk_filled.ugrid.plot.scatter(ax=ax1)
+    disk_filled.ugrid.plot(ax=ax2)
 
 
 
@@ -480,24 +477,29 @@ To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x7f90914fc550>
+    <matplotlib.collections.PolyCollection object at 0x7f4ae83859d0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-223
+.. GENERATED FROM PYTHON SOURCE LINES 216-225
 
-The bandwidth of this matrix is poor. Connections are all over the place: low
-numbered cells are connected to high numbered cells (and vice versa). The
-bandwidth of the reordered grid is much smaller and has much better data
-locality:
+Reverse-Cuthill McKee
+---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-230
+For numerical solutions, low "bandwidth" is desirable as this increases
+performance due to more efficient memory access. Xugrid wraps
+:py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee` to reorder
+grids for bandwith reduction.
+
+To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
+
+.. GENERATED FROM PYTHON SOURCE LINES 225-232
 
 .. code-block:: default
 
 
-    renumbered_grid, _ = grid.reverse_cuthill_mckee()
-    connectivity = renumbered_grid.face_face_connectivity.toarray() != 0
+    grid = xugrid.data.xoxo()
+    connectivity = grid.face_face_connectivity.toarray() != 0
 
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(connectivity, cmap="Greys")
@@ -516,14 +518,50 @@ locality:
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x7f9092788bd0>
+    <matplotlib.image.AxesImage object at 0x7f4ae7b41410>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 233-237
+
+The bandwidth of this matrix is poor. Connections are all over the place: low
+numbered cells are connected to high numbered cells (and vice versa). The
+bandwidth of the reordered grid is much smaller and has much better data
+locality:
+
+.. GENERATED FROM PYTHON SOURCE LINES 237-244
+
+.. code-block:: default
+
+
+    renumbered_grid, _ = grid.reverse_cuthill_mckee()
+    connectivity = renumbered_grid.face_face_connectivity.toarray() != 0
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(connectivity, cmap="Greys")
+
+
+
+
+.. image-sg:: /examples/images/sphx_glr_connectivity_012.png
+   :alt: connectivity
+   :srcset: /examples/images/sphx_glr_connectivity_012.png
+   :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <matplotlib.image.AxesImage object at 0x7f4ae811ff50>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.015 seconds)
+   **Total running time of the script:** (0 minutes 1.665 seconds)
 
 
 .. _sphx_glr_download_examples_connectivity.py:

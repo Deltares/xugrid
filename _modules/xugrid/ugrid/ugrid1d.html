@@ -662,6 +662,18 @@ document.write(`
     <span class="k">def</span> <span class="nf">dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">}</span>
 
+    <span class="k">def</span> <span class="nf">connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
+            <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">xy_weights</span><span class="p">:</span>
+            <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_weights</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">connectivity</span>
+
     <span class="c1"># These are all optional attributes. They are not computed by default, only</span>
     <span class="c1"># when called upon.</span>
 

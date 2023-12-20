@@ -199,6 +199,20 @@ filled = uda.ugrid.laplace_interpolate(direct_solve=True)
 filled.ugrid.plot(cmap="gist_rainbow", vmin=2.5, vmax=7.5)
 
 # %%
+# Laplace interpolation can also be used on the nodes of a grid.
+# We start by removing 75% of the data. Then we fill it up again using
+# interpolation.
+
+disk_nodes = xugrid.data.disk()["node_z"]
+disk_emptied = disk_nodes.where(disk_nodes["mesh2d_nNodes"] % 4 == 0)
+disk_filled = disk_emptied.ugrid.laplace_interpolate(direct_solve=True)
+
+fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize=(12, 3))
+disk_emptied.ugrid.plot.scatter(ax=ax0)
+disk_filled.ugrid.plot.scatter(ax=ax1)
+disk_filled.ugrid.plot(ax=ax2)
+
+# %%
 # Reverse-Cuthill McKee
 # ---------------------
 #
