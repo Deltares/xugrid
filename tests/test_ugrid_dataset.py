@@ -68,7 +68,7 @@ def ugrid1d_ds():
         edge_node_connectivity=np.array([[0, 1], [1, 2]]),
     )
     ds = grid.to_dataset()
-    ds["a1d"] = xr.DataArray([1, 2, 3], dims=[grid.node_dimension])
+    ds["a1d"] = xr.DataArray([1.0, 2.0, 3.0], dims=[grid.node_dimension])
     return xugrid.UgridDataset(ds)
 
 
@@ -1202,3 +1202,40 @@ def test_periodic_conversion():
     assert isinstance(back_ds, xugrid.UgridDataset)
     assert "a1d" in back_ds
     assert "a2d" in back_ds
+
+
+def test_laplace_interpolate_facets():
+    grid = GRID()
+    node_uda = xugrid.UgridDataArray(
+        xr.DataArray(np.ones(grid.n_node), dims=(grid.node_dimension,)),
+        grid=grid,
+    )
+    edge_uda = xugrid.UgridDataArray(
+        xr.DataArray(np.ones(grid.n_edge), dims=(grid.edge_dimension,)),
+        grid=grid,
+    )
+    face_uda = xugrid.UgridDataArray(
+        xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,)),
+        grid=grid,
+    )
+    node_uda[:-1] = np.nan
+    edge_uda[:-1] = np.nan
+    face_uda[:-1] = np.nan
+
+    for uda in (node_uda, face_uda):
+        actual = uda.ugrid.laplace_interpolate(direct_solve=True)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+
+    msg = "Laplace interpolation along edges is not allowed."
+    with pytest.raises(ValueError, match=msg):
+        edge_uda.ugrid.laplace_interpolate(direct_solve=True)
+
+
+def test_laplace_interpolate_1d():
+    uda = ugrid1d_ds()["a1d"]
+    uda[:] = 1.0
+    uda[1] = np.nan
+    actual = uda.ugrid.laplace_interpolate(direct_solve=True)
+    assert isinstance(actual, xugrid.UgridDataArray)
+    assert np.allclose(actual, 1.0)

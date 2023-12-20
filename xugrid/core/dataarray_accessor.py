@@ -1,6 +1,5 @@
 from typing import Dict, List, Sequence, Tuple, Union
 
-import numpy as np
 import scipy.sparse
 import xarray as xr
 
@@ -591,6 +590,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         the documentation of :py:func:`scipy.sparse.linalg.spilu` and
         :py:func:`scipy.sparse.linalg.cg`.
 
+        Data can be interpolated from nodes or faces. Direct interpolation of edge
+        associated data is not allowed. Instead, create node associated data first,
+        then translate that data to the edges.
+
         Parameters
         ----------
         xy_weights: bool, default False.
@@ -621,19 +624,13 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         grid = self.grid
         da = self.obj
-        if grid.topology_dimension != 2:
+        if len(da.dims) > 1:
+            # TODO: apply ufunc
             raise NotImplementedError
-        if len(da.dims) > 1 or da.dims[0] != grid.face_dimension:
-            raise NotImplementedError
+        if da.dims[0] == grid.edge_dimension:
+            raise ValueError("Laplace interpolation along edges is not allowed.")
 
-        connectivity = grid.face_face_connectivity.copy()
-        if xy_weights:
-            xy = grid.centroids
-            coo = connectivity.tocoo()
-            i = coo.row
-            j = coo.col
-            connectivity.data = 1.0 / np.linalg.norm(xy[j] - xy[i], axis=1)
-
+        connectivity = grid.connectivity_matrix(da.dims[0], xy_weights)
         filled = laplace_interpolate(
             connectivity=connectivity,
             data=da.to_numpy(),

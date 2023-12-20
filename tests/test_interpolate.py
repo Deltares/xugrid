@@ -12,12 +12,16 @@ def test_laplace_interpolate():
     data = np.array([1.0, np.nan, np.nan, np.nan, 5.0])
     with pytest.raises(ValueError, match="connectivity is not a square matrix"):
         con = sparse.coo_matrix(coo_content, shape=(4, 5)).tocsr()
-        interpolate.laplace_interpolate(con, data)
+        interpolate.laplace_interpolate(con, data, use_weights=False)
 
     expected = np.arange(1.0, 6.0)
     con = sparse.coo_matrix(coo_content, shape=(5, 5)).tocsr()
-    actual = interpolate.laplace_interpolate(con, data, direct_solve=True)
+    actual = interpolate.laplace_interpolate(
+        con, data, use_weights=False, direct_solve=True
+    )
     assert np.allclose(actual, expected)
 
-    actual = interpolate.laplace_interpolate(con, data, direct_solve=False)
+    actual = interpolate.laplace_interpolate(
+        con, data, use_weights=False, direct_solve=False
+    )
     assert np.allclose(actual, expected)

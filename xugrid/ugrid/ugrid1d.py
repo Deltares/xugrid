@@ -256,6 +256,18 @@ class Ugrid1d(AbstractUgrid):
     def dimensions(self):
         return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
+    def connectivity_matrix(self, dim: str, xy_weights: bool):
+        if dim == self.node_dimension:
+            connectivity = self.node_node_connectivity.copy()
+            coordinates = self.node_coordinates
+        else:
+            raise ValueError(f"Expected {self.node_dimension}; got: {dim}")
+
+        if xy_weights:
+            connectivity.data = self._connectivity_weights(connectivity, coordinates)
+
+        return connectivity
+
     # These are all optional attributes. They are not computed by default, only
     # when called upon.
 

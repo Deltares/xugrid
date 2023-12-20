@@ -666,7 +666,9 @@ def _triangulate(i: IntArray, j: IntArray, n_triangle_per_row: IntArray) -> IntA
     return triangles
 
 
-def triangulate_dense(face_node_connectivity: IntArray, fill_value: int) -> None:
+def triangulate_dense(
+    face_node_connectivity: IntArray, fill_value: int
+) -> Tuple[IntArray, IntArray]:
     n_face, n_max = face_node_connectivity.shape
 
     if n_max == 3:
@@ -686,7 +688,9 @@ def triangulate_dense(face_node_connectivity: IntArray, fill_value: int) -> None
     return triangles, triangle_face_connectivity
 
 
-def triangulate_coo(face_node_connectivity: sparse.coo_matrix) -> IntArray:
+def triangulate_coo(
+    face_node_connectivity: sparse.coo_matrix
+) -> Tuple[IntArray, IntArray]:
     ncol_per_row = face_node_connectivity.getnnz(axis=1)
 
     if ncol_per_row.max() == 3:
@@ -705,7 +709,9 @@ def triangulate_coo(face_node_connectivity: sparse.coo_matrix) -> IntArray:
     return triangles, triangle_face_connectivity
 
 
-def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
+def triangulate(
+    face_node_connectivity, fill_value: int | None = None
+) -> Tuple[IntArray, IntArray]:
     """
     Convert polygons into its constituent triangles.
 
@@ -732,7 +738,9 @@ def triangulate(face_node_connectivity, fill_value: int = None) -> IntArray:
         raise TypeError("connectivity must be ndarray or sparse matrix")
 
 
-def _mutate(output: BoolArray, i: IntArray, j: IntArray, value: bool, mask: BoolArray):
+def _mutate(
+    output: BoolArray, i: IntArray, j: IntArray, value: bool, mask: BoolArray
+) -> None:
     a = output[i]
     b = output[j]
     mutate = a != b
@@ -783,9 +791,9 @@ def binary_erosion(
     connectivity: sparse.csr_matrix,
     input: BoolArray,
     iterations: int = 1,
-    mask: BoolArray = None,
-    exterior: IntArray = None,
-    border_value: bool = False,
+    mask: BoolArray | None = None,
+    exterior: IntArray | None = None,
+    border_value: bool | None = False,
 ) -> BoolArray:
     """By default, erodes inwards from the exterior."""
     return _binary_iterate(
@@ -803,9 +811,9 @@ def binary_dilation(
     connectivity: sparse.csr_matrix,
     input: BoolArray,
     iterations: int = 1,
-    mask: BoolArray = None,
-    exterior: IntArray = None,
-    border_value: bool = False,
+    mask: BoolArray | None = None,
+    exterior: IntArray | None = None,
+    border_value: bool | None = False,
 ) -> BoolArray:
     """By default, does not dilate inward from the exterior."""
     return _binary_iterate(

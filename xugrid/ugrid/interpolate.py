@@ -12,7 +12,7 @@ from xugrid.constants import FloatArray
 def laplace_interpolate(
     connectivity: scipy.sparse.csr_matrix,
     data: FloatArray,
-    use_weights: FloatArray | None = None,
+    use_weights: bool,
     direct_solve: bool = False,
     drop_tol: float | None = None,
     fill_factor: float | None = None,

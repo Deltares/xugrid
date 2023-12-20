@@ -399,3 +399,26 @@ def test_contract_vertices():
     assert new.n_node == 2
     # The nodes have been renumbered
     assert np.array_equal(new.edge_node_connectivity, [[0, 1]])
+
+
+def test_connectivity_matrix():
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [3.0, 0.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+    )
+    with pytest.raises(ValueError, match="Expected network1d_nNodes; got: abc"):
+        grid.connectivity_matrix(dim="abc", xy_weights=True)
+
+    connectivity = grid.connectivity_matrix(grid.node_dimension, True)
+    assert isinstance(connectivity, sparse.csr_matrix)
+    assert np.allclose(connectivity.data, [1.5, 1.5, 0.75, 0.75])
+    assert np.array_equal(connectivity.indices, [1, 0, 2, 1])

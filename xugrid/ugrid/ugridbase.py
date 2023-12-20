@@ -149,6 +149,10 @@ class AbstractUgrid(abc.ABC):
     def reindex_like():
         pass
 
+    @abc.abstractmethod
+    def connectivity_matrix(self, dim: str, xy_weights: bool) -> csr_matrix:
+        pass
+
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
 
@@ -592,6 +596,17 @@ class AbstractUgrid(abc.ABC):
         connectivity: csr_matrix
         """
         return connectivity.directed_node_node_connectivity(self.edge_node_connectivity)
+
+    @staticmethod
+    def _connectivity_weights(connectivity: csr_matrix, coordinates: FloatArray):
+        xy = coordinates
+        coo = connectivity.tocoo()
+        i = coo.row
+        j = coo.col
+        distance = np.linalg.norm(xy[j] - xy[i], axis=1)
+        # The inverse distance is a measure of the strength of the connection.
+        # Normalize so the weights are around 1.0
+        return distance.mean() / distance
 
     def set_crs(
         self,

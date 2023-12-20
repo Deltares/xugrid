@@ -656,6 +656,23 @@ class Ugrid2d(AbstractUgrid):
             )
         return self._node_face_connectivity
 
+    def connectivity_matrix(self, dim: str, xy_weights: bool):
+        if dim == self.node_dimension:
+            connectivity = self.node_node_connectivity.copy()
+            coordinates = self.node_coordinates
+        elif dim == self.face_dimension:
+            connectivity = self.face_face_connectivity.copy()
+            coordinates = self.centroids
+        else:
+            raise ValueError(
+                f"Expected {self.node_dimension} or {self.face_dimension}; got: {dim}"
+            )
+
+        if xy_weights:
+            connectivity.data = self._connectivity_weights(connectivity, coordinates)
+
+        return connectivity
+
     @property
     def mesh(self) -> "mk.Mesh2d":  # type: ignore # noqa
         """
