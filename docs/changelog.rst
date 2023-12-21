@@ -6,8 +6,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor.reindex_like` will now take the tolerance
+  argument into account before sorting. In the past, near ties could be resolved
+  differently between otherwise similar grid topologies due to roundoff.
+
+Added
+~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now also supports
+  interpolation of node associated data, and Ugrid1d topologies.
+
 [0.8.0] 2023-12-11
 ------------------
+
 
 Changed
 ~~~~~~~
