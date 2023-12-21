@@ -23,8 +23,17 @@ def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
     if xy_a.shape != xy_b.shape:
         raise ValueError("coordinates do not match in shape")
 
-    sorter_a = argsort_rows(xy_a)
-    sorter_b = argsort_rows(xy_b)
+    # Quantize coordinates before sorting in case a tolerance is given.
+    # After quantization, coordinates can be considered integers.
+    # Float64 has ample room for our coordinate system even with small
+    # tolerances, e.g. 1.0e9 / 1.0e-9 is not a problem.
+    if tolerance != 0.0:
+        sorter_a = argsort_rows(np.round(xy_a / tolerance))
+        sorter_b = argsort_rows(np.round(xy_b / tolerance))
+    else:
+        sorter_a = argsort_rows(xy_a)
+        sorter_b = argsort_rows(xy_b)
+
     if not np.allclose(xy_a[sorter_a], xy_b[sorter_b], rtol=0.0, atol=tolerance):
         raise ValueError("coordinates are not identical after sorting")
     #

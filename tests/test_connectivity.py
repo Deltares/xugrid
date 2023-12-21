@@ -68,6 +68,13 @@ def test_index_like():
     expected = [3, 1, 0, 2]
     assert np.array_equal(actual, expected)
 
+    # With tolerance
+    xy_a = np.array([[3.0, 3.0001], [1.0, 1.0], [2.0, 2.0], [-0.0001, 0.0]])
+    xy_b = np.array([[0.0, 0.0], [1.0, 1.0], [3.0, 3.0], [2.0, 2.0]])
+    actual = connectivity.index_like(xy_a, xy_b, tolerance=0.001)
+    expected = [3, 1, 0, 2]
+    assert np.array_equal(actual, expected)
+
 
 def test_neighbors():
     i = [0, 0, 0, 1, 1, 1]
