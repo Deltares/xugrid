@@ -18,17 +18,11 @@ except ImportError:
 
 import xugrid
 from xugrid.constants import FloatArray
+from xugrid.core.sparse import MatrixCOO, MatrixCSR, row_slice
 from xugrid.core.wrap import UgridDataArray
 from xugrid.regrid import reduce
 from xugrid.regrid.structured import StructuredGrid2d
 from xugrid.regrid.unstructured import UnstructuredGrid2d
-from xugrid.regrid.weight_matrix import (
-    WeightMatrixCOO,
-    WeightMatrixCSR,
-    nzrange,
-    weight_matrix_coo,
-    weight_matrix_csr,
-)
 
 
 def make_regrid(func):
@@ -38,13 +32,15 @@ def make_regrid(func):
     """
     f = numba.njit(func, inline="always")
 
-    def _regrid(source: FloatArray, A: WeightMatrixCSR, size: int):
+    def _regrid(source: FloatArray, A: MatrixCSR, size: int):
         n_extra = source.shape[0]
         out = np.full((n_extra, size), np.nan)
         for extra_index in numba.prange(n_extra):
             source_flat = source[extra_index]
             for target_index in range(A.n):
-                indices, weights = nzrange(A, target_index)
+                slice = row_slice(A, target_index)
+                indices = A.indices[slice]
+                weights = A.data[slice]
                 if len(indices) > 0:
                     out[extra_index, target_index] = f(source_flat, indices, weights)
         return out
@@ -246,38 +242,39 @@ class BaseRegridder(abc.ABC):
         return xr.merge((weights_ds, source_ds, target_ds))
 
     @staticmethod
-    def _csr_from_dataset(dataset: xr.Dataset) -> WeightMatrixCSR:
+    def _csr_from_dataset(dataset: xr.Dataset) -> MatrixCSR:
         """
         Create a compressed sparse row matrix from the dataset variables.
 
         Variables n and nnz are expected to be scalar variables.
         """
-        return WeightMatrixCSR(
+        return MatrixCSR(
             dataset["__regrid_data"].to_numpy(),
             dataset["__regrid_indices"].to_numpy(),
             dataset["__regrid_indptr"].to_numpy(),
             dataset["__regrid_n"].item(),
+            dataset["__regrid_m"].item(),
             dataset["__regrid_nnz"].item(),
         )
 
     @staticmethod
-    def _coo_from_dataset(dataset: xr.Dataset) -> WeightMatrixCOO:
+    def _coo_from_dataset(dataset: xr.Dataset) -> MatrixCOO:
         """
         Create a coordinate/triplet sparse row matrix from the dataset variables.
 
         Variables n and nnz are expected to be scalar variables.
         """
-        return WeightMatrixCOO(
+        return MatrixCOO(
             dataset["__regrid_data"].to_numpy(),
             dataset["__regrid_row"].to_numpy(),
             dataset["__regrid_col"].to_numpy(),
+            dataset["__regrid_n"].item(),
+            dataset["__regrid_m"].item(),
             dataset["__regrid_nnz"].item(),
         )
 
-    @abc.abstractclassmethod
-    def _weights_from_dataset(
-        cls, dataset: xr.Dataset
-    ) -> Union[WeightMatrixCOO, WeightMatrixCSR]:
+    @abc.abstractmethod
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> Union[MatrixCOO, MatrixCSR]:
         """Return either COO or CSR weights."""
 
     @classmethod
@@ -322,18 +319,20 @@ class CentroidLocatorRegridder(BaseRegridder):
     ----------
     source: Ugrid2d, UgridDataArray
     target: Ugrid2d, UgridDataArray
-    weights: Optional[WeightMatrixCOO]
+    weights: Optional[MatrixCOO]
     """
 
     def _compute_weights(self, source, target):
         source, target = convert_to_match(source, target)
         source_index, target_index, weight_values = source.locate_centroids(target)
-        self._weights = weight_matrix_coo(source_index, target_index, weight_values)
+        self._weights = MatrixCOO.from_triplet(
+            source_index, target_index, weight_values
+        )
         return
 
     @staticmethod
     @numba.njit(parallel=True, cache=True)
-    def _regrid(source: FloatArray, A: WeightMatrixCOO, size: int):
+    def _regrid(source: FloatArray, A: MatrixCOO, size: int):
         n_extra = source.shape[0]
         out = np.full((n_extra, size), np.nan)
         for extra_index in numba.prange(n_extra):
@@ -347,16 +346,14 @@ class CentroidLocatorRegridder(BaseRegridder):
         return self.to_dataset()
 
     @weights.setter
-    def weights(self, weights: WeightMatrixCOO, target: "xugrid.Ugrid2d"):
-        if not isinstance(weights, WeightMatrixCOO):
-            raise TypeError(
-                f"Expected WeightMatrixCOO, received: {type(weights).__name__}"
-            )
+    def weights(self, weights: MatrixCOO, target: "xugrid.Ugrid2d"):
+        if not isinstance(weights, MatrixCOO):
+            raise TypeError(f"Expected MatrixCOO, received: {type(weights).__name__}")
         self._weights = weights
         return
 
     @classmethod
-    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> MatrixCOO:
         return cls._coo_from_dataset(dataset)
 
 
@@ -366,7 +363,9 @@ class BaseOverlapRegridder(BaseRegridder, abc.ABC):
         source_index, target_index, weight_values = source.overlap(
             target, relative=relative
         )
-        self._weights = weight_matrix_csr(source_index, target_index, weight_values)
+        self._weights = MatrixCSR.from_triplet(
+            source_index, target_index, weight_values
+        )
         return
 
     @property
@@ -374,16 +373,14 @@ class BaseOverlapRegridder(BaseRegridder, abc.ABC):
         return self.to_dataset()
 
     @weights.setter
-    def weights(self, weights: WeightMatrixCSR):
-        if not isinstance(weights, WeightMatrixCSR):
-            raise TypeError(
-                f"Expected WeightMatrixCSR, received: {type(weights).__name__}"
-            )
+    def weights(self, weights: MatrixCSR):
+        if not isinstance(weights, MatrixCSR):
+            raise TypeError(f"Expected MatrixCSR, received: {type(weights).__name__}")
         self._weights = weights
         return
 
     @classmethod
-    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> MatrixCOO:
         return cls._csr_from_dataset(dataset)
 
 
@@ -487,7 +484,7 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
     @classmethod
     def from_weights(
         cls,
-        weights: WeightMatrixCSR,
+        weights: MatrixCSR,
         target: "xugrid.Ugrid2d",
         method: Union[str, Callable] = "first_order_conservative",
     ):
@@ -529,7 +526,7 @@ class BarycentricInterpolator(BaseRegridder):
             source_index, target_index, weights = source.linear_weights(target)
         else:
             source_index, target_index, weights = source.barycentric(target)
-        self._weights = weight_matrix_csr(source_index, target_index, weights)
+        self._weights = MatrixCSR.from_triplet(source_index, target_index, weights)
         return
 
     @property
@@ -537,20 +534,18 @@ class BarycentricInterpolator(BaseRegridder):
         return self.to_dataset()
 
     @weights.setter
-    def weights(self, weights: WeightMatrixCSR):
-        if not isinstance(weights, WeightMatrixCSR):
-            raise TypeError(
-                f"Expected WeightMatrixCSR, received: {type(weights).__name__}"
-            )
+    def weights(self, weights: MatrixCSR):
+        if not isinstance(weights, MatrixCSR):
+            raise TypeError(f"Expected MatrixCSR, received: {type(weights).__name__}")
         self._weights = weights
         return
 
     @classmethod
-    def from_weights(cls, weights: WeightMatrixCSR, target: Optional["xugrid.Ugrid2d"]):
+    def from_weights(cls, weights: MatrixCSR, target: Optional["xugrid.Ugrid2d"]):
         instance = super().from_weights(weights, target)
         instance._setup_regrid("mean")
         return instance
 
     @classmethod
-    def _weights_from_dataset(cls, dataset: xr.Dataset) -> WeightMatrixCOO:
+    def _weights_from_dataset(cls, dataset: xr.Dataset) -> MatrixCOO:
         return cls._csr_from_dataset(dataset)
