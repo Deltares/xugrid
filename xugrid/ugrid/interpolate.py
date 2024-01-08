@@ -28,6 +28,7 @@ def columns_and_values(ilu, slice):
 
 @nb.njit
 def set_uptr(ilu: ILU0Preconditioner) -> None:
+    # i is row index, j is column index
     for i in range(ilu.n):
         for nzi in nzrange(ilu, i):
             j = ilu.indices[nzi]
@@ -46,6 +47,7 @@ def _update(ilu: ILU0Preconditioner, A: MatrixCSR, delta: float, relax: float):
     ilu.work[:] = 0.0
     visited = np.full(ilu.n, False)
 
+    # i is row index, j is column index, v is value.
     for i in range(ilu.n):
         for j, v in columns_and_values(A, row_slice(A, i)):
             visited[j] = True
@@ -66,7 +68,7 @@ def _update(ilu: ILU0Preconditioner, A: MatrixCSR, delta: float, relax: float):
         diag = ilu.work[i]
         multiplier = (1.0 + delta) * diag - (relax * rs)
         # Work around a zero-valued pivot
-        if (np.sign(multiplier) != np.sign(multiplier)) or (multiplier == 0):
+        if (np.sign(multiplier) != np.sign(diag)) or (multiplier == 0):
             multiplier = np.sign(diag) * 1.0e-6
         ilu.diagonal[i] = 1.0 / multiplier
 
@@ -111,6 +113,14 @@ def _solve(ilu: ILU0Preconditioner, r: np.ndarray):
 class ILU0Preconditioner(NamedTuple):
     """
     Preconditioner based on zero fill-in lower-upper (ILU0) factorization.
+
+    Data is stored in compressed sparse row (CSR) format. The diagonal
+    values have been extracted for easier access. Upper and lower values
+    are stored in CSR format. Next to the indptr array, which identifies
+    the start and end of each row, the uptr array has been added to
+    identify the start to the right of the diagonal. In case the row to the
+    right of the diagonal is empty, it contains the end of the rows as
+    indicated by the indptr array.
 
     Parameters
     ----------
