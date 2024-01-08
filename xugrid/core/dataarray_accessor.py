@@ -571,12 +571,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         self,
         xy_weights: bool = True,
         direct_solve: bool = False,
-        drop_tol: float = None,
-        fill_factor: float = None,
-        drop_rule: str = None,
-        options: dict = None,
+        delta=0.0,
+        relax=0.0,
         tol: float = 1.0e-5,
-        maxiter: int = 250,
+        maxiter: int = 500,
     ):
         """
         Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.
@@ -604,18 +602,13 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             Whether to use a direct or an iterative solver or a conjugate gradient
             solver. Direct method provides an exact answer, but are unsuitable
             for large problems.
-        drop_tol: float, optional, default None.
-            Drop tolerance for ``scipy.sparse.linalg.spilu`` which functions as a
-            preconditioner for the conjugate gradient solver.
-        fill_factor: float, optional, default None.
-            Fill factor for ``scipy.sparse.linalg.spilu``.
-        drop_rule: str, optional default None.
-            Drop rule for ``scipy.sparse.linalg.spilu``.
-        options: dict, optional, default None.
-            Remaining other options for ``scipy.sparse.linalg.spilu``.
+        delta: float, default 0.0.
+            ILU0 preconditioner non-diagonally dominant correction.
+        relax: float, default 0.0.
+            Modified ILU0 preconditioner relaxation factor.
         tol: float, optional, default 1.0e-5.
             Convergence tolerance for ``scipy.sparse.linalg.cg``.
-        maxiter: int, default 250.
+        maxiter: int, default 500.
             Maximum number of iterations for ``scipy.sparse.linalg.cg``.
 
         Returns
@@ -630,16 +623,14 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         if da.dims[0] == grid.edge_dimension:
             raise ValueError("Laplace interpolation along edges is not allowed.")
 
-        connectivity = grid.connectivity_matrix(da.dims[0], xy_weights)
+        connectivity = grid.connectivity_matrix(da.dims[0], xy_weights=xy_weights)
         filled = laplace_interpolate(
             connectivity=connectivity,
             data=da.to_numpy(),
             use_weights=xy_weights,
             direct_solve=direct_solve,
-            drop_tol=drop_tol,
-            fill_factor=fill_factor,
-            drop_rule=drop_rule,
-            options=options,
+            delta=delta,
+            relax=relax,
             tol=tol,
             maxiter=maxiter,
         )
