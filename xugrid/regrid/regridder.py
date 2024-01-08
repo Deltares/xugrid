@@ -326,7 +326,7 @@ class CentroidLocatorRegridder(BaseRegridder):
         source, target = convert_to_match(source, target)
         source_index, target_index, weight_values = source.locate_centroids(target)
         self._weights = MatrixCOO.from_triplet(
-            source_index, target_index, weight_values
+            target_index, source_index, weight_values
         )
         return
 
@@ -364,7 +364,7 @@ class BaseOverlapRegridder(BaseRegridder, abc.ABC):
             target, relative=relative
         )
         self._weights = MatrixCSR.from_triplet(
-            source_index, target_index, weight_values
+            target_index, source_index, weight_values
         )
         return
 
@@ -526,7 +526,7 @@ class BarycentricInterpolator(BaseRegridder):
             source_index, target_index, weights = source.linear_weights(target)
         else:
             source_index, target_index, weights = source.barycentric(target)
-        self._weights = MatrixCSR.from_triplet(source_index, target_index, weights)
+        self._weights = MatrixCSR.from_triplet(target_index, source_index, weights)
         return
 
     @property
