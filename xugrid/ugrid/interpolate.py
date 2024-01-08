@@ -121,7 +121,7 @@ class ILU0Preconditioner(NamedTuple):
     indptr: np.ndarray of int
         CSR format index pointer array of the matrix
     uptr: np.ndarray of int
-        CSR format index pointer array of the upper elements
+        CSR format index pointer array of the upper elements (diagonal or higher)
     indices: np.ndarray of int
         CSR format index array of the matrix
     data: np.ndarray of float
@@ -153,15 +153,15 @@ class ILU0Preconditioner(NamedTuple):
     def from_csr_matrix(
         A: sparse.csr_matrix, delta: float = 0.0, relax: float = 0.0
     ) -> "ILU0Preconditioner":
+        # Create a copy of the sparse matrix with the diagonals removed.
         n, m = A.shape
         coo = A.tocoo()
         i = coo.row
         j = coo.col
         offdiag = i != j
-
         ii = i[offdiag]
         indices = j[offdiag]
-        indptr = np.cumsum(np.insert(np.bincount(ii), 0, 0))
+        indptr = sparse.csr_matrix((indices, (ii, indices)), shape=A.shape).indptr
 
         ilu = ILU0Preconditioner(
             n=n,
@@ -174,6 +174,7 @@ class ILU0Preconditioner(NamedTuple):
             work=np.empty(n),
         )
         set_uptr(ilu)
+
         _update(ilu, MatrixCSR.from_csr_matrix(A), delta, relax)
         return ilu
 
@@ -184,6 +185,9 @@ class ILU0Preconditioner(NamedTuple):
     def matvec(self, r) -> FloatArray:
         _solve(self, r)
         return self.work
+
+    def __repr__(self) -> str:
+        return f"ILU0Preconditioner of type {self.dtype} and shape {self.shape}"
 
 
 def laplace_interpolate(
