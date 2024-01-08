@@ -1033,12 +1033,10 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">direct_solve</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">drop_tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fill_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">drop_rule</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">relax</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">,</span>
-        <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">250</span><span class="p">,</span>
+        <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.</span>
@@ -1066,18 +1064,13 @@ document.write(`
 <span class="sd">            Whether to use a direct or an iterative solver or a conjugate gradient</span>
 <span class="sd">            solver. Direct method provides an exact answer, but are unsuitable</span>
 <span class="sd">            for large problems.</span>
-<span class="sd">        drop_tol: float, optional, default None.</span>
-<span class="sd">            Drop tolerance for ``scipy.sparse.linalg.spilu`` which functions as a</span>
-<span class="sd">            preconditioner for the conjugate gradient solver.</span>
-<span class="sd">        fill_factor: float, optional, default None.</span>
-<span class="sd">            Fill factor for ``scipy.sparse.linalg.spilu``.</span>
-<span class="sd">        drop_rule: str, optional default None.</span>
-<span class="sd">            Drop rule for ``scipy.sparse.linalg.spilu``.</span>
-<span class="sd">        options: dict, optional, default None.</span>
-<span class="sd">            Remaining other options for ``scipy.sparse.linalg.spilu``.</span>
+<span class="sd">        delta: float, default 0.0.</span>
+<span class="sd">            ILU0 preconditioner non-diagonally dominant correction.</span>
+<span class="sd">        relax: float, default 0.0.</span>
+<span class="sd">            Modified ILU0 preconditioner relaxation factor.</span>
 <span class="sd">        tol: float, optional, default 1.0e-5.</span>
 <span class="sd">            Convergence tolerance for ``scipy.sparse.linalg.cg``.</span>
-<span class="sd">        maxiter: int, default 250.</span>
+<span class="sd">        maxiter: int, default 500.</span>
 <span class="sd">            Maximum number of iterations for ``scipy.sparse.linalg.cg``.</span>
 
 <span class="sd">        Returns</span>
@@ -1092,16 +1085,14 @@ document.write(`
         <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Laplace interpolation along edges is not allowed.&quot;</span><span class="p">)</span>
 
-        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">connectivity_matrix</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_weights</span><span class="p">)</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">connectivity_matrix</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">)</span>
         <span class="n">filled</span> <span class="o">=</span> <span class="n">laplace_interpolate</span><span class="p">(</span>
             <span class="n">connectivity</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">use_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">,</span>
             <span class="n">direct_solve</span><span class="o">=</span><span class="n">direct_solve</span><span class="p">,</span>
-            <span class="n">drop_tol</span><span class="o">=</span><span class="n">drop_tol</span><span class="p">,</span>
-            <span class="n">fill_factor</span><span class="o">=</span><span class="n">fill_factor</span><span class="p">,</span>
-            <span class="n">drop_rule</span><span class="o">=</span><span class="n">drop_rule</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
+            <span class="n">relax</span><span class="o">=</span><span class="n">relax</span><span class="p">,</span>
             <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
             <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
         <span class="p">)</span>

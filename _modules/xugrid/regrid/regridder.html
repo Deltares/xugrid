@@ -410,17 +410,11 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">xugrid</span>
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FloatArray</span>
+<span class="kn">from</span> <span class="nn">xugrid.core.sparse</span> <span class="kn">import</span> <span class="n">MatrixCOO</span><span class="p">,</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">row_slice</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span>
 <span class="kn">from</span> <span class="nn">xugrid.regrid</span> <span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">xugrid.regrid.structured</span> <span class="kn">import</span> <span class="n">StructuredGrid2d</span>
 <span class="kn">from</span> <span class="nn">xugrid.regrid.unstructured</span> <span class="kn">import</span> <span class="n">UnstructuredGrid2d</span>
-<span class="kn">from</span> <span class="nn">xugrid.regrid.weight_matrix</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">WeightMatrixCOO</span><span class="p">,</span>
-    <span class="n">WeightMatrixCSR</span><span class="p">,</span>
-    <span class="n">nzrange</span><span class="p">,</span>
-    <span class="n">weight_matrix_coo</span><span class="p">,</span>
-    <span class="n">weight_matrix_csr</span><span class="p">,</span>
-<span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">make_regrid</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
@@ -430,13 +424,15 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">n_extra</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_extra</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">extra_index</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_extra</span><span class="p">):</span>
             <span class="n">source_flat</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">extra_index</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">target_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
-                <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">nzrange</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">target_index</span><span class="p">)</span>
+                <span class="nb">slice</span> <span class="o">=</span> <span class="n">row_slice</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">target_index</span><span class="p">)</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="nb">slice</span><span class="p">]</span>
+                <span class="n">weights</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">slice</span><span class="p">]</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">source_flat</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
@@ -638,38 +634,39 @@ document.write(`
         <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">weights_ds</span><span class="p">,</span> <span class="n">source_ds</span><span class="p">,</span> <span class="n">target_ds</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCSR</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixCSR</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a compressed sparse row matrix from the dataset variables.</span>
 
 <span class="sd">        Variables n and nnz are expected to be scalar variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">WeightMatrixCSR</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">MatrixCSR</span><span class="p">(</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_indices&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_indptr&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_m&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_nnz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
         <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixCOO</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a coordinate/triplet sparse row matrix from the dataset variables.</span>
 
 <span class="sd">        Variables n and nnz are expected to be scalar variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">WeightMatrixCOO</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">MatrixCOO</span><span class="p">(</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_row&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_col&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_m&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
             <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;__regrid_nnz&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
         <span class="p">)</span>
 
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractclassmethod</span>
-    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">]:</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">MatrixCOO</span><span class="p">,</span> <span class="n">MatrixCSR</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return either COO or CSR weights.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
@@ -716,18 +713,20 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    source: Ugrid2d, UgridDataArray</span>
 <span class="sd">    target: Ugrid2d, UgridDataArray</span>
-<span class="sd">    weights: Optional[WeightMatrixCOO]</span>
+<span class="sd">    weights: Optional[MatrixCOO]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_compute_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">convert_to_match</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">locate_centroids</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_coo</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCOO</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span>
+            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weight_values</span>
+        <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_regrid</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">MatrixCOO</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">n_extra</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_extra</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">extra_index</span> <span class="ow">in</span> <span class="n">numba</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_extra</span><span class="p">):</span>
@@ -741,16 +740,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCOO</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCOO</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCOO, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">MatrixCOO</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">MatrixCOO</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected MatrixCOO, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="k">return</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixCOO</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_coo_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
 
@@ -761,7 +758,9 @@ document.write(`
         <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span>
             <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_csr</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span>
+            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weight_values</span>
+        <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@property</span>
@@ -769,16 +768,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">MatrixCSR</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected MatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="k">return</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixCOO</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
 
@@ -893,7 +890,7 @@ document.write(`
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">,</span>
         <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
         <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;first_order_conservative&quot;</span><span class="p">,</span>
     <span class="p">):</span>
@@ -941,7 +938,7 @@ document.write(`
             <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">linear_weights</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">barycentric</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weight_matrix_csr</span><span class="p">(</span><span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span><span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@property</span>
@@ -949,22 +946,20 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
 
     <span class="nd">@weights</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">WeightMatrixCSR</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected WeightMatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">MatrixCSR</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected MatrixCSR, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="k">return</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">WeightMatrixCSR</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">from_weights</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">]):</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_setup_regrid</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WeightMatrixCOO</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_weights_from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixCOO</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_csr_from_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
 </pre></div>

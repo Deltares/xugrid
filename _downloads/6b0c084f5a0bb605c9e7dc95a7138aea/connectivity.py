@@ -195,7 +195,7 @@ uda.ugrid.plot.line(ax=ax, color="black")
 # %%
 # We can now use Laplace interpolation to fill the gaps in the grid.
 
-filled = uda.ugrid.laplace_interpolate(direct_solve=True)
+filled = uda.ugrid.laplace_interpolate()
 filled.ugrid.plot(cmap="gist_rainbow", vmin=2.5, vmax=7.5)
 
 # %%
