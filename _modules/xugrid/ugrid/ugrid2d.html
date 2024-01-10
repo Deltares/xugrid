@@ -409,6 +409,7 @@ document.write(`
     <span class="n">FloatDType</span><span class="p">,</span>
     <span class="n">IntArray</span><span class="p">,</span>
     <span class="n">IntDType</span><span class="p">,</span>
+    <span class="n">PolygonArray</span><span class="p">,</span>
     <span class="n">SparseMatrix</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
@@ -2397,19 +2398,59 @@ document.write(`
 
 <div class="viewcode-block" id="Ugrid2d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe of polygons to UGRID2D topology.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geodataframe: geopandas GeoDataFrame</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        topology: Ugrid2d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_shapely</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ugrid2d.from_shapely">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_shapely.html#xugrid.Ugrid2d.from_shapely">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">PolygonArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert an array of shapely polygons to UGRID2D topology.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geometry: np.ndarray of shapely polygons</span>
+<span class="sd">        crs: Any, optional</span>
+<span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        topology: Ugrid2d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">shapely</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">POLYGON</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Can only create Ugrid2d from shapely Polygon geometries, &quot;</span>
+                <span class="s2">&quot;geometry contains other types of geometries.&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">fill_value</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">polygons_to_faces</span><span class="p">(</span>
-            <span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">geometry</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.from_structured_bounds">

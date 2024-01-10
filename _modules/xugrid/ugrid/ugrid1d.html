@@ -398,7 +398,14 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">conversion</span>
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">BoolArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatDType</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
+<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BoolArray</span><span class="p">,</span>
+    <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">FloatDType</span><span class="p">,</span>
+    <span class="n">IntArray</span><span class="p">,</span>
+    <span class="n">IntDType</span><span class="p">,</span>
+    <span class="n">LineArray</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
@@ -719,24 +726,55 @@ document.write(`
 
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_geodataframe.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert geodataframe of linestrings into a UGRID1D topology.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        geodataframe: gpd.GeoDataFrame</span>
+<span class="sd">        geodataframe: geopandas GeoDataFrame</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        topology: Ugrid1d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">linestrings_to_edges</span><span class="p">(</span>
-            <span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_shapely</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ugrid1d.from_shapely">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_shapely.html#xugrid.Ugrid1d.from_shapely">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">LineArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert an array of shapely linestrings to UGRID1D topology.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        geometry: np.ndarray of shapely linestrings</span>
+<span class="sd">        crs: Any, optional</span>
+<span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">shapely</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">LINESTRING</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Can only create Ugrid1d from shapely LineString geometries, &quot;</span>
+                <span class="s2">&quot;geometry contains other types of geometries.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">linestrings_to_edges</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
         <span class="n">fill_value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
