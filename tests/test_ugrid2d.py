@@ -979,7 +979,28 @@ def test_meshkernel():
     assert isinstance(grid.meshkernel, mk.MeshKernel)
 
 
+def test_from_shapely():
+    with pytest.raises(TypeError):
+        x = np.array([0.0, 1.0, 2.0])
+        y = np.array([0.0, 0.0, 0.0])
+        xugrid.Ugrid2d.from_shapely(geometry=shapely.linestrings(x, y))
+
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 0.0],
+        ]
+    )
+    grid = xugrid.Ugrid2d.from_shapely(geometry=[shapely.polygons(xy)])
+    assert isinstance(grid, xugrid.Ugrid2d)
+
+
 def test_from_geodataframe():
+    with pytest.raises(TypeError, match="Expected GeoDataFrame"):
+        xugrid.Ugrid2d.from_geodataframe(1)
+
     xy = np.array(
         [
             [0.0, 0.0],

@@ -17,6 +17,7 @@ from xugrid.constants import (
     FloatDType,
     IntArray,
     IntDType,
+    PolygonArray,
     SparseMatrix,
 )
 from xugrid.core.utils import either_dict_or_kwargs
@@ -1917,19 +1918,56 @@ class Ugrid2d(AbstractUgrid):
         ugrid._meshkernel = _mesh_kernel
         return ugrid
 
-    @staticmethod
-    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
+    @classmethod
+    def from_geodataframe(cls, geodataframe: "geopandas.GeoDataFrame") -> "Ugrid2d":  # type: ignore # noqa
         """
         Convert a geodataframe of polygons to UGRID2D topology.
+
+        Parameters
+        ----------
+        geodataframe: geopandas GeoDataFrame
 
         Returns
         -------
         topology: Ugrid2d
         """
+        import geopandas as gpd
+
+        if not isinstance(geodataframe, gpd.GeoDataFrame):
+            raise TypeError(
+                f"Expected GeoDataFrame, received: {type(geodataframe).__name__}"
+            )
+        return cls.from_shapely(geodataframe.geometry.to_numpy(), crs=geodataframe.crs)
+
+    @staticmethod
+    def from_shapely(geometry: PolygonArray, crs=None) -> "Ugrid2d":
+        """
+        Convert an array of shapely polygons to UGRID2D topology.
+
+        Parameters
+        ----------
+        geometry: np.ndarray of shapely polygons
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        topology: Ugrid2d
+        """
+        import shapely
+
+        if not (shapely.get_type_id(geometry) == shapely.GeometryType.POLYGON).all():
+            raise TypeError(
+                "Can only create Ugrid2d from shapely Polygon geometries, "
+                "geometry contains other types of geometries."
+            )
+
         x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
-            geodataframe.geometry.to_numpy()
+            geometry
         )
-        return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=geodataframe.crs)
+        return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=crs)
 
     @staticmethod
     def from_structured_bounds(

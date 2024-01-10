@@ -6,7 +6,14 @@ import pandas as pd
 import xarray as xr
 
 from xugrid import conversion
-from xugrid.constants import BoolArray, FloatArray, FloatDType, IntArray, IntDType
+from xugrid.constants import (
+    BoolArray,
+    FloatArray,
+    FloatDType,
+    IntArray,
+    IntDType,
+    LineArray,
+)
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
@@ -311,24 +318,52 @@ class Ugrid1d(AbstractUgrid):
             self._meshkernel.mesh1d_set(self.mesh)
         return self._meshkernel
 
-    @staticmethod
-    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame") -> "Ugrid1d":  # type: ignore # noqa
+    @classmethod
+    def from_geodataframe(cls, geodataframe: "geopandas.GeoDataFrame") -> "Ugrid1d":  # type: ignore # noqa
         """
         Convert geodataframe of linestrings into a UGRID1D topology.
 
         Parameters
         ----------
-        geodataframe: gpd.GeoDataFrame
+        geodataframe: geopandas GeoDataFrame
 
         Returns
         -------
         topology: Ugrid1d
         """
-        x, y, edge_node_connectivity = conversion.linestrings_to_edges(
-            geodataframe.geometry
-        )
+        import geopandas as gpd
+
+        if not isinstance(geodataframe, gpd.GeoDataFrame):
+            raise TypeError(
+                f"Expected GeoDataFrame, received: {type(geodataframe).__name__}"
+            )
+        return cls.from_shapely(geodataframe.geometry.to_numpy(), crs=geodataframe.crs)
+
+    @staticmethod
+    def from_shapely(geometry: LineArray, crs=None) -> "Ugrid1d":
+        """
+        Convert an array of shapely linestrings to UGRID1D topology.
+
+        Parameters
+        ----------
+        geometry: np.ndarray of shapely linestrings
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
+        """
+
+        import shapely
+
+        if not (shapely.get_type_id(geometry) == shapely.GeometryType.LINESTRING).all():
+            raise TypeError(
+                "Can only create Ugrid1d from shapely LineString geometries, "
+                "geometry contains other types of geometries."
+            )
+
+        x, y, edge_node_connectivity = conversion.linestrings_to_edges(geometry)
         fill_value = -1
-        return Ugrid1d(x, y, fill_value, edge_node_connectivity, crs=geodataframe.crs)
+        return Ugrid1d(x, y, fill_value, edge_node_connectivity, crs=crs)
 
     def to_pygeos(self, dim):
         from warnings import warn

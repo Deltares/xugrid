@@ -21,6 +21,8 @@ Added
 
 - :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now also supports
   interpolation of node associated data, and Ugrid1d topologies.
+- :meth:`xugrid.Ugrid1d.from_shapely` and :meth:`xugrid.Ugrid2d.from_shapely` have
+  been added to directly instantiate UGRID topologies from arrays of shapely geometries.
 
 Changed
 ~~~~~~~
@@ -29,6 +31,9 @@ Changed
   ILU decomposition as a preconditioner. A simpler and more effective preconditioner
   is automatically used instead. The arguments have changed accordingly.
   ``direct_solve`` is now by default ``False``.
+- :meth:`xugrid.Ugrid1d.from_geodataframe` and :meth:`xugrid.Ugrid2d.from_geodataframe`
+  now check whether the geodataframe argument is a geopandas GeoDataFrame, and whether
+  the geometry types are appropriate (LineStrings for Ugrid1d, Polygons for Ugrid2d).
 
 [0.8.0] 2023-12-11
 ------------------
