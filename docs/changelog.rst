@@ -22,6 +22,14 @@ Added
 - :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now also supports
   interpolation of node associated data, and Ugrid1d topologies.
 
+Changed
+~~~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` no longer uses scipy's
+  ILU decomposition as a preconditioner. A simpler and more effective preconditioner
+  is automatically used instead. The arguments have changed accordingly.
+  ``direct_solve`` is now by default ``False``.
+
 [0.8.0] 2023-12-11
 ------------------
 
