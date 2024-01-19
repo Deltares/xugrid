@@ -1,12 +1,11 @@
 [build-system]
-requires = ["setuptools>=64.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "xugrid"
 description = "Xarray extension for unstructured grids"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-version = "0.8.0"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
 requires-python = ">=3.9"
 dependencies = [
@@ -18,6 +17,7 @@ dependencies = [
     'scipy',
     'xarray',
 ]
+dynamic = ["version"]
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Science/Research',
@@ -51,32 +51,12 @@ all = [
     'pyproj',
     'zarr',
 ]
-# pyproject.toml doesn't quite support re-use like setup.cfg did:
-# https://github.com/pypa/setuptools/issues/3221
-docs = [
-    'geopandas',
-    'matplotlib',
-    'meshkernel',
-    'netcdf4',
-    'pooch',
-    'pyproj',
-    'shapely >= 2.0',
-    'zarr',
-    'pydata-sphinx-theme',
-    'sphinx',
-    'sphinx-gallery',
-]
 
-[tool.setuptools]
-packages = [
-    "xugrid",
-    "xugrid.core",
-    "xugrid.data",
-    "xugrid.plot",
-    "xugrid.regrid",
-    "xugrid.ugrid",
-]
-license-files = ["LICENSE"]
+[tool.hatch.version]
+path = "xugrid/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["xugrid", "tests"]
 
 [tool.isort]
 profile = "black"

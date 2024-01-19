@@ -1,5 +1,3 @@
-from importlib.metadata import version as _version
-
 from xugrid import data
 from xugrid.core.common import (
     concat,
@@ -30,11 +28,7 @@ from xugrid.ugrid.snapping import snap_to_grid
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
-try:
-    __version__ = _version("xugrid")
-except Exception:
-    # Disable minimum version checks on downstream libraries.
-    __version__ = "9999"
+__version__ = "0.8.1"
 
 __all__ = (
     "data",
