@@ -7,6 +7,8 @@ Xugrid
    :target: https://app.codecov.io/gh/deltares/xugrid
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square
    :target: https://github.com/psf/black
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10534099.svg?style=flat-square
+  :target: https://doi.org/10.5281/zenodo.10534099
 
 **This is a work in progress.** `See documentation <https://deltares.github.io/xugrid/>`_.
 
