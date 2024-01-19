@@ -1,13 +1,13 @@
 Xugrid
 ======
 
-.. image:: https://img.shields.io/github/actions/workflow/status/deltares/xugrid/ci.yml?style=flat-square
+.. image:: https://img.shields.io/github/actions/workflow/status/deltares/xugrid/ci.yml
    :target: https://github.com/deltares/xugrid/actions?query=workflows%3Aci
-.. image:: https://img.shields.io/codecov/c/github/deltares/xugrid.svg?style=flat-square
+.. image:: https://img.shields.io/codecov/c/github/deltares/xugrid.svg
    :target: https://app.codecov.io/gh/deltares/xugrid
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10534099.svg?style=flat-square
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10534099.svg
   :target: https://doi.org/10.5281/zenodo.10534099
 
 **This is a work in progress.** `See documentation <https://deltares.github.io/xugrid/>`_.
