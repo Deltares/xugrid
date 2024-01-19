@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-Unreleased
-----------
+[0.8.1] 2024-01-19
+------------------
 
 Fixed
 ~~~~~
@@ -37,7 +37,6 @@ Changed
 
 [0.8.0] 2023-12-11
 ------------------
-
 
 Changed
 ~~~~~~~
