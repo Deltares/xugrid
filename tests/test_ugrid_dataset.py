@@ -177,6 +177,25 @@ class TestUgridDataArray:
         uda = xugrid.UgridDataArray.from_structured(flipped)
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
 
+    def test_from_structured_multicoord(self):
+        da = xr.DataArray(
+            data=[[0, 1], [2, 3]],
+            coords={
+                "yc": (("y", "x"), [[12.0, 11.0], [12.0, 11.0]]),
+                "xc": (("y", "x"), [[10.0, 12.0], [10.0, 12.0]]),
+            },
+            dims=("y", "x"),
+        )
+        uda = xugrid.UgridDataArray.from_structured(da)
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [-0.5, 0.5, 1.5])
+        assert np.array_equal(uda.data, [0, 1, 2, 3])
+
+        uda = xugrid.UgridDataArray.from_structured(da, x="xc", y="yc")
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
+        assert np.array_equal(uda.data, [0, 1, 2, 3])
+
     def test_unary_op(self):
         alltrue = self.uda.astype(bool)
         allfalse = alltrue.copy()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import chain
 from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
@@ -1970,21 +1972,15 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=crs)
 
     @staticmethod
-    def from_structured_bounds(
-        x_bounds: np.ndarray,
-        y_bounds: np.ndarray,
+    def _from_intervals_helper(
+        node_x: np.ndarray,
+        node_y: np.ndarray,
+        nx: int,
+        ny: int,
     ) -> "Ugrid2d":
-        nx, _ = x_bounds.shape
-        ny, _ = y_bounds.shape
-        nfaces = ny * nx
-        x = conversion.bounds_to_vertices(x_bounds)
-        y = conversion.bounds_to_vertices(y_bounds)
-
-        # Compute all vertices, these are the ugrid nodes
-        node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
         linear_index = np.arange(node_x.size, dtype=IntDType).reshape((ny + 1, nx + 1))
         # Allocate face_node_connectivity
-        face_nodes = np.empty((nfaces, 4), dtype=IntDType)
+        face_nodes = np.empty((ny * nx, 4), dtype=IntDType)
         # Set connectivity in counterclockwise manner
         face_nodes[:, 0] = linear_index[:-1, 1:].ravel()  # upper right
         face_nodes[:, 1] = linear_index[:-1, :-1].ravel()  # upper left
@@ -1993,27 +1989,157 @@ class Ugrid2d(AbstractUgrid):
         return Ugrid2d(node_x, node_y, -1, face_nodes)
 
     @staticmethod
+    def from_structured_intervals1d(
+        x_intervals: np.ndarray,
+        y_intervals: np.ndarray,
+    ) -> "Ugrid2d":
+        """
+        Create a Ugrid2d topology from a structured topology based on 1D intervals.
+
+        Parameters
+        ----------
+        x_intervals: np.ndarray of shape (M + 1,)
+            x-coordinate interval values for N row and M columns.
+        y_intervals: np.ndarray of shape (N + 1,)
+            y-coordinate interval values for N row and M columns.
+        """
+        x_intervals = np.asarray(x_intervals)
+        y_intervals = np.asarray(y_intervals)
+        nx = x_intervals.shape[0] - 1
+        ny = y_intervals.shape[0] - 1
+        node_y, node_x = (
+            a.ravel() for a in np.meshgrid(y_intervals, x_intervals, indexing="ij")
+        )
+        return Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny)
+
+    @staticmethod
+    def from_structured_intervals2d(
+        x_intervals: np.ndarray,
+        y_intervals: np.ndarray,
+    ) -> "Ugrid2d":
+        """
+        Create a Ugrid2d topology from a structured topology based on 2D intervals.
+
+        Parameters
+        ----------
+        x_intervals: np.ndarray of shape shape (N + 1, M + 1)
+            x-coordinate interval values for N row and M columns.
+        y_intervals: np.ndarray of shape shape (N + 1, M + 1)
+            y-coordinate interval values for N row and M columns.
+        """
+        x_intervals = np.asarray(x_intervals)
+        y_intervals = np.asarray(y_intervals)
+        shape = x_intervals.shape
+        if (x_intervals.ndim != 2) or (y_intervals.ndim != 2):
+            raise ValueError("Dimensions of intervals must be 2D.")
+        if shape != y_intervals.shape:
+            raise ValueError(
+                "Interval shapes must match. Found: "
+                f"x_intervals: {shape}, versus y_intervals: {y_intervals.shape}"
+            )
+        nx = shape[1] - 1
+        ny = shape[0] - 1
+        node_x = x_intervals.ravel()
+        node_y = y_intervals.ravel()
+        return Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny)
+
+    @staticmethod
+    def from_structured_bounds(
+        x_bounds: np.ndarray,
+        y_bounds: np.ndarray,
+    ) -> "Ugrid2d":
+        """
+        Create a Ugrid2d topology from a structured topology based on 1D bounds.
+
+        The bounds contain the lower and upper cell boundary for each cell.
+
+        Parameters
+        ----------
+        x_bounds: np.ndarray of shape (M, 2)
+            x-coordinate bounds for N row and M columns.
+        y_bounds: np.ndarray of shape (N, 2)
+            y-coordinate bounds for N row and M columns.
+
+        Returns
+        -------
+        grid: Ugrid2d
+        """
+        nx, _ = x_bounds.shape
+        ny, _ = y_bounds.shape
+        x = conversion.bounds_to_vertices(x_bounds)
+        y = conversion.bounds_to_vertices(y_bounds)
+        node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
+        return Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny)
+
+    @staticmethod
     def from_structured(
         data: Union[xr.DataArray, xr.Dataset],
-        x_bounds: str = None,
-        y_bounds: str = None,
+        x: str | None = None,
+        y: str | None = None,
     ) -> "Ugrid2d":
-        if x_bounds is not None and y_bounds is not None:
-            x_bounds = data[x_bounds]
-            y_bounds = data[y_bounds]
-        else:
-            x_coord, y_coord = conversion.infer_xy_coords(data)
-            x_bounds = conversion.infer_bounds(data, x_coord)
-            y_bounds = conversion.infer_bounds(data, y_coord)
-            if x_bounds is None or y_bounds is None:
+        """
+        Create a Ugrid2d topology from an axis-aligned rectilinear structured topology.
+
+        This method assumes the coordinates are 1D.
+
+        Use ``from_structured_multicoord`` for 2D x and y coordinates, e.g. for
+        (approximated) curvilinear and rotated structured topologies.
+
+        Parameters
+        ----------
+        data: xr.DataArray or xr.Dataset
+        x: str, optional
+            Name of the 1D coordinate to use as the UGRID x-coordinate.
+        y: str, optional
+            Name of the 1D coordinate to use as the UGRID y-coordinate.
+
+        Returns
+        -------
+        grid: Ugrid2d
+        """
+        if x is None or y is None:
+            x, y = conversion.infer_xy_coords(data)
+            if x is None or y is None:
                 raise ValueError(
-                    "Could not infer bounds. Please provide x_bounds and"
-                    " y_bounds explicitly."
+                    "Could not infer bounds. Please provide x and y explicitly."
                 )
-        return Ugrid2d.from_structured_bounds(
-            x_bounds.to_numpy(),
-            y_bounds.to_numpy(),
-        )
+
+        x_intervals = conversion.infer_interval_breaks1d(data, x)
+        y_intervals = conversion.infer_interval_breaks1d(data, y)
+        return Ugrid2d.from_structured_intervals1d(x_intervals, y_intervals)
+
+    @staticmethod
+    def from_structured_multicoord(
+        data: Union[xr.DataArray, xr.Dataset],
+        x: str,
+        y: str,
+    ) -> "Ugrid2d":
+        """
+        Create a Ugrid2d topology from a structured topology, including rotated
+        and (approximated) curvilinear topologies.
+
+        This method assumes the coordinates are 2D.
+
+        Use ``from_structured`` for 1D x and y coordinates, which is generally
+        the case for axis-aligned rectilinear topologies (most rasters).
+
+        Parameters
+        ----------
+        data: xr.DataArray or xr.Dataset
+        x: str
+            Name of the 2D coordinate to use as the UGRID x-coordinate.
+        y: str
+            Name of the 2D coordinate to use as the UGRID y-coordinate.
+
+        Returns
+        -------
+        grid: Ugrid2d
+        """
+        xv = conversion.infer_interval_breaks(data[x], axis=1, check_monotonic=True)
+        xv = conversion.infer_interval_breaks(xv, axis=0)
+        yv = conversion.infer_interval_breaks(data[y], axis=1)
+        yv = conversion.infer_interval_breaks(yv, axis=0, check_monotonic=True)
+        return Ugrid2d.from_structured_intervals2d(xv, yv)
 
     def to_shapely(self, dim):
         """

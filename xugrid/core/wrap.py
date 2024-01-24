@@ -230,16 +230,28 @@ class UgridDataArray(DataArrayForwardMixin):
         )
 
     @staticmethod
-    def from_structured(da: xr.DataArray):
+    def from_structured(
+        da: xr.DataArray,
+        x: str | None = None,
+        y: str | None = None,
+    ) -> "UgridDataArray":
         """
         Create a UgridDataArray from a (structured) xarray DataArray.
 
         The spatial dimensions are flattened into a single UGRID face dimension.
 
+        By default, this method looks for the "x" and "y" coordinates and assumes
+        they are one-dimensional. To convert rotated or curvilinear coordinates,
+        provide the names of the x and y coordinates.
+
         Parameters
         ----------
         da: xr.DataArray
             Last two dimensions must be ``("y", "x")``.
+        x: str, default: None
+            Which coordinate to use as the UGRID x-coordinate.
+        y: str, default: None
+            Which coordinate to use as the UGRID y-coordinate.
 
         Returns
         -------
@@ -247,7 +259,20 @@ class UgridDataArray(DataArrayForwardMixin):
         """
         if da.dims[-2:] != ("y", "x"):
             raise ValueError('Last two dimensions of da must be ("y", "x")')
-        grid = Ugrid2d.from_structured(da)
+        if (x is None) ^ (y is None):
+            raise ValueError("Provide both x and y, or neither.")
+        if x is None:
+            grid = Ugrid2d.from_structured(da)
+        else:
+            # Find out if it's multi-dimensional
+            xdim = da[x].ndim
+            if xdim == 1:
+                grid = Ugrid2d.from_structured(da, x=x, y=y)
+            elif xdim == 2:
+                grid = Ugrid2d.from_structured_multicoord(da, x=x, y=y)
+            else:
+                raise ValueError(f"x and y must be 1D or 2D. Found: {xdim}")
+
         dims = da.dims[:-2]
         coords = {k: da.coords[k] for k in dims}
         face_da = xr.DataArray(

@@ -133,48 +133,110 @@ def _array_spacing(coords, spacing):
     return halfdiff
 
 
-def _implicit_spacing(coords):
-    dim = coords.dims[0]
-    if coords.size == 1:
-        raise ValueError(
-            f"Cannot derive spacing of 1-sized coordinate: {coords.name} \n"
-            f"Set bounds yourself or assign a d{coords.name} variable with spacing"
-        )
-    halfdiff = 0.5 * abs(coords.diff(dim)).to_numpy()
-    return np.insert(halfdiff, 0, halfdiff[0])
+def _is_monotonic_and_increasing(coord, axis=0) -> bool:
+    """
+    Test if monotonic and retun whether increasing along axis.
+    Raises error if not monotonic.
+
+    Copied and slightly adapted from xarray.utils.
+
+    >>> _is_monotonic(np.array([0, 1, 2]))
+    True
+    >>> _is_monotonic(np.array([2, 1, 0]))
+    True
+    >>> _is_monotonic(np.array([0, 2, 1]))
+    False
+    """
+    coord = np.asarray(coord)
+    n = coord.shape[axis]
+    delta_pos = coord.take(np.arange(1, n), axis=axis) >= coord.take(
+        np.arange(0, n - 1), axis=axis
+    )
+    delta_neg = coord.take(np.arange(1, n), axis=axis) <= coord.take(
+        np.arange(0, n - 1), axis=axis
+    )
+    if np.all(delta_pos):
+        return True
+    elif np.all(delta_neg):
+        return False
+    else:
+        raise ValueError("The input coordinate is not monotonic.")
 
 
-def infer_bounds(
+def infer_interval_breaks(coord, axis: int = 0, check_monotonic: bool = False):
+    """
+    Infer intervals from cell center coordinates.
+
+    Copied and adapted from xarray.utils.
+
+    >>> _infer_interval_breaks(np.arange(5))
+    array([-0.5,  0.5,  1.5,  2.5,  3.5,  4.5])
+    >>> _infer_interval_breaks([[0, 1], [3, 4]], axis=1)
+    array([[-0.5,  0.5,  1.5],
+           [ 2.5,  3.5,  4.5]])
+    """
+    coord = np.asarray(coord)
+    if check_monotonic:
+        _is_monotonic_and_increasing(coord, axis=axis)
+
+    deltas = 0.5 * np.diff(coord, axis=axis)
+    if deltas.size == 0:
+        deltas = np.array(0.0)
+
+    first = np.take(coord, [0], axis=axis) - np.take(deltas, [0], axis=axis)
+    last = np.take(coord, [-1], axis=axis) + np.take(deltas, [-1], axis=axis)
+    trim_last = tuple(
+        slice(None, -1) if n == axis else slice(None) for n in range(coord.ndim)
+    )
+    interval_breaks = np.concatenate(
+        [first, coord[trim_last] + deltas, last], axis=axis
+    )
+    return interval_breaks
+
+
+def infer_interval_breaks1d(
     obj: Union[xr.DataArray, xr.Dataset],
     var: str,
-):
-    coords = obj[var]
-    index = obj.indexes[var]
-    if not (index.is_monotonic_increasing or index.is_monotonic_decreasing):
-        raise ValueError(f"{var} is not monotonic")
+) -> np.ndarray:
+    """
+    Infer the breaks for 1D coordinates.
 
-    # e.g. rioxarray will set dx, dy as (scalar) values.
+        * For non-equidistant grids, taking half of each cell size result in
+          wrong answers.
+        * Cell size may be provided by a dx or dy attribute instead.
+        * We also want to take 1-row or 1 column topologies into account.
+    """
+    coord = obj[var]
     spacing_name = f"d{var}"
+
+    # Spacing name is provided:
     if spacing_name in obj.coords:
         spacing = obj[spacing_name]
-        spacing_shape = spacing.shape
-        if len(spacing_shape) > 1:
+        if spacing.ndim > 1:
             raise NotImplementedError(
                 f"More than one dimension in spacing variable: {spacing_name}"
             )
-
-        if spacing_shape in ((), (1,)):
-            halfdiff = _scalar_spacing(coords, spacing)
+        if spacing.shape in ((), (1,)):
+            halfdiff = _scalar_spacing(coord, spacing)
         else:
-            halfdiff = _array_spacing(coords, spacing)
-    # Implicit spacing
-    else:
-        halfdiff = _implicit_spacing(coords)
+            halfdiff = _array_spacing(coord, spacing)
 
-    lower = coords - halfdiff
-    upper = coords + halfdiff
-    bounds = xr.concat([lower, upper], dim="bounds").transpose()
-    return bounds
+        # Now check if monotonic and take orientation into account.
+        if _is_monotonic_and_increasing(coord):
+            intervals = np.insert(coord + halfdiff, 0, coord[0] - halfdiff[0])
+        else:
+            intervals = np.insert(coord - halfdiff, 0, coord[0] + halfdiff[0])
+
+    # Implicit spacing, infer from coordinates instead:
+    else:
+        if coord.size == 1:
+            raise ValueError(
+                f"Cannot derive spacing of 1-sized coordinate: {var} \n"
+                f"Assign a d{var} variable with spacing instead."
+            )
+        intervals = infer_interval_breaks(coord.to_numpy(), check_monotonic=True)
+
+    return intervals
 
 
 def infer_xy_coords(obj):
