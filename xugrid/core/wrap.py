@@ -3,6 +3,7 @@ Wrap in advance instead of overloading __getattr__.
 
 This allows for tab completion and documentation.
 """
+from __future__ import annotations
 
 import types
 from collections import ChainMap
