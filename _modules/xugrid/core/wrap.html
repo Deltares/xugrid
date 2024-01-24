@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xugrid.core.wrap &#8212; Xugrid 0.8.0 documentation</title>
+    <title>xugrid.core.wrap &#8212; Xugrid 0.8.1 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
   <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
-    <script src="../../../_static/documentation_options.js?v=486e5634"></script>
+    <script src="../../../_static/documentation_options.js?v=ec16d22d"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xugrid/core/wrap';</script>
@@ -629,16 +629,28 @@ document.write(`
 <div class="viewcode-block" id="UgridDataArray.from_structured">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+        <span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a UgridDataArray from a (structured) xarray DataArray.</span>
 
 <span class="sd">        The spatial dimensions are flattened into a single UGRID face dimension.</span>
 
+<span class="sd">        By default, this method looks for the &quot;x&quot; and &quot;y&quot; coordinates and assumes</span>
+<span class="sd">        they are one-dimensional. To convert rotated or curvilinear coordinates,</span>
+<span class="sd">        provide the names of the x and y coordinates.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        da: xr.DataArray</span>
 <span class="sd">            Last two dimensions must be ``(&quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">        x: str, default: None</span>
+<span class="sd">            Which coordinate to use as the UGRID x-coordinate.</span>
+<span class="sd">        y: str, default: None</span>
+<span class="sd">            Which coordinate to use as the UGRID y-coordinate.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -646,7 +658,20 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Last two dimensions of da must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide both x and y, or neither.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Find out if it&#39;s multi-dimensional</span>
+            <span class="n">xdim</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span>
+            <span class="k">if</span> <span class="n">xdim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">xdim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_multicoord</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x and y must be 1D or 2D. Found: </span><span class="si">{</span><span class="n">xdim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">dims</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">}</span>
         <span class="n">face_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>

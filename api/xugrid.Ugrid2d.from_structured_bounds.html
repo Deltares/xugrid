@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>xugrid.Ugrid2d.from_structured_bounds &#8212; Xugrid 0.8.0 documentation</title>
+    <title>xugrid.Ugrid2d.from_structured_bounds &#8212; Xugrid 0.8.1 documentation</title>
   
   
   
@@ -40,14 +40,14 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
   <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
-    <script src="../_static/documentation_options.js?v=486e5634"></script>
+    <script src="../_static/documentation_options.js?v=ec16d22d"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.Ugrid2d.from_structured_bounds';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="xugrid.Ugrid2d.from_shapely" href="xugrid.Ugrid2d.from_shapely.html" />
-    <link rel="prev" title="xugrid.Ugrid2d.from_structured" href="xugrid.Ugrid2d.from_structured.html" />
+    <link rel="next" title="xugrid.Ugrid2d.from_structured_intervals1d" href="xugrid.Ugrid2d.from_structured_intervals1d.html" />
+    <link rel="prev" title="xugrid.Ugrid2d.from_structured_multicoord" href="xugrid.Ugrid2d.from_structured_multicoord.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -578,7 +578,10 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured.html">xugrid.Ugrid2d.from_structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_multicoord.html">xugrid.Ugrid2d.from_structured_multicoord</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.Ugrid2d.from_structured_bounds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_intervals1d.html">xugrid.Ugrid2d.from_structured_intervals1d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_intervals2d.html">xugrid.Ugrid2d.from_structured_intervals2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_shapely.html">xugrid.Ugrid2d.from_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html">xugrid.Ugrid2d.to_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.plot.html">xugrid.Ugrid2d.plot</a></li>
@@ -651,7 +654,23 @@ document.write(`
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.Ugrid2d.from_structured_bounds">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">from_structured_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.ugrid.ugrid2d.Ugrid2d"><span class="pre">Ugrid2d</span></a></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/ugrid2d.html#Ugrid2d.from_structured_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.from_structured_bounds" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Create a Ugrid2d topology from a structured topology based on 1D bounds.</p>
+<p>The bounds contain the lower and upper cell boundary for each cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_bounds</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>M</em><em>, </em><em>2</em><em>)</em>) – x-coordinate bounds for N row and M columns.</p></li>
+<li><p><strong>y_bounds</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>2</em><em>)</em>) – y-coordinate bounds for N row and M columns.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>grid</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="xugrid.Ugrid2d.html#xugrid.Ugrid2d" title="xugrid.Ugrid2d">Ugrid2d</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -666,20 +685,20 @@ document.write(`
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="xugrid.Ugrid2d.from_structured.html"
+       href="xugrid.Ugrid2d.from_structured_multicoord.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">xugrid.Ugrid2d.from_structured</p>
+        <p class="prev-next-title">xugrid.Ugrid2d.from_structured_multicoord</p>
       </div>
     </a>
     <a class="right-next"
-       href="xugrid.Ugrid2d.from_shapely.html"
+       href="xugrid.Ugrid2d.from_structured_intervals1d.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">xugrid.Ugrid2d.from_shapely</p>
+        <p class="prev-next-title">xugrid.Ugrid2d.from_structured_intervals1d</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
