@@ -578,10 +578,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured.html">xugrid.Ugrid2d.from_structured</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_multicoord.html">xugrid.Ugrid2d.from_structured_multicoord</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_bounds.html">xugrid.Ugrid2d.from_structured_bounds</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_intervals1d.html">xugrid.Ugrid2d.from_structured_intervals1d</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_intervals2d.html">xugrid.Ugrid2d.from_structured_intervals2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_shapely.html">xugrid.Ugrid2d.from_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html">xugrid.Ugrid2d.to_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.plot.html">xugrid.Ugrid2d.plot</a></li>
@@ -653,19 +650,12 @@ document.write(`
 <h1>xugrid.UgridDataArray.from_structured<a class="headerlink" href="#xugrid-ugriddataarray-from-structured" title="Link to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.UgridDataArray.from_structured">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">UgridDataArray.</span></span><span class="sig-name descname"><span class="pre">from_structured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></span><a class="reference internal" href="../_modules/xugrid/core/wrap.html#UgridDataArray.from_structured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray.from_structured" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">UgridDataArray.</span></span><span class="sig-name descname"><span class="pre">from_structured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataArray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/core/wrap.html#UgridDataArray.from_structured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArray.from_structured" title="Link to this definition">#</a></dt>
 <dd><p>Create a UgridDataArray from a (structured) xarray DataArray.</p>
 <p>The spatial dimensions are flattened into a single UGRID face dimension.</p>
-<p>By default, this method looks for the “x” and “y” coordinates and assumes
-they are one-dimensional. To convert rotated or curvilinear coordinates,
-provide the names of the x and y coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>da</strong> (<em>xr.DataArray</em>) – Last two dimensions must be <code class="docutils literal notranslate"><span class="pre">(&quot;y&quot;,</span> <span class="pre">&quot;x&quot;)</span></code>.</p></li>
-<li><p><strong>x</strong> (<em>str</em><em>, </em><em>default: None</em>) – Which coordinate to use as the UGRID x-coordinate.</p></li>
-<li><p><strong>y</strong> (<em>str</em><em>, </em><em>default: None</em>) – Which coordinate to use as the UGRID y-coordinate.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>da</strong> (<em>xr.DataArray</em>) – Last two dimensions must be <code class="docutils literal notranslate"><span class="pre">(&quot;y&quot;,</span> <span class="pre">&quot;x&quot;)</span></code>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>unstructured</strong></p>
