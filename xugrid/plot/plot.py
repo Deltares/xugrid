@@ -673,31 +673,3 @@ class _PlotMethods:
     @functools.wraps(tripcolor)
     def tripcolor(self, *args, **kwargs):
         return tripcolor(self.grid, self.darray, *args, **kwargs)
-
-    def to_holoviews(self):
-        import holoviews
-        import pandas as pd
-
-        grid = self.grid
-        da = self.darray
-        (_, _, triangles), index = grid.triangulation
-        name = getattr(da, "name", "data")
-
-        vertices = pd.DataFrame(
-            data=grid.node_coordinates,
-            columns=("x", "y"),
-        )
-        triangles = pd.DataFrame(
-            data=triangles,
-            columns=("v0", "v1", "v2"),
-        )
-
-        dim = get_ugrid_dim(grid, da)
-        if dim == NODE:
-            vertices[name] = da
-        elif dim == FACE:
-            triangles[name] = da.isel({grid.face_dimension: index})
-        else:
-            raise ValueError("only supports data on nodes or faces")
-
-        return holoviews.TriMesh((triangles, vertices))
