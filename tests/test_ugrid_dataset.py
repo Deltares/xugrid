@@ -928,6 +928,10 @@ def test_concat():
     with pytest.raises(ValueError, match="All UgridDataArrays must have the same grid"):
         xugrid.concat([uda1, uda3], dim="layer")
 
+    # test issue 206 resolved
+    # https://github.com/Deltares/xugrid/issues/206
+    result = xugrid.concat([uda1, uda2.copy()], dim="foo")
+    assert len(result.grids) == 1
 
 def test_multiple_topology_errors():
     # Create a dataset with two UGRID topologies:
