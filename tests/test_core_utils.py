@@ -7,11 +7,12 @@ Hence, Xarray provides no guarantees on breaking changes.
 Xarray is licensed under Apache License 2.0:
 https://github.com/pydata/xarray/blob/main/LICENSE
 """
-import pytest
 import numpy as np
+import pytest
 
-from xugrid.core.utils import either_dict_or_kwargs, unique_grids
 import xugrid
+from xugrid.core.utils import either_dict_or_kwargs, unique_grids
+
 
 def grid1d(dataset=None, indexes=None, crs=None, attrs=None):
     xy = np.array(

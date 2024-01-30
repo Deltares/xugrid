@@ -15,9 +15,9 @@ from pandas import RangeIndex
 
 import xugrid
 from xugrid.conversion import grid_from_dataset, grid_from_geodataframe
+from xugrid.core.utils import unique_grids
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType, align
-from xugrid.core.utils import unique_grids
 
 # Import entire module here for circular import of UgridDatasetAccessor and
 # UgridDataArrayAccessor. Note: can only be used in functions (since that code

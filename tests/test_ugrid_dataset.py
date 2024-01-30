@@ -933,6 +933,7 @@ def test_concat():
     result = xugrid.concat([uda1, uda2.copy()], dim="foo")
     assert len(result.grids) == 1
 
+
 def test_multiple_topology_errors():
     # Create a dataset with two UGRID topologies:
     uds = ugrid1d_ds()
