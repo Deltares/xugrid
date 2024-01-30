@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Hashable, Mapping
 from typing import Any, TypeVar, cast
+from xugrid.ugrid.ugridbase import UgridType
 
 T = TypeVar("T")
 
@@ -55,3 +56,17 @@ class UncachedAccessor:
             return self._accessor
 
         return self._accessor(obj)  # type: ignore  # assume it is a valid accessor!
+
+def partition(grids: list[UgridType]):
+    parts = []
+    for item in grids:
+        for part in parts:
+            if item == part[0]:
+               part.append(item)
+               break
+        else:
+            parts.append([item])
+    return parts
+
+def unique_grids(grids: list[UgridType]):
+    return [p[0] for p in partition(grids)]
