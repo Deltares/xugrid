@@ -443,3 +443,36 @@ def test_connectivity_matrix():
     assert isinstance(connectivity, sparse.csr_matrix)
     assert np.allclose(connectivity.data, [1.5, 1.5, 0.75, 0.75])
     assert np.array_equal(connectivity.indices, [1, 0, 2, 1])
+
+
+def test_equals():
+    grid = grid1d()
+    grid_copy = grid1d()
+    assert grid.equals(grid)
+    assert grid.equals(grid_copy)
+    xr_grid = grid.to_dataset()
+    assert not grid.equals(xr_grid)
+    grid_copy.attrs["attr"] = "something_else"
+    assert grid.equals(grid_copy)
+
+
+def test_identical():
+    grid = grid1d()
+    grid_copy = grid1d()
+    assert grid.identical(grid)
+    assert grid.identical(grid_copy)
+    xr_grid = grid.to_dataset()
+    assert not grid.identical(xr_grid)
+    grid_copy.attrs["attr"] = "something_else"
+    assert not grid.identical(grid_copy)
+
+
+def test_eq():
+    grid = grid1d()
+    grid_copy = grid1d()
+    assert grid == grid
+    assert grid == grid_copy
+    xr_grid = grid.to_dataset()
+    assert grid != xr_grid
+    grid_copy.attrs["attr"] = "something_else"
+    assert grid != grid_copy
