@@ -394,6 +394,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
+<span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">unique_grids</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
 
 <span class="n">DATAARRAY_NAME</span> <span class="o">=</span> <span class="s2">&quot;__xarray_dataarray_name__&quot;</span>
@@ -502,7 +503,7 @@ document.write(`
 
             <span class="n">bare_objs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
 
-        <span class="n">grids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
+        <span class="n">grids</span> <span class="o">=</span> <span class="n">unique_grids</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">bare_objs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
