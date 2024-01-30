@@ -72,4 +72,8 @@ def partition(grids: list[UgridType]):
 
 
 def unique_grids(grids: list[UgridType]):
+    """
+    Find uniques in list of unhashable elements.
+    Source: https://stackoverflow.com/a/54964373
+    """
     return [p[0] for p in partition(grids)]
