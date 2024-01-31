@@ -59,21 +59,12 @@ class UncachedAccessor:
         return self._accessor(obj)  # type: ignore  # assume it is a valid accessor!
 
 
-def partition(grids: list[UgridType]):
-    parts = []
-    for item in grids:
-        for part in parts:
-            if item.equals(part[0]):
-                part.append(item)
+def unique_grids(grids: list[UgridType]) -> list[UgridType]:
+    uniques: list[UgridType] = []
+    for grid in grids:
+        for unique in uniques:
+            if grid.equals(unique):
                 break
         else:
-            parts.append([item])
-    return parts
-
-
-def unique_grids(grids: list[UgridType]):
-    """
-    Find uniques in list of unhashable elements.
-    Source: https://stackoverflow.com/a/54964373
-    """
-    return [p[0] for p in partition(grids)]
+            uniques.append(grid)
+    return uniques
