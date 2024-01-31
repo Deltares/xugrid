@@ -453,26 +453,5 @@ def test_equals():
     xr_grid = grid.to_dataset()
     assert not grid.equals(xr_grid)
     grid_copy.attrs["attr"] = "something_else"
-    assert grid.equals(grid_copy)
-
-
-def test_identical():
-    grid = grid1d()
-    grid_copy = grid1d()
-    assert grid.identical(grid)
-    assert grid.identical(grid_copy)
-    xr_grid = grid.to_dataset()
-    assert not grid.identical(xr_grid)
-    grid_copy.attrs["attr"] = "something_else"
-    assert not grid.identical(grid_copy)
-
-
-def test_eq():
-    grid = grid1d()
-    grid_copy = grid1d()
-    assert grid == grid
-    assert grid == grid_copy
-    xr_grid = grid.to_dataset()
-    assert grid != xr_grid
-    grid_copy.attrs["attr"] = "something_else"
-    assert grid != grid_copy
+    # Dataset.identical is called so returns False
+    assert not grid.equals(grid_copy)

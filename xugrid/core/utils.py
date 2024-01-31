@@ -63,7 +63,7 @@ def partition(grids: list[UgridType]):
     parts = []
     for item in grids:
         for part in parts:
-            if item == part[0]:
+            if item.equals(part[0]):
                 part.append(item)
                 break
         else:

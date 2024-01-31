@@ -84,14 +84,6 @@ def align(obj, grids, old_indexes):
     return obj, new_grids
 
 
-def to_xr_if_possible(other):
-    # Test if to_dataset method is present
-    if hasattr(other, "to_dataset") and callable(other.to_dataset):
-        return other.to_dataset()
-    else:
-        return other
-
-
 class AbstractUgrid(abc.ABC):
     @abc.abstractproperty
     def topology_dimension():
@@ -280,28 +272,14 @@ class AbstractUgrid(abc.ABC):
         else:
             return self.to_dataset().__repr__()
 
-    def __eq__(self, other) -> bool:
-        return self.identical(other)
-
     def equals(self, other) -> bool:
         if other is self:
             return True
-        elif not isinstance(other, type(self)):
-            return False
-        else:
+        elif isinstance(other, type(self)):
             xr_self = self.to_dataset()
-            other_maybe_xr = to_xr_if_possible(other)
-            return xr_self.equals(other_maybe_xr)
-
-    def identical(self, other) -> bool:
-        if other is self:
-            return True
-        elif not isinstance(other, type(self)):
-            return False
-        else:
-            xr_self = self.to_dataset()
-            other_maybe_xr = to_xr_if_possible(other)
-            return xr_self.identical(other_maybe_xr)
+            xr_other = other.to_dataset()
+            return xr_self.identical(xr_other)
+        return False
 
     def copy(self):
         """Create a deepcopy."""
