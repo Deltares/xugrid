@@ -979,6 +979,84 @@ def test_meshkernel():
     assert isinstance(grid.meshkernel, mk.MeshKernel)
 
 
+def test_from_structured_intervals1d():
+    grid = xugrid.Ugrid2d.from_structured_intervals1d(
+        x_intervals=[0.0, 1.0, 2.0],
+        y_intervals=[2.0, 1.0, 0.0],
+    )
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 4
+
+
+def test_from_structured_intervals2d():
+    with pytest.raises(ValueError, match="Dimensions of intervals must be 2D."):
+        xugrid.Ugrid2d.from_structured_intervals2d(
+            x_intervals=[0.0, 1.0, 2.0],
+            y_intervals=[2.0, 1.0, 0.0],
+        )
+    with pytest.raises(ValueError, match="Interval shapes must match."):
+        xugrid.Ugrid2d.from_structured_intervals2d(
+            x_intervals=[[0.0, 1.0, 2.0]],
+            y_intervals=[[2.0, 1.0, 0.0, 4.0]],
+        )
+
+    grid = xugrid.Ugrid2d.from_structured_intervals2d(
+        x_intervals=[[0.0, 1.0, 2.0], [0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
+        y_intervals=[
+            [2.0, 1.0, 0.0],
+            [2.0, 1.0, 0.0],
+            [2.0, 1.0, 0.0],
+        ],
+    )
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 4
+
+
+def test_from_structured_bounds():
+    x_vertices = np.array([1.0, 3.0, 5.0, 7.0, 9.0])
+    y_vertices = np.array([2.5, 7.5, 12.5, 17.5])
+    # Ascending
+    x_bounds = np.column_stack((x_vertices[:-1], x_vertices[1:]))
+    y_bounds = np.column_stack((y_vertices[:-1], y_vertices[1:]))
+    grid = xugrid.Ugrid2d.from_structured_bounds(x_bounds, y_bounds)
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 12
+
+
+def test_from_structured():
+    da = xr.DataArray(
+        data=np.ones((2, 2)),
+        coords={"y": [12.0, 11.0], "x": [1.0, 2.0]},
+        dims=("y", "x"),
+    )
+    grid = xugrid.Ugrid2d.from_structured(da)
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 4
+
+    da = xr.DataArray(
+        data=np.ones((2, 2)),
+        coords={"lat": [12.0, 11.0], "lon": [1.0, 2.0]},
+        dims=("lat", "lon"),
+    )
+    grid = xugrid.Ugrid2d.from_structured(da, x="lon", y="lat")
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 4
+
+
+def test_form_structured_multicoord():
+    da = xr.DataArray(
+        data=np.ones((2, 2)),
+        coords={
+            "yc": (("y", "x"), [[12.0, 11.0], [13.0, 12.0]]),
+            "xc": (("y", "x"), [[1.0, 2.0], [2.0, 3.0]]),
+        },
+        dims=("y", "x"),
+    )
+    grid = xugrid.Ugrid2d.from_structured_multicoord(da, x="xc", y="yc")
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 4
+
+
 def test_from_shapely():
     with pytest.raises(TypeError):
         x = np.array([0.0, 1.0, 2.0])

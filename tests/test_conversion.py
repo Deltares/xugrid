@@ -130,6 +130,56 @@ def test_faces_geos_roundtrip__mixed(mixed_mesh):
     _faces_geos_roundtrip(mixed_mesh)
 
 
+def test_is_monotonic_and_increasing():
+    with pytest.raises(ValueError):
+        cv._is_monotonic_and_increasing([0.0, -1.0, 2.0])
+    with pytest.raises(ValueError):
+        cv._is_monotonic_and_increasing([2.0, 0.0, 1.0])
+
+    assert cv._is_monotonic_and_increasing([0.0, 1.0, 2.0])
+    assert not cv._is_monotonic_and_increasing([2.0, 1.0, 0.0])
+
+    ascending = np.array(
+        [
+            [0.0, 1.0, 2.0],
+            [3.0, 4.0, 5.0],
+            [6.0, 7.0, 8.0],
+        ]
+    )
+    descending = np.array(
+        [
+            [8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0],
+            [2.0, 1.0, 0.0],
+        ]
+    )
+    assert cv._is_monotonic_and_increasing(ascending, axis=0)
+    assert cv._is_monotonic_and_increasing(ascending, axis=1)
+    assert not cv._is_monotonic_and_increasing(descending, axis=1)
+    assert not cv._is_monotonic_and_increasing(descending, axis=1)
+
+
+def test_infer_interval_breaks():
+    assert np.allclose([-0.5, 0.5, 1.5], cv.infer_interval_breaks([0, 1]))
+    assert np.allclose(
+        [-0.5, 0.5, 5.0, 9.5, 10.5], cv.infer_interval_breaks([0, 1, 9, 10])
+    )
+
+    xref, yref = np.meshgrid(np.arange(6), np.arange(5))
+    cx = (xref[1:, 1:] + xref[:-1, :-1]) / 2
+    cy = (yref[1:, 1:] + yref[:-1, :-1]) / 2
+    x = cv.infer_interval_breaks(cx, axis=1)
+    x = cv.infer_interval_breaks(x, axis=0)
+    y = cv.infer_interval_breaks(cy, axis=1)
+    y = cv.infer_interval_breaks(y, axis=0)
+    np.testing.assert_allclose(xref, x)
+    np.testing.assert_allclose(yref, y)
+
+    # test that ValueError is raised for non-monotonic 1D inputs
+    with pytest.raises(ValueError):
+        cv.infer_interval_breaks(np.array([0, 2, 1]), check_monotonic=True)
+
+
 def test_scalar_spacing(structured_mesh_ascending, structured_mesh_descending):
     upcoords = structured_mesh_ascending.coords["x"]
     downcoords = structured_mesh_descending.coords["x"]
@@ -163,34 +213,25 @@ def test_implicit_spacing(structured_mesh_ascending, structured_mesh_descending)
         ["y", "x"],
     )
     with pytest.raises(ValueError, match="Cannot derive spacing of 1-sized coordinate"):
-        cv._implicit_spacing(da.coords["y"])
+        cv.infer_interval_breaks1d(da, "y")
 
-    upcoords = structured_mesh_ascending.coords["x"]
-    downcoords = structured_mesh_descending.coords["x"]
-    assert np.allclose(cv._implicit_spacing(upcoords), 1.0)
-    assert np.allclose(cv._implicit_spacing(downcoords), 1.0)
+    actual = cv.infer_interval_breaks1d(structured_mesh_ascending, "x")
+    assert np.allclose(actual, [1.0, 3.0, 5.0, 7.0, 9.0])
+    actual = cv.infer_interval_breaks1d(structured_mesh_descending, "x")
+    assert np.allclose(actual, [9.0, 7.0, 5.0, 3.0, 1.0])
 
 
 @pytest.mark.parametrize("spacing_type", ["implicit", "scalar", "array"])
-def test_infer_bounds(
+def test_infer_breaks_intervals1d(
     structured_mesh_ascending, structured_mesh_descending, spacing_type
 ):
     up = structured_mesh_ascending
     down = structured_mesh_descending
     x_expected = np.array(
-        [
-            [1.0, 3.0],
-            [3.0, 5.0],
-            [5.0, 7.0],
-            [7.0, 9.0],
-        ]
+        [1.0, 3.0, 5.0, 7.0, 9.0],
     )
     y_expected = np.array(
-        [
-            [2.5, 7.5],
-            [7.5, 12.5],
-            [12.5, 17.5],
-        ]
+        [2.5, 7.5, 12.5, 17.5],
     )
 
     if spacing_type == "scalar":
@@ -200,21 +241,21 @@ def test_infer_bounds(
         up = up.assign_coords({"dx": ("x", [2.0] * 4), "dy": ("y", [5.0] * 3)})
         down = down.assign_coords({"dx": ("x", [2.0] * 4), "dy": ("y", [5.0] * 3)})
 
-    assert np.allclose(cv.infer_bounds(up, "x"), x_expected)
-    assert np.allclose(cv.infer_bounds(up, "y"), y_expected)
-    assert np.allclose(cv.infer_bounds(down, "x"), x_expected[::-1])
-    assert np.allclose(cv.infer_bounds(down, "y"), y_expected[::-1])
+    assert np.allclose(cv.infer_interval_breaks1d(up, "x"), x_expected)
+    assert np.allclose(cv.infer_interval_breaks1d(up, "y"), y_expected)
+    assert np.allclose(cv.infer_interval_breaks1d(down, "x"), x_expected[::-1])
+    assert np.allclose(cv.infer_interval_breaks1d(down, "y"), y_expected[::-1])
 
 
-def test_infer_bounds_errors(structured_mesh_ascending):
+def test_infer_breaks_intervals1d_errors(structured_mesh_ascending):
     up = structured_mesh_ascending
     up = up.assign_coords(x=[2.0, 4.0, 3.0, 8.0])
 
-    with pytest.raises(ValueError, match="x is not monotonic"):
-        cv.infer_bounds(up, "x")
+    with pytest.raises(ValueError, match="The input coordinate is not monotonic."):
+        cv.infer_interval_breaks1d(up, "x")
 
 
-def test_bounds_to_vertices(structured_mesh_ascending, structured_mesh_descending):
+def test_bounds_to_vertices():
     with pytest.raises(ValueError, match="Bounds are not monotonic"):
         cv.bounds_to_vertices(
             xr.DataArray(
@@ -222,20 +263,20 @@ def test_bounds_to_vertices(structured_mesh_ascending, structured_mesh_descendin
             )
         )
 
-    up = structured_mesh_ascending
-    down = structured_mesh_descending
     x_vertices = np.array([1.0, 3.0, 5.0, 7.0, 9.0])
     y_vertices = np.array([2.5, 7.5, 12.5, 17.5])
     # Ascending
-    x_bounds = cv.infer_bounds(up, "x")
-    y_bounds = cv.infer_bounds(up, "y")
+    x_bounds = np.column_stack((x_vertices[:-1], x_vertices[1:]))
+    y_bounds = np.column_stack((y_vertices[:-1], y_vertices[1:]))
     assert np.allclose(cv.bounds_to_vertices(x_bounds), x_vertices)
     assert np.allclose(cv.bounds_to_vertices(y_bounds), y_vertices)
     # Descending
-    x_bounds = cv.infer_bounds(down, "x")
-    y_bounds = cv.infer_bounds(down, "y")
-    assert np.allclose(cv.bounds_to_vertices(x_bounds), x_vertices[::-1])
-    assert np.allclose(cv.bounds_to_vertices(y_bounds), y_vertices[::-1])
+    xrev = x_vertices[::-1]
+    yrev = y_vertices[::-1]
+    x_bounds = np.column_stack((xrev[1:], xrev[:-1]))
+    y_bounds = np.column_stack((yrev[1:], yrev[:-1]))
+    assert np.allclose(cv.bounds_to_vertices(x_bounds), xrev)
+    assert np.allclose(cv.bounds_to_vertices(y_bounds), yrev)
 
 
 def test_infer_xy_coords():
