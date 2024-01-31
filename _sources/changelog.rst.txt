@@ -9,10 +9,19 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Fixed
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.equals` and :meth:`xugrid.Ugrid1d.equals` test if
+  dataset is equal instead of testing type.
+- Fixed bug in :func:`xugrid.concat` and :func:`xugrid.merge` where multiple
+  grids were returned if grids did not point to the same object id (i.e.
+  copies).
+
 Added
 ~~~~~
 
-- :meth:`xugrid.Ugrid2.from_structured_multicoord` has been added
+- :meth:`xugrid.Ugrid2d.from_structured_multicoord` has been added
   to generate UGRID topologies from rotated or approximated curvilinear grids.
 - :meth:`xugrid.Ugrid2d.from_structured_intervals1d` has been added to generate
   UGRID topologies from "intervals": the N + 1 vertex coordinates for N faces.
