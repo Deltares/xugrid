@@ -98,7 +98,7 @@ def test_init_errors():
     with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
         xugrid.UgridDataArray(0, GRID())
     with pytest.raises(TypeError, match="grid must be Ugrid1d or Ugrid2d"):
-        .copy(), 0)
+        xugrid.UgridDataArray(DARRAY(), 0)
 
     with pytest.raises(ValueError, match="At least either obj or grids is required"):
         xugrid.UgridDataset()
@@ -1263,6 +1263,7 @@ def test_laplace_interpolate_1d():
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
     assert isinstance(actual, xugrid.UgridDataArray)
     assert np.allclose(actual, 1.0)
+
 
 def test_ugriddataset_wrap_twice():
     _ = xugrid.UgridDataset(UGRID_DS)
