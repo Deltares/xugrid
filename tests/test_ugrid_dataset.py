@@ -976,7 +976,7 @@ def test_merge():
     assert len(merged.grids) == 2
 
 
-def get_ugrid_fillvaluem999_startindex1():
+def get_ugrid_fillvaluem999_startindex1_ds():
     """
     Return a minimal dataset with a specific fill value.
 
@@ -1139,12 +1139,14 @@ def get_ugrid_fillvaluem999_startindex1():
     # add dummy nodevar to plot and trigger triangulation procedure
     nodevar = np.ones(shape=(ds2.dims[mesh2d_attrs["node_dimension"]]))
     ds2["mesh2d_nodevar"] = xr.DataArray(nodevar, dims=(mesh2d_attrs["node_dimension"]))
+    return ds2
 
+
+def get_ugrid_fillvaluem999_startindex1_uds():
     # upon loading a dataset from a file, xarray decodes it, so we also do it here
+    ds2 = get_ugrid_fillvaluem999_startindex1_ds()
     ds2_enc = xr.decode_cf(ds2)
-
     uds = xugrid.UgridDataset(ds2_enc)
-
     return uds
 
 
@@ -1156,7 +1158,7 @@ def test_fm_fillvalue_startindex_isel():
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
-    uds = get_ugrid_fillvaluem999_startindex1()
+    uds = get_ugrid_fillvaluem999_startindex1_uds()
 
     # xugrid 0.6.0 raises "ValueError: Invalid edge_node_connectivity"
     uds.isel({uds.grid.face_dimension: [1]})
@@ -1170,7 +1172,7 @@ def test_fm_facenodeconnectivity_fillvalue():
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
-    uds = get_ugrid_fillvaluem999_startindex1()
+    uds = get_ugrid_fillvaluem999_startindex1_uds()
 
     # xugrid 0.6.0 has -2 values in the array
     assert (uds.grid.face_node_connectivity != -2).all()
