@@ -1266,5 +1266,5 @@ def test_laplace_interpolate_1d():
 
 
 def test_ugriddataset_wrap_twice():
-    _ = xugrid.UgridDataset(UGRID_DS)
-    _ = xugrid.UgridDataset(UGRID_DS)
+    _ = xugrid.UgridDataset(UGRID_DS())
+    _ = xugrid.UgridDataset(UGRID_DS())
