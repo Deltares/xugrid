@@ -1267,6 +1267,16 @@ def test_laplace_interpolate_1d():
     assert np.allclose(actual, 1.0)
 
 
-def test_ugriddataset_wrap_twice():
-    _ = xugrid.UgridDataset(UGRID_DS())
-    _ = xugrid.UgridDataset(UGRID_DS())
+def test_ugriddataset_wrap_twice(tmp_path):
+    """
+    in issue https://github.com/Deltares/xugrid/issues/208 wrapping a ds
+    twice with UgridDataset gave unexpected behaviour. This tests ensures
+    that future changes will not cause that again.
+    """
+    ds_raw = get_ugrid_fillvaluem999_startindex1_ds()
+    file_nc = tmp_path / "ugrid_fillvaluem999_startindex1.nc"
+    ds_raw.to_netcdf(file_nc)
+    ds = xr.open_dataset(file_nc)
+
+    _ = xugrid.UgridDataset(ds)
+    _ = xugrid.UgridDataset(ds)
