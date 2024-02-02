@@ -389,7 +389,7 @@ class AbstractUgrid(abc.ABC):
         if start_index not in (0, 1):
             raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
 
-        data = da.to_numpy()
+        data = da.to_numpy().copy()
         # If xarray detects a _FillValue, it converts the array to floats and
         # replaces the fill value by NaN, and moves the _FillValue to
         # da.encoding.
