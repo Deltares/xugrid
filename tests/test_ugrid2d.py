@@ -291,6 +291,20 @@ def test_ugrid2d_dataset_roundtrip():
     assert grid2._dataset == ds
 
 
+def test_ugrid2d_dataset_no_mutation():
+    grid = grid2d()
+    ds = grid.to_dataset()
+    ds2 = ds.copy()
+    # Test a non-default fill value
+    face_nodes = ds2["mesh2d_face_nodes"]
+    face_nodes = face_nodes.where(face_nodes != -1, other=-999)
+    face_nodes.attrs["_FillValue"] = -999
+    ds2["mesh2d_face_nodes"] = face_nodes
+    reference = ds2.copy()
+    xugrid.Ugrid2d.from_dataset(ds2)
+    assert ds2.identical(reference)
+
+
 def test_ugrid2d_from_meshkernel():
     # Setup a meshkernel Mesh2d mimick
     class Mesh2d(NamedTuple):

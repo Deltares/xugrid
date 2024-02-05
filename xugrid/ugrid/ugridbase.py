@@ -397,13 +397,14 @@ class AbstractUgrid(abc.ABC):
             is_fill = data == da.attrs["_FillValue"]
         else:
             is_fill = np.isnan(data)
+        # Set the fill_value before casting: otherwise the cast may fail.
         data[is_fill] = fill_value
+        cast = data.astype(dtype, copy=False)
 
-        cast = data.astype(dtype, copy=True)
+        not_fill = ~is_fill
         if start_index:
-            cast -= start_index
-        cast[is_fill] = fill_value
-        if (cast[~is_fill] < 0).any():
+            cast[not_fill] -= start_index
+        if (cast[not_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
