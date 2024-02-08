@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Union
 
 import numba as nb
@@ -16,15 +18,9 @@ from xugrid.constants import FloatArray, IntArray, MissingOptionalModule
 
 try:
     import shapely
+
 except ImportError:
     shapely = MissingOptionalModule("shapely")
-
-
-POINT = shapely.GeometryType.POINT
-LINESTRING = shapely.GeometryType.LINESTRING
-LINEARRING = shapely.GeometryType.LINEARRING
-POLYGON = shapely.GeometryType.POLYGON
-GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
 
 
 @nb.njit(inline="always")
@@ -228,7 +224,7 @@ def _burn_lines(
 def burn_vector_geometry(
     gdf: "geopandas.GeoDataframe",  # type: ignore # noqa
     like: Union["xugrid.Ugrid2d", "xugrid.UgridDataArray", "xugrid.UgridDataset"],
-    column: str = None,
+    column: str | None = None,
     fill: Union[int, float] = np.nan,
     all_touched: bool = False,
 ) -> None:
@@ -244,7 +240,7 @@ def burn_vector_geometry(
         Polygons, points, and/or lines to be burned into the grid.
     like: UgridDataArray, UgridDataset, or Ugrid2d
         Grid to burn the vector data into.
-    column: str
+    column: str, optional
         Name of the geodataframe column of which to the values to burn into
         grid.
     fill: int, float, optional, default value ``np.nan``.
@@ -258,6 +254,12 @@ def burn_vector_geometry(
     burned: UgridDataArray
     """
     import geopandas as gpd
+
+    POINT = shapely.GeometryType.POINT
+    LINESTRING = shapely.GeometryType.LINESTRING
+    LINEARRING = shapely.GeometryType.LINEARRING
+    POLYGON = shapely.GeometryType.POLYGON
+    GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
 
     if not isinstance(gdf, gpd.GeoDataFrame):
         raise TypeError(f"gdf must be GeoDataFrame, received: {type(like).__name__}")
