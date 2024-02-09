@@ -271,7 +271,7 @@ def _infer_dims(
                             f" with dimensions: {var_dims}"
                         )
             elif isinstance(key, int):
-                dim_size = ds.dims[dim]
+                dim_size = ds.sizes[dim]
                 if not dim_size == key:
                     raise UgridDimensionError(
                         f"Expected size {key} for dimension {dim} in variable "
