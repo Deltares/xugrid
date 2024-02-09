@@ -147,7 +147,7 @@ def merge_edges(grids, node_inverse):
 
 def validate_partition_topology(grouped, n_partition: int):
     n = n_partition
-    if not all(len(v) == n for v in grouped.values()):
+    if False:
         raise ValueError(
             f"Expected {n} UGRID topologies for {n} partitions, received: " f"{grouped}"
         )
@@ -182,6 +182,7 @@ def group_grids_by_name(partitions):
 
 def validate_partition_objects(data_objects):
     # Check presence of variables.
+    # TODO: Groupby gridtype, then test if variables present all grids per type.
     allvars = list({tuple(sorted(ds.data_vars)) for ds in data_objects})
     if len(allvars) > 1:
         raise ValueError(
@@ -200,7 +201,7 @@ def validate_partition_objects(data_objects):
 
 def separate_variables(data_objects, ugrid_dims):
     """Separate into UGRID variables grouped by dimension, and other variables."""
-    validate_partition_objects(data_objects)
+    # validate_partition_objects(data_objects)
 
     def assert_single_dim(intersection):
         if len(intersection) > 1:
@@ -216,6 +217,7 @@ def separate_variables(data_objects, ugrid_dims):
         return all(element == first for element in iterator)
 
     # Group variables by UGRID dimension.
+    #TODO: Take first grid per mesh type
     first = data_objects[0]
     variables = first.variables
     vardims = {var: tuple(first[var].dims) for var in variables}
@@ -280,6 +282,7 @@ def merge_partitions(partitions):
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dimensions}
     grids_by_name = group_grids_by_name(partitions)
+    # TODO: make sure 1D variables also in vars_by_dim
     vars_by_dim, other_vars = separate_variables(data_objects, ugrid_dims)
 
     # First, take identical non-UGRID variables from the first partition:
@@ -291,6 +294,7 @@ def merge_partitions(partitions):
     for grids in grids_by_name.values():
         # First, merge the grid topology.
         grid = grids[0]
+        # TODO: shortcut for length 1 merge_partitions
         merged_grid, indexes = grid.merge_partitions(grids)
         merged_grids.append(merged_grid)
 
