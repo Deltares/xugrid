@@ -1133,11 +1133,11 @@ def get_ugrid_fillvaluem999_startindex1_ds():
     )
 
     # add dummy face variable in order to have a face dimension in the uds
-    facevar = np.ones(shape=(ds2.dims[mesh2d_attrs["face_dimension"]]))
+    facevar = np.ones(shape=(ds2.sizes[mesh2d_attrs["face_dimension"]]))
     ds2["mesh2d_facevar"] = xr.DataArray(facevar, dims=(mesh2d_attrs["face_dimension"]))
 
     # add dummy nodevar to plot and trigger triangulation procedure
-    nodevar = np.ones(shape=(ds2.dims[mesh2d_attrs["node_dimension"]]))
+    nodevar = np.ones(shape=(ds2.sizes[mesh2d_attrs["node_dimension"]]))
     ds2["mesh2d_nodevar"] = xr.DataArray(nodevar, dims=(mesh2d_attrs["node_dimension"]))
     return ds2
 
