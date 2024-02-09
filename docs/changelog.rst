@@ -17,6 +17,8 @@ Fixed
 - Fixed bug in :func:`xugrid.concat` and :func:`xugrid.merge` where multiple
   grids were returned if grids did not point to the same object id (i.e.
   copies).
+- Fixed bug in :meth:`xugrid.Ugrid1d.merge_partitions`, which caused
+  ``ValueError: indexes must be provided for attrs``.
 
 Added
 ~~~~~
