@@ -24,6 +24,17 @@ def generate_mesh_2d(nx, ny, name="mesh2d"):
     return xu.Ugrid2d(*np.array(points).T, -1, np.array(connectivity), name=name)
 
 
+def generate_mesh_1d(n, name="mesh1d"):
+    points = [
+        (p,p) for p in np.linspace(0, n, n+1)
+    ]
+    connectivity = [
+        [it, it+1] for it in range(n)
+    ]
+    
+    return xu.Ugrid1d(*np.array(points).T, -1, np.array(connectivity), name=name)
+
+
 def test_labels_to_indices():
     labels = np.array([0, 1, 0, 2, 2])
     indices = pt.labels_to_indices(labels)
@@ -159,7 +170,7 @@ class TestDatasetPartition:
         assert np.bincount(merged["face_z"] == 1).all()
 
 
-class TestMultiTopologyMergePartitions:
+class TestMultiTopology2DMergePartitions:
     @pytest.fixture(autouse=True)
     def setup(self):
         grid_a = generate_mesh_2d(2, 3, "first")
@@ -220,3 +231,54 @@ class TestMultiTopologyMergePartitions:
             TypeError, match="All partition topologies with name second"
         ):
             pt.merge_partitions([self.datasets[0], dataset3])
+
+class TestMergeDataset1D:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        grid = generate_mesh_1d(6, "mesh1d")
+        # TODO: If partitioning implented for 1D grids, replace with that.
+        i_edges = [[0,1,2], [3,4,5]]
+        parts = [grid.isel(mesh1d_nEdges=np.array(ls)) for ls in i_edges]
+
+        datasets = []
+        for i, part in enumerate(parts):
+            ds = xu.UgridDataset(grids=[part])
+            ds["a"] = ((part.edge_dimension), np.arange(part.n_edge))
+            ds["c"] = i
+            datasets.append(ds)
+
+        self.datasets = datasets
+
+    def test_merge_partitions(self):
+        merged = pt.merge_partitions(self.datasets)
+        assert isinstance(merged, xu.UgridDataset)
+        assert len(merged.ugrid.grids) == 1
+        # In case of non-UGRID data, it should default to the first partition:
+        assert merged["c"] == 0
+
+class TestMultiTopology1D2DMergePartitions:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        grid_a = generate_mesh_2d(2, 3, "mesh2d")
+        grid_b = generate_mesh_1d(6, "mesh1d")
+        parts_a = grid_a.partition(n_part=2)
+        # TODO: If partitioning implented for 1D grids, replace with that.
+        i_edges = [[0,1,2], [3,4,5]]
+        parts_b = [grid_b.isel(mesh1d_nEdges=np.array(ls)) for ls in i_edges]
+
+        datasets = []
+        for i, (part_a, part_b) in enumerate(zip(parts_a, parts_b)):
+            ds = xu.UgridDataset(grids=[part_a, part_b])
+            ds["a"] = ((part_a.face_dimension), np.arange(part_a.n_face))
+            ds["b"] = ((part_b.edge_dimension), np.arange(part_b.n_edge))
+            ds["c"] = i
+            datasets.append(ds)
+
+        self.datasets = datasets
+
+    def test_merge_partitions(self):
+        merged = pt.merge_partitions(self.datasets)
+        assert isinstance(merged, xu.UgridDataset)
+        assert len(merged.ugrid.grids) == 2
+        # In case of non-UGRID data, it should default to the first partition:
+        assert merged["c"] == 0
