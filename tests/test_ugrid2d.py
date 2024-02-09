@@ -1378,12 +1378,13 @@ def test_equals():
     grid_copy.attrs["attr"] = "something_else"
     assert not grid.equals(grid_copy)
 
+
 def test_equals_connectivity_mismatch():
     grid = grid2d()
     grid_copy = grid2d()
-    # perturbate 
+    # perturbate
     copy_dataset = grid_copy.to_dataset()
-    copy_dataset["mesh2d_face_nodes"].to_numpy()[2,1] += 1
-    copy_dataset["mesh2d_face_nodes"].to_numpy()[3,1] -= 1
+    copy_dataset["mesh2d_face_nodes"].to_numpy()[2, 1] += 1
+    copy_dataset["mesh2d_face_nodes"].to_numpy()[3, 1] -= 1
     grid_copy = type(grid).from_dataset(copy_dataset)
     assert not grid.equals(grid_copy)
