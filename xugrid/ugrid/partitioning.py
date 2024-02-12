@@ -180,6 +180,22 @@ def group_grids_by_name(partitions):
     return grouped
 
 
+def group_data_objects_by_gridname(partitions):
+    # Convert to dataset for convenience
+    data_objects = [partition.obj for partition in partitions]
+    data_objects = [
+        obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
+        for obj in data_objects
+    ]
+
+    grouped = defaultdict(list)
+    for partition, obj in zip(partitions, data_objects):
+        for grid in partition.grids:
+            grouped[grid.name].append(obj)
+
+    return grouped
+
+
 def validate_partition_objects(data_objects):
     # Check presence of variables.
     # TODO: Groupby gridtype, then test if variables present all grids per type.
@@ -199,7 +215,7 @@ def validate_partition_objects(data_objects):
             )
 
 
-def separate_variables(data_objects, ugrid_dims):
+def separate_variables(objects_by_gridname, ugrid_dims):
     """Separate into UGRID variables grouped by dimension, and other variables."""
     # validate_partition_objects(data_objects)
 
@@ -217,30 +233,42 @@ def separate_variables(data_objects, ugrid_dims):
         return all(element == first for element in iterator)
 
     # Group variables by UGRID dimension.
-    #TODO: Take first grid per mesh type
-    first = data_objects[0]
-    variables = first.variables
-    vardims = {var: tuple(first[var].dims) for var in variables}
     grouped = defaultdict(list)  # UGRID associated vars
-    other = []  # other vars
-    for var, da in variables.items():
-        shapes = (obj[var].shape for obj in data_objects)
+    other = defaultdict(list)  # other vars
 
-        # Check if variable depends on UGRID dimension.
-        intersection = ugrid_dims.intersection(da.dims)
-        if intersection:
-            assert_single_dim(intersection)
-            # Now check whether the non-UGRID dimensions match.
-            dim = intersection.pop()  # Get the single element in the set.
-            axis = vardims[var].index(dim)
-            shapes = [remove_item(shape, axis) for shape in shapes]
-            if all_equal(shapes):
-                grouped[dim].append(var)
+    for gridname, data_objects in objects_by_gridname.items():
+        first = data_objects[0]
+        variables = first.variables
+        vardims = {var: tuple(first[var].dims) for var in variables}
+        for var, da in variables.items():
+            shapes = (obj[var].shape for obj in data_objects)
 
-        elif all_equal(shapes):
-            other.append(var)
+            # Check if variable depends on UGRID dimension.
+            intersection = ugrid_dims.intersection(da.dims)
+            if intersection:
+                assert_single_dim(intersection)
+                # Now check whether the non-UGRID dimensions match.
+                dim = intersection.pop()  # Get the single element in the set.
+                axis = vardims[var].index(dim)
+                shapes = [remove_item(shape, axis) for shape in shapes]
+                if all_equal(shapes):
+                    grouped[dim].append(var)
+
+            elif all_equal(shapes):
+                other[gridname].append(var)
 
     return grouped, other
+
+
+def maybe_pad_connectivity_dims_to_max(selection, merged_grid):
+    nmax_dict = merged_grid.max_connectivity_dimensions
+    nmax_dict = {key: value for key, value in nmax_dict.items() if key in selection[0].dims}
+    if not nmax_dict:
+        return selection
+    
+    pad_width_ls = [{dim: (0, nmax - obj.sizes[dim]) for dim, nmax in nmax_dict.items()} for obj in selection]
+
+    return [obj.pad(pad_width = pad_width) for obj, pad_width in zip(selection, pad_width_ls)]
 
 
 def merge_partitions(partitions):
@@ -272,27 +300,23 @@ def merge_partitions(partitions):
     if obj_type not in (UgridDataArray, UgridDataset):
         raise TypeError(msg.format(obj_type.__name__))
 
-    # Convert to dataset for convenience
-    data_objects = [partition.obj for partition in partitions]
-    data_objects = [
-        obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
-        for obj in data_objects
-    ]
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dimensions}
     grids_by_name = group_grids_by_name(partitions)
     # TODO: make sure 1D variables also in vars_by_dim
-    vars_by_dim, other_vars = separate_variables(data_objects, ugrid_dims)
+    data_objects_by_name = group_data_objects_by_gridname(partitions)
+    vars_by_dim, other_vars_by_name = separate_variables(data_objects_by_name, ugrid_dims)
 
     # First, take identical non-UGRID variables from the first partition:
-    merged = data_objects[0][other_vars]
+    merged = xr.Dataset() # data_objects[0][other_vars]
 
     # Merge the UGRID topologies into one, and find the indexes to index into
     # the data to avoid duplicates.
     merged_grids = []
-    for grids in grids_by_name.values():
+    for grids, data_objects, other_vars in zip(grids_by_name.values(), data_objects_by_name.values(), other_vars_by_name.values()):
         # First, merge the grid topology.
+        merged.update(data_objects[0][other_vars])
         grid = grids[0]
         # TODO: shortcut for length 1 merge_partitions
         merged_grid, indexes = grid.merge_partitions(grids)
@@ -305,7 +329,9 @@ def merge_partitions(partitions):
                 obj[vars].isel({dim: index}, missing_dims="ignore")
                 for obj, index in zip(data_objects, dim_indexes)
             ]
-            merged_selection = xr.concat(selection, dim=dim)
+            selection_padded = maybe_pad_connectivity_dims_to_max(selection, merged_grid)
+
+            merged_selection = xr.concat(selection_padded, dim=dim)
             merged.update(merged_selection)
 
     return UgridDataset(merged, merged_grids)
