@@ -31,6 +31,11 @@ Added
   UGRID topologies from "intervals": the (M + 1, N + 1) vertex coordinates for N faces.
 - :meth:`xugrid.UgridDataArrayAccessor.from_structured` now takes ``x`` and ``y``
   arguments to specify which coordinates to use as the UGRID x and y coordinates.
+- :attr:`xugrid.UgridDataset.sizes` as an alternative to :attr:`xugrid.UgridDataset.dimensions`
+- :attr:`xugrid.Ugrid2d.max_face_node_dimension` which returns the dimension
+  name designating nodes per face.
+- :attr:`xugrid.AbstractUgrid.max_connectivity_dimensions` which returns all
+  maximum connectivity dimensions and their corresponding size.
 
 Changed
 ~~~~~~~
