@@ -19,6 +19,8 @@ Fixed
   copies).
 - Fixed bug in :meth:`xugrid.Ugrid1d.merge_partitions`, which caused
   ``ValueError: indexes must be provided for attrs``.
+- :func:`xugrid.merge_partitions` merges partitions with grids not contained in
+  other partitions.
 
 Added
 ~~~~~
