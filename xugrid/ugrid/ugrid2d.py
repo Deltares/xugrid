@@ -418,6 +418,16 @@ class Ugrid2d(AbstractUgrid):
         }
 
     @property
+    def max_face_node_dimension(self):
+        return self._attrs["max_face_nodes_dimension"]
+
+    @property
+    def max_connectivity_dimensions(self):
+        return {
+            self.max_face_node_dimension: self.n_max_node_per_face,
+        }
+
+    @property
     def topology_dimension(self):
         """Highest dimensionality of the geometric elements: 2"""
         return 2

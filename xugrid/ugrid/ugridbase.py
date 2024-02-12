@@ -300,6 +300,14 @@ class AbstractUgrid(abc.ABC):
         return self._attrs["edge_dimension"]
 
     @property
+    def max_connectivity_dimensions(self):
+        return {}
+
+    @property
+    def sizes(self):
+        return self.dimensions
+
+    @property
     def node_coordinates(self) -> FloatArray:
         """Coordinates (x, y) of the nodes (vertices)"""
         return np.column_stack([self.node_x, self.node_y])
