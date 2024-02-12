@@ -976,7 +976,7 @@ def test_merge():
     assert len(merged.grids) == 2
 
 
-def get_ugrid_fillvaluem999_startindex1():
+def get_ugrid_fillvaluem999_startindex1_ds():
     """
     Return a minimal dataset with a specific fill value.
 
@@ -1133,18 +1133,20 @@ def get_ugrid_fillvaluem999_startindex1():
     )
 
     # add dummy face variable in order to have a face dimension in the uds
-    facevar = np.ones(shape=(ds2.dims[mesh2d_attrs["face_dimension"]]))
+    facevar = np.ones(shape=(ds2.sizes[mesh2d_attrs["face_dimension"]]))
     ds2["mesh2d_facevar"] = xr.DataArray(facevar, dims=(mesh2d_attrs["face_dimension"]))
 
     # add dummy nodevar to plot and trigger triangulation procedure
-    nodevar = np.ones(shape=(ds2.dims[mesh2d_attrs["node_dimension"]]))
+    nodevar = np.ones(shape=(ds2.sizes[mesh2d_attrs["node_dimension"]]))
     ds2["mesh2d_nodevar"] = xr.DataArray(nodevar, dims=(mesh2d_attrs["node_dimension"]))
+    return ds2
 
+
+def get_ugrid_fillvaluem999_startindex1_uds():
     # upon loading a dataset from a file, xarray decodes it, so we also do it here
+    ds2 = get_ugrid_fillvaluem999_startindex1_ds()
     ds2_enc = xr.decode_cf(ds2)
-
     uds = xugrid.UgridDataset(ds2_enc)
-
     return uds
 
 
@@ -1156,7 +1158,7 @@ def test_fm_fillvalue_startindex_isel():
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
-    uds = get_ugrid_fillvaluem999_startindex1()
+    uds = get_ugrid_fillvaluem999_startindex1_uds()
 
     # xugrid 0.6.0 raises "ValueError: Invalid edge_node_connectivity"
     uds.isel({uds.grid.face_dimension: [1]})
@@ -1170,7 +1172,7 @@ def test_fm_facenodeconnectivity_fillvalue():
     """
 
     # xugrid 0.5.0 warns "RuntimeWarning: invalid value encountered in cast: cast = data.astype(dtype, copy=True)"
-    uds = get_ugrid_fillvaluem999_startindex1()
+    uds = get_ugrid_fillvaluem999_startindex1_uds()
 
     # xugrid 0.6.0 has -2 values in the array
     assert (uds.grid.face_node_connectivity != -2).all()
@@ -1263,3 +1265,19 @@ def test_laplace_interpolate_1d():
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
     assert isinstance(actual, xugrid.UgridDataArray)
     assert np.allclose(actual, 1.0)
+
+
+def test_ugriddataset_wrap_twice(tmp_path):
+    """
+    in issue https://github.com/Deltares/xugrid/issues/208 wrapping a ds
+    twice with UgridDataset resulted in "ValueError: connectivity contains negative values",
+    because the original connectivity array in the xarray dataset was altered.
+    This tests ensures that future changes will not cause this issue again.
+    """
+    ds_raw = get_ugrid_fillvaluem999_startindex1_ds()
+    file_nc = tmp_path / "ugrid_fillvaluem999_startindex1.nc"
+    ds_raw.to_netcdf(file_nc)
+    ds = xr.open_dataset(file_nc)
+
+    _ = xugrid.UgridDataset(ds)
+    _ = xugrid.UgridDataset(ds)
