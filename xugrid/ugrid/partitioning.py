@@ -262,13 +262,20 @@ def separate_variables(objects_by_gridname, ugrid_dims):
 
 def maybe_pad_connectivity_dims_to_max(selection, merged_grid):
     nmax_dict = merged_grid.max_connectivity_dimensions
-    nmax_dict = {key: value for key, value in nmax_dict.items() if key in selection[0].dims}
+    nmax_dict = {
+        key: value for key, value in nmax_dict.items() if key in selection[0].dims
+    }
     if not nmax_dict:
         return selection
-    
-    pad_width_ls = [{dim: (0, nmax - obj.sizes[dim]) for dim, nmax in nmax_dict.items()} for obj in selection]
 
-    return [obj.pad(pad_width = pad_width) for obj, pad_width in zip(selection, pad_width_ls)]
+    pad_width_ls = [
+        {dim: (0, nmax - obj.sizes[dim]) for dim, nmax in nmax_dict.items()}
+        for obj in selection
+    ]
+
+    return [
+        obj.pad(pad_width=pad_width) for obj, pad_width in zip(selection, pad_width_ls)
+    ]
 
 
 def merge_partitions(partitions):
@@ -306,15 +313,21 @@ def merge_partitions(partitions):
     grids_by_name = group_grids_by_name(partitions)
     # TODO: make sure 1D variables also in vars_by_dim
     data_objects_by_name = group_data_objects_by_gridname(partitions)
-    vars_by_dim, other_vars_by_name = separate_variables(data_objects_by_name, ugrid_dims)
+    vars_by_dim, other_vars_by_name = separate_variables(
+        data_objects_by_name, ugrid_dims
+    )
 
     # First, take identical non-UGRID variables from the first partition:
-    merged = xr.Dataset() # data_objects[0][other_vars]
+    merged = xr.Dataset()  # data_objects[0][other_vars]
 
     # Merge the UGRID topologies into one, and find the indexes to index into
     # the data to avoid duplicates.
     merged_grids = []
-    for grids, data_objects, other_vars in zip(grids_by_name.values(), data_objects_by_name.values(), other_vars_by_name.values()):
+    for grids, data_objects, other_vars in zip(
+        grids_by_name.values(),
+        data_objects_by_name.values(),
+        other_vars_by_name.values(),
+    ):
         # First, merge the grid topology.
         merged.update(data_objects[0][other_vars])
         grid = grids[0]
@@ -329,7 +342,9 @@ def merge_partitions(partitions):
                 obj[vars].isel({dim: index}, missing_dims="ignore")
                 for obj, index in zip(data_objects, dim_indexes)
             ]
-            selection_padded = maybe_pad_connectivity_dims_to_max(selection, merged_grid)
+            selection_padded = maybe_pad_connectivity_dims_to_max(
+                selection, merged_grid
+            )
 
             merged_selection = xr.concat(selection_padded, dim=dim)
             merged.update(merged_selection)
