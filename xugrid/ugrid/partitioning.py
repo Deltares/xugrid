@@ -207,9 +207,12 @@ def validate_partition_objects(objects_by_gridname):
                     f"{vardims_ls[0]} versus {vardims_ls[1]}"
                 )
 
+
 def validate_vars_in_all_data_objects(vars, data_objects, gridname):
     for var in vars:
-        var_in_objects = [True if var in obj.variables else False for obj in data_objects]
+        var_in_objects = [
+            True if var in obj.variables else False for obj in data_objects
+        ]
         if not all(var_in_objects):
             raise ValueError(
                 f"'{var}' does not occur not in all partitions with '{gridname}'"

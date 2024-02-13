@@ -139,7 +139,10 @@ class TestDatasetPartition:
 
         grid1 = partitions[1].ugrid.grid
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))
-        with pytest.raises(ValueError, match="'extra' does not occur not in all partitions with 'mesh2d'"):
+        with pytest.raises(
+            ValueError,
+            match="'extra' does not occur not in all partitions with 'mesh2d'",
+        ):
             pt.merge_partitions(partitions)
 
         partitions = self.uds.ugrid.partition(n_part=2)
@@ -208,7 +211,9 @@ class TestMultiTopology2DMergePartitions:
     def test_merge_partitions__errors(self):
         pa = self.datasets[0][["a"]] * xr.DataArray([1.0, 1.0], dims=("error_dim",))
         pb = self.datasets[1][["a"]]
-        with pytest.raises(ValueError, match="Dimensions for 'a' do not match across partitions: "):
+        with pytest.raises(
+            ValueError, match="Dimensions for 'a' do not match across partitions: "
+        ):
             pt.merge_partitions([pa, pb])
 
         grid_a = self.datasets[1].ugrid.grids[0].copy()
@@ -353,4 +358,3 @@ class TestMultiTopology1D2DMergePartitions:
         assert merged["c"] == 1
 
         assert self.dataset_expected.equals(merged)
-
