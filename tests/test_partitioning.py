@@ -260,7 +260,8 @@ class TestMergeDataset1D:
         merged = pt.merge_partitions(self.datasets_partitioned)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 1
-        # In case of non-UGRID data, it should default to the first partition:
+        # In case of non-UGRID data, it should default to the first partition of
+        # the grid that's checked last.
         assert merged["c"] == 0
 
         assert self.dataset_expected.ugrid.grid.equals(merged.ugrid.grid)
@@ -289,7 +290,13 @@ class TestMultiTopology1D2DMergePartitions:
             ds["a"] = ((part_a.face_dimension), values_a)
             ds["b"] = ((part_b.edge_dimension), values_b)
             ds["c"] = i
-            datasets_parts.append(ds)
+
+            coords = {
+                part_a.face_dimension: values_a,
+                part_b.edge_dimension: values_b,
+            }
+
+            datasets_parts.append(ds.assign_coords(**coords))
 
         ds_expected = xu.UgridDataset(grids=[grid_a, grid_b])
         ds_expected["a"] = ((grid_a.face_dimension), np.concatenate(values_parts_a))
@@ -297,8 +304,8 @@ class TestMultiTopology1D2DMergePartitions:
         ds_expected["c"] = 0
         # Assign coordinates also added during merge_partitions
         coords = {
-            grid_a.face_dimension: np.arange(grid_a.n_face),
-            grid_b.edge_dimension: np.arange(grid_b.n_edge),
+            grid_a.face_dimension: np.concatenate(values_parts_a),
+            grid_b.edge_dimension: np.concatenate(values_parts_b),
         }
         ds_expected = ds_expected.assign_coords(**coords)
 
@@ -309,13 +316,14 @@ class TestMultiTopology1D2DMergePartitions:
         merged = pt.merge_partitions(self.datasets_parts)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 2
-        # In case of non-UGRID data, it should default to the first partition:
+        # In case of non-UGRID data, it should default to the first partition of
+        # the grid that's checked last.
         assert merged["c"] == 0
 
         assert self.dataset_expected.equals(merged)
 
     def test_merge_partitions_inconsistent_grid_types(self):
-        self.datasets_parts[0] = self.datasets_parts[0].drop_vars("b")
+        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(["b", "mesh1d_nEdges"])
         b = self.dataset_expected["b"].isel(mesh1d_nEdges=[0, 1, 2])
         self.dataset_expected = self.dataset_expected.drop_vars(["b", "mesh1d_nEdges"])
         self.dataset_expected["b"] = b
@@ -324,8 +332,8 @@ class TestMultiTopology1D2DMergePartitions:
         merged = pt.merge_partitions(self.datasets_parts)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 2
-        # In case of non-UGRID data, it should default to the first partition in
-        # the last grid:
+        # In case of non-UGRID data, it should default to the first partition of
+        # the grid that's checked last.
         assert merged["c"] == 1
 
         assert self.dataset_expected.equals(merged)
