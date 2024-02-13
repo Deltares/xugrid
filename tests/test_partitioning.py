@@ -192,11 +192,6 @@ class TestMultiTopology2DMergePartitions:
         assert merged["c"] == 0
 
     def test_merge_partitions__errors(self):
-        pa = self.datasets[0][["a"]]
-        pb = self.datasets[1][["b"]]
-        with pytest.raises(ValueError, match="Expected 2 UGRID topologies"):
-            pt.merge_partitions([pa, pb])
-
         grid_a = self.datasets[1].ugrid.grids[0].copy()
         grid_c = self.datasets[1].ugrid.grids[1].copy()
         grid_c._attrs["face_dimension"] = "abcdef"
@@ -322,8 +317,10 @@ class TestMultiTopology1D2DMergePartitions:
 
         assert self.dataset_expected.equals(merged)
 
-    def test_merge_partitions_inconsistent_grid_types(self):
-        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(["b", "mesh1d_nEdges"])
+    def test_merge_partitions__inconsistent_grid_types(self):
+        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(
+            ["b", "mesh1d_nEdges"]
+        )
         b = self.dataset_expected["b"].isel(mesh1d_nEdges=[0, 1, 2])
         self.dataset_expected = self.dataset_expected.drop_vars(["b", "mesh1d_nEdges"])
         self.dataset_expected["b"] = b
@@ -338,3 +335,8 @@ class TestMultiTopology1D2DMergePartitions:
 
         assert self.dataset_expected.equals(merged)
 
+    def test_merge_partitions__errors(self):
+        pa = self.datasets_parts[0][["a"]] * xr.DataArray([1.0, 1.0], dims=("error_dim",))
+        pb = self.datasets_parts[1][["a"]]
+        with pytest.raises(ValueError, match="Dimensions for 'a' do not match across partitions: "):
+            pt.merge_partitions([pa, pb])
