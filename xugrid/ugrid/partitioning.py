@@ -233,18 +233,17 @@ def separate_variables(objects_by_gridname, ugrid_dims):
         return all(element == first for element in iterator)
 
     # Group variables by UGRID dimension.
-    grouped = defaultdict(list)  # UGRID associated vars
-    other = defaultdict(list)  # other vars
+    grouped = defaultdict(set)  # UGRID associated vars
+    other = defaultdict(set)  # other vars
 
     for gridname, data_objects in objects_by_gridname.items():
-        first = data_objects[0]
-        variables = first.variables
-        vardims = {var: tuple(first[var].dims) for var in variables}
+        variables = {varname: data for obj in data_objects for varname, data in obj.variables.items()}
+        vardims = {varname: data.dims for varname, data in variables.items()}
         for var, da in variables.items():
-            shapes = (obj[var].shape for obj in data_objects)
+            shapes = [obj[var].shape for obj in data_objects if var in obj]
 
             # Check if variable depends on UGRID dimension.
-            intersection = ugrid_dims.intersection(da.dims)
+            intersection = ugrid_dims.intersection(vardims[var])
             if intersection:
                 assert_single_dim(intersection)
                 # Now check whether the non-UGRID dimensions match.
@@ -252,10 +251,10 @@ def separate_variables(objects_by_gridname, ugrid_dims):
                 axis = vardims[var].index(dim)
                 shapes = [remove_item(shape, axis) for shape in shapes]
                 if all_equal(shapes):
-                    grouped[dim].append(var)
+                    grouped[dim].add(var)
 
             elif all_equal(shapes):
-                other[gridname].append(var)
+                other[gridname].add(var)
 
     return grouped, other
 
@@ -311,14 +310,14 @@ def merge_partitions(partitions):
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dimensions}
     grids_by_name = group_grids_by_name(partitions)
-    # TODO: make sure 1D variables also in vars_by_dim
+
     data_objects_by_name = group_data_objects_by_gridname(partitions)
     vars_by_dim, other_vars_by_name = separate_variables(
         data_objects_by_name, ugrid_dims
     )
 
     # First, take identical non-UGRID variables from the first partition:
-    merged = xr.Dataset()  # data_objects[0][other_vars]
+    merged = xr.Dataset()
 
     # Merge the UGRID topologies into one, and find the indexes to index into
     # the data to avoid duplicates.
@@ -331,16 +330,20 @@ def merge_partitions(partitions):
         # First, merge the grid topology.
         merged.update(data_objects[0][other_vars])
         grid = grids[0]
-        # TODO: shortcut for length 1 merge_partitions
+
         merged_grid, indexes = grid.merge_partitions(grids)
         merged_grids.append(merged_grid)
 
         # Now remove duplicates, then concatenate along the UGRID dimension.
         for dim, dim_indexes in indexes.items():
             vars = vars_by_dim[dim]
+            if len(vars) == 0:
+                continue
+            first_var = next(iter(vars))
+            objects_indexes_to_select = [(obj[vars], index) for obj, index in zip(data_objects, dim_indexes) if first_var in obj]
             selection = [
                 obj[vars].isel({dim: index}, missing_dims="ignore")
-                for obj, index in zip(data_objects, dim_indexes)
+                for obj, index in objects_indexes_to_select
             ]
             selection_padded = maybe_pad_connectivity_dims_to_max(
                 selection, merged_grid
