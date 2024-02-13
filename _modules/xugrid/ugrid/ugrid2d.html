@@ -824,6 +824,16 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_face_node_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;max_face_nodes_dimension&quot;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_connectivity_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_face_node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 2&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">2</span>
