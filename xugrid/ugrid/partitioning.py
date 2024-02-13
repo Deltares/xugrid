@@ -207,6 +207,14 @@ def validate_partition_objects(objects_by_gridname):
                     f"{vardims_ls[0]} versus {vardims_ls[1]}"
                 )
 
+def validate_vars_in_all_data_objects(vars, data_objects, gridname):
+    for var in vars:
+        var_in_objects = [True if var in obj.variables else False for obj in data_objects]
+        if not all(var_in_objects):
+            raise ValueError(
+                f"'{var}' does not occur not in all partitions with '{gridname}'"
+            )
+
 
 def separate_variables(objects_by_gridname, ugrid_dims):
     """Separate into UGRID variables grouped by dimension, and other variables."""
@@ -319,23 +327,26 @@ def merge_partitions(partitions):
     # Merge the UGRID topologies into one, and find the indexes to index into
     # the data to avoid duplicates.
     merged_grids = []
-    for grids, data_objects, other_vars in zip(
-        grids_by_name.values(),
-        data_objects_by_name.values(),
-        other_vars_by_name.values(),
-    ):
-        # First, merge the grid topology.
-        merged.update(data_objects[0][other_vars])
-        grid = grids[0]
+    for gridname, grids in grids_by_name.items():
+        data_objects = data_objects_by_name[gridname]
+        other_vars = other_vars_by_name[gridname]
 
+        # First, merge the grid topology.
+        grid = grids[0]
         merged_grid, indexes = grid.merge_partitions(grids)
         merged_grids.append(merged_grid)
+
+        # Add all other vars to dataset
+        for obj in data_objects:
+            other_vars_obj = set(other_vars).intersection(set(obj.data_vars))
+            merged.update(obj[other_vars_obj])
 
         # Now remove duplicates, then concatenate along the UGRID dimension.
         for dim, dim_indexes in indexes.items():
             vars = vars_by_dim[dim]
             if len(vars) == 0:
                 continue
+            validate_vars_in_all_data_objects(vars, data_objects, gridname)
             first_var = next(iter(vars))
             objects_indexes_to_select = [
                 (obj[vars], index)
