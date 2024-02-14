@@ -228,7 +228,7 @@ def validate_vars_in_all_data_objects(
     return None
 
 
-def separate_variables(objects_by_gridname, ugrid_dims):
+def separate_variables(objects_by_gridname: defaultdict[str, xr.Dataset], ugrid_dims: set[str]):
     """Separate into UGRID variables grouped by dimension, and other variables."""
     validate_partition_objects(objects_by_gridname)
 
@@ -348,7 +348,7 @@ def merge_partitions(partitions):
         merged_grid, indexes = grid.merge_partitions(grids)
         merged_grids.append(merged_grid)
 
-        # Add all other vars to dataset
+        # Add other vars, unassociated with UGRID dimensions, to dataset.
         for obj in data_objects:
             other_vars_obj = set(other_vars).intersection(set(obj.data_vars))
             merged.update(obj[other_vars_obj])
