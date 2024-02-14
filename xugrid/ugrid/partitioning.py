@@ -9,6 +9,7 @@ import xarray as xr
 from xugrid.constants import IntArray, IntDType
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.ugrid.connectivity import renumber
+from xugrid.ugrid.ugridbase import UgridType
 
 
 def labels_to_indices(labels: IntArray) -> List[IntArray]:
@@ -145,7 +146,7 @@ def merge_edges(grids, node_inverse):
     return _merge_connectivity(all_edges, slices)
 
 
-def validate_partition_topology(grouped):
+def validate_partition_topology(grouped: defaultdict[str, UgridType]) -> None:
     for name, grids in grouped.items():
         types = {type(grid) for grid in grids}
         if len(types) > 1:
@@ -164,7 +165,7 @@ def validate_partition_topology(grouped):
     return None
 
 
-def group_grids_by_name(partitions):
+def group_grids_by_name(partitions: list[UgridDataset]) -> defaultdict[str, UgridType]:
     grouped = defaultdict(list)
     for partition in partitions:
         for grid in partition.grids:
@@ -174,7 +175,7 @@ def group_grids_by_name(partitions):
     return grouped
 
 
-def group_data_objects_by_gridname(partitions):
+def group_data_objects_by_gridname(partitions: list[UgridDataset]) -> defaultdict[str, xr.Dataset]:
     # Convert to dataset for convenience
     data_objects = [partition.obj for partition in partitions]
     data_objects = [
@@ -190,7 +191,7 @@ def group_data_objects_by_gridname(partitions):
     return grouped
 
 
-def validate_partition_objects(objects_by_gridname):
+def validate_partition_objects(objects_by_gridname: defaultdict[str, xr.Dataset]) -> None:
     for data_objects in objects_by_gridname.values():
         allvars = list({tuple(sorted(ds.data_vars)) for ds in data_objects})
         unique_vars = set(chain(*allvars))
@@ -206,9 +207,10 @@ def validate_partition_objects(objects_by_gridname):
                     f"Dimensions for '{var}' do not match across partitions: "
                     f"{vardims_ls[0]} versus {vardims_ls[1]}"
                 )
+    return None
 
 
-def validate_vars_in_all_data_objects(vars, data_objects, gridname):
+def validate_vars_in_all_data_objects(vars: list[str], data_objects: list[xr.Dataset], gridname: str):
     for var in vars:
         var_in_objects = [
             True if var in obj.variables else False for obj in data_objects
@@ -217,6 +219,7 @@ def validate_vars_in_all_data_objects(vars, data_objects, gridname):
             raise ValueError(
                 f"'{var}' does not occur not in all partitions with '{gridname}'"
             )
+    return None
 
 
 def separate_variables(objects_by_gridname, ugrid_dims):
