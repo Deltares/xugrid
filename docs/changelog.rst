@@ -19,8 +19,6 @@ Fixed
   copies).
 - Fixed bug in :meth:`xugrid.Ugrid1d.merge_partitions`, which caused
   ``ValueError: indexes must be provided for attrs``.
-- :func:`xugrid.merge_partitions` now also merges datasets with grids that are
-  only contained in some of the partition datasets.
 
 Added
 ~~~~~
@@ -47,8 +45,8 @@ Changed
 
 - :meth:`xugrid.Ugrid2d.from_structured` now takes ``x`` and ``y`` arguments instead
   of ``x_bounds`` and ``y_bounds`` arguments.
-- :func:`xugrid.merge_partitions` allows merging partitions with different grids
-  per partition.
+- :func:`xugrid.merge_partitions` now also merges datasets with grids that are
+  only contained in some of the partition datasets.
 
 [0.8.1] 2024-01-19
 ------------------
