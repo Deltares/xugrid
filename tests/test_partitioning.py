@@ -139,12 +139,15 @@ class TestDatasetPartition:
 
         grid1 = partitions[1].ugrid.grid
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))
-        with pytest.raises(ValueError, match="These variables are present"):
+        with pytest.raises(
+            ValueError,
+            match="Missing variables: {'extra'} in partition",
+        ):
             pt.merge_partitions(partitions)
 
         partitions = self.uds.ugrid.partition(n_part=2)
         partitions[1]["face_z"] = partitions[1]["face_z"].expand_dims("layer", axis=0)
-        with pytest.raises(ValueError, match="Dimensions for face_z do not match"):
+        with pytest.raises(ValueError, match="Dimensions for 'face_z' do not match"):
             pt.merge_partitions(partitions)
 
         uds = self.uds.copy()
@@ -188,13 +191,29 @@ class TestMultiTopology2DMergePartitions:
         merged = pt.merge_partitions(self.datasets)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 2
-        # In case of non-UGRID data, it should default to the first partition:
-        assert merged["c"] == 0
+        # In case of non-UGRID data, it should default to the last partition:
+        assert merged["c"] == 1
 
-    def test_merge_partitions__errors(self):
+        assert len(merged["first_nFaces"]) == 6
+        assert len(merged["second_nFaces"]) == 20
+
+    def test_merge_partitions__unique_grid_per_partition(self):
         pa = self.datasets[0][["a"]]
         pb = self.datasets[1][["b"]]
-        with pytest.raises(ValueError, match="Expected 2 UGRID topologies"):
+        merged = pt.merge_partitions([pa, pb])
+
+        assert isinstance(merged, xu.UgridDataset)
+        assert len(merged.ugrid.grids) == 2
+
+        assert len(merged["first_nFaces"]) == 3
+        assert len(merged["second_nFaces"]) == 10
+
+    def test_merge_partitions__errors(self):
+        pa = self.datasets[0][["a"]] * xr.DataArray([1.0, 1.0], dims=("error_dim",))
+        pb = self.datasets[1][["a"]]
+        with pytest.raises(
+            ValueError, match="Dimensions for 'a' do not match across partitions: "
+        ):
             pt.merge_partitions([pa, pb])
 
         grid_a = self.datasets[1].ugrid.grids[0].copy()
@@ -248,7 +267,7 @@ class TestMergeDataset1D:
 
         ds_expected = xu.UgridDataset(grids=[grid])
         ds_expected["a"] = ((grid.edge_dimension), np.concatenate(values_parts))
-        ds_expected["c"] = 0
+        ds_expected["c"] = 1
         # Assign coordinates also added during merge_partitions
         coords = {grid.edge_dimension: np.arange(grid.n_edge)}
         ds_expected = ds_expected.assign_coords(**coords)
@@ -260,8 +279,9 @@ class TestMergeDataset1D:
         merged = pt.merge_partitions(self.datasets_partitioned)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 1
-        # In case of non-UGRID data, it should default to the first partition:
-        assert merged["c"] == 0
+        # In case of non-UGRID data, it should default to the last partition of
+        # the grid that's checked last.
+        assert merged["c"] == 1
 
         assert self.dataset_expected.ugrid.grid.equals(merged.ugrid.grid)
         assert self.dataset_expected["a"].equals(merged["a"])
@@ -289,16 +309,22 @@ class TestMultiTopology1D2DMergePartitions:
             ds["a"] = ((part_a.face_dimension), values_a)
             ds["b"] = ((part_b.edge_dimension), values_b)
             ds["c"] = i
-            datasets_parts.append(ds)
+
+            coords = {
+                part_a.face_dimension: values_a,
+                part_b.edge_dimension: values_b,
+            }
+
+            datasets_parts.append(ds.assign_coords(**coords))
 
         ds_expected = xu.UgridDataset(grids=[grid_a, grid_b])
         ds_expected["a"] = ((grid_a.face_dimension), np.concatenate(values_parts_a))
         ds_expected["b"] = ((grid_b.edge_dimension), np.concatenate(values_parts_b))
-        ds_expected["c"] = 0
+        ds_expected["c"] = 1
         # Assign coordinates also added during merge_partitions
         coords = {
-            grid_a.face_dimension: np.arange(grid_a.n_face),
-            grid_b.edge_dimension: np.arange(grid_b.n_edge),
+            grid_a.face_dimension: np.concatenate(values_parts_a),
+            grid_b.edge_dimension: np.concatenate(values_parts_b),
         }
         ds_expected = ds_expected.assign_coords(**coords)
 
@@ -309,7 +335,26 @@ class TestMultiTopology1D2DMergePartitions:
         merged = pt.merge_partitions(self.datasets_parts)
         assert isinstance(merged, xu.UgridDataset)
         assert len(merged.ugrid.grids) == 2
-        # In case of non-UGRID data, it should default to the first partition:
-        assert merged["c"] == 0
+        # In case of non-UGRID data, it should default to the last partition of
+        # the grid that's checked last.
+        assert merged["c"] == 1
+
+        assert self.dataset_expected.equals(merged)
+
+    def test_merge_partitions__inconsistent_grid_types(self):
+        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(
+            ["b", "mesh1d_nEdges"]
+        )
+        b = self.dataset_expected["b"].isel(mesh1d_nEdges=[0, 1, 2])
+        self.dataset_expected = self.dataset_expected.drop_vars(["b", "mesh1d_nEdges"])
+        self.dataset_expected["b"] = b
+        self.dataset_expected["c"] = 1
+
+        merged = pt.merge_partitions(self.datasets_parts)
+        assert isinstance(merged, xu.UgridDataset)
+        assert len(merged.ugrid.grids) == 2
+        # In case of non-UGRID data, it should default to the last partition of
+        # the grid that's checked last.
+        assert merged["c"] == 1
 
         assert self.dataset_expected.equals(merged)

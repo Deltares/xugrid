@@ -418,6 +418,20 @@ class Ugrid2d(AbstractUgrid):
         }
 
     @property
+    def max_face_node_dimension(self) -> str:
+        return self._attrs["max_face_nodes_dimension"]
+
+    @property
+    def max_connectivity_sizes(self) -> dict[str, int]:
+        return {
+            self.max_face_node_dimension: self.n_max_node_per_face,
+        }
+
+    @property
+    def max_connectivity_dimensions(self) -> tuple[str]:
+        return (self.max_face_node_dimension,)
+
+    @property
     def topology_dimension(self):
         """Highest dimensionality of the geometric elements: 2"""
         return 2
@@ -1491,7 +1505,9 @@ class Ugrid2d(AbstractUgrid):
         return [self.topology_subset(index) for index in indices]
 
     @staticmethod
-    def merge_partitions(grids: Sequence["Ugrid2d"]) -> "Ugrid2d":
+    def merge_partitions(
+        grids: Sequence["Ugrid2d"]
+    ) -> tuple["Ugrid2d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.
 
