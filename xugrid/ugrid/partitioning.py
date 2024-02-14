@@ -214,8 +214,9 @@ def validate_partition_objects(
     return None
 
 
-
-def separate_variables(objects_by_gridname: defaultdict[str, xr.Dataset], ugrid_dims: set[str]):
+def separate_variables(
+    objects_by_gridname: defaultdict[str, xr.Dataset], ugrid_dims: set[str]
+):
     """Separate into UGRID variables grouped by dimension, and other variables."""
     validate_partition_objects(objects_by_gridname)
 
@@ -270,7 +271,7 @@ def merge_data_along_dim(
     indexes: list[np.array],
     merged_grid: UgridType,
 ) -> xr.Dataset:
-    """"
+    """ "
     Select variables from the data objects.
     Pad connectivity dims if needed.
     Concatenate along dim.
@@ -286,7 +287,7 @@ def merge_data_along_dim(
             raise ValueError(f"Missing variables: {missing_vars} in partition {obj}")
 
         selection = obj[vars].isel({merge_dim: index}, missing_dims="ignore")
-        
+
         # Pad the ugrid connectivity dims (e.g. n_max_face_node_connectivity) if
         # needed.
         present_dims = ugrid_connectivity_dims.intersection(selection.dims)
@@ -367,7 +368,9 @@ def merge_partitions(partitions):
             vars = vars_by_dim[dim]
             if len(vars) == 0:
                 continue
-            merged_selection = merge_data_along_dim(data_objects, vars, dim, dim_indexes, merged_grid)
+            merged_selection = merge_data_along_dim(
+                data_objects, vars, dim, dim_indexes, merged_grid
+            )
             merged.update(merged_selection)
 
     return UgridDataset(merged, merged_grids)
