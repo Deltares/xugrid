@@ -824,14 +824,18 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_face_node_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">max_face_node_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;max_face_nodes_dimension&quot;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_connectivity_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">max_connectivity_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_face_node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span><span class="p">,</span>
         <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_connectivity_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_face_node_dimension</span><span class="p">,)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1957,7 +1961,9 @@ document.write(`
 <div class="viewcode-block" id="Ugrid2d.merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid2d&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span>
+        <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid2d&quot;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;Ugrid2d&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Merge grid partitions into a single whole.</span>
 

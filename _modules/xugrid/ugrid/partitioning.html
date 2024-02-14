@@ -401,6 +401,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">renumber</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
 
 
 <span class="k">def</span> <span class="nf">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">IntArray</span><span class="p">]:</span>
@@ -537,7 +538,7 @@ document.write(`
     <span class="k">return</span> <span class="n">_merge_connectivity</span><span class="p">(</span><span class="n">all_edges</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">validate_partition_topology</span><span class="p">(</span><span class="n">grouped</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">validate_partition_topology</span><span class="p">(</span><span class="n">grouped</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">grids</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -556,7 +557,7 @@ document.write(`
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">group_grids_by_name</span><span class="p">(</span><span class="n">partitions</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">group_grids_by_name</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UgridDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
     <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -566,7 +567,9 @@ document.write(`
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">group_data_objects_by_gridname</span><span class="p">(</span><span class="n">partitions</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">group_data_objects_by_gridname</span><span class="p">(</span>
+    <span class="n">partitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UgridDataset</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
     <span class="c1"># Convert to dataset for convenience</span>
     <span class="n">data_objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">partition</span><span class="o">.</span><span class="n">obj</span> <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">]</span>
     <span class="n">data_objects</span> <span class="o">=</span> <span class="p">[</span>
@@ -582,7 +585,9 @@ document.write(`
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">validate_partition_objects</span><span class="p">(</span><span class="n">objects_by_gridname</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">validate_partition_objects</span><span class="p">(</span>
+    <span class="n">objects_by_gridname</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">data_objects</span> <span class="ow">in</span> <span class="n">objects_by_gridname</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">allvars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">))</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">})</span>
         <span class="n">unique_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">allvars</span><span class="p">))</span>
@@ -598,20 +603,12 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;Dimensions for &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; do not match across partitions: &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">validate_vars_in_all_data_objects</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">data_objects</span><span class="p">,</span> <span class="n">gridname</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
-        <span class="n">var_in_objects</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="kc">True</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">variables</span> <span class="k">else</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">data_objects</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">var_in_objects</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; does not occur not in all partitions with &#39;</span><span class="si">{</span><span class="n">gridname</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-            <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">separate_variables</span><span class="p">(</span><span class="n">objects_by_gridname</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">separate_variables</span><span class="p">(</span>
+    <span class="n">objects_by_gridname</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Separate into UGRID variables grouped by dimension, and other variables.&quot;&quot;&quot;</span>
     <span class="n">validate_partition_objects</span><span class="p">(</span><span class="n">objects_by_gridname</span><span class="p">)</span>
 
@@ -659,22 +656,45 @@ document.write(`
     <span class="k">return</span> <span class="n">grouped</span><span class="p">,</span> <span class="n">other</span>
 
 
-<span class="k">def</span> <span class="nf">maybe_pad_connectivity_dims_to_max</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">merged_grid</span><span class="p">):</span>
-    <span class="n">nmax_dict</span> <span class="o">=</span> <span class="n">merged_grid</span><span class="o">.</span><span class="n">max_connectivity_dimensions</span>
-    <span class="n">nmax_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">nmax_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">nmax_dict</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">selection</span>
+<span class="k">def</span> <span class="nf">merge_data_along_dim</span><span class="p">(</span>
+    <span class="n">data_objects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+    <span class="nb">vars</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">merge_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">indexes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">],</span>
+    <span class="n">merged_grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select variables from the data objects.</span>
+<span class="sd">    Pad connectivity dims if needed.</span>
+<span class="sd">    Concatenate along dim.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_sizes</span> <span class="o">=</span> <span class="n">merged_grid</span><span class="o">.</span><span class="n">max_connectivity_sizes</span>
+    <span class="n">ugrid_connectivity_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">max_sizes</span><span class="p">)</span>
 
-    <span class="n">pad_width_ls</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nmax</span> <span class="o">-</span> <span class="n">obj</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">nmax</span> <span class="ow">in</span> <span class="n">nmax_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">selection</span>
-    <span class="p">]</span>
+    <span class="n">to_merge</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_objects</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+        <span class="c1"># Check for presence of vars</span>
+        <span class="n">missing_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">missing_vars</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing variables: </span><span class="si">{</span><span class="n">missing_vars</span><span class="si">}</span><span class="s2"> in partition </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">[</span>
-        <span class="n">obj</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">pad_width</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">pad_width_ls</span><span class="p">)</span>
-    <span class="p">]</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">merge_dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Pad the ugrid connectivity dims (e.g. n_max_face_node_connectivity) if</span>
+        <span class="c1"># needed.</span>
+        <span class="n">present_dims</span> <span class="o">=</span> <span class="n">ugrid_connectivity_dims</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">selection</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">pad_width</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">present_dims</span><span class="p">:</span>
+            <span class="n">nmax</span> <span class="o">=</span> <span class="n">max_sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="o">!=</span> <span class="n">nmax</span><span class="p">:</span>
+                <span class="n">pad_width</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nmax</span> <span class="o">-</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pad_width</span><span class="p">:</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">)</span>
+
+        <span class="n">to_merge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">to_merge</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">merge_dim</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="merge_partitions">
@@ -733,32 +753,18 @@ document.write(`
         <span class="n">merged_grid</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">merge_partitions</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
         <span class="n">merged_grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged_grid</span><span class="p">)</span>
 
-        <span class="c1"># Add all other vars to dataset</span>
+        <span class="c1"># Add other vars, unassociated with UGRID dimensions, to dataset.</span>
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">data_objects</span><span class="p">:</span>
             <span class="n">other_vars_obj</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other_vars</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">))</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">other_vars_obj</span><span class="p">])</span>
 
-        <span class="c1"># Now remove duplicates, then concatenate along the UGRID dimension.</span>
         <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">vars</span> <span class="o">=</span> <span class="n">vars_by_dim</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">validate_vars_in_all_data_objects</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="n">data_objects</span><span class="p">,</span> <span class="n">gridname</span><span class="p">)</span>
-            <span class="n">first_var</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="nb">vars</span><span class="p">))</span>
-            <span class="n">objects_indexes_to_select</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">],</span> <span class="n">index</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_objects</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">first_var</span> <span class="ow">in</span> <span class="n">obj</span>
-            <span class="p">]</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">obj</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">objects_indexes_to_select</span>
-            <span class="p">]</span>
-            <span class="n">selection_padded</span> <span class="o">=</span> <span class="n">maybe_pad_connectivity_dims_to_max</span><span class="p">(</span>
-                <span class="n">selection</span><span class="p">,</span> <span class="n">merged_grid</span>
+            <span class="n">merged_selection</span> <span class="o">=</span> <span class="n">merge_data_along_dim</span><span class="p">(</span>
+                <span class="n">data_objects</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">,</span> <span class="n">merged_grid</span>
             <span class="p">)</span>
-
-            <span class="n">merged_selection</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">selection_padded</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merged_selection</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
