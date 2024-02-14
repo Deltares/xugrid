@@ -271,7 +271,7 @@ def merge_data_along_dim(
     indexes: list[np.array],
     merged_grid: UgridType,
 ) -> xr.Dataset:
-    """ "
+    """
     Select variables from the data objects.
     Pad connectivity dims if needed.
     Concatenate along dim.
