@@ -1505,7 +1505,7 @@ class Ugrid2d(AbstractUgrid):
         return [self.topology_subset(index) for index in indices]
 
     @staticmethod
-    def merge_partitions(grids: Sequence["Ugrid2d"]) -> "Ugrid2d":
+    def merge_partitions(grids: Sequence["Ugrid2d"]) -> tuple["Ugrid2d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.
 

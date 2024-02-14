@@ -630,7 +630,7 @@ class Ugrid1d(AbstractUgrid):
         )
 
     @staticmethod
-    def merge_partitions(grids: Sequence["Ugrid1d"]) -> "Ugrid1d":
+    def merge_partitions(grids: Sequence["Ugrid1d"]) -> tuple["Ugrid1d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.
 
