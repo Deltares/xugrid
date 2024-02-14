@@ -141,7 +141,7 @@ class TestDatasetPartition:
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))
         with pytest.raises(
             ValueError,
-            match="'extra' does not occur not in all partitions with 'mesh2d'",
+            match="Missing variables: {'extra'} in partition",
         ):
             pt.merge_partitions(partitions)
 
