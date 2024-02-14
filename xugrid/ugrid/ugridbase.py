@@ -300,7 +300,11 @@ class AbstractUgrid(abc.ABC):
         return self._attrs["edge_dimension"]
 
     @property
-    def max_connectivity_dimensions(self):
+    def max_connectivity_dimensions(self) -> tuple:
+        return ()
+
+    @property
+    def max_connectivity_sizes(self) -> dict[str, int]:
         return {}
 
     @property

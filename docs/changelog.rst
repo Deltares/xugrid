@@ -19,8 +19,8 @@ Fixed
   copies).
 - Fixed bug in :meth:`xugrid.Ugrid1d.merge_partitions`, which caused
   ``ValueError: indexes must be provided for attrs``.
-- :func:`xugrid.merge_partitions` merges partitions with grids not contained in
-  other partitions.
+- :func:`xugrid.merge_partitions` now also merges datasets with grids that are
+  only contained in some of the partition datasets.
 
 Added
 ~~~~~
@@ -36,8 +36,11 @@ Added
 - :attr:`xugrid.UgridDataset.sizes` as an alternative to :attr:`xugrid.UgridDataset.dimensions`
 - :attr:`xugrid.Ugrid2d.max_face_node_dimension` which returns the dimension
   name designating nodes per face.
-- :attr:`xugrid.AbstractUgrid.max_connectivity_dimensions` which returns all
+- :attr:`xugrid.AbstractUgrid.max_connectivity_sizes` which returns all
   maximum connectivity dimensions and their corresponding size.
+- :attr:`xugrid.AbstractUgrid.max_connectivity_dimensions` which returns all
+  maximum connectivity dimensions.
+
 
 Changed
 ~~~~~~~

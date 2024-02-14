@@ -268,7 +268,7 @@ def separate_variables(objects_by_gridname, ugrid_dims):
 
 
 def maybe_pad_connectivity_dims_to_max(selection, merged_grid):
-    nmax_dict = merged_grid.max_connectivity_dimensions
+    nmax_dict = merged_grid.max_connectivity_sizes
     nmax_dict = {
         key: value for key, value in nmax_dict.items() if key in selection[0].dims
     }

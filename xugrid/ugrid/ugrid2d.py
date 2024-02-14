@@ -422,10 +422,14 @@ class Ugrid2d(AbstractUgrid):
         return self._attrs["max_face_nodes_dimension"]
 
     @property
-    def max_connectivity_dimensions(self):
+    def max_connectivity_sizes(self) -> dict[str, int]:
         return {
             self.max_face_node_dimension: self.n_max_node_per_face,
         }
+
+    @property
+    def max_connectivity_dimensions(self) -> tuple[str]:
+        return (self.max_face_node_dimension,)
 
     @property
     def topology_dimension(self):
