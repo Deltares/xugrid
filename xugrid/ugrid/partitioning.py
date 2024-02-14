@@ -175,7 +175,9 @@ def group_grids_by_name(partitions: list[UgridDataset]) -> defaultdict[str, Ugri
     return grouped
 
 
-def group_data_objects_by_gridname(partitions: list[UgridDataset]) -> defaultdict[str, xr.Dataset]:
+def group_data_objects_by_gridname(
+    partitions: list[UgridDataset]
+) -> defaultdict[str, xr.Dataset]:
     # Convert to dataset for convenience
     data_objects = [partition.obj for partition in partitions]
     data_objects = [
@@ -191,7 +193,9 @@ def group_data_objects_by_gridname(partitions: list[UgridDataset]) -> defaultdic
     return grouped
 
 
-def validate_partition_objects(objects_by_gridname: defaultdict[str, xr.Dataset]) -> None:
+def validate_partition_objects(
+    objects_by_gridname: defaultdict[str, xr.Dataset]
+) -> None:
     for data_objects in objects_by_gridname.values():
         allvars = list({tuple(sorted(ds.data_vars)) for ds in data_objects})
         unique_vars = set(chain(*allvars))
@@ -210,7 +214,9 @@ def validate_partition_objects(objects_by_gridname: defaultdict[str, xr.Dataset]
     return None
 
 
-def validate_vars_in_all_data_objects(vars: list[str], data_objects: list[xr.Dataset], gridname: str):
+def validate_vars_in_all_data_objects(
+    vars: list[str], data_objects: list[xr.Dataset], gridname: str
+):
     for var in vars:
         var_in_objects = [
             True if var in obj.variables else False for obj in data_objects
