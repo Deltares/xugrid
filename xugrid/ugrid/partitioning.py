@@ -359,15 +359,9 @@ def merge_partitions(partitions):
             if len(vars) == 0:
                 continue
             validate_vars_in_all_data_objects(vars, data_objects, gridname)
-            first_var = next(iter(vars))
-            objects_indexes_to_select = [
-                (obj[vars], index)
-                for obj, index in zip(data_objects, dim_indexes)
-                if first_var in obj
-            ]
             selection = [
                 obj[vars].isel({dim: index}, missing_dims="ignore")
-                for obj, index in objects_indexes_to_select
+                for obj, index in zip(data_objects, dim_indexes)
             ]
             selection_padded = maybe_pad_connectivity_dims_to_max(
                 selection, merged_grid
