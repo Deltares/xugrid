@@ -418,7 +418,7 @@ class Ugrid2d(AbstractUgrid):
         }
 
     @property
-    def max_face_node_dimension(self):
+    def max_face_node_dimension(self) -> str:
         return self._attrs["max_face_nodes_dimension"]
 
     @property
