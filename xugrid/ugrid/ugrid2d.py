@@ -1998,10 +1998,16 @@ class Ugrid2d(AbstractUgrid):
         # Allocate face_node_connectivity
         face_nodes = np.empty((ny * nx, 4), dtype=IntDType)
         # Set connectivity in counterclockwise manner
-        face_nodes[:, 0] = linear_index[:-1, 1:].ravel()  # upper right
-        face_nodes[:, 1] = linear_index[:-1, :-1].ravel()  # upper left
-        face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
-        face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
+        left, right = slice(None, -1), slice(1, None)
+        lower, upper = slice(None, -1), slice(1, None)
+        if node_x[1] < node_x[0]:  # x_decreasing
+            left, right = right, left
+        if node_y[ny + 1] < node_y[0]:  # y_decreasing
+            lower, upper = upper, lower
+        face_nodes[:, 0] = linear_index[lower, left].ravel()
+        face_nodes[:, 1] = linear_index[lower, right].ravel()
+        face_nodes[:, 2] = linear_index[upper, right].ravel()
+        face_nodes[:, 3] = linear_index[upper, left].ravel()
         return Ugrid2d(node_x, node_y, -1, face_nodes)
 
     @staticmethod
