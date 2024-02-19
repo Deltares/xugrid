@@ -992,13 +992,23 @@ def test_meshkernel():
     assert isinstance(grid.meshkernel, mk.MeshKernel)
 
 
-def test_from_structured_intervals1d():
-    grid = xugrid.Ugrid2d.from_structured_intervals1d(
-        x_intervals=[0.0, 1.0, 2.0],
-        y_intervals=[2.0, 1.0, 0.0],
-    )
+@pytest.mark.parametrize("xflip", [False, True])
+@pytest.mark.parametrize("yflip", [False, True])
+def test_from_structured_intervals1d(xflip: bool, yflip: bool):
+    x = y = np.array([0.0, 1.0, 2.0])
+    if xflip:
+        x = np.flip(x)
+    if yflip:
+        y = np.flip(y)
+
+    grid = xugrid.Ugrid2d.from_structured_intervals1d(x_intervals=x, y_intervals=y)
     assert isinstance(grid, xugrid.Ugrid2d)
     assert grid.n_face == 4
+
+    # Make sure the orientation is still ccw if x is decreasing, y is increasing.
+    dxy = np.diff(grid.face_node_coordinates, axis=1)
+    clockwise = (np.cross(dxy[:, :-1], dxy[:, 1:])).sum(axis=1) < 0
+    assert not clockwise.any()
 
 
 def test_from_structured_intervals2d():
