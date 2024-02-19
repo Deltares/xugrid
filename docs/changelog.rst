@@ -19,6 +19,9 @@ Fixed
   copies).
 - Fixed bug in :meth:`xugrid.Ugrid1d.merge_partitions`, which caused
   ``ValueError: indexes must be provided for attrs``.
+- Fixed ``from_structured`` methods: the generated faces are now always in
+  counterclockwise direction, also for increasing y-coordinates or decreasing
+  x-coordinates.
 
 Added
 ~~~~~
