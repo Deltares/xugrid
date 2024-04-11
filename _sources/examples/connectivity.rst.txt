@@ -44,7 +44,7 @@ The following imports suffice for the examples.
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-34
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -100,7 +100,7 @@ By default, the border value for binary erosion is set to ``False`` (equal to
 
 .. GENERATED FROM PYTHON SOURCE LINES 70-83
 
-.. code-block:: default
+.. code-block:: Python
 
 
     ds = xugrid.data.disk()
@@ -129,7 +129,7 @@ By default, the border value for binary erosion is set to ``False`` (equal to
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f836aebb0d0>
+    <matplotlib.collections.PolyCollection object at 0x7fbbf045ede0>
 
 
 
@@ -141,7 +141,7 @@ start by setting a single value in the center of the grid to ``True``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 87-95
 
-.. code-block:: default
+.. code-block:: Python
 
 
     uda = xugrid.UgridDataArray(
@@ -165,7 +165,7 @@ start by setting a single value in the center of the grid to ``True``.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f837697c590>
+    <matplotlib.collections.PolyCollection object at 0x7fbbf917bcb0>
 
 
 
@@ -176,7 +176,7 @@ alternative border value:
 
 .. GENERATED FROM PYTHON SOURCE LINES 98-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
     iter1 = uda.ugrid.binary_dilation(iterations=1)
@@ -200,7 +200,7 @@ alternative border value:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f836bc8ee50>
+    <matplotlib.collections.PolyCollection object at 0x7fbbefe036e0>
 
 
 
@@ -214,7 +214,7 @@ analyse connected parts of the mesh.
 
 .. GENERATED FROM PYTHON SOURCE LINES 112-120
 
-.. code-block:: default
+.. code-block:: Python
 
 
     grid = xugrid.data.xoxo()
@@ -238,7 +238,7 @@ analyse connected parts of the mesh.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f83772f10d0>
+    <matplotlib.collections.PolyCollection object at 0x7fbbeffb4aa0>
 
 
 
@@ -252,7 +252,7 @@ Tesselation.
 
 .. GENERATED FROM PYTHON SOURCE LINES 126-130
 
-.. code-block:: default
+.. code-block:: Python
 
 
     voronoi_grid = grid.tesselate_centroidal_voronoi()
@@ -272,7 +272,7 @@ Tesselation.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f836b01d290>
+    <matplotlib.collections.LineCollection object at 0x7fbbf08222a0>
 
 
 
@@ -290,7 +290,7 @@ the original.
 
 .. GENERATED FROM PYTHON SOURCE LINES 140-150
 
-.. code-block:: default
+.. code-block:: Python
 
 
     centroid_only = grid.tesselate_centroidal_voronoi(add_exterior=False)
@@ -316,7 +316,7 @@ the original.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f836aba2c50>
+    <matplotlib.collections.LineCollection object at 0x7fbbf03d5c70>
 
 
 
@@ -333,7 +333,7 @@ We can break down one of the Voronoi tesselations from above into triangles:
 
 .. GENERATED FROM PYTHON SOURCE LINES 159-165
 
-.. code-block:: default
+.. code-block:: Python
 
 
     triangulation = convex_exterior.triangulate()
@@ -355,7 +355,7 @@ We can break down one of the Voronoi tesselations from above into triangles:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f8377f7ff90>
+    <matplotlib.collections.LineCollection object at 0x7fbbef23c560>
 
 
 
@@ -375,7 +375,7 @@ the upper and lower parts:
 
 .. GENERATED FROM PYTHON SOURCE LINES 177-195
 
-.. code-block:: default
+.. code-block:: Python
 
 
     grid = xugrid.data.xoxo()
@@ -409,7 +409,7 @@ the upper and lower parts:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f836bb0de10>
+    <matplotlib.collections.LineCollection object at 0x7fbbf008d130>
 
 
 
@@ -419,7 +419,7 @@ We can now use Laplace interpolation to fill the gaps in the grid.
 
 .. GENERATED FROM PYTHON SOURCE LINES 197-201
 
-.. code-block:: default
+.. code-block:: Python
 
 
     filled = uda.ugrid.laplace_interpolate()
@@ -439,7 +439,7 @@ We can now use Laplace interpolation to fill the gaps in the grid.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f836bef13d0>
+    <matplotlib.collections.PolyCollection object at 0x7fbbeffab020>
 
 
 
@@ -451,7 +451,7 @@ interpolation.
 
 .. GENERATED FROM PYTHON SOURCE LINES 205-215
 
-.. code-block:: default
+.. code-block:: Python
 
 
     disk_nodes = xugrid.data.disk()["node_z"]
@@ -477,7 +477,7 @@ interpolation.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f836aa9f410>
+    <matplotlib.collections.PolyCollection object at 0x7fbbf05118b0>
 
 
 
@@ -495,7 +495,7 @@ To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
 
 .. GENERATED FROM PYTHON SOURCE LINES 225-232
 
-.. code-block:: default
+.. code-block:: Python
 
 
     grid = xugrid.data.xoxo()
@@ -518,7 +518,7 @@ To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x7f836beba490>
+    <matplotlib.image.AxesImage object at 0x7fbbefbbd010>
 
 
 
@@ -531,7 +531,7 @@ locality:
 
 .. GENERATED FROM PYTHON SOURCE LINES 237-244
 
-.. code-block:: default
+.. code-block:: Python
 
 
     renumbered_grid, _ = grid.reverse_cuthill_mckee()
@@ -554,14 +554,14 @@ locality:
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x7f836aed4410>
+    <matplotlib.image.AxesImage object at 0x7fbbefd84740>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.696 seconds)
+   **Total running time of the script:** (0 minutes 1.424 seconds)
 
 
 .. _sphx_glr_download_examples_connectivity.py:
@@ -570,16 +570,13 @@ locality:
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: connectivity.ipynb <connectivity.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: connectivity.py <connectivity.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: connectivity.ipynb <connectivity.ipynb>`
 
 
 .. only:: html
