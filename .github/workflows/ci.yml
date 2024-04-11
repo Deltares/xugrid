@@ -18,32 +18,34 @@ jobs:
         uses: actions/setup-python@v2
       - name: Run pre-commit
         uses: pre-commit/action@v2.0.3
-  
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.pixi-environment }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version:
-          - "3.9"
-          - "3.10"
-          - "3.12"
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        pixi-environment:
+          - py312
+          - py311
+          - py310 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.3.0
-      - name: Setup older Python versions
-        run: pixi add python=${{ matrix.python-version }} 
+        uses: prefix-dev/setup-pixi@v0.5.1
       - name: Run Tests
-        run: pixi run test
+        run: pixi run --environment ${{ matrix.pixi-environment }} test
 
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.3.0
+        uses: prefix-dev/setup-pixi@v0.5.1
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
