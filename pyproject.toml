@@ -7,7 +7,7 @@ name = "xugrid"
 description = "Xarray extension for unstructured grids"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     'pandas',
     'numba',
@@ -25,9 +25,9 @@ classifiers = [
     'Programming Language :: Python',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Scientific/Engineering',
 ]
@@ -67,3 +67,60 @@ exclude_lines = [
     "@abc.abstractmethod",
     "@abc.abstractproperty",
 ]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.pypi-dependencies]
+xugrid = { path = ".", editable = true }
+
+[tool.pixi.dependencies]
+dask = "*"
+geopandas = "*"
+mapbox_earcut = "*"
+matplotlib-base = "*"
+netcdf4 = "*"
+numba_celltree = "*"
+pip = "*"
+pooch = "*"
+pre-commit = "*"
+pydata-sphinx-theme = "*"
+pymetis = "*"
+pyproj = "*"
+pytest = "*"
+pytest-cov = "*"
+python = ">=3.9"
+ruff = "*"
+shapely = ">=2.0"
+scipy = "*"
+sphinx = "*"
+sphinx-gallery = "*"
+xarray = "*"
+zarr = "*"
+ipykernel = "6.26.0.*"  # So we can run examples
+twine = "*"
+build = "*"
+
+[tool.pixi.tasks]
+install-pre-commit = "pre-commit install"
+pre-commit = "pre-commit run --all-files"
+test = "NUMBA_DISABLE_JIT=1 pytest --cov=xugrid --cov-report xml --cov-report term"
+docs = "NUMBA_DISABLE_JIT=1 sphinx-build docs docs/_build"
+all = { depends_on = ["pre-commit", "test", "docs"]}
+pypi-publish = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py310.dependencies]
+python = "3.10.*"
+
+[tool.pixi.environments]
+default = { features = ["py312"], solve-group = "py312" }
+py312 = { features = ["py312"], solve-group = "py312" }
+py311 = ["py311"]
+py310 = ["py310"]
