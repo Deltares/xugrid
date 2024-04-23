@@ -45,8 +45,13 @@ class MatrixCOO(NamedTuple):
     nnz: int
 
     @staticmethod
-    def from_triplet(row, col, data) -> "MatrixCOO":
-        return MatrixCOO(data, row, col, row.max(), col.max(), data.size)
+    def from_triplet(row, col, data, n=None, m=None) -> "MatrixCOO":
+        if n is None:
+            n = row.max() + 1
+        if m is None:
+            m = col.max() + 1
+        nnz = data.size
+        return MatrixCOO(data, row, col, n, m, nnz)
 
     def to_csr(self) -> "MatrixCSR":
         """
@@ -54,7 +59,7 @@ class MatrixCOO(NamedTuple):
 
         Assumes the COO matrix indices are already sorted by row number!
         """
-        i = np.cumsum(np.bincount(self.row))
+        i = np.cumsum(np.bincount(self.row, minlength=self.n))
         indptr = np.empty(i.size + 1, dtype=IntDType)
         indptr[0] = 0
         indptr[1:] = i
@@ -62,9 +67,9 @@ class MatrixCOO(NamedTuple):
             self.data,
             self.col,
             indptr,
-            indptr.size - 1,
-            self.col.max(),
-            self.data.size,
+            self.n,
+            self.m,
+            self.nnz,
         )
 
 
@@ -107,8 +112,14 @@ class MatrixCSR(NamedTuple):
         return MatrixCSR(A.data, A.indices, A.indptr, n, m, A.nnz)
 
     @staticmethod
-    def from_triplet(row, col, data) -> "MatrixCSR":
-        return MatrixCOO.from_triplet(row, col, data).to_csr()
+    def from_triplet(
+        row,
+        col,
+        data,
+        n=None,
+        m=None,
+    ) -> "MatrixCSR":
+        return MatrixCOO.from_triplet(row, col, data, n, m).to_csr()
 
     def to_coo(self) -> MatrixCOO:
         """
