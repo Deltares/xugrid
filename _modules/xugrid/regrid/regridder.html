@@ -719,7 +719,11 @@ document.write(`
         <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">convert_to_match</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weight_values</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">locate_centroids</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCOO</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span>
-            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weight_values</span>
+            <span class="n">target_index</span><span class="p">,</span>
+            <span class="n">source_index</span><span class="p">,</span>
+            <span class="n">weight_values</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+            <span class="n">m</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span>
 
@@ -758,7 +762,7 @@ document.write(`
             <span class="n">target</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span>
-            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weight_values</span>
+            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weight_values</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">size</span>
         <span class="p">)</span>
         <span class="k">return</span>
 
@@ -937,7 +941,9 @@ document.write(`
             <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">linear_weights</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">source_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">barycentric</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span><span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_triplet</span><span class="p">(</span>
+            <span class="n">target_index</span><span class="p">,</span> <span class="n">source_index</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">size</span>
+        <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@property</span>
