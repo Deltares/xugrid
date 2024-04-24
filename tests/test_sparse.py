@@ -61,3 +61,15 @@ def test_csr_to_coo(csr_matrix):
     assert np.array_equal(coo_matrix.row, [0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
     assert np.array_equal(coo_matrix.col, np.arange(10))
     assert coo_matrix.nnz == 10
+
+
+def test_shape():
+    source_index = np.arange(10)
+    target_index = np.repeat(np.arange(5), 2)
+    weights = np.full(10, 0.5)
+    matrix = sparse.MatrixCSR.from_triplet(target_index, source_index, weights, n=20)
+    assert matrix.n == 20
+    assert matrix.m == 10
+    matrix = sparse.MatrixCSR.from_triplet(target_index, source_index, weights, m=20)
+    assert matrix.n == 5
+    assert matrix.m == 20
