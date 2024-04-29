@@ -62,14 +62,13 @@ def test_mode(args):
     actual = reduce.mode(*args)
     assert np.allclose(actual, 1.0)
 
-    values = np.array([99,  1,  2,  3,  4,  5,  6,  7,  8])
+    values = np.array([99, 1, 2, 3, 4, 5, 6, 7, 8])
     indices = np.array([4, 5, 6])
     weights = np.array([0.5, 0.5, 0.5])
     args = (values, indices, weights)
     actual = reduce.mode(*args)
     assert np.allclose(actual, 4)
     assert np.allclose(weights, 0.5)
-    
 
 
 def test_median(args):

@@ -107,7 +107,9 @@ def test_overlap_regridder_structured(
     # https://github.com/Deltares/xugrid/issues/236
     grid_data_adapted = grid_data_a.copy()
     grid_data_adapted[0, 0] = 99
-    regridder = OverlapRegridder(source=grid_data_adapted, target=grid_data_a, method="mode")
+    regridder = OverlapRegridder(
+        source=grid_data_adapted, target=grid_data_a, method="mode"
+    )
     result = regridder.regrid(grid_data_adapted)
     assert not np.all(result == 99.0)
 
