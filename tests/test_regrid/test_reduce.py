@@ -56,7 +56,7 @@ def test_mode(args):
     assert np.allclose(weights, 0.5)
 
     values = np.array([-1, 1, 1, 3, 4])
-    indices = np.array([0, 1, 2])
+    indices = np.array([1, 2, 3])
     weights = np.array([1.0, 1.0, 1.0])
     args = (values, indices, weights)
     actual = reduce.mode(*args)
