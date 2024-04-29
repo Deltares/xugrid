@@ -46,7 +46,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.burn_vector_geometry';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="xugrid.earcut_triangulate_polygons" href="xugrid.earcut_triangulate_polygons.html" />
+    <link rel="next" title="xugrid.polygonize" href="xugrid.polygonize.html" />
     <link rel="prev" title="xugrid.merge_partitions" href="xugrid.merge_partitions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -361,7 +361,6 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.merge.html">xugrid.merge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.merge_partitions.html">xugrid.merge_partitions</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.burn_vector_geometry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.earcut_triangulate_polygons.html">xugrid.earcut_triangulate_polygons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.polygonize.html">xugrid.polygonize</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -583,7 +582,6 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_structured_intervals2d.html">xugrid.Ugrid2d.from_structured_intervals2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_shapely.html">xugrid.Ugrid2d.from_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_shapely.html">xugrid.Ugrid2d.to_shapely</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.earcut_triangulate_polygons.html">xugrid.Ugrid2d.earcut_triangulate_polygons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.plot.html">xugrid.Ugrid2d.plot</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -653,7 +651,7 @@ document.write(`
 <h1>xugrid.burn_vector_geometry<a class="headerlink" href="#xugrid-burn-vector-geometry" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="xugrid.burn_vector_geometry">
-<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">burn_vector_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">geopandas.GeoDataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">like</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'xugrid.Ugrid2d'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="s"><span class="pre">'xugrid.UgridDataArray'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="s"><span class="pre">'xugrid.UgridDataset'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_touched</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><span class="pre">xugrid.UgridDataArray</span></a></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/burn.html#burn_vector_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.burn_vector_geometry" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">burn_vector_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">geopandas.GeoDataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">like</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'xugrid.Ugrid2d'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="s"><span class="pre">'xugrid.UgridDataArray'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="s"><span class="pre">'xugrid.UgridDataset'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_touched</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/burn.html#burn_vector_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.burn_vector_geometry" title="Link to this definition">#</a></dt>
 <dd><p>Burn vector geometries (points, lines, polygons) into a Ugrid2d mesh.</p>
 <p>If no <code class="docutils literal notranslate"><span class="pre">column</span></code> argument is provided, a value of 1.0 will be burned in to
 the mesh.</p>
@@ -700,11 +698,11 @@ those whose center point is within the polygon.</p></li>
       </div>
     </a>
     <a class="right-next"
-       href="xugrid.earcut_triangulate_polygons.html"
+       href="xugrid.polygonize.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">xugrid.earcut_triangulate_polygons</p>
+        <p class="prev-next-title">xugrid.polygonize</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
