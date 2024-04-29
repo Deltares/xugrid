@@ -114,9 +114,8 @@ def mode(values, indices, weights):
             continue
         w_sum += 1
         for j in range(running_total):  # Compare with previously found values
-            prev_index = indices[j]
-            if values[prev_index] == v:  # matches previous value
-                accum[prev_index] += w  # increase previous weight sum
+            if values[j] == v:  # matches previous value
+                accum[j] += w  # increase previous weight sum
                 break
 
     if w_sum == 0:  # It skipped everything: only nodata values
