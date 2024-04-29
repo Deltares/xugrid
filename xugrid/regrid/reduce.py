@@ -114,16 +114,16 @@ def mode(values, indices, weights):
             continue
         w_sum += 1
         for j in range(running_total):  # Compare with previously found values
-            if values[j] == v:  # matches previous value
-                accum[j] += w  # increase previous weight sum
+            prev_index = indices[j]
+            if values[prev_index] == v:  # matches previous value
+                accum[prev_index] += w  # increase previous weight sum
                 break
 
     if w_sum == 0:  # It skipped everything: only nodata values
         return np.nan
     else:  # Find value with highest frequency
         w_max = 0
-        for i in range(accum.size):
-            w_accum = accum[i]
+        for w_accum, i in zip(accum, indices):
             if w_accum > w_max:
                 w_max = w_accum
                 v = values[i]
