@@ -103,6 +103,14 @@ def test_overlap_regridder_structured(
     assert broadcasted.dims == ("layer", "y", "x")
     assert (broadcasted.isel(layer=0) == expected_results_overlap).any()
 
+    # Test if "mode" method doesn't repeat first values again
+    # https://github.com/Deltares/xugrid/issues/236
+    grid_data_adapted = grid_data_a.copy()
+    grid_data_adapted[0, 0] = 99
+    regridder = OverlapRegridder(source=grid_data_adapted, target=grid_data_a, method="mode")
+    result = regridder.regrid(grid_data_adapted)
+    assert not np.all(result == 99.0)
+
 
 def test_overlap_regridder(disk, quads_1):
     square = quads_1
