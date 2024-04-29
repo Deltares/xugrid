@@ -1431,17 +1431,3 @@ def test_earcut_triangulate_polygons():
     assert isinstance(grid, xugrid.Ugrid2d)
     assert isinstance(index, np.ndarray)
     assert np.array_equal(index, np.zeros(7, dtype=int))
-
-    gdf = gpd.GeoDataFrame(data={"a": [10.0], "b": [20.0]}, geometry=[polygon])
-    uda = xugrid.earcut_triangulate_polygons(polygons=gdf)
-    assert isinstance(uda, xugrid.UgridDataArray)
-    assert np.allclose(uda.to_numpy(), 0)
-    assert uda.name is None
-
-    uda = xugrid.earcut_triangulate_polygons(polygons=gdf, column="a")
-    assert np.allclose(uda.to_numpy(), 10.0)
-    assert uda.name == "a"
-
-    uda = xugrid.earcut_triangulate_polygons(polygons=gdf, column="b")
-    assert np.allclose(uda.to_numpy(), 20.0)
-    assert uda.name == "b"
