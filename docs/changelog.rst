@@ -41,7 +41,13 @@ Added
   maximum connectivity dimensions and their corresponding size.
 - :attr:`xugrid.AbstractUgrid.max_connectivity_dimensions` which returns all
   maximum connectivity dimensions.
-
+- :func:`xugrid.earcut_triangulate_polygons` and
+  :meth:`xugrid.Ugrid2d.earcut_triangulate_polygons` have been added to break
+  down polygon geodataframes into a triangular mesh for further processing.
+- :meth:`xugrid.OverlapRegridder.weights_as_dataframe` has been added to
+  extract regridding weights (overlaps) from the regridders. This method is
+  also available for :class:`BarycentricInterpolator`,
+  :class:`CentroidLocatorRegridder`, and :class:`RelativeOverlapRegridder`.
 
 Changed
 ~~~~~~~

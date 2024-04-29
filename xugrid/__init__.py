@@ -20,7 +20,7 @@ from xugrid.regrid.regridder import (
     OverlapRegridder,
     RelativeOverlapRegridder,
 )
-from xugrid.ugrid.burn import burn_vector_geometry
+from xugrid.ugrid.burn import burn_vector_geometry, earcut_triangulate_polygons
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
 from xugrid.ugrid.polygonize import polygonize
@@ -51,6 +51,7 @@ __all__ = (
     "OverlapRegridder",
     "RelativeOverlapRegridder",
     "burn_vector_geometry",
+    "earcut_triangulate_polygons",
     "UgridRolesAccessor",
     "merge_partitions",
     "polygonize",

@@ -22,6 +22,12 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
+try:
+    import mapbox_earcut
+
+except ImportError:
+    mapbox_earcut = MissingOptionalModule("mapbox_earcut")
+
 
 @nb.njit(inline="always")
 def in_bounds(p: Point, a: Point, b: Point) -> bool:
@@ -227,7 +233,7 @@ def burn_vector_geometry(
     column: str | None = None,
     fill: Union[int, float] = np.nan,
     all_touched: bool = False,
-) -> None:
+) -> xugrid.UgridDataArray:
     """
     Burn vector geometries (points, lines, polygons) into a Ugrid2d mesh.
 
@@ -262,7 +268,7 @@ def burn_vector_geometry(
     GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
 
     if not isinstance(gdf, gpd.GeoDataFrame):
-        raise TypeError(f"gdf must be GeoDataFrame, received: {type(like).__name__}")
+        raise TypeError(f"gdf must be GeoDataFrame, received: {type(gdf).__name__}")
     if isinstance(like, (xugrid.UgridDataArray, xugrid.UgridDataset)):
         like = like.ugrid.grid
     if not isinstance(like, xugrid.Ugrid2d):
@@ -307,3 +313,103 @@ def burn_vector_geometry(
         obj=xr.DataArray(output, dims=[like.face_dimension], name=column),
         grid=like,
     )
+
+
+def grid_from_earcut_polygons(
+    polygons: "geopandas.GeoDataFrame",  # type: ignore # noqa
+    return_index: bool = False,
+):
+    import geopandas as gpd
+
+    if not isinstance(polygons, gpd.GeoDataFrame):
+        raise TypeError(f"Expected GeoDataFrame, received: {type(polygons).__name__}")
+
+    geometry = polygons.geometry
+    POLYGON = shapely.GeometryType.POLYGON
+    GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
+    geometry_id = shapely.get_type_id(geometry)
+
+    if not (geometry_id == POLYGON).all():
+        GEOM_NAMES = {v: k for k, v in shapely.GeometryType.__members__.items()}
+        received = ", ".join(
+            [GEOM_NAMES[geom_id] for geom_id in np.unique(geometry_id)]
+        )
+        raise TypeError(
+            "geometry contains unsupported geometry types. Can only triangulate "
+            f"Polygon geometries. Received: {received}"
+        )
+
+    # Shapely does not provide a vectorized manner to get the interior rings
+    # easily, an index argument is always required, which is a poor fit for
+    # heterogeneous polygons (where some have no holes, and some may have
+    # hundreds).
+    # map_box_earcut is also not vectorized for polygons, so we simply loop
+    # over the geometries here.
+    exterior_coordinates = [
+        shapely.get_coordinates(exterior) for exterior in geometry.exterior
+    ]
+    interior_coordinates = [
+        [shapely.get_coordinates(p_interior) for p_interior in p_interiors]
+        for p_interiors in geometry.interiors
+    ]
+
+    all_triangles = []
+    offset = 0
+    for exterior, interiors in zip(exterior_coordinates, interior_coordinates):
+        rings = np.cumsum([len(exterior)] + [len(interior) for interior in interiors])
+        vertices = np.vstack([exterior] + interiors).astype(np.float64)
+        triangles = mapbox_earcut.triangulate_float64(vertices, rings).reshape((-1, 3))
+        all_triangles.append(triangles + offset)
+        offset += len(vertices)
+
+    face_nodes = np.concatenate(all_triangles).reshape((-1, 3))
+    all_vertices = shapely.get_coordinates(geometry)
+    node_x = all_vertices[:, 0]
+    node_y = all_vertices[:, 1]
+    grid = xugrid.Ugrid2d(node_x, node_y, -1, face_nodes)
+
+    if return_index:
+        n_triangles = [len(triangles) for triangles in all_triangles]
+        index = np.repeat(np.arange(len(geometry)), n_triangles)
+        return grid, index
+    else:
+        return grid
+
+
+def earcut_triangulate_polygons(
+    polygons: "geopandas.GeoDataframe",  # type: ignore # noqa
+    column: str | None = None,
+) -> xugrid.UgridDataArray:
+    """
+    Break down polygons using mapbox_earcut, and create a mesh from the
+    resulting triangles.
+
+    If no ``column`` argument is provided, the polygon index will be assigned
+    to the grid faces.
+
+    Parameters
+    ----------
+    polygons: geopandas.GeoDataFrame
+        Polygons to convert to triangles.
+    column: str, optional
+        Name of the geodataframe column of which to the values to assign
+        to the grid faces.
+
+    Returns
+    -------
+    triangulated: UgridDataArray
+    """
+    grid, index = grid_from_earcut_polygons(polygons, return_index=True)
+
+    if column is not None:
+        da = (
+            polygons[column]
+            .reset_index(drop=True)
+            .to_xarray()
+            .isel(index=index)
+            .rename({"index": grid.face_dimension})
+        )
+    else:
+        da = xr.DataArray(data=index, dims=(grid.face_dimension,))
+
+    return xugrid.UgridDataArray(da, grid)
