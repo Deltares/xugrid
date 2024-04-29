@@ -122,8 +122,7 @@ def mode(values, indices, weights):
         return np.nan
     else:  # Find value with highest frequency
         w_max = 0
-        for i in range(accum.size):
-            w_accum = accum[i]
+        for w_accum, i in zip(accum, indices):
             if w_accum > w_max:
                 w_max = w_accum
                 v = values[i]

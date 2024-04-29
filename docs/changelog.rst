@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Fixed indexing bug in the ``"mode"`` method in
+  :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
+  :class:`xugrid.RelativeOverlapRegridder`, which gave the method the tendency
+  to repeat the first value in the source grid across the target grid.
+
+
 [0.9.0] 2024-02-15
 ------------------
 
