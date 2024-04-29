@@ -361,6 +361,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.merge.html">xugrid.merge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.merge_partitions.html">xugrid.merge_partitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.burn_vector_geometry.html">xugrid.burn_vector_geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.earcut_triangulate_polygons.html">xugrid.earcut_triangulate_polygons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.polygonize.html">xugrid.polygonize</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -582,6 +583,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals2d.html">xugrid.Ugrid2d.from_structured_intervals2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_shapely.html">xugrid.Ugrid2d.from_shapely</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.to_shapely.html">xugrid.Ugrid2d.to_shapely</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.earcut_triangulate_polygons.html">xugrid.Ugrid2d.earcut_triangulate_polygons</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.plot.html">xugrid.Ugrid2d.plot</a></li>
 </ul>
 <ul class="nav bd-sidenav">
@@ -687,6 +689,13 @@ name designating nodes per face.</p></li>
 maximum connectivity dimensions and their corresponding size.</p></li>
 <li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.AbstractUgrid.max_connectivity_dimensions</span></code> which returns all
 maximum connectivity dimensions.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.earcut_triangulate_polygons.html#xugrid.earcut_triangulate_polygons" title="xugrid.earcut_triangulate_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.earcut_triangulate_polygons()</span></code></a> and
+<a class="reference internal" href="api/xugrid.Ugrid2d.earcut_triangulate_polygons.html#xugrid.Ugrid2d.earcut_triangulate_polygons" title="xugrid.Ugrid2d.earcut_triangulate_polygons"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.earcut_triangulate_polygons()</span></code></a> have been added to break
+down polygon geodataframes into a triangular mesh for further processing.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.OverlapRegridder.weights_as_dataframe()</span></code> has been added to
+extract regridding weights (overlaps) from the regridders. This method is
+also available for <code class="xref py py-class docutils literal notranslate"><span class="pre">BarycentricInterpolator</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">CentroidLocatorRegridder</span></code>, and <code class="xref py py-class docutils literal notranslate"><span class="pre">RelativeOverlapRegridder</span></code>.</p></li>
 </ul>
 </section>
 <section id="changed">

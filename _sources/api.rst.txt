@@ -32,6 +32,7 @@ Top-level functions
     merge
     merge_partitions
     burn_vector_geometry
+    earcut_triangulate_polygons
     polygonize
 
 UgridDataArray
@@ -335,6 +336,7 @@ UGRID2D Topology
     Ugrid2d.from_structured_intervals2d
     Ugrid2d.from_shapely
     Ugrid2d.to_shapely
+    Ugrid2d.earcut_triangulate_polygons
 
     Ugrid2d.plot
 
