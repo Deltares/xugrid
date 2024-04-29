@@ -2413,6 +2413,31 @@ document.write(`
         <span class="n">ugrid</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="n">_mesh_kernel</span>
         <span class="k">return</span> <span class="n">ugrid</span>
 
+<div class="viewcode-block" id="Ugrid2d.earcut_triangulate_polygons">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.earcut_triangulate_polygons.html#xugrid.Ugrid2d.earcut_triangulate_polygons">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">earcut_triangulate_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Break down polygons using mapbox_earcut, and create a mesh from the</span>
+<span class="sd">        resulting triangles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        polygons: ndarray of shapely polygons</span>
+<span class="sd">        return_index: bool, default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grid: xugrid.Ugrid2d</span>
+<span class="sd">        index: ndarray of integer, optional</span>
+<span class="sd">            The polygon index for each triangle. Only provided if ``return_index``</span>
+<span class="sd">            is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">burn</span><span class="o">.</span><span class="n">grid_from_earcut_polygons</span><span class="p">(</span>
+            <span class="n">polygons</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="n">return_index</span>
+        <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Ugrid2d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe">[docs]</a>
     <span class="nd">@classmethod</span>

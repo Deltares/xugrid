@@ -413,6 +413,12 @@ document.write(`
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">mapbox_earcut</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">mapbox_earcut</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;mapbox_earcut&quot;</span><span class="p">)</span>
+
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -620,7 +626,7 @@ document.write(`
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
     <span class="n">all_touched</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Burn vector geometries (points, lines, polygons) into a Ugrid2d mesh.</span>
 
@@ -655,7 +661,7 @@ document.write(`
     <span class="n">GEOM_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gdf must be GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">like</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gdf must be GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="p">(</span><span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)):</span>
         <span class="n">like</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">):</span>
@@ -700,6 +706,109 @@ document.write(`
         <span class="n">obj</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">like</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">column</span><span class="p">),</span>
         <span class="n">grid</span><span class="o">=</span><span class="n">like</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">grid_from_earcut_polygons</span><span class="p">(</span>
+    <span class="n">polygons</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">polygons</span><span class="o">.</span><span class="n">geometry</span>
+    <span class="n">POLYGON</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">POLYGON</span>
+    <span class="n">GEOM_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">geometry_id</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">geometry_id</span> <span class="o">==</span> <span class="n">POLYGON</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">GEOM_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">received</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">GEOM_NAMES</span><span class="p">[</span><span class="n">geom_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">geom_id</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">geometry_id</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;geometry contains unsupported geometry types. Can only triangulate &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Polygon geometries. Received: </span><span class="si">{</span><span class="n">received</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Shapely does not provide a vectorized manner to get the interior rings</span>
+    <span class="c1"># easily, an index argument is always required, which is a poor fit for</span>
+    <span class="c1"># heterogeneous polygons (where some have no holes, and some may have</span>
+    <span class="c1"># hundreds).</span>
+    <span class="c1"># map_box_earcut is also not vectorized for polygons, so we simply loop</span>
+    <span class="c1"># over the geometries here.</span>
+    <span class="n">exterior_coordinates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">exterior</span><span class="p">)</span> <span class="k">for</span> <span class="n">exterior</span> <span class="ow">in</span> <span class="n">geometry</span><span class="o">.</span><span class="n">exterior</span>
+    <span class="p">]</span>
+    <span class="n">interior_coordinates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">p_interior</span><span class="p">)</span> <span class="k">for</span> <span class="n">p_interior</span> <span class="ow">in</span> <span class="n">p_interiors</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">p_interiors</span> <span class="ow">in</span> <span class="n">geometry</span><span class="o">.</span><span class="n">interiors</span>
+    <span class="p">]</span>
+
+    <span class="n">all_triangles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">exterior</span><span class="p">,</span> <span class="n">interiors</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exterior_coordinates</span><span class="p">,</span> <span class="n">interior_coordinates</span><span class="p">):</span>
+        <span class="n">rings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">exterior</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">interior</span><span class="p">)</span> <span class="k">for</span> <span class="n">interior</span> <span class="ow">in</span> <span class="n">interiors</span><span class="p">])</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">exterior</span><span class="p">]</span> <span class="o">+</span> <span class="n">interiors</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">triangles</span> <span class="o">=</span> <span class="n">mapbox_earcut</span><span class="o">.</span><span class="n">triangulate_float64</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">rings</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">all_triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">triangles</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+
+    <span class="n">face_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_triangles</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">all_vertices</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+    <span class="n">node_x</span> <span class="o">=</span> <span class="n">all_vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">node_y</span> <span class="o">=</span> <span class="n">all_vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_index</span><span class="p">:</span>
+        <span class="n">n_triangles</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">triangles</span><span class="p">)</span> <span class="k">for</span> <span class="n">triangles</span> <span class="ow">in</span> <span class="n">all_triangles</span><span class="p">]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">)),</span> <span class="n">n_triangles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">grid</span><span class="p">,</span> <span class="n">index</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">grid</span>
+
+
+<div class="viewcode-block" id="earcut_triangulate_polygons">
+<a class="viewcode-back" href="../../../api/xugrid.earcut_triangulate_polygons.html#xugrid.earcut_triangulate_polygons">[docs]</a>
+<span class="k">def</span> <span class="nf">earcut_triangulate_polygons</span><span class="p">(</span>
+    <span class="n">polygons</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataframe&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Break down polygons using mapbox_earcut, and create a mesh from the</span>
+<span class="sd">    resulting triangles.</span>
+
+<span class="sd">    If no ``column`` argument is provided, the polygon index will be assigned</span>
+<span class="sd">    to the grid faces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polygons: geopandas.GeoDataFrame</span>
+<span class="sd">        Polygons to convert to triangles.</span>
+<span class="sd">    column: str, optional</span>
+<span class="sd">        Name of the geodataframe column of which to the values to assign</span>
+<span class="sd">        to the grid faces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    triangulated: UgridDataArray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grid</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid_from_earcut_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">polygons</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">})</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,))</span>
+
+    <span class="k">return</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 </pre></div>
 
