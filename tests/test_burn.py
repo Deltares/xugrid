@@ -244,3 +244,39 @@ def test_burn_vector_geometry(
     # All touched should give the same answer for this specific example.
     actual = xu.burn_vector_geometry(gdf, grid, column="values", all_touched=True)
     assert np.allclose(actual.to_numpy(), expected)
+
+
+def test_earcut_triangulate_polygons():
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+            [0.0, 0.0],
+        ]
+    )
+    hole = np.array(
+        [
+            [
+                [0.25, 0.25],
+                [0.75, 0.25],
+                [0.75, 0.75],
+                [0.25, 0.25],
+            ]
+        ]
+    )
+    polygon = shapely.polygons(xy, holes=hole)
+    gdf = gpd.GeoDataFrame(data={"a": [10.0], "b": [20.0]}, geometry=[polygon])
+    uda = xu.earcut_triangulate_polygons(polygons=gdf)
+    assert isinstance(uda, xu.UgridDataArray)
+    assert np.allclose(uda.to_numpy(), 0)
+    assert uda.name is None
+
+    uda = xu.earcut_triangulate_polygons(polygons=gdf, column="a")
+    assert np.allclose(uda.to_numpy(), 10.0)
+    assert uda.name == "a"
+
+    uda = xu.earcut_triangulate_polygons(polygons=gdf, column="b")
+    assert np.allclose(uda.to_numpy(), 20.0)
+    assert uda.name == "b"

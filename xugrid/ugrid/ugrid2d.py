@@ -1936,6 +1936,28 @@ class Ugrid2d(AbstractUgrid):
         ugrid._meshkernel = _mesh_kernel
         return ugrid
 
+    @staticmethod
+    def earcut_triangulate_polygons(polygons, return_index: bool = False):
+        """
+        Break down polygons using mapbox_earcut, and create a mesh from the
+        resulting triangles.
+
+        Parameters
+        ----------
+        polygons: ndarray of shapely polygons
+        return_index: bool, default is False.
+
+        Returns
+        -------
+        grid: xugrid.Ugrid2d
+        index: ndarray of integer, optional
+            The polygon index for each triangle. Only provided if ``return_index``
+            is True.
+        """
+        return xugrid.ugrid.burn.grid_from_earcut_polygons(
+            polygons, return_index=return_index
+        )
+
     @classmethod
     def from_geodataframe(cls, geodataframe: "geopandas.GeoDataFrame") -> "Ugrid2d":  # type: ignore # noqa
         """

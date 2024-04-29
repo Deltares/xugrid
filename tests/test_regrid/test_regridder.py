@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -44,6 +45,32 @@ def test_structured_to_unstructured(
     regridder = regridder_class(quads_structured, disk)
     actual = regridder.regrid(quads_structured)
     assert isinstance(actual, xu.UgridDataArray)
+
+
+@pytest.mark.parametrize(
+    "regridder_class",
+    [
+        CentroidLocatorRegridder,
+        OverlapRegridder,
+        RelativeOverlapRegridder,
+        BarycentricInterpolator,
+    ],
+)
+def test_weights_as_dataframe(
+    regridder_class,
+    disk,
+    quads_structured,
+):
+    regridder = regridder_class(quads_structured, disk)
+    df = regridder.weights_as_dataframe()
+    assert isinstance(df, pd.DataFrame)
+    assert "source_index" in df
+    assert "target_index" in df
+    assert "weight" in df
+
+    regridder._weights = None
+    with pytest.raises(ValueError):
+        regridder.weights_as_dataframe()
 
 
 def test_centroid_locator_regridder_structured(

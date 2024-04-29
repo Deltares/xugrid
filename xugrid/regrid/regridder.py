@@ -4,6 +4,7 @@ from typing import Callable, Optional, Tuple, Union
 
 import numba
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import xugrid as xu
@@ -85,10 +86,12 @@ class BaseRegridder(abc.ABC):
     ):
         self._source = setup_grid(source)
         self._target = setup_grid(target)
+        self._weights = None
         self._compute_weights(self._source, self._target)
         return
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def weights(self):
         pass
 
@@ -240,6 +243,31 @@ class BaseRegridder(abc.ABC):
         source_ds = self._source.to_dataset("__source")
         target_ds = self._target.to_dataset("__target")
         return xr.merge((weights_ds, source_ds, target_ds))
+
+    def weights_as_dataframe(self) -> pd.DataFrame:
+        """
+        Return the weights as a three column dataframe:
+
+        * source index
+        * target index
+        * weight
+
+        Returns
+        -------
+        weights: pd.DataFrame
+        """
+        matrix = self._weights
+        if matrix is None:
+            raise ValueError("Weights have not been computed yet.")
+        if isinstance(matrix, MatrixCSR):
+            matrix = matrix.to_coo()
+        return pd.DataFrame(
+            {
+                "target_index": matrix.row,
+                "source_index": matrix.col,
+                "weight": matrix.data,
+            }
+        )
 
     @staticmethod
     def _csr_from_dataset(dataset: xr.Dataset) -> MatrixCSR:

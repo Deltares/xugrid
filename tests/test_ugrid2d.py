@@ -1387,3 +1387,47 @@ def test_equals():
     assert not grid.equals(xr_grid)
     grid_copy.attrs["attr"] = "something_else"
     assert not grid.equals(grid_copy)
+
+
+def test_earcut_triangulate_polygons():
+    with pytest.raises(TypeError):
+        xugrid.Ugrid2d.earcut_triangulate_polygons("abc")
+
+    x = np.array([0.0, 1.0, 2.0])
+    y = np.array([0.0, 0.0, 0.0])
+    gdf = gpd.GeoDataFrame(geometry=[shapely.linestrings(x, y)])
+    with pytest.raises(TypeError):
+        xugrid.Ugrid2d.earcut_triangulate_polygons(gdf)
+
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+            [0.0, 0.0],
+        ]
+    )
+    hole = np.array(
+        [
+            [
+                [0.25, 0.25],
+                [0.75, 0.25],
+                [0.75, 0.75],
+                [0.25, 0.25],
+            ]
+        ]
+    )
+    polygon = shapely.polygons(xy, holes=hole)
+    gdf = gpd.GeoDataFrame(geometry=[polygon])
+
+    grid = xugrid.Ugrid2d.earcut_triangulate_polygons(polygons=gdf)
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert grid.n_face == 7
+
+    grid, index = xugrid.Ugrid2d.earcut_triangulate_polygons(
+        polygons=gdf, return_index=True
+    )
+    assert isinstance(grid, xugrid.Ugrid2d)
+    assert isinstance(index, np.ndarray)
+    assert np.array_equal(index, np.zeros(7, dtype=int))
