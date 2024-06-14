@@ -13,7 +13,7 @@ REGISTRY = pooch.create(
     version_dev="main",
     env="XUGRID_DATA_DIR",
 )
-REGISTRY.load_registry(importlib.resources.files("xugrid.data")/ "registry.txt")
+REGISTRY.load_registry(importlib.resources.files("xugrid.data") / "registry.txt")
 
 
 def xoxo():
