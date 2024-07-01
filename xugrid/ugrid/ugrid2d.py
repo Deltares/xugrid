@@ -227,11 +227,13 @@ class Ugrid2d(AbstractUgrid):
         face_node_connectivity = np.full((n_face, n_max_node), fill_value)
         isnode = connectivity.ragged_index(n_face, n_max_node, mesh.nodes_per_face)
         face_node_connectivity[isnode] = mesh.face_nodes
+        edge_node_connectivity = np.reshape(mesh.edge_nodes, (-1, 2))
         return cls(
-            mesh.node_x,
-            mesh.node_y,
+            node_x=mesh.node_x,
+            node_y=mesh.node_y,
             fill_value=fill_value,
             face_node_connectivity=face_node_connectivity,
+            edge_node_connectivity=edge_node_connectivity,
             name=name,
             projected=projected,
             crs=crs,
