@@ -625,11 +625,13 @@ document.write(`
         <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_face</span><span class="p">,</span> <span class="n">n_max_node</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
         <span class="n">isnode</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">ragged_index</span><span class="p">(</span><span class="n">n_face</span><span class="p">,</span> <span class="n">n_max_node</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes_per_face</span><span class="p">)</span>
         <span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">isnode</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_nodes</span>
+        <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edge_nodes</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">mesh</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
-            <span class="n">mesh</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
+            <span class="n">node_x</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
+            <span class="n">node_y</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">projected</span><span class="o">=</span><span class="n">projected</span><span class="p">,</span>
             <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
