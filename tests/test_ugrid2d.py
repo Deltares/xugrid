@@ -311,6 +311,7 @@ def test_ugrid2d_from_meshkernel():
         node_y: np.ndarray
         face_nodes: np.ndarray
         nodes_per_face: np.ndarray
+        edge_nodes: np.ndarray
 
     mesh2d = Mesh2d(
         node_x=np.array([0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0, 0.0, 1.0, 2.0, 3.0]),
@@ -319,13 +320,53 @@ def test_ugrid2d_from_meshkernel():
             [0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 4, 5, 9, 8, 5, 6, 10, 9, 6, 7, 11, 10]
         ),
         nodes_per_face=np.array([4, 4, 4, 4, 4, 4]),
+        edge_nodes=np.array(
+            [
+                4,
+                8,
+                5,
+                6,
+                5,
+                9,
+                6,
+                7,
+                6,
+                10,
+                7,
+                11,
+                8,
+                9,
+                9,
+                10,
+                10,
+                11,
+                0,
+                1,
+                0,
+                4,
+                1,
+                2,
+                1,
+                5,
+                2,
+                3,
+                2,
+                6,
+                3,
+                7,
+                4,
+                5,
+            ]
+        ),
     )
 
     grid = xugrid.Ugrid2d.from_meshkernel(mesh2d)
+    grid.plot()
     assert grid.n_face == 6
     assert np.allclose(mesh2d.node_x, grid.node_x)
     assert np.allclose(mesh2d.node_y, grid.node_y)
     assert np.allclose(grid.face_node_connectivity, mesh2d.face_nodes.reshape((6, 4)))
+    assert np.allclose(grid.edge_node_connectivity, mesh2d.edge_nodes.reshape((-1, 2)))
 
 
 def test_assign_node_coords():
