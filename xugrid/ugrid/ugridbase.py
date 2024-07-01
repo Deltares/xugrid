@@ -272,14 +272,11 @@ class AbstractUgrid(abc.ABC):
         else:
             return self.to_dataset().__repr__()
 
-    def equals(self, other) -> bool:
-        if other is self:
-            return True
-        elif isinstance(other, type(self)):
-            xr_self = self.to_dataset()
-            xr_other = other.to_dataset()
-            return xr_self.identical(xr_other)
-        return False
+    def equals(self, other):
+        if not isinstance(other, type(self)):
+            return False
+        # TODO: check values, etc.
+        return True
 
     def copy(self):
         """Create a deepcopy."""
