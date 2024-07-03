@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+
+- included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
+  so the ordering of edges is consistent with ``meshkernel``.
+
 [0.10.0] 2024-05-01
 -------------------
 
