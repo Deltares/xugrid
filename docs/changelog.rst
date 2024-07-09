@@ -9,10 +9,23 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- :func:`xugrid.merge_partitions` now automatically merges chunks (if defined
+  in the partition datasets). This removes the commonly seen
+  ``PerformanceWarning: Slicing with an out-of-order index is generating ...
+  times more chunks`` warning in subsequent operations, and also greatly
+  improves the performance of subsequent operations (roughly scaling linearly
+  with the number of partitions). The previous behavior can be maintained by
+  setting ``merge_ugrid_chunks=False``. This keyword will likely be deprecated
+  in the future as merging the UGRID dimension chunks should be superior for
+  (almost all?) subsquent operations.
+
 Added
 ~~~~~
 
-- included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
+- Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
   so the ordering of edges is consistent with ``meshkernel``.
 
 [0.10.0] 2024-05-01

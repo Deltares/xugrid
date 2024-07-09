@@ -305,7 +305,7 @@ def merge_data_along_dim(
     return xr.concat(to_merge, dim=merge_dim)
 
 
-def merge_partitions(partitions):
+def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     """
     Merge topology and data, partitioned along UGRID dimensions, into a single
     UgridDataset.
@@ -320,6 +320,8 @@ def merge_partitions(partitions):
     Parameters
     ----------
     partitions : sequence of UgridDataset or UgridDataArray
+    merge_ugrid_chunks: bool, default is True.
+        Whether to merge chunks along the UGRID topology dimensions.
 
     Returns
     -------
@@ -372,5 +374,14 @@ def merge_partitions(partitions):
                 data_objects, vars, dim, dim_indexes, merged_grid
             )
             merged.update(merged_selection)
+
+    # Merge chunks along the UGRID dimensions.
+    if merged.chunks and merge_ugrid_chunks:
+        chunks = dict(merged.chunks)
+        for dim in chunks:
+            # Define a single chunk for each UGRID dimension.
+            if dim in ugrid_dims:
+                chunks[dim] = (merged.dims[dim],)
+        merged = merged.chunk(chunks)
 
     return UgridDataset(merged, merged_grids)
