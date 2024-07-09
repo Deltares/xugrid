@@ -774,7 +774,7 @@ document.write(`
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
             <span class="c1"># Define a single chunk for each UGRID dimension.</span>
             <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
-                <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
+                <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
