@@ -698,7 +698,7 @@ document.write(`
 
 <div class="viewcode-block" id="merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.merge_partitions.html#xugrid.merge_partitions">[docs]</a>
-<span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge topology and data, partitioned along UGRID dimensions, into a single</span>
 <span class="sd">    UgridDataset.</span>
@@ -713,6 +713,8 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    partitions : sequence of UgridDataset or UgridDataArray</span>
+<span class="sd">    merge_ugrid_chunks: bool, default is True.</span>
+<span class="sd">        Whether to merge chunks along the UGRID topology dimensions.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -765,6 +767,15 @@ document.write(`
                 <span class="n">data_objects</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_indexes</span><span class="p">,</span> <span class="n">merged_grid</span>
             <span class="p">)</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merged_selection</span><span class="p">)</span>
+
+    <span class="c1"># Merge chunks along the UGRID dimensions.</span>
+    <span class="k">if</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">and</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+            <span class="c1"># Define a single chunk for each UGRID dimension.</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
+                <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
 

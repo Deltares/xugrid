@@ -653,7 +653,7 @@ document.write(`
 <h1>xugrid.merge_partitions<a class="headerlink" href="#xugrid-merge-partitions" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="xugrid.merge_partitions">
-<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">merge_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partitions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid/partitioning.html#merge_partitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.merge_partitions" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">merge_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_ugrid_chunks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/ugrid/partitioning.html#merge_partitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.merge_partitions" title="Link to this definition">#</a></dt>
 <dd><p>Merge topology and data, partitioned along UGRID dimensions, into a single
 UgridDataset.</p>
 <p>UGRID topologies and variables are merged if they share a name. Topologies
@@ -663,7 +663,10 @@ match.</p>
 match in size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partitions</strong> (<em>sequence</em><em> of </em><a class="reference internal" href="xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.UgridDataset"><em>UgridDataset</em></a><em> or </em><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><em>UgridDataArray</em></a>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>partitions</strong> (<em>sequence</em><em> of </em><a class="reference internal" href="xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.UgridDataset"><em>UgridDataset</em></a><em> or </em><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.UgridDataArray"><em>UgridDataArray</em></a>) – </p></li>
+<li><p><strong>merge_ugrid_chunks</strong> (<em>bool</em><em>, </em><em>default is True.</em>) – Whether to merge chunks along the UGRID topology dimensions.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>merged</strong></p>
