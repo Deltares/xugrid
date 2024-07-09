@@ -358,3 +358,24 @@ class TestMultiTopology1D2DMergePartitions:
         assert merged["c"] == 1
 
         assert self.dataset_expected.equals(merged)
+
+    def test_merge_partitions_merge_chunks(self):
+        # Dataset has no chunks defined, chunks should not appear.
+        merged = pt.merge_partitions(self.datasets_parts)
+        assert len(merged.chunks) == 0
+
+        # Dataset has chunks, keyword is True, chunks should be size 1.
+        datasets_parts = [
+            part.expand_dims({"time": 3}).chunk({"time": 1})
+            for part in self.datasets_parts
+        ]
+        merged = pt.merge_partitions(datasets_parts)
+        assert len(merged.chunks["mesh2d_nFaces"]) == 1
+        assert len(merged.chunks["mesh1d_nEdges"]) == 1
+        assert len(merged.chunks["time"]) == 3
+
+        # Dataset has chunks, keyword is False, chunks should be size npartition.
+        merged = pt.merge_partitions(datasets_parts, merge_ugrid_chunks=False)
+        assert len(merged.chunks["mesh2d_nFaces"]) == 2
+        assert len(merged.chunks["mesh1d_nEdges"]) == 2
+        assert len(merged.chunks["time"]) == 3
