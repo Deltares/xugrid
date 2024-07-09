@@ -381,7 +381,7 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
         for dim in chunks:
             # Define a single chunk for each UGRID dimension.
             if dim in ugrid_dims:
-                chunks[dim] = (merged.dims[dim],)
+                chunks[dim] = (merged.sizes[dim],)
         merged = merged.chunk(chunks)
 
     return UgridDataset(merged, merged_grids)
