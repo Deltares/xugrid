@@ -436,6 +436,7 @@ def edge_connectivity(
     edge_node_connectivity, inverse_indices = np.unique(
         ar=edge_node_connectivity, return_inverse=True, axis=0
     )
+    inverse_indices = inverse_indices.ravel()
 
     if prior is not None:  # prior edge_node_connectivity exists
         unique, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
