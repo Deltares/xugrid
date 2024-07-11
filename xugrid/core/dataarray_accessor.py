@@ -573,7 +573,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         direct_solve: bool = False,
         delta=0.0,
         relax=0.0,
-        tol: float = 1.0e-5,
+        rtol=1.0e-5,
+        atol=0.0,
         maxiter: int = 500,
     ):
         """
@@ -606,7 +607,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             ILU0 preconditioner non-diagonally dominant correction.
         relax: float, default 0.0.
             Modified ILU0 preconditioner relaxation factor.
-        tol: float, optional, default 1.0e-5.
+        rtol: float, optional, default 1.0e-5.
+            Convergence tolerance for ``scipy.sparse.linalg.cg``.
+        atol: float, optional, default 0.0.
             Convergence tolerance for ``scipy.sparse.linalg.cg``.
         maxiter: int, default 500.
             Maximum number of iterations for ``scipy.sparse.linalg.cg``.
@@ -631,7 +634,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             direct_solve=direct_solve,
             delta=delta,
             relax=relax,
-            tol=tol,
+            rtol=rtol,
+            atol=atol,
             maxiter=maxiter,
         )
         da_filled = da.copy(data=filled)

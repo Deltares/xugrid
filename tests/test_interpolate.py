@@ -22,8 +22,8 @@ def test_ilu0():
     b[0] = 1.0
     b[-1] = 1.0
     M = interpolate.ILU0Preconditioner.from_csr_matrix(A)
-    _, info_cg = sparse.linalg.cg(A, b, tol=1.0e-5, maxiter=10)
-    x_pcg, info_pcg = sparse.linalg.cg(A, b, tol=1.0e-5, maxiter=10, M=M)
+    _, info_cg = sparse.linalg.cg(A, b, maxiter=10)
+    x_pcg, info_pcg = sparse.linalg.cg(A, b, maxiter=10, M=M)
     x_direct = sparse.linalg.spsolve(A, b)
     assert info_cg != 0  # cg does not converge
     assert info_pcg == 0  # preconditioned cg does converge

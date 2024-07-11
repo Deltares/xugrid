@@ -207,7 +207,8 @@ def laplace_interpolate(
     direct_solve: bool = False,
     delta=0.0,
     relax=0.0,
-    tol: float = 1.0e-5,
+    atol: float = 0.0,
+    rtol: float = 1.0e-5,
     maxiter: int = 500,
 ):
     """
@@ -235,6 +236,8 @@ def laplace_interpolate(
         ILU0 preconditioner non-diagonally dominant correction.
     relax: float, default 0.0
         Modified ILU0 preconditioner relaxation factor.
+    atol: float, optional, default 0.0
+        Convergence tolerance for ``scipy.sparse.linalg.cg``.
     tol: float, optional, default 1.0e-5.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
     maxiter: int, default 500.
@@ -301,7 +304,7 @@ def laplace_interpolate(
         # Create preconditioner M
         M = ILU0Preconditioner.from_csr_matrix(A, delta=delta, relax=relax)
         # Call conjugate gradient solver
-        x, info = sparse.linalg.cg(A, rhs, tol=tol, maxiter=maxiter, M=M, atol="legacy")
+        x, info = sparse.linalg.cg(A, rhs, rtol=rtol, atol=atol, maxiter=maxiter, M=M)
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:
