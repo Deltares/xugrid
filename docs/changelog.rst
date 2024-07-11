@@ -27,6 +27,15 @@ Added
 
 - Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
   so the ordering of edges is consistent with ``meshkernel``.
+  
+Changed
+~~~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now uses ``rtol``
+  and ``atol`` keywords instead of ``tol``, to match changes in
+  ``scipy.linalg.sparse.cg``.
+
+[0.10.0] 2024-05-01
 
 [0.10.0] 2024-05-01
 -------------------

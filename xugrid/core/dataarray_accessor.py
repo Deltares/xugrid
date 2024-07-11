@@ -573,7 +573,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         direct_solve: bool = False,
         delta=0.0,
         relax=0.0,
-        tol: float = 1.0e-5,
+        rtol=1.0e-5,
+        atol=1.0e-5,
         maxiter: int = 500,
     ):
         """
@@ -631,7 +632,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             direct_solve=direct_solve,
             delta=delta,
             relax=relax,
-            tol=tol,
+            rtol=rtol,
+            atol=atol,
             maxiter=maxiter,
         )
         da_filled = da.copy(data=filled)
