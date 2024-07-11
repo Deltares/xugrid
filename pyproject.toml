@@ -7,12 +7,12 @@ name = "xugrid"
 description = "Xarray extension for unstructured grids"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     'pandas',
     'numba',
     'numba_celltree',
-    'numpy<2.0.0',
+    'numpy',
     'pooch',
     'scipy',
     'xarray',
@@ -25,7 +25,6 @@ classifiers = [
     'Programming Language :: Python',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
@@ -120,12 +119,8 @@ python = "3.11.*"
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"
 
-[tool.pixi.feature.py39.dependencies]
-python = "3.9.*"
-
 [tool.pixi.environments]
 default = { features = ["py312"], solve-group = "py312" }
 py312 = { features = ["py312"], solve-group = "py312" }
 py311 = ["py311"]
 py310 = ["py310"]
-py39 = ["py39"]

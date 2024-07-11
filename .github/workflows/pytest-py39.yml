@@ -1,0 +1,35 @@
+name: pytest
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .
+        # dev dependencies, cannot be read with pip because they are in pixi
+        python -m pip install dask geopandas mapbox_earcut matplotlib-base netcdf4 numba_celltree pip pooch pre-commit pydata-sphinx-theme pymetis pyproj pytest pytest-cov ruff shapely scipy sphinx sphinx-gallery xarray zarr ipykernel twine build 
+    - name: Test with pytest
+      run: |
+        pytest
