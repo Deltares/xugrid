@@ -14,19 +14,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=82662543"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/partitioning';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -57,27 +57,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -99,18 +95,25 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -139,29 +142,29 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -175,7 +178,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -189,15 +192,15 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -208,7 +211,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -219,7 +222,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
       
@@ -232,7 +235,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -243,9 +246,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -266,32 +269,35 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -303,15 +309,15 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -322,7 +328,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -333,7 +339,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
         
@@ -356,14 +362,14 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="vector_conversion.html">Vector geometry conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Partitioning</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/provinces_nl.html">Pronvinces NL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/xoxo.html">Xoxo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/elevation_nl.html">Elevation NL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/adh_san_diego.html">ADH San Diego</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/disk.html">Disk</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -378,13 +384,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -393,7 +399,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -424,7 +430,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-partitioning-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="partitioning">
 <span id="sphx-glr-examples-partitioning-py"></span><h1>Partitioning<a class="headerlink" href="#partitioning" title="Link to this heading">#</a></h1>
@@ -448,7 +454,7 @@ into several parts.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_partitioning_001.png" srcset="../_images/sphx_glr_partitioning_001.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea761c0ce0&gt;
+<img src="../_images/sphx_glr_partitioning_001.png" srcset="../_images/sphx_glr_partitioning_001.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd02bf75550&gt;
 </pre></div>
 </div>
 <p>Let’s start by dividing the grid into four parts:</p>
@@ -474,7 +480,7 @@ its partition label number.</p>
 <span class="n">labels</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_partitioning_003.png" srcset="../_images/sphx_glr_partitioning_003.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea6b8fbda0&gt;
+<img src="../_images/sphx_glr_partitioning_003.png" srcset="../_images/sphx_glr_partitioning_003.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd02b00b770&gt;
 </pre></div>
 </div>
 <p>Not quite the twelve provinces of the Netherlands!</p>
@@ -499,7 +505,7 @@ merge these partitions back into one whole for post-processing:</p>
 <span class="n">merged</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_partitioning_005.png" srcset="../_images/sphx_glr_partitioning_005.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea6b96bda0&gt;
+<img src="../_images/sphx_glr_partitioning_005.png" srcset="../_images/sphx_glr_partitioning_005.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd034ef4770&gt;
 </pre></div>
 </div>
 </section>
@@ -520,7 +526,7 @@ data:</p>
 <span class="n">merged_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_partitioning_007.png" srcset="../_images/sphx_glr_partitioning_007.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fea6a529130&gt;
+<img src="../_images/sphx_glr_partitioning_007.png" srcset="../_images/sphx_glr_partitioning_007.png" alt="partitioning" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fd02a08a330&gt;
 </pre></div>
 </div>
 </section>
@@ -897,7 +903,7 @@ dl.xr-attrs {
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (mesh2d_nFaces: 5248)&gt; Size: 5kB
 array([False, False, False, ..., False, False, False])
 Coordinates:
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-01e6cbb6-8100-4ff9-b806-a3661693c69f' class='xr-array-in' type='checkbox' checked><label for='section-01e6cbb6-8100-4ff9-b806-a3661693c69f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>False False False False False False ... False False False False False</span></div><div class='xr-array-data'><pre>array([False, False, False, ..., False, False, False])</pre></div></div></li><li class='xr-section-item'><input id='section-afbf0bd9-26df-4549-b183-4fff2b99e53f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-afbf0bd9-26df-4549-b183-4fff2b99e53f' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-5183f065-db24-4163-9288-11fe589abba7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5183f065-db24-4163-9288-11fe589abba7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-82a99ef0-4450-4334-8c58-c544a0c17c15' class='xr-var-data-in' type='checkbox'><label for='data-82a99ef0-4450-4334-8c58-c544a0c17c15' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b1d9461c-8e93-4a83-a9e1-2d48eee4d53a' class='xr-section-summary-in' type='checkbox'  ><label for='section-b1d9461c-8e93-4a83-a9e1-2d48eee4d53a' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-40df5c56-5447-42d9-8b45-d5580d8c3d0f' class='xr-index-data-in' type='checkbox'/><label for='index-40df5c56-5447-42d9-8b45-d5580d8c3d0f' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-5ad8f436-8155-4bec-a54b-c9af8c5d848c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-5ad8f436-8155-4bec-a54b-c9af8c5d848c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-916642df-d6a1-483c-9895-b2b1eebd2567' class='xr-array-in' type='checkbox' checked><label for='section-916642df-d6a1-483c-9895-b2b1eebd2567' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>False False False False False False ... False False False False False</span></div><div class='xr-array-data'><pre>array([False, False, False, ..., False, False, False])</pre></div></div></li><li class='xr-section-item'><input id='section-0fbaecd0-3af1-4e93-8ba0-80bffb1019ec' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0fbaecd0-3af1-4e93-8ba0-80bffb1019ec' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-8fb436d6-6646-403d-994a-94f05efb1353' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8fb436d6-6646-403d-994a-94f05efb1353' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-38e9b246-59d6-4a8b-8ce2-d8256a4630e4' class='xr-var-data-in' type='checkbox'><label for='data-38e9b246-59d6-4a8b-8ce2-d8256a4630e4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-254e5e0d-9145-440d-a6c8-5df3d26ae3a8' class='xr-section-summary-in' type='checkbox'  ><label for='section-254e5e0d-9145-440d-a6c8-5df3d26ae3a8' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-3ea9408a-d0c4-4b20-99c7-304f50571ae0' class='xr-index-data-in' type='checkbox'/><label for='index-3ea9408a-d0c4-4b20-99c7-304f50571ae0' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-42d1e628-fe92-4210-af6b-2fb9bd374022' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-42d1e628-fe92-4210-af6b-2fb9bd374022' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>The topology is equivalent, but the nodes, edges, and faces are in a
@@ -1279,9 +1285,9 @@ array([ True,  True,  True, ...,  True,  True,  True])
 Coordinates:
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
     mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-05648a87-09aa-41e6-9fbb-dac927f409b5' class='xr-array-in' type='checkbox' checked><label for='section-05648a87-09aa-41e6-9fbb-dac927f409b5' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True])</pre></div></div></li><li class='xr-section-item'><input id='section-174c9820-61ba-45ff-9d6c-3afa362256c6' class='xr-section-summary-in' type='checkbox'  checked><label for='section-174c9820-61ba-45ff-9d6c-3afa362256c6' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-47a450ee-eb9b-401f-b415-0231ca74a977' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-47a450ee-eb9b-401f-b415-0231ca74a977' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d4c420db-fdd8-45ea-823a-7dc65b9df742' class='xr-var-data-in' type='checkbox'><label for='data-d4c420db-fdd8-45ea-823a-7dc65b9df742' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-ce6a7933-a978-4030-a24a-4dd95eddeef5' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-ce6a7933-a978-4030-a24a-4dd95eddeef5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b0ea21ac-0064-477b-8059-f1cc8e902d04' class='xr-var-data-in' type='checkbox'><label for='data-b0ea21ac-0064-477b-8059-f1cc8e902d04' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-23577b20-95f9-4a9f-8be6-8996a8027964' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-23577b20-95f9-4a9f-8be6-8996a8027964' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2b60c3cb-776f-4bf3-bb29-63bd6a790298' class='xr-var-data-in' type='checkbox'><label for='data-2b60c3cb-776f-4bf3-bb29-63bd6a790298' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-651201cf-1c71-4c25-9abd-129670206d51' class='xr-section-summary-in' type='checkbox'  ><label for='section-651201cf-1c71-4c25-9abd-129670206d51' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-b6203ee0-5ac1-45a1-891e-3b81dcfb9898' class='xr-index-data-in' type='checkbox'/><label for='index-b6203ee0-5ac1-45a1-891e-3b81dcfb9898' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a95cbeec-7a6f-42a7-bcda-b4ad92f9769e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-a95cbeec-7a6f-42a7-bcda-b4ad92f9769e' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-8e0eb4d4-d83a-45ae-8abd-9fd9b20f4a00' class='xr-array-in' type='checkbox' checked><label for='section-8e0eb4d4-d83a-45ae-8abd-9fd9b20f4a00' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True])</pre></div></div></li><li class='xr-section-item'><input id='section-f52bc235-56af-4b89-9e34-1ff927afd55c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-f52bc235-56af-4b89-9e34-1ff927afd55c' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-01ca0ce8-1353-4bff-ac51-ad60b63dc77a' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-01ca0ce8-1353-4bff-ac51-ad60b63dc77a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ca8193da-96e3-4af6-9567-94e51df8f6a8' class='xr-var-data-in' type='checkbox'><label for='data-ca8193da-96e3-4af6-9567-94e51df8f6a8' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-0330b97e-af92-4ef8-9c84-4a5a980168f6' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-0330b97e-af92-4ef8-9c84-4a5a980168f6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-60659037-a9dd-4305-a81d-21b8fae428a7' class='xr-var-data-in' type='checkbox'><label for='data-60659037-a9dd-4305-a81d-21b8fae428a7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-64353fec-19f0-42c1-8f04-9dfd456b7c0f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-64353fec-19f0-42c1-8f04-9dfd456b7c0f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5bd0066e-5749-4ce2-8eb4-77864150fd63' class='xr-var-data-in' type='checkbox'><label for='data-5bd0066e-5749-4ce2-8eb4-77864150fd63' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-81968ded-2e13-4a92-86ac-d71861d8ebcf' class='xr-section-summary-in' type='checkbox'  ><label for='section-81968ded-2e13-4a92-86ac-d71861d8ebcf' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-afc61f5a-147a-4922-a4d6-2331819d3741' class='xr-index-data-in' type='checkbox'/><label for='index-afc61f5a-147a-4922-a4d6-2331819d3741' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-fddf5894-a0dd-4e02-bccb-31e1ea178821' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-fddf5894-a0dd-4e02-bccb-31e1ea178821' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Alternatively, we can also assign IDs, carry these along, and use these to
@@ -1667,15 +1673,15 @@ array([ True,  True,  True, ...,  True,  True,  True])
 Coordinates:
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
     mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-f1b4fc37-47cf-43c1-9ffc-3291f278ac98' class='xr-array-in' type='checkbox' checked><label for='section-f1b4fc37-47cf-43c1-9ffc-3291f278ac98' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True])</pre></div></div></li><li class='xr-section-item'><input id='section-1ddae86a-3339-46bd-8a4d-e9ef146780ce' class='xr-section-summary-in' type='checkbox'  checked><label for='section-1ddae86a-3339-46bd-8a4d-e9ef146780ce' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-69962ddd-5ed7-45a7-951b-316916a071be' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-69962ddd-5ed7-45a7-951b-316916a071be' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-49467567-f074-4bfb-8407-6dcab2f9ee4d' class='xr-var-data-in' type='checkbox'><label for='data-49467567-f074-4bfb-8407-6dcab2f9ee4d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-cf232b66-74d0-4ec5-be41-12940a838121' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-cf232b66-74d0-4ec5-be41-12940a838121' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5083f0ea-3953-4789-bf9e-a82ba1b4277a' class='xr-var-data-in' type='checkbox'><label for='data-5083f0ea-3953-4789-bf9e-a82ba1b4277a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-2b4ef3ca-b3da-4d81-ad40-c39a93499d9a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2b4ef3ca-b3da-4d81-ad40-c39a93499d9a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-18ad8792-9ed5-4346-aee0-c2fbf7a362cc' class='xr-var-data-in' type='checkbox'><label for='data-18ad8792-9ed5-4346-aee0-c2fbf7a362cc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-fac905a5-f08f-497b-bcd4-c1ef7d7e4f5e' class='xr-section-summary-in' type='checkbox'  ><label for='section-fac905a5-f08f-497b-bcd4-c1ef7d7e4f5e' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-310ccff3-a382-463f-bb54-108ade2f94e7' class='xr-index-data-in' type='checkbox'/><label for='index-310ccff3-a382-463f-bb54-108ade2f94e7' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-28101d58-0080-4b68-9758-08d382a6a2ee' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-28101d58-0080-4b68-9758-08d382a6a2ee' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-84587ef1-52b2-4f08-91f9-9c3bd9d35e17' class='xr-array-in' type='checkbox' checked><label for='section-84587ef1-52b2-4f08-91f9-9c3bd9d35e17' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True])</pre></div></div></li><li class='xr-section-item'><input id='section-8dba95b0-467d-4105-b7c7-315d55867d21' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8dba95b0-467d-4105-b7c7-315d55867d21' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-866ea8bd-4f88-460b-8e44-2612f9cd8540' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-866ea8bd-4f88-460b-8e44-2612f9cd8540' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0b5c9342-4286-44d3-a579-c436bea6b219' class='xr-var-data-in' type='checkbox'><label for='data-0b5c9342-4286-44d3-a579-c436bea6b219' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-0a75c1a2-a081-4c6a-8127-0155e04a72e5' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-0a75c1a2-a081-4c6a-8127-0155e04a72e5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c0ad4d1a-7e0e-415c-8b39-a40b645fa4dc' class='xr-var-data-in' type='checkbox'><label for='data-c0ad4d1a-7e0e-415c-8b39-a40b645fa4dc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-80748a0f-524e-4153-8ab1-85f843e19bb0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-80748a0f-524e-4153-8ab1-85f843e19bb0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-dfe9079b-6774-4b5c-8289-75ca23b2abee' class='xr-var-data-in' type='checkbox'><label for='data-dfe9079b-6774-4b5c-8289-75ca23b2abee' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-932fa7e9-aaf7-4e2e-9abe-2af07c9ca2a7' class='xr-section-summary-in' type='checkbox'  ><label for='section-932fa7e9-aaf7-4e2e-9abe-2af07c9ca2a7' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-163930e9-9ba6-4a3f-a9c5-0e21d9c5b5ce' class='xr-index-data-in' type='checkbox'/><label for='index-163930e9-9ba6-4a3f-a9c5-0e21d9c5b5ce' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-de3c6975-6f1c-45e5-9260-32b569701eed' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-de3c6975-6f1c-45e5-9260-32b569701eed' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>This is required if results are compared with the input, or with results
 stemming from another partitioning, e.g. one with a different number of
 partitions.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.909 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.845 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-partitioning-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4ef29d5e41f3b42a13ed1782fdafc6d7/partitioning.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">partitioning.ipynb</span></code></a></p>
@@ -1695,7 +1701,7 @@ partitions.</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1764,8 +1770,8 @@ partitions.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1785,7 +1791,7 @@ partitions.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     <br/>
   </p>
 </div>
@@ -1798,7 +1804,7 @@ partitions.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
 </p></div>
       
     </div>

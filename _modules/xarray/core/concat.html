@@ -13,19 +13,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../../_static/documentation_options.js?v=82662543"></script>
-    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/concat';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -54,27 +54,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -96,18 +92,25 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../../../index.html">
@@ -136,29 +139,29 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -172,7 +175,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -186,15 +189,15 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -205,7 +208,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -216,7 +219,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
       
@@ -229,7 +232,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -261,32 +264,35 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -298,15 +304,15 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -317,7 +323,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -328,7 +334,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
         
@@ -345,13 +351,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -360,7 +366,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -399,6 +405,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span><span class="p">,</span> <span class="n">reindex_variables</span>
+<span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
 <span class="kn">from</span> <span class="nn">xarray.core.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
 <span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
 <span class="kn">from</span> <span class="nn">xarray.core.merge</span> <span class="kn">import</span> <span class="p">(</span>
@@ -433,6 +440,7 @@ document.write(`
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span> <span class="o">...</span>
 
 
@@ -447,6 +455,7 @@ document.write(`
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataArray</span><span class="p">:</span> <span class="o">...</span>
 
 
@@ -462,6 +471,7 @@ document.write(`
     <span class="n">fill_value</span><span class="o">=</span><span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Concatenate xarray objects along a new or existing dimension.</span>
 
@@ -555,6 +565,8 @@ document.write(`
 
 <span class="sd">        If a callable, it must expect a sequence of ``attrs`` dicts and a context object</span>
 <span class="sd">        as its only parameters.</span>
+<span class="sd">    create_index_for_new_dim : bool, default: True</span>
+<span class="sd">        Whether to create a new ``PandasIndex`` object when the objects being concatenated contain scalar variables named ``dim``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -610,6 +622,25 @@ document.write(`
 <span class="sd">        x        (new_dim) &lt;U1 8B &#39;a&#39; &#39;b&#39;</span>
 <span class="sd">      * y        (y) int64 24B 10 20 30</span>
 <span class="sd">      * new_dim  (new_dim) int64 16B -90 -100</span>
+
+<span class="sd">    # Concatenate a scalar variable along a new dimension of the same name with and without creating a new index</span>
+
+<span class="sd">    &gt;&gt;&gt; ds = xr.Dataset(coords={&quot;x&quot;: 0})</span>
+<span class="sd">    &gt;&gt;&gt; xr.concat([ds, ds], dim=&quot;x&quot;)</span>
+<span class="sd">    &lt;xarray.Dataset&gt; Size: 16B</span>
+<span class="sd">    Dimensions:  (x: 2)</span>
+<span class="sd">    Coordinates:</span>
+<span class="sd">      * x        (x) int64 16B 0 0</span>
+<span class="sd">    Data variables:</span>
+<span class="sd">        *empty*</span>
+
+<span class="sd">    &gt;&gt;&gt; xr.concat([ds, ds], dim=&quot;x&quot;).indexes</span>
+<span class="sd">    Indexes:</span>
+<span class="sd">        x        Index([0, 0], dtype=&#39;int64&#39;, name=&#39;x&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; xr.concat([ds, ds], dim=&quot;x&quot;, create_index_for_new_dim=False).indexes</span>
+<span class="sd">    Indexes:</span>
+<span class="sd">        *empty*</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: add ignore_index arguments copied from pandas.concat</span>
     <span class="c1"># TODO: support concatenating scalar coordinates even if the concatenated</span>
@@ -638,6 +669,7 @@ document.write(`
             <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
             <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+            <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_obj</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_dataset_concat</span><span class="p">(</span>
@@ -650,6 +682,7 @@ document.write(`
             <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
             <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+            <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -833,7 +866,7 @@ document.write(`
             <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dim_coords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dim_coords</span><span class="p">:</span>
                 <span class="n">dim_coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span>
         <span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
 
@@ -850,6 +883,7 @@ document.write(`
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Concatenate a sequence of datasets along a new or existing dimension</span>
@@ -883,7 +917,6 @@ document.write(`
         <span class="n">datasets</span>
     <span class="p">)</span>
     <span class="n">dim_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dim_coords</span><span class="p">)</span>
-    <span class="n">unlabeled_dims</span> <span class="o">=</span> <span class="n">dim_names</span> <span class="o">-</span> <span class="n">coord_names</span>
 
     <span class="n">both_data_and_coords</span> <span class="o">=</span> <span class="n">coord_names</span> <span class="o">&amp;</span> <span class="n">data_names</span>
     <span class="k">if</span> <span class="n">both_data_and_coords</span><span class="p">:</span>
@@ -896,7 +929,10 @@ document.write(`
 
     <span class="c1"># case where concat dimension is a coordinate or data_var but not a dimension</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">coord_names</span> <span class="ow">or</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">data_names</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="p">:</span>
-        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span>
+        <span class="p">]</span>
 
     <span class="c1"># determine which variables to concatenate</span>
     <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span> <span class="o">=</span> <span class="n">_calc_concat_over</span><span class="p">(</span>
@@ -904,7 +940,7 @@ document.write(`
     <span class="p">)</span>
 
     <span class="c1"># determine which variables to merge, and then merge them according to compat</span>
-    <span class="n">variables_to_merge</span> <span class="o">=</span> <span class="p">(</span><span class="n">coord_names</span> <span class="o">|</span> <span class="n">data_names</span><span class="p">)</span> <span class="o">-</span> <span class="n">concat_over</span> <span class="o">-</span> <span class="n">unlabeled_dims</span>
+    <span class="n">variables_to_merge</span> <span class="o">=</span> <span class="p">(</span><span class="n">coord_names</span> <span class="o">|</span> <span class="n">data_names</span><span class="p">)</span> <span class="o">-</span> <span class="n">concat_over</span>
 
     <span class="n">result_vars</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">result_indexes</span> <span class="o">=</span> <span class="p">{}</span>
@@ -961,7 +997,8 @@ document.write(`
                 <span class="n">var</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">set_dims</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-                    <span class="k">yield</span> <span class="n">PandasIndex</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">coord_dtype</span><span class="o">=</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">create_index_for_new_dim</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">PandasIndex</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">coord_dtype</span><span class="o">=</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># create concatenation index, needed for later reindexing</span>
     <span class="n">file_start_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">))</span>
@@ -1040,29 +1077,33 @@ document.write(`
             <span class="c1"># preserves original variable order</span>
             <span class="n">result_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">result</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">])(</span><span class="n">result_vars</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">result_attrs</span><span class="p">)</span>
-
-    <span class="n">absent_coord_names</span> <span class="o">=</span> <span class="n">coord_names</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+    <span class="n">absent_coord_names</span> <span class="o">=</span> <span class="n">coord_names</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">result_vars</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">absent_coord_names</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Variables </span><span class="si">{</span><span class="n">absent_coord_names</span><span class="si">!r}</span><span class="s2"> are coordinates in some datasets but not others.&quot;</span>
         <span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">set_coords</span><span class="p">(</span><span class="n">coord_names</span><span class="p">)</span>
-    <span class="n">result</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">result_encoding</span>
 
-    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">unlabeled_dims</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">result_data_vars</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">coord_vars</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">result_var</span> <span class="ow">in</span> <span class="n">result_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">coord_names</span><span class="p">:</span>
+            <span class="n">coord_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_var</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result_data_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_var</span>
 
     <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># add concat index / coordinate last to ensure that its in the final Dataset</span>
         <span class="k">if</span> <span class="n">dim_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index_vars</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">create_variables</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">dim_var</span><span class="p">})</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">index_vars</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">create_variables</span><span class="p">()</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index_vars</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+
+        <span class="n">coord_vars</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index_vars</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
         <span class="n">result_indexes</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
 
-    <span class="c1"># TODO: add indexes at Dataset creation (when it is supported)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">_overwrite_indexes</span><span class="p">(</span><span class="n">result_indexes</span><span class="p">)</span>
+    <span class="n">coords_obj</span> <span class="o">=</span> <span class="n">Coordinates</span><span class="p">(</span><span class="n">coord_vars</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">result_indexes</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">])(</span><span class="n">result_data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords_obj</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">result_attrs</span><span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">result_encoding</span>
 
     <span class="k">return</span> <span class="n">result</span>
 
@@ -1077,6 +1118,7 @@ document.write(`
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataArray</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
 
@@ -1113,6 +1155,7 @@ document.write(`
         <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
         <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+        <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">merged_attrs</span> <span class="o">=</span> <span class="n">merge_attrs</span><span class="p">([</span><span class="n">da</span><span class="o">.</span><span class="n">attrs</span> <span class="k">for</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">],</span> <span class="n">combine_attrs</span><span class="p">)</span>
@@ -1129,7 +1172,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -1138,8 +1181,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -1152,8 +1193,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1173,7 +1214,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     <br/>
   </p>
 </div>
@@ -1186,7 +1227,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
 </p></div>
       
     </div>

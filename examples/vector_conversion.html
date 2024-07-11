@@ -14,19 +14,19 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=1c61d878" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=82662543"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/vector_conversion';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -57,27 +57,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -99,18 +95,25 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -139,29 +142,29 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -175,7 +178,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -189,15 +192,15 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -208,7 +211,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -219,7 +222,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
       
@@ -232,7 +235,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -243,9 +246,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -266,32 +269,35 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../user_guide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../api.html">
-                        API Reference
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../dev_docs.html">
-                        Development
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../dev_docs.html">
+    Development
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -303,15 +309,15 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -322,7 +328,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
+          <a href="https://github.com/Deltares/xugrid" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="icon-link-image" alt="GitHub"/></a>
         </li>
         <li class="nav-item">
           
@@ -333,7 +339,7 @@ document.write(`
           
           
           
-          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+          <a href="https://deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
         </li>
 </ul></div>
         
@@ -356,14 +362,14 @@ document.write(`
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Vector geometry conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="partitioning.html">Partitioning</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/provinces_nl.html">Pronvinces NL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/xoxo.html">Xoxo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/elevation_nl.html">Elevation NL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/adh_san_diego.html">ADH San Diego</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../sample_data/disk.html">Disk</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -378,13 +384,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -393,7 +399,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -424,7 +430,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-vector-conversion-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="vector-geometry-conversion">
 <span id="sphx-glr-examples-vector-conversion-py"></span><h1>Vector geometry conversion<a class="headerlink" href="#vector-geometry-conversion" title="Link to this heading">#</a></h1>
@@ -446,7 +452,7 @@ unstructured grids. These are demonstrated below.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea7656cbc0&gt;
+<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd034f9aa20&gt;
 </pre></div>
 </div>
 <section id="conversion-to-geodataframe">
@@ -470,8 +476,8 @@ mesh2d_nFaces             ...
 5243            0.930000  ...  POLYGON ((38115.173 400096.935, 34838.247 3952...
 5244           36.189999  ...  POLYGON ((252916.585 467082.681, 255888.448 45...
 5245            0.280000  ...  POLYGON ((34838.247 395258.331, 34522.298 3998...
-5246          -15.830000  ...  POLYGON ((32729.434 403338.332, 32167.160 3973...
-5247           -0.450000  ...  POLYGON ((29985.831 394355.220, 32167.160 3973...
+5246          -15.830000  ...  POLYGON ((32729.434 403338.332, 32167.16 39737...
+5247           -0.450000  ...  POLYGON ((29985.831 394355.22, 32167.16 397379...
 
 [5248 rows x 4 columns]
 </pre></div>
@@ -857,9 +863,9 @@ Coordinates:
 Data variables:
     elevation      (mesh2d_nFaces) float32 21kB 1.17 9.81 54.04 ... -15.83 -0.45
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
-    mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-0f85e984-adcc-4673-b605-88fbc60ecefc' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0f85e984-adcc-4673-b605-88fbc60ecefc' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-184d9306-dadb-4495-afec-bb90b117254c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-184d9306-dadb-4495-afec-bb90b117254c' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-3edd234f-88b4-4622-825c-bfcadf3db984' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3edd234f-88b4-4622-825c-bfcadf3db984' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-07b58522-d5a5-404d-a617-2de757e69d69' class='xr-var-data-in' type='checkbox'><label for='data-07b58522-d5a5-404d-a617-2de757e69d69' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8e6f9f56-f8c4-4355-8341-c50cb2fa3a12' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8e6f9f56-f8c4-4355-8341-c50cb2fa3a12' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-f3e9d0e3-05cc-4b4b-84e1-33b41f23d647' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f3e9d0e3-05cc-4b4b-84e1-33b41f23d647' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-23a40ab9-6929-4fc6-93da-99006e136952' class='xr-var-data-in' type='checkbox'><label for='data-23a40ab9-6929-4fc6-93da-99006e136952' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-f0b7f6fa-0827-48a5-9f47-601b868e4c23' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f0b7f6fa-0827-48a5-9f47-601b868e4c23' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7554c0cf-448a-42a9-81a8-3e3bb0722699' class='xr-var-data-in' type='checkbox'><label for='data-7554c0cf-448a-42a9-81a8-3e3bb0722699' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-307d2adf-4e3b-46af-bf8f-dccbff89c8a6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-307d2adf-4e3b-46af-bf8f-dccbff89c8a6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8cab0820-d590-4455-be05-e32079c73ee9' class='xr-var-data-in' type='checkbox'><label for='data-8cab0820-d590-4455-be05-e32079c73ee9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7a8d6067-2b48-4ce5-a91b-c5e86735f5ba' class='xr-section-summary-in' type='checkbox'  ><label for='section-7a8d6067-2b48-4ce5-a91b-c5e86735f5ba' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-2a63509c-aaf9-465d-aa3a-e78c93cc074e' class='xr-index-data-in' type='checkbox'/><label for='index-2a63509c-aaf9-465d-aa3a-e78c93cc074e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-4ebb8d9e-31e7-466f-b3b9-6cf4016af3d3' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-4ebb8d9e-31e7-466f-b3b9-6cf4016af3d3' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-0acf76bc-29c0-4d74-85e5-95fb15d20ace' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-0acf76bc-29c0-4d74-85e5-95fb15d20ace' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-a4b6c2b6-1b7a-4f2b-b0b2-f6ca4a5b0189' class='xr-section-summary-in' type='checkbox'  checked><label for='section-a4b6c2b6-1b7a-4f2b-b0b2-f6ca4a5b0189' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-f6333610-9aa3-4b35-b907-7dd3281d59ce' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f6333610-9aa3-4b35-b907-7dd3281d59ce' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-be7f6755-0645-4b50-b38b-20c5491577ba' class='xr-var-data-in' type='checkbox'><label for='data-be7f6755-0645-4b50-b38b-20c5491577ba' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([   0,    1,    2, ..., 5245, 5246, 5247])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e2454858-a39d-466f-bed2-1b7c2cea5bd8' class='xr-section-summary-in' type='checkbox'  checked><label for='section-e2454858-a39d-466f-bed2-1b7c2cea5bd8' class='xr-section-summary' >Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-3e271351-5ce8-4ee3-8441-a7bc1cbf0def' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3e271351-5ce8-4ee3-8441-a7bc1cbf0def' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9791ad50-a6d4-4426-94e1-f53aafe56ced' class='xr-var-data-in' type='checkbox'><label for='data-9791ad50-a6d4-4426-94e1-f53aafe56ced' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45], dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-303f9b0d-81f9-4c49-8706-91532cb39346' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-303f9b0d-81f9-4c49-8706-91532cb39346' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-64ff28db-edbf-4b14-a86a-059b9ba275ea' class='xr-var-data-in' type='checkbox'><label for='data-64ff28db-edbf-4b14-a86a-059b9ba275ea' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+        33842.56847139,  33139.63056206,  30303.5164253 ])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-40d50045-3b89-4283-8431-7b76c1c43ae6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-40d50045-3b89-4283-8431-7b76c1c43ae6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b60af703-f0fc-45f2-a1ac-bee27684ab7d' class='xr-var-data-in' type='checkbox'><label for='data-b60af703-f0fc-45f2-a1ac-bee27684ab7d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+       397494.51640391, 400187.85011645, 396399.29036318])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-bbdb68a2-f851-4b86-9a13-57b470f314a9' class='xr-section-summary-in' type='checkbox'  ><label for='section-bbdb68a2-f851-4b86-9a13-57b470f314a9' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-cab8a66a-0c92-43ca-a8df-39c713fd0b29' class='xr-index-data-in' type='checkbox'/><label for='index-cab8a66a-0c92-43ca-a8df-39c713fd0b29' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b9505b40-88e7-4072-b742-f7f107c11d55' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-b9505b40-88e7-4072-b742-f7f107c11d55' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><div class="admonition note">
@@ -895,7 +901,7 @@ burn into the grid.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea6b41a0c0&gt;
+<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd02b150ad0&gt;
 </pre></div>
 </div>
 <p>This makes it very easy to classify and group data. Let’s say
@@ -1275,9 +1281,9 @@ array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
 Coordinates:
   * id       (id) float64 96B 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-0a3d3deb-a776-408b-a256-7fff0378b01d' class='xr-array-in' type='checkbox' checked><label for='section-0a3d3deb-a776-408b-a256-7fff0378b01d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-c467be21-f972-4d36-9a9f-d8317a7dc64d' class='xr-array-in' type='checkbox' checked><label for='section-c467be21-f972-4d36-9a9f-d8317a7dc64d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
        52.252567  , 12.194658  , -1.7175047 , 11.021334  ,  3.0442472 ,
-       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-c2a249f6-2977-4be6-bdad-a75291ef73ff' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c2a249f6-2977-4be6-bdad-a75291ef73ff' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-8744ba3f-d63f-4a1d-9013-034cfe99ee3a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-8744ba3f-d63f-4a1d-9013-034cfe99ee3a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7d691d3b-43c5-471b-ab01-c4d9bd61e9dc' class='xr-var-data-in' type='checkbox'><label for='data-7d691d3b-43c5-471b-ab01-c4d9bd61e9dc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-33d93e8f-dabc-4bd9-b949-73cd6adfa92e' class='xr-section-summary-in' type='checkbox'  ><label for='section-33d93e8f-dabc-4bd9-b949-73cd6adfa92e' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>id</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-e29ccc48-cbf8-41fa-8045-cf3c29320c9a' class='xr-index-data-in' type='checkbox'/><label for='index-e29ccc48-cbf8-41fa-8045-cf3c29320c9a' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0], dtype=&#x27;float64&#x27;, name=&#x27;id&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1013e89d-7e9b-4da2-a9bd-f2ae24d7a345' class='xr-section-summary-in' type='checkbox'  checked><label for='section-1013e89d-7e9b-4da2-a9bd-f2ae24d7a345' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-1f7dd8fb-8e6f-4477-a3be-f20f4188edce' class='xr-section-summary-in' type='checkbox'  checked><label for='section-1f7dd8fb-8e6f-4477-a3be-f20f4188edce' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-4e17d686-6610-4fa4-b407-36477638a209' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4e17d686-6610-4fa4-b407-36477638a209' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-07a8c9bc-c832-4174-82b0-d2ac57dbcd35' class='xr-var-data-in' type='checkbox'><label for='data-07a8c9bc-c832-4174-82b0-d2ac57dbcd35' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a53fa691-074b-4b93-92e4-39de76d8f179' class='xr-section-summary-in' type='checkbox'  ><label for='section-a53fa691-074b-4b93-92e4-39de76d8f179' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>id</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-453131a1-b7e7-4213-8f2e-aa10ec1a7417' class='xr-index-data-in' type='checkbox'/><label for='index-453131a1-b7e7-4213-8f2e-aa10ec1a7417' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0], dtype=&#x27;float64&#x27;, name=&#x27;id&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b8ee7b92-b355-48af-a8f7-f05fee05be95' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b8ee7b92-b355-48af-a8f7-f05fee05be95' class='xr-section-summary' >Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>This is a convenient way to create masks for specific regions:</p>
@@ -1317,7 +1323,7 @@ by setting <code class="docutils literal notranslate"><span class="pre">all_touc
 <span class="n">modified</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea6b405d60&gt;
+<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd02afcfb60&gt;
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">all_touched=True</span></code> is less suitable when differently valued
@@ -1377,7 +1383,7 @@ burn operation.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fea66018d70&gt;
+<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fd025c10f80&gt;
 </pre></div>
 </div>
 </section>
@@ -1434,7 +1440,7 @@ centroid of an edge, it is snapped to that edge.</p>
 triangles in the lower left corner which are surrounded by the snapped edges.
 In general, results are best when the line segments are relatively large
 compare to the grid faces.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.473 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.443 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-vector-conversion-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/be05b5a234b2a85e0ca223679f6e137e/vector_conversion.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">vector_conversion.ipynb</span></code></a></p>
@@ -1454,7 +1460,7 @@ compare to the grid faces.</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1523,8 +1529,8 @@ compare to the grid faces.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1544,7 +1550,7 @@ compare to the grid faces.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     <br/>
   </p>
 </div>
@@ -1557,7 +1563,7 @@ compare to the grid faces.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
 </p></div>
       
     </div>
