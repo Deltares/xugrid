@@ -7,7 +7,7 @@ name = "xugrid"
 description = "Xarray extension for unstructured grids"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
     'pandas',
     'numba',
@@ -25,6 +25,7 @@ classifiers = [
     'Programming Language :: Python',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
@@ -120,11 +121,15 @@ python = "3.11.*"
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"
 
+[tool.pixi.feature.py309.dependencies]
+python = "3.9.*"
+
 [tool.pixi.environments]
 default = { features = ["py312"], solve-group = "py312" }
 py312 = { features = ["py312"], solve-group = "py312" }
 py311 = ["py311"]
 py310 = ["py310"]
+py309 = ["py309"]
 
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/
