@@ -69,6 +69,7 @@ def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntA
     segments = np.column_stack([linear_index[:-1], linear_index[1:]])
     segments = segments[np.diff(index) == 0]
     unique, inverse = np.unique(xy, return_inverse=True, axis=0)
+    inverse = inverse.ravel()
     segments = inverse[segments]
     x, y = contiguous_xy(unique)
     return x, y, segments
@@ -93,6 +94,7 @@ def polygons_to_faces(
         *shapely.get_coordinates(polygons, return_index=True)
     )
     unique, inverse = np.unique(xy, axis=0, return_inverse=True)
+    inverse = inverse.ravel()
     n = len(polygons)
     m_per_row = np.bincount(indices)
     m = m_per_row.max()

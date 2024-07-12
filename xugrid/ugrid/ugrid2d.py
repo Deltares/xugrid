@@ -1586,6 +1586,7 @@ class Ugrid2d(AbstractUgrid):
         _, node_index, inverse = np.unique(
             coordinates, return_index=True, return_inverse=True, axis=0
         )
+        inverse = inverse.ravel()
         # Create a mapping of the inverse index to the new node index.
         new_index = connectivity.renumber(node_index)
         new_faces = new_index[inverse[self.face_node_connectivity]]

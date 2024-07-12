@@ -84,6 +84,7 @@ def merge_nodes(grids):
     _, index, inverse = np.unique(
         node_xy, axis=0, return_index=True, return_inverse=True
     )
+    inverse = inverse.ravel()
     # We want to maintain order, so create an inverse index to the new numbers.
     inverse = renumber(index)[inverse]
     # Maintain order.
