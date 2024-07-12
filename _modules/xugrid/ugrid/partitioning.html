@@ -481,6 +481,7 @@ document.write(`
     <span class="n">_</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
         <span class="n">node_xy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
+    <span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="c1"># We want to maintain order, so create an inverse index to the new numbers.</span>
     <span class="n">inverse</span> <span class="o">=</span> <span class="n">renumber</span><span class="p">(</span><span class="n">index</span><span class="p">)[</span><span class="n">inverse</span><span class="p">]</span>
     <span class="c1"># Maintain order.</span>
