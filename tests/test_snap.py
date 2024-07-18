@@ -9,6 +9,24 @@ import xugrid as xu
 from xugrid.ugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
 
 
+@pytest.fixture(scope="function")
+def structured():
+    shape = nlay, nrow, ncol = 3, 9, 9
+    dx = 10.0
+    dy = -10.0
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+    dims = ("layer", "y", "x")
+
+    layer = np.arange(1, nlay + 1)
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"layer": layer, "y": y, "x": x}
+
+    return xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
+
 def test_snap__three_points():
     x = y = np.array([0.0, 1.0, 1.5])
     inv_perm, snap_x, snap_y = snap_nodes(x, y, 0.1)
@@ -125,25 +143,8 @@ def test_snap_to_grid():
     # TODO test for returned values...
 
 
-def test_snap_to_grid_with_data():
+def test_snap_to_grid_with_data(structured):
     # This caused a failure in 0.6.3
-
-    shape = nlay, nrow, ncol = 3, 9, 9
-    dx = 10.0
-    dy = -10.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-    dims = ("layer", "y", "x")
-
-    layer = np.arange(1, nlay + 1)
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-
-    structured = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
-
     line_x = [2.2, 2.2, 2.2]
     line_y = [82.0, 40.0, 0.0]
     geometry = gpd.GeoDataFrame(
@@ -157,3 +158,63 @@ def test_snap_to_grid_with_data():
     assert uds["a"].notnull().sum() == 8
     assert uds["line_index"].notnull().sum() == 8
     assert uds["line_index"].sum() == 0  # all values should be 0
+
+
+def test_snap_parallel_linestrings_to_grid(structured):
+    line_x1 = [2.2, 2.2, 2.2]
+    line_x2 = [22.2, 22.2, 22.2]
+    line_y = [82.0, 40.0, 0.0]
+
+    line1 = shapely.linestrings(line_x1, line_y)
+    line2 = shapely.linestrings(line_x2, line_y)
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[line1, line2], data={"a": [1.0, 1.0]}
+    )
+
+    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+    assert uds["a"].notnull().sum() == 16
+    assert uds["line_index"].notnull().sum() == 16
+    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0]))
+
+def test_snap_series_linestrings_to_grid(structured):
+    line_x = [2.2, 2.2]
+    line_y1 = [82.0, 60.0]
+    line_y2 = [60.0, 40.0]
+    line_y3 = [40.0, 20.0]
+    line_y4 = [20.0, 0.0]
+    line1 = shapely.linestrings(line_x, line_y1)
+    line2 = shapely.linestrings(line_x, line_y2)
+    line3 = shapely.linestrings(line_x, line_y3)
+    line4 = shapely.linestrings(line_x, line_y4)
+    geometry = gpd.GeoDataFrame(
+        geometry=[line1, line2, line3, line4], data={"a": [1.0, 1.0, 1.0, 1.0]}
+    )
+    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+    assert uds["a"].notnull().sum() == 8
+    assert uds["line_index"].notnull().sum() == 8
+    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0, 2.0, 3.0]))
+
+
+def test_snap_crossing_linestrings_to_grid(structured):
+    line_x = [40.0, 40.0, 40.0]
+    line_y = [82.0, 40.0, 0.0]
+    line1 = shapely.linestrings(line_x, line_y)
+    line2 = shapely.linestrings(line_y, line_x)
+    geometry = gpd.GeoDataFrame(
+        geometry=[line1, line2], data={"a": [1.0, 2.0]}
+    )
+    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+    assert uds["a"].notnull().sum() == 16
+    assert uds["line_index"].notnull().sum() == 16
+    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0]))
