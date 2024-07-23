@@ -144,7 +144,7 @@ def _locate_polygon(
     rings = np.cumsum([len(exterior)] + [len(interior) for interior in interiors])
     vertices = np.vstack([exterior] + interiors).astype(np.float64)
     triangles = mapbox_earcut.triangulate_float64(vertices, rings).reshape((-1, 3))
-    triangle_indices, grid_indices = grid.celltree._locate_faces(vertices, triangles)
+    triangle_indices, grid_indices = grid.celltree.locate_faces(vertices, triangles)
     if all_touched:
         return grid_indices
     else:
