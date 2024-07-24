@@ -2264,16 +2264,12 @@ class Ugrid2d(AbstractUgrid):
         -------
         uda: UgridDataArray
         """
-        match facet:
-            case "node":
-                dimension = self.node_dimension
-            case "edge":
-                dimension = self.edge_dimension
-            case "face":
-                dimension = self.face_dimension
-            case _:
-                raise ValueError(
-                    f"Invalid facet: {facet}. Must be one of: node, edge face."
-                )
-
+        if facet == "node":
+            dimension = self.node_dimension
+        elif facet == "edge":
+            dimension = self.edge_dimension
+        elif facet == "face":
+            dimension = self.face_dimension
+        else:
+            raise ValueError(f"Invalid facet: {facet}. Must be one of: node, edge.")
         return self._create_data_array(data, dimension)
