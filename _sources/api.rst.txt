@@ -44,6 +44,7 @@ UgridDataArray
     UgridDataArray
     UgridDataArray.ugrid
     UgridDataArray.from_structured
+    UgridDataArray.from_data
 
 UgridDataset
 ------------
@@ -232,6 +233,8 @@ UGRID1D Topology
     Ugrid1d.from_geodataframe
     Ugrid1d.from_shapely
     Ugrid1d.to_shapely
+
+    Ugrid1d.create_data_array
     
     Ugrid1d.plot
 
@@ -337,6 +340,8 @@ UGRID2D Topology
     Ugrid2d.from_shapely
     Ugrid2d.to_shapely
     Ugrid2d.earcut_triangulate_polygons
+
+    Ugrid2d.create_data_array
 
     Ugrid2d.plot
 

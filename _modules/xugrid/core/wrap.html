@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -409,6 +409,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">RangeIndex</span>
 
 <span class="kn">import</span> <span class="nn">xugrid</span>
@@ -688,6 +689,31 @@ document.write(`
             <span class="n">name</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">face_da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDataArray.from_data">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_data.html#xugrid.UgridDataArray.from_data">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a UgridDataArray from a grid and a 1D array of values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: array like</span>
+<span class="sd">            Values for this array. Must be a ``numpy.ndarray`` or castable to</span>
+<span class="sd">            it.</span>
+<span class="sd">        grid: Ugrid1d, Ugrid2d</span>
+<span class="sd">        facet: str</span>
+<span class="sd">            With which facet to associate the data. Options for Ugrid1d are,</span>
+<span class="sd">            ``&quot;node&quot;`` or ``&quot;edge&quot;``. Options for Ugrid2d are ``&quot;node&quot;``,</span>
+<span class="sd">            ``&quot;edge&quot;``, or ``&quot;face&quot;``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        uda: UgridDataArray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">create_data_array</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">facet</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span></div>
 </div>
 
 
@@ -867,7 +893,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     <br/>
   </p>
 </div>

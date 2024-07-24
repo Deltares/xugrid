@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -401,28 +401,28 @@ document.write(`
 <p>The examples in this gallery demonstrate  the functionality of the <code class="docutils literal notranslate"><span class="pre">xugrid</span></code>
 package. Every example can be downloaded as either a Python script or a Jupyter
 notebook for interactive exploration.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Here are a number of quick examples of how to get started with xugrid. More detailed explanatio..."><img alt="" src="../_images/sphx_glr_quick_overview_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Here are a number of quick examples of how to get started with xugrid. More detailed explanation can be found in the rest of the documentation."><img alt="" src="../_images/sphx_glr_quick_overview_thumb.png" />
 <p><a class="reference internal" href="quick_overview.html#sphx-glr-examples-quick-overview-py"><span class="std std-ref">Quick overview</span></a></p>
   <div class="sphx-glr-thumbnail-title">Quick overview</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Grid partitioning, or domain decomposition, is an important step in setting up parallellized si..."><img alt="" src="../_images/sphx_glr_partitioning_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="Grid partitioning, or domain decomposition, is an important step in setting up parallellized simulations. Xugrid provides utilities for partitioning a grid and its associated data, and for merging partitions back into a single whole."><img alt="" src="../_images/sphx_glr_partitioning_thumb.png" />
 <p><a class="reference internal" href="partitioning.html#sphx-glr-examples-partitioning-py"><span class="std std-ref">Partitioning</span></a></p>
   <div class="sphx-glr-thumbnail-title">Partitioning</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The labels that are present in xarray&#x27;s data structures allow for easy creation of informative ..."><img alt="" src="../_images/sphx_glr_plotting_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The labels that are present in xarray&#x27;s data structures allow for easy creation of informative plots: think of dates on the x-axis, or geospatial coordinates. Xarray provides a convenient way of plotting your data provided it is structured. Xugrid extends these plotting methods to easily make spatial (x-y) plots of unstructured grids."><img alt="" src="../_images/sphx_glr_plotting_thumb.png" />
 <p><a class="reference internal" href="plotting.html#sphx-glr-examples-plotting-py"><span class="std std-ref">Plot unstructured mesh data</span></a></p>
   <div class="sphx-glr-thumbnail-title">Plot unstructured mesh data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The overlap regridder works in two stages. First, it searches the source grid for all faces of ..."><img alt="" src="../_images/sphx_glr_overlap_regridder_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The overlap regridder works in two stages. First, it searches the source grid for all faces of the target grid, computes the intersections, and stores all overlaps between source and target faces. This occurs when the regridder is initialized. Second, the regridder applies the weights: it reduces the collection of overlapping faces to a single value for the target face."><img alt="" src="../_images/sphx_glr_overlap_regridder_thumb.png" />
 <p><a class="reference internal" href="overlap_regridder.html#sphx-glr-examples-overlap-regridder-py"><span class="std std-ref">OverlapRegridder</span></a></p>
   <div class="sphx-glr-thumbnail-title">OverlapRegridder</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A fundamental difference between structured and unstructured grids lies in the connectivity. Th..."><img alt="" src="../_images/sphx_glr_connectivity_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="A fundamental difference between structured and unstructured grids lies in the connectivity. This is true for cell to cell connectivity, but also for vertex (node) connectivity (which set of vertices make up an individual cell). In structured grids, connectivity is implicit and can be directly derived from row and column numbers; unstructured grids require explicit connectivity lists."><img alt="" src="../_images/sphx_glr_connectivity_thumb.png" />
 <p><a class="reference internal" href="connectivity.html#sphx-glr-examples-connectivity-py"><span class="std std-ref">Connectivity</span></a></p>
   <div class="sphx-glr-thumbnail-title">Connectivity</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Xarray has flexible tools for label based selection, in the form of .sel and .isel for index se..."><img alt="" src="../_images/sphx_glr_selection_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="Xarray has flexible tools for label based selection, in the form of .sel and .isel for index selection. This works well for structured data since the orthogonality of the x and y axes is reflected in the axes of the underlying arrays. This orthogonality does not exist for unstructured grids, as the data for all faces cannot be stored in a two-dimensional array and is stored in a one-dimensional array instead."><img alt="" src="../_images/sphx_glr_selection_thumb.png" />
 <p><a class="reference internal" href="selection.html#sphx-glr-examples-selection-py"><span class="std std-ref">Select unstructured data</span></a></p>
   <div class="sphx-glr-thumbnail-title">Select unstructured data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="`Regridding`_ is the process of converting gridded data from one grid to another grid. Xugrid p..."><img alt="" src="../_images/sphx_glr_regridder_overview_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="`Regridding`_ is the process of converting gridded data from one grid to another grid. Xugrid provides tools for 2D and 3D regridding of structured gridded data, represented as xarray objects, as well as (`layered`_) unstructured gridded data, represented as xugrid objects."><img alt="" src="../_images/sphx_glr_regridder_overview_thumb.png" />
 <p><a class="reference internal" href="regridder_overview.html#sphx-glr-examples-regridder-overview-py"><span class="std std-ref">Regridding overview</span></a></p>
   <div class="sphx-glr-thumbnail-title">Regridding overview</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A great deal of geospatial data is available not in gridded form, but in vectorized form: as po..."><img alt="" src="../_images/sphx_glr_vector_conversion_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="A great deal of geospatial data is available not in gridded form, but in vectorized form: as points, lines, and polygons. In the Python data ecosystem, these geometries and their associated data are generally represented by a geopandas GeoDataFrame."><img alt="" src="../_images/sphx_glr_vector_conversion_thumb.png" />
 <p><a class="reference internal" href="vector_conversion.html#sphx-glr-examples-vector-conversion-py"><span class="std std-ref">Vector geometry conversion</span></a></p>
   <div class="sphx-glr-thumbnail-title">Vector geometry conversion</div>
 </div></div><div class="toctree-wrapper compound">
@@ -493,7 +493,7 @@ notebook for interactive exploration.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     <br/>
   </p>
 </div>
