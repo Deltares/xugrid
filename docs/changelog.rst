@@ -27,6 +27,10 @@ Added
 
 - Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
   so the ordering of edges is consistent with ``meshkernel``.
+- Added :meth:`xugrid.Ugrid1d.create_data_array`,
+  :meth:`xugrid.Ugrid2d.create_data_array`, and
+  :meth:`xugrid.UgridDataArray.from_data` to more easily instantiate a
+  UgridDataArray from a grid topology and an array of values.
   
 Changed
 ~~~~~~~

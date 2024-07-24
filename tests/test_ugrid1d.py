@@ -455,3 +455,25 @@ def test_equals():
     grid_copy.attrs["attr"] = "something_else"
     # Dataset.identical is called so returns False
     assert not grid.equals(grid_copy)
+
+
+def test_ugrid1d_create_data_array():
+    grid = grid1d()
+
+    uda = grid.create_data_array(np.zeros(grid.n_node), facet="node")
+    assert isinstance(uda, xugrid.UgridDataArray)
+
+    uda = grid.create_data_array(np.zeros(grid.n_edge), facet="edge")
+    assert isinstance(uda, xugrid.UgridDataArray)
+
+    # Error on facet
+    with pytest.raises(ValueError, match="Invalid facet"):
+        grid.create_data_array([1, 2, 3], facet="face")
+
+    # Error on on dimensions
+    with pytest.raises(ValueError, match="Can only create DataArrays from 1D arrays"):
+        grid.create_data_array([[1, 2, 3]], facet="node")
+
+    # Error on size
+    with pytest.raises(ValueError, match="Conflicting sizes"):
+        grid.create_data_array([1, 2, 3, 4], facet="node")

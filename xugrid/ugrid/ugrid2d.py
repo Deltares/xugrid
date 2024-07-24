@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from numba_celltree import CellTree2d
+from numpy.typing import ArrayLike
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
 
@@ -2243,3 +2244,32 @@ class Ugrid2d(AbstractUgrid):
         collection = shapely.polygonize(shapely.linestrings(edges))
         polygon = max(collection.geoms, key=lambda x: _bbox_area(x.bounds))
         return polygon
+
+    def create_data_array(self, data: ArrayLike, facet: str) -> "xugrid.UgridDataArray":
+        """
+        Create a UgridDataArray from this grid and a 1D array of values.
+
+        Parameters
+        ----------
+        data: array like
+            Values for this array. Must be a ``numpy.ndarray`` or castable to
+            it.
+        grid: Ugrid1d, Ugrid2d
+        facet: str
+            With which facet to associate the data. Options for Ugrid1d are,
+            ``"node"`` or ``"edge"``. Options for Ugrid2d are ``"node"``,
+            ``"edge"``, or ``"face"``.
+
+        Returns
+        -------
+        uda: UgridDataArray
+        """
+        if facet == "node":
+            dimension = self.node_dimension
+        elif facet == "edge":
+            dimension = self.edge_dimension
+        elif facet == "face":
+            dimension = self.face_dimension
+        else:
+            raise ValueError(f"Invalid facet: {facet}. Must be one of: node, edge.")
+        return self._create_data_array(data, dimension)
