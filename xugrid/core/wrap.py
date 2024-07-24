@@ -12,6 +12,7 @@ from itertools import chain
 from typing import List, Sequence, Union
 
 import xarray as xr
+from numpy.typing import ArrayLike
 from pandas import RangeIndex
 
 import xugrid
@@ -284,6 +285,28 @@ class UgridDataArray(DataArrayForwardMixin):
             name=da.name,
         )
         return UgridDataArray(face_da, grid)
+
+    @staticmethod
+    def from_data(data: ArrayLike, grid: UgridType, facet: str) -> UgridDataArray:
+        """
+        Create a UgridDataArray from a grid and a 1D array of values.
+
+        Parameters
+        ----------
+        data: array like
+            Values for this array. Must be a ``numpy.ndarray`` or castable to
+            it.
+        grid: Ugrid1d, Ugrid2d
+        facet: str
+            With which facet to associate the data. Options for Ugrid1d are,
+            ``"node"`` or ``"edge"``. Options for Ugrid2d are ``"node"``,
+            ``"edge"``, or ``"face"``.
+
+        Returns
+        -------
+        uda: UgridDataArray
+        """
+        return grid.create_data_array(data=data, facet=facet)
 
 
 class UgridDataset(DatasetForwardMixin):

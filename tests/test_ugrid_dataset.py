@@ -123,6 +123,11 @@ class TestUgridDataArray:
         assert isinstance(self.uda.ugrid.grid, xugrid.Ugrid2d)
         assert self.uda.grid.face_dimension in self.uda.coords
 
+    def test_from_data(self):
+        grid = self.uda.ugrid.grid
+        uda = xugrid.UgridDataArray.from_data(np.zeros(grid.n_node), grid, facet="node")
+        assert isinstance(uda, xugrid.UgridDataArray)
+
     def test_reinit_error(self):
         # Should not be able to initialize using a UgridDataArray.
         with pytest.raises(TypeError, match="obj must be xarray.DataArray"):

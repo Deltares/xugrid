@@ -1464,11 +1464,36 @@ def test_earcut_triangulate_polygons():
 
     grid = xugrid.Ugrid2d.earcut_triangulate_polygons(polygons=gdf)
     assert isinstance(grid, xugrid.Ugrid2d)
-    assert grid.n_face == 7
+    assert np.allclose(polygon.area, grid.area.sum())
 
     grid, index = xugrid.Ugrid2d.earcut_triangulate_polygons(
         polygons=gdf, return_index=True
     )
     assert isinstance(grid, xugrid.Ugrid2d)
     assert isinstance(index, np.ndarray)
-    assert np.array_equal(index, np.zeros(7, dtype=int))
+    assert (index == 0).all()
+
+
+def test_ugrid2d_create_data_array():
+    grid = grid2d()
+
+    uda = grid.create_data_array(np.zeros(grid.n_node), facet="node")
+    assert isinstance(uda, xugrid.UgridDataArray)
+
+    uda = grid.create_data_array(np.zeros(grid.n_edge), facet="edge")
+    assert isinstance(uda, xugrid.UgridDataArray)
+
+    uda = grid.create_data_array(np.zeros(grid.n_face), facet="face")
+    assert isinstance(uda, xugrid.UgridDataArray)
+
+    # Error on facet
+    with pytest.raises(ValueError, match="Invalid facet"):
+        grid.create_data_array([1, 2, 3, 4], facet="volume")
+
+    # Error on on dimensions
+    with pytest.raises(ValueError, match="Can only create DataArrays from 1D arrays"):
+        grid.create_data_array([[1, 2, 3, 4]], facet="face")
+
+    # Error on size
+    with pytest.raises(ValueError, match="Conflicting sizes"):
+        grid.create_data_array([1, 2, 3, 4, 5], facet="face")
