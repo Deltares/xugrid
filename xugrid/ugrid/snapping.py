@@ -282,28 +282,6 @@ def snap_to_edges(
     return edges[:count], segment_index[:count]
 
 
-def _find_largest_edges(
-    edges: FloatArray,
-    edge_index: IntArray,
-    line_index: IntArray,
-):
-    max_edge_index = (
-        pd.DataFrame(
-            data={
-                "edge_index": edge_index,
-                "length": ((edges[:, 1] - edges[:, 0]) ** 2).sum(axis=1),
-            }
-        )
-        .groupby("edge_index")
-        .idxmax()["length"]
-        .to_numpy()
-    )
-
-    edge_index = edge_index[max_edge_index]
-    line_index = line_index[max_edge_index]
-    return edge_index, line_index
-
-
 def _create_output_dataset(
     lines: GeoDataFrameType,
     topology: "xu.Ugrid2d",
@@ -343,54 +321,64 @@ def _create_output_gdf(
     )
 
 
-def snap_to_grid(
+def create_snap_to_grid_dataframe(
     lines: GeoDataFrameType,
     grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
-) -> Tuple[IntArray, Union[pd.DataFrame, GeoDataFrameType]]:
+) -> pd.DataFrame:
     """
-    Snap a collection of lines to a grid.
+    Create a dataframe required to snap line geometries to a Ugrid2d topology.
 
     A line is included and snapped to a grid edge when the line separates
     the centroid of the cell with the centroid of the edge.
-
-    When a line in a cell is snapped to an edge that is **not** shared with
-    another cell, this is denoted with a value of -1 in the second column of
-    ``cell_to_cell``.
 
     Parameters
     ----------
     lines: gpd.GeoDataFrame
         Line data. Geometry colum should contain exclusively LineStrings.
-    grid: xr.DataArray or xu.UgridDataArray of integers
-        Grid of cells to snap lines to. Cells with a value of 0 are not
-        included.
+    grid: xugrid.Ugrid2d
+        Grid of cells to snap lines to.
     max_snap_distance: float
 
     Returns
     -------
-    cell_to_cell: ndarray of integers with shape ``(N, 2)``
-        Cells whose centroids are separated from each other by a line.
-    segment_data: pd.DataFrame or gpd.DataFrame
-        Data for every segment. GeoDataFrame if ``return_geometry`` is
-        ``True``.
-    """
-    if isinstance(grid, Ugrid2d):
-        topology = grid
-    elif isinstance(grid, xr.DataArray):
-        # Convert structured to unstructured representation
-        topology = Ugrid2d.from_structured(grid)
-    elif isinstance(grid, xu.UgridDataArray):
-        topology = grid.ugrid.grid
-    else:
-        raise TypeError(
-            "Expected xarray.DataArray or xugrid.UgridDataArray, received: "
-            f" {type(grid).__name__}"
-        )
+    result: pd.DataFrame
+        DataFrame with columns:
 
+        * line_index: the index of the geodataframe geometry.
+        * edge_index: the index of the
+        * x0: start x-coordinate of edge segment.
+        * y0: start y-coordinate of edge segment.
+        * x1: end x-coordinate of edge segment.
+        * y1: end y-coordinate of edge segment.
+        * length: length of the edge.
+
+    Examples
+    --------
+    First create data frame:
+
+    >>> snapping_df = create_snap_to_grid_dataframe(lines, grid2d, max_snap_distance=0.5)
+
+    Use the ``line_index`` column to assign values from ``lines`` to this new dataframe:
+
+    >>> snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]]
+
+    Run some reduction on the variable, to create an aggregated value per grid edge:
+
+    >>> aggregated = snapping_df.groupby("edge_index").sum()["my_variable"]
+
+    Assign the aggregated values to a Ugrid2d topology:
+
+    >>> new = xu.full_like(edge_data, np.nan)
+    >>> new.data[aggregated.index] = aggregated["my_variable"]
+
+    """
+    if not isinstance(grid, Ugrid2d):
+        raise TypeError(f"Expected Ugrid2d, received: {type(grid).__name__}")
+
+    topology = grid
     vertices = topology.node_coordinates
     edge_centroids = topology.edge_coordinates
-    edge_node_connectivity = topology.edge_node_connectivity
     face_edge_connectivity = topology.face_edge_connectivity
     A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
     n, m = A.shape
@@ -444,13 +432,73 @@ def snap_to_grid(
     line_index = line_index[segment_index]
     segment_edges = segment_edges[segment_index]
 
+    return pd.DataFrame(
+        data={
+            "line_index": shapely_line_index[line_index],
+            "edge_index": edge_index,
+            "x0": segment_edges[:, 0, 0],
+            "y0": segment_edges[:, 0, 1],
+            "x1": segment_edges[:, 1, 0],
+            "y1": segment_edges[:, 1, 1],
+            "length": ((segment_edges[:, 1] - segment_edges[:, 0]) ** 2).sum(axis=1),
+        }
+    )
+
+
+def snap_to_grid(
+    lines: GeoDataFrameType,
+    grid: Union[xr.DataArray, xu.UgridDataArray],
+    max_snap_distance: float,
+) -> Tuple[IntArray, Union[pd.DataFrame, GeoDataFrameType]]:
+    """
+    Snap a collection of lines to a grid.
+
+    A line is included and snapped to a grid edge when the line separates
+    the centroid of the cell with the centroid of the edge.
+
+    Parameters
+    ----------
+    lines: gpd.GeoDataFrame
+        Line data. Geometry colum should contain exclusively LineStrings.
+    grid: xr.DataArray or xu.UgridDataArray of integers
+        Grid of cells to snap lines to.
+    max_snap_distance: float
+
+    Returns
+    -------
+    uds: UgridDataset
+        Snapped line geometries as edges in a Ugrid2d topology. Contains a
+        ``line_index`` variable identifying the original geodataframe line.
+    gdf: gpd.GeoDataFrame
+        Snapped line geometries.
+    """
+    if isinstance(grid, Ugrid2d):
+        topology = grid
+    elif isinstance(grid, xr.DataArray):
+        # Convert structured to unstructured representation
+        topology = Ugrid2d.from_structured(grid)
+    elif isinstance(grid, xu.UgridDataArray):
+        topology = grid.ugrid.grid
+    else:
+        raise TypeError(
+            "Expected xarray.DataArray or xugrid.UgridDataArray, received: "
+            f" {type(grid).__name__}"
+        )
+
+    result = create_snap_to_grid_dataframe(lines, topology, max_snap_distance)
+
     # When multiple line parts are snapped to the same edge, use the ones with
     # the greatest length inside the cell.
-    edges, line_index = _find_largest_edges(segment_edges, edge_index, line_index)
-    shapely_line_index = shapely_line_index[line_index]
+    max_edge_index = result.groupby("edge_index").idxmax()["length"].to_numpy()
+    line_index = result["line_index"].to_numpy()[max_edge_index]
+    edges = result["edge_index"].to_numpy()[max_edge_index]
 
-    uds = _create_output_dataset(lines, topology, edges, shapely_line_index)
+    uds = _create_output_dataset(lines, topology, edges, line_index)
     gdf = _create_output_gdf(
-        lines, vertices, edge_node_connectivity, edges, shapely_line_index
+        lines,
+        topology.node_coordinates,
+        topology.edge_node_connectivity,
+        edges,
+        line_index,
     )
     return uds, gdf
