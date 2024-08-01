@@ -27,6 +27,7 @@ def structured():
 
     return xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
 
+
 def test_snap__three_points():
     x = y = np.array([0.0, 1.0, 1.5])
     inv_perm, snap_x, snap_y = snap_nodes(x, y, 0.1)
@@ -161,27 +162,29 @@ def test_snap_to_grid_with_data(structured):
 
 
 def test_snap_parallel_linestrings_to_grid(structured):
-    line_x1 = [2.2, 2.2, 2.2]
-    line_x2 = [22.2, 22.2, 22.2]
+    line_x1 = [10.2, 10.2, 10.2]
+    line_x2 = [30.2, 30.2, 30.2]
     line_y = [82.0, 40.0, 0.0]
 
     line1 = shapely.linestrings(line_x1, line_y)
     line2 = shapely.linestrings(line_x2, line_y)
 
-    geometry = gpd.GeoDataFrame(
-        geometry=[line1, line2], data={"a": [1.0, 1.0]}
-    )
+    geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
 
     uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
     assert isinstance(uds, xu.UgridDataset)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
-    assert uds["a"].notnull().sum() == 16
-    assert uds["line_index"].notnull().sum() == 16
-    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0]))
+    expected_unique_values = np.array([ 0.,  1., np.nan])
+    expected_line_counts = np.array([  8,   8, 164])
+    actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
+    np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
+    np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
+
 
 def test_snap_series_linestrings_to_grid(structured):
-    line_x = [2.2, 2.2]
+    # This caused a failure up to 0.10.0
+    line_x = [40.2, 40.2]
     line_y1 = [82.0, 60.0]
     line_y2 = [60.0, 40.0]
     line_y3 = [40.0, 20.0]
@@ -197,24 +200,27 @@ def test_snap_series_linestrings_to_grid(structured):
     assert isinstance(uds, xu.UgridDataset)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
-    assert uds["a"].notnull().sum() == 8
-    assert uds["line_index"].notnull().sum() == 8
-    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0, 2.0, 3.0]))
+    expected_unique_values = np.array([ 0.,  1., 2., 3., np.nan])
+    expected_line_counts = np.array([ 2, 2, 2, 2, 172])
+    actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
+    np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
+    np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
 
 
 def test_snap_crossing_linestrings_to_grid(structured):
-    line_x = [40.0, 40.0, 40.0]
+    # This caused a failure up to 0.10.0
+    line_x = [40.2, 40.2, 40.2]
     line_y = [82.0, 40.0, 0.0]
     line1 = shapely.linestrings(line_x, line_y)
     line2 = shapely.linestrings(line_y, line_x)
-    geometry = gpd.GeoDataFrame(
-        geometry=[line1, line2], data={"a": [1.0, 2.0]}
-    )
+    geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 2.0]})
     uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
 
     assert isinstance(uds, xu.UgridDataset)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
-    assert uds["a"].notnull().sum() == 16
-    assert uds["line_index"].notnull().sum() == 16
-    assert np.all(np.unique(uds["line_index"])[:-1] == np.array([0.0, 1.0]))
+    expected_unique_values = np.array([ 0.,  1., np.nan])
+    expected_line_counts = np.array([  8,   8, 164])
+    actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
+    np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
+    np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
