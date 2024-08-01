@@ -224,3 +224,28 @@ def test_snap_crossing_linestrings_to_grid(structured):
     actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
     np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
     np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
+
+
+def test_snap_closely_parallel_linestrings_to_grid(structured):
+    """
+    Closely parallel lines, are snapped to same edge, the first one should be taken.
+    We can use this test to monitor if this behaviour changes.
+    """
+    line_x1 = [19.0, 19.0, 19.0]
+    line_x2 = [21.0, 21.0, 21.0]
+    line_y = [82.0, 40.0, 0.0]
+
+    line1 = shapely.linestrings(line_x1, line_y)
+    line2 = shapely.linestrings(line_x2, line_y)
+
+    geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
+
+    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+    expected_unique_values = np.array([0., np.nan])
+    expected_line_counts = np.array([  8, 172])
+    actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
+    np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
+    np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
