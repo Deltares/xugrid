@@ -31,7 +31,10 @@ Added
   :meth:`xugrid.Ugrid2d.create_data_array`, and
   :meth:`xugrid.UgridDataArray.from_data` to more easily instantiate a
   UgridDataArray from a grid topology and an array of values.
-  
+- Added :func:`xugrid.create_snap_to_grid_dataframe` to provide
+  more versatile snapping, e.g. with custom reductions to assign_edge_coords
+  aggregated properties to grid edges.
+ 
 Changed
 ~~~~~~~
 
