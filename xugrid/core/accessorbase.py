@@ -9,63 +9,69 @@ import xugrid
 
 class AbstractUgridAccessor(abc.ABC):
     @abc.abstractmethod
-    def to_dataset():
+    def to_dataset(self):
         pass
 
     @abc.abstractmethod
-    def assign_node_coords():
+    def assign_node_coords(self):
         pass
 
     @abc.abstractmethod
-    def set_node_coords():
+    def set_node_coords(self):
         pass
 
-    @abc.abstractproperty
-    def crs():
+    @property
+    @abc.abstractmethod
+    def crs(self):
         pass
 
     @abc.abstractmethod
-    def set_crs():
+    def set_crs(self):
         pass
 
     @abc.abstractmethod
-    def to_crs():
+    def to_crs(self):
         pass
 
     @abc.abstractmethod
-    def sel():
+    def sel(self):
         pass
 
     @abc.abstractmethod
-    def sel_points():
+    def sel_points(self):
         pass
 
     @abc.abstractmethod
-    def intersect_line():
+    def intersect_line(self):
         pass
 
     @abc.abstractmethod
-    def intersect_linestring():
+    def intersect_linestring(self):
         pass
 
-    @abc.abstractproperty
-    def bounds():
+    @property
+    @abc.abstractmethod
+    def bounds(self):
         pass
 
-    @abc.abstractproperty
-    def total_bounds():
+    @property
+    @abc.abstractmethod
+    def total_bounds(self):
         pass
 
-    @abc.abstractproperty
-    def name():
+    @property
+    @abc.abstractmethod
+    def name(self):
         pass
 
-    @abc.abstractproperty
-    def names():
+    @property
+    @abc.abstractmethod
+    def names(self):
         pass
 
-    @abc.abstractproperty
-    def topology():
+    @property
+    @abc.abstractmethod
+    def topology(self):
         pass
 
     @staticmethod

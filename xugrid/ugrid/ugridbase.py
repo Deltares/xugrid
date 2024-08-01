@@ -1,11 +1,12 @@
 import abc
 import copy
 from itertools import chain
-from typing import Tuple, Type, Union
+from typing import Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
+from numpy.typing import ArrayLike
 from scipy.sparse import csr_matrix
 
 from xugrid.constants import BoolArray, FloatArray, IntArray
@@ -85,73 +86,107 @@ def align(obj, grids, old_indexes):
 
 
 class AbstractUgrid(abc.ABC):
-    @abc.abstractproperty
-    def topology_dimension():
+    @property
+    @abc.abstractmethod
+    def topology_dimension(self):
         pass
 
-    @abc.abstractproperty
-    def core_dimension():
+    @property
+    @abc.abstractmethod
+    def core_dimension(self):
         pass
 
-    @abc.abstractproperty
-    def dimensions():
+    @property
+    @abc.abstractmethod
+    def dimensions(self):
         pass
 
-    @abc.abstractproperty
-    def mesh():
+    @property
+    @abc.abstractmethod
+    def mesh(self):
         pass
 
-    @abc.abstractproperty
-    def meshkernel():
+    @property
+    @abc.abstractmethod
+    def meshkernel(self):
         pass
 
-    @abc.abstractstaticmethod
-    def from_dataset():
+    @staticmethod
+    @abc.abstractmethod
+    def from_dataset(self):
         pass
 
     @abc.abstractmethod
-    def to_dataset() -> xr.Dataset:
+    def to_dataset(self) -> xr.Dataset:
         pass
 
     @abc.abstractmethod
-    def topology_subset():
+    def topology_subset(self):
         pass
 
     @abc.abstractmethod
-    def clip_box():
+    def clip_box(self):
         pass
 
     @abc.abstractmethod
-    def sel_points():
+    def sel_points(self):
         pass
 
     @abc.abstractmethod
-    def intersect_line():
+    def intersect_line(self):
         pass
 
     @abc.abstractmethod
-    def intersect_linestring():
+    def intersect_linestring(self):
         pass
 
     @abc.abstractmethod
-    def sel():
+    def sel(self):
         pass
 
     @abc.abstractmethod
-    def _clear_geometry_properties():
+    def _clear_geometry_properties(self):
         pass
 
-    @abc.abstractstaticmethod
+    @staticmethod
+    @abc.abstractmethod
     def merge_partitions():
         pass
 
     @abc.abstractmethod
-    def reindex_like():
+    def reindex_like(self):
         pass
 
     @abc.abstractmethod
     def connectivity_matrix(self, dim: str, xy_weights: bool) -> csr_matrix:
         pass
+
+    @abc.abstractmethod
+    def create_data_array(self, data: ArrayLike, facet: str):
+        pass
+
+    def _create_data_array(self, data: ArrayLike, dimension: str):
+        from xugrid import UgridDataArray
+
+        data = np.array(data)
+        if data.ndim != 1:
+            raise ValueError(
+                "Can only create DataArrays from 1D arrays. "
+                f"Data has {data.ndim} dimensions."
+            )
+        len_data = len(data)
+        len_grid = self.dimensions[dimension]
+        if len_data != len_grid:
+            raise ValueError(
+                f"Conflicting sizes for dimension {dimension}: length "
+                f"{len_data} on the data, but length {len_grid} on the grid."
+            )
+
+        da = xr.DataArray(data=data, dims=(dimension,))
+
+        # TODO: is there a better way to do this to satisfy mypy?
+        grid = cast(UgridType, self)
+        return UgridDataArray(da, grid)
 
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)

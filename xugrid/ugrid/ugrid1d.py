@@ -4,7 +4,9 @@ from typing import Any, Dict, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import xarray as xr
+from numpy.typing import ArrayLike
 
+import xugrid
 from xugrid import conversion
 from xugrid.constants import (
     BoolArray,
@@ -709,3 +711,30 @@ class Ugrid1d(AbstractUgrid):
             ),
         }
         return obj.isel(indexers, missing_dims="ignore")
+
+    def create_data_array(self, data: ArrayLike, facet: str) -> "xugrid.UgridDataArray":
+        """
+        Create a UgridDataArray from this grid and a 1D array of values.
+
+        Parameters
+        ----------
+        data: array like
+            Values for this array. Must be a ``numpy.ndarray`` or castable to
+            it.
+        grid: Ugrid1d, Ugrid2d
+        facet: str
+            With which facet to associate the data. Options for Ugrid1d are,
+            ``"node"`` or ``"edge"``. Options for Ugrid2d are ``"node"``,
+            ``"edge"``, or ``"face"``.
+
+        Returns
+        -------
+        uda: UgridDataArray
+        """
+        if facet == "node":
+            dimension = self.node_dimension
+        elif facet == "edge":
+            dimension = self.edge_dimension
+        else:
+            raise ValueError(f"Invalid facet: {facet}. Must be one of: node, edge.")
+        return self._create_data_array(data, dimension)
