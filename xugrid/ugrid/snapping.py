@@ -205,7 +205,8 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
     edges = np.empty((len(line_coords) - 1, 2, 2))
     edges[:, 0, :] = line_coords[:-1]
     edges[:, 1, :] = line_coords[1:]
-    return edges[np.diff(line_index) == 0]
+    keep = np.diff(line_index) == 0
+    return edges[keep], line_index[1:][keep]
 
 
 @nb.njit(inline="always")
@@ -397,14 +398,16 @@ def snap_to_grid(
 
     # Create geometric data
     line_geometry = coerce_geometry(lines)
-    line_coords, shapely_index = shapely.get_coordinates(
+    line_coords, shapely_vertex_index = shapely.get_coordinates(
         line_geometry, return_index=True
     )
     # Snap line_coords to grid
     x, y = snap_to_nodes(
         *line_coords.T, *vertices.T, max_snap_distance, tiebreaker="nearest"
     )
-    line_edges = lines_as_edges(np.column_stack([x, y]), shapely_index)
+    line_edges, shapely_line_index = lines_as_edges(
+        np.column_stack([x, y]), shapely_vertex_index
+    )
 
     # Search for intersections. Every edge is potentially divided into smaller
     # segments: The segment_indices contain (repeated) values of the
@@ -444,10 +447,10 @@ def snap_to_grid(
     # When multiple line parts are snapped to the same edge, use the ones with
     # the greatest length inside the cell.
     edges, line_index = _find_largest_edges(segment_edges, edge_index, line_index)
-    shapely_index = shapely_index[line_index]
+    shapely_line_index = shapely_line_index[line_index]
 
-    uds = _create_output_dataset(lines, topology, edges, shapely_index)
+    uds = _create_output_dataset(lines, topology, edges, shapely_line_index)
     gdf = _create_output_gdf(
-        lines, vertices, edge_node_connectivity, edges, shapely_index
+        lines, vertices, edge_node_connectivity, edges, shapely_line_index
     )
     return uds, gdf
