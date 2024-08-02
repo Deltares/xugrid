@@ -361,11 +361,11 @@ def create_snap_to_grid_dataframe(
 
     Use the ``line_index`` column to assign values from ``lines`` to this new dataframe:
 
-    >>> snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]]
+    >>> snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]].to_numpy()
 
     Run some reduction on the variable, to create an aggregated value per grid edge:
 
-    >>> aggregated = snapping_df.groupby("edge_index").sum()["my_variable"]
+    >>> aggregated = snapping_df.groupby("edge_index").sum()
 
     Assign the aggregated values to a Ugrid2d topology:
 
