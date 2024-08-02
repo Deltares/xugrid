@@ -152,13 +152,23 @@ def test_snap_to_grid():
 
 class LineCases:
     def case_single_line(self):
-        line_x = [2.2, 2.2, 2.2]
+        line_x = [40.2, 40.2, 40.2]
         line_y = [82.0, 40.0, 0.0]
         geometry = gpd.GeoDataFrame(
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
         unique_values = np.array([0.0, np.nan])
         line_counts = np.array([8, 172])
+        return geometry, unique_values, line_counts
+
+    def case_single_line_at_edge(self):
+        line_x = [40.0, 40.0, 40.0]
+        line_y = [82.0, 40.0, 0.0]
+        geometry = gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
+        )
+        unique_values = np.array([0.0, np.nan])
+        line_counts = np.array([9, 172])
         return geometry, unique_values, line_counts
 
     def case_parallel_lines(self):
