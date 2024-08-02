@@ -157,7 +157,7 @@ class LineCases:
         geometry = gpd.GeoDataFrame(
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
-        unique_values = np.array([0., np.nan])
+        unique_values = np.array([0.0, np.nan])
         line_counts = np.array([8, 172])
         return geometry, unique_values, line_counts
 
@@ -169,10 +169,10 @@ class LineCases:
         line2 = shapely.linestrings(line_x2, line_y)
         geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
 
-        unique_values = np.array([ 0.,  1., np.nan])
-        line_counts = np.array([  8,   8, 164])
+        unique_values = np.array([0.0, 1.0, np.nan])
+        line_counts = np.array([8, 8, 164])
         return geometry, unique_values, line_counts
-    
+
     def case_series_lines(self):
         # This caused a failure up to 0.10.0
         line_x = [40.2, 40.2]
@@ -187,8 +187,8 @@ class LineCases:
         geometry = gpd.GeoDataFrame(
             geometry=[line1, line2, line3, line4], data={"a": [1.0, 1.0, 1.0, 1.0]}
         )
-        unique_values = np.array([ 0.,  1., 2., 3., np.nan])
-        line_counts = np.array([ 2, 2, 2, 2, 172])
+        unique_values = np.array([0.0, 1.0, 2.0, 3.0, np.nan])
+        line_counts = np.array([2, 2, 2, 2, 172])
         return geometry, unique_values, line_counts
 
     def case_crossing_lines(self):
@@ -197,10 +197,10 @@ class LineCases:
         line_y = [82.0, 40.0, 0.0]
         line1 = shapely.linestrings(line_x, line_y)
         line2 = shapely.linestrings(line_y, line_x)
-        geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 2.0]})        
+        geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 2.0]})
 
-        unique_values = np.array([ 0.,  1., np.nan])
-        line_counts = np.array([  8,   8, 164])
+        unique_values = np.array([0.0, 1.0, np.nan])
+        line_counts = np.array([8, 8, 164])
         return geometry, unique_values, line_counts
 
     def case_closely_parallel(self):
@@ -216,8 +216,8 @@ class LineCases:
         line2 = shapely.linestrings(line_x2, line_y)
         geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
 
-        unique_values = np.array([0., np.nan])
-        line_counts = np.array([  8, 172])
+        unique_values = np.array([0.0, np.nan])
+        line_counts = np.array([8, 172])
         return geometry, unique_values, line_counts
 
 
@@ -228,10 +228,11 @@ def test_snap_to_grid_with_data(structured, geometry, unique_values, line_counts
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
 
-    actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
+    actual_unique_values, actual_line_counts = np.unique(
+        uds["line_index"], return_counts=True
+    )
     np.testing.assert_array_equal(unique_values, actual_unique_values)
     np.testing.assert_array_equal(line_counts, actual_line_counts)
-
 
 
 def test_create_snap_to_grid_dataframe(structured):
@@ -253,14 +254,20 @@ def test_create_snap_to_grid_dataframe(structured):
 
     # Act
     snapping_df = create_snap_to_grid_dataframe(lines, grid2d, max_snap_distance=0.5)
-    
+
     # Assert
-    edge_index0 = snapping_df.loc[snapping_df["line_index"]==0, "edge_index"].to_numpy()
-    edge_index1 = snapping_df.loc[snapping_df["line_index"]==1, "edge_index"].to_numpy()
+    edge_index0 = snapping_df.loc[
+        snapping_df["line_index"] == 0, "edge_index"
+    ].to_numpy()
+    edge_index1 = snapping_df.loc[
+        snapping_df["line_index"] == 1, "edge_index"
+    ].to_numpy()
     assert np.all(edge_index0 == edge_index1)
 
     # Now test if docstring part works
-    snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]].to_numpy()
+    snapping_df["my_variable"] = (
+        lines["my_variable"].iloc[snapping_df["line_index"]].to_numpy()
+    )
     aggregated = snapping_df.groupby("edge_index").sum()
 
     new = xu.full_like(edge_data, np.nan)
