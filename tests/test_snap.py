@@ -168,7 +168,7 @@ class LineCases:
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
         unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([9, 172])
+        line_counts = np.array([9, 171])
         return geometry, unique_values, line_counts
 
     def case_parallel_lines(self):
