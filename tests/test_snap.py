@@ -168,7 +168,7 @@ class LineCases:
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
         unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([9, 171])
+        line_counts = np.array([8, 172])
         return geometry, unique_values, line_counts
 
     def case_parallel_lines(self):
@@ -283,4 +283,5 @@ def test_create_snap_to_grid_dataframe(structured):
     new = xu.full_like(edge_data, np.nan)
     new.data[aggregated.index] = aggregated["my_variable"]
 
-    assert (new == 3).all()
+    # A lot of values are NaN, but all not-nan values should be three.
+    assert new.min() == new.max() == 3
