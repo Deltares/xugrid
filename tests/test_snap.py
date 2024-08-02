@@ -6,7 +6,12 @@ import shapely.geometry as sg
 import xarray as xr
 
 import xugrid as xu
-from xugrid.ugrid.snapping import snap_nodes, snap_to_grid, snap_to_nodes
+from xugrid.ugrid.snapping import (
+    create_snap_to_grid_dataframe,
+    snap_nodes,
+    snap_to_grid,
+    snap_to_nodes,
+)
 
 
 @pytest.fixture(scope="function")
@@ -249,3 +254,38 @@ def test_snap_closely_parallel_linestrings_to_grid(structured):
     actual_unique_values, actual_line_counts = np.unique(uds["line_index"], return_counts=True)
     np.testing.assert_array_equal(expected_unique_values, actual_unique_values)
     np.testing.assert_array_equal(expected_line_counts, actual_line_counts)
+
+
+def test_create_snap_to_grid_dataframe(structured):
+    """
+    Test if create_snap_to_grid_dataframe and its code example in the docstring
+    still work
+    """
+    # Arrange test
+    line_x1 = [19.0, 19.0, 19.0]
+    line_x2 = [21.0, 21.0, 21.0]
+    line_y = [82.0, 40.0, 0.0]
+
+    line1 = shapely.linestrings(line_x1, line_y)
+    line2 = shapely.linestrings(line_x2, line_y)
+    lines = gpd.GeoDataFrame(geometry=[line1, line2], data={"my_variable": [1.0, 2.0]})
+    grid2d = xu.Ugrid2d.from_structured(structured)
+    edge_arr_data = np.ones(grid2d.sizes["mesh2d_nEdges"])
+    edge_data = xu.UgridDataArray.from_data(edge_arr_data, grid2d, facet="edge")
+
+    # Act
+    snapping_df = create_snap_to_grid_dataframe(lines, grid2d, max_snap_distance=0.5)
+    
+    # Assert
+    edge_index0 = snapping_df.loc[snapping_df["line_index"]==0, "edge_index"].to_numpy()
+    edge_index1 = snapping_df.loc[snapping_df["line_index"]==1, "edge_index"].to_numpy()
+    assert np.all(edge_index0 == edge_index1)
+
+    # Now test if docstring part works
+    snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]].to_numpy()
+    aggregated = snapping_df.groupby("edge_index").sum()
+
+    new = xu.full_like(edge_data, np.nan)
+    new.data[aggregated.index] = aggregated["my_variable"]
+
+    assert (new == 3).all()
