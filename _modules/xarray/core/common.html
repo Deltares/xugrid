@@ -449,6 +449,7 @@ document.write(`
         <span class="n">T_Variable</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span> <span class="nn">xarray.groupers</span> <span class="kn">import</span> <span class="n">Resampler</span>
 
     <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">DTypeLikeSave</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLikeSave</span><span class="p">]]</span>
 
@@ -1273,16 +1274,14 @@ document.write(`
     <span class="k">def</span> <span class="nf">_resample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resample_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T_Resample</span><span class="p">],</span>
-        <span class="n">indexer</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">indexer</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Resampler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">skipna</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">closed</span><span class="p">:</span> <span class="n">SideOptions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">label</span><span class="p">:</span> <span class="n">SideOptions</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">base</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">offset</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span> <span class="o">|</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">origin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">DatetimeLike</span><span class="p">,</span>
-        <span class="n">loffset</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">restore_coord_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">indexer_kwargs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">indexer_kwargs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Resampler</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Resample</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a Resample object for performing resampling operations.</span>
 
@@ -1302,16 +1301,6 @@ document.write(`
 <span class="sd">            Side of each interval to treat as closed.</span>
 <span class="sd">        label : {&quot;left&quot;, &quot;right&quot;}, optional</span>
 <span class="sd">            Side of each interval to use for labeling.</span>
-<span class="sd">        base : int, optional</span>
-<span class="sd">            For frequencies that evenly subdivide 1 day, the &quot;origin&quot; of the</span>
-<span class="sd">            aggregated intervals. For example, for &quot;24H&quot; frequency, base could</span>
-<span class="sd">            range from 0 through 23.</span>
-
-<span class="sd">            .. deprecated:: 2023.03.0</span>
-<span class="sd">                Following pandas, the ``base`` parameter is deprecated in favor</span>
-<span class="sd">                of the ``origin`` and ``offset`` parameters, and will be removed</span>
-<span class="sd">                in a future version of xarray.</span>
-
 <span class="sd">        origin : {&#39;epoch&#39;, &#39;start&#39;, &#39;start_day&#39;, &#39;end&#39;, &#39;end_day&#39;}, pd.Timestamp, datetime.datetime, np.datetime64, or cftime.datetime, default &#39;start_day&#39;</span>
 <span class="sd">            The datetime on which to adjust the grouping. The timezone of origin</span>
 <span class="sd">            must match the timezone of the index.</span>
@@ -1324,15 +1313,6 @@ document.write(`
 <span class="sd">            - &#39;end_day&#39;: `origin` is the ceiling midnight of the last day</span>
 <span class="sd">        offset : pd.Timedelta, datetime.timedelta, or str, default is None</span>
 <span class="sd">            An offset timedelta added to the origin.</span>
-<span class="sd">        loffset : timedelta or str, optional</span>
-<span class="sd">            Offset used to adjust the resampled time labels. Some pandas date</span>
-<span class="sd">            offset strings are supported.</span>
-
-<span class="sd">            .. deprecated:: 2023.03.0</span>
-<span class="sd">                Following pandas, the ``loffset`` parameter is deprecated in favor</span>
-<span class="sd">                of using time offset arithmetic, and will be removed in a future</span>
-<span class="sd">                version of xarray.</span>
-
 <span class="sd">        restore_coord_dims : bool, optional</span>
 <span class="sd">            If True, also restore the dimension order of multi-dimensional</span>
 <span class="sd">            coordinates.</span>
@@ -1464,20 +1444,9 @@ document.write(`
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
         <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">ResolvedGrouper</span><span class="p">,</span> <span class="n">TimeResampler</span>
+        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">ResolvedGrouper</span>
         <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
-
-        <span class="c1"># note: the second argument (now &#39;skipna&#39;) use to be &#39;dim&#39;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">skipna</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">skipna</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))</span>
-            <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;how&quot;</span> <span class="ow">in</span> <span class="n">indexer_kwargs</span> <span class="ow">and</span> <span class="s2">&quot;how&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;dim&quot;</span> <span class="ow">in</span> <span class="n">indexer_kwargs</span> <span class="ow">and</span> <span class="s2">&quot;dim&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;resample() no longer supports the `how` or &quot;</span>
-                <span class="s2">&quot;`dim` arguments. Instead call methods on resample &quot;</span>
-                <span class="s2">&quot;objects, e.g., data.resample(time=&#39;1D&#39;).mean()&quot;</span>
-            <span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">xarray.groupers</span> <span class="kn">import</span> <span class="n">Resampler</span><span class="p">,</span> <span class="n">TimeResampler</span>
 
         <span class="n">indexer</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">indexer_kwargs</span><span class="p">,</span> <span class="s2">&quot;resample&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexer</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -1488,21 +1457,18 @@ document.write(`
         <span class="n">dim_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
 
         <span class="n">group</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">dim_coord</span><span class="p">,</span>
-            <span class="n">coords</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
-            <span class="n">dims</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span><span class="p">,</span>
+            <span class="n">dim_coord</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dim_coord</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">RESAMPLE_DIM</span>
         <span class="p">)</span>
 
-        <span class="n">grouper</span> <span class="o">=</span> <span class="n">TimeResampler</span><span class="p">(</span>
-            <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-            <span class="n">closed</span><span class="o">=</span><span class="n">closed</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
-            <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
-            <span class="n">loffset</span><span class="o">=</span><span class="n">loffset</span><span class="p">,</span>
-            <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">grouper</span><span class="p">:</span> <span class="n">Resampler</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">grouper</span> <span class="o">=</span> <span class="n">TimeResampler</span><span class="p">(</span>
+                <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="n">closed</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">Resampler</span><span class="p">):</span>
+            <span class="n">grouper</span> <span class="o">=</span> <span class="n">freq</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;freq must be a str or a Resampler object&quot;</span><span class="p">)</span>
 
         <span class="n">rgrouper</span> <span class="o">=</span> <span class="n">ResolvedGrouper</span><span class="p">(</span><span class="n">grouper</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
@@ -2551,7 +2517,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>
