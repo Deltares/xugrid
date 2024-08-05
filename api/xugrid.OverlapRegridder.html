@@ -678,9 +678,12 @@ multiple ways to aggregate the values associated with the source faces.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;median&quot;</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&quot;max_overlap&quot;</span></code></p></li>
+<li><p>percentiles 5, 10, 25, 50, 75, 90, 95: as <code class="docutils literal notranslate"><span class="pre">&quot;p5&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;p10&quot;</span></code>, etc.</p></li>
 </ul>
 <p>Custom aggregation functions are also supported, if they can be compiled by
 Numba. See the User Guide.</p>
+<p>Any percentile method can be created via:
+<code class="docutils literal notranslate"><span class="pre">method</span> <span class="pre">=</span> <span class="pre">OverlapRegridder.create_percentile_methode(percentile)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -701,22 +704,25 @@ Numba. See the User Guide.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#xugrid.OverlapRegridder.__init__" title="xugrid.OverlapRegridder.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(source, target[, method])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataset</span></code>(dataset)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_percentile_method</span></code>(percentile)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataset</span></code>(dataset)</p></td>
 <td><p>Reconstruct the regridder from a dataset with source, target indices and weights.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_weights</span></code>(weights, target[, method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_weights</span></code>(weights, target[, method])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid</span></code>(object)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid</span></code>(object)</p></td>
 <td><p>Regrid the data from a DataArray from its old grid topology to the new target topology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_dataarray</span></code>(source, source_dims)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_dataarray</span></code>(source, source_dims)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code>()</p></td>
 <td><p>Store the computed weights and target in a dataset for re-use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weights_as_dataframe</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weights_as_dataframe</span></code>()</p></td>
 <td><p>Return the weights as a three column dataframe:</p></td>
 </tr>
 </tbody>
