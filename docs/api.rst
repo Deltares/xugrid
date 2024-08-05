@@ -143,6 +143,7 @@ nodes/edges/faces if within a certain range.
       :toctree: api/
 
        snap_to_grid
+       create_snap_to_grid_dataframe
 
 
 Regridding

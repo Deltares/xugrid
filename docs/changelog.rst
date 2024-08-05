@@ -21,6 +21,9 @@ Fixed
   setting ``merge_ugrid_chunks=False``. This keyword will likely be deprecated
   in the future as merging the UGRID dimension chunks should be superior for
   (almost all?) subsquent operations.
+- :func:`xugrid.snap_to_grid` now returns proper line indexes when multiple
+  linestrings are snapped. Snapping previously could result in correct
+  linestring locations, but wrong line indexes.
 
 Added
 ~~~~~
@@ -31,7 +34,10 @@ Added
   :meth:`xugrid.Ugrid2d.create_data_array`, and
   :meth:`xugrid.UgridDataArray.from_data` to more easily instantiate a
   UgridDataArray from a grid topology and an array of values.
-  
+- Added :func:`xugrid.create_snap_to_grid_dataframe` to provide
+  more versatile snapping, e.g. with custom reductions to assign_edge_coords
+  aggregated properties to grid edges.
+ 
 Changed
 ~~~~~~~
 
