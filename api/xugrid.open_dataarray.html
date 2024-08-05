@@ -450,6 +450,7 @@ document.write(`
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.snap_to_grid.html">xugrid.snap_to_grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.create_snap_to_grid_dataframe.html">xugrid.create_snap_to_grid_dataframe</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.BarycentricInterpolator.html">xugrid.BarycentricInterpolator</a></li>
@@ -678,18 +679,13 @@ objects are opened by scipy.io.netcdf (netCDF3) or h5py (netCDF4/HDF).</p></li>
 <li><p><strong>engine</strong> (<em>{&quot;netcdf4&quot;</em><em>, </em><em>&quot;scipy&quot;</em><em>, </em><em>&quot;pydap&quot;</em><em>, </em><em>&quot;h5netcdf&quot;</em><em>, </em><em>&quot;zarr&quot;</em><em>, </em><em>None}</em><em>        , </em><em>installed backend</em><em>         or </em><em>subclass</em><em> of </em><em>xarray.backends.BackendEntrypoint</em><em>, </em><em>optional</em>) – Engine to use when reading files. If not provided, the default engine
 is chosen based on available dependencies, with a preference for
 “netcdf4”.</p></li>
-<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>default: None</em>) – <p>If provided, used to load the data into dask arrays.</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
-engine preferred chunks.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask, which is generally faster for
-small arrays.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the data with dask using a single chunk for all arrays.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the data with dask using engine preferred chunks if
-exposed by the backend, otherwise with a single chunk for all arrays.</p></li>
-</ul>
-<p>See dask chunking for more details.</p>
-</p></li>
+<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – If chunks is provided, it is used to load the new dataset into dask
+arrays. <code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the dataset with dask using a single
+chunk for all arrays. <cite>chunks={}`</cite> loads the dataset with dask using
+engine preferred chunks if exposed by the backend, otherwise with
+a single chunk for all arrays.
+<code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
+engine preferred chunks. See dask chunking for more details.</p></li>
 <li><p><strong>cache</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, cache data loaded from the underlying datastore in memory as
 NumPy arrays when accessed to avoid reading from the underlying data-
 store multiple times. Defaults to True unless you specify the <cite>chunks</cite>
@@ -878,7 +874,7 @@ documentation for further details.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     <br/>
   </p>
 </div>

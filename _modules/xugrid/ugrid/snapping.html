@@ -602,7 +602,8 @@ document.write(`
     <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">line_coords</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">line_coords</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">line_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-    <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">line_index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">line_index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span> <span class="n">line_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:][</span><span class="n">keep</span><span class="p">]</span>
 
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
@@ -678,28 +679,6 @@ document.write(`
     <span class="k">return</span> <span class="n">edges</span><span class="p">[:</span><span class="n">count</span><span class="p">],</span> <span class="n">segment_index</span><span class="p">[:</span><span class="n">count</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_find_largest_edges</span><span class="p">(</span>
-    <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
-    <span class="n">edge_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
-    <span class="n">line_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">max_edge_index</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
-                <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="p">((</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
-        <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;edge_index&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">idxmax</span><span class="p">()[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span>
-        <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="p">)</span>
-
-    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">max_edge_index</span><span class="p">]</span>
-    <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_index</span><span class="p">[</span><span class="n">max_edge_index</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">line_index</span>
-
-
 <span class="k">def</span> <span class="nf">_create_output_dataset</span><span class="p">(</span>
     <span class="n">lines</span><span class="p">:</span> <span class="n">GeoDataFrameType</span><span class="p">,</span>
     <span class="n">topology</span><span class="p">:</span> <span class="s2">&quot;xu.Ugrid2d&quot;</span><span class="p">,</span>
@@ -739,56 +718,66 @@ document.write(`
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="snap_to_grid">
-<a class="viewcode-back" href="../../../api/xugrid.snap_to_grid.html#xugrid.snap_to_grid">[docs]</a>
-<span class="k">def</span> <span class="nf">snap_to_grid</span><span class="p">(</span>
+<div class="viewcode-block" id="create_snap_to_grid_dataframe">
+<a class="viewcode-back" href="../../../api/xugrid.create_snap_to_grid_dataframe.html#xugrid.create_snap_to_grid_dataframe">[docs]</a>
+<span class="k">def</span> <span class="nf">create_snap_to_grid_dataframe</span><span class="p">(</span>
     <span class="n">lines</span><span class="p">:</span> <span class="n">GeoDataFrameType</span><span class="p">,</span>
     <span class="n">grid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
     <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">GeoDataFrameType</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Snap a collection of lines to a grid.</span>
+<span class="sd">    Create a dataframe required to snap line geometries to a Ugrid2d topology.</span>
 
 <span class="sd">    A line is included and snapped to a grid edge when the line separates</span>
 <span class="sd">    the centroid of the cell with the centroid of the edge.</span>
-
-<span class="sd">    When a line in a cell is snapped to an edge that is **not** shared with</span>
-<span class="sd">    another cell, this is denoted with a value of -1 in the second column of</span>
-<span class="sd">    ``cell_to_cell``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    lines: gpd.GeoDataFrame</span>
 <span class="sd">        Line data. Geometry colum should contain exclusively LineStrings.</span>
-<span class="sd">    grid: xr.DataArray or xu.UgridDataArray of integers</span>
-<span class="sd">        Grid of cells to snap lines to. Cells with a value of 0 are not</span>
-<span class="sd">        included.</span>
+<span class="sd">    grid: xugrid.Ugrid2d</span>
+<span class="sd">        Grid of cells to snap lines to.</span>
 <span class="sd">    max_snap_distance: float</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    cell_to_cell: ndarray of integers with shape ``(N, 2)``</span>
-<span class="sd">        Cells whose centroids are separated from each other by a line.</span>
-<span class="sd">    segment_data: pd.DataFrame or gpd.DataFrame</span>
-<span class="sd">        Data for every segment. GeoDataFrame if ``return_geometry`` is</span>
-<span class="sd">        ``True``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
-        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-        <span class="c1"># Convert structured to unstructured representation</span>
-        <span class="n">topology</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
-        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;Expected xarray.DataArray or xugrid.UgridDataArray, received: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+<span class="sd">    result: pd.DataFrame</span>
+<span class="sd">        DataFrame with columns:</span>
 
+<span class="sd">        * line_index: the index of the geodataframe geometry.</span>
+<span class="sd">        * edge_index: the index of the</span>
+<span class="sd">        * x0: start x-coordinate of edge segment.</span>
+<span class="sd">        * y0: start y-coordinate of edge segment.</span>
+<span class="sd">        * x1: end x-coordinate of edge segment.</span>
+<span class="sd">        * y1: end y-coordinate of edge segment.</span>
+<span class="sd">        * length: length of the edge.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    First create data frame:</span>
+
+<span class="sd">    &gt;&gt;&gt; snapping_df = create_snap_to_grid_dataframe(lines, grid2d, max_snap_distance=0.5)</span>
+
+<span class="sd">    Use the ``line_index`` column to assign values from ``lines`` to this new dataframe:</span>
+
+<span class="sd">    &gt;&gt;&gt; snapping_df[&quot;my_variable&quot;] = lines[&quot;my_variable&quot;].iloc[snapping_df[&quot;line_index&quot;]].to_numpy()</span>
+
+<span class="sd">    Run some reduction on the variable, to create an aggregated value per grid edge:</span>
+
+<span class="sd">    &gt;&gt;&gt; aggregated = snapping_df.groupby(&quot;edge_index&quot;).sum()</span>
+
+<span class="sd">    Assign the aggregated values to a Ugrid2d topology:</span>
+
+<span class="sd">    &gt;&gt;&gt; new = xu.full_like(edge_data, np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; new.data[aggregated.index] = aggregated[&quot;my_variable&quot;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Ugrid2d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">node_coordinates</span>
     <span class="n">edge_centroids</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">edge_coordinates</span>
-    <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">edge_node_connectivity</span>
     <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">face_edge_connectivity</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
@@ -796,14 +785,16 @@ document.write(`
 
     <span class="c1"># Create geometric data</span>
     <span class="n">line_geometry</span> <span class="o">=</span> <span class="n">coerce_geometry</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
-    <span class="n">line_coords</span><span class="p">,</span> <span class="n">shapely_index</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span>
+    <span class="n">line_coords</span><span class="p">,</span> <span class="n">shapely_vertex_index</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span>
         <span class="n">line_geometry</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="c1"># Snap line_coords to grid</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">snap_to_nodes</span><span class="p">(</span>
         <span class="o">*</span><span class="n">line_coords</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">tiebreaker</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span>
     <span class="p">)</span>
-    <span class="n">line_edges</span> <span class="o">=</span> <span class="n">lines_as_edges</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]),</span> <span class="n">shapely_index</span><span class="p">)</span>
+    <span class="n">line_edges</span><span class="p">,</span> <span class="n">shapely_line_index</span> <span class="o">=</span> <span class="n">lines_as_edges</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]),</span> <span class="n">shapely_vertex_index</span>
+    <span class="p">)</span>
 
     <span class="c1"># Search for intersections. Every edge is potentially divided into smaller</span>
     <span class="c1"># segments: The segment_indices contain (repeated) values of the</span>
@@ -840,14 +831,77 @@ document.write(`
     <span class="n">line_index</span> <span class="o">=</span> <span class="n">line_index</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
     <span class="n">segment_edges</span> <span class="o">=</span> <span class="n">segment_edges</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
 
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;line_index&quot;</span><span class="p">:</span> <span class="n">shapely_line_index</span><span class="p">[</span><span class="n">line_index</span><span class="p">],</span>
+            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;y0&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="p">((</span><span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="snap_to_grid">
+<a class="viewcode-back" href="../../../api/xugrid.snap_to_grid.html#xugrid.snap_to_grid">[docs]</a>
+<span class="k">def</span> <span class="nf">snap_to_grid</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">GeoDataFrameType</span><span class="p">,</span>
+    <span class="n">grid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
+    <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">GeoDataFrameType</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Snap a collection of lines to a grid.</span>
+
+<span class="sd">    A line is included and snapped to a grid edge when the line separates</span>
+<span class="sd">    the centroid of the cell with the centroid of the edge.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lines: gpd.GeoDataFrame</span>
+<span class="sd">        Line data. Geometry colum should contain exclusively LineStrings.</span>
+<span class="sd">    grid: xr.DataArray or xu.UgridDataArray of integers</span>
+<span class="sd">        Grid of cells to snap lines to.</span>
+<span class="sd">    max_snap_distance: float</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    uds: UgridDataset</span>
+<span class="sd">        Snapped line geometries as edges in a Ugrid2d topology. Contains a</span>
+<span class="sd">        ``line_index`` variable identifying the original geodataframe line.</span>
+<span class="sd">    gdf: gpd.GeoDataFrame</span>
+<span class="sd">        Snapped line geometries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="c1"># Convert structured to unstructured representation</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;Expected xarray.DataArray or xugrid.UgridDataArray, received: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">create_snap_to_grid_dataframe</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">)</span>
+
     <span class="c1"># When multiple line parts are snapped to the same edge, use the ones with</span>
     <span class="c1"># the greatest length inside the cell.</span>
-    <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span> <span class="o">=</span> <span class="n">_find_largest_edges</span><span class="p">(</span><span class="n">segment_edges</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span>
-    <span class="n">shapely_index</span> <span class="o">=</span> <span class="n">shapely_index</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span>
+    <span class="n">max_edge_index</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;edge_index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">line_index</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;line_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
 
-    <span class="n">uds</span> <span class="o">=</span> <span class="n">_create_output_dataset</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">shapely_index</span><span class="p">)</span>
+    <span class="n">uds</span> <span class="o">=</span> <span class="n">_create_output_dataset</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">_create_output_gdf</span><span class="p">(</span>
-        <span class="n">lines</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">shapely_index</span>
+        <span class="n">lines</span><span class="p">,</span>
+        <span class="n">topology</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+        <span class="n">topology</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+        <span class="n">edges</span><span class="p">,</span>
+        <span class="n">line_index</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">uds</span><span class="p">,</span> <span class="n">gdf</span></div>
 
@@ -901,7 +955,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
     <br/>
   </p>
 </div>
