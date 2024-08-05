@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.11.0] 2024-08-05
+-------------------
 
 Fixed
 ~~~~~
@@ -44,8 +44,6 @@ Changed
 - :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now uses ``rtol``
   and ``atol`` keywords instead of ``tol``, to match changes in
   ``scipy.linalg.sparse.cg``.
-
-[0.10.0] 2024-05-01
 
 [0.10.0] 2024-05-01
 -------------------
