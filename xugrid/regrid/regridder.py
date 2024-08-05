@@ -1,4 +1,5 @@
 """This module is heavily inspired by xemsf.frontend.py"""
+
 import abc
 from typing import Callable, Optional, Tuple, Union
 
@@ -34,16 +35,31 @@ def make_regrid(func):
     f = numba.njit(func, inline="always")
 
     def _regrid(source: FloatArray, A: MatrixCSR, size: int):
+        # Pre-allocate the output array
         n_extra = source.shape[0]
         out = np.full((n_extra, size), np.nan)
+        # Pre-allocate workspace arrays. Every reduction algorithm should use
+        # no more than the size of indices. Every thread gets it own workspace
+        # row!
+        n_work = np.diff(A.indptr).max()
+        workspace = np.empty((n_extra, 2, n_work), dtype=np.float64)
         for extra_index in numba.prange(n_extra):
             source_flat = source[extra_index]
             for target_index in range(A.n):
                 slice = row_slice(A, target_index)
                 indices = A.indices[slice]
                 weights = A.data[slice]
+
+                # Copy the source data for this row to values.
+                n_value = len(indices)
+                values = workspace[extra_index, 0, :n_value]
+                for i, index in enumerate(indices):
+                    values[i] = source_flat[index]
+
                 if len(indices) > 0:
-                    out[extra_index, target_index] = f(source_flat, indices, weights)
+                    out[extra_index, target_index] = f(
+                        values, weights, workspace[extra_index, 1, :]
+                    )
         return out
 
     return numba.njit(_regrid, parallel=True, cache=True)
@@ -433,9 +449,13 @@ class OverlapRegridder(BaseOverlapRegridder):
     * ``"mode"``
     * ``"median"``
     * ``"max_overlap"``
+    * percentiles 5, 10, 25, 50, 75, 90, 95: as ``"p5"``, ``"p10"``, etc.
 
     Custom aggregation functions are also supported, if they can be compiled by
     Numba. See the User Guide.
+
+    Any percentile method can be created via:
+    ``method = OverlapRegridder.create_percentile_methode(percentile)``
 
     Parameters
     ----------
@@ -446,7 +466,7 @@ class OverlapRegridder(BaseOverlapRegridder):
     """
 
     _JIT_FUNCTIONS = {
-        k: make_regrid(f) for k, f in reduce.ASBOLUTE_OVERLAP_METHODS.items()
+        k: make_regrid(f) for k, f in reduce.ABSOLUTE_OVERLAP_METHODS.items()
     }
 
     def __init__(
@@ -460,6 +480,10 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     def _compute_weights(self, source, target) -> None:
         super()._compute_weights(source, target, relative=False)
+
+    @staticmethod
+    def create_percentile_method(percentile: float) -> Callable:
+        return reduce.create_percentile_method(percentile)
 
     @classmethod
     def from_weights(

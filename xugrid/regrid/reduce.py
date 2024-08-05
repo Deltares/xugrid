@@ -1,12 +1,18 @@
 """Contains common reduction methods."""
+
+import math
+from typing import Callable
+
+import numba as nb
 import numpy as np
 
+from xugrid.regrid.nanpercentile import _select_two
 
-def mean(values, indices, weights):
+
+def mean(values, weights, workspace):
     vsum = 0.0
     wsum = 0.0
-    for i, w in zip(indices, weights):
-        v = values[i]
+    for v, w in zip(values, weights):
         if np.isnan(v):
             continue
         vsum += w * v
@@ -17,11 +23,10 @@ def mean(values, indices, weights):
         return vsum / wsum
 
 
-def harmonic_mean(values, indices, weights):
+def harmonic_mean(values, weights, workspace):
     v_agg = 0.0
     w_sum = 0.0
-    for i, w in zip(indices, weights):
-        v = values[i]
+    for v, w in zip(values, weights):
         if np.isnan(v) or v == 0:
             continue
         if w > 0:
@@ -33,21 +38,20 @@ def harmonic_mean(values, indices, weights):
         return w_sum / v_agg
 
 
-def geometric_mean(values, indices, weights):
+def geometric_mean(values, weights, workspace):
     v_agg = 0.0
     w_sum = 0.0
 
     # Compute sum to normalize weights to avoid tiny or huge values in exp
     normsum = 0.0
-    for i, w in zip(indices, weights):
+    for v, w in zip(values, weights):
         normsum += w
     # Early return if no values
     if normsum == 0:
         return np.nan
 
-    for i, w in zip(indices, weights):
+    for v, w in zip(values, weights):
         w = w / normsum
-        v = values[i]
         # Skip if v is NaN or 0.
         if v > 0 and w > 0:
             v_agg += w * np.log(abs(v))
@@ -64,12 +68,11 @@ def geometric_mean(values, indices, weights):
         return np.exp((1.0 / w_sum) * v_agg)
 
 
-def sum(values, indices, weights):
+def sum(values, weights, workspace):
     v_sum = 0.0
     w_sum = 0.0
 
-    for i, w in zip(indices, weights):
-        v = values[i]
+    for v, w in zip(values, weights):
         if np.isnan(v):
             continue
         v_sum += v
@@ -80,68 +83,127 @@ def sum(values, indices, weights):
         return v_sum
 
 
-def minimum(values, indices, weights):
-    vmin = values[indices[0]]
-    for i in indices:
-        v = values[i]
+def minimum(values, weights, workspace):
+    v_min = np.inf
+    w_max = 0.0
+    for v, w in zip(values, weights):
         if np.isnan(v):
             continue
-        if v < vmin:
-            vmin = v
-    return vmin
+        v_min = min(v, v_min)
+        w_max = max(w_max, w)
+    if w_max == 0.0:
+        return np.nan
+    return v_min
 
 
-def maximum(values, indices, weights):
-    vmax = values[indices[0]]
-    for i in indices:
-        v = values[i]
+def maximum(values, weights, workspace):
+    v_max = -np.inf
+    w_max = 0.0
+    for v, w in zip(values, weights):
         if np.isnan(v):
             continue
-        if v > vmax:
-            vmax = v
-    return vmax
+        v_max = max(v, v_max)
+        w_max = max(w_max, w)
+    if w_max == 0.0:
+        return np.nan
+    return v_max
 
 
-def mode(values, indices, weights):
+def mode(values, weights, workspace):
     # Area weighted mode. We use a linear search to accumulate weights, as we
     # generally expect a relatively small number of elements in the indices and
     # weights arrays.
-    accum = weights.copy()
+    accum = workspace
+    accum[: weights.size] = weights[:]
     w_sum = 0
-    for running_total, (i, w) in enumerate(zip(indices, weights)):
-        v = values[i]
+    w_max = 0.0
+    for running_total, (v, w) in enumerate(zip(values, weights)):
         if np.isnan(v):
             continue
+        w_max = max(w, w_max)
         w_sum += 1
         for j in range(running_total):  # Compare with previously found values
             if values[j] == v:  # matches previous value
                 accum[j] += w  # increase previous weight sum
                 break
 
-    if w_sum == 0:  # It skipped everything: only nodata values
+    if w_sum == 0 or w_max == 0.0:
+        # Everything skipped (all nodata), or all weights zero
         return np.nan
     else:  # Find value with highest frequency
         w_max = 0
-        for w_accum, i in zip(accum, indices):
-            if w_accum > w_max:
+        mode_value = values[0]
+        for w_accum, v in zip(accum, values):
+            if w_accum >= w_max and ~np.isnan(v):
                 w_max = w_accum
-                v = values[i]
-        return v
+                mode_value = v
+        return mode_value
 
 
-def median(values, indices, weights):
-    # TODO: more efficient implementation?
-    # See: https://github.com/numba/numba/blob/0441bb17c7820efc2eba4fd141b68dac2afa4740/numba/np/arraymath.py#L1693
-    return np.nanpercentile(values[indices], 50)
+@nb.njit
+def percentile(values, weights, workspace, p):
+    # This function is a simplified port of:
+    # https://github.com/numba/numba/blob/0441bb17c7820efc2eba4fd141b68dac2afa4740/numba/np/arraymath.py#L1745
+
+    w_max = 0.0
+    for w in weights:
+        w_max = max(w, w_max)
+    if w_max == 0.0:
+        return np.nan
+
+    if p == 0:
+        # Equal to minimum
+        vmin = values[0]
+        for v in values[1:]:
+            if np.isnan(v):
+                continue
+            if v < vmin:
+                vmin = v
+        return vmin
+
+    if p == 100:
+        # Equal to maximum
+        vmax = values[0]
+        for v in values:
+            if np.isnan(v):
+                continue
+            if v > vmax:
+                vmax = v
+        return vmax
+
+    # Everything should've been checked before:
+    #
+    # * a.dtype should be float
+    # * 0 <= q <= 100.
+    #
+    # Filter the NaNs
+
+    n = 0
+    for v in values:
+        if ~np.isnan(v):
+            workspace[n] = v
+            n += 1
+
+    # Early returns
+    if n == 0:
+        return np.nan
+    if n == 1:
+        return workspace[0]
+
+    # linear interp between closest ranks
+    rank = 1 + (n - 1) * p / 100.0
+    f = math.floor(rank)
+    m = rank - f
+    lower, upper = _select_two(workspace[:n], k=int(f - 1), low=0, high=(n - 1))
+    return lower * (1 - m) + upper * m
 
 
-def first_order_conservative(values, indices, weights):
+def first_order_conservative(values, weights, workspace):
     # Uses relative weights!
     # Rename to: first order conservative?
     v_agg = 0.0
     w_sum = 0.0
-    for i, w in zip(indices, weights):
-        v = values[i]
+    for v, w in zip(values, weights):
         if np.isnan(v):
             continue
         v_agg += v * w
@@ -155,20 +217,32 @@ def first_order_conservative(values, indices, weights):
 conductance = first_order_conservative
 
 
-def max_overlap(values, indices, weights):
-    max_w = 0.0
+def max_overlap(values, weights, workspace):
+    w_max = 0.0
     v = np.nan
-    for i, w in zip(indices, weights):
-        if w > max_w:
-            max_w = w
-            v_temp = values[i]
-            if np.isnan(v_temp):
-                continue
+    for v_temp, w in zip(values, weights):
+        if w >= w_max and ~np.isnan(v_temp):
+            w_max = w
             v = v_temp
+    if w_max == 0.0:
+        return np.nan
     return v
 
 
-ASBOLUTE_OVERLAP_METHODS = {
+def create_percentile_method(p: float) -> Callable:
+    if not (0.0 <= p <= 100.0):
+        raise ValueError(f"percentile must be in the range [0, 100], received: {p}")
+
+    def f(values, weights, workspace) -> float:
+        return percentile(values, weights, workspace, p)
+
+    return f
+
+
+median = create_percentile_method(50)
+
+
+ABSOLUTE_OVERLAP_METHODS = {
     "mean": mean,
     "harmonic_mean": harmonic_mean,
     "geometric_mean": geometric_mean,
@@ -179,6 +253,8 @@ ASBOLUTE_OVERLAP_METHODS = {
     "median": median,
     "max_overlap": max_overlap,
 }
+for p in (5, 10, 25, 50, 75, 90, 95):
+    ABSOLUTE_OVERLAP_METHODS[f"p{p}"] = create_percentile_method(p)
 
 
 RELATIVE_OVERLAP_METHODS = {
