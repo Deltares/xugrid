@@ -284,4 +284,4 @@ def test_create_snap_to_grid_dataframe(structured):
     new.data[aggregated.index] = aggregated["my_variable"]
 
     # A lot of values are NaN, but all not-nan values should be three.
-    assert new.min() == new.max() == 3
+    np.testing.assert_array_equal(np.unique(new), [3, np.nan])
