@@ -109,13 +109,14 @@ result.ugrid.plot()
 # inserted during the ``.regrid`` call and compiled by `Numba`_ for performance.
 #
 # A valid reduction method must be compileable by Numba, and takes exactly three
-# arguments: ``values``, ``indices``, ``weights``.
+# arguments: ``values``, ``weights``, ``workspace``.
 #
 # * ``values``: is the array containing the (float) source values.
 # * ``weights``: contains the (float) overlap between the target face and the
 #   source faces. The size of ``weights`` is equal to the size of ``values``.
-# * ``work``: used as a temporary workspace of floats. The size of ``work`` is
-#   equal to the size of ``values``.
+# * ``workspace``: used as a temporary workspace of floats. The size of ``work`` is
+#   equal to the size of ``values``. (Make sure to zero it beforehand if that's
+#   important to your reduction!)
 #
 # Xugrid regridder reduction functions are implemented in such a way. For a
 # example, an area weighted sum could be implemented as follows:
