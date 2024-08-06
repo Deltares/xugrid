@@ -1,6 +1,6 @@
 """
-Pronvinces NL
-=============
+Provinces NL
+============
 
 This is a small vector dataset containing polygons of the provinces of the
 Netherlands, including water, presented as geopandas GeoDataFrame.

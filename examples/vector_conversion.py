@@ -3,7 +3,7 @@ Vector geometry conversion
 ==========================
 
 A great deal of geospatial data is available not in gridded form, but in
-vectorized form: as points, lines, and polygons. In the Python data ecosystem,
+vector form: as points, lines, and polygons. In the Python data ecosystem,
 these geometries and their associated data are generally represented by a
 geopandas GeoDataFrame.
 
