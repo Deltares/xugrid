@@ -113,9 +113,9 @@ result.ugrid.plot()
 #
 # * ``values``: is the array containing the (float) source values.
 # * ``weights``: contains the (float) overlap between the target face and the
-#   source faces. The size of ``weights`` is equal to the size of ``indices``.
-# * ``work``: used as a temporary workspace. Contains one float value for each
-#   index in indices.
+#   source faces. The size of ``weights`` is equal to the size of ``values``.
+# * ``work``: used as a temporary workspace of floats. The size of ``work`` is
+#   equal to the size of ``values``.
 #
 # Xugrid regridder reduction functions are implemented in such a way. For a
 # example, an area weighted sum could be implemented as follows:
@@ -126,7 +126,7 @@ def mean(values, weights, workspace):
     weight_sum = 0.0
     for value, weight in zip(values, weights):
         if ~np.isnan(value):
-            total = +value * weight
+            total += value * weight
             weight_sum += weight
     if weight_sum == 0.0:
         return np.nan
@@ -136,20 +136,24 @@ def mean(values, weights, workspace):
 # %%
 # .. note::
 #    * Each reduction must return a single float.
-#    * Custom reductions methods must be able to deal with NaN values as these
-#      are commonly encountered in datasets as a "no data value".
+#    * Always check for ``np.isnan(value)``: Custom reductions methods must be
+#      able to deal with NaN values as these are commonly encountered in datasets
+#      as a "no data value".
 #    * If Python features are used that are unsupported by Numba, you will get
-#      somewhat obscure errors. In such a case, test your function with
-#      synthetic values for ``values, weights, workspace``.
+#      somewhat obscure errors. In such a case, ``numba.njit`` and test your
+#      function separately with synthetic values for ``values, weights,
+#      workspace``.
 #    * The ``workspace`` array is provided to avoid dynamic memory allocations.
 #      It is a an array of floats with the same size as ``values`` or
 #      ``weights``. You may freely allocate new arrays within the reduction
-#      function but it will impact performance.
+#      function but it will impact performance. (Methods such as mode or median
+#      require a workspace.)
 #    * While we could have implemented a weighted mean as:
 #      ``np.nansum(values * weights) / np.nansum(weights)``, the function above
-#      is efficiently compiled by Numba and does not allocate.
+#      is efficiently compiled by Numba and does not allocate temporary arrays.
 #
-# To use our custom method, we provide at initialization of the OverlapRegridder:
+# To use our custom method, we provide it at initialization of the
+# OverlapRegridder:
 
 regridder = xu.OverlapRegridder(uda, grid, method=mean)
 result = regridder.regrid(uda)
@@ -157,7 +161,7 @@ result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
 # %%
 # Not every reduction uses the ``weights`` and ``workspace`` arguments. For
-# example, a regular sum:
+# example, a regular sum could only look at the values:
 
 
 def nansum(values, weights, workspace):
@@ -165,8 +169,6 @@ def nansum(values, weights, workspace):
 
 
 # %%
-# Always ensure that the function can deal with NaN values!
-#
 # Custom percentiles
 # ------------------
 #

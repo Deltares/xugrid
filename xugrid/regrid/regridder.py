@@ -58,7 +58,7 @@ def make_regrid(func):
 
                 if len(indices) > 0:
                     out[extra_index, target_index] = f(
-                        values, weights, workspace[extra_index, 1, :]
+                        values, weights, workspace[extra_index, 1, :n_value]
                     )
         return out
 
@@ -456,6 +456,7 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     Any percentile method can be created via:
     ``method = OverlapRegridder.create_percentile_methode(percentile)``
+    See the examples.
 
     Parameters
     ----------
@@ -463,6 +464,13 @@ class OverlapRegridder(BaseOverlapRegridder):
     target: Ugrid2d, UgridDataArray
     method: str, function, optional
         Default value is ``"mean"``.
+
+    Examples
+    --------
+    Setup a custom percentile method and apply it:
+
+    >>> p33_3 = OverlapRegridder.create_percentile_method(33.3)
+    >>> regridder = OverlapRegridder(source, target, method=p33_3)
     """
 
     _JIT_FUNCTIONS = {

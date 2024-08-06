@@ -56,9 +56,10 @@ def test_maximum(args):
 
 @pytest.mark.parametrize("args", [forward_args(), reverse_args()])
 def test_mode(args):
-    # In case of ties, returns the last not-nan value.
     actual = reduce.mode(*args)
-    assert ~np.isnan(actual)
+    # We have tied frequency (all weights 0.5). In this case we return the
+    # highest value.
+    assert np.allclose(actual, 2.0)
 
 
 @pytest.mark.parametrize("args", [forward_args(), reverse_args()])
@@ -76,8 +77,8 @@ def test_conductance(args):
 @pytest.mark.parametrize("args", [forward_args(), reverse_args()])
 def test_max_overlap(args):
     actual = reduce.max_overlap(*args)
-    # It returns the last not-nan value.
-    assert ~np.isnan(actual)
+    # We have tied overlap (all 0.5). In this case we return the highest value.
+    assert np.allclose(actual, 2.0)
 
 
 def test_max_overlap_extra():
@@ -177,7 +178,7 @@ def test_weights_all_zeros(f):
 
 
 @pytest.mark.parametrize("f", METHODS)
-def test_weights_all_nan(f):
+def test_values_all_nan(f):
     values = np.full(5, np.nan)
     weights = np.ones(5)
     workspace = np.zeros(5)

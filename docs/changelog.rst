@@ -6,6 +6,31 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- The reduction methods for the overlap regridders now behave consistently when
+  all values are NaN or when all weights (overlaps) are zero, and all methods
+  give the same answer irrespective of the order in which the values are
+  encountered.
+  
+Added
+~~~~~
+
+- Percentiles (5, 10, 25, 50, 75, 90, 95) have been added to the
+  :class:`xugrid.OverlapRegridder` as standard available reduction methods
+  (available as ``"p5", "p10"``, etc.). Custom percentile values (e.g. 2.5, 42) can be
+  setup using :meth:`xugrid.OverlapRegridder.create_percentile_method`.
+  
+Changed
+~~~~~~~
+
+- Custom reduction functions provide to the overlap regridders no longer require
+  an ``indices`` argument.
+
 [0.11.0] 2024-08-05
 -------------------
 

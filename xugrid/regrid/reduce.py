@@ -83,7 +83,8 @@ def sum(values, weights, workspace):
         return v_sum
 
 
-def minimum(values, weights, workspace):
+@nb.njit(inline="always")
+def _minimum(values, weights):
     v_min = np.inf
     w_max = 0.0
     for v, w in zip(values, weights):
@@ -96,7 +97,12 @@ def minimum(values, weights, workspace):
     return v_min
 
 
-def maximum(values, weights, workspace):
+def minimum(values, weights, workspace):
+    return _minimum(values, weights)
+
+
+@nb.njit(inline="always")
+def _maximum(values, weights):
     v_max = -np.inf
     w_max = 0.0
     for v, w in zip(values, weights):
@@ -107,6 +113,10 @@ def maximum(values, weights, workspace):
     if w_max == 0.0:
         return np.nan
     return v_max
+
+
+def maximum(values, weights, workspace):
+    return _maximum(values, weights)
 
 
 def mode(values, weights, workspace):
@@ -130,13 +140,17 @@ def mode(values, weights, workspace):
     if w_sum == 0 or w_max == 0.0:
         # Everything skipped (all nodata), or all weights zero
         return np.nan
-    else:  # Find value with highest frequency
+    else:
+        # Find value with highest frequency.
+        # In case frequencies are equal (a tie), take the largest value.
+        # This ensures the same result irrespective of value ordering.
         w_max = 0
         mode_value = values[0]
         for w_accum, v in zip(accum, values):
-            if w_accum >= w_max and ~np.isnan(v):
-                w_max = w_accum
-                mode_value = v
+            if ~np.isnan(v):
+                if (w_accum > w_max) or (w_accum == w_max and v > mode_value):
+                    w_max = w_accum
+                    mode_value = v
         return mode_value
 
 
@@ -145,6 +159,7 @@ def percentile(values, weights, workspace, p):
     # This function is a simplified port of:
     # https://github.com/numba/numba/blob/0441bb17c7820efc2eba4fd141b68dac2afa4740/numba/np/arraymath.py#L1745
 
+    # Exit early if all weights are 0.
     w_max = 0.0
     for w in weights:
         w_max = max(w, w_max)
@@ -152,24 +167,10 @@ def percentile(values, weights, workspace, p):
         return np.nan
 
     if p == 0:
-        # Equal to minimum
-        vmin = values[0]
-        for v in values[1:]:
-            if np.isnan(v):
-                continue
-            if v < vmin:
-                vmin = v
-        return vmin
+        return _minimum(values, weights)
 
     if p == 100:
-        # Equal to maximum
-        vmax = values[0]
-        for v in values:
-            if np.isnan(v):
-                continue
-            if v > vmax:
-                vmax = v
-        return vmax
+        return _maximum(values, weights)
 
     # Everything should've been checked before:
     #
@@ -219,14 +220,18 @@ conductance = first_order_conservative
 
 def max_overlap(values, weights, workspace):
     w_max = 0.0
-    v = np.nan
-    for v_temp, w in zip(values, weights):
-        if w >= w_max and ~np.isnan(v_temp):
-            w_max = w
-            v = v_temp
+    v_max = -np.inf
+    # Find value with highest overlap.
+    # In case frequencies are equal (a tie), take the largest value.
+    # This ensures the same result irrespective of value ordering.
+    for v, w in zip(values, weights):
+        if ~np.isnan(v):
+            if (w > w_max) or (w == w_max and v > v_max):
+                w_max = w
+                v_max = v
     if w_max == 0.0:
         return np.nan
-    return v
+    return v_max
 
 
 def create_percentile_method(p: float) -> Callable:
