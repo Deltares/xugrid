@@ -109,52 +109,79 @@ result.ugrid.plot()
 # inserted during the ``.regrid`` call and compiled by `Numba`_ for performance.
 #
 # A valid reduction method must be compileable by Numba, and takes exactly three
-# arguments: ``values``, ``indices``, ``weights``.
+# arguments: ``values``, ``weights``, ``workspace``.
 #
-# * ``values``: is the ravelled array containing the (float) source values.
-# * ``indices``: contains the flat, or "linear", (integer) indices into the
-#   source values for a single target face.
+# * ``values``: is the array containing the (float) source values.
 # * ``weights``: contains the (float) overlap between the target face and the
-#   source faces. The size of ``weights`` is equal to the size of ``indices``.
+#   source faces. The size of ``weights`` is equal to the size of ``values``.
+# * ``workspace``: used as a temporary workspace of floats. The size of ``work`` is
+#   equal to the size of ``values``. (Make sure to zero it beforehand if that's
+#   important to your reduction!)
 #
-# Xugrid regridder reduction functions are implemented in such a way. For a example, the area
-# could be implemented as follows:
+# Xugrid regridder reduction functions are implemented in such a way. For a
+# example, an area weighted sum could be implemented as follows:
 
 
-def mean(values, indices, weights):
-    subset = values[indices]
-    return np.nansum(subset * weights) / np.nansum(weights)
+def mean(values, weights, workspace):
+    total = 0.0
+    weight_sum = 0.0
+    for value, weight in zip(values, weights):
+        if ~np.isnan(value):
+            total += value * weight
+            weight_sum += weight
+    if weight_sum == 0.0:
+        return np.nan
+    return total / weight_sum
 
 
 # %%
 # .. note::
-#    * Custom reductions methods must be able to deal with NaN values as these
-#      are commonly encountered in datasets as a "no data value".
+#    * Each reduction must return a single float.
+#    * Always check for ``np.isnan(value)``: Custom reductions methods must be
+#      able to deal with NaN values as these are commonly encountered in datasets
+#      as a "no data value".
 #    * If Python features are used that are unsupported by Numba, you will get
-#      somewhat obscure errors. In such a case, test your function with
-#      synthetic values for ``values, indices, weights``.
-#    * The built-in mean is more efficient, avoiding temporary memory
-#      allocations.
+#      somewhat obscure errors. In such a case, ``numba.njit`` and test your
+#      function separately with synthetic values for ``values, weights,
+#      workspace``.
+#    * The ``workspace`` array is provided to avoid dynamic memory allocations.
+#      It is a an array of floats with the same size as ``values`` or
+#      ``weights``. You may freely allocate new arrays within the reduction
+#      function but it will impact performance. (Methods such as mode or median
+#      require a workspace.)
+#    * While we could have implemented a weighted mean as:
+#      ``np.nansum(values * weights) / np.nansum(weights)``, the function above
+#      is efficiently compiled by Numba and does not allocate temporary arrays.
 #
-# To use our custom method, we provide at initialization of the OverlapRegridder:
+# To use our custom method, we provide it at initialization of the
+# OverlapRegridder:
 
 regridder = xu.OverlapRegridder(uda, grid, method=mean)
 result = regridder.regrid(uda)
 result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
 # %%
-# Not every reduction uses the weights argument. For example, computing an
-# arbitrary quantile value requires just the values. Again, make sure the
-# function can deal with NaN values! -- hence ``nanpercentile`` rather than
-# ``percentile`` here.
+# Not every reduction uses the ``weights`` and ``workspace`` arguments. For
+# example, a regular sum could only look at the values:
 
 
-def p17(values, indices, weights):
-    subset = values[indices]
-    return np.nanpercentile(subset, 17)
+def nansum(values, weights, workspace):
+    return np.nansum(values)
 
 
-regridder = xu.OverlapRegridder(uda, grid, method=p17)
+# %%
+# Custom percentiles
+# ------------------
+#
+# Xugrid provides a number of predefined percentiles (5, 10, 25, 50, 75, 90,
+# 95). In case you need a different percentile value, you can use this utility:
+
+p333 = xu.OverlapRegridder.create_percentile_method(33.3)
+
+# %%
+# Then, provide it as the regridder method as above:
+
+regridder = xu.OverlapRegridder(uda, grid, method=p333)
 result = regridder.regrid(uda)
 result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 
