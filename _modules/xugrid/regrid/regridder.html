@@ -869,10 +869,16 @@ document.write(`
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    Create an OverlapRegridder to regrid with mean:</span>
+
+<span class="sd">    &gt;&gt;&gt; regridder = OverlapRegridder(source_grid, target_grid, method=&quot;mean&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; regridder.regrid(source_data)</span>
+
 <span class="sd">    Setup a custom percentile method and apply it:</span>
 
 <span class="sd">    &gt;&gt;&gt; p33_3 = OverlapRegridder.create_percentile_method(33.3)</span>
-<span class="sd">    &gt;&gt;&gt; regridder = OverlapRegridder(source, target, method=p33_3)</span>
+<span class="sd">    &gt;&gt;&gt; regridder = OverlapRegridder(source_grid, target_grid, method=p33_3)</span>
+<span class="sd">    &gt;&gt;&gt; regridder.regrid(source_data)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>

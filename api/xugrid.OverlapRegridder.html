@@ -695,9 +695,15 @@ See the examples.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
+<p>Create an OverlapRegridder to regrid with mean:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="p">(</span><span class="n">source_grid</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">source_data</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Setup a custom percentile method and apply it:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p33_3</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="o">.</span><span class="n">create_percentile_method</span><span class="p">(</span><span class="mf">33.3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">p33_3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="p">(</span><span class="n">source_grid</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">p33_3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">source_data</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
