@@ -774,307 +774,310 @@ document.write(`
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop</span></code>([labels, dim, errors])</p></td>
 <td><p>Backward compatible method based on <cite>drop_vars</cite> and <cite>drop_sel</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_dims</span></code>(drop_dims, *[, errors])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_attrs</span></code>(*[, deep])</p></td>
+<td><p>Removes all attributes from the Dataset and its variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_dims</span></code>(drop_dims, *[, errors])</p></td>
 <td><p>Drop dimensions and associated variables from this dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_duplicates</span></code>(dim, *[, keep])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_duplicates</span></code>(dim, *[, keep])</p></td>
 <td><p>Returns a new Dataset with duplicate dimension values removed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_encoding</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_encoding</span></code>()</p></td>
 <td><p>Return a new Dataset without encoding on the dataset or any of its variables/coords.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_indexes</span></code>(coord_names, *[, errors])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_indexes</span></code>(coord_names, *[, errors])</p></td>
 <td><p>Drop the indexes assigned to the given coordinates.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_isel</span></code>([indexers])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_isel</span></code>([indexers])</p></td>
 <td><p>Drop index positions from this Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_sel</span></code>([labels, errors])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_sel</span></code>([labels, errors])</p></td>
 <td><p>Drop index labels from this dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_vars</span></code>(names, *[, errors])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_vars</span></code>(names, *[, errors])</p></td>
 <td><p>Drop variables from this dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropna</span></code>(dim, *[, how, thresh, subset])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dropna</span></code>(dim, *[, how, thresh, subset])</p></td>
 <td><p>Returns a new dataset with dropped labels for missing values along the provided dimension.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump_to_store</span></code>(store, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump_to_store</span></code>(store, **kwargs)</p></td>
 <td><p>Store dataset contents to a backends.*DataStore object.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equals</span></code>(other)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equals</span></code>(other)</p></td>
 <td><p>Two Datasets are equal if they have matching variables and coordinates, all of which are equal.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code>(statement, *[, parser])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval</span></code>(statement, *[, parser])</p></td>
 <td><p>Calculate an expression supplied as a string in the context of the dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_dims</span></code>([dim, axis, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_dims</span></code>([dim, axis, ...])</p></td>
 <td><p>Return a new object with an additional axis (or axes) inserted at the corresponding position in the array shape.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ffill</span></code>(dim[, limit])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ffill</span></code>(dim[, limit])</p></td>
 <td><p>Fill NaN values by propagating values forward</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fillna</span></code>(value)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fillna</span></code>(value)</p></td>
 <td><p>Fill missing values in this object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_by_attrs</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_by_attrs</span></code>(**kwargs)</p></td>
 <td><p>Returns a <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> with variables that match specific conditions.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataframe</span></code>([sparse])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataframe</span></code>([sparse])</p></td>
 <td><p>Convert a pandas.DataFrame into an xarray.Dataset</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>()</p></td>
 <td><p>Convert a dictionary into an xarray.Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe" title="xugrid.UgridDataset.from_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_geodataframe</span></code></a>(geodataframe)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe" title="xugrid.UgridDataset.from_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_geodataframe</span></code></a>(geodataframe)</p></td>
 <td><p>Convert a geodataframe into the appropriate Ugrid topology and dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(k[,d])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code>(k[,d])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_index</span></code>(key)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_index</span></code>(key)</p></td>
 <td><p>Get an index for a dimension, with fall-back to a default RangeIndex</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby</span></code>(group[, squeeze, restore_coord_dims])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby</span></code>([group, squeeze, restore_coord_dims])</p></td>
 <td><p>Returns a DatasetGroupBy object for performing grouped operations.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby_bins</span></code>(group, bins[, right, labels, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groupby_bins</span></code>(group, bins[, right, labels, ...])</p></td>
 <td><p>Returns a DatasetGroupBy object for performing grouped operations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">head</span></code>([indexers])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">head</span></code>([indexers])</p></td>
 <td><p>Returns a new dataset with the first <cite>n</cite> values of each array for the specified dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">identical</span></code>(other)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">identical</span></code>(other)</p></td>
 <td><p>Like equals, but also checks all dataset attributes and the attributes on all variables and coordinates.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmax</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmax</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
 <td><p>Return the coordinate label of the maximum value along a dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmin</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idxmin</span></code>([dim, skipna, fill_value, keep_attrs])</p></td>
 <td><p>Return the coordinate label of the minimum value along a dimension.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code>([buf])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code>([buf])</p></td>
 <td><p>Concise summary of a Dataset variables and attributes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code>(coord[, datetime_unit])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code>(coord[, datetime_unit])</p></td>
 <td><p>Integrate along the given coordinate using the trapezoidal rule.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([coords, method, assume_sorted, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([coords, method, assume_sorted, ...])</p></td>
 <td><p>Interpolate a Dataset onto new coordinates</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_calendar</span></code>(target[, dim])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_calendar</span></code>(target[, dim])</p></td>
 <td><p>Interpolates the Dataset to another calendar based on decimal year measure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_like</span></code>(other[, method, assume_sorted, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_like</span></code>(other[, method, assume_sorted, ...])</p></td>
 <td><p>Interpolate this object onto the coordinates of another object, filling the out of range values with NaN.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_na</span></code>([dim, method, limit, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_na</span></code>([dim, method, limit, ...])</p></td>
 <td><p>Fill in NaNs by interpolating according to different methods.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>([indexers, drop, missing_dims])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>([indexers, drop, missing_dims])</p></td>
 <td><p>Returns a new dataset with each array indexed along the specified dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isin</span></code>(test_elements)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isin</span></code>(test_elements)</p></td>
 <td><p>Tests each value in the array for whether it is in test elements.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isnull</span></code>([keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isnull</span></code>([keep_attrs])</p></td>
 <td><p>Test each value in the array for whether it is a missing value.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code>(**kwargs)</p></td>
 <td><p>Manually trigger loading and/or computation of this dataset's data from disk or a remote source into memory and return this dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_store</span></code>([decoder])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_store</span></code>([decoder])</p></td>
 <td><p>Create a new dataset from the contents of a backends.*DataStore object</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code>(func[, keep_attrs, args])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code>(func[, keep_attrs, args])</p></td>
 <td><p>Apply a function to each data variable in this dataset</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_blocks</span></code>(func[, args, kwargs, template])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_blocks</span></code>(func[, args, kwargs, template])</p></td>
 <td><p>Apply a function to each block of this Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code>([dim, skipna, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code>([dim, skipna, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">max</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code>([dim, skipna, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code>([dim, skipna, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">mean</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">median</span></code>([dim, skipna, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">median</span></code>([dim, skipna, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">median</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code>(other[, overwrite_vars, compat, join, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code>(other[, overwrite_vars, compat, join, ...])</p></td>
 <td><p>Merge the arrays of two datasets into a single dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code>([dim, skipna, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code>([dim, skipna, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">min</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">notnull</span></code>([keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">notnull</span></code>([keep_attrs])</p></td>
 <td><p>Test each value in the array for whether it is not a missing value.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code>([pad_width, mode, stat_length, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pad</span></code>([pad_width, mode, stat_length, ...])</p></td>
 <td><p>Pad this dataset along one or more dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">persist</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">persist</span></code>(**kwargs)</p></td>
 <td><p>Trigger computation, keeping data as dask arrays</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipe</span></code>(func, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipe</span></code>(func, *args, **kwargs)</p></td>
 <td><p>Apply <code class="docutils literal notranslate"><span class="pre">func(self,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">polyfit</span></code>(dim, deg[, skipna, rcond, w, full, cov])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">polyfit</span></code>(dim, deg[, skipna, rcond, w, full, cov])</p></td>
 <td><p>Least squares polynomial fit.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prod</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prod</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">prod</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantile</span></code>(q[, dim, method, numeric_only, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantile</span></code>(q[, dim, method, numeric_only, ...])</p></td>
 <td><p>Compute the qth quantile of the data along the specified dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code>([queries, parser, engine, missing_dims])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query</span></code>([queries, parser, engine, missing_dims])</p></td>
 <td><p>Return a new dataset with each array indexed along the specified dimension(s), where the indexers are given as strings containing Python expressions to be evaluated against the data variables in the dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span></code>(dim, *[, pct, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rank</span></code>(dim, *[, pct, keep_attrs])</p></td>
 <td><p>Ranks the data.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce</span></code>(func[, dim, keep_attrs, keepdims, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce</span></code>(func[, dim, keep_attrs, keepdims, ...])</p></td>
 <td><p>Reduce this dataset by applying <cite>func</cite> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex</span></code>([indexers, method, tolerance, copy, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex</span></code>([indexers, method, tolerance, copy, ...])</p></td>
 <td><p>Conform this object onto a new set of indexes, filling in missing values with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex_like</span></code>(other[, method, tolerance, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reindex_like</span></code>(other[, method, tolerance, ...])</p></td>
 <td><p>Conform this object onto the indexes of another object, for indexes which the objects share.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>([name_dict])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename</span></code>([name_dict])</p></td>
 <td><p>Returns a new object with renamed variables, coordinates and dimensions.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_dims</span></code>([dims_dict])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_dims</span></code>([dims_dict])</p></td>
 <td><p>Returns a new object with renamed dimensions only.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_vars</span></code>([name_dict])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rename_vars</span></code>([name_dict])</p></td>
 <td><p>Returns a new object with renamed variables including coordinates</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder_levels</span></code>([dim_order])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder_levels</span></code>([dim_order])</p></td>
 <td><p>Rearrange index levels using input order.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code>([indexer, skipna, closed, label, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code>([indexer, skipna, closed, label, ...])</p></td>
 <td><p>Returns a Resample object for performing resampling operations.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_coords</span></code>([names, drop])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_coords</span></code>([names, drop])</p></td>
 <td><p>Given names of coordinates, reset them to become variables</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_encoding</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_encoding</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_index</span></code>(dims_or_levels, *[, drop])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_index</span></code>(dims_or_levels, *[, drop])</p></td>
 <td><p>Reset the specified index(es) or multi-index level(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">roll</span></code>([shifts, roll_coords])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">roll</span></code>([shifts, roll_coords])</p></td>
 <td><p>Roll this dataset by an offset along one or more dimensions.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling</span></code>([dim, min_periods, center])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling</span></code>([dim, min_periods, center])</p></td>
 <td><p>Rolling window object for Datasets.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_exp</span></code>([window, window_type])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_exp</span></code>([window, window_type])</p></td>
 <td><p>Exponentially-weighted moving window.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code>(*args, **kwargs)</p></td>
 <td><p>Round an array to the given number of decimals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>([indexers, method, tolerance, drop])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>([indexers, method, tolerance, drop])</p></td>
 <td><p>Returns a new dataset with each array indexed by tick labels along the specified dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_close</span></code>(close)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_close</span></code>(close)</p></td>
 <td><p>Register the function that releases any resources linked to this object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_coords</span></code>(names)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_coords</span></code>(names)</p></td>
 <td><p>Given names of one or more variables, set them as coordinates</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_index</span></code>([indexes, append])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_index</span></code>([indexes, append])</p></td>
 <td><p>Set Dataset (multi-)indexes using one or more existing coordinates or variables.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_xindex</span></code>(coord_names[, index_cls])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_xindex</span></code>(coord_names[, index_cls])</p></td>
 <td><p>Set a new, Xarray-compatible index from one or more existing coordinate(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code>([shifts, fill_value])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code>([shifts, fill_value])</p></td>
 <td><p>Shift this dataset by an offset along one or more dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortby</span></code>(variables[, ascending])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortby</span></code>(variables[, ascending])</p></td>
 <td><p>Sort object by labels or values (along an axis).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">squeeze</span></code>([dim, drop, axis])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">squeeze</span></code>([dim, drop, axis])</p></td>
 <td><p>Return a new object with squeezed data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stack</span></code>([dim, create_index, index_cls])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stack</span></code>([dim, create_index, index_cls])</p></td>
 <td><p>Stack any number of existing dimensions into a single new dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">std</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">std</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">std</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code>([dim, skipna, min_count, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">sum</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_dims</span></code>([dims_dict])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">swap_dims</span></code>([dims_dict])</p></td>
 <td><p>Returns a new object with swapped dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tail</span></code>([indexers])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tail</span></code>([indexers])</p></td>
 <td><p>Returns a new dataset with the last <cite>n</cite> values of each array for the specified dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">thin</span></code>([indexers])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">thin</span></code>([indexers])</p></td>
 <td><p>Returns a new dataset with each array indexed along every <cite>n</cite>-th value for the specified dimension(s)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_array</span></code>([dim, name])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_array</span></code>([dim, name])</p></td>
 <td><p>Deprecated version of to_dataarray</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dask_dataframe</span></code>([dim_order, set_index])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dask_dataframe</span></code>([dim_order, set_index])</p></td>
 <td><p>Convert this dataset into a dask.dataframe.DataFrame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataarray</span></code>([dim, name])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataarray</span></code>([dim, name])</p></td>
 <td><p>Convert this dataset into an xarray.DataArray</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([dim_order])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataframe</span></code>([dim_order])</p></td>
 <td><p>Convert this dataset into a pandas.DataFrame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([data, encoding])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>([data, encoding])</p></td>
 <td><p>Convert this dataset to a dictionary following xarray naming conventions.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>([path, mode, format, group, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>([path, mode, format, group, ...])</p></td>
 <td><p>Write dataset contents to a netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>()</p></td>
 <td><p>Convert this dataset into a pandas object without changing the number of dimensions.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stacked_array</span></code>(new_dim, sample_dims[, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_stacked_array</span></code>(new_dim, sample_dims[, ...])</p></td>
 <td><p>Combine variables of differing dimensionality into a DataArray without broadcasting.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code>([store, chunk_store, mode, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code>([store, chunk_store, mode, ...])</p></td>
 <td><p>Write dataset contents to a zarr group.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(*dim[, missing_dims])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transpose</span></code>(*dim[, missing_dims])</p></td>
 <td><p>Return a new Dataset object with all array dimensions transposed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unify_chunks</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unify_chunks</span></code>()</p></td>
 <td><p>Unify chunk size along all chunked dimensions of this Dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstack</span></code>([dim, fill_value, sparse])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unstack</span></code>([dim, fill_value, sparse])</p></td>
 <td><p>Unstack existing dimensions corresponding to MultiIndexes into multiple new dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(other)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(other)</p></td>
 <td><p>Update this dataset's variables with those from another dataset.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var</span></code>([dim, skipna, ddof, keep_attrs])</p></td>
 <td><p>Reduce this Dataset's data by applying <code class="docutils literal notranslate"><span class="pre">var</span></code> along some dimension(s).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted</span></code>(weights)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">weighted</span></code>(weights)</p></td>
 <td><p>Weighted Dataset operations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">where</span></code>(cond[, other, drop])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">where</span></code>(cond[, other, drop])</p></td>
 <td><p>Filter elements from this object according to a condition.</p></td>
 </tr>
 </tbody>
@@ -1252,7 +1255,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>

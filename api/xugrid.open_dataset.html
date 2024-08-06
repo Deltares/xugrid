@@ -677,14 +677,19 @@ objects are opened by scipy.io.netcdf (netCDF3) or h5py (netCDF4/HDF).</p></li>
 is chosen based on available dependencies, with a preference for
 “netcdf4”. A custom backend class (a subclass of <code class="docutils literal notranslate"><span class="pre">BackendEntrypoint</span></code>)
 can also be used.</p></li>
-<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – If chunks is provided, it is used to load the new dataset into dask
-arrays. <code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the dataset with dask using a single
-chunk for all arrays. <code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the dataset with dask using
-engine preferred chunks if exposed by the backend, otherwise with
-a single chunk for all arrays. In order to reproduce the default behavior
-of <code class="docutils literal notranslate"><span class="pre">xr.open_zarr(...)</span></code> use <code class="docutils literal notranslate"><span class="pre">xr.open_dataset(...,</span> <span class="pre">engine='zarr',</span> <span class="pre">chunks={})</span></code>.
-<code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
-engine preferred chunks. See dask chunking for more details.</p></li>
+<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>default: None</em>) – <p>If provided, used to load the data into dask arrays.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks=&quot;auto&quot;</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
+engine preferred chunks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask, which is generally faster for
+small arrays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the data with dask using a single chunk for all arrays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the data with dask using the engine’s preferred chunk
+size, generally identical to the format’s chunk size. If not available, a
+single chunk for all arrays.</p></li>
+</ul>
+<p>See dask chunking for more details.</p>
+</p></li>
 <li><p><strong>cache</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, cache data loaded from the underlying datastore in memory as
 NumPy arrays when accessed to avoid reading from the underlying data-
 store multiple times. Defaults to True unless you specify the <cite>chunks</cite>
@@ -693,22 +698,28 @@ change the behavior of coordinates corresponding to dimensions, which
 always load their data from disk into a <code class="docutils literal notranslate"><span class="pre">pandas.Index</span></code>.</p></li>
 <li><p><strong>decode_cf</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to decode these variables, assuming they were saved according
 to CF conventions.</p></li>
-<li><p><strong>mask_and_scale</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, replace array values equal to <cite>_FillValue</cite> with NA and scale
+<li><p><strong>mask_and_scale</strong> (<em>bool</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – If True, replace array values equal to <cite>_FillValue</cite> with NA and scale
 values according to the formula <cite>original_values * scale_factor +
 add_offset</cite>, where <cite>_FillValue</cite>, <cite>scale_factor</cite> and <cite>add_offset</cite> are
 taken from variable attributes (if they exist).  If the <cite>_FillValue</cite> or
 <cite>missing_value</cite> attribute contains multiple values a warning will be
 issued and all array values matching one of the multiple values will
-be replaced by NA. This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>decode_times</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, decode times encoded in the standard NetCDF datetime format
-into datetime objects. Otherwise, leave them encoded as numbers.
+be replaced by NA. Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
 This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>decode_timedelta</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, decode variables and coordinates with time units in
+<li><p><strong>decode_times</strong> (<em>bool</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – If True, decode times encoded in the standard NetCDF datetime format
+into datetime objects. Otherwise, leave them encoded as numbers.
+Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
+This keyword may not be supported by all the backends.</p></li>
+<li><p><strong>decode_timedelta</strong> (<em>bool</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – If True, decode variables and coordinates with time units in
 {“days”, “hours”, “minutes”, “seconds”, “milliseconds”, “microseconds”}
 into timedelta objects. If False, leave them encoded as numbers.
 If None (default), assume the same value of decode_time.
+Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
 This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>use_cftime</strong> (<em>bool</em><em>, </em><em>optional</em>) – Only relevant if encoded dates come from a standard calendar
+<li><p><strong>use_cftime</strong> (<em>bool</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – Only relevant if encoded dates come from a standard calendar
 (e.g. “gregorian”, “proleptic_gregorian”, “standard”, or not
 specified).  If None (default), attempt to decode times to
 <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects; if this is not possible, decode times to
@@ -716,11 +727,15 @@ specified).  If None (default), attempt to decode times to
 <code class="docutils literal notranslate"><span class="pre">cftime.datetime</span></code> objects, regardless of whether or not they can be
 represented using <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects.  If False, always
 decode times to <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects; if this is not possible
-raise an error. This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>concat_characters</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, concatenate along the last dimension of character arrays to
+raise an error. Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
+This keyword may not be supported by all the backends.</p></li>
+<li><p><strong>concat_characters</strong> (<em>bool</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – If True, concatenate along the last dimension of character arrays to
 form string arrays. Dimensions will only be concatenated over (and
 removed) if they have no corresponding variable and if they are only
 used as the last dimension of character arrays.
+Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
 This keyword may not be supported by all the backends.</p></li>
 <li><p><strong>decode_coords</strong> (<em>bool</em><em> or </em><em>{&quot;coordinates&quot;</em><em>, </em><em>&quot;all&quot;}</em><em>, </em><em>optional</em>) – <p>Controls which variables are set as coordinate variables:</p>
 <ul>
@@ -878,7 +893,7 @@ is never touched.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
     <br/>
   </p>
 </div>
