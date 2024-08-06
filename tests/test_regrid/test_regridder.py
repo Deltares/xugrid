@@ -269,3 +269,17 @@ def test_regridder_daks_arrays(
     )
     result = regridder.regrid(grid_data_dask_source_layered)
     assert result.isel(layer=0).equals(grid_data_dask_expected_layered.isel(layer=0))
+
+
+def test_create_percentile_method():
+    with pytest.raises(ValueError):
+        OverlapRegridder.create_percentile_method(percentile=-1)
+
+    with pytest.raises(ValueError):
+        OverlapRegridder.create_percentile_method(percentile=101)
+
+    median = OverlapRegridder.create_percentile_method(percentile=50)
+    values = np.array([0, 1, 2, 3, 4], dtype=float)
+    weights = np.ones_like(values)
+    workspace = np.zeros_like(values)
+    assert median(values, weights, workspace) == 2
