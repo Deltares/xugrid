@@ -12,10 +12,8 @@ def forward_args():
 
 
 def reverse_args():
-    values = np.flip(np.array([0.0, 1.0, 2.0, np.nan]))
-    weights = np.array([0.5, 0.5, 0.5, 0.5])
-    work = np.empty_like(weights)
-    return values, weights, work
+    values, weights, work = forward_args()
+    return np.flip(values), weights, work
 
 
 @pytest.mark.parametrize("args", [forward_args(), reverse_args()])

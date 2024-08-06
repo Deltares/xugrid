@@ -467,10 +467,16 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     Examples
     --------
+    Create an OverlapRegridder to regrid with mean:
+
+    >>> regridder = OverlapRegridder(source_grid, target_grid, method="mean")
+    >>> regridder.regrid(source_data)
+
     Setup a custom percentile method and apply it:
 
     >>> p33_3 = OverlapRegridder.create_percentile_method(33.3)
-    >>> regridder = OverlapRegridder(source, target, method=p33_3)
+    >>> regridder = OverlapRegridder(source_grid, target_grid, method=p33_3)
+    >>> regridder.regrid(source_data)
     """
 
     _JIT_FUNCTIONS = {

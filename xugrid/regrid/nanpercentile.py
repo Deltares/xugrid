@@ -1,5 +1,5 @@
 """
-Numba percentile methods allocate continuosly on the heap.
+Numba percentile methods allocate continuously on the heap.
 
 This has significant overhead when calling the reduction method millions of
 times -- as happens when regridding.
