@@ -455,7 +455,7 @@ document.write(`
 
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="n">target_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span>
-                        <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">workspace</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+                        <span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">workspace</span><span class="p">[</span><span class="n">extra_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">n_value</span><span class="p">]</span>
                     <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
@@ -858,6 +858,7 @@ document.write(`
 
 <span class="sd">    Any percentile method can be created via:</span>
 <span class="sd">    ``method = OverlapRegridder.create_percentile_methode(percentile)``</span>
+<span class="sd">    See the examples.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -865,6 +866,13 @@ document.write(`
 <span class="sd">    target: Ugrid2d, UgridDataArray</span>
 <span class="sd">    method: str, function, optional</span>
 <span class="sd">        Default value is ``&quot;mean&quot;``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Setup a custom percentile method and apply it:</span>
+
+<span class="sd">    &gt;&gt;&gt; p33_3 = OverlapRegridder.create_percentile_method(33.3)</span>
+<span class="sd">    &gt;&gt;&gt; regridder = OverlapRegridder(source, target, method=p33_3)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_JIT_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>

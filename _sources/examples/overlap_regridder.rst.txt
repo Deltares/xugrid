@@ -112,7 +112,7 @@ some bathymetry) of the Netherlands, and a coarser target grid.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f30a8db8440>
+    <matplotlib.collections.LineCollection object at 0x7f583dd06bd0>
 
 
 
@@ -202,7 +202,7 @@ conservative methods, such as conductance:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f30a9275430>
+    <matplotlib.collections.PolyCollection object at 0x7f583db652b0>
 
 
 
@@ -219,9 +219,9 @@ arguments: ``values``, ``indices``, ``weights``.
 
 * ``values``: is the array containing the (float) source values.
 * ``weights``: contains the (float) overlap between the target face and the
-  source faces. The size of ``weights`` is equal to the size of ``indices``.
-* ``work``: used as a temporary workspace. Contains one float value for each
-  index in indices.
+  source faces. The size of ``weights`` is equal to the size of ``values``.
+* ``work``: used as a temporary workspace of floats. The size of ``work`` is
+  equal to the size of ``values``.
 
 Xugrid regridder reduction functions are implemented in such a way. For a
 example, an area weighted sum could be implemented as follows:
@@ -237,7 +237,7 @@ example, an area weighted sum could be implemented as follows:
         weight_sum = 0.0
         for value, weight in zip(values, weights):
             if ~np.isnan(value):
-                total = +value * weight
+                total += value * weight
                 weight_sum += weight
         if weight_sum == 0.0:
             return np.nan
@@ -251,26 +251,30 @@ example, an area weighted sum could be implemented as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-153
+.. GENERATED FROM PYTHON SOURCE LINES 137-157
 
 .. note::
    * Each reduction must return a single float.
-   * Custom reductions methods must be able to deal with NaN values as these
-     are commonly encountered in datasets as a "no data value".
+   * Always check for ``np.isnan(value)``: Custom reductions methods must be
+     able to deal with NaN values as these are commonly encountered in datasets
+     as a "no data value".
    * If Python features are used that are unsupported by Numba, you will get
-     somewhat obscure errors. In such a case, test your function with
-     synthetic values for ``values, weights, workspace``.
+     somewhat obscure errors. In such a case, ``numba.njit`` and test your
+     function separately with synthetic values for ``values, weights,
+     workspace``.
    * The ``workspace`` array is provided to avoid dynamic memory allocations.
      It is a an array of floats with the same size as ``values`` or
      ``weights``. You may freely allocate new arrays within the reduction
-     function but it will impact performance.
+     function but it will impact performance. (Methods such as mode or median
+     require a workspace.)
    * While we could have implemented a weighted mean as:
      ``np.nansum(values * weights) / np.nansum(weights)``, the function above
-     is efficiently compiled by Numba and does not allocate.
+     is efficiently compiled by Numba and does not allocate temporary arrays.
 
-To use our custom method, we provide at initialization of the OverlapRegridder:
+To use our custom method, we provide it at initialization of the
+OverlapRegridder:
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-158
+.. GENERATED FROM PYTHON SOURCE LINES 157-162
 
 .. code-block:: Python
 
@@ -293,16 +297,16 @@ To use our custom method, we provide at initialization of the OverlapRegridder:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f30a8f4c950>
+    <matplotlib.collections.PolyCollection object at 0x7f583d8a9760>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-161
+.. GENERATED FROM PYTHON SOURCE LINES 163-165
 
 Not every reduction uses the ``weights`` and ``workspace`` arguments. For
-example, a regular sum:
+example, a regular sum could only look at the values:
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-167
+.. GENERATED FROM PYTHON SOURCE LINES 165-171
 
 .. code-block:: Python
 
@@ -319,9 +323,7 @@ example, a regular sum:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-175
-
-Always ensure that the function can deal with NaN values!
+.. GENERATED FROM PYTHON SOURCE LINES 172-177
 
 Custom percentiles
 ------------------
@@ -329,7 +331,7 @@ Custom percentiles
 Xugrid provides a number of predefined percentiles (5, 10, 25, 50, 75, 90,
 95). In case you need a different percentile value, you can use this utility:
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-178
+.. GENERATED FROM PYTHON SOURCE LINES 177-180
 
 .. code-block:: Python
 
@@ -343,11 +345,11 @@ Xugrid provides a number of predefined percentiles (5, 10, 25, 50, 75, 90,
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-180
+.. GENERATED FROM PYTHON SOURCE LINES 181-182
 
 Then, provide it as the regridder method as above:
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-185
+.. GENERATED FROM PYTHON SOURCE LINES 182-187
 
 .. code-block:: Python
 
@@ -370,18 +372,18 @@ Then, provide it as the regridder method as above:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7f30a820a390>
+    <matplotlib.collections.PolyCollection object at 0x7f58475a4620>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-187
+.. GENERATED FROM PYTHON SOURCE LINES 188-189
 
 .. _Numba: https://numba.pydata.org/
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.007 seconds)
+   **Total running time of the script:** (0 minutes 4.019 seconds)
 
 
 .. _sphx_glr_download_examples_overlap_regridder.py:

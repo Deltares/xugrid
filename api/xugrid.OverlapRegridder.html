@@ -683,7 +683,8 @@ multiple ways to aggregate the values associated with the source faces.</p>
 <p>Custom aggregation functions are also supported, if they can be compiled by
 Numba. See the User Guide.</p>
 <p>Any percentile method can be created via:
-<code class="docutils literal notranslate"><span class="pre">method</span> <span class="pre">=</span> <span class="pre">OverlapRegridder.create_percentile_methode(percentile)</span></code></p>
+<code class="docutils literal notranslate"><span class="pre">method</span> <span class="pre">=</span> <span class="pre">OverlapRegridder.create_percentile_methode(percentile)</span></code>
+See the examples.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -693,6 +694,12 @@ Numba. See the User Guide.</p>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>Setup a custom percentile method and apply it:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p33_3</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="o">.</span><span class="n">create_percentile_method</span><span class="p">(</span><span class="mf">33.3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regridder</span> <span class="o">=</span> <span class="n">OverlapRegridder</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">p33_3</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.OverlapRegridder.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/regrid/regridder.html#OverlapRegridder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.OverlapRegridder.__init__" title="Link to this definition">#</a></dt>

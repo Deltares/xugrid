@@ -478,7 +478,7 @@ some bathymetry) of the Netherlands, and a coarser target grid.</p>
 <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f30a8db8440&gt;
+<img src="../_images/sphx_glr_overlap_regridder_001.png" srcset="../_images/sphx_glr_overlap_regridder_001.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f583dd06bd0&gt;
 </pre></div>
 </div>
 <section id="method-comparison">
@@ -527,7 +527,7 @@ conservative methods, such as conductance:</p>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f30a9275430&gt;
+<img src="../_images/sphx_glr_overlap_regridder_003.png" srcset="../_images/sphx_glr_overlap_regridder_003.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f583db652b0&gt;
 </pre></div>
 </div>
 </section>
@@ -540,9 +540,9 @@ arguments: <code class="docutils literal notranslate"><span class="pre">values</
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">values</span></code>: is the array containing the (float) source values.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">weights</span></code>: contains the (float) overlap between the target face and the
-source faces. The size of <code class="docutils literal notranslate"><span class="pre">weights</span></code> is equal to the size of <code class="docutils literal notranslate"><span class="pre">indices</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">work</span></code>: used as a temporary workspace. Contains one float value for each
-index in indices.</p></li>
+source faces. The size of <code class="docutils literal notranslate"><span class="pre">weights</span></code> is equal to the size of <code class="docutils literal notranslate"><span class="pre">values</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">work</span></code>: used as a temporary workspace of floats. The size of <code class="docutils literal notranslate"><span class="pre">work</span></code> is
+equal to the size of <code class="docutils literal notranslate"><span class="pre">values</span></code>.</p></li>
 </ul>
 <p>Xugrid regridder reduction functions are implemented in such a way. For a
 example, an area weighted sum could be implemented as follows:</p>
@@ -551,7 +551,7 @@ example, an area weighted sum could be implemented as follows:</p>
     <span class="n">weight_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-            <span class="n">total</span> <span class="o">=</span> <span class="o">+</span><span class="n">value</span> <span class="o">*</span> <span class="n">weight</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">weight</span>
             <span class="n">weight_sum</span> <span class="o">+=</span> <span class="n">weight</span>
     <span class="k">if</span> <span class="n">weight_sum</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -562,36 +562,39 @@ example, an area weighted sum could be implemented as follows:</p>
 <p class="admonition-title">Note</p>
 <ul class="simple">
 <li><p>Each reduction must return a single float.</p></li>
-<li><p>Custom reductions methods must be able to deal with NaN values as these
-are commonly encountered in datasets as a “no data value”.</p></li>
+<li><p>Always check for <code class="docutils literal notranslate"><span class="pre">np.isnan(value)</span></code>: Custom reductions methods must be
+able to deal with NaN values as these are commonly encountered in datasets
+as a “no data value”.</p></li>
 <li><p>If Python features are used that are unsupported by Numba, you will get
-somewhat obscure errors. In such a case, test your function with
-synthetic values for <code class="docutils literal notranslate"><span class="pre">values,</span> <span class="pre">weights,</span> <span class="pre">workspace</span></code>.</p></li>
+somewhat obscure errors. In such a case, <code class="docutils literal notranslate"><span class="pre">numba.njit</span></code> and test your
+function separately with synthetic values for <code class="docutils literal notranslate"><span class="pre">values,</span> <span class="pre">weights,</span>
+<span class="pre">workspace</span></code>.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">workspace</span></code> array is provided to avoid dynamic memory allocations.
 It is a an array of floats with the same size as <code class="docutils literal notranslate"><span class="pre">values</span></code> or
 <code class="docutils literal notranslate"><span class="pre">weights</span></code>. You may freely allocate new arrays within the reduction
-function but it will impact performance.</p></li>
+function but it will impact performance. (Methods such as mode or median
+require a workspace.)</p></li>
 <li><p>While we could have implemented a weighted mean as:
 <code class="docutils literal notranslate"><span class="pre">np.nansum(values</span> <span class="pre">*</span> <span class="pre">weights)</span> <span class="pre">/</span> <span class="pre">np.nansum(weights)</span></code>, the function above
-is efficiently compiled by Numba and does not allocate.</p></li>
+is efficiently compiled by Numba and does not allocate temporary arrays.</p></li>
 </ul>
 </div>
-<p>To use our custom method, we provide at initialization of the OverlapRegridder:</p>
+<p>To use our custom method, we provide it at initialization of the
+OverlapRegridder:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">regridder</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">OverlapRegridder</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">mean</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">regridder</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">uda</span><span class="p">)</span>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f30a8f4c950&gt;
+<img src="../_images/sphx_glr_overlap_regridder_004.png" srcset="../_images/sphx_glr_overlap_regridder_004.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f583d8a9760&gt;
 </pre></div>
 </div>
 <p>Not every reduction uses the <code class="docutils literal notranslate"><span class="pre">weights</span></code> and <code class="docutils literal notranslate"><span class="pre">workspace</span></code> arguments. For
-example, a regular sum:</p>
+example, a regular sum could only look at the values:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">nansum</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Always ensure that the function can deal with NaN values!</p>
 </section>
 <section id="custom-percentiles">
 <h2>Custom percentiles<a class="headerlink" href="#custom-percentiles" title="Link to this heading">#</a></h2>
@@ -606,10 +609,10 @@ example, a regular sum:</p>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_overlap_regridder_005.png" srcset="../_images/sphx_glr_overlap_regridder_005.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f30a820a390&gt;
+<img src="../_images/sphx_glr_overlap_regridder_005.png" srcset="../_images/sphx_glr_overlap_regridder_005.png" alt="overlap regridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f58475a4620&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.007 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.019 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-overlap-regridder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/2113e51a6a17a0230a513258e99cc8d1/overlap_regridder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">overlap_regridder.ipynb</span></code></a></p>
