@@ -66,7 +66,7 @@ grid.plot(ax=ax, color="red")
 ax.scatter(*grid.centroids.T, color="red")
 
 # %%
-# Rexgrid provides the CentroidLocatorRegridder for this:
+# Xugrid provides the CentroidLocatorRegridder for this:
 
 regridder = xu.CentroidLocatorRegridder(source=uda, target=grid)
 result = regridder.regrid(uda)
