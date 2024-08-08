@@ -53,7 +53,7 @@ def test_unique_grids():
     grid2 = grid1d()
     grid_different = grid1d()
 
-    grid_different.attrs["something"] = "different"
+    grid_different._attrs["something"] = "different"
 
     assert len(unique_grids([grid, grid2, grid_different])) == 2
     assert len(unique_grids([grid, grid2])) == 1

@@ -322,7 +322,7 @@ class AbstractUgrid(abc.ABC):
 
     @property
     def attrs(self):
-        return self._attrs
+        return copy.deepcopy(self._attrs)
 
     @property
     def node_dimension(self):
