@@ -175,7 +175,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y):
+    def sel_points(self, x, y, out_of_bounds="warn"):
         """
         Select points in the unstructured grid.
 
@@ -187,11 +187,20 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         x: ndarray of floats with shape ``(n_points,)``
         y: ndarray of floats with shape ``(n_points,)``
 
+        out_of_bounds: str, default "warn"
+            What to do when points are located outside of any feature:
+
+            * raise: raise a ValueError.
+            * ignore: return NaN for the out of bounds points.
+            * warn: give a warning and return NaN for the out of bounds points.
+            * drop: drop the out of bounds points. They may be identified
+              via the ``index`` coordinate of the returned selection.
+
         Returns
         -------
         points: Union[xr.DataArray, xr.Dataset]
         """
-        return self.grid.sel_points(self.obj, x, y)
+        return self.grid.sel_points(self.obj, x, y, out_of_bounds)
 
     def rasterize(self, resolution: float) -> xr.DataArray:
         """
