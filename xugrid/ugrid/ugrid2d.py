@@ -1354,9 +1354,6 @@ class Ugrid2d(AbstractUgrid):
             elif out_of_bounds == "drop":
                 index = index[valid]
                 keep = valid
-            else:
-                # This code shouldn't be reachable due to check up top.
-                raise ValueError("invalid out_of_bounds options")
 
         # Create the selection DataArray or Dataset
         coords = {

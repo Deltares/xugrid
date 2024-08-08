@@ -129,7 +129,7 @@ class AbstractUgrid(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def sel_points(self, obj, x, y, out_bounds):
+    def sel_points(self, obj, x, y, out_bounds, fill_value):
         pass
 
     @abc.abstractmethod

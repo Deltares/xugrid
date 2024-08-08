@@ -342,6 +342,20 @@ def test_sel():
     assert np.array_equal(new_obj.values, [0])
 
 
+def test_sel_points():
+    grid = grid1d()
+    obj = xr.DataArray(
+        data=[0, 1],
+        dims=[grid.edge_dimension],
+    )
+    # For now, this function does nothing so it'll work for multi-topology
+    # UgridDatasets.
+    actual = grid.sel_points(
+        obj=obj, x=None, y=None, out_of_bounds=None, fill_value=None
+    )
+    assert actual.identical(obj)
+
+
 def test_topology_subset():
     grid = grid1d()
     edge_indices = np.array([1])
