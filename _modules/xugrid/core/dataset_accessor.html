@@ -651,7 +651,7 @@ document.write(`
 
 <div class="viewcode-block" id="UgridDatasetAccessor.sel_points">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.sel_points.html#xugrid.UgridDatasetAccessor.sel_points">[docs]</a>
-    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
@@ -662,15 +662,17 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        x: ndarray of floats with shape ``(n_points,)``</span>
 <span class="sd">        y: ndarray of floats with shape ``(n_points,)``</span>
-
 <span class="sd">        out_of_bounds: str, default ``&quot;warn&quot;``</span>
 <span class="sd">            What to do when points are located outside of any feature:</span>
 
 <span class="sd">            * raise: raise a ValueError.</span>
-<span class="sd">            * ignore: return NaN for the out of bounds points.</span>
+<span class="sd">            * ignore: return ``fill_value`` for the out of bounds points.</span>
 <span class="sd">            * warn: give a warning and return NaN for the out of bounds points.</span>
 <span class="sd">            * drop: drop the out of bounds points. They may be identified</span>
 <span class="sd">              via the ``index`` coordinate of the returned selection.</span>
+<span class="sd">        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan</span>
+<span class="sd">            Value to assign to out-of-bounds points if out_of_bounds is warn</span>
+<span class="sd">            or ignore. Forwarded to xarray&#39;s ``.where()`` method.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -679,7 +681,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
 

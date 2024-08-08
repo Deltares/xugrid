@@ -1736,7 +1736,9 @@ document.write(`
 
 <div class="viewcode-block" id="Ugrid2d.sel_points">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points">[docs]</a>
-    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
@@ -1750,10 +1752,13 @@ document.write(`
 <span class="sd">            What to do when points are located outside of any feature:</span>
 
 <span class="sd">            * raise: raise a ValueError.</span>
-<span class="sd">            * ignore: return NaN for the out of bounds points.</span>
+<span class="sd">            * ignore: return ``fill_value`` for the out of bounds points.</span>
 <span class="sd">            * warn: give a warning and return NaN for the out of bounds points.</span>
 <span class="sd">            * drop: drop the out of bounds points. They may be identified</span>
 <span class="sd">              via the ``index`` coordinate of the returned selection.</span>
+<span class="sd">        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan</span>
+<span class="sd">            Value to assign to out-of-bounds points if out_of_bounds is warn</span>
+<span class="sd">            or ignore. Forwarded to xarray&#39;s ``.where()`` method.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1778,8 +1783,8 @@ document.write(`
         <span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
 
-        <span class="n">multiplier</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">keep</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># keep all by default</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
@@ -1790,33 +1795,25 @@ document.write(`
                         <span class="s2">&quot;Not all points are located inside of the grid. &quot;</span>
                         <span class="s2">&quot;Out of bounds points are marked by NaN.&quot;</span>
                     <span class="p">)</span>
-
-                <span class="c1"># Mask the out_of_bounds points with NaN (they will be indexed</span>
-                <span class="c1"># with -1). Multiply valid values by 1.0, multiply outside</span>
-                <span class="c1"># values by NaN. Note that multiplying a dask array with a</span>
-                <span class="c1"># numpy array will result a dask array, so this doesn&#39;t break</span>
-                <span class="c1"># lazy evaluation.</span>
-                <span class="n">multiplier</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">dim</span><span class="p">,)</span>
-                <span class="p">)</span>
-
+                <span class="n">condition</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">dim</span><span class="p">,))</span>
             <span class="k">elif</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;drop&quot;</span><span class="p">:</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
                 <span class="n">keep</span> <span class="o">=</span> <span class="n">valid</span>
-
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># This code shouldn&#39;t be reachable due to check up top.</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid out_of_bounds options&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Create the selection DataArray or Dataset</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_index&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xy</span><span class="p">))[</span><span class="n">keep</span><span class="p">]),</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
         <span class="p">}</span>
         <span class="n">selection</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">multiplier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span> <span class="o">*</span> <span class="n">multiplier</span>
 
+        <span class="c1"># Set values to fill_value for out-of-bounds</span>
+        <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">selection</span></div>
 
 
