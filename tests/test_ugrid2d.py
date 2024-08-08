@@ -107,6 +107,13 @@ def test_ugrid2d_init():
     assert grid._face_edge_connectivity is None
 
 
+def test_safe_attrs():
+    # .attrs should return a copy
+    grid = grid2d()
+    assert grid.attrs == grid.attrs
+    assert grid._attrs is not grid.attrs
+
+
 def test_ugrid2d_alternative_init():
     custom_attrs = {
         "node_dimension": "nNetNode",
@@ -1448,7 +1455,7 @@ def test_equals():
     assert grid.equals(grid_copy)
     xr_grid = grid.to_dataset()
     assert not grid.equals(xr_grid)
-    grid_copy.attrs["attr"] = "something_else"
+    grid_copy._attrs["attr"] = "something_else"
     assert not grid.equals(grid_copy)
 
 
