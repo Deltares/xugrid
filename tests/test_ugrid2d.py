@@ -713,6 +713,11 @@ class TestUgrid2dSelection:
         actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="ignore")
         assert np.allclose(actual, [np.nan, 0, np.nan, 3, np.nan], equal_nan=True)
 
+        actual = self.grid.sel_points(
+            obj=self.obj, x=x, y=y, out_of_bounds="ignore", fill_value=-1
+        )
+        assert np.allclose(actual, [-1, 0, -1, 3, -1])
+
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):
             self.grid._validate_indexer(slice(2, 0))
