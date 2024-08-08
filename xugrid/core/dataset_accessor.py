@@ -229,7 +229,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y):
+    def sel_points(self, x, y, out_of_bounds="warn", fill_value=np.nan):
         """
         Select points in the unstructured grid.
 
@@ -240,6 +240,17 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         ----------
         x: ndarray of floats with shape ``(n_points,)``
         y: ndarray of floats with shape ``(n_points,)``
+        out_of_bounds: str, default ``"warn"``
+            What to do when points are located outside of any feature:
+
+            * raise: raise a ValueError.
+            * ignore: return ``fill_value`` for the out of bounds points.
+            * warn: give a warning and return NaN for the out of bounds points.
+            * drop: drop the out of bounds points. They may be identified
+              via the ``index`` coordinate of the returned selection.
+        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
+            Value to assign to out-of-bounds points if out_of_bounds is warn
+            or ignore. Forwarded to xarray's ``.where()`` method.
 
         Returns
         -------
@@ -248,7 +259,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         """
         result = self.obj
         for grid in self.grids:
-            result = grid.sel_points(result, x, y)
+            result = grid.sel_points(result, x, y, out_of_bounds, fill_value)
         return result
 
     def rasterize(self, resolution: float) -> xr.Dataset:

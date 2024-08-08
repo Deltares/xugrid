@@ -30,6 +30,14 @@ Changed
 
 - Custom reduction functions provide to the overlap regridders no longer require
   an ``indices`` argument.
+- :meth:`xugrid.Ugrid2d.sel_points`,
+  :meth:`xugrid.UgridDataArrayAccessor.sel_points` and
+  :meth:`xugrid.UgridDatasetAccessor.sel_points` now take an ``out_of_bounds``
+  and ``fill_value`` argument to determine what to with points that do not fall
+  inside of any grid feature. Previously, the method silently dropped these
+  points. The method now takes a ``fill_value`` argument to assign to
+  out-of-bounds points. It gives a warning return uses ``fill_value=np.nan`` by
+  default. To enable the old behavior, set ``out_of_bounds="drop"``.
 
 [0.11.0] 2024-08-05
 -------------------

@@ -574,7 +574,7 @@ class Ugrid1d(AbstractUgrid):
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
-    def sel_points(obj, x, y):
+    def sel_points(self, obj, x, y, out_of_bounds, fill_value):
         return obj
 
     def intersect_line(self, obj, start, stop):

@@ -670,6 +670,8 @@ class TestUgrid2dSelection:
         x = [0.5, 1.5]
         y = [0.5, 1.25]
 
+        with pytest.raises(ValueError, match="out_of_bounds must be one of"):
+            self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="nothing")
         with pytest.raises(ValueError, match="shape of x does not match shape of y"):
             self.grid.sel_points(obj=self.obj, x=[0.5, 1.5], y=[0.5])
         with pytest.raises(ValueError, match="x and y must be 1d"):
@@ -693,8 +695,28 @@ class TestUgrid2dSelection:
     def test_sel_points_out_of_bounds(self):
         x = [-10.0, 0.5, -20.0, 1.5, -30.0]
         y = [-10.0, 0.5, -20.0, 1.25, -30.0]
-        actual = self.grid.sel_points(obj=self.obj, x=x, y=y)
+
+        with pytest.raises(
+            ValueError, match="Not all points are located inside of the grid"
+        ):
+            self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="raise")
+
+        actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="drop")
         assert np.array_equal(actual[f"{NAME}_index"], [1, 3])
+
+        with pytest.warns(
+            UserWarning, match="Not all points are located inside of the grid"
+        ):
+            actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="warn")
+            assert np.allclose(actual, [np.nan, 0, np.nan, 3, np.nan], equal_nan=True)
+
+        actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="ignore")
+        assert np.allclose(actual, [np.nan, 0, np.nan, 3, np.nan], equal_nan=True)
+
+        actual = self.grid.sel_points(
+            obj=self.obj, x=x, y=y, out_of_bounds="ignore", fill_value=-1
+        )
+        assert np.allclose(actual, [-1, 0, -1, 3, -1])
 
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):

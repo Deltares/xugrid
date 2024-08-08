@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from itertools import chain
 from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
@@ -1292,24 +1293,43 @@ class Ugrid2d(AbstractUgrid):
         ystop = numeric_bound(y.stop, ymax)
         return self._sel_line(obj, start=(x, ystart), end=(x, ystop))
 
-    def sel_points(self, obj, x: FloatArray, y: FloatArray):
+    def sel_points(
+        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
+    ):
         """
         Select points in the unstructured grid.
 
-        Out-of-bounds points are ignored. They may be identified via the
-        ``index`` coordinate of the returned selection.
 
         Parameters
         ----------
         x: 1d array of floats with shape ``(n_points,)``
         y: 1d array of floats with shape ``(n_points,)``
         obj: xr.DataArray or xr.Dataset
+        out_of_bounds: str, default ``"warn"``
+            What to do when points are located outside of any feature:
+
+            * raise: raise a ValueError.
+            * ignore: return ``fill_value`` for the out of bounds points.
+            * warn: give a warning and return NaN for the out of bounds points.
+            * drop: drop the out of bounds points. They may be identified
+              via the ``index`` coordinate of the returned selection.
+        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
+            Value to assign to out-of-bounds points if out_of_bounds is warn
+            or ignore. Forwarded to xarray's ``.where()`` method.
 
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
             The name of the topology is prefixed in the x, y coordinates.
         """
+        options = ("warn", "raise", "ignore", "drop")
+        if out_of_bounds not in options:
+            str_options = ", ".join(options)
+            raise ValueError(
+                f"out_of_bounds must be one of {str_options}, "
+                f"received: {out_of_bounds}"
+            )
+
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
         if x.shape != y.shape:
@@ -1319,14 +1339,34 @@ class Ugrid2d(AbstractUgrid):
         dim = self.face_dimension
         xy = np.column_stack([x, y])
         index = self.locate_points(xy)
+
+        keep = slice(None, None)  # keep all by default
+        condition = None
         valid = index != -1
-        index = index[valid]
+        if not valid.all():
+            msg = "Not all points are located inside of the grid."
+            if out_of_bounds == "raise":
+                raise ValueError(msg)
+            elif out_of_bounds in ("warn", "ignore"):
+                if out_of_bounds == "warn":
+                    warnings.warn(msg)
+                condition = xr.DataArray(valid, dims=(dim,))
+            elif out_of_bounds == "drop":
+                index = index[valid]
+                keep = valid
+
+        # Create the selection DataArray or Dataset
         coords = {
-            f"{self.name}_index": (dim, np.arange(len(valid))[valid]),
-            f"{self.name}_x": (dim, xy[valid, 0]),
-            f"{self.name}_y": (dim, xy[valid, 1]),
+            f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
+            f"{self.name}_x": (dim, xy[keep, 0]),
+            f"{self.name}_y": (dim, xy[keep, 1]),
         }
-        return obj.isel({dim: index}).assign_coords(coords)
+        selection = obj.isel({dim: index}).assign_coords(coords)
+
+        # Set values to fill_value for out-of-bounds
+        if condition is not None:
+            selection = selection.where(condition, other=fill_value)
+        return selection
 
     def intersect_line(self, obj, start: Sequence[float], end: Sequence[float]):
         """
