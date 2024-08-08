@@ -663,7 +663,7 @@ document.write(`
 <h1>xugrid.UgridDataArrayAccessor.sel_points<a class="headerlink" href="#xugrid-ugriddataarrayaccessor-sel-points" title="Link to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.UgridDataArrayAccessor.sel_points">
-<span class="sig-prename descclassname"><span class="pre">UgridDataArrayAccessor.</span></span><span class="sig-name descname"><span class="pre">sel_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/core/dataarray_accessor.html#UgridDataArrayAccessor.sel_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArrayAccessor.sel_points" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">UgridDataArrayAccessor.</span></span><span class="sig-name descname"><span class="pre">sel_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/xugrid/core/dataarray_accessor.html#UgridDataArrayAccessor.sel_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataArrayAccessor.sel_points" title="Link to this definition">#</a></dt>
 <dd><p>Select points in the unstructured grid.</p>
 <p>Out-of-bounds points are ignored. They may be identified via the
 <code class="docutils literal notranslate"><span class="pre">index</span></code> coordinate of the returned selection.</p>
@@ -672,6 +672,15 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (ndarray of floats with shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>)</p></li>
 <li><p><strong>y</strong> (ndarray of floats with shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>)</p></li>
+<li><p><strong>out_of_bounds</strong> (<em>str</em><em>, </em><em>default &quot;warn&quot;</em>) – <p>What to do when points are located outside of any feature:</p>
+<ul>
+<li><p>raise: raise a ValueError.</p></li>
+<li><p>ignore: return NaN for the out of bounds points.</p></li>
+<li><p>warn: give a warning and return NaN for the out of bounds points.</p></li>
+<li><p>drop: drop the out of bounds points. They may be identified
+via the <code class="docutils literal notranslate"><span class="pre">index</span></code> coordinate of the returned selection.</p></li>
+</ul>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -689,6 +689,13 @@ setup using <code class="xref py py-meth docutils literal notranslate"><span cla
 <ul class="simple">
 <li><p>Custom reduction functions provide to the overlap regridders no longer require
 an <code class="docutils literal notranslate"><span class="pre">indices</span></code> argument.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points" title="xugrid.Ugrid2d.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel_points()</span></code></a>,
+<a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.sel_points()</span></code></a> and
+<a class="reference internal" href="api/xugrid.UgridDatasetAccessor.sel_points.html#xugrid.UgridDatasetAccessor.sel_points" title="xugrid.UgridDatasetAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.sel_points()</span></code></a> now take an <code class="docutils literal notranslate"><span class="pre">out_of_bounds</span></code>
+keyword to determine what to with points that do not fall inside of any grid
+feature. Previously, the method silently dropped these points. The method now
+returns NaN for out-of-bounds points and gives a warning by default. To enable
+the old behavior, specify <code class="docutils literal notranslate"><span class="pre">out_of_bounds=&quot;drop&quot;</span></code>.</p></li>
 </ul>
 </section>
 </section>
