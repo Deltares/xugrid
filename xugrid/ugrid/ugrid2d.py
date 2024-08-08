@@ -1344,14 +1344,12 @@ class Ugrid2d(AbstractUgrid):
         condition = None
         valid = index != -1
         if not valid.all():
+            msg = "Not all points are located inside of the grid."
             if out_of_bounds == "raise":
-                raise ValueError("Not all points are located inside of the grid.")
+                raise ValueError(msg)
             elif out_of_bounds in ("warn", "ignore"):
                 if out_of_bounds == "warn":
-                    warnings.warn(
-                        "Not all points are located inside of the grid. "
-                        "Out of bounds points are marked by NaN."
-                    )
+                    warnings.warn(msg)
                 condition = xr.DataArray(valid, dims=(dim,))
             elif out_of_bounds == "drop":
                 index = index[valid]
