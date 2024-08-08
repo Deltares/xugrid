@@ -1,5 +1,6 @@
 from typing import Dict, List, Sequence, Tuple, Union
 
+import numpy as np
 import scipy.sparse
 import xarray as xr
 
@@ -175,7 +176,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, out_of_bounds="warn"):
+    def sel_points(self, x, y, out_of_bounds="warn", fill_value=np.nan):
         """
         Select points in the unstructured grid.
 
@@ -186,21 +187,23 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         ----------
         x: ndarray of floats with shape ``(n_points,)``
         y: ndarray of floats with shape ``(n_points,)``
-
-        out_of_bounds: str, default "warn"
+        out_of_bounds: str, default: "warn"
             What to do when points are located outside of any feature:
 
             * raise: raise a ValueError.
-            * ignore: return NaN for the out of bounds points.
+            * ignore: return ``fill_value`` for the out of bounds points.
             * warn: give a warning and return NaN for the out of bounds points.
             * drop: drop the out of bounds points. They may be identified
               via the ``index`` coordinate of the returned selection.
+        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
+            Value to assign to out-of-bounds points if out_of_bounds is warn
+            or ignore. Forwarded to xarray's ``.where()`` method.
 
         Returns
         -------
         points: Union[xr.DataArray, xr.Dataset]
         """
-        return self.grid.sel_points(self.obj, x, y, out_of_bounds)
+        return self.grid.sel_points(self.obj, x, y, out_of_bounds, fill_value)
 
     def rasterize(self, resolution: float) -> xr.DataArray:
         """

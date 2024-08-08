@@ -1293,7 +1293,9 @@ class Ugrid2d(AbstractUgrid):
         ystop = numeric_bound(y.stop, ymax)
         return self._sel_line(obj, start=(x, ystart), end=(x, ystop))
 
-    def sel_points(self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn"):
+    def sel_points(
+        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
+    ):
         """
         Select points in the unstructured grid.
 
@@ -1307,10 +1309,13 @@ class Ugrid2d(AbstractUgrid):
             What to do when points are located outside of any feature:
 
             * raise: raise a ValueError.
-            * ignore: return NaN for the out of bounds points.
+            * ignore: return ``fill_value`` for the out of bounds points.
             * warn: give a warning and return NaN for the out of bounds points.
             * drop: drop the out of bounds points. They may be identified
               via the ``index`` coordinate of the returned selection.
+        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
+            Value to assign to out-of-bounds points if out_of_bounds is warn
+            or ignore. Forwarded to xarray's ``.where()`` method.
 
         Returns
         -------
@@ -1335,8 +1340,8 @@ class Ugrid2d(AbstractUgrid):
         xy = np.column_stack([x, y])
         index = self.locate_points(xy)
 
-        multiplier = None
         keep = slice(None, None)  # keep all by default
+        condition = None
         valid = index != -1
         if not valid.all():
             if out_of_bounds == "raise":
@@ -1347,33 +1352,25 @@ class Ugrid2d(AbstractUgrid):
                         "Not all points are located inside of the grid. "
                         "Out of bounds points are marked by NaN."
                     )
-
-                # Mask the out_of_bounds points with NaN (they will be indexed
-                # with -1). Multiply valid values by 1.0, multiply outside
-                # values by NaN. Note that multiplying a dask array with a
-                # numpy array will result a dask array, so this doesn't break
-                # lazy evaluation.
-                multiplier = xr.DataArray(
-                    data=np.where(valid, 1.0, np.nan), dims=(dim,)
-                )
-
+                condition = xr.DataArray(valid, dims=(dim,))
             elif out_of_bounds == "drop":
                 index = index[valid]
                 keep = valid
-
             else:
                 # This code shouldn't be reachable due to check up top.
                 raise ValueError("invalid out_of_bounds options")
 
+        # Create the selection DataArray or Dataset
         coords = {
             f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
             f"{self.name}_x": (dim, xy[keep, 0]),
             f"{self.name}_y": (dim, xy[keep, 1]),
         }
         selection = obj.isel({dim: index}).assign_coords(coords)
-        if multiplier is not None:
-            selection = selection * multiplier
 
+        # Set values to fill_value for out-of-bounds
+        if condition is not None:
+            selection = selection.where(condition, other=fill_value)
         return selection
 
     def intersect_line(self, obj, start: Sequence[float], end: Sequence[float]):
