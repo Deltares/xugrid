@@ -84,10 +84,10 @@ class StructuredGrid1d:
     @property
     def coords(self) -> dict:
         coords = {self.name: self.index}
-        if isinstance(self.dvalue, np.ndarray):
-            coords[self.dname] = (self.name, self.dvalue)
-        else:
+        if self.dvalue.ndim == 0:
             coords[self.dname] = self.dvalue
+        else:
+            coords[self.dname] = (self.name, self.dvalue)
         return coords
 
     @property

@@ -310,14 +310,16 @@ def test_directional_dependence():
     # orientation.
     result = []
     for source in [da, flipy, flipx, flipxy, uda, uda_flipxy]:
-        regridder = xu.OverlapRegridder(source, taget=target_da)
+        regridder = xu.OverlapRegridder(source, target=target_da)
         result.append(regridder.regrid(source))
-    assert all(result[0] == item for item in result[1:])
+    first = result.pop(0)
+    assert all(first.identical(item) for item in result)
 
     # Unstructured target: test whether the result is the same regardless of
     # source orientation.
     result = []
     for source in [da, flipy, flipx, flipxy, uda, uda_flipxy]:
-        regridder = xu.OverlapRegridder(source, taget=target_uda)
+        regridder = xu.OverlapRegridder(source, target=target_uda)
         result.append(regridder.regrid(source))
-    assert all(result[0] == item for item in result[1:])
+    first = result.pop(0)
+    assert all(first.identical(item) for item in result)
