@@ -28,7 +28,7 @@ from xugrid.ugrid.snapping import create_snap_to_grid_dataframe, snap_to_grid
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 
 __all__ = (
     "data",
