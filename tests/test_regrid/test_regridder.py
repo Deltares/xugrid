@@ -283,3 +283,41 @@ def test_create_percentile_method():
     weights = np.ones_like(values)
     workspace = np.zeros_like(values)
     assert median(values, weights, workspace) == 2
+
+
+def test_directional_dependence():
+    # Increasing / decreasing x or y direction shouldn't matter for the result.
+    da = xr.DataArray(
+        data=[[1.0, 2.0], [3.0, 4.0]],
+        coords={"y": [17.5, 12.5], "x": [2.5, 7.5]},
+        dims=("y", "x"),
+    )
+    target_da = xr.DataArray(
+        data=[[np.nan, np.nan], [np.nan, np.nan]],
+        coords={"y": [10.0, 20.0], "x": [0.0, 10.0]},
+        dims=("y", "x"),
+    )
+    target_uda = xu.UgridDataArray.from_structured(target_da)
+
+    flip = slice(None, None, -1)
+    flipy = da.isel(y=flip)
+    flipx = da.isel(x=flip)
+    flipxy = da.isel(x=flip, y=flip)
+    uda = xu.UgridDataArray.from_structured(da)
+    uda_flipxy = xu.UgridDataArray.from_structured(flipxy)
+
+    # Structured target: test whether the result is the same regardless of source
+    # orientation.
+    result = []
+    for source in [da, flipy, flipx, flipxy, uda, uda_flipxy]:
+        regridder = xu.OverlapRegridder(source, taget=target_da)
+        result.append(regridder.regrid(source))
+    assert all(result[0] == item for item in result[1:])
+
+    # Unstructured target: test whether the result is the same regardless of
+    # source orientation.
+    result = []
+    for source in [da, flipy, flipx, flipxy, uda, uda_flipxy]:
+        regridder = xu.OverlapRegridder(source, taget=target_uda)
+        result.append(regridder.regrid(source))
+    assert all(result[0] == item for item in result[1:])
