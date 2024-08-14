@@ -775,6 +775,9 @@ document.write(`
             <span class="p">)</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merged_selection</span><span class="p">)</span>
 
+    <span class="c1"># prevent inconsistent chunks, for which merged.chunks will give a ValueError</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">unify_chunks</span><span class="p">()</span>
+
     <span class="c1"># Merge chunks along the UGRID dimensions.</span>
     <span class="k">if</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">and</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
         <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">chunks</span><span class="p">)</span>
