@@ -5,8 +5,6 @@ import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
-from scipy import sparse
-from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
 import xugrid as xu
@@ -19,6 +17,7 @@ from xugrid.constants import (
     Point,
     Vector,
 )
+from xugrid.core.sparse import MatrixCSR, columns_and_values, row_slice
 from xugrid.ugrid import connectivity
 from xugrid.ugrid.connectivity import AdjacencyMatrix
 from xugrid.ugrid.ugrid2d import Ugrid2d
@@ -36,6 +35,46 @@ try:
     import shapely
 except ImportError:
     shapely = MissingOptionalModule("shapely")
+
+
+@nb.njit(cache=True)
+def _snap_to_nearest(A: MatrixCSR, snap_candidates: IntArray, max_distance) -> IntArray:
+    """
+    Find a closest target for each node.
+
+    The kD tree distance matrix will have stored for each node the other nodes
+    that are within snapping distance. These are the rows in the sparse matrix
+    that have more than one entry: the snap_candidates.
+
+    The first condition for a point to become a TARGET is if it hasn't been
+    connected to another point yet, i.e. it is UNVISITED. Once a point becomes
+    an TARGET, it looks for nearby points within the max_distance. These nearby
+    points are connected if: they are UNVISITED (i.e. they don't have a target
+    yet), or the current target is closer than the previous.
+    """
+    UNVISITED = -1
+    TARGET = -2
+    nearest = np.full(A.n, max_distance + 1.0)
+    visited = np.full(A.n, UNVISITED)
+
+    for i in snap_candidates:
+        if visited[i] != UNVISITED:
+            continue
+        visited[i] = TARGET
+
+        # Now iterate through every node j that is within max_distance of node i.
+        for j, dist in columns_and_values(A, row_slice(A, i)):
+            if i == j or visited[j] == TARGET:
+                # Continue if we're looking at the distance to ourselves
+                # (i==j), or other node is a target.
+                continue
+            if visited[j] == UNVISITED or dist < nearest[j]:
+                # If unvisited node, or already visited but we're closer, set
+                # to i.
+                visited[j] = i
+                nearest[j] = dist
+
+    return visited
 
 
 def snap_nodes(
@@ -79,38 +118,23 @@ def snap_nodes(
     """
     # First, find all the points that lie within max_distance of each other
     coords = np.column_stack((x, y))
-    n = len(coords)
     tree = cKDTree(coords)
-    coo_distances = tree.sparse_distance_matrix(
+    distances = tree.sparse_distance_matrix(
         tree, max_distance=max_distance, output_type="coo_matrix"
-    )
-    # Get rid of diagonal
-    i = coo_distances.row
-    j = coo_distances.col
-    off_diagonal = i != j
-    i = i[off_diagonal]
-    j = j[off_diagonal]
-    # If no pairs are found, there is nothing to snap
-    if len(i) > 0:
-        # Next, group the points together.
-        # Point A might lie close to point B, point B might lie close to
-        # Point C, and so on. These points are grouped, and their centroid
-        # is computed.
-        coo_content = (np.ones(i.size), (i, j))
-        coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
-        # Directed is true: this matrix is symmetrical
-        _, inverse = connected_components(coo_matrix, directed=True)
-        new = (
-            pd.DataFrame({"label": inverse, "x": x, "y": y})
-            .groupby("label")
-            .agg(
-                {
-                    "x": "mean",
-                    "y": "mean",
-                }
-            )
+    ).tocsr()
+    should_snap = distances.getnnz(axis=1) > 1
+
+    if should_snap.any():
+        index = np.arange(x.size)
+        visited = _snap_to_nearest(
+            A=MatrixCSR.from_csr_matrix(distances),
+            snap_candidates=index[should_snap],
+            max_distance=max_distance,
         )
-        return inverse, new["x"].to_numpy(), new["y"].to_numpy()
+        targets = visited < 0  # i.e. still UNVISITED or TARGET valued.
+        visited[targets] = index[targets]
+        deduplicated, inverse = np.unique(visited, return_inverse=True)
+        return inverse, x[deduplicated], y[deduplicated]
     else:
         return None, x.copy(), y.copy()
 
