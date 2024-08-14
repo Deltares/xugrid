@@ -6,6 +6,22 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- The regridders will no longer flip around data along an axis when regridding
+  from data from structured to unstructured form when the coordinates along the
+  dimensions is decreasing. (Decreasing y-axis is a common occurence in
+  geospatial rasters.)
+- The regridders will no longer error on ``.regrid()`` if a structured target
+  grid is non-equidistant, and contains an array delta (``d``) coordinate
+  rather than a single delta to denote cell sizes along a dimension (i.e.
+  ``dy`` along ``y`` midpoints, and ``dx`` along ``x``.)
+
 [0.11.1] 2024-08-13
 -------------------
 

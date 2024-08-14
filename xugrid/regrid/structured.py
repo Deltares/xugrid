@@ -83,10 +83,12 @@ class StructuredGrid1d:
 
     @property
     def coords(self) -> dict:
-        return {
-            self.name: self.index,
-            self.dname: self.dvalue,
-        }
+        coords = {self.name: self.index}
+        if self.dvalue.ndim == 0:
+            coords[self.dname] = self.dvalue
+        else:
+            coords[self.dname] = (self.name, self.dvalue)
+        return coords
 
     @property
     def ndim(self) -> int:
@@ -103,6 +105,14 @@ class StructuredGrid1d:
     @property
     def length(self) -> FloatArray:
         return np.squeeze(abs(np.diff(self.bounds, axis=1)))
+
+    @property
+    def directional_bounds(self):
+        # Only flip bounds if needed
+        if self.flipped:
+            return self.bounds[::-1, :].copy()
+        else:
+            return self.bounds
 
     def flip_if_needed(self, index: IntArray) -> IntArray:
         if self.flipped:
@@ -462,8 +472,8 @@ class StructuredGrid2d(StructuredGrid1d):
             return self
         elif matched_type == UnstructuredGrid2d:
             ugrid2d = Ugrid2d.from_structured_bounds(
-                self.xbounds.bounds,
-                self.ybounds.bounds,
+                self.xbounds.directional_bounds,
+                self.ybounds.directional_bounds,
             )
             return UnstructuredGrid2d(ugrid2d)
         else:

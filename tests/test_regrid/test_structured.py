@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import xarray as xr
 
 from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 
@@ -403,4 +404,26 @@ def test_linear_weights_2d(
         np.array([5, 4, 9, 8, 6, 5, 10, 9, 9, 8, 13, 12, 10, 9, 14, 13]),
         np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10]),
         np.array([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]),
+    )
+
+
+def test_nonscalar_dx():
+    da = xr.DataArray(
+        [1, 2, 3], coords={"x": [1, 2, 3], "dx": ("x", [1, 1, 1])}, dims=("x",)
+    )
+    grid = StructuredGrid1d(da, name="x")
+    actual = xr.DataArray([1, 2, 3], coords=grid.coords, dims=grid.dims)
+    assert actual.identical(da)
+
+
+def test_directional_bounds():
+    da = xr.DataArray([1, 2, 3], coords={"y": [1, 2, 3]}, dims=("y",))
+    decreasing = da.isel(y=slice(None, None, -1))
+    grid_inc = StructuredGrid1d(da, name="y")
+    grid_dec = StructuredGrid1d(decreasing, name="y")
+    assert grid_inc.flipped is False
+    assert grid_dec.flipped is True
+    assert np.array_equal(grid_inc.bounds, grid_dec.bounds)
+    assert np.array_equal(
+        grid_inc.directional_bounds, grid_dec.directional_bounds[::-1]
     )
