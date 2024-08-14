@@ -376,16 +376,24 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
             )
             merged.update(merged_selection)
 
-    # prevent inconsistent chunks, for which merged.chunks will give a ValueError
-    merged = merged.unify_chunks()
-
-    # Merge chunks along the UGRID dimensions.
-    if merged.chunks and merge_ugrid_chunks:
-        chunks = dict(merged.chunks)
-        for dim in chunks:
-            # Define a single chunk for each UGRID dimension.
-            if dim in ugrid_dims:
-                chunks[dim] = (merged.sizes[dim],)
-        merged = merged.chunk(chunks)
-
+    # Merge chunks along the UGRID dimensions
+    for varname, da in merged._variables.items():
+        if da.chunks and merge_ugrid_chunks:
+            # access _variables to avoid automatic (time consuming) alignment
+            merged._variables[varname] = _single_ugrid_chunk(da, ugrid_dims)
+    
     return UgridDataset(merged, merged_grids)
+
+
+def _single_ugrid_chunk(da, ugrid_dims):
+    """
+    docstring
+    """
+    chunks = {}
+    for dim, sizes in zip(da.dims, da.chunks):
+        # Define a single chunk for each UGRID dimension.
+        if dim in ugrid_dims:
+            chunks[dim] = (da.sizes[dim],)
+        else:
+            chunks[dim] = sizes
+    return da.chunk(chunks)
