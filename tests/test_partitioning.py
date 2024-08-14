@@ -132,10 +132,15 @@ class TestDatasetPartition:
         reordered = back.isel(mesh2d_nFaces=order)
         assert reordered["face_z"].equals(self.uds["face_z"])
 
+    def test_merge_partition_single(self):
+        partitions = [self.uds]
+        back = pt.merge_partitions(partitions)
+        assert back == self.uds
+
     def test_merge_partitions__errors(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         with pytest.raises(TypeError, match="Expected UgridDataArray or UgridDataset"):
-            pt.merge_partitions(p.ugrid.obj for p in partitions)
+            pt.merge_partitions([p.ugrid.obj for p in partitions])
 
         grid1 = partitions[1].ugrid.grid
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))
@@ -161,6 +166,11 @@ class TestDatasetPartition:
             ValueError, match="two_dim contains more than one UGRID dimension"
         ):
             pt.merge_partitions(partitions)
+
+        with pytest.raises(
+            ValueError, match="Cannot merge partitions: zero partitions provided."
+        ):
+            xu.merge_partitions([])
 
     def test_merge_partitions_no_duplicates(self):
         part1 = self.uds.isel(mesh2d_nFaces=[0, 1, 2, 3])
