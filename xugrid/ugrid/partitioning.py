@@ -381,7 +381,6 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
         if da.chunks and merge_ugrid_chunks:
             # access _variables to avoid automatic (time consuming) alignment
             merged._variables[varname] = _single_ugrid_chunk(da, ugrid_dims)
-    
     return UgridDataset(merged, merged_grids)
 
 
