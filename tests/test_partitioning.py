@@ -40,7 +40,9 @@ def test_labels_to_indices():
 
 
 def test_merge_partitions_empty_list():
-    with pytest.raises(ValueError, message="Received empty partitions list, cannot be merged."):
+    with pytest.raises(
+        ValueError, message="Received empty partitions list, cannot be merged."
+    ):
         xu.merge_partitions([])
 
 
