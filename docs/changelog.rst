@@ -16,7 +16,14 @@ Fixed
   all values are NaN or when all weights (overlaps) are zero, and all methods
   give the same answer irrespective of the order in which the values are
   encountered.
-  
+- :meth:`xugrid.merge_partitions` will now raise a ValueError if zero
+  partitions are provided.
+- :meth:`xugrid.merge_partitions` will no longer error when chunks are
+  inconsistent across variables in a dataset, but now returns a merged dataset
+  while keeping the chunking per variable. (Note that if chunks are inconstent
+  for a variable **across partitions** that they are still and always unified
+  for the variable.)
+
 Added
 ~~~~~
 
@@ -24,7 +31,7 @@ Added
   :class:`xugrid.OverlapRegridder` as standard available reduction methods
   (available as ``"p5", "p10"``, etc.). Custom percentile values (e.g. 2.5, 42) can be
   setup using :meth:`xugrid.OverlapRegridder.create_percentile_method`.
-  
+
 Changed
 ~~~~~~~
 
@@ -61,7 +68,7 @@ Fixed
 Added
 ~~~~~
 
-- Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
+- Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`,
   so the ordering of edges is consistent with ``meshkernel``.
 - Added :meth:`xugrid.Ugrid1d.create_data_array`,
   :meth:`xugrid.Ugrid2d.create_data_array`, and
@@ -70,7 +77,7 @@ Added
 - Added :func:`xugrid.create_snap_to_grid_dataframe` to provide
   more versatile snapping, e.g. with custom reductions to assign_edge_coords
   aggregated properties to grid edges.
- 
+
 Changed
 ~~~~~~~
 
@@ -88,10 +95,10 @@ Fixed
   :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
   :class:`xugrid.RelativeOverlapRegridder`, which gave the method the tendency
   to repeat the first value in the source grid across the target grid.
-  
+
 Added
 ~~~~~
-  
+
 - :func:`xugrid.earcut_triangulate_polygons` and
   :meth:`xugrid.Ugrid2d.earcut_triangulate_polygons` have been added to break
   down polygon geodataframes into a triangular mesh for further processing.
@@ -229,7 +236,7 @@ Fixed
   original grid being returned, rather than a new grid with the faces or edges
   shuffled. This breaks the link the between topology and data when using
   ``.isel`` on a UgridDataset or UgridDataArray. This has been fixed: both data
-  and the topology are now shuffled accordingly. 
+  and the topology are now shuffled accordingly.
 
 [0.6.5] 2023-09-30
 ------------------
@@ -254,7 +261,7 @@ Changed
 - Xugrid now contains a partial copy of the xarray plot utils module, and its
   tests. The latest xarray release broke xugrid (on import), since (private)
   parts of xarray were used which no longer existed.
- 
+
 Fixed
 ~~~~~
 
