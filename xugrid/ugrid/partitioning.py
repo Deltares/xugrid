@@ -305,7 +305,6 @@ def merge_data_along_dim(
 
     return xr.concat(to_merge, dim=merge_dim)
 
-xu.merge_partitions([1])
 
 def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     """
