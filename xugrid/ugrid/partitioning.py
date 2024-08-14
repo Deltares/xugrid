@@ -376,6 +376,9 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
             )
             merged.update(merged_selection)
 
+    # prevent inconsistent chunks, for which merged.chunks will give a ValueError
+    merged = merged.unify_chunks()
+
     # Merge chunks along the UGRID dimensions.
     if merged.chunks and merge_ugrid_chunks:
         chunks = dict(merged.chunks)
