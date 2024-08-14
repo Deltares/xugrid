@@ -727,6 +727,8 @@ document.write(`
 <span class="sd">    -------</span>
 <span class="sd">    merged : UgridDataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">partitions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot merge partitions: zero partitions provided.&quot;</span><span class="p">)</span>
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">}</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Expected UgridDataArray or UgridDataset, received: </span><span class="si">{}</span><span class="s2">&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -775,27 +777,17 @@ document.write(`
             <span class="p">)</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merged_selection</span><span class="p">)</span>
 
-    <span class="c1"># Merge chunks along the UGRID dimensions</span>
-    <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">merged</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">and</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
-            <span class="c1"># access _variables to avoid automatic (time consuming) alignment</span>
-            <span class="n">merged</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">_single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">)</span>
+    <span class="c1"># Merge chunks along the UGRID dimensions.</span>
+    <span class="k">if</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">and</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+            <span class="c1"># Define a single chunk for each UGRID dimension.</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
+                <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
 
-
-
-<span class="k">def</span> <span class="nf">_single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    docstring</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">chunks</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">sizes</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">chunks</span><span class="p">):</span>
-        <span class="c1"># Define a single chunk for each UGRID dimension.</span>
-        <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
-            <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">sizes</span>
-    <span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
 </pre></div>
 
                 </article>
