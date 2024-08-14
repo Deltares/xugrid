@@ -39,13 +39,6 @@ def test_labels_to_indices():
     assert np.array_equal(indices[2], [3, 4])
 
 
-def test_merge_partitions_empty_list():
-    with pytest.raises(
-        ValueError, message="Received empty partitions list, cannot be merged."
-    ):
-        xu.merge_partitions([])
-
-
 class TestGridPartitioning:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -168,6 +161,11 @@ class TestDatasetPartition:
             ValueError, match="two_dim contains more than one UGRID dimension"
         ):
             pt.merge_partitions(partitions)
+
+        with pytest.raises(
+            ValueError, match="Received empty partitions list, cannot be merged."
+        ):
+            xu.merge_partitions([])
 
     def test_merge_partitions_no_duplicates(self):
         part1 = self.uds.isel(mesh2d_nFaces=[0, 1, 2, 3])
