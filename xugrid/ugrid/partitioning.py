@@ -343,7 +343,7 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     # return first partition if single partition is provided
     if len(partitions) == 1:
         return next(iter(partitions))
-    
+
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dimensions}

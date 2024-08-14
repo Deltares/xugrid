@@ -136,7 +136,7 @@ class TestDatasetPartition:
         partitions = [self.uds]
         back = xu.merge_partitions(partitions)
         assert back == self.uds
-        
+
     def test_merge_partitions__errors(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         with pytest.raises(TypeError, match="Expected UgridDataArray or UgridDataset"):
