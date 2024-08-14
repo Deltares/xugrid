@@ -135,7 +135,7 @@ class TestDatasetPartition:
     def test_merge_partitions__errors(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         with pytest.raises(TypeError, match="Expected UgridDataArray or UgridDataset"):
-            pt.merge_partitions(p.ugrid.obj for p in partitions)
+            pt.merge_partitions([p.ugrid.obj for p in partitions])
 
         grid1 = partitions[1].ugrid.grid
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))

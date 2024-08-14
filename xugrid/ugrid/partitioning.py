@@ -328,10 +328,10 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     -------
     merged : UgridDataset
     """
+    if len(partitions) == 0:
+        raise ValueError("Cannot merge partitions: zero partitions provided.")
     types = {type(obj) for obj in partitions}
     msg = "Expected UgridDataArray or UgridDataset, received: {}"
-    if len(types) == 0:
-        raise ValueError("Cannot merge partitions: zero partitions provided.")
     if len(types) > 1:
         type_names = [t.__name__ for t in types]
         raise TypeError(msg.format(type_names))
