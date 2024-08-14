@@ -255,7 +255,7 @@ def ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
     m = 4
     m_per_row = np.array([1, 2, 3])
 
-    Then the result of _ragged_index(n, m, m_per_row) is:
+    Then the result of ragged_index(n, m, m_per_row) is:
 
     np.array([
         [True, False, False, False],
