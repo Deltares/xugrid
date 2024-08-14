@@ -39,8 +39,8 @@ def test_labels_to_indices():
     assert np.array_equal(indices[2], [3, 4])
 
 
-def test_merge_partitions_empty_list()
-    pytest.raises(ValueError, message="Received list of partitions is empty, cannot be merged."):
+def test_merge_partitions_empty_list():
+    pytest.raises(ValueError, message="Received empty partitions list, cannot be merged."):
         xu.merge_partitions([])
 
 
