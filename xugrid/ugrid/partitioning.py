@@ -305,6 +305,7 @@ def merge_data_along_dim(
 
     return xr.concat(to_merge, dim=merge_dim)
 
+xu.merge_partitions([1])
 
 def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     """
@@ -339,6 +340,10 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     if obj_type not in (UgridDataArray, UgridDataset):
         raise TypeError(msg.format(obj_type.__name__))
 
+    # return first partition if single partition is provided
+    if len(partitions) == 1:
+        return next(iter(partitions))
+    
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dimensions}

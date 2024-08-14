@@ -132,6 +132,11 @@ class TestDatasetPartition:
         reordered = back.isel(mesh2d_nFaces=order)
         assert reordered["face_z"].equals(self.uds["face_z"])
 
+    def test_merge_partition_single(self):
+        partitions = [self.uds]
+        back = xu.merge_partitions(partitions)
+        assert back == self.uds
+        
     def test_merge_partitions__errors(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         with pytest.raises(TypeError, match="Expected UgridDataArray or UgridDataset"):
