@@ -163,7 +163,7 @@ class TestDatasetPartition:
             pt.merge_partitions(partitions)
 
         with pytest.raises(
-            ValueError, match="Received empty partitions list, cannot be merged."
+            ValueError, match="Cannot merge partitions: zero partitions provided."
         ):
             xu.merge_partitions([])
 
