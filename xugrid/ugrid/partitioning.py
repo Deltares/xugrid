@@ -306,6 +306,26 @@ def merge_data_along_dim(
     return xr.concat(to_merge, dim=merge_dim)
 
 
+def single_ugrid_chunk(da: xr.DataArray, ugrid_dims: set[str]) -> xr.DataArray:
+    """
+    Ensure that along a UGRID dimension only a single chunk is defined.
+
+    Preserving chunks on the merged result may generate a very sub-optimal,
+    complex dask graph.
+    """
+    if not da.chunks:
+        return da
+
+    chunks = {}
+    for dim, sizes in zip(da.dims, da.chunks):
+        # Define a single chunk for each UGRID dimension.
+        if dim in ugrid_dims:
+            chunks[dim] = (da.sizes[dim],)
+        else:
+            chunks[dim] = sizes
+    return da.chunk(chunks)
+
+
 def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     """
     Merge topology and data, partitioned along UGRID dimensions, into a single
@@ -377,22 +397,11 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
             merged.update(merged_selection)
 
     # Merge chunks along the UGRID dimensions
-    for varname, da in merged._variables.items():
-        if da.chunks and merge_ugrid_chunks:
-            # access _variables to avoid automatic (time consuming) alignment
-            merged._variables[varname] = _single_ugrid_chunk(da, ugrid_dims)
+    if merge_ugrid_chunks:
+        # Running `merged[varname] = da` will cause xarray to auto-align. This
+        # is quite expensive, especially when there are many variables. Setting
+        # it via `._variables` sidesteps the alignment.
+        for varname, da in merged._variables.items():
+            merged._variables[varname] = single_ugrid_chunk(da, ugrid_dims)
+
     return UgridDataset(merged, merged_grids)
-
-
-def _single_ugrid_chunk(da, ugrid_dims):
-    """
-    docstring
-    """
-    chunks = {}
-    for dim, sizes in zip(da.dims, da.chunks):
-        # Define a single chunk for each UGRID dimension.
-        if dim in ugrid_dims:
-            chunks[dim] = (da.sizes[dim],)
-        else:
-            chunks[dim] = sizes
-    return da.chunk(chunks)
