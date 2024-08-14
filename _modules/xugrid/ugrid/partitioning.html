@@ -703,6 +703,26 @@ document.write(`
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">to_merge</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">merge_dim</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensure that along a UGRID dimension only a single chunk is defined.</span>
+
+<span class="sd">    Preserving chunks on the merged result may generate a very sub-optimal,</span>
+<span class="sd">    complex dask graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">da</span>
+
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">sizes</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">chunks</span><span class="p">):</span>
+        <span class="c1"># Define a single chunk for each UGRID dimension.</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">sizes</span>
+    <span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.merge_partitions.html#xugrid.merge_partitions">[docs]</a>
 <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
@@ -781,14 +801,13 @@ document.write(`
             <span class="p">)</span>
             <span class="n">merged</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">merged_selection</span><span class="p">)</span>
 
-    <span class="c1"># Merge chunks along the UGRID dimensions.</span>
-    <span class="k">if</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">and</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
-        <span class="n">chunks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">chunks</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
-            <span class="c1"># Define a single chunk for each UGRID dimension.</span>
-            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">:</span>
-                <span class="n">chunks</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">],)</span>
-        <span class="n">merged</span> <span class="o">=</span> <span class="n">merged</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="c1"># Merge chunks along the UGRID dimensions</span>
+    <span class="k">if</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span>
+        <span class="c1"># Running `merged[varname] = da` will cause xarray to auto-align. This</span>
+        <span class="c1"># is quite expensive, especially when there are many variables. Setting</span>
+        <span class="c1"># it via `._variables` sidesteps the alignment.</span>
+        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">merged</span><span class="o">.</span><span class="n">_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">merged</span><span class="o">.</span><span class="n">_variables</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">merged_grids</span><span class="p">)</span></div>
 
