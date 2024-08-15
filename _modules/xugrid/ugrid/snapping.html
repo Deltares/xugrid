@@ -402,8 +402,6 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">cKDTree</span>
 
 <span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
@@ -416,6 +414,7 @@ document.write(`
     <span class="n">Point</span><span class="p">,</span>
     <span class="n">Vector</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xugrid.core.sparse</span> <span class="kn">import</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">columns_and_values</span><span class="p">,</span> <span class="n">row_slice</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">AdjacencyMatrix</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
@@ -435,20 +434,60 @@ document.write(`
     <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
 
 
+<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_snap_to_nearest</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">snap_candidates</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find a closest target for each node.</span>
+
+<span class="sd">    The kD tree distance matrix will have stored for each node the other nodes</span>
+<span class="sd">    that are within snapping distance. These are the rows in the sparse matrix</span>
+<span class="sd">    that have more than one entry: the snap_candidates.</span>
+
+<span class="sd">    The first condition for a point to become a TARGET is if it hasn&#39;t been</span>
+<span class="sd">    connected to another point yet, i.e. it is UNVISITED. Once a point becomes</span>
+<span class="sd">    an TARGET, it looks for nearby points within the max_distance. These nearby</span>
+<span class="sd">    points are connected if: they are UNVISITED (i.e. they don&#39;t have a target</span>
+<span class="sd">    yet), or the current target is closer than the previous.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UNVISITED</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">TARGET</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="n">nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">max_distance</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">UNVISITED</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">snap_candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">visited</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">UNVISITED</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">visited</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">TARGET</span>
+
+        <span class="c1"># Now iterate through every node j that is within max_distance of node i.</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">columns_and_values</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">row_slice</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">i</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span> <span class="ow">or</span> <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">TARGET</span><span class="p">:</span>
+                <span class="c1"># Continue if we&#39;re looking at the distance to ourselves</span>
+                <span class="c1"># (i==j), or other node is a target.</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">UNVISITED</span> <span class="ow">or</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">nearest</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                <span class="c1"># If unvisited node, or already visited but we&#39;re closer, set</span>
+                <span class="c1"># to i.</span>
+                <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">nearest</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
+
+    <span class="k">return</span> <span class="n">visited</span>
+
+
+<div class="viewcode-block" id="snap_nodes">
+<a class="viewcode-back" href="../../../api/xugrid.snap_nodes.html#xugrid.snap_nodes">[docs]</a>
 <span class="k">def</span> <span class="nf">snap_nodes</span><span class="p">(</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Snap neigbhoring vertices together that are located within a maximum</span>
-<span class="sd">    distance from each other.</span>
+<span class="sd">    snapping distance from each other.</span>
 
-<span class="sd">    If vertices are located within a maximum distance, they are merged into a</span>
-<span class="sd">    single vertex. The coordinates of the merged coordinates are given by the</span>
-<span class="sd">    centroid of the merging vertices.</span>
-
-<span class="sd">    Note that merging is a communicative process: vertex A might lie close to</span>
-<span class="sd">    vertex B, vertex B might lie close to vertex C, and so on. These points are</span>
-<span class="sd">    grouped and merged into a single new vertex.</span>
+<span class="sd">    If vertices are located within a maximum distance, some of them are snapped</span>
+<span class="sd">    to their neighbors (&quot;targets&quot;), thereby guaranteeing a minimum distance</span>
+<span class="sd">    between nodes in the result. The determination of whether a point becomes a</span>
+<span class="sd">    target itself or gets snapped to another point is primarily based on the</span>
+<span class="sd">    order in which points are processed and their spatial relationships.</span>
 
 <span class="sd">    This function also return an inverse index array. In case of a connectivity</span>
 <span class="sd">    array, ``inverse`` can be used to index into, yielding the updated</span>
@@ -460,56 +499,42 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    x: 1D nd array of floats of size N</span>
 <span class="sd">    y: 1D nd array of floats of size N</span>
-<span class="sd">    max_distance: float</span>
+<span class="sd">    max_snap_distance: float</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    inverse: 1D nd array of ints of size N</span>
 <span class="sd">        Inverse index array: the new vertex number for every old vertex. Is</span>
 <span class="sd">        None when no vertices within max_distance of each other.</span>
-<span class="sd">    x_merged: 1D nd array of floats of size M</span>
+<span class="sd">    x_snapped: 1D nd array of floats of size M</span>
 <span class="sd">        Returns a copy of ``x`` when no vertices within max_distance of each</span>
 <span class="sd">        other.</span>
-<span class="sd">    y_merged: 1D nd array of floats of size M</span>
+<span class="sd">    y_snapped: 1D nd array of floats of size M</span>
 <span class="sd">        Returns a copy of ``y`` when no vertices within max_distance of each</span>
 <span class="sd">        other.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># First, find all the points that lie within max_distance of each other</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-    <span class="n">coo_distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
-        <span class="n">tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
-    <span class="p">)</span>
-    <span class="c1"># Get rid of diagonal</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">coo_distances</span><span class="o">.</span><span class="n">row</span>
-    <span class="n">j</span> <span class="o">=</span> <span class="n">coo_distances</span><span class="o">.</span><span class="n">col</span>
-    <span class="n">off_diagonal</span> <span class="o">=</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">off_diagonal</span><span class="p">]</span>
-    <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="p">[</span><span class="n">off_diagonal</span><span class="p">]</span>
-    <span class="c1"># If no pairs are found, there is nothing to snap</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># Next, group the points together.</span>
-        <span class="c1"># Point A might lie close to point B, point B might lie close to</span>
-        <span class="c1"># Point C, and so on. These points are grouped, and their centroid</span>
-        <span class="c1"># is computed.</span>
-        <span class="n">coo_content</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
-        <span class="n">coo_matrix</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">coo_content</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
-        <span class="c1"># Directed is true: this matrix is symmetrical</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span><span class="n">coo_matrix</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">new</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">inverse</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
-            <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">agg</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
+        <span class="n">tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+    <span class="n">should_snap</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">should_snap</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="n">_snap_to_nearest</span><span class="p">(</span>
+            <span class="n">A</span><span class="o">=</span><span class="n">MatrixCSR</span><span class="o">.</span><span class="n">from_csr_matrix</span><span class="p">(</span><span class="n">distances</span><span class="p">),</span>
+            <span class="n">snap_candidates</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="n">should_snap</span><span class="p">],</span>
+            <span class="n">max_distance</span><span class="o">=</span><span class="n">max_snap_distance</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">new</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">visited</span> <span class="o">&lt;</span> <span class="mi">0</span>  <span class="c1"># i.e. still UNVISITED or TARGET valued.</span>
+        <span class="n">visited</span><span class="p">[</span><span class="n">targets</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">targets</span><span class="p">]</span>
+        <span class="n">deduplicated</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">visited</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">deduplicated</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">deduplicated</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">snap_to_nodes</span><span class="p">(</span>
