@@ -21,6 +21,14 @@ Fixed
   grid is non-equidistant, and contains an array delta (``d``) coordinate
   rather than a single delta to denote cell sizes along a dimension (i.e.
   ``dy`` along ``y`` midpoints, and ``dx`` along ``x``.)
+  
+Added
+~~~~~
+
+- :func:`xugrid.snap_nodes` to snap nodes to themselves: that is, if nodes are
+  located very close together, this function will snap some of them to their
+  neighbors, thereby guaranteeing a minimum distance between nodes in the
+  result.
 
 [0.11.1] 2024-08-13
 -------------------

@@ -24,7 +24,11 @@ from xugrid.ugrid.burn import burn_vector_geometry, earcut_triangulate_polygons
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
 from xugrid.ugrid.polygonize import polygonize
-from xugrid.ugrid.snapping import create_snap_to_grid_dataframe, snap_to_grid
+from xugrid.ugrid.snapping import (
+    create_snap_to_grid_dataframe,
+    snap_nodes,
+    snap_to_grid,
+)
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
@@ -55,6 +59,7 @@ __all__ = (
     "UgridRolesAccessor",
     "merge_partitions",
     "polygonize",
+    "snap_nodes",
     "snap_to_grid",
     "create_snap_to_grid_dataframe",
     "Ugrid1d",

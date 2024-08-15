@@ -142,6 +142,7 @@ nodes/edges/faces if within a certain range.
 .. autosummary::
       :toctree: api/
 
+       snap_nodes
        snap_to_grid
        create_snap_to_grid_dataframe
 

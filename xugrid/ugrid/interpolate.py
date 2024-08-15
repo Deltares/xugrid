@@ -8,7 +8,7 @@ import numpy as np
 from scipy import sparse
 
 from xugrid.constants import FloatArray, IntArray
-from xugrid.core.sparse import MatrixCSR, nzrange, row_slice
+from xugrid.core.sparse import MatrixCSR, columns_and_values, nzrange, row_slice
 
 
 @nb.njit(inline="always")
@@ -19,11 +19,6 @@ def lower_slice(ilu, row: int) -> slice:
 @nb.njit(inline="always")
 def upper_slice(ilu, row: int) -> slice:
     return slice(ilu.uptr[row], ilu.indptr[row + 1])
-
-
-@nb.njit(inline="always")
-def columns_and_values(ilu, slice):
-    return zip(ilu.indices[slice], ilu.data[slice])
 
 
 @nb.njit

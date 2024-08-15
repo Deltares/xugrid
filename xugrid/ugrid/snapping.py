@@ -78,19 +78,17 @@ def _snap_to_nearest(A: MatrixCSR, snap_candidates: IntArray, max_distance) -> I
 
 
 def snap_nodes(
-    x: FloatArray, y: FloatArray, max_distance: float
+    x: FloatArray, y: FloatArray, max_snap_distance: float
 ) -> Tuple[FloatArray, FloatArray, IntArray]:
     """
     Snap neigbhoring vertices together that are located within a maximum
-    distance from each other.
+    snapping distance from each other.
 
-    If vertices are located within a maximum distance, they are merged into a
-    single vertex. The coordinates of the merged coordinates are given by the
-    centroid of the merging vertices.
-
-    Note that merging is a communicative process: vertex A might lie close to
-    vertex B, vertex B might lie close to vertex C, and so on. These points are
-    grouped and merged into a single new vertex.
+    If vertices are located within a maximum distance, some of them are snapped
+    to their neighbors ("targets"), thereby guaranteeing a minimum distance
+    between nodes in the result. The determination of whether a point becomes a
+    target itself or gets snapped to another point is primarily based on the
+    order in which points are processed and their spatial relationships.
 
     This function also return an inverse index array. In case of a connectivity
     array, ``inverse`` can be used to index into, yielding the updated
@@ -102,17 +100,17 @@ def snap_nodes(
     ----------
     x: 1D nd array of floats of size N
     y: 1D nd array of floats of size N
-    max_distance: float
+    max_snap_distance: float
 
     Returns
     -------
     inverse: 1D nd array of ints of size N
         Inverse index array: the new vertex number for every old vertex. Is
         None when no vertices within max_distance of each other.
-    x_merged: 1D nd array of floats of size M
+    x_snapped: 1D nd array of floats of size M
         Returns a copy of ``x`` when no vertices within max_distance of each
         other.
-    y_merged: 1D nd array of floats of size M
+    y_snapped: 1D nd array of floats of size M
         Returns a copy of ``y`` when no vertices within max_distance of each
         other.
     """
@@ -120,7 +118,7 @@ def snap_nodes(
     coords = np.column_stack((x, y))
     tree = cKDTree(coords)
     distances = tree.sparse_distance_matrix(
-        tree, max_distance=max_distance, output_type="coo_matrix"
+        tree, max_distance=max_snap_distance, output_type="coo_matrix"
     ).tocsr()
     should_snap = distances.getnnz(axis=1) > 1
 
@@ -129,7 +127,7 @@ def snap_nodes(
         visited = _snap_to_nearest(
             A=MatrixCSR.from_csr_matrix(distances),
             snap_candidates=index[should_snap],
-            max_distance=max_distance,
+            max_distance=max_snap_distance,
         )
         targets = visited < 0  # i.e. still UNVISITED or TARGET valued.
         visited[targets] = index[targets]
