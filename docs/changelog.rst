@@ -43,6 +43,13 @@ Fixed
   all values are NaN or when all weights (overlaps) are zero, and all methods
   give the same answer irrespective of the order in which the values are
   encountered.
+- :meth:`xugrid.merge_partitions` will now raise a ValueError if zero
+  partitions are provided.
+- :meth:`xugrid.merge_partitions` will no longer error when chunks are
+  inconsistent across variables in a dataset, but now returns a merged dataset
+  while keeping the chunking per variable. (Note that if chunks are inconstent
+  for a variable **across partitions** that they are still and always unified
+  for the variable.)
 
 Added
 ~~~~~

@@ -39,6 +39,27 @@ def test_labels_to_indices():
     assert np.array_equal(indices[2], [3, 4])
 
 
+def test_single_ugrid_chunk():
+    grid = generate_mesh_2d(3, 3)
+    ugrid_dims = set(grid.dimensions)
+    da = xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,))
+    assert pt.single_ugrid_chunk(da, ugrid_dims) is da
+
+    da = da.chunk({grid.face_dimension: (3, 3, 3)})
+    single = pt.single_ugrid_chunk(da, ugrid_dims)
+    assert single.chunks == ((9,),)
+
+    # Don't touch other dims
+    da_time = (
+        xr.DataArray(data=np.ones(3), dims=("time",)).chunk({"time": (1, 1, 1)}) * da
+    )
+    single = pt.single_ugrid_chunk(da_time, ugrid_dims)
+    assert single.chunks == (
+        (1, 1, 1),
+        (9,),
+    )
+
+
 class TestGridPartitioning:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -177,6 +198,31 @@ class TestDatasetPartition:
         part2 = self.uds.isel(mesh2d_nFaces=[2, 3, 4, 5])
         merged = pt.merge_partitions([part1, part2])
         assert np.bincount(merged["face_z"] == 1).all()
+
+    def test_merge_inconsistent_chunks_across_partitions(self):
+        part1, part2 = self.uds.ugrid.partition(n_part=2)
+        time = xr.DataArray(data=np.ones(3), dims=("time",))
+        part1 = (part1 * time).chunk({"time": (1, 1, 1)})
+        part2 = (part2 * time).chunk({"time": (1, 2)})
+        merged = pt.merge_partitions([part1, part2])
+        assert isinstance(merged, xu.UgridDataset)
+        assert merged.chunks["time"] == (1, 1, 1)
+
+    def test_merge_inconsistent_chunks_across_variables(self):
+        uds = self.uds * xr.DataArray(data=np.ones(3), dims=("time",))
+        # Make them inconsistent across the variables
+        uds["node_z"] = uds["node_z"].chunk({"time": (3,)})
+        uds["edge_z"] = uds["edge_z"].chunk({"time": (2, 1)})
+        uds["face_z"] = uds["face_z"].chunk({"time": (1, 2)})
+        part1, part2 = uds.ugrid.partition(n_part=2)
+        merged = pt.merge_partitions([part1, part2])
+        # Test that it runs without encountering the xarray "inconsistent
+        # chunks" ValueError.
+        assert isinstance(merged, xu.UgridDataset)
+        # Make sure they remain inconsistent after merging.
+        assert uds["node_z"].chunks == ((self.grid.n_node,), (3,))
+        assert uds["edge_z"].chunks == ((self.grid.n_edge,), (2, 1))
+        assert uds["face_z"].chunks == ((self.grid.n_face,), (1, 2))
 
 
 class TestMultiTopology2DMergePartitions:
