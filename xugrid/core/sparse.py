@@ -146,3 +146,8 @@ def row_slice(A, row: int) -> slice:
     start = A.indptr[row]
     end = A.indptr[row + 1]
     return slice(start, end)
+
+
+@numba.njit(inline="always")
+def columns_and_values(A, slice):
+    return zip(A.indices[slice], A.data[slice])

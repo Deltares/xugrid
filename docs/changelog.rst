@@ -22,6 +22,17 @@ Fixed
   rather than a single delta to denote cell sizes along a dimension (i.e.
   ``dy`` along ``y`` midpoints, and ``dx`` along ``x``.)
 
+Added
+~~~~~
+
+- :func:`xugrid.snap_nodes` to snap neigbhoring vertices together that are
+  located within a maximum snapping distance from each other. If vertices are
+  located within a maximum distance, some of them are snapped to their
+  neighbors ("targets"), thereby guaranteeing a minimum distance between nodes
+  in the result. The determination of whether a point becomes a target itself
+  or gets snapped to another point is primarily based on the order in which
+  points are processed and their spatial relationships.
+
 [0.11.1] 2024-08-13
 -------------------
 

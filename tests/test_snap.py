@@ -34,7 +34,32 @@ def structured():
     return xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
 
 
-def test_snap__three_points():
+def test_snap__three_points_horizontal():
+    x = np.array([0.0, 1.0, 2.0])
+    y = np.zeros_like(x)
+    inv_perm, snap_x, snap_y = snap_nodes(x, y, 0.1)
+    assert inv_perm is None
+    assert np.array_equal(x, snap_x)
+    assert np.array_equal(y, snap_y)
+
+    inv_perm, snap_x, snap_y = snap_nodes(x, y, 1.0)
+    expected_inv_perm = np.array([0, 0, 1])
+    expected_x = np.array([0.0, 2.0])
+    expected_y = np.zeros_like(expected_x)
+    assert np.array_equal(inv_perm, expected_inv_perm)
+    assert np.array_equal(expected_x, snap_x)
+    assert np.array_equal(expected_y, snap_y)
+
+    inv_perm, snap_x, snap_y = snap_nodes(x, y, 2.0)
+    expected_inv_perm = np.array([0, 0, 0])
+    expected_x = np.array([0.0])
+    expected_y = np.zeros_like(expected_x)
+    assert np.array_equal(inv_perm, expected_inv_perm)
+    assert np.array_equal(expected_x, snap_x)
+    assert np.array_equal(expected_y, snap_y)
+
+
+def test_snap__three_points_diagonal():
     x = y = np.array([0.0, 1.0, 1.5])
     inv_perm, snap_x, snap_y = snap_nodes(x, y, 0.1)
     assert inv_perm is None
@@ -44,17 +69,18 @@ def test_snap__three_points():
     # hypot(0.5, 0.5) = 0.707...
     inv_perm, snap_x, snap_y = snap_nodes(x, y, 0.71)
     expected_inv_perm = np.array([0, 1, 1])
-    expected_x = expected_y = np.array([0.0, 1.25])
+    expected_x = expected_y = np.array([0.0, 1.0])
     assert np.array_equal(inv_perm, expected_inv_perm)
     assert np.array_equal(snap_x, expected_x)
     assert np.array_equal(snap_y, expected_y)
 
     # hypot(1, 1) = 1.414...
     inv_perm, snap_x, snap_y = snap_nodes(x, y, 1.42)
-    expected_inv_perm = np.array([0, 0, 0])
+    expected_inv_perm = np.array([0, 1, 1])
+    expected_x = expected_y = np.array([0.0, 1.5])
     assert np.array_equal(inv_perm, expected_inv_perm)
-    assert np.allclose(snap_x, np.array([2.5 / 3]))
-    assert np.allclose(snap_y, np.array([2.5 / 3]))
+    assert np.array_equal(snap_x, expected_x)
+    assert np.array_equal(snap_y, expected_y)
 
 
 def test_snap__two_lines():
@@ -70,7 +96,7 @@ def test_snap__two_lines():
     c = inv_perm[edge_node_connectivity]
 
     expected_inv_perm = np.array([0, 1, 1, 2])
-    expected_x = np.array([0.0, 1.01, 2.0])
+    expected_x = np.array([0.0, 1.0, 2.0])
     expected_y = np.array([1.0, 0.0, 1.0])
     expected_c = np.array(
         [
