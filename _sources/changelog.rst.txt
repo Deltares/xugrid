@@ -7,8 +7,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
-Unreleased
-----------
+[0.11.2] 2024-08-16
+-------------------
 
 Fixed
 ~~~~~
@@ -25,7 +25,7 @@ Fixed
 Added
 ~~~~~
 
-- :func:`xugrid.snap_nodes` to snap neigbhoring vertices together that are
+- :func:`xugrid.snap_nodes` to snap neighboring vertices together that are
   located within a maximum snapping distance from each other. If vertices are
   located within a maximum distance, some of them are snapped to their
   neighbors ("targets"), thereby guaranteeing a minimum distance between nodes
