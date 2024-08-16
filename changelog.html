@@ -683,10 +683,13 @@ rather than a single delta to denote cell sizes along a dimension (i.e.
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="api/xugrid.snap_nodes.html#xugrid.snap_nodes" title="xugrid.snap_nodes"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_nodes()</span></code></a> to snap nodes to themselves: that is, if nodes are
-located very close together, this function will snap some of them to their
-neighbors, thereby guaranteeing a minimum distance between nodes in the
-result.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.snap_nodes.html#xugrid.snap_nodes" title="xugrid.snap_nodes"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_nodes()</span></code></a> to snap neigbhoring vertices together that are
+located within a maximum snapping distance from each other. If vertices are
+located within a maximum distance, some of them are snapped to their
+neighbors (“targets”), thereby guaranteeing a minimum distance between nodes
+in the result. The determination of whether a point becomes a target itself
+or gets snapped to another point is primarily based on the order in which
+points are processed and their spatial relationships.</p></li>
 </ul>
 </section>
 </section>
