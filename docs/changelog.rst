@@ -21,14 +21,17 @@ Fixed
   grid is non-equidistant, and contains an array delta (``d``) coordinate
   rather than a single delta to denote cell sizes along a dimension (i.e.
   ``dy`` along ``y`` midpoints, and ``dx`` along ``x``.)
-  
+
 Added
 ~~~~~
 
-- :func:`xugrid.snap_nodes` to snap nodes to themselves: that is, if nodes are
-  located very close together, this function will snap some of them to their
-  neighbors, thereby guaranteeing a minimum distance between nodes in the
-  result.
+- :func:`xugrid.snap_nodes` to snap neigbhoring vertices together that are
+  located within a maximum snapping distance from each other. If vertices are
+  located within a maximum distance, some of them are snapped to their
+  neighbors ("targets"), thereby guaranteeing a minimum distance between nodes
+  in the result. The determination of whether a point becomes a target itself
+  or gets snapped to another point is primarily based on the order in which
+  points are processed and their spatial relationships.
 
 [0.11.1] 2024-08-13
 -------------------
@@ -40,7 +43,7 @@ Fixed
   all values are NaN or when all weights (overlaps) are zero, and all methods
   give the same answer irrespective of the order in which the values are
   encountered.
-  
+
 Added
 ~~~~~
 
@@ -48,7 +51,7 @@ Added
   :class:`xugrid.OverlapRegridder` as standard available reduction methods
   (available as ``"p5", "p10"``, etc.). Custom percentile values (e.g. 2.5, 42) can be
   setup using :meth:`xugrid.OverlapRegridder.create_percentile_method`.
-  
+
 Changed
 ~~~~~~~
 
@@ -85,7 +88,7 @@ Fixed
 Added
 ~~~~~
 
-- Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`, 
+- Included ``edge_node_connectivity`` in :meth:`xugrid.Ugrid2d.from_meshkernel`,
   so the ordering of edges is consistent with ``meshkernel``.
 - Added :meth:`xugrid.Ugrid1d.create_data_array`,
   :meth:`xugrid.Ugrid2d.create_data_array`, and
@@ -94,7 +97,7 @@ Added
 - Added :func:`xugrid.create_snap_to_grid_dataframe` to provide
   more versatile snapping, e.g. with custom reductions to assign_edge_coords
   aggregated properties to grid edges.
- 
+
 Changed
 ~~~~~~~
 
@@ -112,10 +115,10 @@ Fixed
   :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
   :class:`xugrid.RelativeOverlapRegridder`, which gave the method the tendency
   to repeat the first value in the source grid across the target grid.
-  
+
 Added
 ~~~~~
-  
+
 - :func:`xugrid.earcut_triangulate_polygons` and
   :meth:`xugrid.Ugrid2d.earcut_triangulate_polygons` have been added to break
   down polygon geodataframes into a triangular mesh for further processing.
@@ -253,7 +256,7 @@ Fixed
   original grid being returned, rather than a new grid with the faces or edges
   shuffled. This breaks the link the between topology and data when using
   ``.isel`` on a UgridDataset or UgridDataArray. This has been fixed: both data
-  and the topology are now shuffled accordingly. 
+  and the topology are now shuffled accordingly.
 
 [0.6.5] 2023-09-30
 ------------------
@@ -278,7 +281,7 @@ Changed
 - Xugrid now contains a partial copy of the xarray plot utils module, and its
   tests. The latest xarray release broke xugrid (on import), since (private)
   parts of xarray were used which no longer existed.
- 
+
 Fixed
 ~~~~~
 
