@@ -181,7 +181,7 @@ def default_topology_attrs(name: str, topology_dimension: int):
 
 
 def _get_topology(ds: xr.Dataset) -> List[str]:
-    return [k for k in ds.data_vars if ds[k].attrs.get("cf_role") == "mesh_topology"]
+    return [varname for varname, var in ds.variables.items() if var.attrs.get("cf_role") == "mesh_topology"]
 
 
 def _infer_xy_coords(
