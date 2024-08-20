@@ -578,10 +578,10 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_get_topology</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="c1"># looping over ds.variables.items() is way faster for datasets with many </span>
-    <span class="c1"># variables than accessing each var with ds[var]</span>
+    <span class="c1"># accessing ds.variables[var] is way faster for datasets with many </span>
+    <span class="c1"># variables than accessing them with ds[var]</span>
     <span class="c1"># https://github.com/Deltares/xugrid/issues/285</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">varname</span> <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cf_role&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;mesh_topology&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cf_role&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;mesh_topology&quot;</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_infer_xy_coords</span><span class="p">(</span>
