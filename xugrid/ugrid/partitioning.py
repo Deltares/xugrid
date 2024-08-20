@@ -202,7 +202,7 @@ def validate_partition_objects(
         unique_vars = set(chain(*allvars))
         # Check dimensions
         dims_per_var = [
-            {ds[var].dims for ds in data_objects if var in ds.data_vars}
+            {ds.variables[var].dims for ds in data_objects if var in ds.data_vars}
             for var in unique_vars
         ]
         for var, vardims in zip(unique_vars, dims_per_var):
