@@ -546,7 +546,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             else:
                 raise ValueError("invalid topology dimension on grid")
 
-            variables = [var for var in ds.data_vars if dim in ds[var].dims]
+            variables = [var for var in ds.data_vars if dim in ds.variables[var].dims]
             if variables:
                 data = ds[variables].to_dataframe(dim_order=dim_order)
             else:

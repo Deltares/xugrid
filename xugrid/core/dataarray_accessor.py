@@ -422,7 +422,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             ds = self.obj.to_dataset()
 
-        variables = [var for var in ds.data_vars if dim in ds[var].dims]
+        variables = [var for var in ds.data_vars if dim in ds.variables[var].dims]
         # TODO deal with time-dependent data, etc.
         # Basically requires checking which variables are static, which aren't.
         # For non-static, requires repeating all geometries.
