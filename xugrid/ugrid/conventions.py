@@ -181,6 +181,9 @@ def default_topology_attrs(name: str, topology_dimension: int):
 
 
 def _get_topology(ds: xr.Dataset) -> List[str]:
+    # looping over ds.variables.items() is way faster for datasets with many 
+    # variables than accessing each var with ds[var]
+    # https://github.com/Deltares/xugrid/issues/285
     return [varname for varname, var in ds.variables.items() if var.attrs.get("cf_role") == "mesh_topology"]
 
 
