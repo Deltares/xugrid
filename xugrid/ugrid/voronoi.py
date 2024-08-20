@@ -21,7 +21,12 @@ import pandas as pd
 from scipy import sparse
 
 from xugrid.constants import X_EPSILON, FloatArray, IntArray
-from xugrid.ugrid.connectivity import renumber
+from xugrid.ugrid.connectivity import (
+    area_from_coordinates,
+    close_polygons,
+    ragged_index,
+    renumber,
+)
 
 
 def dot_product2d(U: FloatArray, V: FloatArray):
@@ -134,6 +139,42 @@ def exterior_vertices(
     return i_keep, j_keep, vertices_keep, face_i, n_interpolated
 
 
+def choose_convex(
+    i: IntArray,
+    j: IntArray,
+    nodes: FloatArray,
+    original_vertices: FloatArray,
+    n_interpolated: int,
+) -> None:
+    # Determine whether the original vertex or the interpolated vertex
+    # generates the largest area (since the concave face will be smaller than
+    # the convex face.)
+    # Create a face_node_connectivity array.
+    n_vertex = np.bincount(i)
+    n_vertex = n_vertex[n_vertex > 0]
+    n = len(n_vertex)
+    m = n_vertex.max()
+    index = ragged_index(n, m, n_vertex)
+    faces = np.full((n, m), -1)
+    faces[index] = j
+    # Close the polygons so we can easily compute areas.
+    closed, _ = close_polygons(faces, -1)
+    # Make a copy and insert the original vertices.
+    modified_nodes = nodes.copy()
+    modified_nodes[-n_interpolated:] = original_vertices
+
+    # Compare areas of faces
+    convex_area = area_from_coordinates(nodes[closed])
+    modified_area = area_from_coordinates(modified_nodes[closed])
+    original_is_convex = (modified_area >= convex_area)[:, np.newaxis]
+    # All the newly created vertices are found at the end.
+    is_interpolated = faces >= len(nodes) - n_interpolated
+    # No need for unique: every exterior vertex is featured exactly once.
+    use_original = faces[original_is_convex & is_interpolated]
+    nodes[use_original] = modified_nodes[use_original]
+    return
+
+
 def exterior_topology(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
@@ -142,6 +183,7 @@ def exterior_topology(
     vertices: FloatArray,
     centroids: FloatArray,
     add_vertices: bool,
+    skip_concave: bool,
 ):
     """
     Create the exterior topology of the voronoi tesselation.
@@ -220,7 +262,10 @@ def exterior_topology(
     # to generate the proper ordering. We overwrite those substituted points
     # here by their possibly concave true vertices.
     if add_vertices:
-        vor_vertices[-n_interpolated:] = orig_vertices
+        if skip_concave:
+            choose_convex(i, j, vor_vertices, orig_vertices, n_interpolated)
+        else:
+            vor_vertices[-n_interpolated:] = orig_vertices
 
     return vor_vertices, i, j, face_i
 
@@ -234,6 +279,7 @@ def voronoi_topology(
     fill_value: int = None,
     add_exterior: bool = False,
     add_vertices: bool = False,
+    skip_concave: bool = False,
 ) -> Tuple[FloatArray, sparse.csr_matrix]:
     """
     Compute the centroidal voronoi tesslation (CVT) of an existing mesh of
@@ -277,6 +323,9 @@ def voronoi_topology(
         exclusively centroids.
     add_vertices: bool, optional
         Whether to use existing exterior vertices.
+    skip_concave: bool, optional
+        Whether to skip existing exterior vertices if they generate concave
+        faces.
 
     Returns
     -------
@@ -334,6 +383,7 @@ def voronoi_topology(
             vertices,
             centroids,
             add_vertices,
+            skip_concave,
         )
         offset = node_i.max() + 1 if len(node_i > 0) else 0
         i = np.concatenate([node_i, exterior_i + offset])
@@ -347,4 +397,5 @@ def voronoi_topology(
     i = renumber(i)
     coo_content = (j, (i, j))
     face_node_connectivity = sparse.coo_matrix(coo_content)
+
     return vor_vertices, face_node_connectivity, face_i

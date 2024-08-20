@@ -571,20 +571,26 @@ def perimeter(
     return np.linalg.norm(dxy, axis=-1).sum(axis=1)
 
 
-def area(
-    face_node_connectivity: IntArray,
-    fill_value: int,
-    node_x: FloatArray,
-    node_y: FloatArray,
-):
-    nodes = np.column_stack([node_x, node_y])
-    closed, _ = close_polygons(face_node_connectivity, fill_value)
-    coordinates = nodes[closed]
+def area_from_coordinates(
+    coordinates: FloatArray,
+) -> FloatArray:
     xy0 = coordinates[:, 0]
     a = coordinates[:, :-1] - xy0[:, np.newaxis]
     b = coordinates[:, 1:] - xy0[:, np.newaxis]
     determinant = np.cross(a, b)
     return 0.5 * abs(determinant.sum(axis=1))
+
+
+def area(
+    face_node_connectivity: IntArray,
+    fill_value: int,
+    node_x: FloatArray,
+    node_y: FloatArray,
+) -> FloatArray:
+    nodes = np.column_stack([node_x, node_y])
+    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    coordinates = nodes[closed]
+    return area_from_coordinates(coordinates)
 
 
 def centroids(
