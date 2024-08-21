@@ -1,12 +1,14 @@
+import numba as nb
 import numpy as np
 import xarray as xr
 
 import xugrid as xu
 from xugrid.constants import FloatDType
-from xugrid.ugrid import connectivity, voronoi
+from xugrid.ugrid import voronoi
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
 
+@nb.njit(cache=True)
 def replace_interpolated_weights(
     vertices,
     faces,
@@ -25,7 +27,8 @@ def replace_interpolated_weights(
             if (p < node_index_threshold) or (w <= 0):
                 continue
             # Find the two surrounding nodes (q and r)
-            q, r = node_to_node_map[p - node_index_threshold]
+            index = p - node_index_threshold
+            q, r = node_to_node_map[index]
             px, py = vertices[p]
             qx, qy = vertices[q]
             rx, ry = vertices[r]
@@ -36,7 +39,7 @@ def replace_interpolated_weights(
             # Redistribute weight according to inverse distance.
             weight_q = (p_r / total) * w
             weight_r = (p_q / total) * w
-            # Set weights to zero for p, and add to r and q.
+            # Set weights to zero for p, and add to r and q weights.
             weights[i, j] = 0.0
             # Search for p and q
             for jj in range(m):
@@ -154,7 +157,6 @@ class UnstructuredGrid2d:
             add_vertices=True,
             skip_concave=True,
         )
-        faces = connectivity.to_dense(faces, fill_value=-1)
 
         voronoi_grid = Ugrid2d(
             vertices[:, 0],

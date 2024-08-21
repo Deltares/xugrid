@@ -323,3 +323,39 @@ def test_directional_dependence():
         result.append(regridder.regrid(source))
     first = result.pop(0)
     assert all(first.identical(item) for item in result)
+
+
+def test_barycentric_concave():
+    vertices = np.array(
+        [
+            [0.0, 0.0],
+            [3.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 2.0],
+            [3.0, 2.0],
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 2],
+            [0, 2, 3],
+            [2, 4, 3],
+        ]
+    )
+    grid = xu.Ugrid2d(*vertices.T, -1, faces)
+
+    dx = 0.1
+    x = np.arange(0.0, 3.0, dx) + 0.5 * dx
+    y = np.arange(0.0, 2.0, dx) + 0.5 * dx
+    other = xr.DataArray(
+        data=np.ones((y.size, x.size)), coords={"y": y, "x": x}, dims=("y", "x")
+    )
+
+    uda = xu.UgridDataArray(
+        obj=xr.DataArray([2.0, 0.5, 2.0], dims=[grid.face_dimension]),
+        grid=grid,
+    )
+    regridder = xu.BarycentricInterpolator(source=uda, target=other)
+    result = regridder.regrid(uda)
+    assert result.min() >= 0.5
+    assert result.max() <= 2.0

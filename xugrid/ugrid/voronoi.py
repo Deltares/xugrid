@@ -55,6 +55,17 @@ def compute_centroid(i: IntArray, x: FloatArray, y: FloatArray):
     return _centroid_pandas(i, x, y)
 
 
+def _create_face_node_connectivity(i: IntArray, j: IntArray) -> IntArray:
+    n_vertex = np.bincount(i)
+    n_vertex = n_vertex[n_vertex > 0]
+    n = len(n_vertex)
+    m = n_vertex.max()
+    index = ragged_index(n, m, n_vertex)
+    face_node_connectivity = np.full((n, m), -1)
+    face_node_connectivity[index] = j
+    return face_node_connectivity
+
+
 def exterior_centroids(node_face_connectivity: sparse.csr_matrix):
     n, _ = node_face_connectivity.shape
     # Find exterior nodes NOT associated with any interior edge
@@ -85,6 +96,53 @@ def interior_centroids(
     return i, j
 
 
+def _project_centroid_on_edge(
+    edge_vertices: FloatArray, centroid_vertices: FloatArray
+) -> FloatArray:
+    a = edge_vertices[:, 0, :]
+    b = edge_vertices[:, 1, :]
+    V = b - a
+    U = centroid_vertices - a
+    # np.dot(U, V) doesn't do the desired thing here
+    projected_vertices = a + ((dot_product2d(U, V) / dot_product2d(V, V)) * V.T).T
+    return projected_vertices
+
+
+def _filter_projections(
+    projected_vertices: FloatArray,
+    centroid_vertices: FloatArray,
+    exterior_nodes: IntArray,
+    face_i: IntArray,
+) -> Tuple[IntArray, FloatArray, IntArray]:
+    # Create the numbering pointing to these new vertices.
+    # Discard vertices that overlap with e.g. circumcenters.
+    keep = np.linalg.norm(projected_vertices - centroid_vertices, axis=1) > (
+        X_EPSILON * X_EPSILON
+    )
+    face_i = face_i[keep]
+    vertices = projected_vertices[keep]
+    i = exterior_nodes[keep].ravel()
+    return i, vertices, face_i
+
+
+def _interpolate_between_projections(
+    projected_vertices: FloatArray,
+    exterior_nodes: IntArray,
+    n: int,
+) -> Tuple[IntArray, IntArray, FloatArray, IntArray]:
+    n_new = len(projected_vertices)
+    i = exterior_nodes.ravel()
+    order = np.argsort(i)
+    jj = np.repeat(np.arange(n_new), 2)[order]
+    to_interpolate = projected_vertices[jj]
+    interpolated_vertices = 0.5 * (to_interpolate[::2] + to_interpolate[1::2])
+    # For the interpolated vertices, it depends on the two other nodes (which
+    # depend on centroids). Store for each interpolation on which two nodes it relies.
+    j = np.arange(n, n + len(interpolated_vertices))
+    interpolation_map = jj.reshape((-1, 2))
+    return i[order][::2], j, interpolated_vertices, interpolation_map
+
+
 def exterior_vertices(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
@@ -99,49 +157,39 @@ def exterior_vertices(
     edge_vertices = vertices[exterior_nodes]
     face_i = edge_face_connectivity[is_exterior, 0]
     centroid_vertices = centroids[face_i]
-    a = edge_vertices[:, 0, :]
-    b = edge_vertices[:, 1, :]
-    V = b - a
-    U = centroid_vertices - a
-    # np.dot(U, V) doesn't do the desired thing here
-    projected_vertices = a + ((dot_product2d(U, V) / dot_product2d(V, V)) * V.T).T
-
-    # Create the numbering pointing to these new vertices.
-    # Discard vertices that overlap with e.g. circumcenters.
-    keep = np.linalg.norm(projected_vertices - centroid_vertices, axis=1) > (
-        X_EPSILON * X_EPSILON
+    projected_vertices = _project_centroid_on_edge(edge_vertices, centroid_vertices)
+    i, vertices, face_i = _filter_projections(
+        projected_vertices,
+        centroid_vertices,
+        exterior_nodes,
+        face_i,
     )
-    face_i = face_i[keep]
-    vertices_keep = projected_vertices[keep]
+
     n_centroid = len(centroids)
-    i_keep = exterior_nodes[keep].ravel()
-    n = n_centroid + len(vertices_keep)
-    j_keep = np.repeat(np.arange(n_centroid, n), 2)
+    n = n_centroid + len(vertices)
+    j = np.repeat(np.arange(n_centroid, n), 2)
     n_interpolated = 0
     interpolation_map = None
 
-    # We add a substitution value for the actual vertex
+    # We add a guaranteed convex substitution vertex instead of the actual vertex
     if add_vertices:
-        n_new = len(projected_vertices)
-        i = exterior_nodes.ravel()
-        order = np.argsort(i)
-        jj = np.repeat(np.arange(n_new), 2)[order]
-        to_interpolate = projected_vertices[jj]
-        interpolated = 0.5 * (to_interpolate[::2] + to_interpolate[1::2])
-        n_interpolated = len(interpolated)
-        i_keep = np.concatenate([i_keep, i[order][::2]])
-        j_keep = np.concatenate([j_keep, np.arange(n, n + n_interpolated)])
-        vertices_keep = np.concatenate([vertices_keep, interpolated])
+        (
+            i_new,
+            j_new,
+            interpolated_vertices,
+            interpolation_map,
+        ) = _interpolate_between_projections(projected_vertices, exterior_nodes, n)
+        interpolation_map += n_centroid
+        n_interpolated = len(interpolated_vertices)
+        i = np.concatenate([i, i_new])
+        j = np.concatenate([j, j_new])
+        vertices = np.concatenate([vertices, interpolated_vertices])
         # Create face index: the face of the original mesh associated with every
         # voronoi vertex is a centroid. The exterior vertices are an exception to
         # this: these are associated with two faces. So we set a value of -1 here.
         face_i = np.concatenate([face_i, np.full(n_interpolated, -1)])
 
-        # For the interpolated vertices, it depends on the two other nodes (which
-        # depend on centroids). Store for each interpolation on which two nodes it relies.
-        interpolation_map = jj.reshape((-1, 2))
-
-    return i_keep, j_keep, vertices_keep, face_i, n_interpolated, interpolation_map
+    return i, j, vertices, face_i, n_interpolated, interpolation_map
 
 
 def choose_convex(
@@ -220,7 +268,8 @@ def exterior_topology(
 
     * i refers to the node number of the original mesh.
     * In principle, j refers to the face number (and associated centroids) of
-    the original mesh; exterior vertices require new numbers.
+    the original mesh; exterior vertices require new numbers as they are not a
+    centroid.
 
     Finally, in the resulting new (voronoi) face_node_connectivity, i becomes
     the face number, and j becomes the node number.
@@ -416,8 +465,5 @@ def voronoi_topology(
         i = node_i
         j = renumber(j)
 
-    i = renumber(i)
-    coo_content = (j, (i, j))
-    face_node_connectivity = sparse.coo_matrix(coo_content)
-
+    face_node_connectivity = _create_face_node_connectivity(i, j)
     return vor_vertices, face_node_connectivity, face_i, interpolation_map
