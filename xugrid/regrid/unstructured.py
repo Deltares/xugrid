@@ -3,8 +3,49 @@ import xarray as xr
 
 import xugrid as xu
 from xugrid.constants import FloatDType
-from xugrid.ugrid import voronoi
+from xugrid.ugrid import connectivity, voronoi
 from xugrid.ugrid.ugrid2d import Ugrid2d
+
+
+def replace_interpolated_weights(
+    vertices,
+    faces,
+    face_index,
+    weights,
+    node_to_node_map,
+    node_index_threshold,
+):
+    n, m = weights.shape
+    for i in range(n):
+        face = faces[face_index[i]]
+        weights_row = weights[i]
+        for j in range(m):
+            p = face[j]
+            w = weights_row[j]
+            if (p < node_index_threshold) or (w <= 0):
+                continue
+            # Find the two surrounding nodes (q and r)
+            q, r = node_to_node_map[p - node_index_threshold]
+            px, py = vertices[p]
+            qx, qy = vertices[q]
+            rx, ry = vertices[r]
+            # Compute the euclidian distance to both
+            p_q = np.sqrt((qx - px) ** 2 + (qy - py) ** 2)
+            p_r = np.sqrt((rx - px) ** 2 + (ry - py) ** 2)
+            total = p_q + p_r
+            # Redistribute weight according to inverse distance.
+            weight_q = (p_r / total) * w
+            weight_r = (p_q / total) * w
+            # Set weights to zero for p, and add to r and q.
+            weights[i, j] = 0.0
+            # Search for p and q
+            for jj in range(m):
+                node = face[jj]
+                if node == q:
+                    weights[i, jj] += weight_q
+                if node == r:
+                    weights[i, jj] += weight_r
+    return
 
 
 class UnstructuredGrid2d:
@@ -97,16 +138,23 @@ class UnstructuredGrid2d:
         grid = self.ugrid_topology
 
         # Create a voronoi grid to get surrounding nodes as vertices
-        vertices, faces, node_to_face_index = voronoi.voronoi_topology(
+        (
+            vertices,
+            faces,
+            node_to_face_index,
+            node_to_node_map,
+        ) = voronoi.voronoi_topology(
             grid.node_face_connectivity,
             grid.node_coordinates,
             grid.centroids,
-            #    edge_face_connectivity=grid.edge_face_connectivity,
-            #    edge_node_connectivity=grid.edge_node_connectivity,
-            #    fill_value=grid.fill_value,
-            #    add_exterior=True,
-            #    add_vertices=False,
+            edge_face_connectivity=grid.edge_face_connectivity,
+            edge_node_connectivity=grid.edge_node_connectivity,
+            fill_value=grid.fill_value,
+            add_exterior=True,
+            add_vertices=True,
+            skip_concave=True,
         )
+        faces = connectivity.to_dense(faces, fill_value=-1)
 
         voronoi_grid = Ugrid2d(
             vertices[:, 0],
@@ -114,28 +162,30 @@ class UnstructuredGrid2d:
             -1,
             faces,
         )
-
         face_index, weights = voronoi_grid.compute_barycentric_weights(points)
-        n_points, n_max_node = weights.shape
+
+        # Find which nodes are interpolated. Redistribute their weights
+        # according to distance to projection vertex.
+        replace_interpolated_weights(
+            vertices=vertices,
+            faces=faces,
+            face_index=face_index,
+            weights=weights,
+            node_to_node_map=node_to_node_map,
+            node_index_threshold=len(vertices) - len(node_to_node_map),
+        )
+
+        # Discards 0 weights and points that fall outside of the grid.
+        outside = grid.locate_points(points) == -1
+        weights[outside] = 0
         keep = weights.ravel() > 0
         source_index = node_to_face_index[
             voronoi_grid.face_node_connectivity[face_index]
         ].ravel()[keep]
+
+        n_points, n_max_node = weights.shape
         target_index = np.repeat(np.arange(n_points), n_max_node)[keep]
         weights = weights.ravel()[keep]
-
-        # Look for points falling outside.
-        outside = face_index == -1
-        other_points = points[outside]
-        sampled_index = grid.locate_points(other_points)
-        sampled_inside = sampled_index != grid.fill_value
-        other_source = sampled_index[sampled_inside]
-        other_target = np.arange(n_points)[outside][sampled_inside]
-
-        # Combine first and second
-        source_index = np.concatenate((source_index, other_source))
-        target_index = np.concatenate((target_index, other_target))
-        weights = np.concatenate((weights, np.ones(other_target.size, dtype=float)))
 
         order = np.argsort(target_index)
         return source_index[order], target_index[order], weights[order]

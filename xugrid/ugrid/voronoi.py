@@ -118,6 +118,7 @@ def exterior_vertices(
     n = n_centroid + len(vertices_keep)
     j_keep = np.repeat(np.arange(n_centroid, n), 2)
     n_interpolated = 0
+    interpolation_map = None
 
     # We add a substitution value for the actual vertex
     if add_vertices:
@@ -136,7 +137,11 @@ def exterior_vertices(
         # this: these are associated with two faces. So we set a value of -1 here.
         face_i = np.concatenate([face_i, np.full(n_interpolated, -1)])
 
-    return i_keep, j_keep, vertices_keep, face_i, n_interpolated
+        # For the interpolated vertices, it depends on the two other nodes (which
+        # depend on centroids). Store for each interpolation on which two nodes it relies.
+        interpolation_map = jj.reshape((-1, 2))
+
+    return i_keep, j_keep, vertices_keep, face_i, n_interpolated, interpolation_map
 
 
 def choose_convex(
@@ -227,7 +232,14 @@ def exterior_topology(
         fill_value,
     )
     i1, j1 = exterior_centroids(node_face_connectivity)
-    i2, j2, projected_vertices, face_i, n_interpolated = exterior_vertices(
+    (
+        i2,
+        j2,
+        projected_vertices,
+        face_i,
+        n_interpolated,
+        interpolation_map,
+    ) = exterior_vertices(
         edge_face_connectivity,
         edge_node_connectivity,
         fill_value,
@@ -267,7 +279,7 @@ def exterior_topology(
         else:
             vor_vertices[-n_interpolated:] = orig_vertices
 
-    return vor_vertices, i, j, face_i
+    return vor_vertices, i, j, face_i, interpolation_map
 
 
 def voronoi_topology(
@@ -280,7 +292,7 @@ def voronoi_topology(
     add_exterior: bool = False,
     add_vertices: bool = False,
     skip_concave: bool = False,
-) -> Tuple[FloatArray, sparse.csr_matrix]:
+) -> Tuple[FloatArray, sparse.csr_matrix, IntArray, IntArray]:
     """
     Compute the centroidal voronoi tesslation (CVT) of an existing mesh of
     (convex!) cells using connectivity index arrays.
@@ -335,6 +347,9 @@ def voronoi_topology(
         Connects the nodes of the voronoi topology to the faces of the original
         grid. Exterior vertices (when ``add_vertices=True``) are given an index
         of -1.
+    interpolation_map: ndarray of ints with shape ``(n_interpolated, 2)``
+        Marks for each interpolated point from which nodes it has been
+        interpolated.
     """
     if add_exterior:
         if any(
@@ -375,7 +390,13 @@ def voronoi_topology(
     j = face_i[order]
 
     if add_exterior:
-        vor_vertices, exterior_i, exterior_j, face_i = exterior_topology(
+        (
+            vor_vertices,
+            exterior_i,
+            exterior_j,
+            face_i,
+            interpolation_map,
+        ) = exterior_topology(
             edge_face_connectivity,
             edge_node_connectivity,
             node_face_connectivity,
@@ -389,6 +410,7 @@ def voronoi_topology(
         i = np.concatenate([node_i, exterior_i + offset])
         j = np.concatenate([j, exterior_j])
     else:
+        interpolation_map = None
         vor_vertices = centroids[np.unique(face_i)]
         face_i = np.arange(face_i.max() + 1)
         i = node_i
@@ -398,4 +420,4 @@ def voronoi_topology(
     coo_content = (j, (i, j))
     face_node_connectivity = sparse.coo_matrix(coo_content)
 
-    return vor_vertices, face_node_connectivity, face_i
+    return vor_vertices, face_node_connectivity, face_i, interpolation_map
