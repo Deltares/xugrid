@@ -308,9 +308,9 @@ def test_linear_weights_1d(
     # --------
     assert_expected_overlap(
         *grid_data_a_1d.linear_weights(grid_data_c_1d),
-        np.array([1, 0, 2, 1]),
-        np.array([1, 1, 2, 2]),
-        np.array([0.8, 0.2, 0.8, 0.2]),
+        np.array([0, 0, 1, 0, 2, 1]),
+        np.array([0, 0, 1, 1, 2, 2]),
+        np.array([0.0, 1.0, 0.8, 0.2, 0.8, 0.2]),
     )
 
     # --------
@@ -324,9 +324,9 @@ def test_linear_weights_1d(
     # --------
     assert_expected_overlap(
         *grid_data_a_1d.linear_weights(grid_data_d_1d),
-        np.array([0, 1, 1, 0, 1, 2]),
-        np.array([1, 1, 2, 2, 3, 3]),
-        np.array([0.9, 0.1, 0.6, 0.4, 0.9, 0.1]),
+        np.array([0, 0, 0, 1, 1, 0, 1, 2]),
+        np.array([0, 0, 1, 1, 2, 2, 3, 3]),
+        np.array([0.0, 0.1, 0.9, 0.1, 0.6, 0.4, 0.9, 0.1]),
     )
 
     # non-equidistant
@@ -339,9 +339,9 @@ def test_linear_weights_1d(
     # --------
     assert_expected_overlap(
         *grid_data_a_1d.linear_weights(grid_data_e_1d),
-        np.array([0, 1, 1, 2]),
-        np.array([1, 1, 2, 2]),
-        np.array([0.65, 0.35, 0.9, 0.1]),
+        np.array([0, 0, 0, 1, 1, 2]),
+        np.array([0, 0, 1, 1, 2, 2]),
+        np.array([0.0, 1.0, 0.65, 0.35, 0.9, 0.1]),
     )
 
     # 1-1 grid
@@ -354,9 +354,9 @@ def test_linear_weights_1d(
     # --------
     assert_expected_overlap(
         *grid_data_b_1d.linear_weights(grid_data_b_1d),
-        np.array([1, 0, 2, 1]),
-        np.array([1, 1, 2, 2]),
-        np.array([1.0, 0.0, 1.0, 0.0]),
+        np.array([0, 0, 1, 0, 2, 1, 3, 2]),
+        np.array([0, 0, 1, 1, 2, 2, 3, 3]),
+        np.array([0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]),
     )
 
 
@@ -379,32 +379,63 @@ def test_linear_weights_2d(
 
     # --------
     # source   targets      weight
+    # 4        0, 0, 3, 3   0%  50% 0%  50%
     # 5        0, 1, 3, 4   10%	40%	10%	40%
     # 6        1, 2, 4, 5   10%	40%	10%	40%
+    # 8        3, 3, 6, 6   0%  50% 0%  50%
     # 9        3, 4, 6, 7   10%	40%	10%	40%
     # 10       4, 5, 7, 8   10%	40%	10%	40%
     # --------
     assert_expected_overlap(
         *grid_data_a_layered_2d.linear_weights(grid_data_c_2d),
-        np.array([1, 0, 4, 3, 2, 1, 5, 4, 4, 3, 7, 6, 5, 4, 8, 7]),
-        np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10]),
-        np.array([0.4, 0.1, 0.4, 0.1] * 4),
+        np.array(
+            [0, 0, 3, 3, 1, 0, 3, 4, 5, 4, 2, 1, 3, 3, 6, 6, 4, 3, 7, 6, 8, 5, 4, 7]
+        ),
+        np.array(
+            [4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10]
+        ),
+        np.array(
+            [
+                0.0,
+                0.5,
+                0.0,
+                0.5,
+                0.4,
+                0.1,
+                0.1,
+                0.4,
+                0.4,
+                0.1,
+                0.4,
+                0.1,
+                0.0,
+                0.5,
+                0.0,
+                0.5,
+                0.4,
+                0.1,
+                0.4,
+                0.1,
+                0.4,
+                0.4,
+                0.1,
+                0.1,
+            ]
+        ),
     )
 
     # 1-1
     # --------
     # source   targets      weight
-    # 5        4, 5, 8, 9   0% 100% 0% 0%
-    # 6        5, 6, 9,10   0% 100% 0% 0%
-    # 9        8, 9,12,13   0% 100% 0% 0%
-    # 10       9,10,13,14   0% 100% 0% 0%
+    # 0-15     0-15         0% 0% 0% 100% (or shuffled)
+    # result should be 1:1 mapping
     # --------
-    assert_expected_overlap(
-        *grid_data_b_2d.linear_weights(grid_data_b_2d),
-        np.array([5, 4, 9, 8, 6, 5, 10, 9, 9, 8, 13, 12, 10, 9, 14, 13]),
-        np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10]),
-        np.array([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]),
-    )
+    source, target, weights = grid_data_b_2d.linear_weights(grid_data_b_2d)
+    expected_target = np.repeat(np.arange(16), 4)
+    assert np.array_equal(target, expected_target)
+    assert np.array_equal(np.unique(weights), [0, 1])
+    check_source = source[weights != 0]
+    assert np.array_equal(check_source, np.arange(16))
 
 
 def test_nonscalar_dx():

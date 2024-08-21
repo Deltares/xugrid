@@ -6,6 +6,7 @@ other.
 While the unstructured logic would work for structured data as well, it is much
 less efficient than utilizing the structure of the coordinates.
 """
+
 from typing import Any, Tuple, Union
 
 import numpy as np
@@ -176,6 +177,7 @@ class StructuredGrid1d:
             valid target indexes
         """
         source_index, target_index = self.valid_nodes_within_bounds(other)
+        return source_index, target_index
         valid = (other.midpoints[target_index] > self.midpoints[0]) & (
             other.midpoints[target_index] < self.midpoints[-1]
         )
@@ -283,31 +285,47 @@ class StructuredGrid1d:
         weights: np.array
         neighbor: np.narray
         """
-        source_midpoint_index = self.maybe_reverse_index(source_index)
-        target_midpoints_index = other.maybe_reverse_index(target_index)
-        neighbor = np.ones(target_midpoints_index.size, dtype=int)
-        # cases where midpoint target <= midpoint source
-        condition = (
-            other.midpoints[target_midpoints_index]
-            <= self.midpoints[source_midpoint_index]
-        )
-        neighbor[condition] = -neighbor[condition]
-
         if self.midpoints.size < 2:
             raise ValueError(
                 f"Coordinate {self.name} has size: {self.midpoints.size}. "
                 "At least two points are required for interpolation."
             )
-        weights = 1 - (
-            (
-                other.midpoints[target_midpoints_index]
-                - self.midpoints[source_midpoint_index]
-            )
-            / (
-                self.midpoints[source_midpoint_index + neighbor]
-                - self.midpoints[source_midpoint_index]
-            )
+
+        source_midpoint_index = self.maybe_reverse_index(source_index)
+        target_midpoint_index = other.maybe_reverse_index(target_index)
+        # cases where midpoint target <= midpoint source: set neighbor to -1
+        neighbor = np.where(
+            other.midpoints[target_midpoint_index]
+            <= self.midpoints[source_midpoint_index],
+            -1,
+            1,
         )
+
+        # When we exceed the original domain, it should still interpolate
+        # within the bounds.
+        # Make sure neighbor falls in [0, n)
+        neighbor_index = np.clip(
+            source_midpoint_index + neighbor, 0, self.midpoints.size - 1
+        )
+        # Update neighbor since we return it
+        neighbor = neighbor_index - source_midpoint_index
+
+        # If neighbor is 0, we end up computing zero distance, since we're
+        # comparing a midpoint to iself. Instead, set a weight of 1.0 on one,
+        # (and impliclity 0 in the other). Similarly, if source and target
+        # midpoints coincide, the distance may end up 0.
+        length = (
+            other.midpoints[target_midpoint_index]
+            - self.midpoints[source_midpoint_index]
+        )
+        total_length = (
+            self.midpoints[neighbor_index] - self.midpoints[source_midpoint_index]
+        )
+        # Do not divide by zero.
+        # We will overwrite the value anyway at neighbor == 0.
+        total_length[total_length == 0] = 1
+        weights = 1 - (length / total_length)
+        weights[neighbor == 0] = 0.0
         condition = np.logical_and(weights < 0.0, weights > 1.0)
         if condition.any():
             raise ValueError(
