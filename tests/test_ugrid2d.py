@@ -643,8 +643,8 @@ def test_rasterize():
     x, y, index = grid.rasterize(resolution=0.5)
     expected_index = np.array(
         [
-            [-1, 2, -1, -1],
-            [2, 2, 3, -1],
+            [-1, 2, 3, -1],
+            [2, 2, 3, 3],
             [0, 0, 1, 1],
             [0, 0, 1, 1],
         ]
@@ -658,8 +658,8 @@ def test_rasterize():
     x, y, index = grid.rasterize(resolution=0.5, bounds=bounds)
     expected_index = np.array(
         [
-            [-1, -1, -1, 2, -1, -1],
-            [-1, -1, 2, 2, 3, -1],
+            [-1, -1, -1, 2, 3, -1],
+            [-1, -1, 2, 2, 3, 3],
             [-1, -1, 0, 0, 1, 1],
             [-1, -1, 0, 0, 1, 1],
             [-1, -1, -1, -1, -1, -1],

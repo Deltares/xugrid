@@ -359,3 +359,42 @@ def test_barycentric_concave():
     result = regridder.regrid(uda)
     assert result.min() >= 0.5
     assert result.max() <= 2.0
+    # There should be a large enough "gap" of NaNs on the right side.
+    assert result.isnull().sum() == 200
+
+
+def test_barycentric_structured():
+    da = xr.DataArray(
+        data=[[1, 2], [3, 4]],
+        coords={"y": [1.5, 0.5], "x": [0.5, 1.5]},
+        dims=("y", "x"),
+    )
+    x = np.arange(0.0, 2.0, 0.25) + 0.125
+    y = np.arange(0.0, 2.0, 0.25) + 0.125
+    target = xr.DataArray(
+        data=np.empty((y.size, x.size)), coords={"y": y, "x": x}, dims=("y", "x")
+    )
+
+    regridder = xu.BarycentricInterpolator(source=da, target=target)
+    out_structured = regridder.regrid(da)
+
+    target_uda = xu.UgridDataArray.from_structured(target)
+    regridder = xu.BarycentricInterpolator(source=da, target=target_uda)
+    out_unstructured = regridder.regrid(da)
+
+    # Answers should be same regardless whether the topology is stored as
+    # structured or unstructured.
+    values_structured = out_structured.to_numpy()
+    values_unstructured = out_unstructured.to_numpy()
+    assert np.allclose(values_structured.ravel(), values_unstructured)
+
+    # Check values. Original values should be present at exterior (repeated).
+    assert np.allclose(
+        values_structured[0], [3.0, 3.0, 3.125, 3.375, 3.625, 3.875, 4.0, 4.0]
+    )
+    assert np.allclose(
+        values_structured[-1], [1.0, 1.0, 1.125, 1.375, 1.625, 1.875, 2.0, 2.0]
+    )
+    assert np.allclose(
+        values_structured[:, 0], [3.0, 3.0, 2.75, 2.25, 1.75, 1.25, 1.0, 1.0]
+    )
