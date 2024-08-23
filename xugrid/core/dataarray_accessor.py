@@ -10,7 +10,7 @@ from xugrid.core.utils import UncachedAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
-from xugrid.ugrid.interpolate import laplace_interpolate
+from xugrid.ugrid.interpolate import laplace_interpolate, nearest_interpolate
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
@@ -579,6 +579,23 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             reordered_grid,
         )
 
+    def interpolate_na(
+        self,
+        method: str = "nearest",
+    ):
+        if method != "nearest":
+            raise ValueError(f'"{method}" is not a valid interpolator.')
+
+        grid = self.grid
+        da = self.obj
+
+        filled = nearest_interpolate(
+            coordinates=grid.get_coordinates(dim=da.dims[0]),
+            data=da.to_numpy(),
+        )
+        da_filled = da.copy(data=filled)
+        return UgridDataArray(da_filled, grid)
+
     def laplace_interpolate(
         self,
         xy_weights: bool = True,
@@ -638,7 +655,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         if da.dims[0] == grid.edge_dimension:
             raise ValueError("Laplace interpolation along edges is not allowed.")
 
-        connectivity = grid.connectivity_matrix(da.dims[0], xy_weights=xy_weights)
+        connectivity = grid.get_connectivity_matrix(da.dims[0], xy_weights=xy_weights)
         filled = laplace_interpolate(
             connectivity=connectivity,
             data=da.to_numpy(),

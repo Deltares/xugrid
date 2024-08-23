@@ -677,7 +677,29 @@ class Ugrid2d(AbstractUgrid):
             )
         return self._node_face_connectivity
 
-    def connectivity_matrix(self, dim: str, xy_weights: bool):
+    @property
+    def coords(self):
+        """Dictionary for grid coordinates."""
+        return {
+            self.node_dimension: self.node_coordinates,
+            self.edge_dimension: self.edge_coordinates,
+            self.face_dimension: self.face_coordinates,
+        }
+
+    def get_coordinates(self, dim: str) -> FloatArray:
+        if dim == self.node_dimension:
+            return self.node_coordinates
+        elif dim == self.edge_dimension:
+            return self.edge_coordinates
+        elif dim == self.face_dimension:
+            return self.face_coordinates
+        else:
+            raise ValueError(
+                f"Expected {self.node_dimension}, {self.edge_dimension}, or "
+                f"{self.face_dimension}; got: {dim}",
+            )
+
+    def get_connectivity_matrix(self, dim: str, xy_weights: bool):
         if dim == self.node_dimension:
             connectivity = self.node_node_connectivity.copy()
             coordinates = self.node_coordinates
@@ -1549,7 +1571,7 @@ class Ugrid2d(AbstractUgrid):
 
     @staticmethod
     def merge_partitions(
-        grids: Sequence["Ugrid2d"]
+        grids: Sequence["Ugrid2d"],
     ) -> tuple["Ugrid2d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.

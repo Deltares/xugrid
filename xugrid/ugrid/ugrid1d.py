@@ -265,7 +265,25 @@ class Ugrid1d(AbstractUgrid):
     def dimensions(self):
         return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
-    def connectivity_matrix(self, dim: str, xy_weights: bool):
+    @property
+    def coords(self):
+        """Dictionary for grid coordinates."""
+        return {
+            self.node_dimension: self.node_coordinates,
+            self.edge_dimension: self.edge_coordinates,
+        }
+
+    def get_coordinates(self, dim: str) -> FloatArray:
+        if dim == self.node_dimension:
+            return self.node_coordinates
+        elif dim == self.edge_dimension:
+            return self.edge_coordinates
+        else:
+            raise ValueError(
+                f"Expected {self.node_dimension} or {self.edge_dimension}; got: {dim}"
+            )
+
+    def get_connectivity_matrix(self, dim: str, xy_weights: bool):
         if dim == self.node_dimension:
             connectivity = self.node_node_connectivity.copy()
             coordinates = self.node_coordinates
