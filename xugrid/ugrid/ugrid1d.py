@@ -263,9 +263,8 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def dims(self):
-        """Tuple of UGRID dimension names: node dimension, edge dimension."""
-        # Tuple to preserve order, unlike set.
-        return (self.node_dimension, self.edge_dimension)
+        """Set of UGRID dimension names: node dimension, edge dimension."""
+        return {self.node_dimension, self.edge_dimension}
 
     @property
     def sizes(self):
@@ -466,7 +465,9 @@ class Ugrid1d(AbstractUgrid):
             )
 
         indexers = {k: as_pandas_index(v, self.sizes[k]) for k, v in indexers.items()}
-        nodedim, edgedim = self.dims
+        nodedim = self.node_dimension
+        edgedim = self.edge_dimension
+
         edge_index = {}
         if nodedim in indexers:
             node_index = indexers[nodedim]

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import warnings
-from typing import NamedTuple, Tuple
+from typing import Any, Callable, Dict, NamedTuple, Tuple
 
 import numba as nb
 import numpy as np
+import xarray as xr
 from scipy import sparse
 from scipy.spatial import KDTree
 
@@ -197,8 +198,8 @@ class ILU0Preconditioner(NamedTuple):
 
 
 def laplace_interpolate(
-    connectivity: sparse.csr_matrix,
     data: FloatArray,
+    connectivity: sparse.csr_matrix,
     use_weights: bool,
     direct_solve: bool = False,
     delta=0.0,
@@ -218,9 +219,9 @@ def laplace_interpolate(
 
     Parameters
     ----------
+    data: ndarray of floats with shape ``(n,)``
     connectivity: scipy.sparse.csr_matrix with shape ``(n, n)``
         Sparse connectivity matrix containing ``n_nonzero`` indices and weight values.
-    data: ndarray of floats with shape ``(n,)``
     use_weights: bool, default False.
         Wether to use the data attribute of the connectivity matrix as
         coefficients. If ``False``, defaults to uniform coefficients of 1.
@@ -310,8 +311,8 @@ def laplace_interpolate(
 
 
 def nearest_interpolate(
-    coordinates: FloatArray,
     data: FloatArray,
+    coordinates: FloatArray,
     max_distance: float,
 ) -> FloatArray:
     isnull = np.isnan(data)
@@ -337,3 +338,24 @@ def nearest_interpolate(
     out = data.copy()
     out[i_target] = data[i_source[index]]
     return out
+
+
+def interpolate_na_helper(
+    da: xr.DataArray,
+    ugrid_dim: str,
+    func: Callable,
+    kwargs: Dict[str, Any],
+):
+    """Use apply ufunc to broadcast over the non UGRID dims."""
+    da_filled = xr.apply_ufunc(
+        func,
+        da,
+        input_core_dims=[[ugrid_dim]],
+        output_core_dims=[[ugrid_dim]],
+        vectorize=True,
+        kwargs=kwargs,
+        dask="parallelized",
+        keep_attrs=True,
+        output_dtypes=[da.dtype],
+    )
+    return da_filled

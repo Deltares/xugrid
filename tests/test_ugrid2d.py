@@ -264,6 +264,22 @@ def test_to_dataset():
     check_attrs(ds)
 
 
+def test_find_ugrid_dim():
+    grid = grid2d()
+    da = xr.DataArray(data=np.ones((grid.n_face,)), dims=[grid.face_dimension])
+    assert grid.find_ugrid_dim(da) == grid.face_dimension
+
+    weird = xr.DataArray(
+        data=np.ones((grid.n_face, grid.n_node)),
+        dims=[grid.face_dimension, grid.node_dimension],
+    )
+    with pytest.raises(
+        ValueError,
+        match="UgridDataArray should contain exactly one of the UGRID dimension",
+    ):
+        grid.find_ugrid_dim(weird)
+
+
 def test_ugrid2d_set_node_coords():
     grid = grid2d()
     ds = xr.Dataset()
@@ -449,11 +465,11 @@ def test_dimensions():
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.face_dimension == f"{NAME}_nFaces"
-    assert grid.dims == (
+    assert grid.dims == {
         f"{NAME}_nNodes",
         f"{NAME}_nEdges",
         f"{NAME}_nFaces",
-    )
+    }
     assert grid.sizes == {
         f"{NAME}_nNodes": 7,
         f"{NAME}_nEdges": 10,

@@ -37,17 +37,17 @@ def test_laplace_interpolate():
     data = np.array([1.0, np.nan, np.nan, np.nan, 5.0])
     with pytest.raises(ValueError, match="connectivity is not a square matrix"):
         con = sparse.coo_matrix(coo_content, shape=(4, 5)).tocsr()
-        interpolate.laplace_interpolate(con, data, use_weights=False)
+        interpolate.laplace_interpolate(data, con, use_weights=False)
 
     expected = np.arange(1.0, 6.0)
     con = sparse.coo_matrix(coo_content, shape=(5, 5)).tocsr()
     actual = interpolate.laplace_interpolate(
-        con, data, use_weights=False, direct_solve=True
+        data, con, use_weights=False, direct_solve=True
     )
     assert np.allclose(actual, expected)
 
     actual = interpolate.laplace_interpolate(
-        con, data, use_weights=False, direct_solve=False
+        data, con, use_weights=False, direct_solve=False
     )
     assert np.allclose(actual, expected)
 
@@ -57,13 +57,11 @@ def test_nearest_interpolate():
     y = np.zeros_like(x)
     coordinates = np.column_stack((x, y))
     data = np.array([0.0, np.nan, np.nan, np.nan, 4.0])
-    actual = interpolate.nearest_interpolate(coordinates, data, np.inf)
+    actual = interpolate.nearest_interpolate(data, coordinates, np.inf)
     assert np.allclose(actual, np.array([0.0, 0.0, 0.0, 4.0, 4.0]))
 
-    actual = interpolate.nearest_interpolate(coordinates, data, 1.1)
+    actual = interpolate.nearest_interpolate(data, coordinates, 1.1)
     assert np.allclose(actual, np.array([0.0, 0.0, np.nan, 4.0, 4.0]), equal_nan=True)
 
     with pytest.raises(ValueError, match="All values are NA."):
-        interpolate.nearest_interpolate(
-            coordinates, data=np.full_like(data, np.nan), max_distance=np.inf
-        )
+        interpolate.nearest_interpolate(np.full_like(data, np.nan), coordinates, np.inf)

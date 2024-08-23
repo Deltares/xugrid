@@ -24,7 +24,9 @@ Added
 - :meth:`xugrid.UgridDataArrayAccessor.interpolate_na` has been added to fill missing
   data. Currently, the only supported method is ``"nearest"``.
 - :attr:`xugrid.Ugrid1.dims` and :attr:`xugrid.Ugrid2.dims` have been added to
-  return a tuple of the UGRID dimensions.
+  return a set of the UGRID dimensions.
+- :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` now uses broadcasts
+  over non-UGRID dimensions and support lazy evaluation.
 
 Changed
 ~~~~~~~

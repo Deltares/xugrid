@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Tuple, Type, Union, cast
+from typing import Dict, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -75,7 +75,7 @@ def align(obj, grids, old_indexes):
     # Group the indexers by grid
     new_grids = []
     for grid in grids:
-        ugrid_dims = set(grid.dims).intersection(new_indexes)
+        ugrid_dims = grid.dims.intersection(new_indexes)
         ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
         newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
         indexers = {
@@ -99,7 +99,7 @@ class AbstractUgrid(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def dims(self) -> Tuple[str]:
+    def dims(self) -> Set[str]:
         pass
 
     @property
@@ -501,6 +501,16 @@ class AbstractUgrid(abc.ABC):
                         "in an invalid topology "
                     )
         return
+
+    def find_ugrid_dim(self, obj: Union[xr.DataArray, xr.Dataset]):
+        """Find the UGRID dimension that is present in the object."""
+        ugrid_dims = self.dims.intersection(obj.dims)
+        if len(ugrid_dims) != 1:
+            raise ValueError(
+                "UgridDataArray should contain exactly one of the UGRID "
+                f"dimensions: {self.dims}"
+            )
+        return ugrid_dims.pop()
 
     def set_node_coords(
         self,
