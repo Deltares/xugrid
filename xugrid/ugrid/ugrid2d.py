@@ -414,7 +414,17 @@ class Ugrid2d(AbstractUgrid):
         return self.face_dimension
 
     @property
-    def dimensions(self):
+    def dims(self):
+        """Tuple of UGRID dimension names: node dimension, edge dimension, face_dimension."""
+        # Tuple to preserve order, unlike set.
+        return (
+            self.node_dimension,
+            self.edge_dimension,
+            self.face_dimension,
+        )
+
+    @property
+    def sizes(self):
         return {
             self.node_dimension: self.n_node,
             self.edge_dimension: self.n_edge,
@@ -1184,17 +1194,15 @@ class Ugrid2d(AbstractUgrid):
             True.
         """
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
-        alldims = set(self.dimensions)
+        alldims = set(self.dims)
         invalid = indexers.keys() - alldims
         if invalid:
             raise ValueError(
                 f"Dimensions {invalid} do not exist. Expected one of {alldims}"
             )
 
-        indexers = {
-            k: as_pandas_index(v, self.dimensions[k]) for k, v in indexers.items()
-        }
-        nodedim, edgedim, facedim = self.dimensions
+        indexers = {k: as_pandas_index(v, self.sizes[k]) for k, v in indexers.items()}
+        nodedim, edgedim, facedim = self.dims
         face_index = {}
         if nodedim in indexers:
             node_index = indexers[nodedim]

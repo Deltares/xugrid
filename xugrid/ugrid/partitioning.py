@@ -156,7 +156,7 @@ def validate_partition_topology(grouped: defaultdict[str, UgridType]) -> None:
                 f"same type, received: {types}"
             )
 
-        griddims = list({tuple(grid.dimensions) for grid in grids})
+        griddims = list({grid.dims for grid in grids})
         if len(griddims) > 1:
             raise ValueError(
                 f"Dimension names on UGRID topology {name} do not match "
@@ -365,7 +365,7 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
 
     # Collect grids
     grids = [grid for p in partitions for grid in p.grids]
-    ugrid_dims = {dim for grid in grids for dim in grid.dimensions}
+    ugrid_dims = {dim for grid in grids for dim in grid.dims}
     grids_by_name = group_grids_by_name(partitions)
 
     data_objects_by_name = group_data_objects_by_gridname(partitions)

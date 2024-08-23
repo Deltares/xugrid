@@ -625,11 +625,11 @@ class _PlotMethods:
         darray = obj.obj
         grid = obj.grid
 
-        invalid = set(darray.dims) - set(grid.dimensions)
+        invalid = set(darray.dims) - set(grid.dims)
         if invalid:
             raise ValueError(
                 f"UgridDataArray contains non-topology dimensions: {invalid}.\n"
-                f"Expected only one of {set(grid.dimensions.keys())}."
+                f"Expected only one of {grid.dims}."
             )
 
         self.grid = grid

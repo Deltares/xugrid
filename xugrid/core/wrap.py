@@ -32,9 +32,9 @@ def maybe_xugrid(obj, topology, old_indexes=None):
 
     # Topology can either be a sequence of grids or a grid.
     if isinstance(topology, (list, set, tuple)):
-        grids = {dim: grid for grid in topology for dim in grid.dimensions}
+        grids = {dim: grid for grid in topology for dim in grid.dims}
     else:
-        grids = {dim: topology for dim in topology.dimensions}
+        grids = {dim: topology for dim in topology.dims}
 
     item_grids = unique_grids([grids[dim] for dim in obj.dims if dim in grids])
 
@@ -183,7 +183,7 @@ class DatasetForwardMixin:
 
 
 def assign_ugrid_coords(obj, grids):
-    grid_dims = ChainMap(*(grid.dimensions for grid in grids))
+    grid_dims = ChainMap(*(grid.sizes for grid in grids))
     ugrid_dims = set(grid_dims.keys()).intersection(obj.dims)
     ugrid_coords = {dim: RangeIndex(0, grid_dims[dim]) for dim in ugrid_dims}
     obj = obj.assign_coords(ugrid_coords)
@@ -385,16 +385,12 @@ class UgridDataset(DatasetForwardMixin):
             # Check if the dimensions occur in self.
             # if they don't, the grid should be added.
             if self.grids is not None:
-                alldims = set(
-                    chain.from_iterable([grid.dimensions for grid in self.grids])
-                )
-                matching_dims = set(value.grid.dimensions).intersection(alldims)
+                alldims = set(chain.from_iterable([grid.dims for grid in self.grids]))
+                matching_dims = set(value.grid.dims).intersection(alldims)
                 if matching_dims:
                     append = False
                     # If they do match: the grids should match.
-                    grids = {
-                        dim: grid for grid in self.grids for dim in grid.dimensions
-                    }
+                    grids = {dim: grid for grid in self.grids for dim in grid.dims}
                     firstdim = next(iter(matching_dims))
                     grid_to_check = grids[firstdim]
                     if not grid_to_check.equals(value.grid):
