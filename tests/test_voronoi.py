@@ -168,7 +168,14 @@ class TestVoronoi:
         assert np.array_equal(actual_j, expected_j)
 
     def test_exterior_vertices(self):
-        _, _, actual_vertices, actual_face, n = voronoi.exterior_vertices(
+        (
+            _,
+            _,
+            actual_vertices,
+            actual_face,
+            n,
+            interpolation_map,
+        ) = voronoi.exterior_vertices(
             self.edge_face_connectivity,
             self.edge_node_connectivity,
             self.fill_value,
@@ -179,25 +186,25 @@ class TestVoronoi:
         assert n == 0
         assert np.allclose(rowsort(actual_vertices), self.exterior_vertices)
         assert np.isin(np.arange(6), actual_face).all()
+        assert interpolation_map is None
 
     def test_voronoi_topology(self):
-        vertices, faces, face_i = voronoi.voronoi_topology(
+        vertices, faces, face_i, _ = voronoi.voronoi_topology(
             self.node_face_connectivity,
             self.vertices,
             self.centroids,
         )
-        actual_faces = connectivity.to_dense(faces, fill_value=-1)
         expected_faces = np.array(
             [
                 [0, 1, 4, 3],
                 [1, 2, 5, 4],
             ]
         )
-        assert actual_faces.shape == (2, 4)
+        assert faces.shape == (2, 4)
         assert np.allclose(rowsort(vertices), self.expected_vertices)
         assert np.array_equal(face_i, [0, 1, 2, 3, 4, 5])
-        assert np.array_equal(actual_faces, expected_faces)
-        assert np.allclose(mesh_area(vertices, actual_faces), 2.0)
+        assert np.array_equal(faces, expected_faces)
+        assert np.allclose(mesh_area(vertices, faces), 2.0)
 
     def test_voronoi_topology__add_exterior(self):
         with pytest.raises(
@@ -210,7 +217,7 @@ class TestVoronoi:
                 add_exterior=True,
             )
 
-        vertices, faces, face_i = voronoi.voronoi_topology(
+        vertices, faces, face_i, _ = voronoi.voronoi_topology(
             self.node_face_connectivity,
             self.vertices,
             self.centroids,
@@ -219,16 +226,15 @@ class TestVoronoi:
             self.fill_value,
             add_exterior=True,
         )
-        actual_faces = connectivity.to_dense(faces, fill_value=-1)
         expected_vertices = rowsort(
             np.concatenate([self.expected_vertices, self.exterior_vertices])
         )
-        assert actual_faces.shape == (12, 4)
+        assert faces.shape == (12, 4)
         assert np.allclose(rowsort(vertices), expected_vertices)
         assert (face_i != -1).all()
-        assert np.allclose(mesh_area(vertices, actual_faces), 5.5)
+        assert np.allclose(mesh_area(vertices, faces), 5.5)
 
-        vertices, faces, face_i = voronoi.voronoi_topology(
+        vertices, faces, face_i, node_interpolation = voronoi.voronoi_topology(
             self.node_face_connectivity,
             self.vertices,
             self.centroids,
@@ -238,15 +244,14 @@ class TestVoronoi:
             add_exterior=True,
             add_vertices=True,
         )
-        actual_faces = connectivity.to_dense(faces, fill_value=-1)
         expected_vertices = rowsort(
             np.concatenate([expected_vertices, self.additional_vertices])
         )
         # This introduces hanging nodes
-        assert actual_faces.shape == (12, 5)
+        assert faces.shape == (12, 5)
         assert np.allclose(rowsort(vertices), expected_vertices)
         assert (face_i == -1).sum() == 10
-        assert np.allclose(mesh_area(vertices, actual_faces), 6.0)
+        assert np.allclose(mesh_area(vertices, faces), 6.0)
 
 
 def test_projected_vertices_on_edge():
@@ -334,3 +339,43 @@ def test_isolated_face():
     voronoi_grid = grid.tesselate_centroidal_voronoi(False, False)
     assert voronoi_grid.n_face == 2
     assert voronoi_grid.n_node == 4
+
+
+def test_concave_voronoi():
+    r"""
+    Three triangles.
+    The lack of a fourth on the creates
+
+    4 (0,2)      5 (3,2)
+         *------------*
+         | \   2    / |
+         |   \    /   |
+         |  1  \/     |
+         |     /\     |
+         |   /    \   |
+         | /   0    \ |
+         *------------*
+    1 (0,0)  3 (1,1)  2 (3,0)
+    """
+    vertices = np.array(
+        [
+            [0.0, 0.0],
+            [3.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 2.0],
+            [3.0, 2.0],
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 2],
+            [0, 2, 3],
+            [2, 4, 3],
+        ]
+    )
+    grid = xu.Ugrid2d(*vertices.T, -1, faces)
+    voronoi_0 = grid.tesselate_centroidal_voronoi(skip_concave=False)
+    voronoi_1 = grid.tesselate_centroidal_voronoi(skip_concave=True)
+    assert voronoi_0.n_face == voronoi_1.n_face
+    assert voronoi_0.n_node == voronoi_1.n_node
+    assert voronoi_0.area.sum() < voronoi_1.area.sum()
