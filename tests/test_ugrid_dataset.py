@@ -1,5 +1,6 @@
 import warnings
 
+import dask
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -386,6 +387,27 @@ class TestUgridDataArray:
         actual = uda2.ugrid.laplace_interpolate(direct_solve=True)
         assert isinstance(actual, xugrid.UgridDataArray)
         assert np.allclose(actual, 1.0)
+
+    def test_broadcasted_laplace_interpolate(self):
+        uda2 = self.uda.copy()
+        uda2.obj[:-2] = np.nan
+        multiplier = xr.DataArray(
+            np.ones((3, 2)),
+            coords={"time": [0, 1, 2], "layer": [1, 2]},
+            dims=("time", "layer"),
+        )
+        nd_uda2 = uda2 * multiplier
+        actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=True)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+        assert set(actual.dims) == set(nd_uda2.dims)
+
+        # Test delayed evaluation too.
+        nd_uda2 = uda2 * multiplier.chunk({"time": 1})
+        actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=True)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert set(actual.dims) == set(nd_uda2.dims)
+        assert isinstance(actual.data, dask.array.Array)
 
     def test_to_dataset(self):
         uda2 = self.uda.copy()

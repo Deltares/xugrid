@@ -156,7 +156,7 @@ def validate_partition_topology(grouped: defaultdict[str, UgridType]) -> None:
                 f"same type, received: {types}"
             )
 
-        griddims = list({grid.dims for grid in grids})
+        griddims = list({tuple(grid.dims) for grid in grids})
         if len(griddims) > 1:
             raise ValueError(
                 f"Dimension names on UGRID topology {name} do not match "

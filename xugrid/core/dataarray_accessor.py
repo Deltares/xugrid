@@ -10,7 +10,11 @@ from xugrid.core.utils import UncachedAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
-from xugrid.ugrid.interpolate import laplace_interpolate, nearest_interpolate
+from xugrid.ugrid.interpolate import (
+    interpolate_na_helper,
+    laplace_interpolate,
+    nearest_interpolate,
+)
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
@@ -587,6 +591,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         Fill in NaNs by interpolating.
 
+        This function automatically finds the UGRID dimension and broadcasts
+        over the other dimensions.
+
         Parameters
         ----------
         method: str, default is "nearest"
@@ -607,13 +614,17 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         grid = self.grid
         da = self.obj
+        ugrid_dim = grid.find_ugrid_dim(da)
 
-        filled = nearest_interpolate(
-            coordinates=grid.get_coordinates(dim=da.dims[0]),
-            data=da.to_numpy(),
-            max_distance=max_distance,
+        da_filled = interpolate_na_helper(
+            da,
+            ugrid_dim=ugrid_dim,
+            func=nearest_interpolate,
+            kwargs={
+                "coordinates": grid.get_coordinates(ugrid_dim),
+                "max_distance": max_distance,
+            },
         )
-        da_filled = da.copy(data=filled)
         return UgridDataArray(da_filled, grid)
 
     def laplace_interpolate(
@@ -628,6 +639,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     ):
         """
         Fill in NaNs by using Laplace interpolation.
+
+        This function automatically finds the UGRID dimension and broadcasts
+        over the other dimensions.
 
         This solves Laplace's equation where where there is no data, with data
         values functioning as fixed potential boundary conditions.
@@ -669,25 +683,29 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         grid = self.grid
         da = self.obj
-        if len(da.dims) > 1:
-            # TODO: apply ufunc
-            raise NotImplementedError
-        if da.dims[0] == grid.edge_dimension:
+
+        grid = self.grid
+        da = self.obj
+        ugrid_dim = grid.find_ugrid_dim(da)
+        if ugrid_dim == grid.edge_dimension:
             raise ValueError("Laplace interpolation along edges is not allowed.")
 
-        connectivity = grid.get_connectivity_matrix(da.dims[0], xy_weights=xy_weights)
-        filled = laplace_interpolate(
-            connectivity=connectivity,
-            data=da.to_numpy(),
-            use_weights=xy_weights,
-            direct_solve=direct_solve,
-            delta=delta,
-            relax=relax,
-            rtol=rtol,
-            atol=atol,
-            maxiter=maxiter,
+        connectivity = grid.get_connectivity_matrix(ugrid_dim, xy_weights=xy_weights)
+        da_filled = interpolate_na_helper(
+            da,
+            ugrid_dim,
+            func=laplace_interpolate,
+            kwargs={
+                "connectivity": connectivity,
+                "use_weights": xy_weights,
+                "direct_solve": direct_solve,
+                "delta": delta,
+                "relax": relax,
+                "rtol": rtol,
+                "atol": atol,
+                "maxiter": maxiter,
+            },
         )
-        da_filled = da.copy(data=filled)
         return UgridDataArray(da_filled, grid)
 
     def to_dataset(self, optional_attributes: bool = False):
