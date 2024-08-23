@@ -312,20 +312,28 @@ def laplace_interpolate(
 def nearest_interpolate(
     coordinates: FloatArray,
     data: FloatArray,
+    max_distance: float,
 ) -> FloatArray:
     isnull = np.isnan(data)
     if isnull.all():
         raise ValueError("All values are NA.")
 
     i_source = np.flatnonzero(~isnull)
+    i_target = np.flatnonzero(isnull)
     source_coordinates = coordinates[i_source]
-    target_coordinates = coordinates[isnull]
+    target_coordinates = coordinates[i_target]
     # Locate the nearest notnull for each null value.
     tree = KDTree(source_coordinates)
-    _, index = tree.query(target_coordinates, workers=-1)
-    # index contains an intex of the target coordinates to the source
+    _, index = tree.query(
+        target_coordinates, distance_upper_bound=max_distance, workers=-1
+    )
+    # Remove entries beyond max distance, returned by .query as self.n.
+    keep = index < len(source_coordinates)
+    index = index[keep]
+    i_target = i_target[keep]
+    # index contains an index of the target coordinates to the source
     # coordinates, not the direct index into the data, so we need an additional
     # indexing step.
     out = data.copy()
-    out[isnull] = data[i_source[index]]
+    out[i_target] = data[i_source[index]]
     return out

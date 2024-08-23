@@ -69,6 +69,7 @@ def ugrid1d_ds():
     )
     ds = grid.to_dataset()
     ds["a1d"] = xr.DataArray([1.0, 2.0, 3.0], dims=[grid.node_dimension])
+    ds["b1d"] = xr.DataArray([1.0, 2.0], dims=[grid.edge_dimension])
     return xugrid.UgridDataset(ds)
 
 
@@ -1262,6 +1263,11 @@ def test_laplace_interpolate_facets():
     with pytest.raises(ValueError, match=msg):
         edge_uda.ugrid.laplace_interpolate(direct_solve=True)
 
+    for uda in (node_uda, edge_uda, face_uda):
+        actual = uda.ugrid.interpolate_na()
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+
 
 def test_laplace_interpolate_1d():
     uda = ugrid1d_ds()["a1d"]
@@ -1270,6 +1276,32 @@ def test_laplace_interpolate_1d():
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
     assert isinstance(actual, xugrid.UgridDataArray)
     assert np.allclose(actual, 1.0)
+
+
+def test_interpolate_na_1d():
+    uda = ugrid1d_ds()["a1d"]
+    with pytest.raises(ValueError, match='"abc" is not a valid interpolator.'):
+        uda.ugrid.interpolate_na(method="abc")
+
+    # Node data
+    uda = ugrid1d_ds()["a1d"]
+    uda[:] = 1.0
+    uda[1] = np.nan
+    actual = uda.ugrid.interpolate_na()
+    assert isinstance(actual, xugrid.UgridDataArray)
+    assert np.allclose(actual, 1.0)
+
+    # Edge data
+    uda = ugrid1d_ds()["b1d"]
+    uda[:] = 1.0
+    uda[1] = np.nan
+    actual = uda.ugrid.interpolate_na()
+    assert isinstance(actual, xugrid.UgridDataArray)
+    assert np.allclose(actual, 1.0)
+
+    # Check max_distance
+    actual = uda.ugrid.interpolate_na(max_distance=0.5)
+    assert np.isnan(actual[1])
 
 
 def test_ugriddataset_wrap_twice(tmp_path):

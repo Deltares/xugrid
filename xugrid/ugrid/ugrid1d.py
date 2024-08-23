@@ -274,6 +274,7 @@ class Ugrid1d(AbstractUgrid):
         }
 
     def get_coordinates(self, dim: str) -> FloatArray:
+        """Return the coordinates for the specified UGRID dimension."""
         if dim == self.node_dimension:
             return self.node_coordinates
         elif dim == self.edge_dimension:
@@ -284,6 +285,7 @@ class Ugrid1d(AbstractUgrid):
             )
 
     def get_connectivity_matrix(self, dim: str, xy_weights: bool):
+        """Return the connectivity matrix for the specified UGRID dimension."""
         if dim == self.node_dimension:
             connectivity = self.node_node_connectivity.copy()
             coordinates = self.node_coordinates

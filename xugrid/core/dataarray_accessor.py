@@ -1,4 +1,4 @@
-from typing import Dict, List, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import scipy.sparse
@@ -582,9 +582,28 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     def interpolate_na(
         self,
         method: str = "nearest",
+        max_distance: Optional[float] = None,
     ):
+        """
+        Fill in NaNs by interpolating.
+
+        Parameters
+        ----------
+        method: str, default is "nearest"
+            Currently the only supported method.
+        max_distance: nonnegative float, optional.
+            Use ``None`` for no maximum distance.
+
+        Returns
+        -------
+        filled: UgridDataArray of floats
+        """
+
         if method != "nearest":
             raise ValueError(f'"{method}" is not a valid interpolator.')
+
+        if max_distance is None:
+            max_distance = np.inf
 
         grid = self.grid
         da = self.obj
@@ -592,6 +611,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         filled = nearest_interpolate(
             coordinates=grid.get_coordinates(dim=da.dims[0]),
             data=da.to_numpy(),
+            max_distance=max_distance,
         )
         da_filled = da.copy(data=filled)
         return UgridDataArray(da_filled, grid)
@@ -607,7 +627,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         maxiter: int = 500,
     ):
         """
-        Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.
+        Fill in NaNs by using Laplace interpolation.
 
         This solves Laplace's equation where where there is no data, with data
         values functioning as fixed potential boundary conditions.
