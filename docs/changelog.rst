@@ -18,6 +18,12 @@ Fixed
   beyond the centroids for structured to structured regridding, and it would
   give nearest results (equal to :class:`CentroidLocatorRegridder`) otherwise.
 
+Changed
+~~~~~~~
+
+- Selection operations such as :meth:`UgridDataArrayAccessor.sel_points` will
+  now also return points that are located on the edges of 2D topologies.
+
 [0.11.2] 2024-08-16
 -------------------
 
