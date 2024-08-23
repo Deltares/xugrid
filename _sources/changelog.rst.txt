@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- The :class:`xugrid.BarycentricInterpolator` now interpolates according to
+  linear weights within the full bounds of the source grid, rather than only
+  within the centroids of the source grid. Previously, it would give no results
+  beyond the centroids for structured to structured regridding, and it would
+  give nearest results (equal to :class:`CentroidLocatorRegridder`) otherwise.
 
 [0.11.2] 2024-08-16
 -------------------
