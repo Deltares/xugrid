@@ -191,7 +191,8 @@ UGRID1D Topology
     Ugrid1d
 
     Ugrid1d.topology_dimension
-    Ugrid1d.dimensions
+    Ugrid1d.dims
+    Ugrid1d.sizes
     Ugrid1d.attrs
     Ugrid1d.coords
 
@@ -253,7 +254,8 @@ UGRID2D Topology
     Ugrid2d
 
     Ugrid2d.topology_dimension
-    Ugrid2d.dimensions
+    Ugrid2d.dims
+    Ugrid2d.sizes
     Ugrid2d.attrs
     Ugrid2d.coords
 

@@ -1046,11 +1046,11 @@ document.write(`
         <span class="n">darray</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">obj</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">grid</span>
 
-        <span class="n">invalid</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">darray</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">invalid</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">darray</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;UgridDataArray contains non-topology dimensions: </span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected only one of </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dimensions</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected only one of </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>

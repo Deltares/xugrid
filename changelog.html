@@ -473,7 +473,8 @@ document.write(`
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.html">xugrid.Ugrid1d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.topology_dimension.html">xugrid.Ugrid1d.topology_dimension</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.dimensions.html">xugrid.Ugrid1d.dimensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.dims.html">xugrid.Ugrid1d.dims</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.sizes.html">xugrid.Ugrid1d.sizes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.attrs.html">xugrid.Ugrid1d.attrs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.coords.html">xugrid.Ugrid1d.coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.n_node.html">xugrid.Ugrid1d.n_node</a></li>
@@ -518,7 +519,8 @@ document.write(`
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.html">xugrid.Ugrid2d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.topology_dimension.html">xugrid.Ugrid2d.topology_dimension</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.dimensions.html">xugrid.Ugrid2d.dimensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.dims.html">xugrid.Ugrid2d.dims</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.sizes.html">xugrid.Ugrid2d.sizes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.attrs.html">xugrid.Ugrid2d.attrs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.coords.html">xugrid.Ugrid2d.coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.n_node.html">xugrid.Ugrid2d.n_node</a></li>
@@ -687,8 +689,10 @@ give nearest results (equal to <a class="reference internal" href="api/xugrid.Ce
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.interpolate_na()</span></code> has been added to fill missing
+<li><p><a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.interpolate_na.html#xugrid.UgridDataArrayAccessor.interpolate_na" title="xugrid.UgridDataArrayAccessor.interpolate_na"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.interpolate_na()</span></code></a> has been added to fill missing
 data. Currently, the only supported method is <code class="docutils literal notranslate"><span class="pre">&quot;nearest&quot;</span></code>.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1.dims</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2.dims</span></code> have been added to
+return a tuple of the UGRID dimensions.</p></li>
 </ul>
 </section>
 <section id="changed">
@@ -696,6 +700,8 @@ data. Currently, the only supported method is <code class="docutils literal notr
 <ul class="simple">
 <li><p>Selection operations such as <code class="xref py py-meth docutils literal notranslate"><span class="pre">UgridDataArrayAccessor.sel_points()</span></code> will
 now also return points that are located on the edges of 2D topologies.</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.dimensions</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.dimensions</span></code> now
+raise a FutureWarning; use <code class="docutils literal notranslate"><span class="pre">.dims</span></code> or <code class="docutils literal notranslate"><span class="pre">.sizes</span></code> instead.</p></li>
 </ul>
 </section>
 </section>
@@ -1313,8 +1319,8 @@ dimension) will also result in a valid selection of the data on another facet
 argument and return a DataArray or Dataset.</p></li>
 <li><p>Consequently, <cite>xugrid.UgridDataArrayAccessor.isel</cite> and
 <cite>xugrid.UgridDatasetAccessor.isel</cite> have been removed.</p></li>
-<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.dimensions.html#xugrid.Ugrid1d.dimensions" title="xugrid.Ugrid1d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.dimensions</span></code></a> and
-<a class="reference internal" href="api/xugrid.Ugrid2d.dimensions.html#xugrid.Ugrid2d.dimensions" title="xugrid.Ugrid2d.dimensions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.dimensions</span></code></a> will now return a dictionary with the
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.dimensions</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.dimensions</span></code> will now return a dictionary with the
 keys the dimension names and as the values the sizes of the dimensions.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid2d.voronoi_topology.html#xugrid.Ugrid2d.voronoi_topology" title="xugrid.Ugrid2d.voronoi_topology"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.voronoi_topology</span></code></a> will now include exterior vertices to
 also generate a valid 2D topology when when “island” faces are present (no

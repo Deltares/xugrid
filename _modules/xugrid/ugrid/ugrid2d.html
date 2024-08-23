@@ -825,7 +825,17 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tuple of UGRID dimension names: node dimension, edge dimension, face_dimension.&quot;&quot;&quot;</span>
+        <span class="c1"># Tuple to preserve order, unlike set.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">,</span>
@@ -1630,17 +1640,15 @@ document.write(`
 <span class="sd">            True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">indexers</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">indexers_kwargs</span><span class="p">,</span> <span class="s2">&quot;isel&quot;</span><span class="p">)</span>
-        <span class="n">alldims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">alldims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">indexers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">alldims</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dimensions </span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2"> do not exist. Expected one of </span><span class="si">{</span><span class="n">alldims</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">as_pandas_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
-        <span class="n">nodedim</span><span class="p">,</span> <span class="n">edgedim</span><span class="p">,</span> <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span>
+        <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">as_pandas_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">nodedim</span><span class="p">,</span> <span class="n">edgedim</span><span class="p">,</span> <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
         <span class="n">face_index</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">nodedim</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">:</span>
             <span class="n">node_index</span> <span class="o">=</span> <span class="n">indexers</span><span class="p">[</span><span class="n">nodedim</span><span class="p">]</span>

@@ -21,14 +21,18 @@ Fixed
 Added
 ~~~~~
 
-- :meth:`UgridDataArrayAccessor.interpolate_na` has been added to fill missing
+- :meth:`xugrid.UgridDataArrayAccessor.interpolate_na` has been added to fill missing
   data. Currently, the only supported method is ``"nearest"``.
+- :attr:`xugrid.Ugrid1.dims` and :attr:`xugrid.Ugrid2.dims` have been added to
+  return a tuple of the UGRID dimensions.
 
 Changed
 ~~~~~~~
 
 - Selection operations such as :meth:`UgridDataArrayAccessor.sel_points` will
   now also return points that are located on the edges of 2D topologies.
+- :attr:`xugrid.Ugrid1d.dimensions` and :attr:`xugrid.Ugrid2d.dimensions` now
+  raise a FutureWarning; use ``.dims`` or ``.sizes`` instead.
 
 [0.11.2] 2024-08-16
 -------------------
