@@ -16,7 +16,13 @@ Fixed
   linear weights within the full bounds of the source grid, rather than only
   within the centroids of the source grid. Previously, it would give no results
   beyond the centroids for structured to structured regridding, and it would
-  give nearest results (equal to :class:`CentroidLocatorRegridder`) otherwise.
+  give nearest results (equal to :class:`xugrid.CentroidLocatorRegridder`) otherwise.
+
+Added
+~~~~~
+
+- :meth:`UgridDataArrayAccessor.interpolate_na` has been added to fill missing
+  data. Currently, the only supported method is ``"nearest"``.
 
 Changed
 ~~~~~~~
