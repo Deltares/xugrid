@@ -676,7 +676,32 @@ document.write(`
     <span class="k">def</span> <span class="nf">dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary for grid coordinates.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="Ugrid1d.get_coordinates">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_coordinates.html#xugrid.Ugrid1d.get_coordinates">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the coordinates for the specified UGRID dimension.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
+        <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ugrid1d.get_connectivity_matrix">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_connectivity_matrix.html#xugrid.Ugrid1d.get_connectivity_matrix">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the connectivity matrix for the specified UGRID dimension.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
@@ -686,7 +711,8 @@ document.write(`
         <span class="k">if</span> <span class="n">xy_weights</span><span class="p">:</span>
             <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_weights</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">connectivity</span>
+        <span class="k">return</span> <span class="n">connectivity</span></div>
+
 
     <span class="c1"># These are all optional attributes. They are not computed by default, only</span>
     <span class="c1"># when called upon.</span>

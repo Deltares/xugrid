@@ -395,7 +395,7 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.core.dataarray_accessor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span>
@@ -407,7 +407,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
 <span class="kn">from</span> <span class="nn">xugrid.plot.plot</span> <span class="kn">import</span> <span class="n">_PlotMethods</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.interpolate</span> <span class="kn">import</span> <span class="n">laplace_interpolate</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.interpolate</span> <span class="kn">import</span> <span class="n">laplace_interpolate</span><span class="p">,</span> <span class="n">nearest_interpolate</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid1d</span> <span class="kn">import</span> <span class="n">Ugrid1d</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
@@ -1044,6 +1044,46 @@ document.write(`
         <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="UgridDataArrayAccessor.interpolate_na">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.interpolate_na.html#xugrid.UgridDataArrayAccessor.interpolate_na">[docs]</a>
+    <span class="k">def</span> <span class="nf">interpolate_na</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+        <span class="n">max_distance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fill in NaNs by interpolating.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method: str, default is &quot;nearest&quot;</span>
+<span class="sd">            Currently the only supported method.</span>
+<span class="sd">        max_distance: nonnegative float, optional.</span>
+<span class="sd">            Use ``None`` for no maximum distance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        filled: UgridDataArray of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">&quot; is not a valid interpolator.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_distance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+
+        <span class="n">filled</span> <span class="o">=</span> <span class="n">nearest_interpolate</span><span class="p">(</span>
+            <span class="n">coordinates</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+            <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">filled</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da_filled</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="UgridDataArrayAccessor.laplace_interpolate">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.laplace_interpolate.html#xugrid.UgridDataArrayAccessor.laplace_interpolate">[docs]</a>
     <span class="k">def</span> <span class="nf">laplace_interpolate</span><span class="p">(</span>
@@ -1057,7 +1097,7 @@ document.write(`
         <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.</span>
+<span class="sd">        Fill in NaNs by using Laplace interpolation.</span>
 
 <span class="sd">        This solves Laplace&#39;s equation where where there is no data, with data</span>
 <span class="sd">        values functioning as fixed potential boundary conditions.</span>
@@ -1105,7 +1145,7 @@ document.write(`
         <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Laplace interpolation along edges is not allowed.&quot;</span><span class="p">)</span>
 
-        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">connectivity_matrix</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">)</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_connectivity_matrix</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">)</span>
         <span class="n">filled</span> <span class="o">=</span> <span class="n">laplace_interpolate</span><span class="p">(</span>
             <span class="n">connectivity</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
