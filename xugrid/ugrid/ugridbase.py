@@ -181,11 +181,15 @@ class AbstractUgrid(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def connectivity_matrix(self, dim: str, xy_weights: bool) -> csr_matrix:
+    def get_connectivity_matrix(self, dim: str, xy_weights: bool) -> csr_matrix:
         pass
 
     @abc.abstractmethod
     def create_data_array(self, data: ArrayLike, facet: str):
+        pass
+
+    @abc.abstractmethod
+    def get_coordinates(self, dim: str):
         pass
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
@@ -403,6 +407,11 @@ class AbstractUgrid(abc.ABC):
     def edge_node_coordinates(self) -> FloatArray:
         """Node coordinates for every edge, shape: ``n_edge, 2, 2``."""
         return self.node_coordinates[self.edge_node_connectivity]
+
+    @property
+    @abc.abstractmethod
+    def coords(self):
+        pass
 
     @property
     def bounds(self) -> Tuple[float, float, float, float]:

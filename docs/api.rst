@@ -127,6 +127,7 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.binary_erosion
     UgridDataArrayAccessor.connected_components
     UgridDataArrayAccessor.reverse_cuthill_mckee
+    UgridDataArrayAccessor.interpolate_na
     UgridDataArrayAccessor.laplace_interpolate
     UgridDataArrayAccessor.to_dataset
     UgridDataArrayAccessor.to_netcdf
@@ -193,6 +194,7 @@ UGRID1D Topology
     Ugrid1d.dims
     Ugrid1d.sizes
     Ugrid1d.attrs
+    Ugrid1d.coords
 
     Ugrid1d.n_node
     Ugrid1d.node_dimension
@@ -200,6 +202,7 @@ UGRID1D Topology
     Ugrid1d.set_node_coords
     Ugrid1d.assign_node_coords
     Ugrid1d.assign_edge_coords
+    Ugrid1d.get_coordinates
 
     Ugrid1d.n_edge
     Ugrid1d.edge_dimension
@@ -212,6 +215,7 @@ UGRID1D Topology
 
     Ugrid1d.node_edge_connectivity
     Ugrid1d.node_node_connectivity
+    Ugrid1d.get_connectivity_matrix
 
     Ugrid1d.copy
     Ugrid1d.rename
@@ -253,6 +257,7 @@ UGRID2D Topology
     Ugrid2d.dims
     Ugrid2d.sizes
     Ugrid2d.attrs
+    Ugrid2d.coords
 
     Ugrid2d.n_node
     Ugrid2d.node_dimension
@@ -261,6 +266,7 @@ UGRID2D Topology
     Ugrid2d.assign_node_coords
     Ugrid2d.assign_edge_coords
     Ugrid2d.assign_face_coords
+    Ugrid2d.get_coordinates
 
     Ugrid2d.n_edge
     Ugrid2d.edge_dimension
@@ -289,6 +295,7 @@ UGRID2D Topology
     Ugrid2d.edge_node_connectivity
     Ugrid2d.face_edge_connectivity
     Ugrid2d.face_face_connectivity
+    Ugrid2d.get_connectivity_matrix
     
     Ugrid2d.validate_edge_node_connectivity
 

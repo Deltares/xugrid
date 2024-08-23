@@ -161,6 +161,11 @@ def test_ugrid2d_properties():
     assert are_nan[2:, -1:, :].all()
     assert not are_nan[:, :-1, :].any()
     assert isinstance(grid.attrs, dict)
+    coords = grid.coords
+    assert isinstance(coords, dict)
+    assert np.array_equal(coords[grid.node_dimension], grid.node_coordinates)
+    assert np.array_equal(coords[grid.edge_dimension], grid.edge_coordinates)
+    assert np.array_equal(coords[grid.face_dimension], grid.face_coordinates)
 
 
 def test_validate_edge_node_connectivity():
@@ -503,18 +508,31 @@ def test_connectivity_matrix():
     with pytest.raises(
         ValueError, match="Expected mesh2d_nNodes or mesh2d_nFaces; got: mesh2d_nEdges"
     ):
-        grid.connectivity_matrix(dim=grid.edge_dimension, xy_weights=False)
+        grid.get_connectivity_matrix(dim=grid.edge_dimension, xy_weights=False)
 
-    connectivity = grid.connectivity_matrix(grid.face_dimension, xy_weights=True)
+    connectivity = grid.get_connectivity_matrix(grid.face_dimension, xy_weights=True)
     assert isinstance(connectivity, sparse.csr_matrix)
     assert np.array_equal(connectivity.indices, [1, 2, 0, 3, 0, 3, 1, 2])
 
-    connectivity = grid.connectivity_matrix(grid.node_dimension, xy_weights=True)
+    connectivity = grid.get_connectivity_matrix(grid.node_dimension, xy_weights=True)
     assert isinstance(connectivity, sparse.csr_matrix)
     assert np.array_equal(
         connectivity.indices,
         [1, 3, 0, 2, 4, 1, 5, 0, 4, 6, 1, 3, 5, 6, 2, 4, 6, 3, 4, 5],
     )
+
+
+def test_get_coordinates():
+    grid = grid2d()
+    with pytest.raises(
+        ValueError,
+        match="Expected mesh2d_nNodes, mesh2d_nEdges, or mesh2d_nFaces; got: abc",
+    ):
+        grid.get_coordinates(dim="abc")
+
+    assert isinstance(grid.get_coordinates(grid.node_dimension), np.ndarray)
+    assert isinstance(grid.get_coordinates(grid.edge_dimension), np.ndarray)
+    assert isinstance(grid.get_coordinates(grid.face_dimension), np.ndarray)
 
 
 def test_voronoi_topology():

@@ -105,6 +105,11 @@ def test_ugrid1d_properties():
     assert np.allclose(actual_coords, expected_coords)
     assert isinstance(grid.attrs, dict)
 
+    coords = grid.coords
+    assert isinstance(coords, dict)
+    assert np.array_equal(coords[grid.node_dimension], grid.node_coordinates)
+    assert np.array_equal(coords[grid.edge_dimension], grid.edge_coordinates)
+
 
 def test_ugrid1d_egde_bounds():
     grid = grid1d()
@@ -446,7 +451,7 @@ def test_contract_vertices():
     assert np.array_equal(new.edge_node_connectivity, [[0, 1]])
 
 
-def test_connectivity_matrix():
+def test_get_connectivity_matrix():
     xy = np.array(
         [
             [0.0, 0.0],
@@ -461,12 +466,35 @@ def test_connectivity_matrix():
         edge_node_connectivity=np.array([[0, 1], [1, 2]]),
     )
     with pytest.raises(ValueError, match="Expected network1d_nNodes; got: abc"):
-        grid.connectivity_matrix(dim="abc", xy_weights=True)
+        grid.get_connectivity_matrix(dim="abc", xy_weights=True)
 
-    connectivity = grid.connectivity_matrix(grid.node_dimension, True)
+    connectivity = grid.get_connectivity_matrix(grid.node_dimension, True)
     assert isinstance(connectivity, sparse.csr_matrix)
     assert np.allclose(connectivity.data, [1.5, 1.5, 0.75, 0.75])
     assert np.array_equal(connectivity.indices, [1, 0, 2, 1])
+
+
+def test_get_coordinates():
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [3.0, 0.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2]]),
+    )
+    with pytest.raises(
+        ValueError, match="Expected network1d_nNodes or network1d_nEdges; got: abc"
+    ):
+        grid.get_coordinates(dim="abc")
+
+    assert isinstance(grid.get_coordinates(grid.node_dimension), np.ndarray)
+    assert isinstance(grid.get_coordinates(grid.edge_dimension), np.ndarray)
 
 
 def test_equals():
