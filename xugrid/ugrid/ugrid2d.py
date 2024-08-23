@@ -415,6 +415,7 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def dims(self):
+        """Tuple of UGRID dimension names: node dimension, edge dimension, face_dimension."""
         # Tuple to preserve order, unlike set.
         return (
             self.node_dimension,

@@ -263,6 +263,7 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def dims(self):
+        """Tuple of UGRID dimension names: node dimension, edge dimension."""
         # Tuple to preserve order, unlike set.
         return (self.node_dimension, self.edge_dimension)
 
