@@ -543,15 +543,19 @@ def test_voronoi_topology():
     )
     expected_vertices = np.vstack([CENTROIDS, expected_exterior])
     assert np.allclose(vertices, expected_vertices)
-    assert isinstance(faces, sparse.coo_matrix)
-    expected_row = np.array(
-        [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6]
+    assert isinstance(faces, np.ndarray)
+    expected_faces = np.array(
+        [
+            [0, 1, 3, 2],
+            [4, 0, 5, -1],
+            [4, 6, 1, 0],
+            [6, 7, 1, -1],
+            [5, 0, 2, 8],
+            [1, 7, 9, 3],
+            [2, 3, 9, 8],
+        ]
     )
-    expected_col = np.array(
-        [0, 1, 3, 2, 4, 0, 5, 4, 6, 1, 0, 6, 7, 1, 5, 0, 2, 8, 1, 7, 9, 3, 2, 3, 9, 8]
-    )
-    assert np.array_equal(faces.row, expected_row)
-    assert np.array_equal(faces.col, expected_col)
+    assert np.array_equal(faces, expected_faces)
     assert np.array_equal(face_index, [0, 1, 2, 3, 0, 0, 1, 1, 2, 3])
 
 
@@ -657,8 +661,8 @@ def test_rasterize():
     x, y, index = grid.rasterize(resolution=0.5)
     expected_index = np.array(
         [
-            [-1, 2, -1, -1],
-            [2, 2, 3, -1],
+            [-1, 2, 3, -1],
+            [2, 2, 3, 3],
             [0, 0, 1, 1],
             [0, 0, 1, 1],
         ]
@@ -672,8 +676,8 @@ def test_rasterize():
     x, y, index = grid.rasterize(resolution=0.5, bounds=bounds)
     expected_index = np.array(
         [
-            [-1, -1, -1, 2, -1, -1],
-            [-1, -1, 2, 2, 3, -1],
+            [-1, -1, -1, 2, 3, -1],
+            [-1, -1, 2, 2, 3, 3],
             [-1, -1, 0, 0, 1, 1],
             [-1, -1, 0, 0, 1, 1],
             [-1, -1, -1, -1, -1, -1],

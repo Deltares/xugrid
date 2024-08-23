@@ -775,7 +775,7 @@ class Ugrid2d(AbstractUgrid):
         face_index: 1d array of integers
         """
         if self._voronoi_topology is None:
-            vertices, faces, face_index = voronoi_topology(
+            vertices, faces, face_index, _ = voronoi_topology(
                 self.node_face_connectivity,
                 self.node_coordinates,
                 self.centroids,
@@ -1855,7 +1855,7 @@ class Ugrid2d(AbstractUgrid):
         )
         return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
 
-    def _tesselate_voronoi(self, centroids, add_exterior, add_vertices):
+    def _tesselate_voronoi(self, centroids, add_exterior, add_vertices, skip_concave):
         if add_exterior:
             edge_face_connectivity = self.edge_face_connectivity
             edge_node_connectivity = self.edge_node_connectivity
@@ -1863,7 +1863,7 @@ class Ugrid2d(AbstractUgrid):
             edge_face_connectivity = None
             edge_node_connectivity = None
 
-        vertices, faces, _ = voronoi_topology(
+        vertices, faces, _, _ = voronoi_topology(
             self.node_face_connectivity,
             self.node_coordinates,
             centroids,
@@ -1872,11 +1872,13 @@ class Ugrid2d(AbstractUgrid):
             self.fill_value,
             add_exterior,
             add_vertices,
+            skip_concave,
         )
-        faces = connectivity.to_dense(faces, self.fill_value)
         return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
 
-    def tesselate_centroidal_voronoi(self, add_exterior=True, add_vertices=True):
+    def tesselate_centroidal_voronoi(
+        self, add_exterior=True, add_vertices=True, skip_concave=False
+    ):
         """
         Create a centroidal Voronoi tesselation of this UGRID2D topology.
 
@@ -1888,14 +1890,19 @@ class Ugrid2d(AbstractUgrid):
         ----------
         add_exterior: bool, default: True
         add_vertices: bool, default: True
+        skip_concave: bool, default: False
 
         Returns
         -------
         tesselation: Ugrid2d
         """
-        return self._tesselate_voronoi(self.centroids, add_exterior, add_vertices)
+        return self._tesselate_voronoi(
+            self.centroids, add_exterior, add_vertices, skip_concave
+        )
 
-    def tesselate_circumcenter_voronoi(self, add_exterior=True, add_vertices=True):
+    def tesselate_circumcenter_voronoi(
+        self, add_exterior=True, add_vertices=True, skip_concave=False
+    ):
         """
         Create a circumcenter Voronoi tesselation of this UGRID2D topology.
 
@@ -1907,12 +1914,15 @@ class Ugrid2d(AbstractUgrid):
         ----------
         add_exterior: bool, default: True
         add_vertices: bool, default: True
+        skip_concave: bool, default: False
 
         Returns
         -------
         tesselation: Ugrid2d
         """
-        return self._tesselate_voronoi(self.circumcenters, add_exterior, add_vertices)
+        return self._tesselate_voronoi(
+            self.circumcenters, add_exterior, add_vertices, skip_concave
+        )
 
     def reverse_cuthill_mckee(self, dimension=None):
         """

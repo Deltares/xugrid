@@ -133,14 +133,13 @@ vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
 
 node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
+voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
     add_exterior=False,
     add_vertices=False,
 )
-voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 # %%
 # We can compare the two meshes:
@@ -163,7 +162,7 @@ edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
     faces, -1
 )
 edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
-voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
+voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
@@ -173,7 +172,6 @@ voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=True,
 )
-voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
@@ -197,7 +195,7 @@ edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
     faces, -1
 )
 edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
-voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
+voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
@@ -207,7 +205,6 @@ voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=True,
 )
-voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
@@ -225,7 +222,7 @@ edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
     faces, -1
 )
 edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
-voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
+voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
@@ -235,25 +232,44 @@ voronoi_vertices, voronoi_faces, face_index = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=False,
 )
-voronoi_faces = connectivity.to_dense(voronoi_faces, -1)
 
 comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 
 # %%
 # This will (obviously) result in a mesh that does not preserve the exterior
-# exactly.
-#
-# These are the three options, side by side:
+# exactly. Alternatively, we can choose to skip the exterior vertex if it
+# creates a concave face:
 
-nodes0, faces0, face_index0 = voronoi.voronoi_topology(
+node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
+edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
+    faces, -1
+)
+edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
+    node_face_connectivity,
+    vertices,
+    centroids,
+    edge_face_connectivity=edge_face_connectivity,
+    edge_node_connectivity=edge_node_connectivity,
+    fill_value=-1,
+    add_exterior=True,
+    add_vertices=True,
+    skip_concave=True,
+)
+
+comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
+
+# %%
+# These are the four options, side by side:
+
+nodes0, faces0, face_index0, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
 )
-faces0 = connectivity.to_dense(faces0, -1)
 edges0, _ = connectivity.edge_connectivity(faces0, -1)
 
-nodes1, faces1, face_index1 = voronoi.voronoi_topology(
+nodes1, faces1, face_index1, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
@@ -263,10 +279,9 @@ nodes1, faces1, face_index1 = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=False,
 )
-faces1 = connectivity.to_dense(faces1, -1)
 edges1, _ = connectivity.edge_connectivity(faces1, -1)
 
-nodes2, faces2, _ = voronoi.voronoi_topology(
+nodes2, faces2, _, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
     centroids,
@@ -276,20 +291,31 @@ nodes2, faces2, _ = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=True,
 )
-faces2 = connectivity.to_dense(faces2, -1)
 edges2, _ = connectivity.edge_connectivity(faces2, -1)
 
+nodes3, faces3, face_index3, node_map3 = voronoi.voronoi_topology(
+    node_face_connectivity,
+    vertices,
+    centroids,
+    edge_face_connectivity=edge_face_connectivity,
+    edge_node_connectivity=edge_node_connectivity,
+    fill_value=-1,
+    add_exterior=True,
+    add_vertices=True,
+    skip_concave=True,
+)
+edges3, _ = connectivity.edge_connectivity(faces3, -1)
 
 fig, axes = plt.subplots(
     nrows=1,
-    ncols=3,
-    figsize=(15, 5),
+    ncols=4,
+    figsize=(20, 5),
     subplot_kw={"box_aspect": 1},
     sharey=True,
     sharex=True,
 )
-all_edges = [edges0, edges1, edges2]
-all_nodes = [nodes0, nodes1, nodes2]
+all_edges = [edges0, edges1, edges2, edges3]
+all_nodes = [nodes0, nodes1, nodes2, nodes3]
 for ax, e, v in zip(axes, all_edges, all_nodes):
     edge_plot(v, e, ax, colors="red")
     ax.scatter(*centroids.T, color="red")
@@ -312,9 +338,9 @@ data = centroids[:, 0] + centroids[:, 1]
 # Before we can send the data of an unstructured mesh off to a plotting library
 # such as ``matplotlib``, we'll generally need to triangulate the mesh. We can
 # directly use the first two options, since the generated voronoi vertices
-# correspond directly to a cell face. This is not the case for the third option,
-# since it includes some vertices of the original mesh, which are connected to
-# two faces.
+# correspond directly to a cell face. This is not the case for the third or
+# fourth option, since it includes some vertices of the original mesh, which
+# are connected to multiple faces.
 
 triangles0, face_triangles0 = connectivity.triangulate(faces0, -1)
 triangulation0 = mtri.Triangulation(nodes0[:, 0], nodes0[:, 1], triangles0)
