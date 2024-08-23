@@ -41,7 +41,7 @@ def test_labels_to_indices():
 
 def test_single_ugrid_chunk():
     grid = generate_mesh_2d(3, 3)
-    ugrid_dims = set(grid.dimensions)
+    ugrid_dims = set(grid.dims)
     da = xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,))
     assert pt.single_ugrid_chunk(da, ugrid_dims) is da
 

@@ -268,10 +268,13 @@ def test_dimensions():
     grid = grid1d()
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
-    assert grid.dimensions == {
+    assert grid.dims == (f"{NAME}_nNodes", f"{NAME}_nEdges")
+    assert grid.sizes == {
         f"{NAME}_nNodes": 3,
         f"{NAME}_nEdges": 2,
     }
+    with pytest.warns(FutureWarning):
+        assert grid.dimensions == grid.sizes
 
 
 @requires_meshkernel

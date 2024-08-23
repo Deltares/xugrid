@@ -262,7 +262,12 @@ class Ugrid1d(AbstractUgrid):
         return self.node_dimension
 
     @property
-    def dimensions(self):
+    def dims(self):
+        # Tuple to preserve order, unlike set.
+        return (self.node_dimension, self.edge_dimension)
+
+    @property
+    def sizes(self):
         return {self.node_dimension: self.n_node, self.edge_dimension: self.n_edge}
 
     def connectivity_matrix(self, dim: str, xy_weights: bool):
@@ -432,17 +437,15 @@ class Ugrid1d(AbstractUgrid):
             their respective index. Only returned if return_index is True.
         """
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
-        alldims = set(self.dimensions)
+        alldims = self.dims
         invalid = indexers.keys() - alldims
         if invalid:
             raise ValueError(
                 f"Dimensions {invalid} do not exist. Expected one of {alldims}"
             )
 
-        indexers = {
-            k: as_pandas_index(v, self.dimensions[k]) for k, v in indexers.items()
-        }
-        nodedim, edgedim = self.dimensions
+        indexers = {k: as_pandas_index(v, self.sizes[k]) for k, v in indexers.items()}
+        nodedim, edgedim = self.dims
         edge_index = {}
         if nodedim in indexers:
             node_index = indexers[nodedim]

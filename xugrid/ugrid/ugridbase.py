@@ -1,7 +1,8 @@
 import abc
 import copy
+import warnings
 from itertools import chain
-from typing import Tuple, Type, Union, cast
+from typing import Dict, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -60,9 +61,9 @@ def align(obj, grids, old_indexes):
     if old_indexes is None:
         return obj, grids
 
-    ugrid_dims = set(
-        chain.from_iterable(grid.dimensions for grid in grids)
-    ).intersection(old_indexes)
+    ugrid_dims = set(chain.from_iterable(grid.dims for grid in grids)).intersection(
+        old_indexes
+    )
     new_indexes = {
         k: index
         for k, index in obj.indexes.items()
@@ -74,7 +75,7 @@ def align(obj, grids, old_indexes):
     # Group the indexers by grid
     new_grids = []
     for grid in grids:
-        ugrid_dims = set(grid.dimensions).intersection(new_indexes)
+        ugrid_dims = set(grid.dims).intersection(new_indexes)
         ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
         newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
         indexers = {
@@ -98,7 +99,29 @@ class AbstractUgrid(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def dimensions(self):
+    def dims(self) -> Tuple[str]:
+        pass
+
+    @property
+    def dimensions(self) -> Dict[str, Dict[str, str]]:
+        """
+        Mapping from UGRID dimension names to lengths.
+
+        This property will be changed to return a type more consistent with
+        DataArray.dims in the future, i.e. a set of dimension names.
+        """
+
+        warnings.warn(
+            ".dimensions will is replaced by .dims and its return type is a set "
+            "of dimension names in future. To access a mapping of names to "
+            "lengths, use .sizes instead.",
+            FutureWarning,
+        )
+        return self.sizes
+
+    @property
+    @abc.abstractmethod
+    def sizes(self):
         pass
 
     @property
@@ -175,7 +198,7 @@ class AbstractUgrid(abc.ABC):
                 f"Data has {data.ndim} dimensions."
             )
         len_data = len(data)
-        len_grid = self.dimensions[dimension]
+        len_grid = self.sizes[dimension]
         if len_data != len_grid:
             raise ValueError(
                 f"Conflicting sizes for dimension {dimension}: length "
@@ -341,10 +364,6 @@ class AbstractUgrid(abc.ABC):
     @property
     def max_connectivity_sizes(self) -> dict[str, int]:
         return {}
-
-    @property
-    def sizes(self) -> dict[str, int]:
-        return self.dimensions
 
     @property
     def node_coordinates(self) -> FloatArray:

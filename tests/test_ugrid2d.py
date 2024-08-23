@@ -444,11 +444,18 @@ def test_dimensions():
     assert grid.node_dimension == f"{NAME}_nNodes"
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.face_dimension == f"{NAME}_nFaces"
-    assert grid.dimensions == {
+    assert grid.dims == (
+        f"{NAME}_nNodes",
+        f"{NAME}_nEdges",
+        f"{NAME}_nFaces",
+    )
+    assert grid.sizes == {
         f"{NAME}_nNodes": 7,
         f"{NAME}_nEdges": 10,
         f"{NAME}_nFaces": 4,
     }
+    with pytest.warns(FutureWarning):
+        assert grid.dimensions == grid.sizes
 
 
 def test_edge_node_connectivity():
