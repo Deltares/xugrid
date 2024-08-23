@@ -553,7 +553,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;same type, received: </span><span class="si">{</span><span class="n">types</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">griddims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="n">grid</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">})</span>
+        <span class="n">griddims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="nb">tuple</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">})</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">griddims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dimension names on UGRID topology </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> do not match &quot;</span>

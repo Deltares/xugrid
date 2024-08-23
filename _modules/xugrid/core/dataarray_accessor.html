@@ -407,7 +407,11 @@ document.write(`
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
 <span class="kn">from</span> <span class="nn">xugrid.plot.plot</span> <span class="kn">import</span> <span class="n">_PlotMethods</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.interpolate</span> <span class="kn">import</span> <span class="n">laplace_interpolate</span><span class="p">,</span> <span class="n">nearest_interpolate</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.interpolate</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">interpolate_na_helper</span><span class="p">,</span>
+    <span class="n">laplace_interpolate</span><span class="p">,</span>
+    <span class="n">nearest_interpolate</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid1d</span> <span class="kn">import</span> <span class="n">Ugrid1d</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
@@ -1054,6 +1058,9 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fill in NaNs by interpolating.</span>
 
+<span class="sd">        This function automatically finds the UGRID dimension and broadcasts</span>
+<span class="sd">        over the other dimensions.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        method: str, default is &quot;nearest&quot;</span>
@@ -1074,13 +1081,17 @@ document.write(`
 
         <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
         <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">ugrid_dim</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">find_ugrid_dim</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
 
-        <span class="n">filled</span> <span class="o">=</span> <span class="n">nearest_interpolate</span><span class="p">(</span>
-            <span class="n">coordinates</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-            <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span>
+        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">interpolate_na_helper</span><span class="p">(</span>
+            <span class="n">da</span><span class="p">,</span>
+            <span class="n">ugrid_dim</span><span class="o">=</span><span class="n">ugrid_dim</span><span class="p">,</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">nearest_interpolate</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">ugrid_dim</span><span class="p">),</span>
+                <span class="s2">&quot;max_distance&quot;</span><span class="p">:</span> <span class="n">max_distance</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
-        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">filled</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da_filled</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 
@@ -1098,6 +1109,9 @@ document.write(`
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fill in NaNs by using Laplace interpolation.</span>
+
+<span class="sd">        This function automatically finds the UGRID dimension and broadcasts</span>
+<span class="sd">        over the other dimensions.</span>
 
 <span class="sd">        This solves Laplace&#39;s equation where where there is no data, with data</span>
 <span class="sd">        values functioning as fixed potential boundary conditions.</span>
@@ -1139,25 +1153,29 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
         <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="c1"># TODO: apply ufunc</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
+
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">ugrid_dim</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">find_ugrid_dim</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ugrid_dim</span> <span class="o">==</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Laplace interpolation along edges is not allowed.&quot;</span><span class="p">)</span>
 
-        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_connectivity_matrix</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">)</span>
-        <span class="n">filled</span> <span class="o">=</span> <span class="n">laplace_interpolate</span><span class="p">(</span>
-            <span class="n">connectivity</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-            <span class="n">use_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">,</span>
-            <span class="n">direct_solve</span><span class="o">=</span><span class="n">direct_solve</span><span class="p">,</span>
-            <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
-            <span class="n">relax</span><span class="o">=</span><span class="n">relax</span><span class="p">,</span>
-            <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
-            <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span>
-            <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_connectivity_matrix</span><span class="p">(</span><span class="n">ugrid_dim</span><span class="p">,</span> <span class="n">xy_weights</span><span class="o">=</span><span class="n">xy_weights</span><span class="p">)</span>
+        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">interpolate_na_helper</span><span class="p">(</span>
+            <span class="n">da</span><span class="p">,</span>
+            <span class="n">ugrid_dim</span><span class="p">,</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">laplace_interpolate</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;connectivity&quot;</span><span class="p">:</span> <span class="n">connectivity</span><span class="p">,</span>
+                <span class="s2">&quot;use_weights&quot;</span><span class="p">:</span> <span class="n">xy_weights</span><span class="p">,</span>
+                <span class="s2">&quot;direct_solve&quot;</span><span class="p">:</span> <span class="n">direct_solve</span><span class="p">,</span>
+                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">delta</span><span class="p">,</span>
+                <span class="s2">&quot;relax&quot;</span><span class="p">:</span> <span class="n">relax</span><span class="p">,</span>
+                <span class="s2">&quot;rtol&quot;</span><span class="p">:</span> <span class="n">rtol</span><span class="p">,</span>
+                <span class="s2">&quot;atol&quot;</span><span class="p">:</span> <span class="n">atol</span><span class="p">,</span>
+                <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="n">maxiter</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
-        <span class="n">da_filled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">filled</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">da_filled</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 

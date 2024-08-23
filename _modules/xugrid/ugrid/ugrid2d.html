@@ -826,13 +826,12 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tuple of UGRID dimension names: node dimension, edge dimension, face_dimension.&quot;&quot;&quot;</span>
-        <span class="c1"># Tuple to preserve order, unlike set.</span>
-        <span class="k">return</span> <span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of UGRID dimension names: node dimension, edge dimension, face_dimension.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1648,7 +1647,10 @@ document.write(`
             <span class="p">)</span>
 
         <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">as_pandas_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="n">nodedim</span><span class="p">,</span> <span class="n">edgedim</span><span class="p">,</span> <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
+        <span class="n">nodedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span>
+        <span class="n">edgedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span>
+        <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span>
+
         <span class="n">face_index</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">nodedim</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">:</span>
             <span class="n">node_index</span> <span class="o">=</span> <span class="n">indexers</span><span class="p">[</span><span class="n">nodedim</span><span class="p">]</span>
