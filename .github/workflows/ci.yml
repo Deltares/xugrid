@@ -60,6 +60,9 @@ jobs:
         run: pixi run test
       - name: Publish Code Coverage
         uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
       - name: Build Docs
         run: pixi run docs
       - name: Deploy to Github Pages
