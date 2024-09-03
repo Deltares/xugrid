@@ -35,6 +35,9 @@ Changed
   now also return points that are located on the edges of 2D topologies.
 - :attr:`xugrid.Ugrid1d.dimensions` and :attr:`xugrid.Ugrid2d.dimensions` now
   raise a FutureWarning; use ``.dims`` or ``.sizes`` instead.
+- Improved performance of :func:`xugrid.open_dataset` and
+  :func:`xugrid.merge_partitions` when handling datasets with a large number
+  of variables (>100).
 
 [0.11.2] 2024-08-16
 -------------------
