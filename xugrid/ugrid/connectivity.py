@@ -18,6 +18,39 @@ def argsort_rows(array: np.ndarray) -> IntArray:
     return np.argsort(arr1d)
 
 
+def unique_rows(ar, return_index=False, return_inverse=False, return_counts=False):
+    # We change the array into a 1D void type array.
+    # numpy.unique does the following internally for axis=0 in a 2D array:
+    #
+    #    dtype = [('f{i}'.format(i=i), ar.dtype) for i in range(ar.shape[1])]
+    #    consolidated = ar.view(dtype).flatten()
+    #
+    # Which essentially results in a lexsort. By changing to a void type, we
+    # "blind" np.unique, and a lot less sorting is required. That's always
+    # faster, up to 2-6 times.
+
+    def to_flat_void(ar2d):
+        nbytes = ar2d.itemsize * ar2d.shape[1]
+        dtype = np.dtype((np.void, nbytes))
+        return ar2d.view(dtype).ravel()
+
+    def from_flat_void(ar1d, ar2d):
+        return ar1d.view(ar2d.dtype).reshape((-1, ar2d.shape[1]))
+
+    consolidated = to_flat_void(ar)
+    result = np.unique(
+        consolidated,
+        return_index=return_index,
+        return_inverse=return_inverse,
+        return_counts=return_counts,
+    )
+
+    if isinstance(result, tuple):
+        return (from_flat_void(result[0], ar),) + result[1:]
+    else:
+        return from_flat_void(result, ar)
+
+
 def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
     """Return the index that would transform xy_a into xy_b."""
     if xy_a.shape != xy_b.shape:
@@ -433,13 +466,12 @@ def edge_connectivity(
     ]
     # Now find the unique rows == unique edges
     edge_node_connectivity.sort(axis=1)
-    edge_node_connectivity, inverse_indices = np.unique(
-        ar=edge_node_connectivity, return_inverse=True, axis=0
+    edge_node_connectivity, inverse_indices = unique_rows(
+        ar=edge_node_connectivity, return_inverse=True
     )
-    inverse_indices = inverse_indices.ravel()
 
     if prior is not None:  # prior edge_node_connectivity exists
-        unique, index = np.unique(np.sort(prior, axis=1), axis=0, return_index=True)
+        unique, index = unique_rows(np.sort(prior, axis=1), return_index=True)
         # Check whether everything looks okay:
         if not np.array_equal(unique, edge_node_connectivity):
             raise ValueError(

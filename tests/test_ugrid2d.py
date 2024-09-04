@@ -1436,8 +1436,8 @@ class TestPeriodicGridConversion:
             expected_vertices,
         )
         assert np.array_equal(
-            new.edge_node_connectivity,
-            expected_edges,
+            np.unique(np.sort(new.edge_node_connectivity, axis=1), axis=0),
+            np.unique(np.sort(expected_edges, axis=1), axis=0),
         )
         # Remove nodes (3 & 7 & 11) and edges (6 & 13)
         expected_a = np.arange(grid.n_node).tolist()
@@ -1458,7 +1458,10 @@ class TestPeriodicGridConversion:
             expected_faces,
         )
         assert np.allclose(new.node_coordinates, expected_vertices)
-        assert np.array_equal(new.edge_node_connectivity, expected_edges)
+        assert np.array_equal(
+            np.unique(np.sort(new.edge_node_connectivity, axis=1), axis=0),
+            np.unique(np.sort(expected_edges, axis=1), axis=0),
+        )
 
     def test_to_nonperiodic(self):
         grid = self.grid.copy()

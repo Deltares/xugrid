@@ -26,6 +26,7 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.connectivity import unique_rows
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 from xugrid.ugrid.voronoi import voronoi_topology
 
@@ -1658,10 +1659,9 @@ class Ugrid2d(AbstractUgrid):
         # Discard the rightmost nodes. Preserve the order in the faces, and the
         # order of the nodes.
         coordinates[is_right, 0] = xmin
-        _, node_index, inverse = np.unique(
-            coordinates, return_index=True, return_inverse=True, axis=0
+        _, node_index, inverse = unique_rows(
+            coordinates, return_index=True, return_inverse=True
         )
-        inverse = inverse.ravel()
         # Create a mapping of the inverse index to the new node index.
         new_index = connectivity.renumber(node_index)
         new_faces = new_index[inverse[self.face_node_connectivity]]
@@ -1675,7 +1675,7 @@ class Ugrid2d(AbstractUgrid):
         if self._edge_node_connectivity is not None:
             new_edges = inverse[self.edge_node_connectivity]
             new_edges.sort(axis=1)
-            _, edge_index = np.unique(new_edges, axis=0, return_index=True)
+            _, edge_index = unique_rows(new_edges, return_index=True)
             edge_index.sort()
             new_edges = new_index[new_edges][edge_index]
 

@@ -23,7 +23,7 @@ def line():
 @pytest.fixture(scope="function")
 def line_gdf():
     x = np.array([0.0, 1.0, 2.0])
-    y = np.array([0.0, 0.0, 0.0])
+    y = np.array([13.0, 12.0, 11.0])
     gdf = gpd.GeoDataFrame(geometry=[shapely.linestrings(x, y)])
     return gdf
 
@@ -91,20 +91,34 @@ def test_nodes_geos_roundtrip(line):
 
 
 def test_linestrings_to_edges(line_gdf):
-    x, y, segments = cv.linestrings_to_edges(line_gdf.geometry.values)
-    assert np.allclose(x, [0.0, 1.0, 2.0])
-    assert np.allclose(y, [0.0, 0.0, 0.0])
-    assert np.array_equal(segments, [[0, 1], [1, 2]])
+    geometry = line_gdf.geometry.to_numpy()
+    expected = np.array([[[0.0, 13.0], [1.0, 12.0]], [[1.0, 12.0], [2.0, 11.0]]])
+    x, y, c = cv.linestrings_to_edges(geometry)
+    xy = np.column_stack((x, y))
+    assert np.allclose(np.unique(x), [0.0, 1.0, 2.0])
+    assert np.allclose(np.unique(y), [11.0, 12.0, 13.0])
+    assert np.array_equal(xy[c], expected)
+
+    # Flip the line orientation around
+    coords = shapely.get_coordinates(geometry)[::-1]
+    geometry = shapely.linestrings([coords])
+    expected = expected[::-1, ::-1]
+    x, y, c = cv.linestrings_to_edges(geometry)
+    xy = np.column_stack((x, y))
+    assert np.allclose(np.unique(x), [0.0, 1.0, 2.0])
+    assert np.allclose(np.unique(y), [11.0, 12.0, 13.0])
+    assert np.array_equal(xy[c], expected)
 
 
 def test_edges_geos_roundtrip(line):
     x, y, c = line
+    xy = np.column_stack((x, y))
     actual = cv.edges_to_linestrings(x, y, c)
     x_back, y_back, c_back = cv.linestrings_to_edges(actual)
+    xy_back = np.column_stack((x_back, y_back))
     lines_back = cv.edges_to_linestrings(x_back, y_back, c_back)
-    assert np.array_equal(x, x_back)
-    assert np.array_equal(y, y_back)
-    assert np.array_equal(c, c_back)
+    assert np.array_equal(np.sort(xy, axis=0), np.sort(xy_back, axis=0))
+    assert np.array_equal(xy[c], xy_back[c_back])
     assert np.array_equal(actual, lines_back)
 
 
@@ -112,12 +126,13 @@ def test_edges_geos_roundtrip(line):
 # https://github.com/pytest-dev/pytest/issues/349
 def _faces_geos_roundtrip(mesh):
     x, y, c, fv = mesh
+    xy = np.column_stack((x, y))
     actual = cv.faces_to_polygons(x, y, c, fv)
     x_back, y_back, c_back, fv_back = cv.polygons_to_faces(actual)
+    xy_back = np.column_stack((x_back, y_back))
     polygons_back = cv.faces_to_polygons(x_back, y_back, c_back, fv_back)
-    assert np.array_equal(x, x_back)
-    assert np.array_equal(y, y_back)
-    assert np.array_equal(c, c_back)
+    assert np.array_equal(np.sort(xy, axis=0), np.sort(xy_back, axis=0))
+    assert np.array_equal(xy[c[c != fv]], xy_back[c_back[c_back != fv_back]])
     assert fv == fv_back
     assert np.array_equal(actual, polygons_back)
 

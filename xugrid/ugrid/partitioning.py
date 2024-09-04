@@ -8,7 +8,7 @@ import xarray as xr
 
 from xugrid.constants import IntArray, IntDType
 from xugrid.core.wrap import UgridDataArray, UgridDataset
-from xugrid.ugrid.connectivity import renumber
+from xugrid.ugrid.connectivity import renumber, unique_rows
 from xugrid.ugrid.ugridbase import UgridType
 
 
@@ -81,10 +81,7 @@ def merge_nodes(grids):
     node_x = np.hstack([grid.node_x for grid in grids])
     node_y = np.hstack([grid.node_y for grid in grids])
     node_xy = np.column_stack((node_x, node_y))
-    _, index, inverse = np.unique(
-        node_xy, axis=0, return_index=True, return_inverse=True
-    )
-    inverse = inverse.ravel()
+    _, index, inverse = unique_rows(node_xy, return_index=True, return_inverse=True)
     # We want to maintain order, so create an inverse index to the new numbers.
     inverse = renumber(index)[inverse]
     # Maintain order.

@@ -19,7 +19,7 @@ from xugrid.constants import (
     PointArray,
     PolygonArray,
 )
-from xugrid.ugrid.connectivity import ragged_index
+from xugrid.ugrid.connectivity import ragged_index, unique_rows
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
@@ -68,8 +68,7 @@ def linestrings_to_edges(edges: LineArray) -> Tuple[FloatArray, FloatArray, IntA
     linear_index = np.arange(index.size)
     segments = np.column_stack([linear_index[:-1], linear_index[1:]])
     segments = segments[np.diff(index) == 0]
-    unique, inverse = np.unique(xy, return_inverse=True, axis=0)
-    inverse = inverse.ravel()
+    unique, inverse = unique_rows(xy, return_inverse=True)
     segments = inverse[segments]
     x, y = contiguous_xy(unique)
     return x, y, segments
@@ -93,8 +92,7 @@ def polygons_to_faces(
     xy, indices = _remove_last_vertex(
         *shapely.get_coordinates(polygons, return_index=True)
     )
-    unique, inverse = np.unique(xy, axis=0, return_inverse=True)
-    inverse = inverse.ravel()
+    unique, inverse = unique_rows(xy, return_inverse=True)
     n = len(polygons)
     m_per_row = np.bincount(indices)
     m = m_per_row.max()
