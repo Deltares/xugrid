@@ -100,7 +100,7 @@ def _merge_connectivity(gathered, slices):
     # Make sure identical edges are identified: [0, 1] == [1, 0]
     # As well as faces: [0, 1, 2] == [2, 1, 0]
     sorted = np.sort(gathered, axis=1)
-    _, index = np.unique(sorted, axis=0, return_index=True)
+    _, index = unique_rows(sorted, return_index=True)
     # Maintain order.
     index.sort()
     merged = gathered[index]
