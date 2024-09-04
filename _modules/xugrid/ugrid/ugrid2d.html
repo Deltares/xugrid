@@ -423,6 +423,7 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">unique_rows</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.voronoi</span> <span class="kn">import</span> <span class="n">voronoi_topology</span>
 
@@ -2128,10 +2129,9 @@ document.write(`
         <span class="c1"># Discard the rightmost nodes. Preserve the order in the faces, and the</span>
         <span class="c1"># order of the nodes.</span>
         <span class="n">coordinates</span><span class="p">[</span><span class="n">is_right</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
-            <span class="n">coordinates</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span>
+            <span class="n">coordinates</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
-        <span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="c1"># Create a mapping of the inverse index to the new node index.</span>
         <span class="n">new_index</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">node_index</span><span class="p">)</span>
         <span class="n">new_faces</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">]]</span>
@@ -2145,7 +2145,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_edges</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">]</span>
             <span class="n">new_edges</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">edge_index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
             <span class="n">new_edges</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">new_edges</span><span class="p">][</span><span class="n">edge_index</span><span class="p">]</span>
 

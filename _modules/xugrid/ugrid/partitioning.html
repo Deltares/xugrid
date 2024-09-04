@@ -405,7 +405,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">renumber</span>
+<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">renumber</span><span class="p">,</span> <span class="n">unique_rows</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
 
 
@@ -478,10 +478,7 @@ document.write(`
     <span class="n">node_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">])</span>
     <span class="n">node_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">])</span>
     <span class="n">node_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">))</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
-        <span class="n">node_xy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span><span class="n">node_xy</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># We want to maintain order, so create an inverse index to the new numbers.</span>
     <span class="n">inverse</span> <span class="o">=</span> <span class="n">renumber</span><span class="p">(</span><span class="n">index</span><span class="p">)[</span><span class="n">inverse</span><span class="p">]</span>
     <span class="c1"># Maintain order.</span>
