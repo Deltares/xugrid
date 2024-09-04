@@ -497,7 +497,7 @@ document.write(`
     <span class="c1"># Make sure identical edges are identified: [0, 1] == [1, 0]</span>
     <span class="c1"># As well as faces: [0, 1, 2] == [2, 1, 0]</span>
     <span class="nb">sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">gathered</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">sorted</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span><span class="nb">sorted</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Maintain order.</span>
     <span class="n">index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="n">merged</span> <span class="o">=</span> <span class="n">gathered</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
