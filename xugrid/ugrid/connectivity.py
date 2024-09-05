@@ -18,16 +18,29 @@ def argsort_rows(array: np.ndarray) -> IntArray:
     return np.argsort(arr1d)
 
 
-def unique_rows(ar, return_index=False, return_inverse=False, return_counts=False):
-    # We change the array into a 1D void type array.
+def unique_rows(
+    array,
+    return_index: bool = False,
+    return_inverse: bool = False,
+    return_counts: bool = False,
+):
+    """
+    Flattens 2D array to a 1D array, cach row becomes a single np.void type
+    value, then calls np.unique. This sorts differently, but is a faster way of
+    finding unique rows.
+    """
     # numpy.unique does the following internally for axis=0 in a 2D array:
     #
-    #    dtype = [('f{i}'.format(i=i), ar.dtype) for i in range(ar.shape[1])]
-    #    consolidated = ar.view(dtype).flatten()
+    #    dtype = [('f{i}'.format(i=i), array.dtype) for i in range(array.shape[1])]
+    #    consolidated = array.view(dtype).flatten()
     #
-    # Which essentially results in a lexsort. By changing to a void type, we
-    # "blind" np.unique, and a lot less sorting is required. That's always
-    # faster, up to 2-6 times.
+    # By changing to a void type, we "blind" np.unique, and a lot less sorting
+    # is required. That's always faster, up to 2-6 times.
+
+    array = np.asarray(array)
+
+    if array.ndim != 2:
+        raise ValueError(f"Array is not 2D, but has shape: {array.shape}")
 
     def to_flat_void(ar2d):
         nbytes = ar2d.itemsize * ar2d.shape[1]
@@ -37,7 +50,7 @@ def unique_rows(ar, return_index=False, return_inverse=False, return_counts=Fals
     def from_flat_void(ar1d, ar2d):
         return ar1d.view(ar2d.dtype).reshape((-1, ar2d.shape[1]))
 
-    consolidated = to_flat_void(ar)
+    consolidated = to_flat_void(array)
     result = np.unique(
         consolidated,
         return_index=return_index,
@@ -45,10 +58,10 @@ def unique_rows(ar, return_index=False, return_inverse=False, return_counts=Fals
         return_counts=return_counts,
     )
 
-    if isinstance(result, tuple):
-        return (from_flat_void(result[0], ar),) + result[1:]
+    if return_index or return_inverse or return_counts:
+        return (from_flat_void(result[0], array),) + result[1:]
     else:
-        return from_flat_void(result, ar)
+        return from_flat_void(result, array)
 
 
 def index_like(xy_a: FloatArray, xy_b: FloatArray, tolerance: float):
@@ -467,7 +480,7 @@ def edge_connectivity(
     # Now find the unique rows == unique edges
     edge_node_connectivity.sort(axis=1)
     edge_node_connectivity, inverse_indices = unique_rows(
-        ar=edge_node_connectivity, return_inverse=True
+        edge_node_connectivity, return_inverse=True
     )
 
     if prior is not None:  # prior edge_node_connectivity exists

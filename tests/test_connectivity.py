@@ -50,6 +50,42 @@ def test_argsort_rows():
     assert np.array_equal(actual, expected)
 
 
+def test_unique_rows():
+    with pytest.raises(ValueError, match="Array is not 2D"):
+        connectivity.unique_rows(np.array([3, 2, 1, 0]))
+
+    array = np.array(
+        [
+            [1, 0],
+            [0, 1],
+            [2, 2],
+            [2, 1],
+            [0, 1],
+            [2, 1],
+        ]
+    )
+    expected = np.array(
+        [
+            [0, 1],
+            [1, 0],
+            [2, 1],
+            [2, 2],
+        ]
+    )
+    actual = connectivity.unique_rows(array)
+    assert actual.dtype == array.dtype
+    assert actual.shape[1] == array.shape[1]
+    assert np.array_equal(actual, expected)
+
+    actual, index, inverse, count = connectivity.unique_rows(array, True, True, True)
+    assert actual.dtype == array.dtype
+    assert actual.shape[1] == array.shape[1]
+    assert np.array_equal(actual, expected)
+    assert np.array_equal(index, [1, 0, 3, 2])
+    assert np.array_equal(inverse, [1, 0, 3, 2, 0, 2])
+    assert np.array_equal(count, [2, 1, 2, 1])
+
+
 def test_index_like():
     xy_a = np.array([[0.0, 0.0], [1.0, 1.0]])
     xy_b = np.array([[0.0, 0.0]])
