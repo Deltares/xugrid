@@ -413,6 +413,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">conversion</span>
 <span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">meshkernel_utils</span> <span class="k">as</span> <span class="n">mku</span>
 <span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FILL_VALUE</span><span class="p">,</span>
     <span class="n">BoolArray</span><span class="p">,</span>
     <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">FloatDType</span><span class="p">,</span>
@@ -423,7 +424,6 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">unique_rows</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
 <span class="kn">from</span> <span class="nn">xugrid.ugrid.voronoi</span> <span class="kn">import</span> <span class="n">voronoi_topology</span>
 
@@ -506,17 +506,18 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">projected</span> <span class="o">=</span> <span class="n">projected</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">face_node_connectivity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">face_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="p">(</span><span class="n">coo_matrix</span><span class="p">,</span> <span class="n">csr_matrix</span><span class="p">)):</span>
-            <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span>
-                <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">fill_value</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span><span class="n">face_node_connectivity</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;face_node_connectivity should be an array of integers or a sparse matrix&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">face_node_connectivity</span>
+        <span class="c1"># Ensure the fill value is FILL_VALUE (-1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">FILL_VALUE</span>
 
         <span class="c1"># TODO: do this in validation instead. While UGRID conventions demand it,</span>
         <span class="c1"># where does it go wrong?</span>
@@ -630,15 +631,14 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_face</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes_per_face</span><span class="p">)</span>
         <span class="n">n_max_node</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes_per_face</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="n">fill_value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_face</span><span class="p">,</span> <span class="n">n_max_node</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
+        <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_face</span><span class="p">,</span> <span class="n">n_max_node</span><span class="p">),</span> <span class="n">FILL_VALUE</span><span class="p">)</span>
         <span class="n">isnode</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">ragged_index</span><span class="p">(</span><span class="n">n_face</span><span class="p">,</span> <span class="n">n_max_node</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes_per_face</span><span class="p">)</span>
         <span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">isnode</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_nodes</span>
         <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">edge_nodes</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">node_x</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
             <span class="n">node_y</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="n">FILL_VALUE</span><span class="p">,</span>
             <span class="n">face_node_connectivity</span><span class="o">=</span><span class="n">face_node_connectivity</span><span class="p">,</span>
             <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -741,14 +741,14 @@ document.write(`
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">face_nodes</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_fillvalue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">face_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">optional_attributes</span><span class="p">:</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>  <span class="c1"># has no fill values</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
@@ -757,28 +757,29 @@ document.write(`
             <span class="n">face_faces</span><span class="p">,</span> <span class="n">face_faces_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_and_attrs</span><span class="p">(</span><span class="s2">&quot;face_face&quot;</span><span class="p">)</span>
             <span class="n">edge_faces</span><span class="p">,</span> <span class="n">edge_faces_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_and_attrs</span><span class="p">(</span><span class="s2">&quot;edge_face&quot;</span><span class="p">)</span>
             <span class="n">bound_nodes</span><span class="p">,</span> <span class="n">bound_nodes_attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name_and_attrs</span><span class="p">(</span><span class="s2">&quot;boundary_node&quot;</span><span class="p">)</span>
-            <span class="n">fill_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
             <span class="n">boundary_edge_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;boundary_edge_dimension&quot;</span><span class="p">]</span>
 
             <span class="n">data_vars</span><span class="p">[</span><span class="n">face_edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_fillvalue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">face_edges_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">face_faces</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_fillvalue</span><span class="p">(</span>
+                    <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span>
+                    <span class="p">)</span>
                 <span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">face_faces_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">edge_faces</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_fillvalue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_faces_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">bound_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_fillvalue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">bound_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">boundary_edge_dim</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
@@ -819,7 +820,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_node_per_face</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">core_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -872,7 +873,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_face_edge_connectivity</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -919,7 +919,6 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_node_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_node_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_node_connectivity</span>
@@ -936,7 +935,6 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_centroids</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">centroids</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
@@ -951,7 +949,6 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_circumcenters</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
@@ -963,7 +960,6 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">area</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
@@ -975,7 +971,6 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">perimeter</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
             <span class="p">)</span>
@@ -993,7 +988,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">]</span>
-        <span class="n">isfill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="n">isfill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">==</span> <span class="n">FILL_VALUE</span>
         <span class="n">x</span><span class="p">[</span><span class="n">isfill</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">y</span><span class="p">[</span><span class="n">isfill</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
@@ -1040,7 +1035,7 @@ document.write(`
         <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_face</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">FloatDType</span>
         <span class="p">)</span>
-        <span class="n">is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="n">is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">is_node</span><span class="p">]</span>
         <span class="n">coords</span><span class="p">[</span><span class="n">is_node</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">coords</span>
@@ -1051,7 +1046,7 @@ document.write(`
 <span class="sd">        Edge to face connectivity. An edge may belong to a single face</span>
 <span class="sd">        (exterior edge), or it may be shared by two faces (interior edge).</span>
 
-<span class="sd">        An exterior edge will contain a ``fill_value`` for the second column.</span>
+<span class="sd">        An exterior edge will contain a FILL_VALUE of -1 for the second column.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1059,7 +1054,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_face_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_face_connectivity</span>
 
@@ -1079,7 +1074,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_face_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_face_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_face_connectivity</span>
 
@@ -1094,7 +1089,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_face_connectivity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_face_connectivity</span>
 
@@ -1157,7 +1152,7 @@ document.write(`
         <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
 
         <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+        <span class="n">is_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span>
         <span class="n">nodes_per_face</span> <span class="o">=</span> <span class="n">is_node</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="n">face_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">is_node</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
@@ -1210,7 +1205,6 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
                 <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">add_vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1234,7 +1228,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroid_triangulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nodes</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">face_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voronoi_topology</span>
-            <span class="n">triangles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
+            <span class="n">triangles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
             <span class="n">triangulation</span> <span class="o">=</span> <span class="p">(</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">triangles</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_centroid_triangulation</span> <span class="o">=</span> <span class="p">(</span><span class="n">triangulation</span><span class="p">,</span> <span class="n">face_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroid_triangulation</span>
@@ -1253,7 +1247,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_triangulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">triangles</span><span class="p">,</span> <span class="n">triangle_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span>
             <span class="p">)</span>
             <span class="n">triangulation</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_triangulation</span> <span class="o">=</span> <span class="p">(</span><span class="n">triangulation</span><span class="p">,</span> <span class="n">triangle_face_connectivity</span><span class="p">)</span>
@@ -1269,7 +1263,7 @@ document.write(`
 <span class="sd">        edge_index: 1d array of integers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Numpy argwhere doesn&#39;t return a 1D array</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">FILL_VALUE</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exterior_faces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
@@ -1282,7 +1276,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">exterior_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exterior_edges</span>
         <span class="n">exterior_faces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span><span class="n">exterior_edges</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">exterior_faces</span><span class="p">[</span><span class="n">exterior_faces</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">exterior_faces</span><span class="p">[</span><span class="n">exterior_faces</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1293,7 +1287,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="o">=</span> <span class="n">CellTree2d</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">FILL_VALUE</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span>
 
@@ -1324,7 +1318,6 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">validate_edge_node_connectivity</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -1565,8 +1558,8 @@ document.write(`
         <span class="n">index</span> <span class="o">=</span> <span class="n">face_index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">face_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="n">node_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">face_subset</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-        <span class="n">node_index</span> <span class="o">=</span> <span class="n">node_index</span><span class="p">[</span><span class="n">node_index</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">]</span>
-        <span class="n">new_faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">face_subset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
+        <span class="n">node_index</span> <span class="o">=</span> <span class="n">node_index</span><span class="p">[</span><span class="n">node_index</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">]</span>
+        <span class="n">new_faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">face_subset</span><span class="p">)</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
         <span class="n">node_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
 
@@ -1574,7 +1567,7 @@ document.write(`
         <span class="n">new_edges</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">edge_index</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">]</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">edge_index</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">]</span>
             <span class="n">edge_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
             <span class="n">new_edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">edge_subset</span><span class="p">)</span>
 
@@ -1661,7 +1654,7 @@ document.write(`
         <span class="k">if</span> <span class="n">edgedim</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">:</span>
             <span class="n">edge_index</span> <span class="o">=</span> <span class="n">indexers</span><span class="p">[</span><span class="n">edgedim</span><span class="p">]</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">])</span>
-            <span class="n">face_index</span><span class="p">[</span><span class="n">edgedim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">index</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">]</span>
+            <span class="n">face_index</span><span class="p">[</span><span class="n">edgedim</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">index</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">facedim</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">:</span>
             <span class="n">face_index</span><span class="p">[</span><span class="n">facedim</span><span class="p">]</span> <span class="o">=</span> <span class="n">indexers</span><span class="p">[</span><span class="n">facedim</span><span class="p">]</span>
 
@@ -2072,11 +2065,8 @@ document.write(`
 
         <span class="c1"># Grab a sample grid</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">grids</span><span class="p">))</span>
-        <span class="n">fill_value</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span>
         <span class="n">node_coordinates</span><span class="p">,</span> <span class="n">node_indexes</span><span class="p">,</span> <span class="n">node_inverse</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">merge_nodes</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
-        <span class="n">new_faces</span><span class="p">,</span> <span class="n">face_indexes</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">merge_faces</span><span class="p">(</span>
-            <span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">,</span> <span class="n">fill_value</span>
-        <span class="p">)</span>
+        <span class="n">new_faces</span><span class="p">,</span> <span class="n">face_indexes</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">merge_faces</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">)</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">grid</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">node_indexes</span><span class="p">,</span>
             <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">face_indexes</span><span class="p">,</span>
@@ -2090,7 +2080,7 @@ document.write(`
 
         <span class="n">merged_grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="p">(</span>
             <span class="o">*</span><span class="n">node_coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
-            <span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">FILL_VALUE</span><span class="p">,</span>
             <span class="n">new_faces</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">new_edges</span><span class="p">,</span>
@@ -2129,9 +2119,10 @@ document.write(`
         <span class="c1"># Discard the rightmost nodes. Preserve the order in the faces, and the</span>
         <span class="c1"># order of the nodes.</span>
         <span class="n">coordinates</span><span class="p">[</span><span class="n">is_right</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span>
-            <span class="n">coordinates</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="n">coordinates</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
         <span class="p">)</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="c1"># Create a mapping of the inverse index to the new node index.</span>
         <span class="n">new_index</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">node_index</span><span class="p">)</span>
         <span class="n">new_faces</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">]]</span>
@@ -2145,7 +2136,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_edges</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">]</span>
             <span class="n">new_edges</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">unique_rows</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">new_edges</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">edge_index</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
             <span class="n">new_edges</span> <span class="o">=</span> <span class="n">new_index</span><span class="p">[</span><span class="n">new_edges</span><span class="p">][</span><span class="n">edge_index</span><span class="p">]</span>
 
@@ -2341,10 +2332,8 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        triangles: Ugrid2d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">triangles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
+        <span class="n">triangles</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">triangles</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_tesselate_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">,</span> <span class="n">skip_concave</span><span class="p">):</span>
@@ -2361,12 +2350,11 @@ document.write(`
             <span class="n">centroids</span><span class="p">,</span>
             <span class="n">edge_face_connectivity</span><span class="p">,</span>
             <span class="n">edge_node_connectivity</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="n">add_exterior</span><span class="p">,</span>
             <span class="n">add_vertices</span><span class="p">,</span>
             <span class="n">skip_concave</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Ugrid2d.tesselate_centroidal_voronoi">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.tesselate_centroidal_voronoi.html#xugrid.Ugrid2d.tesselate_centroidal_voronoi">[docs]</a>
@@ -2589,10 +2577,8 @@ document.write(`
                 <span class="s2">&quot;geometry contains other types of geometries.&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">fill_value</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">polygons_to_faces</span><span class="p">(</span>
-            <span class="n">geometry</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">polygons_to_faces</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
 
 
     <span class="nd">@staticmethod</span>
@@ -2810,7 +2796,6 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">nodes_to_points</span><span class="p">(</span>

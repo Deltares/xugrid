@@ -473,12 +473,12 @@ modules. The functions in these modules depend only on <code class="docutils lit
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)),</span> <span class="n">triang</span><span class="o">.</span><span class="n">triangles</span>
 
 
-<span class="k">def</span> <span class="nf">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">n_edge</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge_nodes</span><span class="p">)</span>
     <span class="n">edge_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_edge</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">node_0</span> <span class="o">=</span> <span class="n">edge_nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
     <span class="n">node_1</span> <span class="o">=</span> <span class="n">edge_nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_0</span> <span class="o">!=</span> <span class="n">fill_value</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">node_1</span> <span class="o">!=</span> <span class="n">fill_value</span><span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_0</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">node_1</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">node_0</span> <span class="o">=</span> <span class="n">node_0</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
     <span class="n">node_1</span> <span class="o">=</span> <span class="n">node_1</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
     <span class="n">edge_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">node_0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -491,10 +491,10 @@ modules. The functions in these modules depend only on <code class="docutils lit
     <span class="k">return</span> <span class="n">primitive</span>
 
 
-<span class="k">def</span> <span class="nf">face_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">face_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">]</span>
     <span class="c1"># Replace fill value; PolyCollection ignores NaN.</span>
-    <span class="n">vertices</span><span class="p">[</span><span class="n">face_nodes</span> <span class="o">==</span> <span class="n">fill_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">vertices</span><span class="p">[</span><span class="n">face_nodes</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">collection</span> <span class="o">=</span> <span class="n">PolyCollection</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">primitive</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">()</span>
@@ -517,12 +517,12 @@ modules. The functions in these modules depend only on <code class="docutils lit
         <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">edges0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">edges0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces0</span><span class="p">)</span>
     <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
     <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
     <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 
-    <span class="n">edges1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">edges1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces1</span><span class="p">)</span>
     <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
     <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 
@@ -539,7 +539,7 @@ centroids to generate a voronoi tesselation.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">generate_disk</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">centroids</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">faces</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
 <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
     <span class="n">vertices</span><span class="p">,</span>
@@ -566,17 +566,14 @@ black.</p></li>
 uses only the centroids, we do not preserve the exterior.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">voronoi_topology</span></code> is capable of preserving the exterior exactly, but
 this requires more topological information.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
-    <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
-<span class="p">)</span>
-<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">)</span>
 <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -599,18 +596,15 @@ we apply it to a mesh with a more complex exterior.</p>
 <span class="n">faces</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
 <span class="n">centroids</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">faces</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
-    <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
-<span class="p">)</span>
-<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">)</span>
 <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -627,18 +621,15 @@ finite difference simulations.</p>
 <p>We can circumvent this difficulty entirely, by ignoring the exterior vertices
 of the original mesh altogether. We still add an orthogonal projection of
 every centroid to exterior edges.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
-    <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
-<span class="p">)</span>
-<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">)</span>
 <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -652,18 +643,15 @@ every centroid to exterior edges.</p>
 <p>This will (obviously) result in a mesh that does not preserve the exterior
 exactly. Alternatively, we can choose to skip the exterior vertex if it
 creates a concave face:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span>
-    <span class="n">faces</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
-<span class="p">)</span>
-<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">node_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense_to_sparse</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">face_edge_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+<span class="n">edge_face_connectivity</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">invert_dense</span><span class="p">(</span><span class="n">face_edge_connectivity</span><span class="p">)</span>
 <span class="n">voronoi_vertices</span><span class="p">,</span> <span class="n">voronoi_faces</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">skip_concave</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -681,7 +669,7 @@ creates a concave face:</p>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">centroids</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">edges0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces0</span><span class="p">)</span>
 
 <span class="n">nodes1</span><span class="p">,</span> <span class="n">faces1</span><span class="p">,</span> <span class="n">face_index1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
@@ -689,11 +677,10 @@ creates a concave face:</p>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">edges1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces1</span><span class="p">)</span>
 
 <span class="n">nodes2</span><span class="p">,</span> <span class="n">faces2</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
@@ -701,11 +688,10 @@ creates a concave face:</p>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">edges2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces2</span><span class="p">)</span>
 
 <span class="n">nodes3</span><span class="p">,</span> <span class="n">faces3</span><span class="p">,</span> <span class="n">face_index3</span><span class="p">,</span> <span class="n">node_map3</span> <span class="o">=</span> <span class="n">voronoi</span><span class="o">.</span><span class="n">voronoi_topology</span><span class="p">(</span>
     <span class="n">node_face_connectivity</span><span class="p">,</span>
@@ -713,12 +699,11 @@ creates a concave face:</p>
     <span class="n">centroids</span><span class="p">,</span>
     <span class="n">edge_face_connectivity</span><span class="o">=</span><span class="n">edge_face_connectivity</span><span class="p">,</span>
     <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">skip_concave</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">edges3</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">edges3</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces3</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
     <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -753,10 +738,10 @@ directly use the first two options, since the generated voronoi vertices
 correspond directly to a cell face. This is not the case for the third or
 fourth option, since it includes some vertices of the original mesh, which
 are connected to multiple faces.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">triangles0</span><span class="p">,</span> <span class="n">face_triangles0</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">triangles0</span><span class="p">,</span> <span class="n">face_triangles0</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces0</span><span class="p">)</span>
 <span class="n">triangulation0</span> <span class="o">=</span> <span class="n">mtri</span><span class="o">.</span><span class="n">Triangulation</span><span class="p">(</span><span class="n">nodes0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">triangles0</span><span class="p">)</span>
 
-<span class="n">triangles1</span><span class="p">,</span> <span class="n">face_triangles1</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">triangles1</span><span class="p">,</span> <span class="n">face_triangles1</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">triangulate</span><span class="p">(</span><span class="n">faces1</span><span class="p">)</span>
 <span class="n">triangulation1</span> <span class="o">=</span> <span class="n">mtri</span><span class="o">.</span><span class="n">Triangulation</span><span class="p">(</span><span class="n">nodes1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nodes1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">triangles1</span><span class="p">)</span>
 
 
@@ -839,7 +824,7 @@ centroids in orange.</p></li>
 <img src="../_images/sphx_glr_voronoi_008.png" srcset="../_images/sphx_glr_voronoi_008.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.323 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.372 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/57be9f22eeecb878a6868437d46d6e74/voronoi.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">voronoi.ipynb</span></code></a></p>

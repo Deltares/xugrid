@@ -928,7 +928,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;pcolormesh only supports data on faces&quot;</span><span class="p">)</span>
 
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">node_coordinates</span>
-    <span class="n">faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">close_polygons</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">)</span>
+    <span class="n">faces</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">close_polygons</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">)</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">faces</span><span class="p">]</span>
 
     <span class="c1"># PolyCollection takes a norm, but not vmin, vmax.</span>

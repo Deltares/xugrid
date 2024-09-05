@@ -38,7 +38,7 @@ For simplicity this example will only deal with (bare) ``numpy`` and
 modules, should you not want to rely on more complex dependencies such as
 ``xugrid`` and ``xarray``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-27
+.. GENERATED FROM PYTHON SOURCE LINES 23-28
 
 .. code-block:: Python
 
@@ -54,13 +54,13 @@ modules, should you not want to rely on more complex dependencies such as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-31
+.. GENERATED FROM PYTHON SOURCE LINES 29-32
 
 From xugrid, we need only import the ``connectivity`` and ``voronoi``
 modules. The functions in these modules depend only on ``numpy`` and
 ``scipy.sparse``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-126
+.. GENERATED FROM PYTHON SOURCE LINES 32-127
 
 .. code-block:: Python
 
@@ -99,12 +99,12 @@ modules. The functions in these modules depend only on ``numpy`` and
         return np.column_stack((x, y)), triang.triangles
 
 
-    def edge_plot(vertices, edge_nodes, ax, fill_value=-1, **kwargs):
+    def edge_plot(vertices, edge_nodes, ax, **kwargs):
         n_edge = len(edge_nodes)
         edge_coords = np.empty((n_edge, 2, 2), dtype=float)
         node_0 = edge_nodes[:, 0]
         node_1 = edge_nodes[:, 1]
-        valid = (node_0 != fill_value) & (node_1 != fill_value)
+        valid = (node_0 != -1) & (node_1 != -1)
         node_0 = node_0[valid]
         node_1 = node_1[valid]
         edge_coords[:, 0, 0] = vertices[node_0, 0]
@@ -117,10 +117,10 @@ modules. The functions in these modules depend only on ``numpy`` and
         return primitive
 
 
-    def face_plot(vertices, face_nodes, ax, fill_value=-1, **kwargs):
+    def face_plot(vertices, face_nodes, ax, **kwargs):
         vertices = vertices[face_nodes]
         # Replace fill value; PolyCollection ignores NaN.
-        vertices[face_nodes == fill_value] = np.nan
+        vertices[face_nodes == -1] = np.nan
         collection = PolyCollection(vertices, **kwargs)
         primitive = ax.add_collection(collection)
         ax.autoscale()
@@ -143,12 +143,12 @@ modules. The functions in these modules depend only on ``numpy`` and
             sharex=True,
         )
 
-        edges0, _ = connectivity.edge_connectivity(faces0, -1)
+        edges0, _ = connectivity.edge_connectivity(faces0)
         edge_plot(vertices0, edges0, ax0, colors="black")
         ax0.scatter(*centroids0.T, color="red")
         ax0.scatter(*vertices0.T, color="black")
 
-        edges1, _ = connectivity.edge_connectivity(faces1, -1)
+        edges1, _ = connectivity.edge_connectivity(faces1)
         edge_plot(vertices0, edges0, ax1, colors="black")
         edge_plot(vertices1, edges1, ax1, colors="red")
 
@@ -166,14 +166,14 @@ modules. The functions in these modules depend only on ``numpy`` and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-131
+.. GENERATED FROM PYTHON SOURCE LINES 128-132
 
 Let's start by generating a simple unstructured mesh and use only its
 centroids to generate a voronoi tesselation.
 
 Note: ``-1`` functions as the fill value in this example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-144
+.. GENERATED FROM PYTHON SOURCE LINES 132-145
 
 .. code-block:: Python
 
@@ -181,7 +181,7 @@ Note: ``-1`` functions as the fill value in this example.
     vertices, faces = generate_disk(5, 2)
     centroids = vertices[faces].mean(axis=1)
 
-    node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
+    node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
     voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
         node_face_connectivity,
         vertices,
@@ -197,7 +197,7 @@ Note: ``-1`` functions as the fill value in this example.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-151
+.. GENERATED FROM PYTHON SOURCE LINES 146-152
 
 We can compare the two meshes:
 
@@ -206,7 +206,7 @@ We can compare the two meshes:
 * Right the new mesh, with its centroids -- the original vertices -- colored
   black.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-154
+.. GENERATED FROM PYTHON SOURCE LINES 152-155
 
 .. code-block:: Python
 
@@ -231,7 +231,7 @@ We can compare the two meshes:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-160
+.. GENERATED FROM PYTHON SOURCE LINES 156-161
 
 It should be clear that the new voronoi mesh is not space filling: since it
 uses only the centroids, we do not preserve the exterior.
@@ -239,22 +239,19 @@ uses only the centroids, we do not preserve the exterior.
 The ``voronoi_topology`` is capable of preserving the exterior exactly, but
 this requires more topological information.
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-178
+.. GENERATED FROM PYTHON SOURCE LINES 161-176
 
 .. code-block:: Python
 
 
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
-    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
     voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
         node_face_connectivity,
         vertices,
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=True,
     )
@@ -279,14 +276,14 @@ this requires more topological information.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-183
+.. GENERATED FROM PYTHON SOURCE LINES 177-181
 
 A potential downside of including the full exterior only becomes clear when
 we apply it to a mesh with a more complex exterior.
 
 Let's take the circular mesh above, and remove a chunk.
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-211
+.. GENERATED FROM PYTHON SOURCE LINES 181-206
 
 .. code-block:: Python
 
@@ -300,18 +297,15 @@ Let's take the circular mesh above, and remove a chunk.
     faces = connectivity.renumber(new)
     centroids = vertices[faces].mean(axis=1)
 
-    node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
-    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+    node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
     voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
         node_face_connectivity,
         vertices,
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=True,
     )
@@ -336,7 +330,7 @@ Let's take the circular mesh above, and remove a chunk.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-219
+.. GENERATED FROM PYTHON SOURCE LINES 207-214
 
 The voronoi cell in the center of the disk has now become concave. This will
 generally render the mesh unsuitable for finite volume or control volume
@@ -346,23 +340,20 @@ We can circumvent this difficulty entirely, by ignoring the exterior vertices
 of the original mesh altogether. We still add an orthogonal projection of
 every centroid to exterior edges.
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-238
+.. GENERATED FROM PYTHON SOURCE LINES 214-230
 
 .. code-block:: Python
 
 
-    node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
-    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+    node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
     voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
         node_face_connectivity,
         vertices,
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=False,
     )
@@ -387,29 +378,26 @@ every centroid to exterior edges.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-242
+.. GENERATED FROM PYTHON SOURCE LINES 231-234
 
 This will (obviously) result in a mesh that does not preserve the exterior
 exactly. Alternatively, we can choose to skip the exterior vertex if it
 creates a concave face:
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-262
+.. GENERATED FROM PYTHON SOURCE LINES 234-251
 
 .. code-block:: Python
 
 
-    node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-        faces, -1
-    )
-    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+    node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+    edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+    edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
     voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
         node_face_connectivity,
         vertices,
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=True,
         skip_concave=True,
@@ -435,11 +423,11 @@ creates a concave face:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 263-264
+.. GENERATED FROM PYTHON SOURCE LINES 252-253
 
 These are the four options, side by side:
 
-.. GENERATED FROM PYTHON SOURCE LINES 264-324
+.. GENERATED FROM PYTHON SOURCE LINES 253-310
 
 .. code-block:: Python
 
@@ -449,7 +437,7 @@ These are the four options, side by side:
         vertices,
         centroids,
     )
-    edges0, _ = connectivity.edge_connectivity(faces0, -1)
+    edges0, _ = connectivity.edge_connectivity(faces0)
 
     nodes1, faces1, face_index1, _ = voronoi.voronoi_topology(
         node_face_connectivity,
@@ -457,11 +445,10 @@ These are the four options, side by side:
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=False,
     )
-    edges1, _ = connectivity.edge_connectivity(faces1, -1)
+    edges1, _ = connectivity.edge_connectivity(faces1)
 
     nodes2, faces2, _, _ = voronoi.voronoi_topology(
         node_face_connectivity,
@@ -469,11 +456,10 @@ These are the four options, side by side:
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=True,
     )
-    edges2, _ = connectivity.edge_connectivity(faces2, -1)
+    edges2, _ = connectivity.edge_connectivity(faces2)
 
     nodes3, faces3, face_index3, node_map3 = voronoi.voronoi_topology(
         node_face_connectivity,
@@ -481,12 +467,11 @@ These are the four options, side by side:
         centroids,
         edge_face_connectivity=edge_face_connectivity,
         edge_node_connectivity=edge_node_connectivity,
-        fill_value=-1,
         add_exterior=True,
         add_vertices=True,
         skip_concave=True,
     )
-    edges3, _ = connectivity.edge_connectivity(faces3, -1)
+    edges3, _ = connectivity.edge_connectivity(faces3)
 
     fig, axes = plt.subplots(
         nrows=1,
@@ -515,7 +500,7 @@ These are the four options, side by side:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 325-334
+.. GENERATED FROM PYTHON SOURCE LINES 311-320
 
 Plotting
 --------
@@ -527,7 +512,7 @@ nodes of the mesh.
 For the sake of this example, let's assume we have data (e.g. pressure) that
 varies linearly from the lower left to the upper right.
 
-.. GENERATED FROM PYTHON SOURCE LINES 334-337
+.. GENERATED FROM PYTHON SOURCE LINES 320-323
 
 .. code-block:: Python
 
@@ -541,7 +526,7 @@ varies linearly from the lower left to the upper right.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 338-344
+.. GENERATED FROM PYTHON SOURCE LINES 324-330
 
 Before we can send the data of an unstructured mesh off to a plotting library
 such as ``matplotlib``, we'll generally need to triangulate the mesh. We can
@@ -550,15 +535,15 @@ correspond directly to a cell face. This is not the case for the third or
 fourth option, since it includes some vertices of the original mesh, which
 are connected to multiple faces.
 
-.. GENERATED FROM PYTHON SOURCE LINES 344-380
+.. GENERATED FROM PYTHON SOURCE LINES 330-366
 
 .. code-block:: Python
 
 
-    triangles0, face_triangles0 = connectivity.triangulate(faces0, -1)
+    triangles0, face_triangles0 = connectivity.triangulate(faces0)
     triangulation0 = mtri.Triangulation(nodes0[:, 0], nodes0[:, 1], triangles0)
 
-    triangles1, face_triangles1 = connectivity.triangulate(faces1, -1)
+    triangles1, face_triangles1 = connectivity.triangulate(faces1)
     triangulation1 = mtri.Triangulation(nodes1[:, 0], nodes1[:, 1], triangles1)
 
 
@@ -608,7 +593,7 @@ are connected to multiple faces.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 381-400
+.. GENERATED FROM PYTHON SOURCE LINES 367-386
 
 While the second option fills a greater proportion than the first option --
 which is confined to the area between the centroids -- it's clear this
@@ -630,7 +615,7 @@ The figure shows:
   centroids in orange.
 * Both of them, overlaid in the same plot.
 
-.. GENERATED FROM PYTHON SOURCE LINES 400-425
+.. GENERATED FROM PYTHON SOURCE LINES 386-412
 
 .. code-block:: Python
 
@@ -662,6 +647,7 @@ The figure shows:
 
 
 
+
 .. image-sg:: /examples-dev/images/sphx_glr_voronoi_008.png
    :alt: voronoi
    :srcset: /examples-dev/images/sphx_glr_voronoi_008.png
@@ -680,7 +666,7 @@ The figure shows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.323 seconds)
+   **Total running time of the script:** (0 minutes 1.372 seconds)
 
 
 .. _sphx_glr_download_examples-dev_voronoi.py:
