@@ -19,6 +19,7 @@ For simplicity this example will only deal with (bare) ``numpy`` and
 modules, should you not want to rely on more complex dependencies such as
 ``xugrid`` and ``xarray``.
 """
+# %%
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 import numpy as np
@@ -107,12 +108,12 @@ def comparison_plot(
         sharex=True,
     )
 
-    edges0, _ = connectivity.edge_connectivity(faces0, -1)
+    edges0, _ = connectivity.edge_connectivity(faces0)
     edge_plot(vertices0, edges0, ax0, colors="black")
     ax0.scatter(*centroids0.T, color="red")
     ax0.scatter(*vertices0.T, color="black")
 
-    edges1, _ = connectivity.edge_connectivity(faces1, -1)
+    edges1, _ = connectivity.edge_connectivity(faces1)
     edge_plot(vertices0, edges0, ax1, colors="black")
     edge_plot(vertices1, edges1, ax1, colors="red")
 
@@ -132,7 +133,7 @@ def comparison_plot(
 vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
 
-node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
+node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
 voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
@@ -158,10 +159,8 @@ comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 # The ``voronoi_topology`` is capable of preserving the exterior exactly, but
 # this requires more topological information.
 
-edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-    faces, -1
-)
-edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
 voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
@@ -189,11 +188,9 @@ vertices = vertices[np.unique(new.ravel())]
 faces = connectivity.renumber(new)
 centroids = vertices[faces].mean(axis=1)
 
-node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-    faces, -1
-)
-edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
 voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
@@ -215,11 +212,9 @@ comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 # of the original mesh altogether. We still add an orthogonal projection of
 # every centroid to exterior edges.
 
-node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-    faces, -1
-)
-edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
 voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
@@ -237,11 +232,9 @@ comparison_plot(vertices, faces, centroids, voronoi_vertices, voronoi_faces)
 # exactly. Alternatively, we can choose to skip the exterior vertex if it
 # creates a concave face:
 
-node_face_connectivity = connectivity.invert_dense_to_sparse(faces, -1)
-edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(
-    faces, -1
-)
-edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity, -1)
+node_face_connectivity = connectivity.invert_dense_to_sparse(faces)
+edge_node_connectivity, face_edge_connectivity = connectivity.edge_connectivity(faces)
+edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
 voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     node_face_connectivity,
     vertices,
@@ -263,7 +256,7 @@ nodes0, faces0, face_index0, _ = voronoi.voronoi_topology(
     vertices,
     centroids,
 )
-edges0, _ = connectivity.edge_connectivity(faces0, -1)
+edges0, _ = connectivity.edge_connectivity(faces0)
 
 nodes1, faces1, face_index1, _ = voronoi.voronoi_topology(
     node_face_connectivity,
@@ -274,7 +267,7 @@ nodes1, faces1, face_index1, _ = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=False,
 )
-edges1, _ = connectivity.edge_connectivity(faces1, -1)
+edges1, _ = connectivity.edge_connectivity(faces1)
 
 nodes2, faces2, _, _ = voronoi.voronoi_topology(
     node_face_connectivity,
@@ -285,7 +278,7 @@ nodes2, faces2, _, _ = voronoi.voronoi_topology(
     add_exterior=True,
     add_vertices=True,
 )
-edges2, _ = connectivity.edge_connectivity(faces2, -1)
+edges2, _ = connectivity.edge_connectivity(faces2)
 
 nodes3, faces3, face_index3, node_map3 = voronoi.voronoi_topology(
     node_face_connectivity,
@@ -297,7 +290,7 @@ nodes3, faces3, face_index3, node_map3 = voronoi.voronoi_topology(
     add_vertices=True,
     skip_concave=True,
 )
-edges3, _ = connectivity.edge_connectivity(faces3, -1)
+edges3, _ = connectivity.edge_connectivity(faces3)
 
 fig, axes = plt.subplots(
     nrows=1,
@@ -415,3 +408,5 @@ edge_plot(nodes2, edges2, ax2, colors="black")
 
 ax0.set_xlim(-1.5, 1.5)
 ax0.set_ylim(-1.5, 1.5)
+
+# %%
