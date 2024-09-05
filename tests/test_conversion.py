@@ -5,6 +5,7 @@ import shapely
 import xarray as xr
 
 from xugrid import conversion as cv
+from xugrid.constants import FILL_VALUE
 
 
 @pytest.fixture(scope="function")
@@ -32,7 +33,6 @@ def line_gdf():
 def triangle_mesh():
     x = np.array([0.0, 1.0, 1.0, 2.0])
     y = np.array([0.0, 0.0, 1.0, 0.0])
-    fill_value = -1
     # Two triangles
     faces = np.array(
         [
@@ -40,22 +40,21 @@ def triangle_mesh():
             [1, 3, 2],
         ]
     )
-    return x, y, faces, fill_value
+    return x, y, faces
 
 
 @pytest.fixture(scope="function")
 def mixed_mesh():
     x = np.array([0.0, 1.0, 1.0, 2.0, 2.0])
     y = np.array([0.0, 0.0, 1.0, 0.0, 1.0])
-    fill_value = -1
     # Triangle, quadrangle
     faces = np.array(
         [
-            [0, 1, 2, fill_value],
+            [0, 1, 2, FILL_VALUE],
             [1, 3, 4, 2],
         ]
     )
-    return x, y, faces, fill_value
+    return x, y, faces
 
 
 @pytest.fixture(scope="function")
@@ -111,14 +110,13 @@ def test_edges_geos_roundtrip(line):
 # Cannot use fixtures in parametrize:
 # https://github.com/pytest-dev/pytest/issues/349
 def _faces_geos_roundtrip(mesh):
-    x, y, c, fv = mesh
-    actual = cv.faces_to_polygons(x, y, c, fv)
-    x_back, y_back, c_back, fv_back = cv.polygons_to_faces(actual)
-    polygons_back = cv.faces_to_polygons(x_back, y_back, c_back, fv_back)
+    x, y, c = mesh
+    actual = cv.faces_to_polygons(x, y, c)
+    x_back, y_back, c_back = cv.polygons_to_faces(actual)
+    polygons_back = cv.faces_to_polygons(x_back, y_back, c_back)
     assert np.array_equal(x, x_back)
     assert np.array_equal(y, y_back)
     assert np.array_equal(c, c_back)
-    assert fv == fv_back
     assert np.array_equal(actual, polygons_back)
 
 

@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 from scipy import sparse
 
-from xugrid.constants import IntArray
+from xugrid.constants import FILL_VALUE, IntArray
 
 
 def _bbox_area(bounds):
@@ -11,7 +11,7 @@ def _bbox_area(bounds):
 
 
 def _classify(
-    fill_value: int, i: IntArray, j: IntArray, face_values: np.ndarray
+    i: IntArray, j: IntArray, face_values: np.ndarray
 ) -> Tuple[int, IntArray]:
     """
     Find out how many discrete polygons are created. Identify the connectivity,
@@ -19,8 +19,6 @@ def _classify(
 
     Parameters
     ----------
-    fill_value: int
-        Fill value in j: marks exterior edges.
     i: np.ndarray of int
         First face of the edge.
     j: np.ndarray of int
@@ -40,7 +38,7 @@ def _classify(
     # For labelling, only those parts of the mesh that have the same value
     # should be connected with each other.
     # Since we dropped NaN values before, we needn't worry about those.
-    is_connection = (i != fill_value) & (j != fill_value) & (vi == vj)
+    is_connection = (i != FILL_VALUE) & (j != FILL_VALUE) & (vi == vj)
     i = i[is_connection]
     j = j[is_connection]
     ij = np.concatenate([i, j])
@@ -94,8 +92,7 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
     face_values = dropped.to_numpy()
     grid = dropped.ugrid.grid
     i, j = grid.edge_face_connectivity.T
-    fill_value = grid.fill_value
-    n_polygon, polygon_id = _classify(fill_value, i, j, face_values)
+    n_polygon, polygon_id = _classify(i, j, face_values)
 
     # Now we identify for each label the subset of edges. These are the
     # "exterior" edges: either the exterior edge of the mesh identified by a
@@ -106,8 +103,8 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
     vj = polygon_id[j]
     # Ensure that no result thas has been created by indexing with the
     # fill_value remains. Since polygon_id starts counting a 0, we may use -1.
-    vi[i == fill_value] = -1
-    vj[j == fill_value] = -1
+    vi[i == FILL_VALUE] = FILL_VALUE
+    vj[j == FILL_VALUE] = FILL_VALUE
     boundary = vi != vj
 
     polygons = []

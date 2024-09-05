@@ -16,6 +16,7 @@ import xugrid
 from xugrid import conversion
 from xugrid import meshkernel_utils as mku
 from xugrid.constants import (
+    FILL_VALUE,
     BoolArray,
     FloatArray,
     FloatDType,
@@ -104,17 +105,18 @@ class Ugrid2d(AbstractUgrid):
         self.projected = projected
 
         if isinstance(face_node_connectivity, np.ndarray):
-            face_node_connectivity = face_node_connectivity
+            self.face_node_connectivity = face_node_connectivity.copy()
         elif isinstance(face_node_connectivity, (coo_matrix, csr_matrix)):
-            face_node_connectivity = connectivity.to_dense(
-                face_node_connectivity, fill_value
-            )
+            self.face_node_connectivity = connectivity.to_dense(face_node_connectivity)
         else:
             raise TypeError(
                 "face_node_connectivity should be an array of integers or a sparse matrix"
             )
 
-        self.face_node_connectivity = face_node_connectivity
+        # Ensure the fill value is FILL_VALUE (-1)
+        self.face_node_connectivity[
+            self.face_node_connectivity == self.fill_value
+        ] = FILL_VALUE
 
         # TODO: do this in validation instead. While UGRID conventions demand it,
         # where does it go wrong?
@@ -225,15 +227,14 @@ class Ugrid2d(AbstractUgrid):
         """
         n_face = len(mesh.nodes_per_face)
         n_max_node = mesh.nodes_per_face.max()
-        fill_value = -1
-        face_node_connectivity = np.full((n_face, n_max_node), fill_value)
+        face_node_connectivity = np.full((n_face, n_max_node), FILL_VALUE)
         isnode = connectivity.ragged_index(n_face, n_max_node, mesh.nodes_per_face)
         face_node_connectivity[isnode] = mesh.face_nodes
         edge_node_connectivity = np.reshape(mesh.edge_nodes, (-1, 2))
         return cls(
             node_x=mesh.node_x,
             node_y=mesh.node_y,
-            fill_value=fill_value,
+            fill_value=FILL_VALUE,
             face_node_connectivity=face_node_connectivity,
             edge_node_connectivity=edge_node_connectivity,
             name=name,
@@ -330,14 +331,14 @@ class Ugrid2d(AbstractUgrid):
         data_vars = {
             self.name: 0,
             face_nodes: xr.DataArray(
-                data=self.face_node_connectivity,
+                data=self._set_fillvalue(self.face_node_connectivity),
                 attrs=face_nodes_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             ),
         }
         if self.edge_node_connectivity is not None or optional_attributes:
             data_vars[edge_nodes] = xr.DataArray(
-                data=self.edge_node_connectivity,
+                data=self.edge_node_connectivity,  # has no fill values
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             )
@@ -346,28 +347,29 @@ class Ugrid2d(AbstractUgrid):
             face_faces, face_faces_attrs = self._get_name_and_attrs("face_face")
             edge_faces, edge_faces_attrs = self._get_name_and_attrs("edge_face")
             bound_nodes, bound_nodes_attrs = self._get_name_and_attrs("boundary_node")
-            fill_value = self.fill_value
             boundary_edge_dim = self._attrs["boundary_edge_dimension"]
 
             data_vars[face_edges] = xr.DataArray(
-                data=self.face_edge_connectivity,
+                data=self._set_fillvalue(self.face_edge_connectivity),
                 attrs=face_edges_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[face_faces] = xr.DataArray(
-                data=connectivity.to_dense(
-                    self.face_face_connectivity, fill_value, self.n_max_node_per_face
+                data=self._set_fillvalue(
+                    connectivity.to_dense(
+                        self.face_face_connectivity, self.n_max_node_per_face
+                    )
                 ),
                 attrs=face_faces_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[edge_faces] = xr.DataArray(
-                data=self.edge_face_connectivity,
+                data=self._set_fillvalue(self.edge_face_connectivity),
                 attrs=edge_faces_attrs,
                 dims=(self.edge_dimension, "two"),
             )
             data_vars[bound_nodes] = xr.DataArray(
-                data=self.boundary_node_connectivity,
+                data=self._set_fillvalue(self.boundary_node_connectivity),
                 attrs=bound_nodes_attrs,
                 dims=(boundary_edge_dim, "two"),
             )
@@ -407,7 +409,7 @@ class Ugrid2d(AbstractUgrid):
 
     @property
     def n_node_per_face(self) -> IntArray:
-        return (self.face_node_connectivity != self.fill_value).sum(axis=1)
+        return (self.face_node_connectivity != FILL_VALUE).sum(axis=1)
 
     @property
     def core_dimension(self):
@@ -460,7 +462,6 @@ class Ugrid2d(AbstractUgrid):
             self._face_edge_connectivity,
         ) = connectivity.edge_connectivity(
             self.face_node_connectivity,
-            self.fill_value,
             self._edge_node_connectivity,
         )
 
@@ -507,7 +508,6 @@ class Ugrid2d(AbstractUgrid):
         if self._boundary_node_connectivity is None:
             self._boundary_node_connectivity = connectivity.boundary_node_connectivity(
                 self.edge_face_connectivity,
-                self.fill_value,
                 self.edge_node_connectivity,
             )
         return self._boundary_node_connectivity
@@ -524,7 +524,6 @@ class Ugrid2d(AbstractUgrid):
         if self._centroids is None:
             self._centroids = connectivity.centroids(
                 self.face_node_connectivity,
-                self.fill_value,
                 self.node_x,
                 self.node_y,
             )
@@ -539,7 +538,6 @@ class Ugrid2d(AbstractUgrid):
         if self._circumcenters is None:
             self._circumcenters = connectivity.circumcenters(
                 self.face_node_connectivity,
-                self.fill_value,
                 self.node_x,
                 self.node_y,
             )
@@ -551,7 +549,6 @@ class Ugrid2d(AbstractUgrid):
         if self._area is None:
             self._area = connectivity.area(
                 self.face_node_connectivity,
-                self.fill_value,
                 self.node_x,
                 self.node_y,
             )
@@ -563,7 +560,6 @@ class Ugrid2d(AbstractUgrid):
         if self._perimeter is None:
             self._perimeter = connectivity.perimeter(
                 self.face_node_connectivity,
-                self.fill_value,
                 self.node_x,
                 self.node_y,
             )
@@ -581,7 +577,7 @@ class Ugrid2d(AbstractUgrid):
         """
         x = self.node_x[self.face_node_connectivity]
         y = self.node_y[self.face_node_connectivity]
-        isfill = self.face_node_connectivity == self.fill_value
+        isfill = self.face_node_connectivity == FILL_VALUE
         x[isfill] = np.nan
         y[isfill] = np.nan
         return np.column_stack(
@@ -628,7 +624,7 @@ class Ugrid2d(AbstractUgrid):
         coords = np.full(
             (self.n_face, self.n_max_node_per_face, 2), np.nan, dtype=FloatDType
         )
-        is_node = self.face_node_connectivity != self.fill_value
+        is_node = self.face_node_connectivity != FILL_VALUE
         index = self.face_node_connectivity[is_node]
         coords[is_node, :] = self.node_coordinates[index]
         return coords
@@ -639,7 +635,7 @@ class Ugrid2d(AbstractUgrid):
         Edge to face connectivity. An edge may belong to a single face
         (exterior edge), or it may be shared by two faces (interior edge).
 
-        An exterior edge will contain a ``fill_value`` for the second column.
+        An exterior edge will contain a FILL_VALUE of -1 for the second column.
 
         Returns
         -------
@@ -647,7 +643,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._edge_face_connectivity is None:
             self._edge_face_connectivity = connectivity.invert_dense(
-                self.face_edge_connectivity, self.fill_value
+                self.face_edge_connectivity
             )
         return self._edge_face_connectivity
 
@@ -667,7 +663,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._face_face_connectivity is None:
             self._face_face_connectivity = connectivity.face_face_connectivity(
-                self.edge_face_connectivity, self.fill_value
+                self.edge_face_connectivity
             )
         return self._face_face_connectivity
 
@@ -682,7 +678,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._node_face_connectivity is None:
             self._node_face_connectivity = connectivity.invert_dense_to_sparse(
-                self.face_node_connectivity, self.fill_value
+                self.face_node_connectivity
             )
         return self._node_face_connectivity
 
@@ -739,7 +735,7 @@ class Ugrid2d(AbstractUgrid):
         import meshkernel as mk
 
         edge_nodes = self.edge_node_connectivity.ravel().astype(np.int32)
-        is_node = self.face_node_connectivity != self.fill_value
+        is_node = self.face_node_connectivity != FILL_VALUE
         nodes_per_face = is_node.sum(axis=1).astype(np.int32)
         face_nodes = self.face_node_connectivity[is_node].ravel().astype(np.int32)
 
@@ -792,7 +788,6 @@ class Ugrid2d(AbstractUgrid):
                 self.centroids,
                 self.edge_face_connectivity,
                 self.edge_node_connectivity,
-                self.fill_value,
                 add_exterior=True,
                 add_vertices=False,
             )
@@ -816,7 +811,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._centroid_triangulation is None:
             nodes, faces, face_index = self.voronoi_topology
-            triangles, _ = connectivity.triangulate(faces, self.fill_value)
+            triangles, _ = connectivity.triangulate(faces)
             triangulation = (nodes[:, 0].copy(), nodes[:, 1].copy(), triangles)
             self._centroid_triangulation = (triangulation, face_index)
         return self._centroid_triangulation
@@ -835,7 +830,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._triangulation is None:
             triangles, triangle_face_connectivity = connectivity.triangulate(
-                self.face_node_connectivity, self.fill_value
+                self.face_node_connectivity
             )
             triangulation = (self.node_x, self.node_y, triangles)
             self._triangulation = (triangulation, triangle_face_connectivity)
@@ -851,7 +846,7 @@ class Ugrid2d(AbstractUgrid):
         edge_index: 1d array of integers
         """
         # Numpy argwhere doesn't return a 1D array
-        return np.nonzero(self.edge_face_connectivity[:, 1] == self.fill_value)[0]
+        return np.nonzero(self.edge_face_connectivity[:, 1] == FILL_VALUE)[0]
 
     @property
     def exterior_faces(self) -> IntArray:
@@ -864,7 +859,7 @@ class Ugrid2d(AbstractUgrid):
         """
         exterior_edges = self.exterior_edges
         exterior_faces = self.edge_face_connectivity[exterior_edges].ravel()
-        return np.unique(exterior_faces[exterior_faces != self.fill_value])
+        return np.unique(exterior_faces[exterior_faces != FILL_VALUE])
 
     @property
     def celltree(self):
@@ -875,7 +870,7 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._celltree is None:
             self._celltree = CellTree2d(
-                self.node_coordinates, self.face_node_connectivity, self.fill_value
+                self.node_coordinates, self.face_node_connectivity, FILL_VALUE
             )
         return self._celltree
 
@@ -904,7 +899,6 @@ class Ugrid2d(AbstractUgrid):
         """
         return connectivity.validate_edge_node_connectivity(
             self.face_node_connectivity,
-            self.fill_value,
             self.edge_node_connectivity,
         )
 
@@ -1121,8 +1115,8 @@ class Ugrid2d(AbstractUgrid):
         index = face_index.to_numpy()
         face_subset = self.face_node_connectivity[index]
         node_index = np.unique(face_subset.ravel())
-        node_index = node_index[node_index != self.fill_value]
-        new_faces = connectivity.renumber(face_subset, self.fill_value)
+        node_index = node_index[node_index != FILL_VALUE]
+        new_faces = connectivity.renumber(face_subset)
         node_x = self.node_x[node_index]
         node_y = self.node_y[node_index]
 
@@ -1130,7 +1124,7 @@ class Ugrid2d(AbstractUgrid):
         new_edges = None
         if self.edge_node_connectivity is not None:
             edge_index = np.unique(self.face_edge_connectivity[index].ravel())
-            edge_index = edge_index[edge_index != self.fill_value]
+            edge_index = edge_index[edge_index != FILL_VALUE]
             edge_subset = self.edge_node_connectivity[edge_index]
             new_edges = connectivity.renumber(edge_subset)
 
@@ -1214,7 +1208,7 @@ class Ugrid2d(AbstractUgrid):
         if edgedim in indexers:
             edge_index = indexers[edgedim]
             index = np.unique(self.edge_face_connectivity[edge_index])
-            face_index[edgedim] = index[index != self.fill_value]
+            face_index[edgedim] = index[index != FILL_VALUE]
         if facedim in indexers:
             face_index[facedim] = indexers[facedim]
 
@@ -1604,11 +1598,8 @@ class Ugrid2d(AbstractUgrid):
 
         # Grab a sample grid
         grid = next(iter(grids))
-        fill_value = grid.fill_value
         node_coordinates, node_indexes, node_inverse = partitioning.merge_nodes(grids)
-        new_faces, face_indexes = partitioning.merge_faces(
-            grids, node_inverse, fill_value
-        )
+        new_faces, face_indexes = partitioning.merge_faces(grids, node_inverse)
         indexes = {
             grid.node_dimension: node_indexes,
             grid.face_dimension: face_indexes,
@@ -1622,7 +1613,7 @@ class Ugrid2d(AbstractUgrid):
 
         merged_grid = Ugrid2d(
             *node_coordinates.T,
-            fill_value,
+            FILL_VALUE,
             new_faces,
             name=grid.name,
             edge_node_connectivity=new_edges,
@@ -1862,10 +1853,8 @@ class Ugrid2d(AbstractUgrid):
         -------
         triangles: Ugrid2d
         """
-        triangles, _ = connectivity.triangulate(
-            self.face_node_connectivity, self.fill_value
-        )
-        return Ugrid2d(self.node_x, self.node_y, self.fill_value, triangles)
+        triangles, _ = connectivity.triangulate(self.face_node_connectivity)
+        return Ugrid2d(self.node_x, self.node_y, FILL_VALUE, triangles)
 
     def _tesselate_voronoi(self, centroids, add_exterior, add_vertices, skip_concave):
         if add_exterior:
@@ -1881,12 +1870,11 @@ class Ugrid2d(AbstractUgrid):
             centroids,
             edge_face_connectivity,
             edge_node_connectivity,
-            self.fill_value,
             add_exterior,
             add_vertices,
             skip_concave,
         )
-        return Ugrid2d(vertices[:, 0], vertices[:, 1], self.fill_value, faces)
+        return Ugrid2d(vertices[:, 0], vertices[:, 1], FILL_VALUE, faces)
 
     def tesselate_centroidal_voronoi(
         self, add_exterior=True, add_vertices=True, skip_concave=False
@@ -2092,10 +2080,8 @@ class Ugrid2d(AbstractUgrid):
                 "geometry contains other types of geometries."
             )
 
-        x, y, face_node_connectivity, fill_value = conversion.polygons_to_faces(
-            geometry
-        )
-        return Ugrid2d(x, y, fill_value, face_node_connectivity, crs=crs)
+        x, y, face_node_connectivity = conversion.polygons_to_faces(geometry)
+        return Ugrid2d(x, y, FILL_VALUE, face_node_connectivity, crs=crs)
 
     @staticmethod
     def _from_intervals_helper(
@@ -2295,7 +2281,6 @@ class Ugrid2d(AbstractUgrid):
                 self.node_x,
                 self.node_y,
                 self.face_node_connectivity,
-                self.fill_value,
             )
         elif dim == self.node_dimension:
             return conversion.nodes_to_points(

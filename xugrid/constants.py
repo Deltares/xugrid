@@ -22,6 +22,10 @@ LineArray = np.ndarray
 PolygonArray = np.ndarray
 SparseMatrix = Union[coo_matrix, csr_matrix]
 
+# Internally we always use a fill value of -1. This ensures we can always index
+# with the fill value as well, since any array will have at least size 1.
+FILL_VALUE = -1
+
 
 class Point(NamedTuple):
     x: float

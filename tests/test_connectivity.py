@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 from scipy import sparse
 
+from xugrid.constants import FILL_VALUE
 from xugrid.ugrid import connectivity
 
 
 @pytest.fixture(scope="function")
 def triangle_mesh():
-    fill_value = -1
     # Two triangles
     faces = np.array(
         [
@@ -15,20 +15,19 @@ def triangle_mesh():
             [1, 3, 2],
         ]
     )
-    return faces, fill_value
+    return faces
 
 
 @pytest.fixture(scope="function")
 def mixed_mesh():
-    fill_value = -1
     # Triangle, quadrangle
     faces = np.array(
         [
-            [0, 1, 2, fill_value],
+            [0, 1, 2, FILL_VALUE],
             [1, 3, 4, 2],
         ]
     )
-    return faces, fill_value
+    return faces
 
 
 def test_argsort_rows():
@@ -88,39 +87,39 @@ def test_neighbors():
 
 
 def test_to_ij(triangle_mesh, mixed_mesh):
-    faces, fill_value = triangle_mesh
-    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=False)
+    faces = triangle_mesh
+    actual_i, actual_j = connectivity._to_ij(faces, invert=False)
     expected_i = [0, 0, 0, 1, 1, 1]
     expected_j = [0, 1, 2, 1, 3, 2]
     assert np.array_equal(actual_i, expected_i)
     assert np.array_equal(actual_j, expected_j)
 
     # Inverted
-    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=True)
+    actual_i, actual_j = connectivity._to_ij(faces, invert=True)
     assert np.array_equal(actual_i, expected_j)
     assert np.array_equal(actual_j, expected_i)
 
-    faces, fill_value = mixed_mesh
-    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=False)
+    faces = mixed_mesh
+    actual_i, actual_j = connectivity._to_ij(faces, invert=False)
     expected_i = [0, 0, 0, 1, 1, 1, 1]
     expected_j = [0, 1, 2, 1, 3, 4, 2]
     assert np.array_equal(actual_i, expected_i)
     assert np.array_equal(actual_j, expected_j)
 
     # Inverted
-    actual_i, actual_j = connectivity._to_ij(faces, fill_value, invert=True)
+    actual_i, actual_j = connectivity._to_ij(faces, invert=True)
     assert np.array_equal(actual_i, expected_j)
     assert np.array_equal(actual_j, expected_i)
 
 
 def test_to_sparse(mixed_mesh):
-    faces, fill_value = mixed_mesh
-    csr = connectivity._to_sparse(faces, fill_value, invert=False, sort_indices=True)
+    faces = mixed_mesh
+    csr = connectivity._to_sparse(faces, invert=False, sort_indices=True)
     expected_j = np.array([0, 1, 2, 1, 2, 3, 4])
     assert np.array_equal(csr.indices, expected_j)
     assert csr.has_sorted_indices
 
-    csr = connectivity._to_sparse(faces, fill_value, invert=False, sort_indices=False)
+    csr = connectivity._to_sparse(faces, invert=False, sort_indices=False)
     expected_j = np.array([0, 1, 2, 1, 3, 4, 2])
     assert np.array_equal(csr.indices, expected_j)
     assert not csr.has_sorted_indices
@@ -142,23 +141,23 @@ def test_ragged_index():
 
 
 def test_sparse_dense_conversion_roundtrip(triangle_mesh, mixed_mesh):
-    faces, fill_value = triangle_mesh
-    sparse = connectivity.to_sparse(faces, fill_value)
-    back = connectivity.to_dense(sparse, fill_value)
+    faces = triangle_mesh
+    sparse = connectivity.to_sparse(faces)
+    back = connectivity.to_dense(sparse)
     # Note: roundtrip does not preserve CW/CCW orientation, since orientation
     # does not apply to node_face_connectivity, but the sorted rows should
     # contain the same elements.
     assert np.array_equal(faces.sort(axis=1), back.sort(axis=1))
 
-    faces, fill_value = mixed_mesh
-    sparse = connectivity.to_sparse(faces, fill_value)
-    back = connectivity.to_dense(sparse, fill_value)
+    faces = mixed_mesh
+    sparse = connectivity.to_sparse(faces)
+    back = connectivity.to_dense(sparse)
     assert np.array_equal(faces.sort(axis=1), back.sort(axis=1))
 
 
 def test_invert_dense(triangle_mesh, mixed_mesh):
-    faces, fill_value = triangle_mesh
-    actual = connectivity.invert_dense(faces, fill_value)
+    faces = triangle_mesh
+    actual = connectivity.invert_dense(faces)
     expected = np.array(
         [
             [0, -1],  # 0
@@ -169,8 +168,8 @@ def test_invert_dense(triangle_mesh, mixed_mesh):
     )
     assert np.array_equal(actual, expected)
 
-    faces, fill_value = mixed_mesh
-    actual = connectivity.invert_dense(faces, fill_value)
+    faces = mixed_mesh
+    actual = connectivity.invert_dense(faces)
     expected = np.array(
         [
             [0, -1],  # 0
@@ -184,10 +183,10 @@ def test_invert_dense(triangle_mesh, mixed_mesh):
 
 
 def test_invert_sparse(triangle_mesh, mixed_mesh):
-    faces, fill_value = triangle_mesh
-    sparse = connectivity.to_sparse(faces, fill_value)
+    faces = triangle_mesh
+    sparse = connectivity.to_sparse(faces)
     inverted = connectivity.invert_sparse(sparse)
-    actual = connectivity.to_dense(inverted, fill_value)
+    actual = connectivity.to_dense(inverted)
     expected = np.array(
         [
             [0, -1],  # 0
@@ -198,10 +197,10 @@ def test_invert_sparse(triangle_mesh, mixed_mesh):
     )
     assert np.array_equal(actual, expected)
 
-    faces, fill_value = mixed_mesh
-    sparse = connectivity.to_sparse(faces, fill_value)
+    faces = mixed_mesh
+    sparse = connectivity.to_sparse(faces)
     inverted = connectivity.invert_sparse(sparse)
-    actual = connectivity.to_dense(inverted, fill_value)
+    actual = connectivity.to_dense(inverted)
     expected = np.array(
         [
             [0, -1],  # 0
@@ -215,30 +214,30 @@ def test_invert_sparse(triangle_mesh, mixed_mesh):
 
 
 def test_to_dense(triangle_mesh):
-    faces, fill_value = triangle_mesh
-    sparse = connectivity.to_sparse(faces, fill_value)
-    actual = connectivity.to_dense(sparse, fill_value)
+    faces = triangle_mesh
+    sparse = connectivity.to_sparse(faces)
+    actual = connectivity.to_dense(sparse)
     assert np.array_equal(actual, np.sort(faces, axis=1))
 
     with pytest.raises(ValueError, match="n_columns 2 is too small"):
-        connectivity.to_dense(sparse, fill_value, n_columns=2)
+        connectivity.to_dense(sparse, n_columns=2)
 
     # now pad
-    actual = connectivity.to_dense(sparse, fill_value, n_columns=4)
+    actual = connectivity.to_dense(sparse, n_columns=4)
     expected = np.array(
         [
-            [0, 1, 2, fill_value],
-            [1, 2, 3, fill_value],
+            [0, 1, 2, FILL_VALUE],
+            [1, 2, 3, FILL_VALUE],
         ]
     )
     assert np.array_equal(actual, expected)
 
     # and twice
-    actual = connectivity.to_dense(sparse, fill_value, n_columns=5)
+    actual = connectivity.to_dense(sparse, n_columns=5)
     expected = np.array(
         [
-            [0, 1, 2, fill_value, fill_value],
-            [1, 2, 3, fill_value, fill_value],
+            [0, 1, 2, FILL_VALUE, FILL_VALUE],
+            [1, 2, 3, FILL_VALUE, FILL_VALUE],
         ]
     )
     assert np.array_equal(actual, expected)
@@ -283,12 +282,12 @@ def test_renumber():
 def test_renumber_with_fill_value():
     a = np.array(
         [
-            [0, 1, -1],
+            [0, 1, FILL_VALUE],
             [10, 11, 12],
-            [30, -1, 32],
+            [30, FILL_VALUE, 32],
         ]
     )
-    actual = connectivity.renumber(a, fill_value=-1)
+    actual = connectivity.renumber(a)
     expected = np.array(
         [
             [0, 1, -1],
@@ -305,7 +304,7 @@ def test_renumber_with_fill_value():
             [30, -1, 2],
         ]
     )
-    actual = connectivity.renumber(a, fill_value=-1)
+    actual = connectivity.renumber(a)
     expected = np.array(
         [
             [0, -1, 1],
@@ -317,8 +316,8 @@ def test_renumber_with_fill_value():
 
 
 def test_close_polygons(mixed_mesh):
-    faces, fill_value = mixed_mesh
-    closed, isfill = connectivity.close_polygons(faces, fill_value)
+    faces = mixed_mesh
+    closed, isfill = connectivity.close_polygons(faces)
     expected = np.array(
         [
             [0, 1, 2, 0, 0],
@@ -333,11 +332,11 @@ def test_close_polygons(mixed_mesh):
 
 
 def test_reverse_orientation(mixed_mesh):
-    faces, fill_value = mixed_mesh
-    reverse = connectivity.reverse_orientation(faces, fill_value)
+    faces = mixed_mesh
+    reverse = connectivity.reverse_orientation(faces)
     expected = np.array(
         [
-            [2, 1, 0, fill_value],
+            [2, 1, 0, FILL_VALUE],
             [2, 4, 3, 1],
         ]
     )
@@ -353,32 +352,31 @@ def test_counterclockwise():
             [0.0, 2.0],
         ]
     )
-    fill_value = -1
 
     # Already ccw, nothing should be changed.
     faces = np.array([[0, 2, 3, -1]])
-    actual = connectivity.counterclockwise(faces, fill_value, nodes)
+    actual = connectivity.counterclockwise(faces, nodes)
     assert np.array_equal(actual, faces)
 
     # Clockwise with a fill value, reverse.
     faces_cw = np.array([[3, 2, 0, -1]])
-    actual = connectivity.counterclockwise(faces_cw, fill_value, nodes)
+    actual = connectivity.counterclockwise(faces_cw, nodes)
     assert np.array_equal(actual, faces)
 
     # Including a hanging node, ccw, nothing changed.
     hanging_ccw = np.array([[0, 1, 2, 3, -1]])
-    actual = connectivity.counterclockwise(hanging_ccw, fill_value, nodes)
+    actual = connectivity.counterclockwise(hanging_ccw, nodes)
     assert np.array_equal(actual, hanging_ccw)
 
     # Including a hanging node, reverse.
     hanging_cw = np.array([[3, 2, 1, 0, -1]])
-    actual = connectivity.counterclockwise(hanging_cw, fill_value, nodes)
+    actual = connectivity.counterclockwise(hanging_cw, nodes)
     assert np.array_equal(actual, hanging_ccw)
 
 
 def test_edge_connectivity(mixed_mesh):
-    faces, fill_value = mixed_mesh
-    edge_nodes, face_edges = connectivity.edge_connectivity(faces, fill_value)
+    faces = mixed_mesh
+    edge_nodes, face_edges = connectivity.edge_connectivity(faces)
     expected_edge_nodes = np.array(
         [
             [0, 1],
@@ -400,10 +398,10 @@ def test_edge_connectivity(mixed_mesh):
 
 
 def test_validate_edge_connectivity(mixed_mesh):
-    faces, fill_value = mixed_mesh
+    faces = mixed_mesh
     edges = np.array([[0, 1]])
     with pytest.raises(ValueError, match="face_node_connectivity defines 6 edges"):
-        connectivity.validate_edge_node_connectivity(faces, fill_value, edges)
+        connectivity.validate_edge_node_connectivity(faces, edges)
 
     edges = np.array(
         [
@@ -418,7 +416,7 @@ def test_validate_edge_connectivity(mixed_mesh):
             [0, 4],  # F
         ]
     )
-    actual = connectivity.validate_edge_node_connectivity(faces, fill_value, edges)
+    actual = connectivity.validate_edge_node_connectivity(faces, edges)
     expected = np.array([True, False, False, True, True, True, True, True, False])
     assert np.array_equal(actual, expected)
 
@@ -505,7 +503,7 @@ def test_face_face_connectivity():
             [1, -1],
         ]
     )
-    face_face = connectivity.face_face_connectivity(edge_faces, fill_value=-1)
+    face_face = connectivity.face_face_connectivity(edge_faces)
     assert isinstance(face_face, sparse.csr_matrix)
     assert np.array_equal(face_face.indices, [1, 0])
     assert np.array_equal(face_face.indptr, [0, 1, 2])
@@ -513,7 +511,7 @@ def test_face_face_connectivity():
 
 
 def test_centroids(mixed_mesh):
-    faces, fill_value = mixed_mesh
+    faces = mixed_mesh
     nodes = np.array(
         [
             [0.0, 0.0],
@@ -523,7 +521,7 @@ def test_centroids(mixed_mesh):
             [2.0, 1.0],
         ]
     )
-    actual = connectivity.centroids(faces, fill_value, nodes[:, 0], nodes[:, 1])
+    actual = connectivity.centroids(faces, nodes[:, 0], nodes[:, 1])
     expected = np.array(
         [
             [2.0 / 3.0, 1.0 / 3.0],
@@ -534,7 +532,7 @@ def test_centroids(mixed_mesh):
 
 
 def test_circumcenters_error(mixed_mesh):
-    faces, fill_value = mixed_mesh
+    faces = mixed_mesh
     nodes = np.array(
         [
             [0.0, 0.0],
@@ -545,11 +543,11 @@ def test_circumcenters_error(mixed_mesh):
         ]
     )
     with pytest.raises(NotImplementedError):
-        connectivity.circumcenters(faces, fill_value, nodes[:, 0], nodes[:, 1])
+        connectivity.circumcenters(faces, nodes[:, 0], nodes[:, 1])
 
 
 def test_circumcenters(triangle_mesh):
-    faces, fill_value = triangle_mesh
+    faces = triangle_mesh
     nodes = np.array(
         [
             [0.0, 1.0],
@@ -558,7 +556,7 @@ def test_circumcenters(triangle_mesh):
             [1.0, -2.0],
         ]
     )
-    actual = connectivity.circumcenters(faces, fill_value, nodes[:, 0], nodes[:, 1])
+    actual = connectivity.circumcenters(faces, nodes[:, 0], nodes[:, 1])
     expected = np.array([[1.0, 0.5], [1.0, -0.75]])
     assert np.allclose(actual, expected)
 
@@ -585,20 +583,20 @@ def test_structured_connectivity():
 def test_area(mixed_mesh):
     node_x = np.array([0.0, 1.0, 1.0, 2.0, 2.0])
     node_y = np.array([0.0, 0.0, 1.0, 0.0, 1.0])
-    actual = connectivity.area(*mixed_mesh, node_x, node_y)
+    actual = connectivity.area(mixed_mesh, node_x, node_y)
     assert np.allclose(actual, [0.5, 1.0])
 
 
 def test_perimeter(mixed_mesh):
     node_x = np.array([0.0, 1.0, 1.0, 2.0, 2.0])
     node_y = np.array([0.0, 0.0, 1.0, 0.0, 1.0])
-    actual = connectivity.perimeter(*mixed_mesh, node_x, node_y)
+    actual = connectivity.perimeter(mixed_mesh, node_x, node_y)
     assert np.allclose(actual, [2.0 + np.sqrt(2), 4.0])
 
 
 def test_triangulate(mixed_mesh):
-    faces, fill_value = mixed_mesh
-    actual_triangles, actual_faces = connectivity.triangulate_dense(faces, fill_value)
+    faces = mixed_mesh
+    actual_triangles, actual_faces = connectivity.triangulate_dense(faces)
     expected_triangles = np.array(
         [
             [0, 1, 2],
@@ -610,7 +608,7 @@ def test_triangulate(mixed_mesh):
     assert np.array_equal(actual_triangles, expected_triangles)
     assert np.array_equal(actual_faces, expected_faces)
 
-    sparse_faces = connectivity.to_sparse(faces, -1, sort_indices=False).tocoo()
+    sparse_faces = connectivity.to_sparse(faces, sort_indices=False).tocoo()
     actual_triangles, actual_faces = connectivity.triangulate_coo(sparse_faces)
     assert np.array_equal(actual_triangles, expected_triangles)
     assert np.array_equal(actual_faces, expected_faces)

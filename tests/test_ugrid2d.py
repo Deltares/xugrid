@@ -1051,6 +1051,19 @@ def test_tesselate_centroidal_voronoi():
     voronoi = grid.tesselate_centroidal_voronoi()
     assert voronoi.n_face == 7
 
+    faces = FACES.copy()
+    faces[faces == -1] = -999
+    grid = xugrid.Ugrid2d(
+        node_x=VERTICES[:, 0],
+        node_y=VERTICES[:, 1],
+        fill_value=-999,
+        face_node_connectivity=faces,
+    )
+    voronoi = grid.tesselate_centroidal_voronoi(add_exterior=True)
+    vfaces = voronoi.face_node_connectivity
+    fill_nodes = vfaces[vfaces < 0]
+    assert (fill_nodes == -1).all()
+
 
 def test_tesselate_circumcenter_voronoi():
     grid = grid2d()

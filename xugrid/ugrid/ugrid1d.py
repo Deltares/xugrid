@@ -9,6 +9,7 @@ from numpy.typing import ArrayLike
 import xugrid
 from xugrid import conversion
 from xugrid.constants import (
+    FILL_VALUE,
     BoolArray,
     FloatArray,
     FloatDType,
@@ -133,7 +134,6 @@ class Ugrid1d(AbstractUgrid):
             + list(connectivity.values())
             + list(chain.from_iterable(chain.from_iterable(coordinates.values())))
         )
-        fill_value = -1
 
         # Take the first coordinates by default.
         # They can be reset with .set_node_coords()
@@ -144,7 +144,7 @@ class Ugrid1d(AbstractUgrid):
 
         edge_nodes = connectivity["edge_node_connectivity"]
         edge_node_connectivity = cls._prepare_connectivity(
-            ds[edge_nodes], fill_value, dtype=IntDType
+            ds[edge_nodes], FILL_VALUE, dtype=IntDType
         ).to_numpy()
 
         indexes["node_x"] = x_index
@@ -154,7 +154,7 @@ class Ugrid1d(AbstractUgrid):
         return cls(
             node_x_coordinates,
             node_y_coordinates,
-            fill_value,
+            FILL_VALUE,
             edge_node_connectivity,
             name=topology,
             dataset=dataset[ugrid_vars],
@@ -211,7 +211,7 @@ class Ugrid1d(AbstractUgrid):
         return cls(
             mesh.node_x,
             mesh.node_y,
-            fill_value=-1,
+            fill_value=FILL_VALUE,
             edge_node_connectivity=mesh.edge_nodes.reshape((-1, 2)),
             name=name,
             projected=projected,
@@ -389,8 +389,7 @@ class Ugrid1d(AbstractUgrid):
             )
 
         x, y, edge_node_connectivity = conversion.linestrings_to_edges(geometry)
-        fill_value = -1
-        return Ugrid1d(x, y, fill_value, edge_node_connectivity, crs=crs)
+        return Ugrid1d(x, y, FILL_VALUE, edge_node_connectivity, crs=crs)
 
     def to_pygeos(self, dim):
         from warnings import warn

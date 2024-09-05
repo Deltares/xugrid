@@ -152,7 +152,6 @@ class UnstructuredGrid2d:
             grid.centroids,
             edge_face_connectivity=grid.edge_face_connectivity,
             edge_node_connectivity=grid.edge_node_connectivity,
-            fill_value=grid.fill_value,
             add_exterior=True,
             add_vertices=True,
             skip_concave=True,

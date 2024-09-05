@@ -63,12 +63,12 @@ def generate_disk(partitions: int, depth: int):
     return np.column_stack((x, y)), triang.triangles
 
 
-def edge_plot(vertices, edge_nodes, ax, fill_value=-1, **kwargs):
+def edge_plot(vertices, edge_nodes, ax, **kwargs):
     n_edge = len(edge_nodes)
     edge_coords = np.empty((n_edge, 2, 2), dtype=float)
     node_0 = edge_nodes[:, 0]
     node_1 = edge_nodes[:, 1]
-    valid = (node_0 != fill_value) & (node_1 != fill_value)
+    valid = (node_0 != -1) & (node_1 != -1)
     node_0 = node_0[valid]
     node_1 = node_1[valid]
     edge_coords[:, 0, 0] = vertices[node_0, 0]
@@ -81,10 +81,10 @@ def edge_plot(vertices, edge_nodes, ax, fill_value=-1, **kwargs):
     return primitive
 
 
-def face_plot(vertices, face_nodes, ax, fill_value=-1, **kwargs):
+def face_plot(vertices, face_nodes, ax, **kwargs):
     vertices = vertices[face_nodes]
     # Replace fill value; PolyCollection ignores NaN.
-    vertices[face_nodes == fill_value] = np.nan
+    vertices[face_nodes == -1] = np.nan
     collection = PolyCollection(vertices, **kwargs)
     primitive = ax.add_collection(collection)
     ax.autoscale()
@@ -168,7 +168,6 @@ voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=True,
 )
@@ -201,7 +200,6 @@ voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=True,
 )
@@ -228,7 +226,6 @@ voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=False,
 )
@@ -251,7 +248,6 @@ voronoi_vertices, voronoi_faces, face_index, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=True,
     skip_concave=True,
@@ -275,7 +271,6 @@ nodes1, faces1, face_index1, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=False,
 )
@@ -287,7 +282,6 @@ nodes2, faces2, _, _ = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=True,
 )
@@ -299,7 +293,6 @@ nodes3, faces3, face_index3, node_map3 = voronoi.voronoi_topology(
     centroids,
     edge_face_connectivity=edge_face_connectivity,
     edge_node_connectivity=edge_node_connectivity,
-    fill_value=-1,
     add_exterior=True,
     add_vertices=True,
     skip_concave=True,
@@ -342,10 +335,10 @@ data = centroids[:, 0] + centroids[:, 1]
 # fourth option, since it includes some vertices of the original mesh, which
 # are connected to multiple faces.
 
-triangles0, face_triangles0 = connectivity.triangulate(faces0, -1)
+triangles0, face_triangles0 = connectivity.triangulate(faces0)
 triangulation0 = mtri.Triangulation(nodes0[:, 0], nodes0[:, 1], triangles0)
 
-triangles1, face_triangles1 = connectivity.triangulate(faces1, -1)
+triangles1, face_triangles1 = connectivity.triangulate(faces1)
 triangulation1 = mtri.Triangulation(nodes1[:, 0], nodes1[:, 1], triangles1)
 
 
