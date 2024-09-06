@@ -38,7 +38,7 @@ For simplicity this example will only deal with (bare) ``numpy`` and
 modules, should you not want to rely on more complex dependencies such as
 ``xugrid`` and ``xarray``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-28
+.. GENERATED FROM PYTHON SOURCE LINES 23-30
 
 .. code-block:: Python
 
@@ -47,6 +47,7 @@ modules, should you not want to rely on more complex dependencies such as
     import numpy as np
     from matplotlib.collections import LineCollection, PolyCollection
 
+    from xugrid.constants import FILL_VALUE  # equals -1
 
 
 
@@ -54,13 +55,14 @@ modules, should you not want to rely on more complex dependencies such as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-32
+
+.. GENERATED FROM PYTHON SOURCE LINES 31-34
 
 From xugrid, we need only import the ``connectivity`` and ``voronoi``
 modules. The functions in these modules depend only on ``numpy`` and
 ``scipy.sparse``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-127
+.. GENERATED FROM PYTHON SOURCE LINES 34-129
 
 .. code-block:: Python
 
@@ -104,7 +106,7 @@ modules. The functions in these modules depend only on ``numpy`` and
         edge_coords = np.empty((n_edge, 2, 2), dtype=float)
         node_0 = edge_nodes[:, 0]
         node_1 = edge_nodes[:, 1]
-        valid = (node_0 != -1) & (node_1 != -1)
+        valid = (node_0 != FILL_VALUE) & (node_1 != FILL_VALUE)
         node_0 = node_0[valid]
         node_1 = node_1[valid]
         edge_coords[:, 0, 0] = vertices[node_0, 0]
@@ -120,7 +122,7 @@ modules. The functions in these modules depend only on ``numpy`` and
     def face_plot(vertices, face_nodes, ax, **kwargs):
         vertices = vertices[face_nodes]
         # Replace fill value; PolyCollection ignores NaN.
-        vertices[face_nodes == -1] = np.nan
+        vertices[face_nodes == FILL_VALUE] = np.nan
         collection = PolyCollection(vertices, **kwargs)
         primitive = ax.add_collection(collection)
         ax.autoscale()
@@ -166,12 +168,10 @@ modules. The functions in these modules depend only on ``numpy`` and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-132
+.. GENERATED FROM PYTHON SOURCE LINES 130-132
 
 Let's start by generating a simple unstructured mesh and use only its
 centroids to generate a voronoi tesselation.
-
-Note: ``-1`` functions as the fill value in this example.
 
 .. GENERATED FROM PYTHON SOURCE LINES 132-145
 
@@ -666,7 +666,7 @@ The figure shows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.345 seconds)
+   **Total running time of the script:** (0 minutes 1.446 seconds)
 
 
 .. _sphx_glr_download_examples-dev_voronoi.py:
