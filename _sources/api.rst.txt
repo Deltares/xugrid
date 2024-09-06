@@ -195,6 +195,8 @@ UGRID1D Topology
     Ugrid1d.sizes
     Ugrid1d.attrs
     Ugrid1d.coords
+    Ugrid1d.fill_value
+    Ugrid1d.start_index
 
     Ugrid1d.n_node
     Ugrid1d.node_dimension
@@ -258,6 +260,8 @@ UGRID2D Topology
     Ugrid2d.sizes
     Ugrid2d.attrs
     Ugrid2d.coords
+    Ugrid2d.fill_value
+    Ugrid2d.start_index
 
     Ugrid2d.n_node
     Ugrid2d.node_dimension

@@ -450,6 +450,9 @@ document.write(`
 <span class="sd">        UGRID topology attributes. Should not be provided together with</span>
 <span class="sd">        dataset: if other names are required, update the dataset instead.</span>
 <span class="sd">        A name entry is ignored, as name is given explicitly.</span>
+<span class="sd">    start_index: int, 0 or 1, default is 0.</span>
+<span class="sd">        Start index of the connectivity arrays. Must match the start index</span>
+<span class="sd">        of the provided face_node_connectivity and edge_node_connectivity.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Ugrid1d.__init__">
@@ -466,11 +469,13 @@ document.write(`
         <span class="n">projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">attrs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_x</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">node_y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span> <span class="o">=</span> <span class="n">fill_value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">edge_node_connectivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">=</span> <span class="n">start_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">edge_node_connectivity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projected</span> <span class="o">=</span> <span class="n">projected</span>
 
@@ -547,8 +552,10 @@ document.write(`
         <span class="n">node_y_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
         <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">]</span>
+        <span class="n">fill_value</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_FillValue&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_connectivity</span><span class="p">(</span>
-            <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
         <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_index</span>
@@ -558,13 +565,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">node_x_coordinates</span><span class="p">,</span>
             <span class="n">node_y_coordinates</span><span class="p">,</span>
-            <span class="n">FILL_VALUE</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="p">,</span>
             <span class="n">edge_node_connectivity</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
             <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="n">ugrid_vars</span><span class="p">],</span>
             <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
             <span class="n">projected</span><span class="o">=</span><span class="n">projected</span><span class="p">,</span>
             <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">start_index</span><span class="o">=</span><span class="n">start_index</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -639,7 +647,7 @@ document.write(`
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">edge_nodes</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">),</span>
@@ -651,7 +659,7 @@ document.write(`
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">:</span>
-            <span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">node_x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">or</span> <span class="n">node_y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
@@ -1003,10 +1011,10 @@ document.write(`
         <span class="n">new_edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">edge_subset</span><span class="p">)</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
         <span class="n">node_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">node_index</span><span class="p">]</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid1d</span><span class="p">(</span>
             <span class="n">node_x</span><span class="p">,</span>
             <span class="n">node_y</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">FILL_VALUE</span><span class="p">,</span>
             <span class="n">new_edges</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">indexes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">,</span>
@@ -1014,6 +1022,7 @@ document.write(`
             <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
             <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_propagate_properties</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">return_index</span><span class="p">:</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">node_index</span><span class="p">),</span>
