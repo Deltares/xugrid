@@ -762,14 +762,14 @@ document.write(`
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">face_nodes</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">face_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">optional_attributes</span><span class="p">:</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
@@ -781,12 +781,12 @@ document.write(`
             <span class="n">boundary_edge_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;boundary_edge_dimension&quot;</span><span class="p">]</span>
 
             <span class="n">data_vars</span><span class="p">[</span><span class="n">face_edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_edge_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">face_edges_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">face_faces</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span>
                     <span class="n">connectivity</span><span class="o">.</span><span class="n">to_dense</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_max_node_per_face</span>
                     <span class="p">)</span>
@@ -795,12 +795,12 @@ document.write(`
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">nmax_node_dim</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">edge_faces</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_faces_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">data_vars</span><span class="p">[</span><span class="n">bound_nodes</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">),</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">bound_nodes_attrs</span><span class="p">,</span>
                 <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">boundary_edge_dim</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
             <span class="p">)</span>
