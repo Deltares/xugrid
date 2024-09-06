@@ -25,6 +25,8 @@ import matplotlib.tri as mtri
 import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 
+from xugrid.constants import FILL_VALUE  # equals -1
+
 # %%
 # From xugrid, we need only import the ``connectivity`` and ``voronoi``
 # modules. The functions in these modules depend only on ``numpy`` and
@@ -69,7 +71,7 @@ def edge_plot(vertices, edge_nodes, ax, **kwargs):
     edge_coords = np.empty((n_edge, 2, 2), dtype=float)
     node_0 = edge_nodes[:, 0]
     node_1 = edge_nodes[:, 1]
-    valid = (node_0 != -1) & (node_1 != -1)
+    valid = (node_0 != FILL_VALUE) & (node_1 != FILL_VALUE)
     node_0 = node_0[valid]
     node_1 = node_1[valid]
     edge_coords[:, 0, 0] = vertices[node_0, 0]
@@ -85,7 +87,7 @@ def edge_plot(vertices, edge_nodes, ax, **kwargs):
 def face_plot(vertices, face_nodes, ax, **kwargs):
     vertices = vertices[face_nodes]
     # Replace fill value; PolyCollection ignores NaN.
-    vertices[face_nodes == -1] = np.nan
+    vertices[face_nodes == FILL_VALUE] = np.nan
     collection = PolyCollection(vertices, **kwargs)
     primitive = ax.add_collection(collection)
     ax.autoscale()
@@ -127,8 +129,6 @@ def comparison_plot(
 # %%
 # Let's start by generating a simple unstructured mesh and use only its
 # centroids to generate a voronoi tesselation.
-#
-# Note: ``-1`` functions as the fill value in this example.
 
 vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
