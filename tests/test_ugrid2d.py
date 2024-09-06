@@ -337,6 +337,24 @@ def test_ugrid2d_dataset_no_mutation():
     assert ds.identical(reference)
 
 
+@pytest.mark.parametrize("edge_start_index", [0, 1])
+@pytest.mark.parametrize("face_start_index", [0, 1])
+def test_ugrid2d_from_dataset__different_start_index(
+    face_start_index, edge_start_index
+):
+    grid = grid2d()
+    ds = grid.to_dataset(optional_attributes=True)  # include edge_nodes
+    faces = ds["mesh2d_face_nodes"].to_numpy()
+    faces[faces != -1] += face_start_index
+    ds["mesh2d_face_nodes"].attrs["start_index"] = face_start_index
+    ds["mesh2d_edge_nodes"] += edge_start_index
+    ds["mesh2d_edge_nodes"].attrs["start_index"] = edge_start_index
+    new = xugrid.Ugrid2d.from_dataset(ds)
+    assert new.start_index == face_start_index
+    assert np.array_equal(new.face_node_connectivity, grid.face_node_connectivity)
+    assert np.array_equal(new.edge_node_connectivity, grid.edge_node_connectivity)
+
+
 def test_ugrid2d_from_meshkernel():
     # Setup a meshkernel Mesh2d mimick
     class Mesh2d(NamedTuple):

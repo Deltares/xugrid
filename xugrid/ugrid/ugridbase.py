@@ -288,6 +288,10 @@ class AbstractUgrid(abc.ABC):
         else:
             return new
 
+    def _propagate_properties(self, other) -> None:
+        other.start_index = self.start_index
+        other.fill_value = self.fill_value
+
     @staticmethod
     def _single_topology(dataset: xr.Dataset):
         topologies = dataset.ugrid_roles.topology
@@ -475,11 +479,14 @@ class AbstractUgrid(abc.ABC):
         )
 
     @staticmethod
-    def _prepare_connectivity(da: xr.DataArray, dtype: type) -> xr.DataArray:
-        start_index = da.attrs.get("start_index", 0)
-        if start_index not in (0, 1):
-            raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
-
+    def _prepare_connectivity(
+        da: xr.DataArray, fill_value: Union[int, float], dtype: type
+    ) -> xr.DataArray:
+        """
+        Undo the work xarray does when it encounters a _FillValue for UGRID
+        connectivity arrays. Set an external unified value back (across all
+        connectivities!), and cast back to the desired dtype.
+        """
         data = da.to_numpy().copy()
         # If xarray detects a _FillValue, it converts the array to floats and
         # replaces the fill value by NaN, and moves the _FillValue to
@@ -489,12 +496,9 @@ class AbstractUgrid(abc.ABC):
         else:
             is_fill = np.isnan(data)
         # Set the fill_value before casting: otherwise the cast may fail.
-        data[is_fill] = FILL_VALUE
+        data[is_fill] = fill_value
         cast = data.astype(dtype, copy=False)
-
         not_fill = ~is_fill
-        if start_index:
-            cast[not_fill] -= start_index
         if (cast[not_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
@@ -504,10 +508,11 @@ class AbstractUgrid(abc.ABC):
         c = connectivity.copy()
         if self.start_index == 0 and self.fill_value == FILL_VALUE:
             return c
-        if self.start_index != 0:
-            c = np.where(c != FILL_VALUE, c + self.start_index, c)
+        is_fill = c == FILL_VALUE
+        if self.start_index:
+            c[~is_fill] += self.start_index
         if self.fill_value != FILL_VALUE:
-            c[c == FILL_VALUE] = self.fill_value
+            c[is_fill] = self.fill_value
         return c
 
     def _precheck(self, multi_index):

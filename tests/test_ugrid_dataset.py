@@ -1197,11 +1197,12 @@ def test_alternative_fill_value_start_index():
     # Check internal fill value. Should be FILL_VALUE
     grid = uds.ugrid.grid
     assert grid.face_node_connectivity.dtype == "int64"
+    assert grid.start_index == 1
+    assert grid.fill_value == -999
     assert (grid.face_node_connectivity != -999).all()
     gridds = grid.to_dataset()
     # Should be set back to the origina fill value.
     faces = gridds["mesh2d_face_nodes"]
-    assert (faces != xugrid.constants.FILL_VALUE).all()
     assert faces.attrs["start_index"] == 1
     uniq = np.unique(faces)
     assert uniq[0] == -999
@@ -1210,7 +1211,6 @@ def test_alternative_fill_value_start_index():
     # And similarly for the UgridAccessors.
     ds = uds.ugrid.to_dataset()
     faces = ds["mesh2d_face_nodes"]
-    assert (faces != xugrid.constants.FILL_VALUE).all()
     assert faces.attrs["start_index"] == 1
     uniq = np.unique(faces)
     assert uniq[0] == -999
@@ -1218,11 +1218,21 @@ def test_alternative_fill_value_start_index():
 
     ds_uda = uds["mesh2d_facevar"].ugrid.to_dataset()
     faces = ds_uda["mesh2d_face_nodes"]
-    assert (faces != xugrid.constants.FILL_VALUE).all()
     assert faces.attrs["start_index"] == 1
     uniq = np.unique(faces)
     assert uniq[0] == -999
     assert uniq[1] == 1
+
+    # Alternative value
+    grid.start_index = 0
+    grid.fill_value = -2
+    gridds = grid.to_dataset()
+    # Should be set back to the origina fill value.
+    faces = gridds["mesh2d_face_nodes"]
+    assert faces.attrs["start_index"] == 0
+    uniq = np.unique(faces)
+    assert uniq[0] == -2
+    assert uniq[1] == 0
 
 
 def test_fm_facenodeconnectivity_fillvalue():

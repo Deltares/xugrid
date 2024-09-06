@@ -119,11 +119,12 @@ class Ugrid2d(AbstractUgrid):
             )
 
         # Ensure the fill value is FILL_VALUE (-1) and the array is 0-based.
-        is_fill = self.face_node_connectivity == self.fill_value
-        if self.start_index != 0:
-            self.face_node_connectivity[~is_fill] -= self.start_index
-        if self.fill_value != FILL_VALUE:
-            self.face_node_connectivity[is_fill] = FILL_VALUE
+        if self.fill_value != -1 or self.start_index != 0:
+            is_fill = self.face_node_connectivity == self.fill_value
+            if self.start_index != 0:
+                self.face_node_connectivity[~is_fill] -= self.start_index
+            if self.fill_value != FILL_VALUE:
+                self.face_node_connectivity[is_fill] = FILL_VALUE
 
         # TODO: do this in validation instead. While UGRID conventions demand it,
         # where does it go wrong?
@@ -156,7 +157,9 @@ class Ugrid2d(AbstractUgrid):
         self._edge_x = None
         self._edge_y = None
         # Connectivity
-        self.edge_node_connectivity = edge_node_connectivity
+        self._edge_node_connectivity = edge_node_connectivity
+        if self._edge_node_connectivity is not None:
+            self._edge_node_connectivity -= self.start_index
         self._edge_face_connectivity = None
         self._node_node_connectivity = None
         self._node_edge_connectivity = None
@@ -290,15 +293,23 @@ class Ugrid2d(AbstractUgrid):
 
         face_nodes = connectivity["face_node_connectivity"]
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
+        start_index = ds[face_nodes].attrs.get("start_index", 0)
         face_node_connectivity = cls._prepare_connectivity(
-            ds[face_nodes], dtype=IntDType
+            ds[face_nodes], fill_value, dtype=IntDType
         ).to_numpy()
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:
             edge_node_connectivity = cls._prepare_connectivity(
-                ds[edge_nodes], dtype=IntDType
+                ds[edge_nodes], fill_value, dtype=IntDType
             ).to_numpy()
+            # Make sure the single passed start index is valid for both
+            # connectivity arrays.
+            edge_start_index = ds[edge_nodes].attrs.get("start_index", 0)
+            if edge_start_index != start_index:
+                # start_index = 1, edge_start_index = 0, then add one
+                # start_index = 0, edge_start_index = 1, then subtract one
+                edge_node_connectivity += start_index - edge_start_index
         else:
             edge_node_connectivity = None
 
@@ -317,6 +328,7 @@ class Ugrid2d(AbstractUgrid):
             indexes=indexes,
             projected=projected,
             crs=None,
+            start_index=start_index,
         )
 
     def _get_name_and_attrs(self, name: str):
@@ -1137,10 +1149,10 @@ class Ugrid2d(AbstractUgrid):
             edge_subset = self.edge_node_connectivity[edge_index]
             new_edges = connectivity.renumber(edge_subset)
 
-        grid = self.__class__(
+        grid = Ugrid2d(
             node_x,
             node_y,
-            self.fill_value,
+            FILL_VALUE,
             new_faces,
             name=self.name,
             edge_node_connectivity=new_edges,
@@ -1149,6 +1161,7 @@ class Ugrid2d(AbstractUgrid):
             crs=self.crs,
             attrs=self._attrs,
         )
+        self._propagate_properties(grid)
         if return_index:
             indexes = {
                 self.node_dimension: pd.Index(node_index),
@@ -1631,6 +1644,8 @@ class Ugrid2d(AbstractUgrid):
             crs=grid.crs,
             attrs=grid._attrs,
         )
+        # Maintain fill_value, start_index
+        grid._propagate_properties(merged_grid)
         return merged_grid, indexes
 
     def to_periodic(self, obj=None):
@@ -1683,7 +1698,7 @@ class Ugrid2d(AbstractUgrid):
             node_x=new_xy[:, 0],
             node_y=new_xy[:, 1],
             face_node_connectivity=new_faces,
-            fill_value=self.fill_value,
+            fill_value=FILL_VALUE,
             name=self.name,
             edge_node_connectivity=new_edges,
             indexes=self._indexes,
@@ -1691,6 +1706,7 @@ class Ugrid2d(AbstractUgrid):
             crs=self.crs,
             attrs=self.attrs,
         )
+        self._propagate_properties(new)
 
         if obj is not None:
             indexes = {
@@ -1743,7 +1759,7 @@ class Ugrid2d(AbstractUgrid):
             node_x=np.concatenate((self.node_x, new_x)),
             node_y=np.concatenate((self.node_y, new_y)),
             face_node_connectivity=new_faces,
-            fill_value=self.fill_value,
+            fill_value=FILL_VALUE,
             name=self.name,
             edge_node_connectivity=None,
             indexes=self._indexes,
@@ -1751,6 +1767,7 @@ class Ugrid2d(AbstractUgrid):
             crs=self.crs,
             attrs=self.attrs,
         )
+        self._propagate_properties(new)
 
         edge_index = None
         if self._edge_node_connectivity is not None:
@@ -1863,7 +1880,9 @@ class Ugrid2d(AbstractUgrid):
         triangles: Ugrid2d
         """
         triangles, _ = connectivity.triangulate(self.face_node_connectivity)
-        return Ugrid2d(self.node_x, self.node_y, FILL_VALUE, triangles)
+        grid = Ugrid2d(self.node_x, self.node_y, FILL_VALUE, triangles)
+        self._propagate_properties(grid)
+        return grid
 
     def _tesselate_voronoi(self, centroids, add_exterior, add_vertices, skip_concave):
         if add_exterior:
@@ -1883,7 +1902,9 @@ class Ugrid2d(AbstractUgrid):
             add_vertices,
             skip_concave,
         )
-        return Ugrid2d(vertices[:, 0], vertices[:, 1], FILL_VALUE, faces)
+        grid = Ugrid2d(vertices[:, 0], vertices[:, 1], FILL_VALUE, faces)
+        self._propagate_properties(grid)
+        return grid
 
     def tesselate_centroidal_voronoi(
         self, add_exterior=True, add_vertices=True, skip_concave=False
@@ -1951,9 +1972,10 @@ class Ugrid2d(AbstractUgrid):
         reordered_grid = Ugrid2d(
             self.node_x,
             self.node_y,
-            self.fill_value,
+            FILL_VALUE,
             self.face_node_connectivity[reordering],
         )
+        self._propagate_properties(reordered_grid)
         return reordered_grid, reordering
 
     def refine_polygon(

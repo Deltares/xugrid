@@ -148,8 +148,10 @@ class Ugrid1d(AbstractUgrid):
         node_y_coordinates = ds[y_index].astype(FloatDType).to_numpy()
 
         edge_nodes = connectivity["edge_node_connectivity"]
+        fill_value = ds[edge_nodes].encoding.get("_FillValue", -1)
+        start_index = ds[edge_nodes].attrs.get("start_index", 0)
         edge_node_connectivity = cls._prepare_connectivity(
-            ds[edge_nodes], dtype=IntDType
+            ds[edge_nodes], fill_value, dtype=IntDType
         ).to_numpy()
 
         indexes["node_x"] = x_index
@@ -159,13 +161,14 @@ class Ugrid1d(AbstractUgrid):
         return cls(
             node_x_coordinates,
             node_y_coordinates,
-            FILL_VALUE,
+            fill_value,
             edge_node_connectivity,
             name=topology,
             dataset=dataset[ugrid_vars],
             indexes=indexes,
             projected=projected,
             crs=None,
+            start_index=start_index,
         )
 
     def _clear_geometry_properties(self):
@@ -246,7 +249,7 @@ class Ugrid1d(AbstractUgrid):
 
         dataset = xr.Dataset(data_vars, attrs=attrs)
         if self._dataset:
-            dataset.update(self._dataset)
+            dataset = dataset.merge(self._dataset, compat="override")
         if other is not None:
             dataset = dataset.merge(other)
         if node_x not in dataset or node_y not in dataset:
@@ -574,10 +577,10 @@ class Ugrid1d(AbstractUgrid):
         new_edges = connectivity.renumber(edge_subset)
         node_x = self.node_x[node_index]
         node_y = self.node_y[node_index]
-        grid = self.__class__(
+        grid = Ugrid1d(
             node_x,
             node_y,
-            self.fill_value,
+            FILL_VALUE,
             new_edges,
             name=self.name,
             indexes=self._indexes,
@@ -585,6 +588,7 @@ class Ugrid1d(AbstractUgrid):
             crs=self.crs,
             attrs=self._attrs,
         )
+        self._propagate_properties(grid)
         if return_index:
             indexes = {
                 self.node_dimension: pd.Index(node_index),
