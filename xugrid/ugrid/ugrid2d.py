@@ -352,14 +352,14 @@ class Ugrid2d(AbstractUgrid):
         data_vars = {
             self.name: 0,
             face_nodes: xr.DataArray(
-                data=self._adjust(self.face_node_connectivity),
+                data=self._adjust_connectivity(self.face_node_connectivity),
                 attrs=face_nodes_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             ),
         }
         if self.edge_node_connectivity is not None or optional_attributes:
             data_vars[edge_nodes] = xr.DataArray(
-                data=self._adjust(self.edge_node_connectivity),
+                data=self._adjust_connectivity(self.edge_node_connectivity),
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             )
@@ -371,12 +371,12 @@ class Ugrid2d(AbstractUgrid):
             boundary_edge_dim = self._attrs["boundary_edge_dimension"]
 
             data_vars[face_edges] = xr.DataArray(
-                data=self._adjust(self.face_edge_connectivity),
+                data=self._adjust_connectivity(self.face_edge_connectivity),
                 attrs=face_edges_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[face_faces] = xr.DataArray(
-                data=self._adjust(
+                data=self._adjust_connectivity(
                     connectivity.to_dense(
                         self.face_face_connectivity, self.n_max_node_per_face
                     )
@@ -385,12 +385,12 @@ class Ugrid2d(AbstractUgrid):
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[edge_faces] = xr.DataArray(
-                data=self._adjust(self.edge_face_connectivity),
+                data=self._adjust_connectivity(self.edge_face_connectivity),
                 attrs=edge_faces_attrs,
                 dims=(self.edge_dimension, "two"),
             )
             data_vars[bound_nodes] = xr.DataArray(
-                data=self._adjust(self.boundary_node_connectivity),
+                data=self._adjust_connectivity(self.boundary_node_connectivity),
                 attrs=bound_nodes_attrs,
                 dims=(boundary_edge_dim, "two"),
             )

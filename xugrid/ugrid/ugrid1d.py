@@ -237,7 +237,7 @@ class Ugrid1d(AbstractUgrid):
         data_vars = {
             self.name: 0,
             edge_nodes: xr.DataArray(
-                data=self._adjust(self.edge_node_connectivity),
+                data=self._adjust_connectivity(self.edge_node_connectivity),
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             ),

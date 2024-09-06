@@ -505,7 +505,7 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    def _adjust(self, connectivity: IntArray) -> IntArray:
+    def _adjust_connectivity(self, connectivity: IntArray) -> IntArray:
         """Adjust connectivity for desired fill_value and start_index."""
         c = connectivity.copy()
         if self.start_index == 0 and self.fill_value == FILL_VALUE:
