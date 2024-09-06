@@ -353,6 +353,7 @@ class AbstractUgrid(abc.ABC):
 
     @property
     def fill_value(self) -> int:
+        """Fill value for UGRID connectivity arrays."""
         return self._fill_value
 
     @fill_value.setter
@@ -361,6 +362,7 @@ class AbstractUgrid(abc.ABC):
 
     @property
     def start_index(self) -> int:
+        """Start index for UGRID connectivity arrays."""
         return self._start_index
 
     @start_index.setter

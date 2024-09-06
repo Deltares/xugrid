@@ -26,6 +26,29 @@ Fixed
   value; the fill value is also set when calling
   :meth:`xugrid.UgridDataArrayAccessor.to_netcdf` or
   :meth:`xugrid.UgridDatasetAccessor.to_netcdf`.
+ 
+Added
+~~~~~
+
+- :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` now take an optional
+  ``start_index`` which controls the start index for the UGRID connectivity
+  arrays.
+- :attr:`xugrid.Ugrid1d.fill_value`, :attr:`xugrid.Ugrid1d.start_index`,
+  :attr:`xugrid.Ugrid2d.fill_value`, and :attr:`xugrid.Ugrid2d.start_index`,
+  have been added to get and set the fill value and start index for the UGRID
+  connectivity arrays. (Internally, every array is 0-based, and has a fill
+  value of -1.)
+  
+Changed
+~~~~~~~
+
+- :class:`xugrid.Ugrid1d` and :class:`xugrid.Ugrid2d` will generally preserve
+  the fill value and start index of grids when roundtripping from and to xarray
+  Dataset. An exception is when the start index or fill value varies per
+  connectivity: ``xugrid`` will enforce a single start index and a single fill
+  value per grid. In case of inconsistent values across connectivity arrays,
+  the values associated with the core connectivity are used: for Ugrid2d, this
+  is the face node connectivity.
 
 [0.12.0] 2024-09-03
 -------------------
