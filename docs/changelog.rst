@@ -6,6 +6,27 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- Release 0.12.0 changed the return type of the face node connectivity of
+  :attr:`xugrid.Ugrid2d.voronoi_topology` from a `scipy.sparse.coo_matrix` to
+  an ordinary `np.array` of integers (and similarly for internal voronoi
+  tesselations); this dense array had fill (hard-coded) values of -1,
+  potentially differing from the grid's fill value. This lead to a number of
+  errors for methods relying on voronoi tesselations (such as contour plots)
+  if the fill value of the grid was not -1. Internally, a ``FILL_VALUE = -1``
+  is now used everywhere in connectivity arrays, and fill values are no longer
+  passed for internal methods; a value of -1 is always assumed. When converting
+  the grid (back) to a dataset with :meth:`xugrid.Ugrid1d.to_dataset` or
+  :meth:`xugrid.Ugrid2d.to_dataset`, the fill value is set back to its original
+  value; the fill value is also set when calling
+  :meth:`xugrid.UgridDataArrayAccessor.to_netcdf` or
+  :meth:`xugrid.UgridDatasetAccessor.to_netcdf`.
+
 [0.12.0] 2024-09-03
 -------------------
 

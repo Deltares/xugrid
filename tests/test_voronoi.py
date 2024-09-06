@@ -79,7 +79,6 @@ class TestVoronoi:
                 [3.0, 2.0],  # 11
             ]
         )
-        self.fill_value = -1
         self.face_node_connectivity = np.array(
             [
                 [0, 1, 5, 4],
@@ -91,18 +90,15 @@ class TestVoronoi:
             ]
         )
         self.node_face_connectivity = connectivity.invert_dense_to_sparse(
-            self.face_node_connectivity, self.fill_value
+            self.face_node_connectivity
         )
         (
             self.edge_node_connectivity,
             face_edge_connectivity,
         ) = connectivity.edge_connectivity(
             self.face_node_connectivity,
-            self.fill_value,
         )
-        self.edge_face_connectivity = connectivity.invert_dense(
-            face_edge_connectivity, self.fill_value
-        )
+        self.edge_face_connectivity = connectivity.invert_dense(face_edge_connectivity)
         self.centroids = np.array(
             [
                 [0.5, 0.5],
@@ -160,7 +156,6 @@ class TestVoronoi:
             self.node_face_connectivity,
             self.edge_face_connectivity,
             self.edge_node_connectivity,
-            fill_value=self.fill_value,
         )
         expected_i = np.array([1, 1, 2, 2, 4, 4, 7, 7, 9, 9, 10, 10])
         expected_j = np.array([0, 1, 1, 2, 0, 3, 2, 5, 3, 4, 4, 5])
@@ -178,7 +173,6 @@ class TestVoronoi:
         ) = voronoi.exterior_vertices(
             self.edge_face_connectivity,
             self.edge_node_connectivity,
-            self.fill_value,
             self.vertices,
             self.centroids,
             add_vertices=False,
@@ -223,7 +217,6 @@ class TestVoronoi:
             self.centroids,
             self.edge_face_connectivity,
             self.edge_node_connectivity,
-            self.fill_value,
             add_exterior=True,
         )
         expected_vertices = rowsort(
@@ -240,7 +233,6 @@ class TestVoronoi:
             self.centroids,
             self.edge_face_connectivity,
             self.edge_node_connectivity,
-            self.fill_value,
             add_exterior=True,
             add_vertices=True,
         )

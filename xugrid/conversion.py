@@ -11,6 +11,7 @@ import numpy as np
 import xarray as xr
 
 from xugrid.constants import (
+    FILL_VALUE,
     FloatArray,
     IntArray,
     IntDType,
@@ -48,9 +49,9 @@ def edges_to_linestrings(
 
 
 def faces_to_polygons(
-    x: FloatArray, y: FloatArray, face_node_connectivity: IntArray, fill_value: int
+    x: FloatArray, y: FloatArray, face_node_connectivity: IntArray
 ) -> PolygonArray:
-    is_data = face_node_connectivity != fill_value
+    is_data = face_node_connectivity != FILL_VALUE
     m_per_row = is_data.sum(axis=1)
     i = np.repeat(np.arange(len(face_node_connectivity)), m_per_row)
     c = face_node_connectivity.ravel()[is_data.ravel()]
@@ -98,7 +99,6 @@ def polygons_to_faces(
     n = len(polygons)
     m_per_row = np.bincount(indices)
     m = m_per_row.max()
-    fill_value = -1
     # Allocate 2D array and create a flat view of the dense connectivity
     conn = np.empty((n, m), dtype=IntDType)
     flat_conn = conn.ravel()
@@ -108,10 +108,10 @@ def polygons_to_faces(
         valid = slice(None)  # a[:] equals a[slice(None)]
     else:
         valid = ragged_index(n, m, m_per_row).ravel()
-        flat_conn[~valid] = fill_value
+        flat_conn[~valid] = FILL_VALUE
     flat_conn[valid] = inverse
     x, y = contiguous_xy(unique)
-    return x, y, conn, fill_value
+    return x, y, conn
 
 
 def _scalar_spacing(coords, spacing):

@@ -1191,6 +1191,20 @@ def test_fm_fillvalue_startindex_isel():
     # xugrid 0.6.0 raises "ValueError: Invalid edge_node_connectivity"
     uds.isel({uds.grid.face_dimension: [1]})
 
+    # Check internal fill value. Should be FILL_VALUE
+    grid = uds.ugrid.grid
+    assert (grid.face_node_connectivity != -999).all()
+    gridds = grid.to_dataset()
+    # Should be set back to the origina fill value.
+    assert (gridds["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+
+    # And similarly for the UgridAccessors.
+    ds = uds.ugrid.to_dataset()
+    assert (ds["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+
+    ds_uda = uds["mesh2d_facevar"].ugrid.to_dataset()
+    assert (ds_uda["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+
 
 def test_fm_facenodeconnectivity_fillvalue():
     """

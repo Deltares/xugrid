@@ -402,7 +402,7 @@ def create_snap_to_grid_dataframe(
     vertices = topology.node_coordinates
     edge_centroids = topology.edge_coordinates
     face_edge_connectivity = topology.face_edge_connectivity
-    A = connectivity.to_sparse(face_edge_connectivity, fill_value=-1)
+    A = connectivity.to_sparse(face_edge_connectivity)
     n, m = A.shape
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
 

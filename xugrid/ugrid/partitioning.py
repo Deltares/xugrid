@@ -6,7 +6,7 @@ from typing import List
 import numpy as np
 import xarray as xr
 
-from xugrid.constants import IntArray, IntDType
+from xugrid.constants import FILL_VALUE, IntArray, IntDType
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.ugrid.connectivity import renumber
 from xugrid.ugrid.ugridbase import UgridType
@@ -115,17 +115,17 @@ def _merge_connectivity(gathered, slices):
     return merged, indexes
 
 
-def merge_faces(grids, node_inverse, fill_value: int = -1):
+def merge_faces(grids, node_inverse):
     node_offsets = tuple(accumulate([0] + [grid.n_node for grid in grids]))
     n_face = [grid.n_face for grid in grids]
     n_max_node = max(grid.n_max_node_per_face for grid in grids)
     slices = (0,) + tuple(accumulate(n_face))
 
-    all_faces = np.full((sum(n_face), n_max_node), fill_value, dtype=IntDType)
+    all_faces = np.full((sum(n_face), n_max_node), FILL_VALUE, dtype=IntDType)
     for grid, face_offset, node_offset in zip(grids, slices, node_offsets):
         faces = grid.face_node_connectivity
         n_face, n_node_per_face = faces.shape
-        valid = faces != grid.fill_value
+        valid = faces != FILL_VALUE
         all_faces[face_offset : face_offset + n_face, :n_node_per_face][
             valid
         ] = node_inverse[faces[valid] + node_offset]

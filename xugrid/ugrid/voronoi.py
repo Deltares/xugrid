@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from xugrid.constants import X_EPSILON, FloatArray, IntArray
+from xugrid.constants import FILL_VALUE, X_EPSILON, FloatArray, IntArray
 from xugrid.ugrid.connectivity import (
     area_from_coordinates,
     close_polygons,
@@ -61,7 +61,7 @@ def _create_face_node_connectivity(i: IntArray, j: IntArray) -> IntArray:
     n = len(n_vertex)
     m = n_vertex.max()
     index = ragged_index(n, m, n_vertex)
-    face_node_connectivity = np.full((n, m), -1)
+    face_node_connectivity = np.full((n, m), FILL_VALUE)
     face_node_connectivity[index] = j
     return face_node_connectivity
 
@@ -79,10 +79,9 @@ def interior_centroids(
     node_face_connectivity: sparse.csr_matrix,
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
-    fill_value: int,
 ):
     # Find exterior nodes associated with interior edges
-    is_exterior = edge_face_connectivity[:, 1] == fill_value
+    is_exterior = edge_face_connectivity[:, 1] == FILL_VALUE
     exterior_nodes = np.unique(edge_node_connectivity[is_exterior].ravel())
     m_per_node = node_face_connectivity.getnnz(axis=1)
     is_interior_only = m_per_node > 1
@@ -146,12 +145,11 @@ def _interpolate_between_projections(
 def exterior_vertices(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
-    fill_value: int,
     vertices: FloatArray,
     centroids: FloatArray,
     add_vertices: bool,
 ):
-    is_exterior = edge_face_connectivity[:, 1] == fill_value
+    is_exterior = edge_face_connectivity[:, 1] == FILL_VALUE
     exterior_nodes = edge_node_connectivity[is_exterior]
     # For every exterior node, project the centroids to exterior edges
     edge_vertices = vertices[exterior_nodes]
@@ -211,7 +209,7 @@ def choose_convex(
     faces = np.full((n, m), -1)
     faces[index] = j
     # Close the polygons so we can easily compute areas.
-    closed, _ = close_polygons(faces, -1)
+    closed, _ = close_polygons(faces)
     # Make a copy and insert the original vertices.
     modified_nodes = nodes.copy()
     modified_nodes[-n_interpolated:] = original_vertices
@@ -232,7 +230,6 @@ def exterior_topology(
     edge_face_connectivity: IntArray,
     edge_node_connectivity: IntArray,
     node_face_connectivity: sparse.csr_matrix,
-    fill_value: int,
     vertices: FloatArray,
     centroids: FloatArray,
     add_vertices: bool,
@@ -278,7 +275,6 @@ def exterior_topology(
         node_face_connectivity,
         edge_face_connectivity,
         edge_node_connectivity,
-        fill_value,
     )
     i1, j1 = exterior_centroids(node_face_connectivity)
     (
@@ -291,7 +287,6 @@ def exterior_topology(
     ) = exterior_vertices(
         edge_face_connectivity,
         edge_node_connectivity,
-        fill_value,
         vertices,
         centroids,
         add_vertices,
@@ -337,7 +332,6 @@ def voronoi_topology(
     centroids: FloatArray,
     edge_face_connectivity: IntArray = None,
     edge_node_connectivity: IntArray = None,
-    fill_value: int = None,
     add_exterior: bool = False,
     add_vertices: bool = False,
     skip_concave: bool = False,
@@ -377,8 +371,6 @@ def voronoi_topology(
     centroids: ndarray of floats with shape ``(n_centroid, 2)``
     edge_face_connectivity: ndarray of integers with shape ``(n_edge, 2)``, optional
     edge_node_connectivity: ndarray of integers with shape ``(n_edge, 2)``, optional
-    fill_value: int, optional
-        Fill value for edge_face_connectivity.
     add_exterior: bool, optional
         Whether to consider exterior edges of the original mesh, or to consider
         exclusively centroids.
@@ -401,12 +393,9 @@ def voronoi_topology(
         interpolated.
     """
     if add_exterior:
-        if any(
-            arg is None
-            for arg in [edge_face_connectivity, edge_node_connectivity, fill_value]
-        ):
+        if any(arg is None for arg in [edge_face_connectivity, edge_node_connectivity]):
             raise ValueError(
-                "edge_face_connectivity, edge_node_connectivity, fill_value "
+                "edge_face_connectivity, edge_node_connectivity "
                 "must be provided if add_exterior is True."
             )
 
@@ -415,7 +404,7 @@ def voronoi_topology(
     # take any valid internal polygon we can construct: at least a triangle.
     ncol_per_row = node_face_connectivity.getnnz(axis=1)
     if add_exterior:
-        is_exterior = edge_face_connectivity[:, 1] == fill_value
+        is_exterior = edge_face_connectivity[:, 1] == FILL_VALUE
         exterior_nodes = edge_node_connectivity[is_exterior]
         valid = np.full(len(vertices), True)
         valid[exterior_nodes.ravel()] = False
@@ -449,7 +438,6 @@ def voronoi_topology(
             edge_face_connectivity,
             edge_node_connectivity,
             node_face_connectivity,
-            fill_value,
             vertices,
             centroids,
             add_vertices,

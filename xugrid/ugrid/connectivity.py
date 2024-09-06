@@ -7,7 +7,14 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from xugrid.constants import BoolArray, FloatArray, IntArray, IntDType, SparseMatrix
+from xugrid.constants import (
+    FILL_VALUE,
+    BoolArray,
+    FloatArray,
+    IntArray,
+    IntDType,
+    SparseMatrix,
+)
 
 
 def argsort_rows(array: np.ndarray) -> IntArray:
@@ -215,10 +222,10 @@ def contract_vertices(A: sparse.csr_matrix, indices: IntArray) -> IntArray:
 
 # Conversion between dense and sparse
 # -----------------------------------
-def _to_ij(conn: IntArray, fill_value: int, invert: bool) -> Tuple[IntArray, IntArray]:
+def _to_ij(conn: IntArray, invert: bool) -> Tuple[IntArray, IntArray]:
     n, m = conn.shape
     j = conn.ravel()
-    valid = j != fill_value
+    valid = j != FILL_VALUE
     i = np.repeat(np.arange(n), m)[valid]
     j = j[valid]
     if invert:
@@ -227,10 +234,8 @@ def _to_ij(conn: IntArray, fill_value: int, invert: bool) -> Tuple[IntArray, Int
         return i, j
 
 
-def _to_sparse(
-    conn: IntArray, fill_value: int, invert: bool, sort_indices: bool
-) -> sparse.csr_matrix:
-    i, j = _to_ij(conn, fill_value, invert)
+def _to_sparse(conn: IntArray, invert: bool, sort_indices: bool) -> sparse.csr_matrix:
+    i, j = _to_ij(conn, invert)
     coo_content = (j, (i, j))
     coo_matrix = sparse.coo_matrix(coo_content)
     csr_matrix = coo_matrix.tocsr()
@@ -270,13 +275,11 @@ def ragged_index(n: int, m: int, m_per_row: IntArray) -> BoolArray:
     return (column_number.T < m_per_row).T
 
 
-def to_sparse(
-    conn: IntArray, fill_value: int, sort_indices: bool = True
-) -> sparse.csr_matrix:
-    return _to_sparse(conn, fill_value, invert=False, sort_indices=sort_indices)
+def to_sparse(conn: IntArray, sort_indices: bool = True) -> sparse.csr_matrix:
+    return _to_sparse(conn, invert=False, sort_indices=sort_indices)
 
 
-def to_dense(conn: SparseMatrix, fill_value: int, n_columns: int = None) -> IntArray:
+def to_dense(conn: SparseMatrix, n_columns: int = None) -> IntArray:
     n, _ = conn.shape
     m_per_row = conn.getnnz(axis=1)
     m = m_per_row.max()
@@ -296,7 +299,7 @@ def to_dense(conn: SparseMatrix, fill_value: int, n_columns: int = None) -> IntA
         valid = slice(None)  # a[:] equals a[slice(None)]
     else:
         valid = ragged_index(n, m, m_per_row).ravel()
-        flat_conn[~valid] = fill_value
+        flat_conn[~valid] = FILL_VALUE
 
     if isinstance(conn, sparse.csr_matrix):
         flat_conn[valid] = conn.indices
@@ -310,18 +313,14 @@ def to_dense(conn: SparseMatrix, fill_value: int, n_columns: int = None) -> IntA
 # Inverting connectivities
 # ------------------------
 def invert_dense_to_sparse(
-    conn: IntArray, fill_value: int, sort_indices: bool = True
+    conn: IntArray, sort_indices: bool = True
 ) -> sparse.csr_matrix:
-    return _to_sparse(conn, fill_value, invert=True, sort_indices=sort_indices)
+    return _to_sparse(conn, invert=True, sort_indices=sort_indices)
 
 
-def invert_dense(
-    conn: IntArray, fill_value: int, sort_indices: bool = True
-) -> IntArray:
-    sparse_inverted = _to_sparse(
-        conn, fill_value, invert=True, sort_indices=sort_indices
-    )
-    return to_dense(sparse_inverted, fill_value)
+def invert_dense(conn: IntArray, sort_indices: bool = True) -> IntArray:
+    sparse_inverted = _to_sparse(conn, invert=True, sort_indices=sort_indices)
+    return to_dense(sparse_inverted)
 
 
 def invert_sparse(conn: sparse.csr_matrix) -> sparse.csr_matrix:
@@ -333,9 +332,9 @@ def invert_sparse(conn: sparse.csr_matrix) -> sparse.csr_matrix:
     return inverted.tocsr()
 
 
-def invert_sparse_to_dense(conn: sparse.csr_matrix, fill_value: int) -> IntArray:
+def invert_sparse_to_dense(conn: sparse.csr_matrix) -> IntArray:
     inverted = invert_sparse(conn)
-    return to_dense(inverted, fill_value)
+    return to_dense(inverted)
 
 
 # Renumbering
@@ -353,51 +352,46 @@ def _renumber(a: IntArray) -> IntArray:
     return dense.reshape(a.shape)
 
 
-def renumber(a: IntArray, fill_value: int = None):
-    if fill_value is None:
-        return _renumber(a)
-
-    valid = a != fill_value
-    renumbered = np.full_like(a, fill_value)
+def renumber(a: IntArray):
+    valid = a != FILL_VALUE
+    renumbered = np.full_like(a, FILL_VALUE)
     renumbered[valid] = _renumber(a[valid])
     return renumbered
 
 
-def close_polygons(face_node_connectivity: IntArray, fill_value: int) -> IntArray:
+def close_polygons(face_node_connectivity: IntArray) -> IntArray:
     # Wrap around and create closed polygon: put the first node at the end of the row
     # In case of fill values, replace all fill values
     n, m = face_node_connectivity.shape
-    closed = np.full((n, m + 1), fill_value, dtype=IntDType)
+    closed = np.full((n, m + 1), FILL_VALUE, dtype=IntDType)
     closed[:, :-1] = face_node_connectivity
     first_node = face_node_connectivity[:, 0]
     # Identify fill value, and replace by first node also
-    isfill = closed == fill_value
+    isfill = closed == FILL_VALUE
     closed.ravel()[isfill.ravel()] = np.repeat(first_node, isfill.sum(axis=1))
     return closed, isfill
 
 
-def reverse_orientation(face_node_connectivity: IntArray, fill_value: int):
+def reverse_orientation(face_node_connectivity: IntArray):
     # We cannot simply reverse the rows with [:, ::-1], since there may be fill
     # values present.
     reversed_orientation = face_node_connectivity.copy()
     in_reverse = face_node_connectivity[:, ::-1]
-    in_reverse = in_reverse[in_reverse != fill_value]
-    replace = face_node_connectivity != fill_value
+    in_reverse = in_reverse[in_reverse != FILL_VALUE]
+    replace = face_node_connectivity != FILL_VALUE
     reversed_orientation[replace] = in_reverse
     return reversed_orientation
 
 
-def counterclockwise(
-    face_node_connectivity: IntArray, fill_value: int, nodes: FloatArray
-) -> IntArray:
+def counterclockwise(face_node_connectivity: IntArray, nodes: FloatArray) -> IntArray:
     # TODO: in case of "periodic grids", we need to wrap around the grid.
-    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    closed, _ = close_polygons(face_node_connectivity)
     p = nodes[closed]
     dxy = np.diff(p, axis=1)
     reverse = (np.cross(dxy[:, :-1], dxy[:, 1:])).sum(axis=1) < 0
     ccw = face_node_connectivity.copy()
     if reverse.any():
-        ccw[reverse] = reverse_orientation(face_node_connectivity[reverse], fill_value)
+        ccw[reverse] = reverse_orientation(face_node_connectivity[reverse])
     return ccw
 
 
@@ -405,24 +399,22 @@ def counterclockwise(
 # ----------------------
 def boundary_node_connectivity(
     edge_face_connectivity: IntArray,
-    fill_value: int,
     edge_node_connectivity: IntArray,
 ) -> IntArray:
     """Is a subset of the edge_node_connectivity"""
-    is_boundary = (edge_face_connectivity == fill_value).any(axis=1)
+    is_boundary = (edge_face_connectivity == FILL_VALUE).any(axis=1)
     return edge_node_connectivity[is_boundary]
 
 
 def edge_connectivity(
     face_node_connectivity: IntArray,
-    fill_value: int,
     edge_node_connectivity=None,
 ) -> Tuple[IntArray, IntArray]:
     """Derive new edge_node_connectivity and face_edge_connectivity."""
     prior = edge_node_connectivity
     n, m = face_node_connectivity.shape
     # Close the polygons: [0 1 2 3] -> [0 1 2 3 0]
-    closed, isfill = close_polygons(face_node_connectivity, fill_value)
+    closed, isfill = close_polygons(face_node_connectivity)
     # Allocate array for edge_node_connectivity: includes duplicate edges
     edge_node_connectivity = np.empty((n * m, 2), dtype=IntDType)
     edge_node_connectivity[:, 0] = closed[:, :-1].ravel()
@@ -449,7 +441,7 @@ def edge_connectivity(
         edge_node_connectivity = prior
 
     # Create face_edge_connectivity
-    face_edge_connectivity = np.full((n, m), fill_value, dtype=np.int64)
+    face_edge_connectivity = np.full((n, m), FILL_VALUE, dtype=np.int64)
     isnode = ~isfill[:, :-1]
     face_edge_connectivity[isnode] = inverse_indices
     return edge_node_connectivity, face_edge_connectivity
@@ -457,14 +449,13 @@ def edge_connectivity(
 
 def validate_edge_node_connectivity(
     face_node_connectivity: IntArray,
-    fill_value: int,
     edge_node_connectivity: IntArray,
 ) -> BoolArray:
     """
     * Is the edge defined by the face_node_connectivity?
     * Are the edges unique?
     """
-    new, _ = edge_connectivity(face_node_connectivity, fill_value)
+    new, _ = edge_connectivity(face_node_connectivity)
     old = np.sort(edge_node_connectivity, axis=1)
 
     new1d = new.astype(np.int32).view(np.int64).ravel()
@@ -485,7 +476,6 @@ def validate_edge_node_connectivity(
 
 def face_face_connectivity(
     edge_face_connectivity: IntArray,
-    fill_value: int,
 ) -> sparse.csr_matrix:
     """
     Derive face to face connectivity.
@@ -495,7 +485,7 @@ def face_face_connectivity(
     """
     i = edge_face_connectivity[:, 0]
     j = edge_face_connectivity[:, 1]
-    is_connection = j != fill_value
+    is_connection = j != FILL_VALUE
     i = i[is_connection]
     j = j[is_connection]
     edge_index = np.arange(len(edge_face_connectivity))[is_connection]
@@ -557,12 +547,11 @@ def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
 
 def perimeter(
     face_node_connectivity: IntArray,
-    fill_value: int,
     node_x: FloatArray,
     node_y: FloatArray,
 ):
     nodes = np.column_stack([node_x, node_y])
-    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    closed, _ = close_polygons(face_node_connectivity)
     coordinates = nodes[closed]
     # Shift coordinates to avoid precision loss
     xy0 = coordinates[:, 0]
@@ -583,19 +572,17 @@ def area_from_coordinates(
 
 def area(
     face_node_connectivity: IntArray,
-    fill_value: int,
     node_x: FloatArray,
     node_y: FloatArray,
 ) -> FloatArray:
     nodes = np.column_stack([node_x, node_y])
-    closed, _ = close_polygons(face_node_connectivity, fill_value)
+    closed, _ = close_polygons(face_node_connectivity)
     coordinates = nodes[closed]
     return area_from_coordinates(coordinates)
 
 
 def centroids(
     face_node_connectivity: IntArray,
-    fill_value: int,
     node_x: FloatArray,
     node_y: FloatArray,
 ) -> FloatArray:
@@ -610,7 +597,7 @@ def centroids(
         # This is mathematically equivalent to triangulating, computing triangle centroids
         # and computing the area weighted average of those centroids
         centroid_coordinates = np.empty((n_face, 2), dtype=np.float64)
-        closed, _ = close_polygons(face_node_connectivity, fill_value)
+        closed, _ = close_polygons(face_node_connectivity)
         coordinates = nodes[closed]
         # Express coordinates relative to first node
         xy0 = coordinates[:, 0]
@@ -644,7 +631,6 @@ def _circumcenters_triangle(xxx: FloatArray, yyy: FloatArray):
 
 def circumcenters(
     face_node_connectivity: IntArray,
-    fill_value: int,
     node_x: FloatArray,
     node_y: FloatArray,
 ) -> FloatArray:
@@ -684,16 +670,14 @@ def _triangulate(i: IntArray, j: IntArray, n_triangle_per_row: IntArray) -> IntA
     return triangles
 
 
-def triangulate_dense(
-    face_node_connectivity: IntArray, fill_value: int
-) -> Tuple[IntArray, IntArray]:
+def triangulate_dense(face_node_connectivity: IntArray) -> Tuple[IntArray, IntArray]:
     n_face, n_max = face_node_connectivity.shape
 
     if n_max == 3:
         triangles = face_node_connectivity.copy()
         return triangles, np.arange(n_face)
 
-    valid = face_node_connectivity != fill_value
+    valid = face_node_connectivity != FILL_VALUE
     n_per_row = valid.sum(axis=1)
     n_triangle_per_row = n_per_row - 2
     i = np.repeat(np.arange(n_face), n_per_row)
@@ -727,9 +711,7 @@ def triangulate_coo(
     return triangles, triangle_face_connectivity
 
 
-def triangulate(
-    face_node_connectivity, fill_value: int | None = None
-) -> Tuple[IntArray, IntArray]:
+def triangulate(face_node_connectivity) -> Tuple[IntArray, IntArray]:
     """
     Convert polygons into its constituent triangles.
 
@@ -747,9 +729,7 @@ def triangulate(
     triangle_face_connectivity: ndarray of integers with shape ``(n_triangle,)``
     """
     if isinstance(face_node_connectivity, IntArray):
-        if fill_value is None:
-            raise ValueError("fill_value is required for dense connectivity")
-        return triangulate_dense(face_node_connectivity, fill_value)
+        return triangulate_dense(face_node_connectivity)
     elif isinstance(face_node_connectivity, sparse.coo_matrix):
         return triangulate_coo(face_node_connectivity)
     else:

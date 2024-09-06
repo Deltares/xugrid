@@ -10,7 +10,7 @@ import xarray as xr
 from numpy.typing import ArrayLike
 from scipy.sparse import csr_matrix
 
-from xugrid.constants import BoolArray, FloatArray, IntArray
+from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
 
 
@@ -483,6 +483,12 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
+    def _set_fillvalue(self, connectivity: IntArray) -> IntArray:
+        c = connectivity.copy()
+        if self.fill_value != FILL_VALUE:
+            c[c == FILL_VALUE] = self.fill_value
+        return c
+
     def _precheck(self, multi_index):
         dim, index = multi_index.popitem()
         for check_dim, check_index in multi_index.items():
@@ -646,7 +652,7 @@ class AbstractUgrid(abc.ABC):
         """
         if self._node_edge_connectivity is None:
             self._node_edge_connectivity = connectivity.invert_dense_to_sparse(
-                self.edge_node_connectivity, self.fill_value
+                self.edge_node_connectivity
             )
         return self._node_edge_connectivity
 

@@ -511,7 +511,7 @@ def pcolormesh(grid, da, ax, **kwargs):
         raise ValueError("pcolormesh only supports data on faces")
 
     nodes = grid.node_coordinates
-    faces, _ = close_polygons(grid.face_node_connectivity, grid.fill_value)
+    faces, _ = close_polygons(grid.face_node_connectivity)
     vertices = nodes[faces]
 
     # PolyCollection takes a norm, but not vmin, vmax.
