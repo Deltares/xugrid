@@ -485,7 +485,8 @@ class AbstractUgrid(abc.ABC):
 
     def _set_fillvalue(self, connectivity: IntArray) -> IntArray:
         c = connectivity.copy()
-        c[c == FILL_VALUE] = self.fill_value
+        if self.fill_value != FILL_VALUE:
+            c[c == FILL_VALUE] = self.fill_value
         return c
 
     def _precheck(self, multi_index):
