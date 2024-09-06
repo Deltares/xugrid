@@ -1191,19 +1191,38 @@ def test_fm_fillvalue_startindex_isel():
     # xugrid 0.6.0 raises "ValueError: Invalid edge_node_connectivity"
     uds.isel({uds.grid.face_dimension: [1]})
 
+
+def test_alternative_fill_value_start_index():
+    uds = get_ugrid_fillvaluem999_startindex1_uds()
     # Check internal fill value. Should be FILL_VALUE
     grid = uds.ugrid.grid
+    assert grid.face_node_connectivity.dtype == "int64"
     assert (grid.face_node_connectivity != -999).all()
     gridds = grid.to_dataset()
     # Should be set back to the origina fill value.
-    assert (gridds["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+    faces = gridds["mesh2d_face_nodes"]
+    assert (faces != xugrid.constants.FILL_VALUE).all()
+    assert faces.attrs["start_index"] == 1
+    uniq = np.unique(faces)
+    assert uniq[0] == -999
+    assert uniq[1] == 1
 
     # And similarly for the UgridAccessors.
     ds = uds.ugrid.to_dataset()
-    assert (ds["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+    faces = ds["mesh2d_face_nodes"]
+    assert (faces != xugrid.constants.FILL_VALUE).all()
+    assert faces.attrs["start_index"] == 1
+    uniq = np.unique(faces)
+    assert uniq[0] == -999
+    assert uniq[1] == 1
 
     ds_uda = uds["mesh2d_facevar"].ugrid.to_dataset()
-    assert (ds_uda["mesh2d_face_nodes"] != xugrid.constants.FILL_VALUE).all()
+    faces = ds_uda["mesh2d_face_nodes"]
+    assert (faces != xugrid.constants.FILL_VALUE).all()
+    assert faces.attrs["start_index"] == 1
+    uniq = np.unique(faces)
+    assert uniq[0] == -999
+    assert uniq[1] == 1
 
 
 def test_fm_facenodeconnectivity_fillvalue():

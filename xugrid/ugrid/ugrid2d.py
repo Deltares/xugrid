@@ -82,6 +82,9 @@ class Ugrid2d(AbstractUgrid):
         UGRID topology attributes. Should not be provided together with
         dataset: if other names are required, update the dataset instead.
         A name entry is ignored, as name is given explicitly.
+    start_index: int, 0 or 1, default is 0.
+        Start index of the connectivity arrays. Must match the start index
+        of the provided face_node_connectivity and edge_node_connectivity.
     """
 
     def __init__(
@@ -97,10 +100,12 @@ class Ugrid2d(AbstractUgrid):
         projected: bool = True,
         crs: Any = None,
         attrs: Dict[str, str] = None,
+        start_index: int = 0,
     ):
         self.node_x = np.ascontiguousarray(node_x)
         self.node_y = np.ascontiguousarray(node_y)
         self.fill_value = fill_value
+        self.start_index = start_index
         self.name = name
         self.projected = projected
 
@@ -113,10 +118,12 @@ class Ugrid2d(AbstractUgrid):
                 "face_node_connectivity should be an array of integers or a sparse matrix"
             )
 
-        # Ensure the fill value is FILL_VALUE (-1)
-        self.face_node_connectivity[
-            self.face_node_connectivity == self.fill_value
-        ] = FILL_VALUE
+        # Ensure the fill value is FILL_VALUE (-1) and the array is 0-based.
+        is_fill = self.face_node_connectivity == self.fill_value
+        if self.start_index != 0:
+            self.face_node_connectivity[~is_fill] -= self.start_index
+        if self.fill_value != FILL_VALUE:
+            self.face_node_connectivity[is_fill] = FILL_VALUE
 
         # TODO: do this in validation instead. While UGRID conventions demand it,
         # where does it go wrong?
@@ -284,13 +291,13 @@ class Ugrid2d(AbstractUgrid):
         face_nodes = connectivity["face_node_connectivity"]
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         face_node_connectivity = cls._prepare_connectivity(
-            ds[face_nodes], fill_value, dtype=IntDType
+            ds[face_nodes], dtype=IntDType
         ).to_numpy()
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:
             edge_node_connectivity = cls._prepare_connectivity(
-                ds[edge_nodes], fill_value, dtype=IntDType
+                ds[edge_nodes], dtype=IntDType
             ).to_numpy()
         else:
             edge_node_connectivity = None
@@ -315,6 +322,8 @@ class Ugrid2d(AbstractUgrid):
     def _get_name_and_attrs(self, name: str):
         key = f"{name}_connectivity"
         attrs = conventions.DEFAULT_ATTRS[key]
+        if "start_index" in attrs:
+            attrs["start_index"] = self.start_index
         if "_FillValue" in attrs:
             attrs["_FillValue"] = self.fill_value
         return self._attrs[key], attrs
@@ -331,14 +340,14 @@ class Ugrid2d(AbstractUgrid):
         data_vars = {
             self.name: 0,
             face_nodes: xr.DataArray(
-                data=self._set_fillvalue(self.face_node_connectivity),
+                data=self._adjust(self.face_node_connectivity),
                 attrs=face_nodes_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             ),
         }
         if self.edge_node_connectivity is not None or optional_attributes:
             data_vars[edge_nodes] = xr.DataArray(
-                data=self.edge_node_connectivity,  # has no fill values
+                data=self._adjust(self.edge_node_connectivity),
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             )
@@ -350,12 +359,12 @@ class Ugrid2d(AbstractUgrid):
             boundary_edge_dim = self._attrs["boundary_edge_dimension"]
 
             data_vars[face_edges] = xr.DataArray(
-                data=self._set_fillvalue(self.face_edge_connectivity),
+                data=self._adjust(self.face_edge_connectivity),
                 attrs=face_edges_attrs,
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[face_faces] = xr.DataArray(
-                data=self._set_fillvalue(
+                data=self._adjust(
                     connectivity.to_dense(
                         self.face_face_connectivity, self.n_max_node_per_face
                     )
@@ -364,12 +373,12 @@ class Ugrid2d(AbstractUgrid):
                 dims=(self.face_dimension, nmax_node_dim),
             )
             data_vars[edge_faces] = xr.DataArray(
-                data=self._set_fillvalue(self.edge_face_connectivity),
+                data=self._adjust(self.edge_face_connectivity),
                 attrs=edge_faces_attrs,
                 dims=(self.edge_dimension, "two"),
             )
             data_vars[bound_nodes] = xr.DataArray(
-                data=self._set_fillvalue(self.boundary_node_connectivity),
+                data=self._adjust(self.boundary_node_connectivity),
                 attrs=bound_nodes_attrs,
                 dims=(boundary_edge_dim, "two"),
             )
@@ -380,7 +389,7 @@ class Ugrid2d(AbstractUgrid):
 
         dataset = xr.Dataset(data_vars, attrs=attrs)
         if self._dataset:
-            dataset.update(self._dataset)
+            dataset = dataset.merge(self._dataset, compat="override")
         if other is not None:
             dataset = dataset.merge(other)
         if node_x not in dataset or node_y not in dataset:

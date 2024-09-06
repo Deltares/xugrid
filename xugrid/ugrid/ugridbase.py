@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Set, Tuple, Type, Union, cast
+from typing import Dict, Literal, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -348,6 +348,24 @@ class AbstractUgrid(abc.ABC):
         return copy.deepcopy(self)
 
     @property
+    def fill_value(self) -> int:
+        return self._fill_value
+
+    @fill_value.setter
+    def fill_value(self, value: int):
+        self._fill_value = value
+
+    @property
+    def start_index(self) -> int:
+        return self._start_index
+
+    @start_index.setter
+    def start_index(self, value: Literal[0, 1]):
+        if value not in (0, 1):
+            raise ValueError(f"start_index must be 0 or 1, received: {value}")
+        self._start_index = value
+
+    @property
     def attrs(self):
         return copy.deepcopy(self._attrs)
 
@@ -457,9 +475,7 @@ class AbstractUgrid(abc.ABC):
         )
 
     @staticmethod
-    def _prepare_connectivity(
-        da: xr.DataArray, fill_value: Union[float, int], dtype: type
-    ) -> xr.DataArray:
+    def _prepare_connectivity(da: xr.DataArray, dtype: type) -> xr.DataArray:
         start_index = da.attrs.get("start_index", 0)
         if start_index not in (0, 1):
             raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
@@ -473,7 +489,7 @@ class AbstractUgrid(abc.ABC):
         else:
             is_fill = np.isnan(data)
         # Set the fill_value before casting: otherwise the cast may fail.
-        data[is_fill] = fill_value
+        data[is_fill] = FILL_VALUE
         cast = data.astype(dtype, copy=False)
 
         not_fill = ~is_fill
@@ -483,8 +499,13 @@ class AbstractUgrid(abc.ABC):
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    def _set_fillvalue(self, connectivity: IntArray) -> IntArray:
+    def _adjust(self, connectivity: IntArray) -> IntArray:
+        """Adjust connectivity for desired fill_value and start_index."""
         c = connectivity.copy()
+        if self.start_index == 0 and self.fill_value == FILL_VALUE:
+            return c
+        if self.start_index != 0:
+            c = np.where(c != FILL_VALUE, c + self.start_index, c)
         if self.fill_value != FILL_VALUE:
             c[c == FILL_VALUE] = self.fill_value
         return c

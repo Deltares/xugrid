@@ -51,6 +51,9 @@ class Ugrid1d(AbstractUgrid):
         UGRID topology attributes. Should not be provided together with
         dataset: if other names are required, update the dataset instead.
         A name entry is ignored, as name is given explicitly.
+    start_index: int, 0 or 1, default is 0.
+        Start index of the connectivity arrays. Must match the start index
+        of the provided face_node_connectivity and edge_node_connectivity.
     """
 
     def __init__(
@@ -65,11 +68,13 @@ class Ugrid1d(AbstractUgrid):
         projected: bool = True,
         crs: Any = None,
         attrs: Dict[str, str] = None,
+        start_index: int = 0,
     ):
         self.node_x = np.ascontiguousarray(node_x)
         self.node_y = np.ascontiguousarray(node_y)
         self.fill_value = fill_value
-        self.edge_node_connectivity = edge_node_connectivity
+        self.start_index = start_index
+        self.edge_node_connectivity = edge_node_connectivity - self.start_index
         self.name = name
         self.projected = projected
 
@@ -144,7 +149,7 @@ class Ugrid1d(AbstractUgrid):
 
         edge_nodes = connectivity["edge_node_connectivity"]
         edge_node_connectivity = cls._prepare_connectivity(
-            ds[edge_nodes], FILL_VALUE, dtype=IntDType
+            ds[edge_nodes], dtype=IntDType
         ).to_numpy()
 
         indexes["node_x"] = x_index
@@ -229,7 +234,7 @@ class Ugrid1d(AbstractUgrid):
         data_vars = {
             self.name: 0,
             edge_nodes: xr.DataArray(
-                data=self.edge_node_connectivity,
+                data=self._adjust(self.edge_node_connectivity),
                 attrs=edge_nodes_attrs,
                 dims=(self.edge_dimension, "two"),
             ),
