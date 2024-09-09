@@ -110,6 +110,11 @@ def test_ugrid1d_properties():
     assert np.array_equal(coords[grid.node_dimension], grid.node_coordinates)
     assert np.array_equal(coords[grid.edge_dimension], grid.edge_coordinates)
 
+    with pytest.raises(ValueError, match="start_index must be 0 or 1, received: 2"):
+        grid.start_index = 2
+    grid.start_index = 1
+    assert grid._start_index == 1
+
 
 def test_ugrid1d_egde_bounds():
     grid = grid1d()

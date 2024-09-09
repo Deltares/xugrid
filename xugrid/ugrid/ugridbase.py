@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Set, Tuple, Type, Union, cast
+from typing import Dict, Literal, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -288,6 +288,10 @@ class AbstractUgrid(abc.ABC):
         else:
             return new
 
+    def _propagate_properties(self, other) -> None:
+        other.start_index = self.start_index
+        other.fill_value = self.fill_value
+
     @staticmethod
     def _single_topology(dataset: xr.Dataset):
         topologies = dataset.ugrid_roles.topology
@@ -346,6 +350,26 @@ class AbstractUgrid(abc.ABC):
     def copy(self):
         """Create a deepcopy."""
         return copy.deepcopy(self)
+
+    @property
+    def fill_value(self) -> int:
+        """Fill value for UGRID connectivity arrays."""
+        return self._fill_value
+
+    @fill_value.setter
+    def fill_value(self, value: int):
+        self._fill_value = value
+
+    @property
+    def start_index(self) -> int:
+        """Start index for UGRID connectivity arrays."""
+        return self._start_index
+
+    @start_index.setter
+    def start_index(self, value: Literal[0, 1]):
+        if value not in (0, 1):
+            raise ValueError(f"start_index must be 0 or 1, received: {value}")
+        self._start_index = value
 
     @property
     def attrs(self):
@@ -458,12 +482,13 @@ class AbstractUgrid(abc.ABC):
 
     @staticmethod
     def _prepare_connectivity(
-        da: xr.DataArray, fill_value: Union[float, int], dtype: type
+        da: xr.DataArray, fill_value: Union[int, float], dtype: type
     ) -> xr.DataArray:
-        start_index = da.attrs.get("start_index", 0)
-        if start_index not in (0, 1):
-            raise ValueError(f"start_index should be 0 or 1, received: {start_index}")
-
+        """
+        Undo the work xarray does when it encounters a _FillValue for UGRID
+        connectivity arrays. Set an external unified value back (across all
+        connectivities!), and cast back to the desired dtype.
+        """
         data = da.to_numpy().copy()
         # If xarray detects a _FillValue, it converts the array to floats and
         # replaces the fill value by NaN, and moves the _FillValue to
@@ -475,18 +500,21 @@ class AbstractUgrid(abc.ABC):
         # Set the fill_value before casting: otherwise the cast may fail.
         data[is_fill] = fill_value
         cast = data.astype(dtype, copy=False)
-
         not_fill = ~is_fill
-        if start_index:
-            cast[not_fill] -= start_index
         if (cast[not_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
         return da.copy(data=cast)
 
-    def _set_fillvalue(self, connectivity: IntArray) -> IntArray:
+    def _adjust_connectivity(self, connectivity: IntArray) -> IntArray:
+        """Adjust connectivity for desired fill_value and start_index."""
         c = connectivity.copy()
+        if self.start_index == 0 and self.fill_value == FILL_VALUE:
+            return c
+        is_fill = c == FILL_VALUE
+        if self.start_index:
+            c[~is_fill] += self.start_index
         if self.fill_value != FILL_VALUE:
-            c[c == FILL_VALUE] = self.fill_value
+            c[is_fill] = self.fill_value
         return c
 
     def _precheck(self, multi_index):
