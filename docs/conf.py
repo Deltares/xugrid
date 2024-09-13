@@ -117,7 +117,7 @@ html_theme_options = {
         {
             "name": "Deltares",
             "url": "https://deltares.nl/en/",
-            "icon": "_static/deltares-white.svg",
+            "icon": "_static/deltares-blue.svg",
             "type": "local",
         },
     ],
@@ -126,7 +126,6 @@ html_theme_options = {
         "image_light": "xugrid-logo.svg",
         "image_dark": "xugrid-logo.svg",
     },
-    "navbar_end": ["theme-switcher", "navbar-icon-links"],
 }
 
 # -- Extension configuration -------------------------------------------------
