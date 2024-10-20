@@ -408,9 +408,7 @@ class UgridDataset(DatasetForwardMixin):
         return UgridDataset(ds, [grid])
 
     @staticmethod
-    def from_structured(
-        ds: xr.DataArray, topology: dict | None = None
-    ) -> "UgridDataArray":
+    def from_structured(ds: xr.Dataset, topology: dict | None = None) -> "UgridDataset":
         """
         Create a UgridDataset from a (structured) xarray Dataset.
 
@@ -422,11 +420,11 @@ class UgridDataset(DatasetForwardMixin):
 
         Parameters
         ----------
-        da: xr.DataArray
-            Last two dimensions must be ``("y", "x")``.
+        ds: xr.Dataset
         topology: dict, optional, default is None.
             Mapping of topology name to x and y coordinate variables.
-            If None, a single mesh2d topology is assumed.
+            If None, searches for "x" and "y" coordinates and creates a Ugrid2d
+            topology with name "mesh2d".
 
         Returns
         -------
@@ -434,11 +432,14 @@ class UgridDataset(DatasetForwardMixin):
         """
         if topology is None:
             topology = {"mesh2d": ("x", "y")}
-        return
 
+        dataset = ds
+        grids = []
+        for name, (x, y) in topology.items():
+            stackdims, grid = Ugrid2d.from_structured(
+                ds, x=x, y=y, name=name, return_dims=True
+            )
+            dataset = dataset.stack(*stackdims).drop_vars(stackdims, errors="ignore")  # noqa: PD013
+            grids.append(grid)
 
-#        grids = []
-#        datasets = []
-#        for key, (xcoord, ycoord) in topology.items():
-#            grid = Ugrid2d.from_structured
-#            selection = ds.isel()
+        return UgridDataset(dataset, grids)
