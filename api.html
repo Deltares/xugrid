@@ -600,7 +600,6 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured.html">xugrid.Ugrid2d.from_structured</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_multicoord.html">xugrid.Ugrid2d.from_structured_multicoord</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_bounds.html">xugrid.Ugrid2d.from_structured_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals1d.html">xugrid.Ugrid2d.from_structured_intervals1d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals2d.html">xugrid.Ugrid2d.from_structured_intervals2d</a></li>
@@ -1439,34 +1438,31 @@ UgridDataArray.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_geodataframe.html#xugrid.Ugrid2d.from_geodataframe" title="xugrid.Ugrid2d.from_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_geodataframe</span></code></a>(geodataframe)</p></td>
 <td><p>Convert a geodataframe of polygons to UGRID2D topology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured" title="xugrid.Ugrid2d.from_structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured</span></code></a>(data[, x, y])</p></td>
-<td><p>Create a Ugrid2d topology from an axis-aligned rectilinear structured topology.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured" title="xugrid.Ugrid2d.from_structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured</span></code></a>(data[, x, y, name, ...])</p></td>
+<td><p>Create a Ugrid2d topology from a structured topology axis-aligned rectilinear, rotated or (approximated) curvilinear topologies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_multicoord.html#xugrid.Ugrid2d.from_structured_multicoord" title="xugrid.Ugrid2d.from_structured_multicoord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_multicoord</span></code></a>(data, x, y)</p></td>
-<td><p>Create a Ugrid2d topology from a structured topology, including rotated and (approximated) curvilinear topologies.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_bounds.html#xugrid.Ugrid2d.from_structured_bounds" title="xugrid.Ugrid2d.from_structured_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_bounds</span></code></a>(x_bounds, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_bounds.html#xugrid.Ugrid2d.from_structured_bounds" title="xugrid.Ugrid2d.from_structured_bounds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_bounds</span></code></a>(x_bounds, ...)</p></td>
 <td><p>Create a Ugrid2d topology from a structured topology based on 1D bounds.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals1d.html#xugrid.Ugrid2d.from_structured_intervals1d" title="xugrid.Ugrid2d.from_structured_intervals1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_intervals1d</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals1d.html#xugrid.Ugrid2d.from_structured_intervals1d" title="xugrid.Ugrid2d.from_structured_intervals1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_intervals1d</span></code></a>(...[, name])</p></td>
 <td><p>Create a Ugrid2d topology from a structured topology based on 1D intervals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals2d.html#xugrid.Ugrid2d.from_structured_intervals2d" title="xugrid.Ugrid2d.from_structured_intervals2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_intervals2d</span></code></a>(...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_structured_intervals2d.html#xugrid.Ugrid2d.from_structured_intervals2d" title="xugrid.Ugrid2d.from_structured_intervals2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_structured_intervals2d</span></code></a>(...[, name])</p></td>
 <td><p>Create a Ugrid2d topology from a structured topology based on 2D intervals.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_shapely.html#xugrid.Ugrid2d.from_shapely" title="xugrid.Ugrid2d.from_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_shapely</span></code></a>(geometry[, crs])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.from_shapely.html#xugrid.Ugrid2d.from_shapely" title="xugrid.Ugrid2d.from_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.from_shapely</span></code></a>(geometry[, crs])</p></td>
 <td><p>Convert an array of shapely polygons to UGRID2D topology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.to_shapely.html#xugrid.Ugrid2d.to_shapely" title="xugrid.Ugrid2d.to_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.to_shapely</span></code></a>(dim)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.to_shapely.html#xugrid.Ugrid2d.to_shapely" title="xugrid.Ugrid2d.to_shapely"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.to_shapely</span></code></a>(dim)</p></td>
 <td><p>Convert UGRID topology to shapely objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.earcut_triangulate_polygons.html#xugrid.Ugrid2d.earcut_triangulate_polygons" title="xugrid.Ugrid2d.earcut_triangulate_polygons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.earcut_triangulate_polygons</span></code></a>(polygons)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.earcut_triangulate_polygons.html#xugrid.Ugrid2d.earcut_triangulate_polygons" title="xugrid.Ugrid2d.earcut_triangulate_polygons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.earcut_triangulate_polygons</span></code></a>(polygons)</p></td>
 <td><p>Break down polygons using mapbox_earcut, and create a mesh from the resulting triangles.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.create_data_array.html#xugrid.Ugrid2d.create_data_array" title="xugrid.Ugrid2d.create_data_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.create_data_array</span></code></a>(data, facet)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.create_data_array.html#xugrid.Ugrid2d.create_data_array" title="xugrid.Ugrid2d.create_data_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.create_data_array</span></code></a>(data, facet)</p></td>
 <td><p>Create a UgridDataArray from this grid and a 1D array of values.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.plot.html#xugrid.Ugrid2d.plot" title="xugrid.Ugrid2d.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.plot</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.plot.html#xugrid.Ugrid2d.plot" title="xugrid.Ugrid2d.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.plot</span></code></a>(**kwargs)</p></td>
 <td><p>Plot the edges of the mesh.</p></td>
 </tr>
 </tbody>

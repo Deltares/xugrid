@@ -2614,10 +2614,7 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_from_intervals_helper</span><span class="p">(</span>
-        <span class="n">node_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">node_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">nx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">ny</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">node_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">node_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">nx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ny</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
         <span class="n">linear_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">node_x</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="c1"># Allocate face_node_connectivity</span>
@@ -2633,7 +2630,7 @@ document.write(`
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="n">upper</span><span class="p">,</span> <span class="n">right</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">face_nodes</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span><span class="p">[</span><span class="n">upper</span><span class="p">,</span> <span class="n">left</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Ugrid2d.from_structured_intervals1d">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured_intervals1d.html#xugrid.Ugrid2d.from_structured_intervals1d">[docs]</a>
@@ -2641,6 +2638,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">from_structured_intervals1d</span><span class="p">(</span>
         <span class="n">x_intervals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">y_intervals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a Ugrid2d topology from a structured topology based on 1D intervals.</span>
@@ -2651,6 +2649,7 @@ document.write(`
 <span class="sd">            x-coordinate interval values for N row and M columns.</span>
 <span class="sd">        y_intervals: np.ndarray of shape (N + 1,)</span>
 <span class="sd">            y-coordinate interval values for N row and M columns.</span>
+<span class="sd">        name: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x_intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x_intervals</span><span class="p">)</span>
         <span class="n">y_intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_intervals</span><span class="p">)</span>
@@ -2659,7 +2658,7 @@ document.write(`
         <span class="n">node_y</span><span class="p">,</span> <span class="n">node_x</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">y_intervals</span><span class="p">,</span> <span class="n">x_intervals</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.from_structured_intervals2d">
@@ -2668,6 +2667,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">from_structured_intervals2d</span><span class="p">(</span>
         <span class="n">x_intervals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">y_intervals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a Ugrid2d topology from a structured topology based on 2D intervals.</span>
@@ -2678,6 +2678,7 @@ document.write(`
 <span class="sd">            x-coordinate interval values for N row and M columns.</span>
 <span class="sd">        y_intervals: np.ndarray of shape shape (N + 1, M + 1)</span>
 <span class="sd">            y-coordinate interval values for N row and M columns.</span>
+<span class="sd">        name: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x_intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x_intervals</span><span class="p">)</span>
         <span class="n">y_intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_intervals</span><span class="p">)</span>
@@ -2693,7 +2694,7 @@ document.write(`
         <span class="n">ny</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="n">x_intervals</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">node_y</span> <span class="o">=</span> <span class="n">y_intervals</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.from_structured_bounds">
@@ -2702,6 +2703,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">from_structured_bounds</span><span class="p">(</span>
         <span class="n">x_bounds</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">y_bounds</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a Ugrid2d topology from a structured topology based on 1D bounds.</span>
@@ -2714,6 +2716,7 @@ document.write(`
 <span class="sd">            x-coordinate bounds for N row and M columns.</span>
 <span class="sd">        y_bounds: np.ndarray of shape (N, 2)</span>
 <span class="sd">            y-coordinate bounds for N row and M columns.</span>
+<span class="sd">        name: str</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2724,37 +2727,17 @@ document.write(`
         <span class="n">x</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">bounds_to_vertices</span><span class="p">(</span><span class="n">x_bounds</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">bounds_to_vertices</span><span class="p">(</span><span class="n">y_bounds</span><span class="p">)</span>
         <span class="n">node_y</span><span class="p">,</span> <span class="n">node_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_intervals_helper</span><span class="p">(</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Ugrid2d.from_structured">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_from_structured_singlecoord</span><span class="p">(</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a Ugrid2d topology from an axis-aligned rectilinear structured topology.</span>
-
-<span class="sd">        This method assumes the coordinates are 1D.</span>
-
-<span class="sd">        Use ``from_structured_multicoord`` for 2D x and y coordinates, e.g. for</span>
-<span class="sd">        (approximated) curvilinear and rotated structured topologies.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data: xr.DataArray or xr.Dataset</span>
-<span class="sd">        x: str, optional</span>
-<span class="sd">            Name of the 1D coordinate to use as the UGRID x-coordinate.</span>
-<span class="sd">        y: str, optional</span>
-<span class="sd">            Name of the 1D coordinate to use as the UGRID y-coordinate.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        grid: Ugrid2d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This method assumes the coordinates are 1D.</span>
         <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_xy_coords</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2764,43 +2747,95 @@ document.write(`
 
         <span class="n">x_intervals</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
         <span class="n">y_intervals</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_intervals1d</span><span class="p">(</span><span class="n">x_intervals</span><span class="p">,</span> <span class="n">y_intervals</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_intervals1d</span><span class="p">(</span><span class="n">x_intervals</span><span class="p">,</span> <span class="n">y_intervals</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="Ugrid2d.from_structured_multicoord">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured_multicoord.html#xugrid.Ugrid2d.from_structured_multicoord">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured_multicoord</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_from_structured_multicoord</span><span class="p">(</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a Ugrid2d topology from a structured topology, including rotated</span>
-<span class="sd">        and (approximated) curvilinear topologies.</span>
-
-<span class="sd">        This method assumes the coordinates are 2D.</span>
-
-<span class="sd">        Use ``from_structured`` for 1D x and y coordinates, which is generally</span>
-<span class="sd">        the case for axis-aligned rectilinear topologies (most rasters).</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data: xr.DataArray or xr.Dataset</span>
-<span class="sd">        x: str</span>
-<span class="sd">            Name of the 2D coordinate to use as the UGRID x-coordinate.</span>
-<span class="sd">        y: str</span>
-<span class="sd">            Name of the 2D coordinate to use as the UGRID y-coordinate.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        grid: Ugrid2d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This method assumes the coordinates are 2D and thereby supports rotated</span>
+        <span class="c1"># or (approximated) curvilinear topologies.</span>
         <span class="n">xv</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">check_monotonic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">xv</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">yv</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">yv</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_interval_breaks</span><span class="p">(</span><span class="n">yv</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">check_monotonic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_intervals2d</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">yv</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_intervals2d</span><span class="p">(</span><span class="n">xv</span><span class="p">,</span> <span class="n">yv</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_structured_multicoord</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid2d&quot;</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Ugrid2d.from_structured_multicoord has been deprecated. &quot;</span>
+            <span class="s2">&quot;Use Ugrid2d.from_structured instead.&quot;</span><span class="p">,</span>
+            <span class="ne">FutureWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ugrid2d.from_structured">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.from_structured.html#xugrid.Ugrid2d.from_structured">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mesh2d&quot;</span><span class="p">,</span>
+        <span class="n">return_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a Ugrid2d topology from a structured topology axis-aligned rectilinear, rotated</span>
+<span class="sd">        or (approximated) curvilinear topologies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: xr.DataArray or xr.Dataset</span>
+<span class="sd">        x: str, optional</span>
+<span class="sd">            Name of the 1D or 2D coordinate to use as the UGRID x-coordinate.</span>
+<span class="sd">        y: str, optional</span>
+<span class="sd">            Name of the 1D or 2D coordinate to use as the UGRID y-coordinate.</span>
+<span class="sd">        return_dims: bool</span>
+<span class="sd">            If True, returns a tuple containing the name of the y and x dimensions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grid: Ugrid2d</span>
+<span class="sd">        dims: tuple of str, optional</span>
+<span class="sd">            Provided if ``return_dims`` is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide both x and y, or neither.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">infer_xy_coords</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+            <span class="n">missing_coords</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">-</span> <span class="p">{</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">missing_coords</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Coordinates </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> are not present, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;expected one of: </span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Find out if it&#39;s multi-dimensional</span>
+        <span class="n">ndim</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span>
+        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_structured_singlecoord</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">_from_structured_multicoord</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x and y must be 1D or 2D. Found: </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_dims</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">grid</span><span class="p">,</span> <span class="n">dims</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">grid</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.to_shapely">

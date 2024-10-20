@@ -654,7 +654,7 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        da: xr.DataArray</span>
-<span class="sd">            Last two dimensions must be ``(&quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">            Last two dimensions must be the y and x dimension (in that order!).</span>
 <span class="sd">        x: str, default: None</span>
 <span class="sd">            Which coordinate to use as the UGRID x-coordinate.</span>
 <span class="sd">        y: str, default: None</span>
@@ -664,30 +664,15 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        unstructured: UgridDataArray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Last two dimensions of da must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide both x and y, or neither.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Find out if it&#39;s multi-dimensional</span>
-            <span class="n">xdim</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span>
-            <span class="k">if</span> <span class="n">xdim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">xdim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured_multicoord</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x and y must be 1D or 2D. Found: </span><span class="si">{</span><span class="n">xdim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">dims</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">}</span>
-        <span class="n">face_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-            <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
-            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">],</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;DataArray must have at least two spatial dimensions. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Found: </span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">grid</span><span class="p">,</span> <span class="n">stackdims</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">return_dims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">face_da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>  <span class="c1"># noqa: PD013</span>
+            <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">stackdims</span><span class="p">},</span> <span class="n">create_index</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">stackdims</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">face_da</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 
@@ -837,7 +822,44 @@ document.write(`
         <span class="n">grid</span> <span class="o">=</span> <span class="n">grid_from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div>
-</div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;UgridDataset&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a UgridDataset from a (structured) xarray Dataset.</span>
+
+<span class="sd">        The spatial dimensions are flattened into a single UGRID face dimension.</span>
+
+<span class="sd">        By default, this method looks for the &quot;x&quot; and &quot;y&quot; coordinates and assumes</span>
+<span class="sd">        they are one-dimensional. To convert rotated or curvilinear coordinates,</span>
+<span class="sd">        provide the names of the x and y coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ds: xr.Dataset</span>
+<span class="sd">        topology: dict, optional, default is None.</span>
+<span class="sd">            Mapping of topology name to x and y coordinate variables.</span>
+<span class="sd">            If None, searches for &quot;x&quot; and &quot;y&quot; coordinates and creates a Ugrid2d</span>
+<span class="sd">            topology with name &quot;mesh2d&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        unstructured: UgridDataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">topology</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mesh2d&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)}</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">stackdims</span><span class="p">,</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span>
+                <span class="n">ds</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">return_dims</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="o">*</span><span class="n">stackdims</span><span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">stackdims</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># noqa: PD013</span>
+            <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
 
 </pre></div>
 

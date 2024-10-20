@@ -348,7 +348,6 @@ UGRID2D Topology
     Ugrid2d.to_dataset
     Ugrid2d.from_geodataframe
     Ugrid2d.from_structured
-    Ugrid2d.from_structured_multicoord
     Ugrid2d.from_structured_bounds
     Ugrid2d.from_structured_intervals1d
     Ugrid2d.from_structured_intervals2d
