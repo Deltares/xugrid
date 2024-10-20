@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Changed
+~~~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor.from_structured` previously required the
+  literal dimensions ``("y", "x")``. This requirement has been relaxed, it will
+  now infer the dimensions from the provided coordinates.
+
 [0.12.1] 2024-09-09
 -------------------
 

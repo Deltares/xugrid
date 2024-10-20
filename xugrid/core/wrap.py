@@ -16,7 +16,7 @@ from numpy.typing import ArrayLike
 from pandas import RangeIndex
 
 import xugrid
-from xugrid.conversion import grid_from_dataset, grid_from_geodataframe
+from xugrid.conversion import grid_from_dataset, grid_from_geodataframe, infer_xy_coords
 from xugrid.core.utils import unique_grids
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType, align
@@ -260,21 +260,33 @@ class UgridDataArray(DataArrayForwardMixin):
         -------
         unstructured: UgridDataArray
         """
-        if da.dims[-2:] != ("y", "x"):
-            raise ValueError('Last two dimensions of da must be ("y", "x")')
+        if da.ndim < 2:
+            raise ValueError(
+                "DataArray must have at least two spatial dimensions. "
+                f"Found: {da.dims}."
+            )
         if (x is None) ^ (y is None):
             raise ValueError("Provide both x and y, or neither.")
+        # Infer x, y coords: works only for 1D coords.
         if x is None:
-            grid = Ugrid2d.from_structured(da)
+            x, y = infer_xy_coords(da)
+
+        # Find out if it's multi-dimensional
+        ndim = da[x].ndim
+        lastdims = da.dims[-2:]
+        if ndim == 1:
+            grid = Ugrid2d.from_structured(da, x=x, y=y)
+            expected = (da["y"].dims[0], da["x"].dims[0])
+        elif ndim == 2:
+            grid = Ugrid2d.from_structured_multicoord(da, x=x, y=y)
+            expected = da[x].dims
         else:
-            # Find out if it's multi-dimensional
-            xdim = da[x].ndim
-            if xdim == 1:
-                grid = Ugrid2d.from_structured(da, x=x, y=y)
-            elif xdim == 2:
-                grid = Ugrid2d.from_structured_multicoord(da, x=x, y=y)
-            else:
-                raise ValueError(f"x and y must be 1D or 2D. Found: {xdim}")
+            raise ValueError(f"x and y must be 1D or 2D. Found: {ndim}")
+
+        if da.dims[-2:] != expected:
+            raise ValueError(
+                f"Last two dimensions of da must be {expected}, received: {lastdims}"
+            )
 
         dims = da.dims[:-2]
         coords = {k: da.coords[k] for k in dims}

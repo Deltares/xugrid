@@ -164,7 +164,9 @@ class TestUgridDataArray:
 
     def test_from_structured(self):
         da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
-        with pytest.raises(ValueError, match="Last two dimensions of da"):
+        with pytest.raises(
+            ValueError, match="DataArray must have at least two spatial dimensions"
+        ):
             xugrid.UgridDataArray.from_structured(da)
 
         da = xr.DataArray(
@@ -173,6 +175,10 @@ class TestUgridDataArray:
             dims=["layer", "y", "x"],
             name="grid",
         )
+
+        with pytest.raises(ValueError, match="Last two dimensions of da"):
+            xugrid.UgridDataArray.from_structured(da.transpose())
+
         uda = xugrid.UgridDataArray.from_structured(da)
         assert isinstance(uda, xugrid.UgridDataArray)
         assert uda.name == "grid"
