@@ -1217,7 +1217,7 @@ def test_from_structured():
     assert grid.n_face == 4
 
 
-def test_form_structured_multicoord():
+def test_from_structured_multicoord():
     da = xr.DataArray(
         data=np.ones((2, 2)),
         coords={
@@ -1226,7 +1226,7 @@ def test_form_structured_multicoord():
         },
         dims=("y", "x"),
     )
-    grid = xugrid.Ugrid2d.from_structured_multicoord(da, x="xc", y="yc")
+    grid = xugrid.Ugrid2d._from_structured_multicoord(da, x="xc", y="yc")
     assert isinstance(grid, xugrid.Ugrid2d)
     assert grid.n_face == 4
 

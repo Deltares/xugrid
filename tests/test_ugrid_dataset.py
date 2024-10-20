@@ -176,8 +176,10 @@ class TestUgridDataArray:
             name="grid",
         )
 
-        with pytest.raises(ValueError, match="Last two dimensions of da"):
-            xugrid.UgridDataArray.from_structured(da.transpose())
+        with pytest.raises(ValueError, match="Provide both x and y, or neither."):
+            xugrid.UgridDataArray.from_structured(da, x="this")
+        with pytest.raises(ValueError, match="Coordinates xc and yc are not present."):
+            xugrid.UgridDataArray.from_structured(da, x="xc", y="yc")
 
         uda = xugrid.UgridDataArray.from_structured(da)
         assert isinstance(uda, xugrid.UgridDataArray)
@@ -188,6 +190,14 @@ class TestUgridDataArray:
         # Check whether flipping the y-axis doesn't cause any problems
         flipped = da.isel(y=slice(None, None, -1))
         uda = xugrid.UgridDataArray.from_structured(flipped)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+
+        daT = da.transpose()
+        uda = xugrid.UgridDataArray.from_structured(daT)
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert uda.name == "grid"
+        assert uda.dims == ("layer", "mesh2d_nFaces")
+        assert uda.shape == (2, 12)
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
 
     def test_from_structured_multicoord(self):

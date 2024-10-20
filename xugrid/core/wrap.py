@@ -16,7 +16,7 @@ from numpy.typing import ArrayLike
 from pandas import RangeIndex
 
 import xugrid
-from xugrid.conversion import grid_from_dataset, grid_from_geodataframe, infer_xy_coords
+from xugrid.conversion import grid_from_dataset, grid_from_geodataframe
 from xugrid.core.utils import unique_grids
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType, align
@@ -250,7 +250,7 @@ class UgridDataArray(DataArrayForwardMixin):
         Parameters
         ----------
         da: xr.DataArray
-            Last two dimensions must be ``("y", "x")``.
+            Last two dimensions must be the y and x dimension (in that order!).
         x: str, default: None
             Which coordinate to use as the UGRID x-coordinate.
         y: str, default: None
@@ -265,37 +265,10 @@ class UgridDataArray(DataArrayForwardMixin):
                 "DataArray must have at least two spatial dimensions. "
                 f"Found: {da.dims}."
             )
-        if (x is None) ^ (y is None):
-            raise ValueError("Provide both x and y, or neither.")
-        # Infer x, y coords: works only for 1D coords.
-        if x is None:
-            x, y = infer_xy_coords(da)
-
-        # Find out if it's multi-dimensional
-        ndim = da[x].ndim
-        lastdims = da.dims[-2:]
-        if ndim == 1:
-            grid = Ugrid2d.from_structured(da, x=x, y=y)
-            expected = (da["y"].dims[0], da["x"].dims[0])
-        elif ndim == 2:
-            grid = Ugrid2d.from_structured_multicoord(da, x=x, y=y)
-            expected = da[x].dims
-        else:
-            raise ValueError(f"x and y must be 1D or 2D. Found: {ndim}")
-
-        if da.dims[-2:] != expected:
-            raise ValueError(
-                f"Last two dimensions of da must be {expected}, received: {lastdims}"
-            )
-
-        dims = da.dims[:-2]
-        coords = {k: da.coords[k] for k in dims}
-        face_da = xr.DataArray(
-            da.data.reshape(*da.shape[:-2], -1),
-            coords=coords,
-            dims=[*dims, grid.face_dimension],
-            name=da.name,
-        )
+        grid, stackdims = Ugrid2d.from_structured(da, x, y, return_dims=True)
+        face_da = da.stack(  # noqa: PD013
+            {grid.face_dimension: stackdims}, create_index=False
+        ).drop_vars(stackdims, errors="ignore")
         return UgridDataArray(face_da, grid)
 
     @staticmethod
@@ -433,3 +406,39 @@ class UgridDataset(DatasetForwardMixin):
         grid = grid_from_geodataframe(geodataframe)
         ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1))
         return UgridDataset(ds, [grid])
+
+    @staticmethod
+    def from_structured(
+        ds: xr.DataArray, topology: dict | None = None
+    ) -> "UgridDataArray":
+        """
+        Create a UgridDataset from a (structured) xarray Dataset.
+
+        The spatial dimensions are flattened into a single UGRID face dimension.
+
+        By default, this method looks for the "x" and "y" coordinates and assumes
+        they are one-dimensional. To convert rotated or curvilinear coordinates,
+        provide the names of the x and y coordinates.
+
+        Parameters
+        ----------
+        da: xr.DataArray
+            Last two dimensions must be ``("y", "x")``.
+        topology: dict, optional, default is None.
+            Mapping of topology name to x and y coordinate variables.
+            If None, a single mesh2d topology is assumed.
+
+        Returns
+        -------
+        unstructured: UgridDataset
+        """
+        if topology is None:
+            topology = {"mesh2d": ("x", "y")}
+        return
+
+
+#        grids = []
+#        datasets = []
+#        for key, (xcoord, ycoord) in topology.items():
+#            grid = Ugrid2d.from_structured
+#            selection = ds.isel()
