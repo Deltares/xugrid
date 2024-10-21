@@ -2283,6 +2283,17 @@ class Ugrid2d(AbstractUgrid):
         Create a Ugrid2d topology from a structured topology axis-aligned rectilinear, rotated
         or (approximated) curvilinear topologies.
 
+        By default, this method looks for:
+
+        1. ``"x"`` and ``"y"`` dimensions.
+        2. ``"longitude"`` and ``"latitude"`` dimensions.
+        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
+        4. ``"standard_name"`` attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "project_y_coordinate" on coordinate
+           variables.
+
+        Specify the x and y coordinate names explicitly otherwise.
+
         Parameters
         ----------
         data: xr.DataArray or xr.Dataset

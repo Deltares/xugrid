@@ -243,9 +243,16 @@ class UgridDataArray(DataArrayForwardMixin):
 
         The spatial dimensions are flattened into a single UGRID face dimension.
 
-        By default, this method looks for the "x" and "y" coordinates and assumes
-        they are one-dimensional. To convert rotated or curvilinear coordinates,
-        provide the names of the x and y coordinates.
+        By default, this method looks for:
+
+        1. ``"x"`` and ``"y"`` dimensions.
+        2. ``"longitude"`` and ``"latitude"`` dimensions.
+        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
+        4. ``"standard_name"`` attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "project_y_coordinate" on coordinate
+           variables.
+
+        Specify the x and y coordinate names explicitly otherwise.
 
         Parameters
         ----------
@@ -416,16 +423,24 @@ class UgridDataset(DatasetForwardMixin):
 
         The spatial dimensions are flattened into a single UGRID face dimension.
 
-        By default, this method looks for the ``"x"`` and ``"y"`` coordinates
-        and assumes they are one-dimensional. To convert rotated or curvilinear
-        coordinates, provide the names of the x and y coordinates.
+        By default, this method looks for:
+
+        1. ``"x"`` and ``"y"`` dimensions.
+        2. ``"longitude"`` and ``"latitude"`` dimensions.
+        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
+        4. ``"standard_name"`` attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "project_y_coordinate" on coordinate
+           variables.
+
+        Specify the x and y coordinate names explicitly otherwise, see the
+        examples.
 
         Parameters
         ----------
         dataset: xr.Dataset
         topology: dict, optional, default is None.
             Mapping of topology name to x and y coordinate variables.
-            If None, defaults to ``{"mesh2d": ("x", "y")}``.
+            If None, defaults to ``{"mesh2d": (None, None)}``.
 
         Returns
         -------
@@ -433,22 +448,22 @@ class UgridDataset(DatasetForwardMixin):
 
         Examples
         --------
-        By default, this method will look for 1D ``"x"`` and ``"y"``
+        By default, this method will look for ``"x"`` and ``"y"``
         coordinates and returns a UgriDataset with a Ugrid topology named
         mesh2d:
 
         >>> uds = xugrid.UgridDataset.from_structured(dataset)
 
-        In case of rotated or curvilinear coordinates, the name of the
-        resulting UGRID topology and the x and y coordinates must be specified:
+        In case of other names, the name of the resulting UGRID topology and
+        the x and y coordinates must be specified:
 
         >>> uds = xugrid.UgridDataset.from_structured(
         >>>     dataset,
-        >>>     topology={"mesh2d": ("xc", "yc")},
+        >>>     topology={"my_mesh2d": ("xc", "yc")},
         >>> )
 
-        In case of multiple grid topologies in a single dataset, these must be
-        specified as well:
+        In case of multiple grid topologies in a single dataset, the names must
+        be specified as well:
 
         >>> uds = xugrid.UgridDataset.from_structured(
         >>>     dataset,
@@ -456,7 +471,7 @@ class UgridDataset(DatasetForwardMixin):
         >>> )
         """
         if topology is None:
-            topology = {"mesh2d": ("x", "y")}
+            topology = {"mesh2d": (None, None)}
 
         grids = []
         dss = []
