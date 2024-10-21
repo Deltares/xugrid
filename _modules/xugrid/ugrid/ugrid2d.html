@@ -2792,6 +2792,17 @@ document.write(`
 <span class="sd">        Create a Ugrid2d topology from a structured topology axis-aligned rectilinear, rotated</span>
 <span class="sd">        or (approximated) curvilinear topologies.</span>
 
+<span class="sd">        By default, this method looks for:</span>
+
+<span class="sd">        1. ``&quot;x&quot;`` and ``&quot;y&quot;`` dimensions.</span>
+<span class="sd">        2. ``&quot;longitude&quot;`` and ``&quot;latitude&quot;`` dimensions.</span>
+<span class="sd">        3. ``&quot;axis&quot;`` attributes of &quot;X&quot; or &quot;Y&quot; on coordinates.</span>
+<span class="sd">        4. ``&quot;standard_name&quot;`` attributes of &quot;longitude&quot;, &quot;latitude&quot;,</span>
+<span class="sd">           &quot;projection_x_coordinate&quot;, or &quot;project_y_coordinate&quot; on coordinate</span>
+<span class="sd">           variables.</span>
+
+<span class="sd">        Specify the x and y coordinate names explicitly otherwise.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data: xr.DataArray or xr.Dataset</span>
