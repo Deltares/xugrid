@@ -243,14 +243,21 @@ class UgridDataArray(DataArrayForwardMixin):
 
         The spatial dimensions are flattened into a single UGRID face dimension.
 
-        By default, this method looks for the "x" and "y" coordinates and assumes
-        they are one-dimensional. To convert rotated or curvilinear coordinates,
-        provide the names of the x and y coordinates.
+        By default, this method looks for:
+
+        1. ``"x"`` and ``"y"`` dimensions.
+        2. ``"longitude"`` and ``"latitude"`` dimensions.
+        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
+        4. ``"standard_name"`` attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "project_y_coordinate" on coordinate
+           variables.
+
+        Specify the x and y coordinate names explicitly otherwise.
 
         Parameters
         ----------
         da: xr.DataArray
-            Last two dimensions must be ``("y", "x")``.
+            Last two dimensions must be the y and x dimension (in that order!).
         x: str, default: None
             Which coordinate to use as the UGRID x-coordinate.
         y: str, default: None
@@ -260,30 +267,15 @@ class UgridDataArray(DataArrayForwardMixin):
         -------
         unstructured: UgridDataArray
         """
-        if da.dims[-2:] != ("y", "x"):
-            raise ValueError('Last two dimensions of da must be ("y", "x")')
-        if (x is None) ^ (y is None):
-            raise ValueError("Provide both x and y, or neither.")
-        if x is None:
-            grid = Ugrid2d.from_structured(da)
-        else:
-            # Find out if it's multi-dimensional
-            xdim = da[x].ndim
-            if xdim == 1:
-                grid = Ugrid2d.from_structured(da, x=x, y=y)
-            elif xdim == 2:
-                grid = Ugrid2d.from_structured_multicoord(da, x=x, y=y)
-            else:
-                raise ValueError(f"x and y must be 1D or 2D. Found: {xdim}")
-
-        dims = da.dims[:-2]
-        coords = {k: da.coords[k] for k in dims}
-        face_da = xr.DataArray(
-            da.data.reshape(*da.shape[:-2], -1),
-            coords=coords,
-            dims=[*dims, grid.face_dimension],
-            name=da.name,
-        )
+        if da.ndim < 2:
+            raise ValueError(
+                "DataArray must have at least two spatial dimensions. "
+                f"Found: {da.dims}."
+            )
+        grid, stackdims = Ugrid2d.from_structured(da, x, y, return_dims=True)
+        face_da = da.stack(  # noqa: PD013
+            {grid.face_dimension: stackdims}, create_index=False
+        ).drop_vars(stackdims, errors="ignore")
         return UgridDataArray(face_da, grid)
 
     @staticmethod
@@ -421,3 +413,89 @@ class UgridDataset(DatasetForwardMixin):
         grid = grid_from_geodataframe(geodataframe)
         ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1))
         return UgridDataset(ds, [grid])
+
+    @staticmethod
+    def from_structured(
+        dataset: xr.Dataset, topology: dict | None = None
+    ) -> "UgridDataset":
+        """
+        Create a UgridDataset from a (structured) xarray Dataset.
+
+        The spatial dimensions are flattened into a single UGRID face dimension.
+
+        By default, this method looks for:
+
+        1. ``"x"`` and ``"y"`` dimensions.
+        2. ``"longitude"`` and ``"latitude"`` dimensions.
+        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
+        4. ``"standard_name"`` attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "project_y_coordinate" on coordinate
+           variables.
+
+        Specify the x and y coordinate names explicitly otherwise, see the
+        examples.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+        topology: dict, optional, default is None.
+            Mapping of topology name to x and y coordinate variables.
+            If None, defaults to ``{"mesh2d": (None, None)}``.
+
+        Returns
+        -------
+        unstructured: UgridDataset
+
+        Examples
+        --------
+        By default, this method will look for ``"x"`` and ``"y"``
+        coordinates and returns a UgriDataset with a Ugrid topology named
+        mesh2d:
+
+        >>> uds = xugrid.UgridDataset.from_structured(dataset)
+
+        In case of other names, the name of the resulting UGRID topology and
+        the x and y coordinates must be specified:
+
+        >>> uds = xugrid.UgridDataset.from_structured(
+        >>>     dataset,
+        >>>     topology={"my_mesh2d": ("xc", "yc")},
+        >>> )
+
+        In case of multiple grid topologies in a single dataset, the names must
+        be specified as well:
+
+        >>> uds = xugrid.UgridDataset.from_structured(
+        >>>     dataset,
+        >>>     topology={"mesh2d_xy": ("x", "y"), "mesh2d_lonlat": {"lon", "lat"},
+        >>> )
+        """
+        if topology is None:
+            topology = {"mesh2d": (None, None)}
+
+        grids = []
+        dss = []
+        for name, (x, y) in topology.items():
+            grid, stackdims = Ugrid2d.from_structured(
+                dataset, x=x, y=y, name=name, return_dims=True
+            )
+            # Use subset to check that ALL dims of stackdims are present in the
+            # variable.
+            checkdims = set(stackdims)
+            ugrid_vars = [
+                name
+                for name, var in dataset.data_vars.items()
+                if checkdims.issubset(var.dims)
+            ]
+            dss.append(
+                dataset[ugrid_vars]  # noqa: PD013
+                .stack({grid.face_dimension: stackdims})
+                .drop_vars(stackdims + (grid.face_dimension,))
+            )
+            grids.append(grid)
+        # Add the original dataset to include all non-UGRID variables.
+        dss.append(dataset)
+        # Then merge with compat="override". This'll pick the first available
+        # variable: i.e. it will prioritize the UGRID form.
+        merged = xr.merge(dss, compat="override")
+        return UgridDataset(merged, grids)

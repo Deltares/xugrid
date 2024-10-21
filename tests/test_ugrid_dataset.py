@@ -162,47 +162,6 @@ class TestUgridDataArray:
         renamed = self.uda.ugrid.rename("renamed")
         assert "renamed_nFaces" in renamed.dims
 
-    def test_from_structured(self):
-        da = xr.DataArray([0.0, 1.0, 2.0], {"x": [5.0, 10.0, 15.0]}, ["x"])
-        with pytest.raises(ValueError, match="Last two dimensions of da"):
-            xugrid.UgridDataArray.from_structured(da)
-
-        da = xr.DataArray(
-            data=np.arange(2 * 3 * 4).reshape((2, 3, 4)),
-            coords={"layer": [1, 2], "y": [5.0, 10.0, 15.0], "x": [2.0, 4.0, 6.0, 8.0]},
-            dims=["layer", "y", "x"],
-            name="grid",
-        )
-        uda = xugrid.UgridDataArray.from_structured(da)
-        assert isinstance(uda, xugrid.UgridDataArray)
-        assert uda.name == "grid"
-        assert uda.dims == ("layer", "mesh2d_nFaces")
-        assert uda.shape == (2, 12)
-        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
-        # Check whether flipping the y-axis doesn't cause any problems
-        flipped = da.isel(y=slice(None, None, -1))
-        uda = xugrid.UgridDataArray.from_structured(flipped)
-        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
-
-    def test_from_structured_multicoord(self):
-        da = xr.DataArray(
-            data=[[0, 1], [2, 3]],
-            coords={
-                "yc": (("y", "x"), [[12.0, 11.0], [12.0, 11.0]]),
-                "xc": (("y", "x"), [[10.0, 12.0], [10.0, 12.0]]),
-            },
-            dims=("y", "x"),
-        )
-        uda = xugrid.UgridDataArray.from_structured(da)
-        assert isinstance(uda, xugrid.UgridDataArray)
-        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [-0.5, 0.5, 1.5])
-        assert np.array_equal(uda.data, [0, 1, 2, 3])
-
-        uda = xugrid.UgridDataArray.from_structured(da, x="xc", y="yc")
-        assert isinstance(uda, xugrid.UgridDataArray)
-        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
-        assert np.array_equal(uda.data, [0, 1, 2, 3])
-
     def test_unary_op(self):
         alltrue = self.uda.astype(bool)
         allfalse = alltrue.copy()
@@ -804,6 +763,113 @@ class TestMultiTopologyUgridDataset:
     def test_reindex_like(self):
         back = self.uds.ugrid.reindex_like(self.uds)
         assert isinstance(back, xugrid.UgridDataset)
+
+
+class TestFromStructured:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.da1d = xr.DataArray(
+            [0.0, 1.0, 2.0, 3.0], {"x": [2.0, 4.0, 6.0, 8.0]}, ["x"]
+        )
+        self.da2d = xr.DataArray(
+            data=np.arange(2 * 3 * 4).reshape((2, 3, 4)),
+            coords={"layer": [1, 2], "y": [5.0, 10.0, 15.0], "x": [2.0, 4.0, 6.0, 8.0]},
+            dims=["layer", "y", "x"],
+            name="grid",
+        )
+        self.da_coords2d = xr.DataArray(
+            data=[[0, 1], [2, 3]],
+            coords={
+                "yc": (("y", "x"), [[12.0, 11.0], [12.0, 11.0]]),
+                "xc": (("y", "x"), [[10.0, 12.0], [10.0, 12.0]]),
+            },
+            dims=("y", "x"),
+        )
+        self.ds = xr.Dataset(
+            {
+                "a": self.da2d,
+                "b": self.da1d,
+                "c": 1.0,
+            }
+        )
+
+    def test_error_1d(self):
+        with pytest.raises(
+            ValueError, match="DataArray must have at least two spatial dimensions"
+        ):
+            xugrid.UgridDataArray.from_structured(self.da1d)
+
+    def test_error_x_xor_y(self):
+        with pytest.raises(ValueError, match="Provide both x and y, or neither."):
+            xugrid.UgridDataArray.from_structured(self.da2d, x="this")
+
+    def test_missing_xy(self):
+        with pytest.raises(ValueError, match="Coordinates xc and yc are not present."):
+            xugrid.UgridDataArray.from_structured(self.da2d, x="xc", y="yc")
+
+    def test_from_dataarray(self):
+        uda = xugrid.UgridDataArray.from_structured(self.da2d)
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert uda.name == "grid"
+        assert uda.dims == ("layer", "mesh2d_nFaces")
+        assert uda.shape == (2, 12)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+        # Check whether flipping the y-axis doesn't cause any problems
+        flipped = self.da2d.isel(y=slice(None, None, -1))
+        uda = xugrid.UgridDataArray.from_structured(flipped)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+
+        # And test transposed.
+        daT = self.da2d.transpose()
+        uda = xugrid.UgridDataArray.from_structured(daT)
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert uda.name == "grid"
+        assert uda.dims == ("layer", "mesh2d_nFaces")
+        assert uda.shape == (2, 12)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+
+    def test_from_multicoord(self):
+        uda = xugrid.UgridDataArray.from_structured(self.da_coords2d)
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [-0.5, 0.5, 1.5])
+        assert np.array_equal(uda.data, [0, 1, 2, 3])
+
+        uda = xugrid.UgridDataArray.from_structured(self.da_coords2d, x="xc", y="yc")
+        assert isinstance(uda, xugrid.UgridDataArray)
+        assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
+        assert np.array_equal(uda.data, [0, 1, 2, 3])
+
+    def test_from_dataset(self):
+        uds = xugrid.UgridDataset.from_structured(self.ds)
+        assert isinstance(uds, xugrid.UgridDataset)
+        assert set(uds.data_vars) == {"a", "b", "c"}
+        assert uds["a"].dims == ("layer", "mesh2d_nFaces")
+        assert uds["b"].dims == ("x",)
+        assert uds["c"].dims == ()
+        uda = uds["a"]
+        assert uda.shape == (2, 12)
+        assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
+
+    def test_from_multicoord_dataset(self):
+        ds = self.ds.copy()
+        da = self.da_coords2d.rename({"x": "x1", "y": "y1"})
+        ds["d"] = da
+        # Unspecified: it'll only infer x and y.
+        uds = xugrid.UgridDataset.from_structured(ds)
+        assert isinstance(uds, xugrid.UgridDataset)
+        assert uds["a"].dims == ("layer", "mesh2d_nFaces")
+        assert uds["d"].dims == ("y1", "x1")
+        assert len(uds.ugrid.grids) == 1
+        # Now specify separate topologies.
+        uds = xugrid.UgridDataset.from_structured(
+            ds, {"mesh2d_0": ("x", "y"), "mesh2d_1": ("xc", "yc")}
+        )
+        assert isinstance(uds, xugrid.UgridDataset)
+        assert uds["a"].dims == ("layer", "mesh2d_0_nFaces")
+        assert uds["b"].dims == ("x",)
+        assert uds["c"].dims == ()
+        assert uds["d"].dims == ("mesh2d_1_nFaces",)
+        assert len(uds.ugrid.grids) == 2
 
 
 def test_multiple_coordinates():
