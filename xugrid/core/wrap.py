@@ -408,38 +408,79 @@ class UgridDataset(DatasetForwardMixin):
         return UgridDataset(ds, [grid])
 
     @staticmethod
-    def from_structured(ds: xr.Dataset, topology: dict | None = None) -> "UgridDataset":
+    def from_structured(
+        dataset: xr.Dataset, topology: dict | None = None
+    ) -> "UgridDataset":
         """
         Create a UgridDataset from a (structured) xarray Dataset.
 
         The spatial dimensions are flattened into a single UGRID face dimension.
 
-        By default, this method looks for the "x" and "y" coordinates and assumes
-        they are one-dimensional. To convert rotated or curvilinear coordinates,
-        provide the names of the x and y coordinates.
+        By default, this method looks for the ``"x"`` and ``"y"`` coordinates
+        and assumes they are one-dimensional. To convert rotated or curvilinear
+        coordinates, provide the names of the x and y coordinates.
 
         Parameters
         ----------
-        ds: xr.Dataset
+        dataset: xr.Dataset
         topology: dict, optional, default is None.
             Mapping of topology name to x and y coordinate variables.
-            If None, searches for "x" and "y" coordinates and creates a Ugrid2d
-            topology with name "mesh2d".
+            If None, defaults to ``{"mesh2d": ("x", "y")}``.
 
         Returns
         -------
         unstructured: UgridDataset
+
+        Examples
+        --------
+        By default, this method will look for 1D ``"x"`` and ``"y"``
+        coordinates and returns a UgriDataset with a Ugrid topology named
+        mesh2d:
+
+        >>> uds = xugrid.UgridDataset.from_structured(dataset)
+
+        In case of rotated or curvilinear coordinates, the name of the
+        resulting UGRID topology and the x and y coordinates must be specified:
+
+        >>> uds = xugrid.UgridDataset.from_structured(
+        >>>     dataset,
+        >>>     topology={"mesh2d": ("xc", "yc")},
+        >>> )
+
+        In case of multiple grid topologies in a single dataset, these must be
+        specified as well:
+
+        >>> uds = xugrid.UgridDataset.from_structured(
+        >>>     dataset,
+        >>>     topology={"mesh2d_xy": ("x", "y"), "mesh2d_lonlat": {"lon", "lat"},
+        >>> )
         """
         if topology is None:
             topology = {"mesh2d": ("x", "y")}
 
-        dataset = ds
         grids = []
+        dss = []
         for name, (x, y) in topology.items():
-            stackdims, grid = Ugrid2d.from_structured(
-                ds, x=x, y=y, name=name, return_dims=True
+            grid, stackdims = Ugrid2d.from_structured(
+                dataset, x=x, y=y, name=name, return_dims=True
             )
-            dataset = dataset.stack(*stackdims).drop_vars(stackdims, errors="ignore")  # noqa: PD013
+            # Use subset to check that ALL dims of stackdims are present in the
+            # variable.
+            checkdims = set(stackdims)
+            ugrid_vars = [
+                name
+                for name, var in dataset.data_vars.items()
+                if checkdims.issubset(var.dims)
+            ]
+            dss.append(
+                dataset[ugrid_vars]  # noqa: PD013
+                .stack({grid.face_dimension: stackdims})
+                .drop_vars(stackdims + (grid.face_dimension,))
+            )
             grids.append(grid)
-
-        return UgridDataset(dataset, grids)
+        # Add the original dataset to include all non-UGRID variables.
+        dss.append(dataset)
+        # Then merge with compat="override". This'll pick the first available
+        # variable: i.e. it will prioritize the UGRID form.
+        merged = xr.merge(dss, compat="override")
+        return UgridDataset(merged, grids)

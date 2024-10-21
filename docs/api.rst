@@ -55,6 +55,7 @@ UgridDataset
     UgridDataset
     UgridDataset.ugrid
     UgridDataset.from_geodataframe
+    UgridDataset.from_structured
 
 UGRID Accessor
 --------------

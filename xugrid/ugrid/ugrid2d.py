@@ -2305,7 +2305,7 @@ class Ugrid2d(AbstractUgrid):
             x, y = conversion.infer_xy_coords(data)
         else:
             coords = set(data.coords)
-            missing_coords = coords - {x, y}
+            missing_coords = {x, y} - coords
             if missing_coords:
                 raise ValueError(
                     f"Coordinates {x} and {y} are not present, "
