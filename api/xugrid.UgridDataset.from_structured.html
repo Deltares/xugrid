@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>xugrid.Ugrid1d.n_node &#8212; Xugrid 0.12.1 documentation</title>
+    <title>xugrid.UgridDataset.from_structured &#8212; Xugrid 0.12.1 documentation</title>
   
   
   
@@ -43,11 +43,11 @@
     <script src="../_static/documentation_options.js?v=c5b435e8"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.Ugrid1d.n_node';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/xugrid.UgridDataset.from_structured';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="xugrid.Ugrid1d.node_dimension" href="xugrid.Ugrid1d.node_dimension.html" />
-    <link rel="prev" title="xugrid.Ugrid1d.start_index" href="xugrid.Ugrid1d.start_index.html" />
+    <link rel="next" title="xugrid.UgridDatasetAccessor" href="xugrid.UgridDatasetAccessor.html" />
+    <link rel="prev" title="xugrid.UgridDataset.from_geodataframe" href="xugrid.UgridDataset.from_geodataframe.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -376,11 +376,11 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArray.from_structured.html">xugrid.UgridDataArray.from_structured</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArray.from_data.html">xugrid.UgridDataArray.from_data</a></li>
 </ul>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataset.html">xugrid.UgridDataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataset.ugrid.html">xugrid.UgridDataset.ugrid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataset.from_geodataframe.html">xugrid.UgridDataset.from_geodataframe</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataset.from_structured.html">xugrid.UgridDataset.from_structured</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.UgridDataset.from_structured</a></li>
 </ul>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDatasetAccessor.html">xugrid.UgridDatasetAccessor</a></li>
@@ -471,7 +471,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.plot.surface.html">xugrid.plot.surface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.plot.tripcolor.html">xugrid.plot.tripcolor</a></li>
 </ul>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.html">xugrid.Ugrid1d</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.topology_dimension.html">xugrid.Ugrid1d.topology_dimension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.dims.html">xugrid.Ugrid1d.dims</a></li>
@@ -480,7 +480,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.coords.html">xugrid.Ugrid1d.coords</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.fill_value.html">xugrid.Ugrid1d.fill_value</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.start_index.html">xugrid.Ugrid1d.start_index</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">xugrid.Ugrid1d.n_node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.n_node.html">xugrid.Ugrid1d.n_node</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.node_dimension.html">xugrid.Ugrid1d.node_dimension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.node_coordinates.html">xugrid.Ugrid1d.node_coordinates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.set_node_coords.html">xugrid.Ugrid1d.set_node_coords</a></li>
@@ -673,12 +673,54 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="xugrid-ugrid1d-n-node">
-<h1>xugrid.Ugrid1d.n_node<a class="headerlink" href="#xugrid-ugrid1d-n-node" title="Link to this heading">#</a></h1>
-<dl class="py property">
-<dt class="sig sig-object py" id="xugrid.Ugrid1d.n_node">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Ugrid1d.</span></span><span class="sig-name descname"><span class="pre">n_node</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#xugrid.Ugrid1d.n_node" title="Link to this definition">#</a></dt>
-<dd><p>Number of nodes (vertices) in the UGRID topology</p>
+  <section id="xugrid-ugriddataset-from-structured">
+<h1>xugrid.UgridDataset.from_structured<a class="headerlink" href="#xugrid-ugriddataset-from-structured" title="Link to this heading">#</a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="xugrid.UgridDataset.from_structured">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">UgridDataset.</span></span><span class="sig-name descname"><span class="pre">from_structured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.core.wrap.UgridDataset"><span class="pre">UgridDataset</span></a></span></span><a class="reference internal" href="../_modules/xugrid/core/wrap.html#UgridDataset.from_structured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.UgridDataset.from_structured" title="Link to this definition">#</a></dt>
+<dd><p>Create a UgridDataset from a (structured) xarray Dataset.</p>
+<p>The spatial dimensions are flattened into a single UGRID face dimension.</p>
+<p>By default, this method looks for the <code class="docutils literal notranslate"><span class="pre">&quot;x&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;y&quot;</span></code> coordinates
+and assumes they are one-dimensional. To convert rotated or curvilinear
+coordinates, provide the names of the x and y coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>xr.Dataset</em>)</p></li>
+<li><p><strong>topology</strong> (<em>dict</em><em>, </em><em>optional</em><em>, </em><em>default is None.</em>) – Mapping of topology name to x and y coordinate variables.
+If None, defaults to <code class="docutils literal notranslate"><span class="pre">{&quot;mesh2d&quot;:</span> <span class="pre">(&quot;x&quot;,</span> <span class="pre">&quot;y&quot;)}</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>unstructured</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="xugrid.UgridDataset.html#xugrid.UgridDataset" title="xugrid.UgridDataset">UgridDataset</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>By default, this method will look for 1D <code class="docutils literal notranslate"><span class="pre">&quot;x&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;y&quot;</span></code>
+coordinates and returns a UgriDataset with a Ugrid topology named
+mesh2d:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uds</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataset</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case of rotated or curvilinear coordinates, the name of the
+resulting UGRID topology and the x and y coordinates must be specified:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uds</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataset</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">dataset</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">topology</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mesh2d&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;xc&quot;</span><span class="p">,</span> <span class="s2">&quot;yc&quot;</span><span class="p">)},</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In case of multiple grid topologies in a single dataset, these must be
+specified as well:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uds</span> <span class="o">=</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataset</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">dataset</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">topology</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;mesh2d_xy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">),</span> <span class="s2">&quot;mesh2d_lonlat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">},</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -694,20 +736,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="xugrid.Ugrid1d.start_index.html"
+       href="xugrid.UgridDataset.from_geodataframe.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">xugrid.Ugrid1d.start_index</p>
+        <p class="prev-next-title">xugrid.UgridDataset.from_geodataframe</p>
       </div>
     </a>
     <a class="right-next"
-       href="xugrid.Ugrid1d.node_dimension.html"
+       href="xugrid.UgridDatasetAccessor.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">xugrid.Ugrid1d.node_dimension</p>
+        <p class="prev-next-title">xugrid.UgridDatasetAccessor</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -729,14 +771,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xugrid.Ugrid1d.n_node"><code class="docutils literal notranslate"><span class="pre">Ugrid1d.n_node</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#xugrid.UgridDataset.from_structured"><code class="docutils literal notranslate"><span class="pre">UgridDataset.from_structured()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/xugrid.Ugrid1d.n_node.rst.txt">
+    <a href="../_sources/api/xugrid.UgridDataset.from_structured.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

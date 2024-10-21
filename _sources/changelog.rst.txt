@@ -15,10 +15,16 @@ Changed
 - :meth:`xugrid.UgridDataArrayAccessor.from_structured` previously required the
   literal dimensions ``("y", "x")``. This requirement has been relaxed, it will
   now infer the dimensions from the provided coordinates.
-- :meth:`xugrid.Ugrid2d.from_structured` previously only supported 1D coordinates;
-  it now detects whether coordinates are 1D or 2D automatically. Accordingly,
-  :meth:`xugrid.Ugrid2d.from_structured_multicoord` should no longer be used,
-  and calling it will give a FutureWarning.
+- :meth:`xugrid.Ugrid2d.from_structured` previously only supported 1D
+  coordinates; it now detects whether coordinates are 1D or 2D automatically.
+  Accordingly, :meth:`xugrid.Ugrid2d.from_structured_multicoord` should no
+  longer be used, and calling it will give a FutureWarning.
+
+Added
+~~~~~
+
+- :meth:`xugrid.UgridDataset.from_structured` has been added to create
+  UgriDatasets from xarray Datasets.
 
 [0.12.1] 2024-09-09
 -------------------

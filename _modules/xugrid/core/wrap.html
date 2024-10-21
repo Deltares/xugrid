@@ -824,42 +824,86 @@ document.write(`
         <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div>
 
 
+<div class="viewcode-block" id="UgridDataset.from_structured">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataset.from_structured.html#xugrid.UgridDataset.from_structured">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;UgridDataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;UgridDataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a UgridDataset from a (structured) xarray Dataset.</span>
 
 <span class="sd">        The spatial dimensions are flattened into a single UGRID face dimension.</span>
 
-<span class="sd">        By default, this method looks for the &quot;x&quot; and &quot;y&quot; coordinates and assumes</span>
-<span class="sd">        they are one-dimensional. To convert rotated or curvilinear coordinates,</span>
-<span class="sd">        provide the names of the x and y coordinates.</span>
+<span class="sd">        By default, this method looks for the ``&quot;x&quot;`` and ``&quot;y&quot;`` coordinates</span>
+<span class="sd">        and assumes they are one-dimensional. To convert rotated or curvilinear</span>
+<span class="sd">        coordinates, provide the names of the x and y coordinates.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ds: xr.Dataset</span>
+<span class="sd">        dataset: xr.Dataset</span>
 <span class="sd">        topology: dict, optional, default is None.</span>
 <span class="sd">            Mapping of topology name to x and y coordinate variables.</span>
-<span class="sd">            If None, searches for &quot;x&quot; and &quot;y&quot; coordinates and creates a Ugrid2d</span>
-<span class="sd">            topology with name &quot;mesh2d&quot;.</span>
+<span class="sd">            If None, defaults to ``{&quot;mesh2d&quot;: (&quot;x&quot;, &quot;y&quot;)}``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        unstructured: UgridDataset</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        By default, this method will look for 1D ``&quot;x&quot;`` and ``&quot;y&quot;``</span>
+<span class="sd">        coordinates and returns a UgriDataset with a Ugrid topology named</span>
+<span class="sd">        mesh2d:</span>
+
+<span class="sd">        &gt;&gt;&gt; uds = xugrid.UgridDataset.from_structured(dataset)</span>
+
+<span class="sd">        In case of rotated or curvilinear coordinates, the name of the</span>
+<span class="sd">        resulting UGRID topology and the x and y coordinates must be specified:</span>
+
+<span class="sd">        &gt;&gt;&gt; uds = xugrid.UgridDataset.from_structured(</span>
+<span class="sd">        &gt;&gt;&gt;     dataset,</span>
+<span class="sd">        &gt;&gt;&gt;     topology={&quot;mesh2d&quot;: (&quot;xc&quot;, &quot;yc&quot;)},</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
+
+<span class="sd">        In case of multiple grid topologies in a single dataset, these must be</span>
+<span class="sd">        specified as well:</span>
+
+<span class="sd">        &gt;&gt;&gt; uds = xugrid.UgridDataset.from_structured(</span>
+<span class="sd">        &gt;&gt;&gt;     dataset,</span>
+<span class="sd">        &gt;&gt;&gt;     topology={&quot;mesh2d_xy&quot;: (&quot;x&quot;, &quot;y&quot;), &quot;mesh2d_lonlat&quot;: {&quot;lon&quot;, &quot;lat&quot;},</span>
+<span class="sd">        &gt;&gt;&gt; )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">topology</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mesh2d&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)}</span>
 
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">ds</span>
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dss</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">stackdims</span><span class="p">,</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span>
-                <span class="n">ds</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">return_dims</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">grid</span><span class="p">,</span> <span class="n">stackdims</span> <span class="o">=</span> <span class="n">Ugrid2d</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">return_dims</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="o">*</span><span class="n">stackdims</span><span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">stackdims</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># noqa: PD013</span>
+            <span class="c1"># Use subset to check that ALL dims of stackdims are present in the</span>
+            <span class="c1"># variable.</span>
+            <span class="n">checkdims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stackdims</span><span class="p">)</span>
+            <span class="n">ugrid_vars</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">name</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">checkdims</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">dss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">ugrid_vars</span><span class="p">]</span>  <span class="c1"># noqa: PD013</span>
+                <span class="o">.</span><span class="n">stack</span><span class="p">({</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">stackdims</span><span class="p">})</span>
+                <span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">stackdims</span> <span class="o">+</span> <span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,))</span>
+            <span class="p">)</span>
             <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+        <span class="c1"># Add the original dataset to include all non-UGRID variables.</span>
+        <span class="n">dss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="c1"># Then merge with compat=&quot;override&quot;. This&#39;ll pick the first available</span>
+        <span class="c1"># variable: i.e. it will prioritize the UGRID form.</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dss</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 
