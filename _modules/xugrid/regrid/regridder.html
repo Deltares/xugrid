@@ -600,7 +600,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Regrid the data from a DataArray from its old grid topology to the new</span>
 <span class="sd">        target topology.</span>
@@ -611,7 +611,7 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        object: UgridDataArray or xarray.DataArray</span>
+<span class="sd">        data: UgridDataArray or xarray.DataArray</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -624,17 +624,21 @@ document.write(`
         <span class="c1"># But it causes problems with initializing a regridder</span>
         <span class="c1"># from_dataset, because the name has been changed to</span>
         <span class="c1"># __source_nFace.</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span>
-            <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">data</span>
             <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span>
+            <span class="n">source_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected DataArray or UgridDataAray, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
-        <span class="n">missing_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">source_dims</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">missing_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">source_dims</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">missing_dims</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;object does not contain regridder source dimensions: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;data does not contain regridder source dimensions: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="n">regridded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">source_dims</span><span class="p">)</span>

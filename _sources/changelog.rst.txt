@@ -19,12 +19,25 @@ Changed
   coordinates; it now detects whether coordinates are 1D or 2D automatically.
   Accordingly, :meth:`xugrid.Ugrid2d.from_structured_multicoord` should no
   longer be used, and calling it will give a FutureWarning.
+- The first argument of the ``.regrid`` methods of
+  :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
+  :class:`xugrid.RelativeOverlapRegridder`, and
+  :class:`xugrid.BarycentricInterpolator` has been renamed. The method now
+  takes a ``data`` argument instead of ``object``.
 
 Added
 ~~~~~
 
 - :meth:`xugrid.UgridDataset.from_structured` has been added to create
   UgriDatasets from xarray Datasets.
+
+Fixed
+~~~~~
+
+- The ``.regrid`` methods of :class:`xugrid.CentroidLocatorRegridder`,
+  :class:`xugrid.OverlapRegridder`, :class:`xugrid.RelativeOverlapRegridder`,
+  and :class:`xugrid.BarycentricInterpolator` now raise a TypeError if an
+  inappropriate type is provided.
 
 [0.12.1] 2024-09-09
 -------------------
