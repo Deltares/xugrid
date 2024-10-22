@@ -22,8 +22,8 @@ Changed
 - The first argument of the ``.regrid`` methods of
   :class:`xugrid.CentroidLocatorRegridder`, :class:`xugrid.OverlapRegridder`,
   :class:`xugrid.RelativeOverlapRegridder`, and
-  :class:`xugrid.BarycentricInterpolator` has been renamed. It now take a
-  ``data`` argument instead of ``object``.
+  :class:`xugrid.BarycentricInterpolator` has been renamed. The method now
+  takes a ``data`` argument instead of ``object``.
 
 Added
 ~~~~~

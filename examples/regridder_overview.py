@@ -17,9 +17,6 @@ Here are a number of quick examples of how to get started with regridding.
 We'll start by importing a few essential packages.
 """
 # %%
-import os
-
-os.environ["NUMBA_DISABLE_JIT"] = "1"
 
 import matplotlib.pyplot as plt
 import xarray as xr
@@ -74,19 +71,6 @@ ax.scatter(*grid.centroids.T, color="red")
 regridder = xu.CentroidLocatorRegridder(source=uda, target=grid)
 result = regridder.regrid(uda)
 result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain", edgecolor="red")
-
-# %%
-
-uds = xu.UgridDataset(grids=[uda.ugrid.grid])
-uds["a"] = uda
-
-# %%
-
-regridder = xu.CentroidLocatorRegridder(source=uds, target=grid)
-
-# %%
-
-results = regridder.regrid(uds)
 
 # %%
 # OverlapRegridder
