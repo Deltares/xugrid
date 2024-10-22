@@ -46,6 +46,11 @@ def test_structured_to_unstructured(
     actual = regridder.regrid(quads_structured)
     assert isinstance(actual, xu.UgridDataArray)
 
+    # Regridding datasets is not (yet) allowed.
+    ds = xr.Dataset({"a": quads_structured})
+    with pytest.raises(TypeError):
+        regridder.regrid(ds)
+
 
 @pytest.mark.parametrize(
     "regridder_class",

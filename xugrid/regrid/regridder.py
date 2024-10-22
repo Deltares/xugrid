@@ -203,7 +203,7 @@ class BaseRegridder(abc.ABC):
         )
         return out
 
-    def regrid(self, object) -> UgridDataArray:
+    def regrid(self, data: Union[xr.DataArray, UgridDataArray]) -> UgridDataArray:
         """
         Regrid the data from a DataArray from its old grid topology to the new
         target topology.
@@ -214,7 +214,7 @@ class BaseRegridder(abc.ABC):
 
         Parameters
         ----------
-        object: UgridDataArray or xarray.DataArray
+        data: UgridDataArray or xarray.DataArray
 
         Returns
         -------
@@ -227,17 +227,21 @@ class BaseRegridder(abc.ABC):
         # But it causes problems with initializing a regridder
         # from_dataset, because the name has been changed to
         # __source_nFace.
-        if isinstance(object, UgridDataArray):
-            obj = object.ugrid.obj
-            source_dims = (object.ugrid.grid.face_dimension,)
-        else:
-            obj = object
+        if isinstance(data, xr.DataArray):
+            obj = data
             source_dims = ("y", "x")
+        elif isinstance(data, UgridDataArray):
+            obj = data.ugrid.obj
+            source_dims = (data.ugrid.grid.face_dimension,)
+        else:
+            raise TypeError(
+                f"Expected DataArray or UgridDataAray, received: {type(data).__name__}"
+            )
 
-        missing_dims = set(source_dims).difference(object.dims)
+        missing_dims = set(source_dims).difference(data.dims)
         if missing_dims:
             raise ValueError(
-                f"object does not contain regridder source dimensions: {missing_dims}"
+                f"data does not contain regridder source dimensions: {missing_dims}"
             )
 
         regridded = self.regrid_dataarray(obj, source_dims)
