@@ -109,7 +109,7 @@ install-pre-commit = "pre-commit install"
 pre-commit = "pre-commit run --all-files"
 test = "NUMBA_DISABLE_JIT=1 pytest --cov=xugrid --cov-report xml --cov-report term"
 docs = "NUMBA_DISABLE_JIT=1 sphinx-build docs docs/_build"
-all = { depends_on = ["pre-commit", "test", "docs"]}
+all = { depends-on = ["pre-commit", "test", "docs"]}
 pypi-publish = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*"
 
 [tool.pixi.feature.py312.dependencies]
