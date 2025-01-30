@@ -17,6 +17,11 @@ from xugrid.constants import (
 )
 
 
+def cross2d(arr1: np.ndarray, arr2: np.ndarray) -> np.ndarray:
+    """Cross product for arrays with 2D coordinates."""
+    return arr1[..., 0] * arr2[..., 1] - arr1[..., 1] * arr2[..., 0]
+
+
 def argsort_rows(array: np.ndarray) -> IntArray:
     if array.ndim != 2:
         raise ValueError(f"Array is not 2D, but has shape: {array.shape}")
@@ -388,7 +393,7 @@ def counterclockwise(face_node_connectivity: IntArray, nodes: FloatArray) -> Int
     closed, _ = close_polygons(face_node_connectivity)
     p = nodes[closed]
     dxy = np.diff(p, axis=1)
-    reverse = (np.cross(dxy[:, :-1], dxy[:, 1:])).sum(axis=1) < 0
+    reverse = cross2d(dxy[:, :-1], dxy[:, 1:]).sum(axis=1) < 0
     ccw = face_node_connectivity.copy()
     if reverse.any():
         ccw[reverse] = reverse_orientation(face_node_connectivity[reverse])
@@ -566,7 +571,7 @@ def area_from_coordinates(
     xy0 = coordinates[:, 0]
     a = coordinates[:, :-1] - xy0[:, np.newaxis]
     b = coordinates[:, 1:] - xy0[:, np.newaxis]
-    determinant = np.cross(a, b)
+    determinant = cross2d(a, b)
     return 0.5 * abs(determinant.sum(axis=1))
 
 
@@ -604,7 +609,7 @@ def centroids(
         a = coordinates[:, :-1] - xy0[:, np.newaxis]
         b = coordinates[:, 1:] - xy0[:, np.newaxis]
         c = a + b
-        determinant = np.cross(a, b)
+        determinant = cross2d(a, b)
         area_weight = 1.0 / (3.0 * determinant.sum(axis=1))
         centroid_coordinates[:, 0] = area_weight * (c[..., 0] * determinant).sum(axis=1)
         centroid_coordinates[:, 1] = area_weight * (c[..., 1] * determinant).sum(axis=1)
