@@ -691,6 +691,12 @@ UgriDatasets from xarray Datasets.</p></li>
 <a class="reference internal" href="api/xugrid.OverlapRegridder.html#xugrid.OverlapRegridder" title="xugrid.OverlapRegridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.OverlapRegridder</span></code></a>, <a class="reference internal" href="api/xugrid.RelativeOverlapRegridder.html#xugrid.RelativeOverlapRegridder" title="xugrid.RelativeOverlapRegridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.RelativeOverlapRegridder</span></code></a>,
 and <a class="reference internal" href="api/xugrid.BarycentricInterpolator.html#xugrid.BarycentricInterpolator" title="xugrid.BarycentricInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.BarycentricInterpolator</span></code></a> now raise a TypeError if an
 inappropriate type is provided.</p></li>
+<li><p>Fixed file handling in <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.close()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataset.close()</span></code>. Previously, files opened with
+<a class="reference internal" href="api/xugrid.open_dataarray.html#xugrid.open_dataarray" title="xugrid.open_dataarray"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.open_dataarray()</span></code></a> or <a class="reference internal" href="api/xugrid.open_dataset.html#xugrid.open_dataset" title="xugrid.open_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.open_dataset()</span></code></a> could not be
+properly closed, and new UgridDataset or UgridDataArray objects were not
+correctly associated with their source files. Now, calling the close methods
+will properly close the associated files.</p></li>
 </ul>
 </section>
 </section>

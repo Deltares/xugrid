@@ -585,7 +585,8 @@
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">set_close</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_close</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
@@ -704,7 +705,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least either obj or grids is required&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+            <span class="n">original</span> <span class="o">=</span> <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -717,6 +718,7 @@
                 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
             <span class="p">]</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span> <span class="o">+</span> <span class="n">connectivity_vars</span><span class="p">)</span>
+            <span class="n">original</span> <span class="o">=</span> <span class="n">obj</span>
 
         <span class="k">if</span> <span class="n">grids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">topologies</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span>
@@ -736,7 +738,11 @@
                     <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_grids</span> <span class="o">=</span> <span class="n">grids</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">assign_ugrid_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">grids</span><span class="p">)</span>
+        <span class="c1"># We&#39;ve created a new object; the file handle will be associated with the original.</span>
+        <span class="c1"># set_close makes sure that when close is called on the UgridDataset, that the</span>
+        <span class="c1"># file will actually be closed (via the original).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">set_close</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_close</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
