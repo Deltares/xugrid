@@ -1158,7 +1158,9 @@ def test_from_structured_intervals1d(xflip: bool, yflip: bool):
 
     # Make sure the orientation is still ccw if x is decreasing, y is increasing.
     dxy = np.diff(grid.face_node_coordinates, axis=1)
-    clockwise = (np.cross(dxy[:, :-1], dxy[:, 1:])).sum(axis=1) < 0
+    clockwise = (
+        xugrid.ugrid.connectivity.cross2d(dxy[:, :-1], dxy[:, 1:]).sum(axis=1) < 0
+    )
     assert not clockwise.any()
 
 

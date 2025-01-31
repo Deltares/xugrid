@@ -247,7 +247,7 @@ class TestUgridDataArray:
         actual = self.uda.ugrid.intersect_line(start=p0, end=p1)
         sqrt2 = np.sqrt(2.0)
         assert isinstance(actual, xr.DataArray)
-        assert actual.dims == ("mesh2d_nFaces",)
+        assert set(actual.dims) == {"mesh2d_nFaces"}
         assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
         assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
@@ -262,7 +262,7 @@ class TestUgridDataArray:
         )
         actual = self.uda.ugrid.intersect_linestring(linestring)
         assert isinstance(actual, xr.DataArray)
-        assert actual.dims == ("mesh2d_nFaces",)
+        assert set(actual.dims) == {"mesh2d_nFaces"}
         assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
         assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
