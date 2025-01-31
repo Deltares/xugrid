@@ -143,7 +143,7 @@ class TestUgridDataArray:
         assert isinstance(float(self.uda[0]), float)
 
     def test_close(self, tmp_path):
-        path = tmp_path / "locktest.nc"
+        path = tmp_path / "dataarray-closetest.nc"
         self.uda.ugrid.to_netcdf(path)
         back = xugrid.open_dataarray(path)
         with pytest.raises(PermissionError):
@@ -323,8 +323,10 @@ class TestUgridDataArray:
         assert result.grid.is_geographic is False
 
     def test_to_geodataframe(self):
+        uda1 = self.uda.copy()
+        uda1.ugrid.obj.name = None
         with pytest.raises(ValueError, match="unable to convert unnamed"):
-            self.uda.ugrid.to_geodataframe()
+            uda1.ugrid.to_geodataframe()
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
         uda2.ugrid.set_crs(epsg=28992)
@@ -499,6 +501,16 @@ class TestUgridDataset:
     def test_repr(self):
         assert self.uds.__repr__() == self.uds.obj.__repr__()
 
+    def test_close(self, tmp_path):
+        path = tmp_path / "dataset-closetest.nc"
+        self.uds.ugrid.to_netcdf(path)
+        back = xugrid.open_dataset(path)
+        with pytest.raises(PermissionError):
+            os.remove(path)
+        # Should close succesfully after closing.
+        back.close()
+        os.remove(path)
+
     def test_getitem(self):
         assert "a" in self.uds
         assert "b" in self.uds
@@ -639,7 +651,7 @@ class TestUgridDataset:
         actual = self.uds.ugrid.intersect_line(start=p0, end=p1)
         sqrt2 = np.sqrt(2.0)
         assert isinstance(actual, xr.Dataset)
-        assert actual.dims == {"mesh2d_nFaces": 2}
+        assert actual.sizes == {"mesh2d_nFaces": 2}
         assert np.allclose(actual["mesh2d_x"], [0.5, 1.25])
         assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
@@ -656,7 +668,7 @@ class TestUgridDataset:
         )
         actual = self.uds.ugrid.intersect_linestring(linestring)
         assert isinstance(actual, xr.Dataset)
-        assert actual.dims == {"mesh2d_nFaces": 4}
+        assert actual.sizes == {"mesh2d_nFaces": 4}
         assert np.allclose(actual["mesh2d_x"], [0.75, 1.25, 1.5, 1.5])
         assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])

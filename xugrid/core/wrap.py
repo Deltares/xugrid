@@ -205,14 +205,11 @@ class UgridDataArray(DataArrayForwardMixin):
 
         self._grid = grid
         self._obj = assign_ugrid_coords(obj, [grid])
-        self._original = obj
+        self._obj.set_close(obj._close)
 
     def __getattr__(self, attr):
         result = getattr(self.obj, attr)
         return maybe_xugrid(result, [self.grid])
-
-    def close(self):
-        self._original.close()
 
     @property
     def obj(self):
@@ -349,11 +346,10 @@ class UgridDataset(DatasetForwardMixin):
 
         self._grids = grids
         self._obj = assign_ugrid_coords(ds, grids)
-        # store a reference to the original such that we can close the file handle.
-        self._original = original
-
-    def close(self):
-        self._original.close()
+        # We've created a new object; the file handle will be associated with the original.
+        # set_close makes sure that when close is called on the UgridDataset, that the
+        # file will actually be closed (via the original).
+        self._obj.set_close(original._close)
 
     @property
     def obj(self):
