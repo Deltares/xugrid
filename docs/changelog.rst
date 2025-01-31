@@ -38,6 +38,12 @@ Fixed
   :class:`xugrid.OverlapRegridder`, :class:`xugrid.RelativeOverlapRegridder`,
   and :class:`xugrid.BarycentricInterpolator` now raise a TypeError if an
   inappropriate type is provided.
+- Fixed file handling in :meth:`xugrid.UgridDataArray.close` and
+  :meth:`xugrid.UgridDataset.close`. Previously, files opened with
+  :func:`xugrid.open_dataarray` or :func:`xugrid.open_dataset` could not be
+  properly closed, and new UgridDataset or UgridDataArray objects were not
+  correctly associated with their source files. Now, calling the close methods
+  will properly close the associated files.
 
 [0.12.1] 2024-09-09
 -------------------

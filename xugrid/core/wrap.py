@@ -205,6 +205,7 @@ class UgridDataArray(DataArrayForwardMixin):
 
         self._grid = grid
         self._obj = assign_ugrid_coords(obj, [grid])
+        self._obj.set_close(obj._close)
 
     def __getattr__(self, attr):
         result = getattr(self.obj, attr)
@@ -311,7 +312,7 @@ class UgridDataset(DatasetForwardMixin):
             raise ValueError("At least either obj or grids is required")
 
         if obj is None:
-            ds = xr.Dataset()
+            original = ds = xr.Dataset()
         else:
             if not isinstance(obj, xr.Dataset):
                 raise TypeError(
@@ -324,6 +325,7 @@ class UgridDataset(DatasetForwardMixin):
                 for name in v.values()
             ]
             ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
+            original = obj
 
         if grids is None:
             topologies = obj.ugrid_roles.topology
@@ -344,6 +346,10 @@ class UgridDataset(DatasetForwardMixin):
 
         self._grids = grids
         self._obj = assign_ugrid_coords(ds, grids)
+        # We've created a new object; the file handle will be associated with the original.
+        # set_close makes sure that when close is called on the UgridDataset, that the
+        # file will actually be closed (via the original).
+        self._obj.set_close(original._close)
 
     @property
     def obj(self):
