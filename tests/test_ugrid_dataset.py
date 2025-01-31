@@ -1,3 +1,4 @@
+import os
 import warnings
 
 import dask
@@ -44,6 +45,7 @@ def DARRAY():
     return xr.DataArray(
         data=np.ones(GRID().n_face),
         dims=[GRID().face_dimension],
+        name="a",
     )
 
 
@@ -139,6 +141,16 @@ class TestUgridDataArray:
         assert isinstance(bool(self.uda[0]), bool)
         assert isinstance(int(self.uda[0]), int)
         assert isinstance(float(self.uda[0]), float)
+
+    def test_close(self, tmp_path):
+        path = tmp_path / "locktest.nc"
+        self.uda.ugrid.to_netcdf(path)
+        back = xugrid.open_dataarray(path)
+        with pytest.raises(PermissionError):
+            os.remove(path)
+        # Should close succesfully after closing.
+        back.close()
+        os.remove(path)
 
     def test_repr(self):
         assert self.uda.__repr__() == self.uda.obj.__repr__()
