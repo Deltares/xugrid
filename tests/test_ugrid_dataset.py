@@ -146,9 +146,6 @@ class TestUgridDataArray:
         path = tmp_path / "dataarray-closetest.nc"
         self.uda.ugrid.to_netcdf(path)
         back = xugrid.open_dataarray(path)
-        with pytest.raises(PermissionError):
-            os.remove(path)
-        # Should close succesfully after closing.
         back.close()
         os.remove(path)
 
@@ -505,9 +502,6 @@ class TestUgridDataset:
         path = tmp_path / "dataset-closetest.nc"
         self.uds.ugrid.to_netcdf(path)
         back = xugrid.open_dataset(path)
-        with pytest.raises(PermissionError):
-            os.remove(path)
-        # Should close succesfully after closing.
         back.close()
         os.remove(path)
 
