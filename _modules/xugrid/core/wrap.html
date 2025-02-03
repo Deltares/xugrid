@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -380,30 +380,30 @@
 
 <span class="sd">This allows for tab completion and documentation.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">ChainMap</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChainMap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">RangeIndex</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">RangeIndex</span>
 
-<span class="kn">import</span> <span class="nn">xugrid</span>
-<span class="kn">from</span> <span class="nn">xugrid.conversion</span> <span class="kn">import</span> <span class="n">grid_from_dataset</span><span class="p">,</span> <span class="n">grid_from_geodataframe</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">unique_grids</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">,</span> <span class="n">align</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.conversion</span><span class="w"> </span><span class="kn">import</span> <span class="n">grid_from_dataset</span><span class="p">,</span> <span class="n">grid_from_geodataframe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">unique_grids</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugrid2d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ugrid2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">,</span> <span class="n">align</span>
 
 <span class="c1"># Import entire module here for circular import of UgridDatasetAccessor and</span>
 <span class="c1"># UgridDataArrayAccessor. Note: can only be used in functions (since that code</span>
 <span class="c1"># is run at runtime).</span>
 
 
-<span class="k">def</span> <span class="nf">maybe_xugrid</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">old_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">maybe_xugrid</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">old_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">obj</span>
 
@@ -429,16 +429,16 @@
             <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">aligned</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">maybe_xarray</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">maybe_xarray</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="p">(</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">)):</span>
         <span class="k">return</span> <span class="n">arg</span><span class="o">.</span><span class="n">obj</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arg</span>
 
 
-<span class="k">def</span> <span class="nf">wraps_xarray</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wraps_xarray</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">maybe_xarray</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">maybe_xarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -454,11 +454,11 @@
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<span class="k">def</span> <span class="nf">wrap_accessor</span><span class="p">(</span><span class="n">accessor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_accessor</span><span class="p">(</span><span class="n">accessor</span><span class="p">):</span>
     <span class="c1"># TODO: This will not add dynamic accessors, those most be included at</span>
     <span class="c1"># runtime instead?</span>
 
-    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">maybe_xarray</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">maybe_xarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">accessor</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -467,7 +467,7 @@
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span>
     <span class="n">target_class_dict</span><span class="p">,</span>
     <span class="n">source_class</span><span class="p">,</span>
 <span class="p">):</span>
@@ -545,21 +545,21 @@
     <span class="k">return</span>
 
 
-<span class="k">class</span> <span class="nc">DataArrayForwardMixin</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataArrayForwardMixin</span><span class="p">:</span>
     <span class="n">wrap</span><span class="p">(</span>
         <span class="n">target_class_dict</span><span class="o">=</span><span class="nb">vars</span><span class="p">(),</span>
         <span class="n">source_class</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">DatasetForwardMixin</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DatasetForwardMixin</span><span class="p">:</span>
     <span class="n">wrap</span><span class="p">(</span>
         <span class="n">target_class_dict</span><span class="o">=</span><span class="nb">vars</span><span class="p">(),</span>
         <span class="n">source_class</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">assign_ugrid_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grids</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">assign_ugrid_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grids</span><span class="p">):</span>
     <span class="n">grid_dims</span> <span class="o">=</span> <span class="n">ChainMap</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">sizes</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">))</span>
     <span class="n">ugrid_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">grid_dims</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
     <span class="n">ugrid_coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="n">RangeIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">grid_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ugrid_dims</span><span class="p">}</span>
@@ -569,10 +569,10 @@
 
 <div class="viewcode-block" id="UgridDataArray">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray">[docs]</a>
-<span class="k">class</span> <span class="nc">UgridDataArray</span><span class="p">(</span><span class="n">DataArrayForwardMixin</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UgridDataArray</span><span class="p">(</span><span class="n">DataArrayForwardMixin</span><span class="p">):</span>
 <div class="viewcode-block" id="UgridDataArray.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.html#xugrid.UgridDataArray.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;obj must be xarray.DataArray. Received instead: &quot;</span>
@@ -589,24 +589,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">set_close</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_close</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">maybe_xugrid</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        UGRID Accessor. This &quot;accessor&quot; makes operations using the UGRID</span>
 <span class="sd">        topology available.</span>
@@ -618,7 +618,7 @@
 <div class="viewcode-block" id="UgridDataArray.from_structured">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_structured.html#xugrid.UgridDataArray.from_structured">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_structured</span><span class="p">(</span>
         <span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -667,7 +667,7 @@
 <div class="viewcode-block" id="UgridDataArray.from_data">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArray.from_data.html#xugrid.UgridDataArray.from_data">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a UgridDataArray from a grid and a 1D array of values.</span>
 
@@ -693,10 +693,10 @@
 
 <div class="viewcode-block" id="UgridDataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset">[docs]</a>
-<span class="k">class</span> <span class="nc">UgridDataset</span><span class="p">(</span><span class="n">DatasetForwardMixin</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UgridDataset</span><span class="p">(</span><span class="n">DatasetForwardMixin</span><span class="p">):</span>
 <div class="viewcode-block" id="UgridDataset.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataset.html#xugrid.UgridDataset.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">grids</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -746,31 +746,31 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">obj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
         <span class="c1"># We need to do some checking. Don&#39;t duplicate that logic.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grids</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ugrid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        UGRID Accessor. This &quot;accessor&quot; makes operations using the UGRID</span>
 <span class="sd">        topology available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset_accessor</span><span class="o">.</span><span class="n">UgridDatasetAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">maybe_xugrid</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># TODO: check with topology</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
             <span class="n">append</span> <span class="o">=</span> <span class="kc">True</span>
@@ -800,7 +800,7 @@
 <div class="viewcode-block" id="UgridDataset.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataset.from_geodataframe.html#xugrid.UgridDataset.from_geodataframe">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_geodataframe</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">):</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a geodataframe into the appropriate Ugrid topology and dataset.</span>
 
@@ -820,7 +820,7 @@
 <div class="viewcode-block" id="UgridDataset.from_structured">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataset.from_structured.html#xugrid.UgridDataset.from_structured">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_structured</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_structured</span><span class="p">(</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;UgridDataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

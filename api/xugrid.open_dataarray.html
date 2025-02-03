@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -700,15 +700,21 @@ taken from variable attributes (if they exist).  If the <cite>_FillValue</cite> 
 <cite>missing_value</cite> attribute contains multiple values a warning will be
 issued and all array values matching one of the multiple values will
 be replaced by NA. This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>decode_times</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, decode times encoded in the standard NetCDF datetime format
-into datetime objects. Otherwise, leave them encoded as numbers.
+<li><p><strong>decode_times</strong> (<em>bool</em><em>, </em><em>CFDatetimeCoder</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – If True, decode times encoded in the standard NetCDF datetime format
+into datetime objects. Otherwise, use <code class="xref py py-class docutils literal notranslate"><span class="pre">coders.CFDatetimeCoder</span></code> or
+leave them encoded as numbers.
+Pass a mapping, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;my_variable&quot;:</span> <span class="pre">False}</span></code>,
+to toggle this feature per-variable individually.
 This keyword may not be supported by all the backends.</p></li>
 <li><p><strong>decode_timedelta</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, decode variables and coordinates with time units in
 {“days”, “hours”, “minutes”, “seconds”, “milliseconds”, “microseconds”}
 into timedelta objects. If False, leave them encoded as numbers.
-If None (default), assume the same value of decode_time.
+If None (default), assume the same value of <code class="docutils literal notranslate"><span class="pre">decode_times</span></code>; if
+<code class="docutils literal notranslate"><span class="pre">decode_times</span></code> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">coders.CFDatetimeCoder</span></code> instance, this
+takes the form of a <code class="xref py py-class docutils literal notranslate"><span class="pre">coders.CFTimedeltaCoder</span></code> instance with a
+matching <code class="docutils literal notranslate"><span class="pre">time_unit</span></code>.
 This keyword may not be supported by all the backends.</p></li>
-<li><p><strong>use_cftime</strong> (<em>bool</em><em>, </em><em>optional</em>) – Only relevant if encoded dates come from a standard calendar
+<li><p><strong>use_cftime</strong> (<em>bool</em><em>, </em><em>optional</em>) – <p>Only relevant if encoded dates come from a standard calendar
 (e.g. “gregorian”, “proleptic_gregorian”, “standard”, or not
 specified).  If None (default), attempt to decode times to
 <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects; if this is not possible, decode times to
@@ -716,7 +722,11 @@ specified).  If None (default), attempt to decode times to
 <code class="docutils literal notranslate"><span class="pre">cftime.datetime</span></code> objects, regardless of whether or not they can be
 represented using <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects.  If False, always
 decode times to <code class="docutils literal notranslate"><span class="pre">np.datetime64[ns]</span></code> objects; if this is not possible
-raise an error. This keyword may not be supported by all the backends.</p></li>
+raise an error. This keyword may not be supported by all the backends.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2025.01.1: </span>Please pass a <code class="xref py py-class docutils literal notranslate"><span class="pre">coders.CFDatetimeCoder</span></code> instance initialized with <code class="docutils literal notranslate"><span class="pre">use_cftime</span></code> to the <code class="docutils literal notranslate"><span class="pre">decode_times</span></code> kwarg instead.</p>
+</div>
+</p></li>
 <li><p><strong>concat_characters</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, concatenate along the last dimension of character arrays to
 form string arrays. Dimensions will only be concatenated over (and
 removed) if they have no corresponding variable and if they are only

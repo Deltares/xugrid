@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,31 +375,31 @@
                 <article class="bd-article">
                   
   <h1>Source code for xarray.core.merge</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span>
-<span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">deep_align</span>
-<span class="kn">from</span> <span class="nn">xarray.core.duck_array_ops</span> <span class="kn">import</span> <span class="n">lazy_array_equiv</span>
-<span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">dtypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_align</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.duck_array_ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">lazy_array_equiv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Index</span><span class="p">,</span>
     <span class="n">create_default_index_implicit</span><span class="p">,</span>
     <span class="n">filter_indexes_from_coords</span><span class="p">,</span>
     <span class="n">indexes_equal</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
-<span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
 
     <span class="n">DimsLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span>
     <span class="n">ArrayLike</span> <span class="o">=</span> <span class="n">Any</span>
@@ -429,14 +429,14 @@
 <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Context</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;object carrying the information of a call&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
 
-<span class="k">def</span> <span class="nf">broadcast_dimension_size</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Variable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">broadcast_dimension_size</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Variable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract dimension sizes from a dictionary of variables.</span>
 
 <span class="sd">    Raises ValueError if any dimensions have different sizes.</span>
@@ -450,14 +450,14 @@
     <span class="k">return</span> <span class="n">dims</span>
 
 
-<span class="k">class</span> <span class="nc">MergeError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MergeError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error class for merge failures due to incompatible arguments.&quot;&quot;&quot;</span>
 
     <span class="c1"># inherits from ValueError for backward compatibility</span>
     <span class="c1"># TODO: move this to an xarray.exceptions module?</span>
 
 
-<span class="k">def</span> <span class="nf">unique_variable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unique_variable</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span>
     <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Variable</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
@@ -530,7 +530,7 @@
     <span class="k">return</span> <span class="n">out</span>
 
 
-<span class="k">def</span> <span class="nf">_assert_compat_valid</span><span class="p">(</span><span class="n">compat</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_compat_valid</span><span class="p">(</span><span class="n">compat</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">compat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_COMPAT</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;compat=</span><span class="si">{</span><span class="n">compat</span><span class="si">!r}</span><span class="s2"> invalid: must be </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">_VALID_COMPAT</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -538,7 +538,7 @@
 <span class="n">MergeElement</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Index</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_assert_prioritized_valid</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_prioritized_valid</span><span class="p">(</span>
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -570,7 +570,7 @@
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">merge_collected</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_collected</span><span class="p">(</span>
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
@@ -681,7 +681,7 @@
     <span class="k">return</span> <span class="n">merged_vars</span><span class="p">,</span> <span class="n">merged_indexes</span>
 
 
-<span class="k">def</span> <span class="nf">collect_variables_and_indexes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_variables_and_indexes</span><span class="p">(</span>
     <span class="n">list_of_mappings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]:</span>
@@ -702,19 +702,19 @@
 <span class="sd">    keys are also extracted.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="n">grouped</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">variable</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">append_all</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append_all</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">indexes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 
@@ -744,7 +744,7 @@
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">collect_from_coordinates</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_from_coordinates</span><span class="p">(</span>
     <span class="n">list_of_coords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Coordinates</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect variables and indexes to be merged from Coordinate objects.&quot;&quot;&quot;</span>
@@ -759,7 +759,7 @@
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">merge_coordinates_without_align</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_coordinates_without_align</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Coordinates</span><span class="p">],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude_dims</span><span class="p">:</span> <span class="n">Set</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
@@ -795,7 +795,7 @@
     <span class="k">return</span> <span class="n">merged_coords</span><span class="p">,</span> <span class="n">merged_indexes</span>
 
 
-<span class="k">def</span> <span class="nf">determine_coords</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">determine_coords</span><span class="p">(</span>
     <span class="n">list_of_mappings</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a list of dicts with xarray object values, identify coordinates.</span>
@@ -812,8 +812,8 @@
 <span class="sd">        All variable found in the input should appear in either the set of</span>
 <span class="sd">        coordinate or non-coordinate names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">coord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">noncoord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -833,7 +833,7 @@
     <span class="k">return</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">noncoord_names</span>
 
 
-<span class="k">def</span> <span class="nf">coerce_pandas_values</span><span class="p">(</span><span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coerce_pandas_values</span><span class="p">(</span><span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert pandas values found in a list of labeled objects.</span>
 
 <span class="sd">    Parameters</span>
@@ -847,9 +847,9 @@
 <span class="sd">    List of Dataset or dictionary objects. Any inputs or values in the inputs</span>
 <span class="sd">    that were pandas objects have been converted into native xarray objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
@@ -868,7 +868,7 @@
     <span class="k">return</span> <span class="n">out</span>
 
 
-<span class="k">def</span> <span class="nf">_get_priority_vars_and_indexes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_priority_vars_and_indexes</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
     <span class="n">priority_arg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
@@ -914,7 +914,7 @@
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">merge_coords</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_coords</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
@@ -939,7 +939,7 @@
     <span class="k">return</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_indexes</span>
 
 
-<span class="k">def</span> <span class="nf">merge_attrs</span><span class="p">(</span><span class="n">variable_attrs</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_attrs</span><span class="p">(</span><span class="n">variable_attrs</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine attributes from different variables according to combine_attrs&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">variable_attrs</span><span class="p">:</span>
         <span class="c1"># no attributes to merge</span>
@@ -960,7 +960,7 @@
                 <span class="k">raise</span> <span class="n">MergeError</span><span class="p">(</span>
                     <span class="s2">&quot;combine_attrs=&#39;no_conflicts&#39;, but some values are not &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;the same. Merging </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">attrs</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">elif</span> <span class="n">combine_attrs</span> <span class="o">==</span> <span class="s2">&quot;drop_conflicts&quot;</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
@@ -993,7 +993,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognised value for combine_attrs=</span><span class="si">{</span><span class="n">combine_attrs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_MergeResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_MergeResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]</span>
     <span class="n">coord_names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span>
     <span class="n">dims</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
@@ -1001,7 +1001,7 @@
     <span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">merge_core</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_core</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
@@ -1054,8 +1054,8 @@
 <span class="sd">    ------</span>
 <span class="sd">    MergeError if the merge cannot be done successfully.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">_assert_compat_valid</span><span class="p">(</span><span class="n">compat</span><span class="p">)</span>
 
@@ -1107,7 +1107,7 @@
 
 <div class="viewcode-block" id="merge">
 <a class="viewcode-back" href="../../../api/xugrid.merge.html#xugrid.merge">[docs]</a>
-<span class="k">def</span> <span class="nf">merge</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">CoercibleMapping</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;no_conflicts&quot;</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
@@ -1334,9 +1334,9 @@
 <span class="sd">    combine_by_coords</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="n">dict_like_objects</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
@@ -1363,7 +1363,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">dataset_merge_method</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dataset_merge_method</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">CoercibleMapping</span><span class="p">,</span>
     <span class="n">overwrite_vars</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
@@ -1409,15 +1409,15 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">dataset_update_method</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CoercibleMapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dataset_update_method</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CoercibleMapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Guts of the Dataset.update method.</span>
 
 <span class="sd">    This drops a duplicated coordinates from `other` if `other` is not an</span>
 <span class="sd">    `xarray.Dataset`, e.g., if it&#39;s a dict with DataArray values (GH2068,</span>
 <span class="sd">    GH2180).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
         <span class="n">other</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>

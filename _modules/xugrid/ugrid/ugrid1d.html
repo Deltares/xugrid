@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,17 +375,17 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.ugrid1d</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
 
-<span class="kn">import</span> <span class="nn">xugrid</span>
-<span class="kn">from</span> <span class="nn">xugrid</span> <span class="kn">import</span> <span class="n">conversion</span>
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">conversion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FILL_VALUE</span><span class="p">,</span>
     <span class="n">BoolArray</span><span class="p">,</span>
     <span class="n">FloatArray</span><span class="p">,</span>
@@ -394,14 +394,14 @@
     <span class="n">IntDType</span><span class="p">,</span>
     <span class="n">LineArray</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.utils</span> <span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
 
 
 <div class="viewcode-block" id="Ugrid1d">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d">[docs]</a>
-<span class="k">class</span> <span class="nc">Ugrid1d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Ugrid1d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class stores the topological data of a &quot;1-D unstructured grid&quot;: a</span>
 <span class="sd">    collection of connected line elements, such as a river network.</span>
@@ -437,7 +437,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
         <span class="n">node_y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
@@ -483,7 +483,7 @@
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">pyproj</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span></div>
 
@@ -491,7 +491,7 @@
 <div class="viewcode-block" id="Ugrid1d.from_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_dataset.html#xugrid.Ugrid1d.from_dataset">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the 1D UGRID topology information from an xarray Dataset.</span>
 
@@ -556,7 +556,7 @@
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
         <span class="c1"># Meshkernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="kc">None</span>
@@ -575,7 +575,7 @@
 <div class="viewcode-block" id="Ugrid1d.from_meshkernel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_meshkernel.html#xugrid.Ugrid1d.from_meshkernel">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_meshkernel</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_meshkernel</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">mesh</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;network1d&quot;</span><span class="p">,</span>
@@ -616,7 +616,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.to_dataset.html#xugrid.Ugrid1d.to_dataset">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
         <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span>
@@ -652,25 +652,25 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 1&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">core_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">core_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of UGRID dimension names: node dimension, edge dimension.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary for grid coordinates.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
@@ -679,7 +679,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.get_coordinates">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_coordinates.html#xugrid.Ugrid1d.get_coordinates">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the coordinates for the specified UGRID dimension.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
@@ -693,7 +693,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.get_connectivity_matrix">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_connectivity_matrix.html#xugrid.Ugrid1d.get_connectivity_matrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the connectivity matrix for the specified UGRID dimension.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -711,7 +711,7 @@
     <span class="c1"># when called upon.</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel Mesh1d object.</span>
 
@@ -719,7 +719,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        mesh: meshkernel.Mesh1d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">meshkernel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mk</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
@@ -731,7 +731,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.MeshKernel&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.MeshKernel&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create if needed, and return meshkernel MeshKernel instance.</span>
 
@@ -739,7 +739,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        meshkernel: meshkernel.MeshKernel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">meshkernel</span> <span class="k">as</span> <span class="nn">mk</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">meshkernel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mk</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_geographic</span><span class="p">:</span>
@@ -753,7 +753,7 @@
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_geodataframe.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert geodataframe of linestrings into a UGRID1D topology.</span>
 
@@ -765,7 +765,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        topology: Ugrid1d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -777,7 +777,7 @@
 <div class="viewcode-block" id="Ugrid1d.from_shapely">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_shapely.html#xugrid.Ugrid1d.from_shapely">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">LineArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">LineArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert an array of shapely linestrings to UGRID1D topology.</span>
 
@@ -790,7 +790,7 @@
 <span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">import</span> <span class="nn">shapely</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">LINESTRING</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -802,8 +802,8 @@
         <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pygeos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
         <span class="n">warn</span><span class="p">(</span>
             <span class="s2">&quot;.to_pygeos has been deprecated. Use .to_shapely instead.&quot;</span><span class="p">,</span>
@@ -813,7 +813,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.to_shapely">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.to_shapely.html#xugrid.Ugrid1d.to_shapely">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert UGRID topology to shapely objects.</span>
 
@@ -849,7 +849,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.isel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.isel.html#xugrid.Ugrid1d.isel">[docs]</a>
-    <span class="k">def</span> <span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select based on node or edge.</span>
 
@@ -906,7 +906,7 @@
             <span class="k">return</span> <span class="n">grid</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_validate_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">indexer</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Ugrid1d does not support steps in slices&quot;</span><span class="p">)</span>
@@ -918,7 +918,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.sel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel">[docs]</a>
-    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select a selection of edges, based on edge centroids.</span>
 
@@ -950,7 +950,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.topology_subset">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topology_subset.html#xugrid.Ugrid1d.topology_subset">[docs]</a>
-    <span class="k">def</span> <span class="nf">topology_subset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topology_subset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoolArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">],</span> <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1013,7 +1013,7 @@
             <span class="k">return</span> <span class="n">grid</span></div>
 
 
-    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">ymin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1022,24 +1022,24 @@
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">intersect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span>
 
 <div class="viewcode-block" id="Ugrid1d.topological_sort_by_dfs">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs">[docs]</a>
-    <span class="k">def</span> <span class="nf">topological_sort_by_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topological_sort_by_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array of vertices in topological order.</span>
 
@@ -1054,7 +1054,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.contract_vertices">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices">[docs]</a>
-    <span class="k">def</span> <span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a simplified network topology by removing all nodes that are</span>
 <span class="sd">        not listed in ``indices``.</span>
@@ -1088,7 +1088,7 @@
 <div class="viewcode-block" id="Ugrid1d.merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.merge_partitions.html#xugrid.Ugrid1d.merge_partitions">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_partitions</span><span class="p">(</span>
         <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1105,7 +1105,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        merged: Ugrid1d</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">partitioning</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">partitioning</span>
 
         <span class="c1"># Grab a sample grid</span>
         <span class="n">grid</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">grids</span><span class="p">))</span>
@@ -1132,7 +1132,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.reindex_like">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.reindex_like.html#xugrid.Ugrid1d.reindex_like">[docs]</a>
-    <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reindex_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
@@ -1174,7 +1174,7 @@
 
 <div class="viewcode-block" id="Ugrid1d.create_data_array">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.create_data_array.html#xugrid.Ugrid1d.create_data_array">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a UgridDataArray from this grid and a 1D array of values.</span>
 

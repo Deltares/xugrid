@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,34 +375,34 @@
                 <article class="bd-article">
                   
   <h1>Source code for xarray.core.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
-<span class="kn">from</span> <span class="nn">html</span> <span class="kn">import</span> <span class="n">escape</span>
-<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">html</span><span class="w"> </span><span class="kn">import</span> <span class="n">escape</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textwrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">dedent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
-<span class="kn">from</span> <span class="nn">xarray.core.indexing</span> <span class="kn">import</span> <span class="n">BasicIndexer</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span>
-<span class="kn">from</span> <span class="nn">xarray.core.options</span> <span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
-<span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="n">ResampleCompatible</span>
-<span class="kn">from</span> <span class="nn">xarray.core.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">duck_array_ops</span><span class="p">,</span> <span class="n">formatting</span><span class="p">,</span> <span class="n">formatting_html</span><span class="p">,</span> <span class="n">ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicIndexer</span><span class="p">,</span> <span class="n">ExplicitlyIndexed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPTIONS</span><span class="p">,</span> <span class="n">_get_keep_attrs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResampleCompatible</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Frozen</span><span class="p">,</span>
     <span class="n">either_dict_or_kwargs</span><span class="p">,</span>
     <span class="n">is_scalar</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">xarray.namedarray.core</span> <span class="kn">import</span> <span class="n">_raise_if_any_duplicate_dimensions</span>
-<span class="kn">from</span> <span class="nn">xarray.namedarray.parallelcompat</span> <span class="kn">import</span> <span class="n">get_chunked_array_type</span><span class="p">,</span> <span class="n">guess_chunkmanager</span>
-<span class="kn">from</span> <span class="nn">xarray.namedarray.pycompat</span> <span class="kn">import</span> <span class="n">is_chunked_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.namedarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">_raise_if_any_duplicate_dimensions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.namedarray.parallelcompat</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_chunked_array_type</span><span class="p">,</span> <span class="n">guess_chunkmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.namedarray.pycompat</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_chunked_array</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">cftime</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">cftime</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -411,14 +411,14 @@
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">DTypeLike</span>
 
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.indexes</span> <span class="kn">import</span> <span class="n">Index</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">Resample</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.rolling_exp</span> <span class="kn">import</span> <span class="n">RollingExp</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.types</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Index</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.resample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resample</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.rolling_exp</span><span class="w"> </span><span class="kn">import</span> <span class="n">RollingExp</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">DatetimeLike</span><span class="p">,</span>
         <span class="n">DTypeLikeSave</span><span class="p">,</span>
         <span class="n">ScalarOrArray</span><span class="p">,</span>
@@ -428,8 +428,8 @@
         <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">T_Variable</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
-    <span class="kn">from</span> <span class="nn">xarray.groupers</span> <span class="kn">import</span> <span class="n">Resampler</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.groupers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampler</span>
 
     <span class="n">DTypeMaybeMapping</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">DTypeLikeSave</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">DTypeLikeSave</span><span class="p">]]</span>
 
@@ -439,21 +439,21 @@
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ImplementsArrayReduce</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImplementsArrayReduce</span><span class="p">:</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_reduce_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">include_skipna</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">numeric_only</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">include_skipna</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">numeric_only</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">include_skipna</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
                     <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">skipna</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
                 <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrapped_func</span>
@@ -478,14 +478,14 @@
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ImplementsDatasetReduce</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImplementsDatasetReduce</span><span class="p">:</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_reduce_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">include_skipna</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">numeric_only</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_method</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">include_skipna</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">numeric_only</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">include_skipna</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
                     <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span>
                     <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
@@ -496,7 +496,7 @@
 
         <span class="k">else</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># type: ignore[misc]</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
                     <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">numeric_only</span><span class="o">=</span><span class="n">numeric_only</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
                 <span class="p">)</span>
@@ -522,24 +522,24 @@
     <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">AbstractArray</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AbstractArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shared base class for DataArray and Variable.&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__complex__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__complex__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">complex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__array__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">DTypeLike</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">copy</span><span class="p">:</span>
@@ -556,15 +556,15 @@
                     <span class="n">copy</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">formatting</span><span class="o">.</span><span class="n">array_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">OPTIONS</span><span class="p">[</span><span class="s2">&quot;display_style&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;pre&gt;</span><span class="si">{</span><span class="n">escape</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="si">}</span><span class="s2">&lt;/pre&gt;&quot;</span>
         <span class="k">return</span> <span class="n">formatting_html</span><span class="o">.</span><span class="n">array_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">format_spec</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
                 <span class="c1"># Scalar values might be ok use format_spec with instead of repr:</span>
@@ -581,22 +581,25 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;iteration over a 0-d array&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">()</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>  <span class="c1"># type: ignore [overload-overlap]</span>
 
     <span class="nd">@overload</span>
-    <span class="k">def</span> <span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span> <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="nd">@overload</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return axis number(s) corresponding to dimension(s) in this array.</span>
 
 <span class="sd">        Parameters</span>
@@ -614,17 +617,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_axis_num</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_axis_num</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">_raise_if_any_duplicate_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">!r}</span><span class="s2"> not found in array dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">!r}</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ordered mapping from dimension names to lengths.</span>
 
 <span class="sd">        Immutable.</span>
@@ -636,12 +639,12 @@
         <span class="k">return</span> <span class="n">Frozen</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
 
 
-<span class="k">class</span> <span class="nc">AttrAccessMixin</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AttrAccessMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that allows getting keys with attribute access&quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify that all subclasses explicitly define ``__slots__``. If they don&#39;t,</span>
 <span class="sd">        raise error in the core xarray module and a FutureWarning in third-party</span>
 <span class="sd">        extensions.</span>
@@ -660,16 +663,16 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init_subclass__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_attr_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_attr_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Places to look-up items for attribute-style access&quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_item_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_item_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Places to look-up items for key-autocompletion&quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;__dict__&quot;</span><span class="p">,</span> <span class="s2">&quot;__setstate__&quot;</span><span class="p">}:</span>
             <span class="c1"># this avoids an infinite loop when pickle looks for the</span>
             <span class="c1"># __setstate__ attribute before the xarray object is initialized</span>
@@ -685,7 +688,7 @@
     <span class="c1"># a whopping 8% compared to a single method that checks hasattr(self, &quot;__dict__&quot;) at</span>
     <span class="c1"># runtime before every single assignment. All of this is just temporary until the</span>
     <span class="c1"># FutureWarning can be changed into a hard crash.</span>
-    <span class="k">def</span> <span class="nf">_setattr_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setattr_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated third party subclass (see ``__init_subclass__`` above)&quot;&quot;&quot;</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
@@ -698,7 +701,7 @@
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Objects with ``__slots__`` raise AttributeError if you try setting an</span>
 <span class="sd">        undeclared attribute. This is desirable, but the error message could use some</span>
 <span class="sd">        improvement.</span>
@@ -713,9 +716,9 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;cannot set attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> on a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object. Use __setitem__ style&quot;</span>
                 <span class="s2">&quot;assignment (e.g., `ds[&#39;name&#39;] = ...`) instead of assigning variables.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
-    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide method name lookup and completion. Only provide &#39;public&#39;</span>
 <span class="sd">        methods.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -727,7 +730,7 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span> <span class="o">|</span> <span class="n">extra_attrs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_ipython_key_completions_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ipython_key_completions_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide method for the key-autocompletions in IPython.</span>
 <span class="sd">        See https://ipython.readthedocs.io/en/stable/config/integrating.html#tab-completion</span>
 <span class="sd">        For the details.</span>
@@ -741,7 +744,7 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">TreeAttrAccessMixin</span><span class="p">(</span><span class="n">AttrAccessMixin</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TreeAttrAccessMixin</span><span class="p">(</span><span class="n">AttrAccessMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin class that allows getting keys with attribute access&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: Ensure ipython tab completion can include both child datatrees and</span>
@@ -749,7 +752,7 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This method overrides the check from ``AttrAccessMixin`` that ensures</span>
 <span class="sd">        ``__dict__`` is absent in a class, with ``__slots__`` used instead.</span>
 <span class="sd">        ``DataTree`` has some dynamically defined attributes in addition to those</span>
@@ -759,7 +762,7 @@
             <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">get_squeeze_dims</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_squeeze_dims</span><span class="p">(</span>
     <span class="n">xarray_obj</span><span class="p">,</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">axis</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -792,7 +795,7 @@
     <span class="k">return</span> <span class="n">dim</span>
 
 
-<span class="k">class</span> <span class="nc">DataWithCoords</span><span class="p">(</span><span class="n">AttrAccessMixin</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataWithCoords</span><span class="p">(</span><span class="n">AttrAccessMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shared base class for Dataset and DataArray.&quot;&quot;&quot;</span>
 
     <span class="n">_close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
@@ -800,7 +803,7 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_close&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span> <span class="nf">squeeze</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">squeeze</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -833,7 +836,7 @@
         <span class="n">dims</span> <span class="o">=</span> <span class="n">get_squeeze_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="n">drop</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">})</span>
 
-    <span class="k">def</span> <span class="nf">clip</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clip</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">min</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">max</span><span class="p">:</span> <span class="n">ScalarOrArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -865,7 +868,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.clip : equivalent function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># When this was a unary func, the default was True, so retaining the</span>
@@ -873,10 +876,10 @@
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">apply_ufunc</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span> <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span>
+            <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">clip</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span> <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an index for a dimension, with fall-back to a default RangeIndex&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -886,12 +889,12 @@
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">name</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_calc_assign_results</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_assign_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">T</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">C</span><span class="p">],</span> <span class="n">T</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-    <span class="k">def</span> <span class="nf">assign_coords</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_coords</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">coords</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">coords_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -1024,7 +1027,7 @@
 <span class="sd">        Dataset.swap_dims</span>
 <span class="sd">        Dataset.set_coords</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.coordinates</span> <span class="kn">import</span> <span class="n">Coordinates</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
 
         <span class="n">coords_combined</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coords_kwargs</span><span class="p">,</span> <span class="s2">&quot;assign_coords&quot;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1038,7 +1041,7 @@
         <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">assign_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_attrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign new attrs to this object.</span>
 
 <span class="sd">        Returns a new object equivalent to ``self.attrs.update(*args, **kwargs)``.</span>
@@ -1093,7 +1096,7 @@
         <span class="n">out</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="k">def</span> <span class="nf">pipe</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pipe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
         <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -1225,7 +1228,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">rolling_exp</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rolling_exp</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">T_DataWithCoords</span><span class="p">,</span>
         <span class="n">window</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">window_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;span&quot;</span><span class="p">,</span>
@@ -1254,7 +1257,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        core.rolling_exp.RollingExp</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core</span> <span class="kn">import</span> <span class="n">rolling_exp</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">rolling_exp</span>
 
         <span class="k">if</span> <span class="s2">&quot;keep_attrs&quot;</span> <span class="ow">in</span> <span class="n">window_kwargs</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
@@ -1268,7 +1271,7 @@
 
         <span class="k">return</span> <span class="n">rolling_exp</span><span class="o">.</span><span class="n">RollingExp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">window_type</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_resample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resample_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">T_Resample</span><span class="p">],</span>
         <span class="n">indexer</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">ResampleCompatible</span> <span class="o">|</span> <span class="n">Resampler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1440,10 +1443,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO support non-string indexer after removing the old API.</span>
 
-        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.groupby</span> <span class="kn">import</span> <span class="n">ResolvedGrouper</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.resample</span> <span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
-        <span class="kn">from</span> <span class="nn">xarray.groupers</span> <span class="kn">import</span> <span class="n">Resampler</span><span class="p">,</span> <span class="n">TimeResampler</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.groupby</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResolvedGrouper</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.resample</span><span class="w"> </span><span class="kn">import</span> <span class="n">RESAMPLE_DIM</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.groupers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampler</span><span class="p">,</span> <span class="n">TimeResampler</span>
 
         <span class="n">indexer</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="n">indexer_kwargs</span><span class="p">,</span> <span class="s2">&quot;resample&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexer</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -1481,7 +1484,7 @@
             <span class="n">restore_coord_dims</span><span class="o">=</span><span class="n">restore_coord_dims</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">where</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter elements from this object according to a condition.</span>
 
 <span class="sd">        Returns elements from &#39;DataArray&#39;, where &#39;cond&#39; is True,</span>
@@ -1569,9 +1572,9 @@
 <span class="sd">        numpy.where : corresponding numpy function</span>
 <span class="sd">        where : equivalent function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.alignment</span> <span class="kn">import</span> <span class="n">align</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">align</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
         <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">cond</span><span class="p">):</span>
             <span class="n">cond</span> <span class="o">=</span> <span class="n">cond</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1586,10 +1589,10 @@
 
             <span class="bp">self</span><span class="p">,</span> <span class="n">cond</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">_dataarray_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_dataarray_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">cond</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cond</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">dim</span><span class="p">))</span>
 
-            <span class="k">def</span> <span class="nf">_dataset_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_indexer</span><span class="p">(</span><span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataArray</span><span class="p">:</span>
                 <span class="n">cond_wdim</span> <span class="o">=</span> <span class="n">cond</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span>
                     <span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">cond</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cond</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
                 <span class="p">)</span>
@@ -1609,7 +1612,7 @@
 
         <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">where_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cond</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the function that releases any resources linked to this object.</span>
 
 <span class="sd">        This method controls how xarray cleans up resources associated</span>
@@ -1625,13 +1628,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="n">close</span>
 
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Release any resources linked to this object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is a missing value.</span>
 
 <span class="sd">        Parameters</span>
@@ -1662,7 +1665,7 @@
 <span class="sd">        array([False,  True, False])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1674,7 +1677,7 @@
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">notnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notnull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_attrs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test each value in the array for whether it is not a missing value.</span>
 
 <span class="sd">        Parameters</span>
@@ -1705,7 +1708,7 @@
 <span class="sd">        array([ True, False,  True])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1717,7 +1720,7 @@
             <span class="n">keep_attrs</span><span class="o">=</span><span class="n">keep_attrs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_elements</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tests each value in the array for whether it is in test elements.</span>
 
 <span class="sd">        Parameters</span>
@@ -1744,10 +1747,10 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.isin</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_elements</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1765,7 +1768,7 @@
             <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">astype</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">astype</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1827,7 +1830,7 @@
 <span class="sd">        dask.array.Array.astype</span>
 <span class="sd">        sparse.COO.astype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">xarray.core.computation</span> <span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="n">casting</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="n">subok</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
@@ -1841,19 +1844,19 @@
             <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;allowed&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># implementations of this class should implement this method</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1865,7 +1868,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1877,7 +1880,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1889,7 +1892,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1901,7 +1904,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1914,7 +1917,7 @@
 
 <div class="viewcode-block" id="full_like">
 <a class="viewcode-back" href="../../../api/xugrid.full_like.html#xugrid.full_like">[docs]</a>
-<span class="k">def</span> <span class="nf">full_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2041,9 +2044,9 @@
 <span class="sd">    ones_like</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataarray</span> <span class="kn">import</span> <span class="n">DataArray</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_scalar</span><span class="p">(</span><span class="n">fill_value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
         <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fill_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
@@ -2102,7 +2105,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_full_like_variable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_full_like_variable</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2111,7 +2114,7 @@
     <span class="n">from_array_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Inner function of full_like, where other must be a variable&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">xarray.core.variable</span> <span class="kn">import</span> <span class="n">Variable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
 
     <span class="k">if</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
         <span class="n">fill_value</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">get_fill_value</span><span class="p">(</span><span class="n">dtype</span> <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -2140,13 +2143,13 @@
             <span class="o">**</span><span class="n">from_array_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Variable</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2157,7 +2160,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2168,7 +2171,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2179,7 +2182,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2190,7 +2193,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2202,7 +2205,7 @@
 
 <div class="viewcode-block" id="zeros_like">
 <a class="viewcode-back" href="../../../api/xugrid.zeros_like.html#xugrid.zeros_like">[docs]</a>
-<span class="k">def</span> <span class="nf">zeros_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zeros_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2286,7 +2289,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2297,7 +2300,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2308,7 +2311,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLikeSave</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2319,7 +2322,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2330,7 +2333,7 @@
 
 
 <span class="nd">@overload</span>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2342,7 +2345,7 @@
 
 <div class="viewcode-block" id="ones_like">
 <a class="viewcode-back" href="../../../api/xugrid.ones_like.html#xugrid.ones_like">[docs]</a>
-<span class="k">def</span> <span class="nf">ones_like</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ones_like</span><span class="p">(</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Variable</span><span class="p">,</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeMaybeMapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -2417,7 +2420,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">get_chunksizes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chunksizes</span><span class="p">(</span>
     <span class="n">variables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Variable</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2433,17 +2436,17 @@
     <span class="k">return</span> <span class="n">Frozen</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_np_datetime_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_np_datetime_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a dtype is a subclass of the numpy datetime types&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">is_np_timedelta_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_np_timedelta_like</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether dtype is of the timedelta64 dtype.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a array inside a Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cftime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -2458,12 +2461,12 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if an xarray.Variable contains cftime.datetime objects&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_contains_cftime_datetimes</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_contains_datetime_like_objects</span><span class="p">(</span><span class="n">var</span><span class="p">:</span> <span class="n">T_Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a variable contains datetime like objects (either</span>
 <span class="sd">    np.datetime64, np.timedelta64, or cftime.datetime)</span>
 <span class="sd">    &quot;&quot;&quot;</span>

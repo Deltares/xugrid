@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -409,21 +409,21 @@ tricky part.</p>
 <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> arrays. This example therefore also shows how to use these
 modules, should you not want to rely on more complex dependencies such as
 <code class="docutils literal notranslate"><span class="pre">xugrid</span></code> and <code class="docutils literal notranslate"><span class="pre">xarray</span></code>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.tri</span> <span class="k">as</span> <span class="nn">mtri</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">LineCollection</span><span class="p">,</span> <span class="n">PolyCollection</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.tri</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mtri</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineCollection</span><span class="p">,</span> <span class="n">PolyCollection</span>
 
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FILL_VALUE</span>  <span class="c1"># equals -1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FILL_VALUE</span>  <span class="c1"># equals -1</span>
 </pre></div>
 </div>
 <p>From xugrid, we need only import the <code class="docutils literal notranslate"><span class="pre">connectivity</span></code> and <code class="docutils literal notranslate"><span class="pre">voronoi</span></code>
 modules. The functions in these modules depend only on <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and
 <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">xugrid.ugrid</span> <span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">voronoi</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">voronoi</span>
 
 
-<span class="k">def</span> <span class="nf">generate_disk</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_disk</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a triangular mesh for the unit circle.</span>
 
@@ -455,7 +455,7 @@ modules. The functions in these modules depend only on <code class="docutils lit
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)),</span> <span class="n">triang</span><span class="o">.</span><span class="n">triangles</span>
 
 
-<span class="k">def</span> <span class="nf">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">n_edge</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge_nodes</span><span class="p">)</span>
     <span class="n">edge_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_edge</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">node_0</span> <span class="o">=</span> <span class="n">edge_nodes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -473,7 +473,7 @@ modules. The functions in these modules depend only on <code class="docutils lit
     <span class="k">return</span> <span class="n">primitive</span>
 
 
-<span class="k">def</span> <span class="nf">face_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">face_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">face_nodes</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">]</span>
     <span class="c1"># Replace fill value; PolyCollection ignores NaN.</span>
     <span class="n">vertices</span><span class="p">[</span><span class="n">face_nodes</span> <span class="o">==</span> <span class="n">FILL_VALUE</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -483,7 +483,7 @@ modules. The functions in these modules depend only on <code class="docutils lit
     <span class="k">return</span> <span class="n">primitive</span>
 
 
-<span class="k">def</span> <span class="nf">comparison_plot</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">comparison_plot</span><span class="p">(</span>
     <span class="n">vertices0</span><span class="p">,</span>
     <span class="n">faces0</span><span class="p">,</span>
     <span class="n">centroids0</span><span class="p">,</span>
@@ -776,7 +776,7 @@ plots below). These can be intersected with the mesh exterior.</p>
 centroids in orange.</p></li>
 <li><p>Both of them, overlaid in the same plot.</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">Voronoi</span><span class="p">,</span> <span class="n">voronoi_plot_2d</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">Voronoi</span><span class="p">,</span> <span class="n">voronoi_plot_2d</span>
 
 <span class="n">vor</span> <span class="o">=</span> <span class="n">Voronoi</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
 
@@ -805,7 +805,7 @@ centroids in orange.</p></li>
 <img src="../_images/sphx_glr_voronoi_008.png" srcset="../_images/sphx_glr_voronoi_008.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.389 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.367 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/57be9f22eeecb878a6868437d46d6e74/voronoi.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">voronoi.ipynb</span></code></a></p>

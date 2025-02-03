@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,32 +375,32 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.core.dataset_accessor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="c1"># from xugrid.plot.pyvista import to_pyvista_grid</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.accessorbase</span> <span class="kn">import</span> <span class="n">AbstractUgridAccessor</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid1d</span> <span class="kn">import</span> <span class="n">Ugrid1d</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugrid2d</span> <span class="kn">import</span> <span class="n">Ugrid2d</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.accessorbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractUgridAccessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.wrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugrid1d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ugrid1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugrid2d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ugrid2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">UgridType</span>
 
 
 <div class="viewcode-block" id="UgridDatasetAccessor">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.html#xugrid.UgridDatasetAccessor">[docs]</a>
-<span class="k">class</span> <span class="nc">UgridDatasetAccessor</span><span class="p">(</span><span class="n">AbstractUgridAccessor</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UgridDatasetAccessor</span><span class="p">(</span><span class="n">AbstractUgridAccessor</span><span class="p">):</span>
 <div class="viewcode-block" id="UgridDatasetAccessor.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.html#xugrid.UgridDatasetAccessor.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">UgridType</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grids</span> <span class="o">=</span> <span class="n">grids</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the single UGRID topology in this dataset. Raises a TypeError if</span>
 <span class="sd">        the dataset contains more than one topology.</span>
@@ -416,7 +416,7 @@
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns name of the single UGRID topology in this dataset. Raises a</span>
 <span class="sd">        TypeError if the dataset contains more than one topology.</span>
@@ -432,17 +432,17 @@
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of all the UGRID topologies in the dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping from names to UGRID topologies.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``</span>
 <span class="sd">        values of the grid&#39;s node coordinates for every grid in the dataset.</span>
@@ -450,7 +450,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">total_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a tuple containing ``minx, miny, maxx, maxy`` values for the</span>
 <span class="sd">        bounds of the dataset as a whole. Currently does not check whether the</span>
@@ -466,7 +466,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.rename">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rename.html#xugrid.UgridDatasetAccessor.rename">[docs]</a>
-    <span class="k">def</span> <span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name_or_name_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name_or_name_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Give a new name to the UGRID topology and update the associated</span>
 <span class="sd">        coordinate and dimension names in the Dataset.</span>
@@ -518,7 +518,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_node_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_node_coords.html#xugrid.UgridDatasetAccessor.assign_node_coords">[docs]</a>
-    <span class="k">def</span> <span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign node coordinates from the grid to the object.</span>
 
@@ -537,7 +537,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_edge_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_edge_coords.html#xugrid.UgridDatasetAccessor.assign_edge_coords">[docs]</a>
-    <span class="k">def</span> <span class="nf">assign_edge_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_edge_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign edge coordinates from the grid to the object.</span>
 
@@ -556,7 +556,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_face_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_face_coords.html#xugrid.UgridDatasetAccessor.assign_face_coords">[docs]</a>
-    <span class="k">def</span> <span class="nf">assign_face_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign_face_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign face coordinates from the grid to the object.</span>
 
@@ -576,7 +576,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.set_node_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.set_node_coords.html#xugrid.UgridDatasetAccessor.set_node_coords">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">node_y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">node_y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given names of x and y coordinates of the nodes of an object, set them</span>
 <span class="sd">        as the coordinates in the grid.</span>
@@ -612,7 +612,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.sel">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.sel.html#xugrid.UgridDatasetAccessor.sel">[docs]</a>
-    <span class="k">def</span> <span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">new_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="n">new_grids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -631,7 +631,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.sel_points">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.sel_points.html#xugrid.UgridDatasetAccessor.sel_points">[docs]</a>
-    <span class="k">def</span> <span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
@@ -667,7 +667,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.rasterize">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize.html#xugrid.UgridDatasetAccessor.rasterize">[docs]</a>
-    <span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize all face data on 2D unstructured grids by sampling.</span>
 
@@ -689,7 +689,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.rasterize_like">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize_like.html#xugrid.UgridDatasetAccessor.rasterize_like">[docs]</a>
-    <span class="k">def</span> <span class="nf">rasterize_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rasterize_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rasterize unstructured all face data on 2D unstructured grids by</span>
 <span class="sd">        sampling on the x and y coordinates of ``other``.</span>
@@ -716,7 +716,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_periodic">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_periodic.html#xugrid.UgridDatasetAccessor.to_periodic">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert every grid to a periodic grid, where the rightmost boundary</span>
 <span class="sd">        shares its nodes with the leftmost boundary.</span>
@@ -735,7 +735,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_nonperiodic">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_nonperiodic.html#xugrid.UgridDatasetAccessor.to_nonperiodic">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert the grid from a periodic grid (where the rightmost boundary shares its</span>
 <span class="sd">        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes</span>
@@ -760,7 +760,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.intersect_line">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_line.html#xugrid.UgridDatasetAccessor.intersect_line">[docs]</a>
-    <span class="k">def</span> <span class="nf">intersect_line</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_line</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -789,7 +789,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.intersect_linestring">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_linestring.html#xugrid.UgridDatasetAccessor.intersect_linestring">[docs]</a>
-    <span class="k">def</span> <span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Intersect the grid along a collection of linestrings. Returns a new Dataset</span>
 <span class="sd">        with the values for each intersected segment.</span>
@@ -812,7 +812,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert this UgridDataset into a standard</span>
 <span class="sd">        xarray.Dataset.</span>
@@ -834,7 +834,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.</span>
 
@@ -849,7 +849,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.set_crs">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.set_crs.html#xugrid.UgridDatasetAccessor.set_crs">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_crs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_crs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -891,7 +891,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_crs">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_crs.html#xugrid.UgridDatasetAccessor.to_crs">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -937,7 +937,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_geodataframe.html#xugrid.UgridDatasetAccessor.to_geodataframe">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert data and topology of one facet (node, edge, face) of the grid</span>
 <span class="sd">        to a geopandas GeoDataFrame. This also determines the geometry type of</span>
@@ -965,7 +965,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        geodataframe: gpd.GeoDataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
 
@@ -1001,7 +1001,7 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.reindex_like">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.reindex_like.html#xugrid.UgridDatasetAccessor.reindex_like">[docs]</a>
-    <span class="k">def</span> <span class="nf">reindex_like</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reindex_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">],</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>

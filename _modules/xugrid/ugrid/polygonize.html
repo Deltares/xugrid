@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,19 +375,19 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.polygonize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span>
 
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">IntArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">IntArray</span>
 
 
-<span class="k">def</span> <span class="nf">_bbox_area</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bbox_area</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_classify</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_classify</span><span class="p">(</span>
     <span class="n">i</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">face_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -431,7 +431,7 @@
 
 <div class="viewcode-block" id="polygonize">
 <a class="viewcode-back" href="../../../api/xugrid.polygonize.html#xugrid.polygonize">[docs]</a>
-<span class="k">def</span> <span class="nf">polygonize</span><span class="p">(</span><span class="n">uda</span><span class="p">:</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">polygonize</span><span class="p">(</span><span class="n">uda</span><span class="p">:</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Polygonize a UgridDataArray.</span>
 
@@ -456,8 +456,8 @@
 <span class="sd">    polygonized: GeoDataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
-    <span class="kn">import</span> <span class="nn">shapely</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 
     <span class="n">facedim</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
     <span class="k">if</span> <span class="n">uda</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,):</span>

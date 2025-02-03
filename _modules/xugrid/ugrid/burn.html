@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -375,39 +375,39 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.burn</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">from</span> <span class="nn">numba_celltree.constants</span> <span class="kn">import</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">,</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Triangle</span>
-<span class="kn">from</span> <span class="nn">numba_celltree.geometry_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">,</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Triangle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.geometry_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">as_point</span><span class="p">,</span>
     <span class="n">as_triangle</span><span class="p">,</span>
     <span class="n">cross_product</span><span class="p">,</span>
     <span class="n">to_vector</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">xugrid</span>
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">shapely</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">mapbox_earcut</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mapbox_earcut</span>
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">mapbox_earcut</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;mapbox_earcut&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check whether point p falls within the bounding box created by a and b</span>
 <span class="sd">    (after we&#39;ve checked the size of the cross product).</span>
@@ -432,7 +432,7 @@
 
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">point_in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Triangle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">point_in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Triangle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># TODO: move this into numba_celltree instead?</span>
     <span class="n">ap</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
     <span class="n">bp</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
@@ -465,7 +465,7 @@
 
 
 <span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">points_in_triangles</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">points_in_triangles</span><span class="p">(</span>
     <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">face_indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
     <span class="n">faces</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
@@ -483,7 +483,7 @@
     <span class="k">return</span> <span class="n">inside</span>
 
 
-<span class="k">def</span> <span class="nf">_locate_polygon</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_locate_polygon</span><span class="p">(</span>
     <span class="n">grid</span><span class="p">:</span> <span class="s2">&quot;xu.Ugrid2d&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">exterior</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
     <span class="n">interiors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">],</span>
@@ -516,7 +516,7 @@
 <span class="sd">        cell that is touched.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">mapbox_earcut</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mapbox_earcut</span>
 
     <span class="n">rings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">exterior</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">interior</span><span class="p">)</span> <span class="k">for</span> <span class="n">interior</span> <span class="ow">in</span> <span class="n">interiors</span><span class="p">])</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">exterior</span><span class="p">]</span> <span class="o">+</span> <span class="n">interiors</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -535,7 +535,7 @@
         <span class="k">return</span> <span class="n">grid_indices</span><span class="p">[</span><span class="n">inside</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_burn_polygons</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_burn_polygons</span><span class="p">(</span>
     <span class="n">polygons</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoSeries&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">like</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -560,7 +560,7 @@
     <span class="k">return</span>
 
 
-<span class="k">def</span> <span class="nf">_burn_points</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_burn_points</span><span class="p">(</span>
     <span class="n">points</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoSeries&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">like</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -573,7 +573,7 @@
     <span class="k">return</span>
 
 
-<span class="k">def</span> <span class="nf">_burn_lines</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_burn_lines</span><span class="p">(</span>
     <span class="n">lines</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoSeries&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">like</span><span class="p">:</span> <span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span>
     <span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -606,7 +606,7 @@
 
 <div class="viewcode-block" id="burn_vector_geometry">
 <a class="viewcode-back" href="../../../api/xugrid.burn_vector_geometry.html#xugrid.burn_vector_geometry">[docs]</a>
-<span class="k">def</span> <span class="nf">burn_vector_geometry</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">burn_vector_geometry</span><span class="p">(</span>
     <span class="n">gdf</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataframe&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">like</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;xugrid.Ugrid2d&quot;</span><span class="p">,</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">,</span> <span class="s2">&quot;xugrid.UgridDataset&quot;</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -638,7 +638,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    burned: UgridDataArray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="n">POINT</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">POINT</span>
     <span class="n">LINESTRING</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">LINESTRING</span>
@@ -695,11 +695,11 @@
 
 
 
-<span class="k">def</span> <span class="nf">grid_from_earcut_polygons</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">grid_from_earcut_polygons</span><span class="p">(</span>
     <span class="n">polygons</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -758,7 +758,7 @@
 
 <div class="viewcode-block" id="earcut_triangulate_polygons">
 <a class="viewcode-back" href="../../../api/xugrid.earcut_triangulate_polygons.html#xugrid.earcut_triangulate_polygons">[docs]</a>
-<span class="k">def</span> <span class="nf">earcut_triangulate_polygons</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">earcut_triangulate_polygons</span><span class="p">(</span>
     <span class="n">polygons</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataframe&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>

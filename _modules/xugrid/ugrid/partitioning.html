@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -376,20 +376,20 @@
                   
   <h1>Source code for xugrid.ugrid.partitioning</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Create and merge partitioned UGRID topologies.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">accumulate</span><span class="p">,</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">accumulate</span><span class="p">,</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
-<span class="kn">from</span> <span class="nn">xugrid.constants</span> <span class="kn">import</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
-<span class="kn">from</span> <span class="nn">xugrid.core.wrap</span> <span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.connectivity</span> <span class="kn">import</span> <span class="n">renumber</span>
-<span class="kn">from</span> <span class="nn">xugrid.ugrid.ugridbase</span> <span class="kn">import</span> <span class="n">UgridType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FILL_VALUE</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">IntDType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.wrap</span><span class="w"> </span><span class="kn">import</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.connectivity</span><span class="w"> </span><span class="kn">import</span> <span class="n">renumber</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">UgridType</span>
 
 
-<span class="k">def</span> <span class="nf">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">IntArray</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">IntArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a 1D array of N labels into a N arrays of indices.</span>
 
@@ -403,7 +403,7 @@
     <span class="k">return</span> <span class="n">indices</span>
 
 
-<span class="k">def</span> <span class="nf">partition_by_label</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">partition_by_label</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Partition the grid and xarray object by integer labels.</span>
 
@@ -454,7 +454,7 @@
     <span class="k">return</span> <span class="n">partitions</span>
 
 
-<span class="k">def</span> <span class="nf">merge_nodes</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_nodes</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
     <span class="n">node_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">grid</span><span class="o">.</span><span class="n">node_x</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">])</span>
     <span class="n">node_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">grid</span><span class="o">.</span><span class="n">node_y</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">])</span>
     <span class="n">node_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">node_x</span><span class="p">,</span> <span class="n">node_y</span><span class="p">))</span>
@@ -476,7 +476,7 @@
     <span class="k">return</span> <span class="n">unique_nodes</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">inverse</span>
 
 
-<span class="k">def</span> <span class="nf">_merge_connectivity</span><span class="p">(</span><span class="n">gathered</span><span class="p">,</span> <span class="n">slices</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_connectivity</span><span class="p">(</span><span class="n">gathered</span><span class="p">,</span> <span class="n">slices</span><span class="p">):</span>
     <span class="c1"># Make sure identical edges are identified: [0, 1] == [1, 0]</span>
     <span class="c1"># As well as faces: [0, 1, 2] == [2, 1, 0]</span>
     <span class="nb">sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">gathered</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -492,7 +492,7 @@
     <span class="k">return</span> <span class="n">merged</span><span class="p">,</span> <span class="n">indexes</span>
 
 
-<span class="k">def</span> <span class="nf">merge_faces</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_faces</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">):</span>
     <span class="n">node_offsets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">accumulate</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">n_node</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">]))</span>
     <span class="n">n_face</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">n_face</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">]</span>
     <span class="n">n_max_node</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">n_max_node_per_face</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">)</span>
@@ -510,7 +510,7 @@
     <span class="k">return</span> <span class="n">_merge_connectivity</span><span class="p">(</span><span class="n">all_faces</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">merge_edges</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_edges</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">node_inverse</span><span class="p">):</span>
     <span class="n">node_offsets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">accumulate</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">n_node</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">]))</span>
     <span class="n">n_edge</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">n_edge</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">]</span>
     <span class="n">slices</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">accumulate</span><span class="p">(</span><span class="n">n_edge</span><span class="p">))</span>
@@ -524,7 +524,7 @@
     <span class="k">return</span> <span class="n">_merge_connectivity</span><span class="p">(</span><span class="n">all_edges</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">validate_partition_topology</span><span class="p">(</span><span class="n">grouped</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_partition_topology</span><span class="p">(</span><span class="n">grouped</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">grids</span> <span class="ow">in</span> <span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -543,7 +543,7 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">group_grids_by_name</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UgridDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_grids_by_name</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UgridDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
     <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -553,7 +553,7 @@
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">group_data_objects_by_gridname</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_data_objects_by_gridname</span><span class="p">(</span>
     <span class="n">partitions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UgridDataset</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
     <span class="c1"># Convert to dataset for convenience</span>
@@ -571,7 +571,7 @@
     <span class="k">return</span> <span class="n">grouped</span>
 
 
-<span class="k">def</span> <span class="nf">validate_partition_objects</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_partition_objects</span><span class="p">(</span>
     <span class="n">objects_by_gridname</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">data_objects</span> <span class="ow">in</span> <span class="n">objects_by_gridname</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -592,22 +592,22 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">separate_variables</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">separate_variables</span><span class="p">(</span>
     <span class="n">objects_by_gridname</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Separate into UGRID variables grouped by dimension, and other variables.&quot;&quot;&quot;</span>
     <span class="n">validate_partition_objects</span><span class="p">(</span><span class="n">objects_by_gridname</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">assert_single_dim</span><span class="p">(</span><span class="n">intersection</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assert_single_dim</span><span class="p">(</span><span class="n">intersection</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> contains more than one UGRID dimension: </span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">remove_item</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_item</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">[:</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
 
-    <span class="k">def</span> <span class="nf">all_equal</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_equal</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
         <span class="n">first</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">iterator</span><span class="p">))</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">element</span> <span class="o">==</span> <span class="n">first</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">)</span>
 
@@ -642,7 +642,7 @@
     <span class="k">return</span> <span class="n">grouped</span><span class="p">,</span> <span class="n">other</span>
 
 
-<span class="k">def</span> <span class="nf">merge_data_along_dim</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_data_along_dim</span><span class="p">(</span>
     <span class="n">data_objects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
     <span class="nb">vars</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">merge_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -683,7 +683,7 @@
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">to_merge</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">merge_dim</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ensure that along a UGRID dimension only a single chunk is defined.</span>
 
@@ -705,7 +705,7 @@
 
 <div class="viewcode-block" id="merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.merge_partitions.html#xugrid.merge_partitions">[docs]</a>
-<span class="k">def</span> <span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge topology and data, partitioned along UGRID dimensions, into a single</span>
 <span class="sd">    UgridDataset.</span>
