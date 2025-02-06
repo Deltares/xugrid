@@ -12,6 +12,7 @@ import xarray as xr
 
 from xugrid.constants import (
     FILL_VALUE,
+    BoolArray,
     FloatArray,
     IntArray,
     IntDType,
@@ -266,7 +267,7 @@ def infer_xy_coords(obj):
     return x, y
 
 
-def bounds_to_vertices(bounds: np.ndarray):
+def bounds1d_to_vertices(bounds: np.ndarray):
     diff = np.diff(bounds, axis=0)
     ascending = (diff >= 0.0).all()
     descending = (diff <= 0.0).all()
@@ -277,6 +278,32 @@ def bounds_to_vertices(bounds: np.ndarray):
     else:
         raise ValueError("Bounds are not monotonic ascending or monotonic descending")
     return vertices
+
+
+def bounds2d_to_vertices(
+    x_bounds: np.ndarray, y_bounds: np.ndarray
+) -> Tuple[FloatArray, BoolArray]:
+    # Create 2D coords, discard NaNs.
+    face_node_coordinates = np.stack(
+        (
+            x_bounds.reshape(-1, 4),
+            y_bounds.reshape(-1, 4),
+        ),
+        axis=-1,
+    )
+    index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1)
+    face_node_coordinates = face_node_coordinates[index]
+
+    # Guarantee counterclockwise orientation
+    face_centroids = np.mean(face_node_coordinates, axis=1)
+    dx = face_node_coordinates[..., 0] - face_centroids[:, np.newaxis, 0]
+    dy = face_node_coordinates[..., 1] - face_centroids[:, np.newaxis, 1]
+    angle = np.arctan2(dy, dx)
+    counterclockwise = np.argsort(angle, axis=1)
+    face_node_coordinates = np.take_along_axis(
+        face_node_coordinates, counterclockwise[..., None], axis=1
+    )
+    return face_node_coordinates, index
 
 
 def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa

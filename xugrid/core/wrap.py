@@ -6,6 +6,7 @@ This allows for tab completion and documentation.
 from __future__ import annotations
 
 import types
+import warnings
 from collections import ChainMap
 from functools import wraps
 from itertools import chain
@@ -234,10 +235,12 @@ class UgridDataArray(DataArrayForwardMixin):
         )
 
     @staticmethod
-    def from_structured(
+    def from_structured2d(
         da: xr.DataArray,
         x: str | None = None,
         y: str | None = None,
+        x_bounds: xr.DataArray = None,
+        y_bounds: xr.DataArray = None,
     ) -> "UgridDataArray":
         """
         Create a UgridDataArray from a (structured) xarray DataArray.
@@ -255,6 +258,9 @@ class UgridDataArray(DataArrayForwardMixin):
 
         Specify the x and y coordinate names explicitly otherwise.
 
+        For curvilinear grids, x_bounds and y_bounds must be provided, next to
+        x and y.
+
         Parameters
         ----------
         da: xr.DataArray
@@ -263,6 +269,8 @@ class UgridDataArray(DataArrayForwardMixin):
             Which coordinate to use as the UGRID x-coordinate.
         y: str, default: None
             Which coordinate to use as the UGRID y-coordinate.
+        x_bounds: xr.DataArray, default: None
+        y_bounds: xr.DataArray, default: None
 
         Returns
         -------
@@ -273,11 +281,44 @@ class UgridDataArray(DataArrayForwardMixin):
                 "DataArray must have at least two spatial dimensions. "
                 f"Found: {da.dims}."
             )
-        grid, stackdims = Ugrid2d.from_structured(da, x, y, return_dims=True)
-        face_da = da.stack(  # noqa: PD013
-            {grid.face_dimension: stackdims}, create_index=False
-        ).drop_vars(stackdims, errors="ignore")
+        if x_bounds is not None and y_bounds is not None:
+            if x is None or y is None:
+                raise ValueError("x and y must be provided for bounds")
+            yx = (y, x)
+            grid, index = Ugrid2d.from_structured_bounds(
+                x_bounds=x_bounds.transpose(y, x, ...).to_numpy(),
+                y_bounds=y_bounds.transpose(y, x, ...).to_numpy(),
+                return_index=True,
+            )
+        else:
+            # Possibly rely on inference of x and y dims.
+            grid, yx = Ugrid2d.from_structured(da, x, y, return_dims=True)
+            index = slice(None, None)
+
+        face_da = (
+            da.stack(  # noqa: PD013
+                {grid.face_dimension: (yx)}, create_index=False
+            )
+            .isel({grid.face_dimension: index})
+            .drop_vars(yx, errors="ignore")
+        )
         return UgridDataArray(face_da, grid)
+
+    @staticmethod
+    def from_structured(
+        da: xr.DataArray,
+        x: str | None = None,
+        y: str | None = None,
+        x_bounds: xr.DataArray = None,
+        y_bounds: xr.DataArray = None,
+    ) -> "UgridDataArray":
+        warnings.warn(
+            "UgridDataArray.from_structured is deprecated and will be removed. "
+            "Use UgridDataArray.from_structured2d instead.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return UgridDataArray.from_structured2d(da, x, y, x_bounds, y_bounds)
 
     @staticmethod
     def from_data(data: ArrayLike, grid: UgridType, facet: str) -> UgridDataArray:
@@ -421,7 +462,7 @@ class UgridDataset(DatasetForwardMixin):
         return UgridDataset(ds, [grid])
 
     @staticmethod
-    def from_structured(
+    def from_structured2d(
         dataset: xr.Dataset, topology: dict | None = None
     ) -> "UgridDataset":
         """
@@ -465,7 +506,7 @@ class UgridDataset(DatasetForwardMixin):
 
         >>> uds = xugrid.UgridDataset.from_structured(
         >>>     dataset,
-        >>>     topology={"my_mesh2d": ("xc", "yc")},
+        >>>     topology={"my_mesh2d": {"x": "xc",  "y": "yc"}},
         >>> )
 
         In case of multiple grid topologies in a single dataset, the names must
@@ -473,18 +514,49 @@ class UgridDataset(DatasetForwardMixin):
 
         >>> uds = xugrid.UgridDataset.from_structured(
         >>>     dataset,
-        >>>     topology={"mesh2d_xy": ("x", "y"), "mesh2d_lonlat": {"lon", "lat"},
+        >>>     topology={"mesh2d_xy": {"x": x", "y": "y"}, "mesh2d_lonlat": {"x": "lon", "y": "lat"},
         >>> )
         """
         if topology is None:
+            # By default, set None. This communicates to
+            # Ugrid2d.from_structured to infer x and y dims.
             topology = {"mesh2d": (None, None)}
 
         grids = []
         dss = []
-        for name, (x, y) in topology.items():
-            grid, stackdims = Ugrid2d.from_structured(
-                dataset, x=x, y=y, name=name, return_dims=True
-            )
+        for name, args in topology.items():
+            x_bounds = None
+            y_bounds = None
+            if isinstance(args, dict):
+                x = args["x"]
+                y = args["y"]
+                if "x_bounds" in args and "y_bounds" in args:
+                    if x is None or y is None:
+                        raise ValueError("x and y must be provided for bounds")
+                    x_bounds = dataset[args["x_bounds"]]
+                    y_bounds = dataset[args["y_bounds"]]
+            elif isinstance(args, tuple):
+                x, y = args
+            else:
+                raise TypeError(
+                    "Expected dict or tuple in topology, received: "
+                    f"{type(args).__name__}"
+                )
+
+            if x_bounds is not None and y_bounds is not None:
+                stackdims = (y, x)
+                grid, index = Ugrid2d.from_structured_bounds(
+                    x_bounds.transpose(*stackdims, ...).to_numpy(),
+                    y_bounds.transpose(*stackdims, ...).to_numpy(),
+                    name=name,
+                    return_index=True,
+                )
+            else:
+                grid, stackdims = Ugrid2d.from_structured(
+                    dataset, x=x, y=y, name=name, return_dims=True
+                )
+                index = slice(None, None)
+
             # Use subset to check that ALL dims of stackdims are present in the
             # variable.
             checkdims = set(stackdims)
@@ -496,12 +568,26 @@ class UgridDataset(DatasetForwardMixin):
             dss.append(
                 dataset[ugrid_vars]  # noqa: PD013
                 .stack({grid.face_dimension: stackdims})
+                .isel({grid.face_dimension: index})
                 .drop_vars(stackdims + (grid.face_dimension,))
             )
             grids.append(grid)
+
         # Add the original dataset to include all non-UGRID variables.
         dss.append(dataset)
         # Then merge with compat="override". This'll pick the first available
         # variable: i.e. it will prioritize the UGRID form.
         merged = xr.merge(dss, compat="override")
         return UgridDataset(merged, grids)
+
+    @staticmethod
+    def from_structured(
+        dataset: xr.Dataset, topology: dict | None = None
+    ) -> "UgridDataset":
+        warnings.warn(
+            "UgridDataset.from_structured is deprecated and will be removed. "
+            "Use UgridDataset.from_structured2d instead.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return UgridDataset.from_structured2d(dataset, topology)

@@ -253,9 +253,9 @@ def test_infer_breaks_intervals1d_errors(structured_mesh_ascending):
         cv.infer_interval_breaks1d(up, "x")
 
 
-def test_bounds_to_vertices():
+def test_bounds1d_to_vertices():
     with pytest.raises(ValueError, match="Bounds are not monotonic"):
-        cv.bounds_to_vertices(
+        cv.bounds1d_to_vertices(
             xr.DataArray(
                 data=[[0.0, 1.0], [2.0, 3.0], [1.0, 2.0]], dims=["x", "nbound"]
             )
@@ -266,15 +266,15 @@ def test_bounds_to_vertices():
     # Ascending
     x_bounds = np.column_stack((x_vertices[:-1], x_vertices[1:]))
     y_bounds = np.column_stack((y_vertices[:-1], y_vertices[1:]))
-    assert np.allclose(cv.bounds_to_vertices(x_bounds), x_vertices)
-    assert np.allclose(cv.bounds_to_vertices(y_bounds), y_vertices)
+    assert np.allclose(cv.bounds1d_to_vertices(x_bounds), x_vertices)
+    assert np.allclose(cv.bounds1d_to_vertices(y_bounds), y_vertices)
     # Descending
     xrev = x_vertices[::-1]
     yrev = y_vertices[::-1]
     x_bounds = np.column_stack((xrev[1:], xrev[:-1]))
     y_bounds = np.column_stack((yrev[1:], yrev[:-1]))
-    assert np.allclose(cv.bounds_to_vertices(x_bounds), xrev)
-    assert np.allclose(cv.bounds_to_vertices(y_bounds), yrev)
+    assert np.allclose(cv.bounds1d_to_vertices(x_bounds), xrev)
+    assert np.allclose(cv.bounds1d_to_vertices(y_bounds), yrev)
 
 
 def test_infer_xy_coords():

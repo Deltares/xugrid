@@ -2198,30 +2198,66 @@ class Ugrid2d(AbstractUgrid):
         x_bounds: np.ndarray,
         y_bounds: np.ndarray,
         name: str = "mesh2d",
-    ) -> "Ugrid2d":
+        return_index: bool = False,
+    ) -> Union["Ugrid2d", Tuple["Ugrid2d", Union[BoolArray, slice]]]:
         """
-        Create a Ugrid2d topology from a structured topology based on 1D bounds.
+        Create a Ugrid2d topology from a structured topology based on 2D or 3D
+        bounds.
 
-        The bounds contain the lower and upper cell boundary for each cell.
+        The bounds contain the lower and upper cell boundary for each cell for 2D,
+        and the four corner vertices in case of 3D bounds.
 
         Parameters
         ----------
-        x_bounds: np.ndarray of shape (M, 2)
+        x_bounds: np.ndarray of shape (M, 2) or (N, M, 4).
             x-coordinate bounds for N row and M columns.
-        y_bounds: np.ndarray of shape (N, 2)
+        y_bounds: np.ndarray of shape (N, 2) or (N, M, 4).
             y-coordinate bounds for N row and M columns.
         name: str
+        return_index: bool, default is False.
 
         Returns
         -------
         grid: Ugrid2d
+        index: pd.Index
+            Indicates which elements are part of the Ugrid2d.
+            Provided if ``return_index`` is True.
         """
-        nx, _ = x_bounds.shape
-        ny, _ = y_bounds.shape
-        x = conversion.bounds_to_vertices(x_bounds)
-        y = conversion.bounds_to_vertices(y_bounds)
-        node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-        return Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny, name)
+        x_shape = x_bounds.shape
+        y_shape = y_bounds.shape
+        if x_shape != y_shape:
+            raise ValueError(f"Bounds shapes do not match: {x_shape} versus {y_shape}")
+
+        ndim = x_bounds.ndim
+        if ndim == 2:
+            nx, _ = x_shape
+            ny, _ = y_shape
+            x = conversion.bounds1d_to_vertices(x_bounds)
+            y = conversion.bounds1d_to_vertices(y_bounds)
+            node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
+            grid = Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny, name)
+            index = slice(None, None)
+        elif ndim == 3:
+            face_node_coordinates, index = conversion.bounds2d_to_vertices(
+                x_bounds, y_bounds
+            )
+            # TODO: this assumes bounds align exactly. Do we need a tolerance?
+            xy, inverse = np.unique(
+                face_node_coordinates.reshape((-1, 2)), return_inverse=True, axis=0
+            )
+            grid = Ugrid2d(
+                *xy.T,
+                -1,
+                face_node_connectivity=inverse.reshape((-1, 4)),
+                name=name,
+            )
+        else:
+            raise ValueError(f"Expected 2 or 3 dimensions on bounds, received: {ndim}")
+
+        if return_index:
+            return grid, index
+        else:
+            return grid
 
     @staticmethod
     def _from_structured_singlecoord(
