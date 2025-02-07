@@ -259,7 +259,13 @@ class UgridDataArray(DataArrayForwardMixin):
         Specify the x and y coordinate names explicitly otherwise.
 
         In case of non-monotonic coordinates such as strongly curvilinear
-        grids, face coordinates can only be provided as bounds.
+        grids, face coordinates can only be provided as bounds. The bounds
+        should be either two or three dimensional:
+
+        * The x bounds should have shape (M, 2) or (N, M, 4)
+        * The y bounds shave have shape (N, 2) or (N, M, 4)
+
+        For N rows (along y) and M columns (along x).
 
         Parameters
         ----------
@@ -482,7 +488,13 @@ class UgridDataset(DatasetForwardMixin):
            variables.
 
         Specify the x and y coordinate names explicitly otherwise or provide
-        the names of the x and y bounds, see the examples.
+        the names of the x and y bounds, see the examples. The bounds should be
+        either two or three dimensional:
+
+        * The x bounds should have shape (M, 2) or (N, M, 4)
+        * The y bounds shave have shape (N, 2) or (N, M, 4)
+
+        For N rows (along y) and M columns (along x).
 
         Parameters
         ----------
