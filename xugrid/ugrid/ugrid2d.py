@@ -2225,9 +2225,6 @@ class Ugrid2d(AbstractUgrid):
         """
         x_shape = x_bounds.shape
         y_shape = y_bounds.shape
-        if x_shape != y_shape:
-            raise ValueError(f"Bounds shapes do not match: {x_shape} versus {y_shape}")
-
         ndim = x_bounds.ndim
         if ndim == 2:
             nx, _ = x_shape
@@ -2238,6 +2235,10 @@ class Ugrid2d(AbstractUgrid):
             grid = Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny, name)
             index = slice(None, None)
         elif ndim == 3:
+            if x_shape != y_shape:
+                raise ValueError(
+                    f"Bounds shapes do not match: {x_shape} versus {y_shape}"
+                )
             face_node_coordinates, index = conversion.bounds2d_to_vertices(
                 x_bounds, y_bounds
             )
