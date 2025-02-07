@@ -1198,6 +1198,20 @@ def test_from_structured_bounds():
     assert isinstance(grid, xugrid.Ugrid2d)
     assert grid.n_face == 12
 
+    x_bounds = np.array(
+        [[[0.0, 0.0, 1.0, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
+    )
+    y_bounds = np.array(
+        [[[0.0, 1.0, 1.0, 0.0], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
+    )
+    grid = xugrid.Ugrid2d.from_structured_bounds(x_bounds, y_bounds)
+    assert grid.n_face == 3
+    assert np.allclose(grid.area, 1.0)
+    assert grid.bounds == (0.0, 0.0, 5.0, 5.0)
+
+    with pytest.raises(ValueError, match="Bounds shapes do not match"):
+        xugrid.Ugrid2d.from_structured_bounds(x_bounds, y_bounds.T)
+
 
 def test_from_structured():
     da = xr.DataArray(

@@ -2146,9 +2146,9 @@ class Ugrid2d(AbstractUgrid):
         Parameters
         ----------
         x_intervals: np.ndarray of shape (M + 1,)
-            x-coordinate interval values for N row and M columns.
+            x-coordinate interval values for N rows and M columns.
         y_intervals: np.ndarray of shape (N + 1,)
-            y-coordinate interval values for N row and M columns.
+            y-coordinate interval values for N rows and M columns.
         name: str
         """
         x_intervals = np.asarray(x_intervals)
@@ -2172,9 +2172,9 @@ class Ugrid2d(AbstractUgrid):
         Parameters
         ----------
         x_intervals: np.ndarray of shape shape (N + 1, M + 1)
-            x-coordinate interval values for N row and M columns.
+            x-coordinate interval values for N rows and M columns.
         y_intervals: np.ndarray of shape shape (N + 1, M + 1)
-            y-coordinate interval values for N row and M columns.
+            y-coordinate interval values for N rows and M columns.
         name: str
         """
         x_intervals = np.asarray(x_intervals)
@@ -2204,15 +2204,20 @@ class Ugrid2d(AbstractUgrid):
         Create a Ugrid2d topology from a structured topology based on 2D or 3D
         bounds.
 
-        The bounds contain the lower and upper cell boundary for each cell for 2D,
-        and the four corner vertices in case of 3D bounds.
+        The bounds contain the lower and upper cell boundary for each cell for
+        2D, and the four corner vertices in case of 3D bounds. The order of the
+        corners in bounds_x and bounds_y must be consistent with each other,
+        but may be arbitrary: this method ensures counterclockwise orientation
+        for UGRID. Inactive cells are assumed to be marked with one or more NaN
+        values for their corner coordinates. These coordinates are discarded
+        and the cells are marked in the optionally returned index.
 
         Parameters
         ----------
         x_bounds: np.ndarray of shape (M, 2) or (N, M, 4).
-            x-coordinate bounds for N row and M columns.
+            x-coordinate bounds for N rows and M columns.
         y_bounds: np.ndarray of shape (N, 2) or (N, M, 4).
-            y-coordinate bounds for N row and M columns.
+            y-coordinate bounds for N rows and M columns.
         name: str
         return_index: bool, default is False.
 
@@ -2220,7 +2225,7 @@ class Ugrid2d(AbstractUgrid):
         -------
         grid: Ugrid2d
         index: pd.Index
-            Indicates which elements are part of the Ugrid2d.
+            Indicates which cells are part of the Ugrid2d topology.
             Provided if ``return_index`` is True.
         """
         x_shape = x_bounds.shape

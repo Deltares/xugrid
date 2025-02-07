@@ -258,17 +258,19 @@ class UgridDataArray(DataArrayForwardMixin):
 
         Specify the x and y coordinate names explicitly otherwise.
 
-        For curvilinear grids, x_bounds and y_bounds must be provided, next to
-        x and y.
+        In case of non-monotonic coordinates such as strongly curvilinear
+        grids, face coordinates can only be provided as bounds.
 
         Parameters
         ----------
         da: xr.DataArray
             Last two dimensions must be the y and x dimension (in that order!).
         x: str, default: None
-            Which coordinate to use as the UGRID x-coordinate.
+            Which coordinate to use as the UGRID x-coordinate, or which
+            dimension to use as x-dimension if bounds are provided.
         y: str, default: None
-            Which coordinate to use as the UGRID y-coordinate.
+            Which coordinate to use as the UGRID y-coordinate, or which
+            dimension to use as x-dimension if bounds are provided.
         x_bounds: xr.DataArray, default: None
         y_bounds: xr.DataArray, default: None
 
@@ -479,15 +481,16 @@ class UgridDataset(DatasetForwardMixin):
            "projection_x_coordinate", or "project_y_coordinate" on coordinate
            variables.
 
-        Specify the x and y coordinate names explicitly otherwise, see the
-        examples.
+        Specify the x and y coordinate names explicitly otherwise or provide
+        the names of the x and y bounds, see the examples.
 
         Parameters
         ----------
         dataset: xr.Dataset
-        topology: dict, optional, default is None.
-            Mapping of topology name to x and y coordinate variables.
-            If None, defaults to ``{"mesh2d": (None, None)}``.
+        topology: dict[str, tuple[str] or dict[str, dict[str, str], optional, default is None.
+            Mapping of topology name to x and y coordinate variables, or of x
+            and y dimensions and x and y bounds. If None, defaults to
+            ``{"mesh2d": (None, None)}``.
 
         Returns
         -------
@@ -499,12 +502,12 @@ class UgridDataset(DatasetForwardMixin):
         coordinates and returns a UgriDataset with a Ugrid topology named
         mesh2d:
 
-        >>> uds = xugrid.UgridDataset.from_structured(dataset)
+        >>> uds = xugrid.UgridDataset.from_structured2d(dataset)
 
         In case of other names, the name of the resulting UGRID topology and
         the x and y coordinates must be specified:
 
-        >>> uds = xugrid.UgridDataset.from_structured(
+        >>> uds = xugrid.UgridDataset.from_structured2d(
         >>>     dataset,
         >>>     topology={"my_mesh2d": {"x": "xc",  "y": "yc"}},
         >>> )
@@ -512,9 +515,19 @@ class UgridDataset(DatasetForwardMixin):
         In case of multiple grid topologies in a single dataset, the names must
         be specified as well:
 
-        >>> uds = xugrid.UgridDataset.from_structured(
+        >>> uds = xugrid.UgridDataset.from_structured2d(
         >>>     dataset,
         >>>     topology={"mesh2d_xy": {"x": x", "y": "y"}, "mesh2d_lonlat": {"x": "lon", "y": "lat"},
+        >>> )
+
+        In case of non-monotonic coordinates such as strongly curvilinear
+        grids, face coordinates can only be provided as bounds. The names of
+        the x and y dimensions and the bounds variables must be provided in the
+        topology dict:
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(
+        >>>     dataset,
+        >>>     topology={"my_mesh2d": {"x": "M",  "y": "N", "bounds_x": "grid_x", "bounds_y": "grid_y}},
         >>> )
         """
         if topology is None:
@@ -528,8 +541,8 @@ class UgridDataset(DatasetForwardMixin):
             x_bounds = None
             y_bounds = None
             if isinstance(args, dict):
-                x = args["x"]
-                y = args["y"]
+                x = args.get("x")
+                y = args.get("y")
                 if "x_bounds" in args and "y_bounds" in args:
                     if x is None or y is None:
                         raise ValueError("x and y must be provided for bounds")

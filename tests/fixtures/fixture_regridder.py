@@ -47,7 +47,7 @@ def quads_0_25():
             "x",
         ],
     )
-    return xu.UgridDataArray.from_structured(da)
+    return xu.UgridDataArray.from_structured2d(da)
 
 
 @pytest.fixture(scope="function")
@@ -83,7 +83,7 @@ def quads_1():
             "x",
         ],
     )
-    return xu.UgridDataArray.from_structured(da)
+    return xu.UgridDataArray.from_structured2d(da)
 
 
 @pytest.fixture(scope="function")

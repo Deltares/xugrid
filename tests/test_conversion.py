@@ -277,6 +277,40 @@ def test_bounds1d_to_vertices():
     assert np.allclose(cv.bounds1d_to_vertices(y_bounds), yrev)
 
 
+def test_bounds2d_to_vertices():
+    # Clockwise
+    x_bounds = np.array(
+        [[[0.0, 0.0, 1.0, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
+    )
+    y_bounds = np.array(
+        [[[0.0, 1.0, 1.0, 0.0], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
+    )
+    vertices, index = cv.bounds2d_to_vertices(x_bounds, y_bounds)
+
+    assert index.all()
+    assert vertices.shape == (3, 4, 2)
+    # Result should be counterclockwise
+    expected_first_cell = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+        ]
+    )
+    assert np.allclose(vertices[0], expected_first_cell)
+
+    # Test with some invalid (NaN) coordinates
+    x_bounds_with_nan = x_bounds.copy()
+    x_bounds_with_nan[0, 0, 0] = np.nan
+    vertices_nan, index_nan = cv.bounds2d_to_vertices(x_bounds_with_nan, y_bounds)
+
+    # Test that the first cell is marked invalid
+    assert not index_nan[0]
+    assert len(vertices_nan) == 2
+    assert index_nan[1:].all()
+
+
 def test_infer_xy_coords():
     da = xr.DataArray(
         data=[[1]],
