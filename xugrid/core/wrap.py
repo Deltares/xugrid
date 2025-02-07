@@ -246,43 +246,69 @@ class UgridDataArray(DataArrayForwardMixin):
         Create a UgridDataArray from a (structured) xarray DataArray.
 
         The spatial dimensions are flattened into a single UGRID face dimension.
-
         By default, this method looks for:
 
-        1. ``"x"`` and ``"y"`` dimensions.
-        2. ``"longitude"`` and ``"latitude"`` dimensions.
-        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
-        4. ``"standard_name"`` attributes of "longitude", "latitude",
-           "projection_x_coordinate", or "project_y_coordinate" on coordinate
-           variables.
-
-        Specify the x and y coordinate names explicitly otherwise.
-
-        In case of non-monotonic coordinates such as strongly curvilinear
-        grids, face coordinates can only be provided as bounds. The bounds
-        should be either two or three dimensional:
-
-        * The x bounds should have shape (M, 2) or (N, M, 4)
-        * The y bounds shave have shape (N, 2) or (N, M, 4)
-
-        For N rows (along y) and M columns (along x).
+        1. "x" and "y" dimensions
+        2. "longitude" and "latitude" dimensions
+        3. "axis" attributes of "X" or "Y" on coordinates
+        4. "standard_name" attributes of "longitude", "latitude",
+          "projection_x_coordinate", or "projection_y_coordinate" on coordinate
+          variables
 
         Parameters
         ----------
-        da: xr.DataArray
-            Last two dimensions must be the y and x dimension (in that order!).
-        x: str, default: None
-            Which coordinate to use as the UGRID x-coordinate, or which
-            dimension to use as x-dimension if bounds are provided.
-        y: str, default: None
-            Which coordinate to use as the UGRID y-coordinate, or which
-            dimension to use as x-dimension if bounds are provided.
-        x_bounds: xr.DataArray, default: None
-        y_bounds: xr.DataArray, default: None
+        da : xr.DataArray
+            The structured data array to convert. The last two dimensions must be
+            the y and x dimensions (in that order).
+        x : str, optional
+            Name of the UGRID x-coordinate, or x-dimension if bounds are provided.
+            Defaults to None.
+        y : str, optional
+            Name of the UGRID y-coordinate, or y-dimension if bounds are provided.
+            Defaults to None.
+        x_bounds : xr.DataArray, optional
+            Bounds for x-coordinates. Required for non-monotonic coordinates.
+            Defaults to None.
+        y_bounds : xr.DataArray, optional
+            Bounds for y-coordinates. Required for non-monotonic coordinates.
+            Defaults to None.
 
         Returns
         -------
-        unstructured: UgridDataArray
+        UgridDataArray
+            The unstructured grid data array.
+
+        Notes
+        -----
+        When using bounds, they should have one of these shapes:
+        * x bounds: (M, 2) or (N, M, 4)
+        * y bounds: (N, 2) or (N, M, 4)
+        where N is the number of rows (along y) and M is columns (along x).
+        Cells with NaN bounds coordinates are omitted.
+
+        Examples
+        --------
+        Basic usage with default coordinate detection:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(data_array)
+
+        Specifying explicit coordinate names:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(
+        ...     data_array,
+        ...     x="longitude",
+        ...     y="latitude"
+        ... )
+
+        Using bounds for curvilinear grids:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(
+        ...     data_array,
+        ...     x="x_dim",
+        ...     y="y_dim",
+        ...     x_bounds=x_bounds_array,
+        ...     y_bounds=y_bounds_array
+        ... )
         """
         if da.ndim < 2:
             raise ValueError(
@@ -477,70 +503,78 @@ class UgridDataset(DatasetForwardMixin):
         Create a UgridDataset from a (structured) xarray Dataset.
 
         The spatial dimensions are flattened into a single UGRID face dimension.
-
         By default, this method looks for:
 
-        1. ``"x"`` and ``"y"`` dimensions.
-        2. ``"longitude"`` and ``"latitude"`` dimensions.
-        3. ``"axis"`` attributes of "X" or "Y" on coordinates.
-        4. ``"standard_name"`` attributes of "longitude", "latitude",
-           "projection_x_coordinate", or "project_y_coordinate" on coordinate
-           variables.
-
-        Specify the x and y coordinate names explicitly otherwise or provide
-        the names of the x and y bounds, see the examples. The bounds should be
-        either two or three dimensional:
-
-        * The x bounds should have shape (M, 2) or (N, M, 4)
-        * The y bounds shave have shape (N, 2) or (N, M, 4)
-
-        For N rows (along y) and M columns (along x).
+        1. "x" and "y" dimensions
+        2. "longitude" and "latitude" dimensions
+        3. "axis" attributes of "X" or "Y" on coordinates
+        4. "standard_name" attributes of "longitude", "latitude",
+           "projection_x_coordinate", or "projection_y_coordinate" on coordinate
+           variables
 
         Parameters
         ----------
-        dataset: xr.Dataset
-        topology: dict[str, tuple[str] or dict[str, dict[str, str], optional, default is None.
-            Mapping of topology name to x and y coordinate variables, or of x
-            and y dimensions and x and y bounds. If None, defaults to
-            ``{"mesh2d": (None, None)}``.
+        dataset : xr.Dataset
+            The structured dataset to convert.
+        topology : dict, optional
+            Either:
+            * A mapping of topology name to (x, y) coordinate names
+            * A mapping of topology name to a dict containing:
+            - "x": x-dimension name
+            - "y": y-dimension name
+            - "bounds_x": x-bounds variable name
+            - "bounds_y": y-bounds variable name
+            Defaults to {"mesh2d": (None, None)}.
 
         Returns
         -------
-        unstructured: UgridDataset
+        UgridDataset
+            The unstructured grid dataset.
+
+        Notes
+        -----
+        When using bounds, they should have one of these shapes:
+        * x bounds: (M, 2) or (N, M, 4)
+        * y bounds: (N, 2) or (N, M, 4)
+        where N is the number of rows (along y) and M is columns (along x).
+        Cells with NaN bounds coordinates are omitted.
 
         Examples
         --------
-        By default, this method will look for ``"x"`` and ``"y"``
-        coordinates and returns a UgriDataset with a Ugrid topology named
-        mesh2d:
+        Basic usage with default coordinate names:
 
         >>> uds = xugrid.UgridDataset.from_structured2d(dataset)
 
-        In case of other names, the name of the resulting UGRID topology and
-        the x and y coordinates must be specified:
+        Specifying custom coordinate names:
 
         >>> uds = xugrid.UgridDataset.from_structured2d(
-        >>>     dataset,
-        >>>     topology={"my_mesh2d": {"x": "xc",  "y": "yc"}},
-        >>> )
+        ...     dataset,
+        ...     topology={"my_mesh2d": {"x": "xc", "y": "yc"}}
+        ... )
 
-        In case of multiple grid topologies in a single dataset, the names must
-        be specified as well:
-
-        >>> uds = xugrid.UgridDataset.from_structured2d(
-        >>>     dataset,
-        >>>     topology={"mesh2d_xy": {"x": x", "y": "y"}, "mesh2d_lonlat": {"x": "lon", "y": "lat"},
-        >>> )
-
-        In case of non-monotonic coordinates such as strongly curvilinear
-        grids, face coordinates can only be provided as bounds. The names of
-        the x and y dimensions and the bounds variables must be provided in the
-        topology dict:
+        Multiple grid topologies in a single dataset:
 
         >>> uds = xugrid.UgridDataset.from_structured2d(
-        >>>     dataset,
-        >>>     topology={"my_mesh2d": {"x": "M",  "y": "N", "bounds_x": "grid_x", "bounds_y": "grid_y}},
-        >>> )
+        ...     dataset,
+        ...     topology={
+        ...         "mesh2d_xy": {"x": "x", "y": "y"},
+        ...         "mesh2d_lonlat": {"x": "lon", "y": "lat"}
+        ...     }
+        ... )
+
+        Using bounds for non-monotonic coordinates (e.g., curvilinear grids):
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(
+        ...     dataset,
+        ...     topology={
+        ...         "my_mesh2d": {
+        ...             "x": "M",
+        ...             "y": "N",
+        ...             "bounds_x": "grid_x",
+        ...             "bounds_y": "grid_y"
+        ...         }
+        ...     }
+        ... )
         """
         if topology is None:
             # By default, set None. This communicates to
