@@ -2264,7 +2264,7 @@ class Ugrid2d(AbstractUgrid):
                     f"Your structured bounds contain {len(keep) - keep.sum()} invalid faces.\n"
                     "These will be omitted from the Ugrid2d topology.",
                 )
-                index = index[keep]
+                index &= keep
                 face_node_connectivity[~valid] = -1
                 face_node_connectivity = connectivity.renumber(
                     face_node_connectivity[keep]
