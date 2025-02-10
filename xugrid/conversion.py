@@ -283,23 +283,32 @@ def bounds1d_to_vertices(bounds: np.ndarray):
 def bounds2d_to_vertices(
     x_bounds: np.ndarray, y_bounds: np.ndarray
 ) -> Tuple[FloatArray, BoolArray]:
-    # Create 2D coords, discard NaNs.
+    x = x_bounds.reshape(-1, 4)
+    y = y_bounds.reshape(-1, 4)
+    # Make sure repeated nodes are consecutive so we can find them later.
+    # lexsort along axis 1.
+    sorter = np.lexsort((y, x))
     face_node_coordinates = np.stack(
         (
-            x_bounds.reshape(-1, 4),
-            y_bounds.reshape(-1, 4),
+            np.take_along_axis(x, sorter, axis=1),
+            np.take_along_axis(y, sorter, axis=1),
         ),
         axis=-1,
     )
     index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1)
     face_node_coordinates = face_node_coordinates[index]
 
-    # Guarantee counterclockwise orientation
+    # Guarantee counterclockwise orientation.
     face_centroids = np.mean(face_node_coordinates, axis=1)
     dx = face_node_coordinates[..., 0] - face_centroids[:, np.newaxis, 0]
     dy = face_node_coordinates[..., 1] - face_centroids[:, np.newaxis, 1]
     angle = np.arctan2(dy, dx)
+    # When nodes are repeated, make sure the repeated node ends up as last so we can
+    # construct the face_node_connectivity directly from it. We do so by inserting
+    # an angle of np.inf for the repeated nodes.
+    angle[:, 1:][angle[:, 1:] == angle[:, :-1]] = np.inf
     counterclockwise = np.argsort(angle, axis=1)
+
     face_node_coordinates = np.take_along_axis(
         face_node_coordinates, counterclockwise[..., None], axis=1
     )
