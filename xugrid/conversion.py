@@ -281,7 +281,7 @@ def bounds1d_to_vertices(bounds: np.ndarray):
     return vertices
 
 
-def bounds2d_to_vertices(
+def bounds2d_to_topology(
     x_bounds: np.ndarray, y_bounds: np.ndarray
 ) -> Tuple[FloatArray, BoolArray]:
     x = x_bounds.reshape(-1, 4)
@@ -299,9 +299,12 @@ def bounds2d_to_vertices(
 
     # Check whether all coordinates form valid UGRID topologies.
     # We can only maintain triangles and quadrangles.
-    valid = (face_node_coordinates != np.roll(face_node_coordinates, 1, axis=1)).any(
-        axis=-1
-    ).sum(axis=1) >= 3
+    n_unique = (
+        (face_node_coordinates != np.roll(face_node_coordinates, 1, axis=1))
+        .any(axis=-1)
+        .sum(axis=1)
+    )
+    valid = n_unique >= 3
     if not valid.all():
         warnings.warn(
             "A UGRID2D face requires at least three unique vertices.\n"
@@ -322,11 +325,17 @@ def bounds2d_to_vertices(
     # an angle of np.inf for the repeated nodes.
     angle[:, 1:][angle[:, 1:] == angle[:, :-1]] = np.inf
     counterclockwise = np.argsort(angle, axis=1)
-
     face_node_coordinates = np.take_along_axis(
         face_node_coordinates, counterclockwise[..., None], axis=1
     )
-    return face_node_coordinates, index
+    # TODO: this assumes bounds align exactly. Do we need a tolerance?
+    xy, inverse = np.unique(
+        face_node_coordinates.reshape((-1, 2)), return_inverse=True, axis=0
+    )
+    face_node_connectivity = inverse.reshape((-1, 4))
+    # For triangles, set the last node to the fill value of -1.
+    face_node_connectivity[n_unique[index] == 3, -1] = -1
+    return *xy.T, face_node_connectivity, index
 
 
 def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa

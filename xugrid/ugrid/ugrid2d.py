@@ -2244,14 +2244,9 @@ class Ugrid2d(AbstractUgrid):
                 raise ValueError(
                     f"Bounds shapes do not match: {x_shape} versus {y_shape}"
                 )
-            face_node_coordinates, index = conversion.bounds2d_to_vertices(
+            xy, face_node_connectivity, index = conversion.bounds2d_to_topology(
                 x_bounds, y_bounds
             )
-            # TODO: this assumes bounds align exactly. Do we need a tolerance?
-            xy, inverse = np.unique(
-                face_node_coordinates.reshape((-1, 2)), return_inverse=True, axis=0
-            )
-            face_node_connectivity = inverse.reshape((-1, 4))
             grid = Ugrid2d(
                 *xy.T,
                 -1,
