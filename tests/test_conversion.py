@@ -310,6 +310,40 @@ def test_bounds2d_to_vertices():
     assert len(vertices_nan) == 2
     assert index_nan[1:].all()
 
+    # Test bad bounds. Triangles are allowed, points and lines are not.
+    x_bounds = np.array(
+        [
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [1.0, 2.0, 2.0, 1.0],
+                [2.0, 3.0, 3.0, 2.0],
+                [2.0, 2.0, 3.0, 3.0],
+            ]
+        ]
+    )
+    y_bounds = np.array(
+        [
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 1.0],
+                [0.0, 0.0, 0.0, 1.0],
+                [0.0, 0.0, 1.0, 1.0],
+            ]
+        ]
+    )
+
+    with pytest.warns(
+        UserWarning, match="A UGRID2D face requires at least three unique vertices."
+    ):
+        nodes, index = cv.bounds2d_to_vertices(x_bounds, y_bounds)
+
+    assert np.array_equal(index, [False, True, True, False])
+    expected_x = [
+        [1.0, 2.0, 2.0, 1.0],
+        [2.0, 3.0, 2.0, 3.0],  # repeated node moved to last one
+    ]
+    assert np.array_equal(nodes[..., 0], expected_x)
+
 
 def test_infer_xy_coords():
     da = xr.DataArray(

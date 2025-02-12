@@ -2252,24 +2252,6 @@ class Ugrid2d(AbstractUgrid):
                 face_node_coordinates.reshape((-1, 2)), return_inverse=True, axis=0
             )
             face_node_connectivity = inverse.reshape((-1, 4))
-
-            # Check whether all coordinates form valid UGRID topologies.
-            # We can only maintain triangles and quadrangles.
-            valid = face_node_connectivity != np.roll(face_node_connectivity, 1, axis=1)
-            if not valid.all():
-                xy = xy[np.unique(face_node_connectivity[valid])]
-                keep = valid.sum(axis=1) >= 3
-                warnings.warn(
-                    "A UGRID2D face requires at least three unique vertices.\n"
-                    f"Your structured bounds contain {len(keep) - keep.sum()} invalid faces.\n"
-                    "These will be omitted from the Ugrid2d topology.",
-                )
-                index &= keep
-                face_node_connectivity[~valid] = -1
-                face_node_connectivity = connectivity.renumber(
-                    face_node_connectivity[keep]
-                )
-
             grid = Ugrid2d(
                 *xy.T,
                 -1,

@@ -5,6 +5,7 @@ Conversion from and to other data structures:
 * Structured data (e.g. rasters)
 
 """
+import warnings
 from typing import Tuple, Union
 
 import numpy as np
@@ -295,7 +296,20 @@ def bounds2d_to_vertices(
         ),
         axis=-1,
     )
-    index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1)
+
+    # Check whether all coordinates form valid UGRID topologies.
+    # We can only maintain triangles and quadrangles.
+    valid = (face_node_coordinates != np.roll(face_node_coordinates, 1, axis=1)).any(
+        axis=-1
+    ).sum(axis=1) >= 3
+    if not valid.all():
+        warnings.warn(
+            "A UGRID2D face requires at least three unique vertices.\n"
+            f"Your structured bounds contain {len(valid) - valid.sum()} invalid faces.\n"
+            "These will be omitted from the Ugrid2d topology.",
+        )
+    # Also check for NaNs.
+    index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1) & valid
     face_node_coordinates = face_node_coordinates[index]
 
     # Guarantee counterclockwise orientation.
