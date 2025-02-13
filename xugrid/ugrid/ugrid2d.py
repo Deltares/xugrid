@@ -2224,7 +2224,7 @@ class Ugrid2d(AbstractUgrid):
         Returns
         -------
         grid: Ugrid2d
-        index: pd.Index
+        index: np.ndarray of bool | slice
             Indicates which cells are part of the Ugrid2d topology.
             Provided if ``return_index`` is True.
         """
@@ -2244,15 +2244,10 @@ class Ugrid2d(AbstractUgrid):
                 raise ValueError(
                     f"Bounds shapes do not match: {x_shape} versus {y_shape}"
                 )
-            xy, face_node_connectivity, index = conversion.bounds2d_to_topology(
+            x, y, face_node_connectivity, index = conversion.bounds2d_to_topology2d(
                 x_bounds, y_bounds
             )
-            grid = Ugrid2d(
-                *xy.T,
-                -1,
-                face_node_connectivity=face_node_connectivity,
-                name=name,
-            )
+            grid = Ugrid2d(x, y, -1, face_node_connectivity, name=name)
         else:
             raise ValueError(f"Expected 2 or 3 dimensions on bounds, received: {ndim}")
 

@@ -281,7 +281,7 @@ def bounds1d_to_vertices(bounds: np.ndarray):
     return vertices
 
 
-def bounds2d_to_topology(
+def bounds2d_to_topology2d(
     x_bounds: np.ndarray, y_bounds: np.ndarray
 ) -> Tuple[FloatArray, BoolArray]:
     x = x_bounds.reshape(-1, 4)

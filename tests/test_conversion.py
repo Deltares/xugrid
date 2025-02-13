@@ -277,7 +277,7 @@ def test_bounds1d_to_vertices():
     assert np.allclose(cv.bounds1d_to_vertices(y_bounds), yrev)
 
 
-def test_bounds2d_to_vertices():
+def test_bounds2d_to_topology2d():
     # Clockwise
     x_bounds = np.array(
         [[[0.0, 0.0, 1.0, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
@@ -285,10 +285,11 @@ def test_bounds2d_to_vertices():
     y_bounds = np.array(
         [[[0.0, 1.0, 1.0, 0.0], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
     )
-    vertices, index = cv.bounds2d_to_vertices(x_bounds, y_bounds)
+    x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
 
     assert index.all()
-    assert vertices.shape == (3, 4, 2)
+    assert faces.shape == (3, 4)
+
     # Result should be counterclockwise
     expected_first_cell = np.array(
         [
@@ -298,17 +299,18 @@ def test_bounds2d_to_vertices():
             [0.0, 1.0],
         ]
     )
-    assert np.allclose(vertices[0], expected_first_cell)
+    actual = np.column_stack((x, y))[faces[0]]
+    assert np.allclose(actual, expected_first_cell)
 
     # Test with some invalid (NaN) coordinates
     x_bounds_with_nan = x_bounds.copy()
     x_bounds_with_nan[0, 0, 0] = np.nan
-    vertices_nan, index_nan = cv.bounds2d_to_vertices(x_bounds_with_nan, y_bounds)
+    x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds_with_nan, y_bounds)
 
     # Test that the first cell is marked invalid
-    assert not index_nan[0]
-    assert len(vertices_nan) == 2
-    assert index_nan[1:].all()
+    assert not index[0]
+    assert index[1:].all()
+    assert faces.shape == (2, 4)
 
     # Test bad bounds. Triangles are allowed, points and lines are not.
     x_bounds = np.array(
@@ -335,14 +337,14 @@ def test_bounds2d_to_vertices():
     with pytest.warns(
         UserWarning, match="A UGRID2D face requires at least three unique vertices."
     ):
-        nodes, index = cv.bounds2d_to_vertices(x_bounds, y_bounds)
+        x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
 
     assert np.array_equal(index, [False, True, True, False])
     expected_x = [
         [1.0, 2.0, 2.0, 1.0],
         [2.0, 3.0, 2.0, 3.0],  # repeated node moved to last one
     ]
-    assert np.array_equal(nodes[..., 0], expected_x)
+    assert np.array_equal(x[faces], expected_x)
 
 
 def test_infer_xy_coords():
