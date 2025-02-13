@@ -9,6 +9,29 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Changed
+~~~~~~~
+
+- :meth:`xugrid.UgridDataset.from_structured` and
+  :meth:`xugrid.UgridDataArray.from_structured` are deprecated and will be
+  removed in the future; calling them will raise a FutureWarning. They have
+  been replaced by :meth:`xugrid.UgridDataset.from_structured2d` and
+  :meth:`xugrid.UgridDataArray.from_structured2d` respectively.
+
+Added
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.from_structured_bounds` now accepts 3D bounds to allow
+  conversion of grids with non-monotonic x and y coordinates, such as strongly
+  curvilinear grids.
+- :meth:`xugrid.Ugrid2d.from_structured_bounds` now takes an optional
+  ``return_index`` argument to return the indices of invalid grid faces,
+  identified by one or more NaNs in its bounds.
+- This method is used in :meth:`xugrid.UgridDataArray.from_structured2d` and
+  :meth:`xugrid.UgridDataset.from_structured2d` when the optional arguments
+  ``x_bounds`` and ``y_bounds`` are provided.
+
+
 [0.12.2] 2025-01-31
 -------------------
 
