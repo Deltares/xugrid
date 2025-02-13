@@ -253,9 +253,9 @@ def test_infer_breaks_intervals1d_errors(structured_mesh_ascending):
         cv.infer_interval_breaks1d(up, "x")
 
 
-def test_bounds_to_vertices():
+def test_bounds1d_to_vertices():
     with pytest.raises(ValueError, match="Bounds are not monotonic"):
-        cv.bounds_to_vertices(
+        cv.bounds1d_to_vertices(
             xr.DataArray(
                 data=[[0.0, 1.0], [2.0, 3.0], [1.0, 2.0]], dims=["x", "nbound"]
             )
@@ -266,15 +266,85 @@ def test_bounds_to_vertices():
     # Ascending
     x_bounds = np.column_stack((x_vertices[:-1], x_vertices[1:]))
     y_bounds = np.column_stack((y_vertices[:-1], y_vertices[1:]))
-    assert np.allclose(cv.bounds_to_vertices(x_bounds), x_vertices)
-    assert np.allclose(cv.bounds_to_vertices(y_bounds), y_vertices)
+    assert np.allclose(cv.bounds1d_to_vertices(x_bounds), x_vertices)
+    assert np.allclose(cv.bounds1d_to_vertices(y_bounds), y_vertices)
     # Descending
     xrev = x_vertices[::-1]
     yrev = y_vertices[::-1]
     x_bounds = np.column_stack((xrev[1:], xrev[:-1]))
     y_bounds = np.column_stack((yrev[1:], yrev[:-1]))
-    assert np.allclose(cv.bounds_to_vertices(x_bounds), xrev)
-    assert np.allclose(cv.bounds_to_vertices(y_bounds), yrev)
+    assert np.allclose(cv.bounds1d_to_vertices(x_bounds), xrev)
+    assert np.allclose(cv.bounds1d_to_vertices(y_bounds), yrev)
+
+
+def test_bounds2d_to_topology2d():
+    # Clockwise
+    x_bounds = np.array(
+        [[[0.0, 0.0, 1.0, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
+    )
+    y_bounds = np.array(
+        [[[0.0, 1.0, 1.0, 0.0], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
+    )
+    x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
+
+    assert index.all()
+    assert faces.shape == (3, 4)
+
+    # Result should be counterclockwise
+    expected_first_cell = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 1.0],
+            [0.0, 1.0],
+        ]
+    )
+    actual = np.column_stack((x, y))[faces[0]]
+    assert np.allclose(actual, expected_first_cell)
+
+    # Test with some invalid (NaN) coordinates
+    x_bounds_with_nan = x_bounds.copy()
+    x_bounds_with_nan[0, 0, 0] = np.nan
+    x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds_with_nan, y_bounds)
+
+    # Test that the first cell is marked invalid
+    assert not index[0]
+    assert index[1:].all()
+    assert faces.shape == (2, 4)
+
+    # Test bad bounds. Triangles are allowed, points and lines are not.
+    x_bounds = np.array(
+        [
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [1.0, 2.0, 2.0, 1.0],
+                [2.0, 3.0, 3.0, 2.0],
+                [2.0, 2.0, 3.0, 3.0],
+            ]
+        ]
+    )
+    y_bounds = np.array(
+        [
+            [
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 1.0],
+                [0.0, 0.0, 0.0, 1.0],
+                [0.0, 0.0, 1.0, 1.0],
+            ]
+        ]
+    )
+
+    with pytest.warns(
+        UserWarning, match="A UGRID2D face requires at least three unique vertices."
+    ):
+        x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
+
+    assert np.array_equal(index, [False, True, True, False])
+    expected_x = [
+        [1.0, 2.0, 2.0, 1.0],
+        [2.0, 3.0, 2.0, 3.0],  # repeated node moved to last one
+    ]
+    assert np.array_equal(x[faces], expected_x)
 
 
 def test_infer_xy_coords():

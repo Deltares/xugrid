@@ -2146,9 +2146,9 @@ class Ugrid2d(AbstractUgrid):
         Parameters
         ----------
         x_intervals: np.ndarray of shape (M + 1,)
-            x-coordinate interval values for N row and M columns.
+            x-coordinate interval values for N rows and M columns.
         y_intervals: np.ndarray of shape (N + 1,)
-            y-coordinate interval values for N row and M columns.
+            y-coordinate interval values for N rows and M columns.
         name: str
         """
         x_intervals = np.asarray(x_intervals)
@@ -2172,9 +2172,9 @@ class Ugrid2d(AbstractUgrid):
         Parameters
         ----------
         x_intervals: np.ndarray of shape shape (N + 1, M + 1)
-            x-coordinate interval values for N row and M columns.
+            x-coordinate interval values for N rows and M columns.
         y_intervals: np.ndarray of shape shape (N + 1, M + 1)
-            y-coordinate interval values for N row and M columns.
+            y-coordinate interval values for N rows and M columns.
         name: str
         """
         x_intervals = np.asarray(x_intervals)
@@ -2198,30 +2198,63 @@ class Ugrid2d(AbstractUgrid):
         x_bounds: np.ndarray,
         y_bounds: np.ndarray,
         name: str = "mesh2d",
-    ) -> "Ugrid2d":
+        return_index: bool = False,
+    ) -> Union["Ugrid2d", Tuple["Ugrid2d", Union[BoolArray, slice]]]:
         """
-        Create a Ugrid2d topology from a structured topology based on 1D bounds.
+        Create a Ugrid2d topology from a structured topology based on 2D or 3D
+        bounds.
 
-        The bounds contain the lower and upper cell boundary for each cell.
+        The bounds contain the lower and upper cell boundary for each cell for
+        2D, and the four corner vertices in case of 3D bounds. The order of the
+        corners in bounds_x and bounds_y must be consistent with each other,
+        but may be arbitrary: this method ensures counterclockwise orientation
+        for UGRID. Inactive cells are assumed to be marked with one or more NaN
+        values for their corner coordinates. These coordinates are discarded
+        and the cells are marked in the optionally returned index.
 
         Parameters
         ----------
-        x_bounds: np.ndarray of shape (M, 2)
-            x-coordinate bounds for N row and M columns.
-        y_bounds: np.ndarray of shape (N, 2)
-            y-coordinate bounds for N row and M columns.
+        x_bounds: np.ndarray of shape (M, 2) or (N, M, 4).
+            x-coordinate bounds for N rows and M columns.
+        y_bounds: np.ndarray of shape (N, 2) or (N, M, 4).
+            y-coordinate bounds for N rows and M columns.
         name: str
+        return_index: bool, default is False.
 
         Returns
         -------
         grid: Ugrid2d
+        index: np.ndarray of bool | slice
+            Indicates which cells are part of the Ugrid2d topology.
+            Provided if ``return_index`` is True.
         """
-        nx, _ = x_bounds.shape
-        ny, _ = y_bounds.shape
-        x = conversion.bounds_to_vertices(x_bounds)
-        y = conversion.bounds_to_vertices(y_bounds)
-        node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-        return Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny, name)
+        x_shape = x_bounds.shape
+        y_shape = y_bounds.shape
+        ndim = x_bounds.ndim
+        if ndim == 2:
+            nx, _ = x_shape
+            ny, _ = y_shape
+            x = conversion.bounds1d_to_vertices(x_bounds)
+            y = conversion.bounds1d_to_vertices(y_bounds)
+            node_y, node_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
+            grid = Ugrid2d._from_intervals_helper(node_x, node_y, nx, ny, name)
+            index = slice(None, None)
+        elif ndim == 3:
+            if x_shape != y_shape:
+                raise ValueError(
+                    f"Bounds shapes do not match: {x_shape} versus {y_shape}"
+                )
+            x, y, face_node_connectivity, index = conversion.bounds2d_to_topology2d(
+                x_bounds, y_bounds
+            )
+            grid = Ugrid2d(x, y, -1, face_node_connectivity, name=name)
+        else:
+            raise ValueError(f"Expected 2 or 3 dimensions on bounds, received: {ndim}")
+
+        if return_index:
+            return grid, index
+        else:
+            return grid
 
     @staticmethod
     def _from_structured_singlecoord(

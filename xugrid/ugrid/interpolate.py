@@ -211,8 +211,8 @@ def laplace_interpolate(
     """
     Fill gaps in ``data`` (``np.nan`` values) using Laplace interpolation.
 
-    This solves Laplace's equation where where there is no data, with data
-    values functioning as fixed potential boundary conditions.
+    This solves Laplace's equation where there is no data, with data values
+    functioning as fixed potential boundary conditions.
 
     Note that an iterative solver method will be required for large grids.
     Refer to the documentation of :py:func:`scipy.sparse.linalg.cg`.

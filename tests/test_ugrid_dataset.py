@@ -811,22 +811,28 @@ class TestFromStructured:
             }
         )
 
+    def test_future_warnings(self):
+        with pytest.warns(FutureWarning):
+            xugrid.UgridDataArray.from_structured(self.da2d)
+        with pytest.warns(FutureWarning):
+            xugrid.UgridDataset.from_structured(self.ds)
+
     def test_error_1d(self):
         with pytest.raises(
             ValueError, match="DataArray must have at least two spatial dimensions"
         ):
-            xugrid.UgridDataArray.from_structured(self.da1d)
+            xugrid.UgridDataArray.from_structured2d(self.da1d)
 
     def test_error_x_xor_y(self):
         with pytest.raises(ValueError, match="Provide both x and y, or neither."):
-            xugrid.UgridDataArray.from_structured(self.da2d, x="this")
+            xugrid.UgridDataArray.from_structured2d(self.da2d, x="this")
 
     def test_missing_xy(self):
         with pytest.raises(ValueError, match="Coordinates xc and yc are not present."):
-            xugrid.UgridDataArray.from_structured(self.da2d, x="xc", y="yc")
+            xugrid.UgridDataArray.from_structured2d(self.da2d, x="xc", y="yc")
 
     def test_from_dataarray(self):
-        uda = xugrid.UgridDataArray.from_structured(self.da2d)
+        uda = xugrid.UgridDataArray.from_structured2d(self.da2d)
         assert isinstance(uda, xugrid.UgridDataArray)
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
@@ -834,12 +840,12 @@ class TestFromStructured:
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
         # Check whether flipping the y-axis doesn't cause any problems
         flipped = self.da2d.isel(y=slice(None, None, -1))
-        uda = xugrid.UgridDataArray.from_structured(flipped)
+        uda = xugrid.UgridDataArray.from_structured2d(flipped)
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
 
         # And test transposed.
         daT = self.da2d.transpose()
-        uda = xugrid.UgridDataArray.from_structured(daT)
+        uda = xugrid.UgridDataArray.from_structured2d(daT)
         assert isinstance(uda, xugrid.UgridDataArray)
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
@@ -847,18 +853,18 @@ class TestFromStructured:
         assert np.allclose(uda.ugrid.sel(x=2.0, y=5.0), [[0], [12]])
 
     def test_from_multicoord(self):
-        uda = xugrid.UgridDataArray.from_structured(self.da_coords2d)
+        uda = xugrid.UgridDataArray.from_structured2d(self.da_coords2d)
         assert isinstance(uda, xugrid.UgridDataArray)
         assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [-0.5, 0.5, 1.5])
         assert np.array_equal(uda.data, [0, 1, 2, 3])
 
-        uda = xugrid.UgridDataArray.from_structured(self.da_coords2d, x="xc", y="yc")
+        uda = xugrid.UgridDataArray.from_structured2d(self.da_coords2d, x="xc", y="yc")
         assert isinstance(uda, xugrid.UgridDataArray)
         assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
         assert np.array_equal(uda.data, [0, 1, 2, 3])
 
     def test_from_dataset(self):
-        uds = xugrid.UgridDataset.from_structured(self.ds)
+        uds = xugrid.UgridDataset.from_structured2d(self.ds)
         assert isinstance(uds, xugrid.UgridDataset)
         assert set(uds.data_vars) == {"a", "b", "c"}
         assert uds["a"].dims == ("layer", "mesh2d_nFaces")
@@ -873,13 +879,13 @@ class TestFromStructured:
         da = self.da_coords2d.rename({"x": "x1", "y": "y1"})
         ds["d"] = da
         # Unspecified: it'll only infer x and y.
-        uds = xugrid.UgridDataset.from_structured(ds)
+        uds = xugrid.UgridDataset.from_structured2d(ds)
         assert isinstance(uds, xugrid.UgridDataset)
         assert uds["a"].dims == ("layer", "mesh2d_nFaces")
         assert uds["d"].dims == ("y1", "x1")
         assert len(uds.ugrid.grids) == 1
         # Now specify separate topologies.
-        uds = xugrid.UgridDataset.from_structured(
+        uds = xugrid.UgridDataset.from_structured2d(
             ds, {"mesh2d_0": ("x", "y"), "mesh2d_1": ("xc", "yc")}
         )
         assert isinstance(uds, xugrid.UgridDataset)
@@ -888,6 +894,63 @@ class TestFromStructured:
         assert uds["c"].dims == ()
         assert uds["d"].dims == ("mesh2d_1_nFaces",)
         assert len(uds.ugrid.grids) == 2
+
+    def test_from_bounds(self):
+        # Construct bounds from ugrid form, it's easier...
+        uda = xugrid.UgridDataArray.from_structured2d(self.da2d)
+        grid = uda.ugrid.grid
+        bounds_x = xr.DataArray(
+            grid.face_node_coordinates[..., 0].reshape(3, 4, 4),
+            dims=("y", "x", "bound"),
+        )
+        bounds_y = xr.DataArray(
+            grid.face_node_coordinates[..., 1].reshape(3, 4, 4),
+            dims=("y", "x", "bound"),
+        )
+        uda2 = xugrid.UgridDataArray.from_structured2d(
+            self.da2d, "x", "y", bounds_x, bounds_y
+        )
+        assert uda.identical(uda2)
+        # Try inconsistent dim order on bounds:
+        uda3 = xugrid.UgridDataArray.from_structured2d(
+            self.da2d, "x", "y", bounds_x.transpose(), bounds_y
+        )
+        assert uda.identical(uda3)
+
+        with pytest.raises(ValueError, match="x and y must be provided for bounds"):
+            xugrid.UgridDataArray.from_structured2d(
+                self.da2d, x_bounds=bounds_x, y_bounds=bounds_y
+            )
+
+        # Now dataset
+        ds = self.ds.copy()
+        ds["grid_x"] = bounds_x
+        ds["grid_y"] = bounds_y
+        uds = xugrid.UgridDataset.from_structured2d(
+            ds,
+            topology={
+                "mesh2d": {
+                    "x": "x",
+                    "y": "y",
+                    "x_bounds": "grid_x",
+                    "y_bounds": "grid_y",
+                }
+            },
+        )
+        assert set(uds.data_vars) == {"a", "b", "c", "grid_x", "grid_y"}
+        assert uds["a"].dims == ("layer", "mesh2d_nFaces")
+        assert uds["b"].dims == ("x",)
+        assert uds["c"].dims == ()
+
+        with pytest.raises(TypeError):
+            xugrid.UgridDataset.from_structured2d(
+                ds, topology={"x_bounds": "grid_x", "y_bounds": "grid_y"}
+            )
+
+        with pytest.raises(ValueError, match="x and y must be provided for bounds"):
+            xugrid.UgridDataset.from_structured2d(
+                ds, topology={"mesh2d": {"x_bounds": "grid_x", "y_bounds": "grid_y"}}
+            )
 
 
 def test_multiple_coordinates():

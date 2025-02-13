@@ -302,14 +302,14 @@ def test_directional_dependence():
         coords={"y": [10.0, 20.0], "x": [0.0, 10.0]},
         dims=("y", "x"),
     )
-    target_uda = xu.UgridDataArray.from_structured(target_da)
+    target_uda = xu.UgridDataArray.from_structured2d(target_da)
 
     flip = slice(None, None, -1)
     flipy = da.isel(y=flip)
     flipx = da.isel(x=flip)
     flipxy = da.isel(x=flip, y=flip)
-    uda = xu.UgridDataArray.from_structured(da)
-    uda_flipxy = xu.UgridDataArray.from_structured(flipxy)
+    uda = xu.UgridDataArray.from_structured2d(da)
+    uda_flipxy = xu.UgridDataArray.from_structured2d(flipxy)
 
     # Structured target: test whether the result is the same regardless of source
     # orientation.
@@ -383,7 +383,7 @@ def test_barycentric_structured():
     regridder = xu.BarycentricInterpolator(source=da, target=target)
     out_structured = regridder.regrid(da)
 
-    target_uda = xu.UgridDataArray.from_structured(target)
+    target_uda = xu.UgridDataArray.from_structured2d(target)
     regridder = xu.BarycentricInterpolator(source=da, target=target_uda)
     out_unstructured = regridder.regrid(da)
 

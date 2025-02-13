@@ -43,7 +43,7 @@ UgridDataArray
 
     UgridDataArray
     UgridDataArray.ugrid
-    UgridDataArray.from_structured
+    UgridDataArray.from_structured2d
     UgridDataArray.from_data
 
 UgridDataset
@@ -55,7 +55,7 @@ UgridDataset
     UgridDataset
     UgridDataset.ugrid
     UgridDataset.from_geodataframe
-    UgridDataset.from_structured
+    UgridDataset.from_structured2d
 
 UGRID Accessor
 --------------

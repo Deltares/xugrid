@@ -5,6 +5,7 @@ Conversion from and to other data structures:
 * Structured data (e.g. rasters)
 
 """
+import warnings
 from typing import Tuple, Union
 
 import numpy as np
@@ -12,6 +13,7 @@ import xarray as xr
 
 from xugrid.constants import (
     FILL_VALUE,
+    BoolArray,
     FloatArray,
     IntArray,
     IntDType,
@@ -266,7 +268,7 @@ def infer_xy_coords(obj):
     return x, y
 
 
-def bounds_to_vertices(bounds: np.ndarray):
+def bounds1d_to_vertices(bounds: np.ndarray):
     diff = np.diff(bounds, axis=0)
     ascending = (diff >= 0.0).all()
     descending = (diff <= 0.0).all()
@@ -277,6 +279,63 @@ def bounds_to_vertices(bounds: np.ndarray):
     else:
         raise ValueError("Bounds are not monotonic ascending or monotonic descending")
     return vertices
+
+
+def bounds2d_to_topology2d(
+    x_bounds: np.ndarray, y_bounds: np.ndarray
+) -> Tuple[FloatArray, BoolArray]:
+    x = x_bounds.reshape(-1, 4)
+    y = y_bounds.reshape(-1, 4)
+    # Make sure repeated nodes are consecutive so we can find them later.
+    # lexsort along axis 1.
+    sorter = np.lexsort((y, x))
+    face_node_coordinates = np.stack(
+        (
+            np.take_along_axis(x, sorter, axis=1),
+            np.take_along_axis(y, sorter, axis=1),
+        ),
+        axis=-1,
+    )
+
+    # Check whether all coordinates form valid UGRID topologies.
+    # We can only maintain triangles and quadrangles.
+    n_unique = (
+        (face_node_coordinates != np.roll(face_node_coordinates, 1, axis=1))
+        .any(axis=-1)
+        .sum(axis=1)
+    )
+    valid = n_unique >= 3
+    if not valid.all():
+        warnings.warn(
+            "A UGRID2D face requires at least three unique vertices.\n"
+            f"Your structured bounds contain {len(valid) - valid.sum()} invalid faces.\n"
+            "These will be omitted from the Ugrid2d topology.",
+        )
+    # Also check for NaNs.
+    index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1) & valid
+    face_node_coordinates = face_node_coordinates[index]
+
+    # Guarantee counterclockwise orientation.
+    face_centroids = np.mean(face_node_coordinates, axis=1)
+    dx = face_node_coordinates[..., 0] - face_centroids[:, np.newaxis, 0]
+    dy = face_node_coordinates[..., 1] - face_centroids[:, np.newaxis, 1]
+    angle = np.arctan2(dy, dx)
+    # When nodes are repeated, make sure the repeated node ends up as last so we can
+    # construct the face_node_connectivity directly from it. We do so by inserting
+    # an angle of np.inf for the repeated nodes.
+    angle[:, 1:][angle[:, 1:] == angle[:, :-1]] = np.inf
+    counterclockwise = np.argsort(angle, axis=1)
+    face_node_coordinates = np.take_along_axis(
+        face_node_coordinates, counterclockwise[..., None], axis=1
+    )
+    # TODO: this assumes bounds align exactly. Do we need a tolerance?
+    xy, inverse = np.unique(
+        face_node_coordinates.reshape((-1, 2)), return_inverse=True, axis=0
+    )
+    face_node_connectivity = inverse.reshape((-1, 4))
+    # For triangles, set the last node to the fill value of -1.
+    face_node_connectivity[n_unique[index] == 3, -1] = -1
+    return *xy.T, face_node_connectivity, index
 
 
 def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
