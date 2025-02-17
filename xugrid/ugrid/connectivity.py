@@ -540,9 +540,12 @@ def directed_edge_edge_connectivity(
     n_downstream = node_edge_connectivity.getnnz(axis=1)[second_node]
     upstream_edges = np.repeat(np.arange(n_edge), n_downstream)
     downstream_edges = node_edge_connectivity[second_node].indices
-    ij = np.column_stack((upstream_edges, downstream_edges))
-    i, j = ij[ij[:, 0] != ij[:, 1]].T
-    return sparse.csr_matrix((j, (i, j)), shape=(n_edge, n_edge))
+    node_index = np.repeat(second_node, n_downstream)
+    valid = downstream_edges != upstream_edges
+    return sparse.csr_matrix(
+        (node_index[valid], (upstream_edges[valid], downstream_edges[valid])),
+        shape=(n_edge, n_edge),
+    )
 
 
 def structured_connectivity(active: IntArray) -> AdjacencyMatrix:

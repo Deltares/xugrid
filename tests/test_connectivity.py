@@ -494,6 +494,8 @@ def test_directed_node_node_connectivity():
 
 def test_directed_edge_edge_connectivity():
     r"""
+    Derive connectivity for this network:
+
                              5
                           4 --- 6
                          /
@@ -525,6 +527,8 @@ def test_directed_edge_edge_connectivity():
     actual = np.column_stack([coo.row, coo.col])
     expected = np.array([[0, 1], [1, 2], [2, 3], [2, 4], [3, 5]])
     assert np.array_equal(actual, expected)
+    # Test through which node the connection is formed.
+    assert np.array_equal(coo.data, [1, 2, 3, 3, 4])
 
 
 def test_face_face_connectivity():
