@@ -13,9 +13,11 @@ def open_dataset(*args, **kwargs):
     ds = xr.open_dataset(*args, **kwargs)
     return UgridDataset(ds)
 
+
 def load_dataset(*args, **kwargs):
     ds = xr.load_dataset(*args, **kwargs)
     return UgridDataset(ds)
+
 
 def open_dataarray(*args, **kwargs):
     ds = xr.open_dataset(*args, **kwargs)

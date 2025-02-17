@@ -2,11 +2,11 @@ from xugrid import data
 from xugrid.core.common import (
     concat,
     full_like,
+    load_dataset,
     merge,
     ones_like,
     open_dataarray,
     open_dataset,
-    load_dataset,
     open_mfdataset,
     open_zarr,
     zeros_like,
