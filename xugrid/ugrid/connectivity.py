@@ -526,6 +526,28 @@ def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matri
     return coo_matrix.tocsr()
 
 
+def directed_edge_edge_connectivity(
+    edge_node_connectivity: IntArray,
+    node_edge_connectivity: sparse.csr_matrix,
+) -> sparse.csr_matrix:
+    # - Get the second node of each edge.
+    # - Find which edges are connected to this second node.
+    # - This will include the edge we started with.
+    # - Hence, make room for one more.
+    # - Then filter self -> self away.
+    n_edge = len(edge_node_connectivity)
+    second_node = edge_node_connectivity[:, 1]
+    n_downstream = node_edge_connectivity.getnnz(axis=1)[second_node]
+    upstream_edges = np.repeat(np.arange(n_edge), n_downstream)
+    downstream_edges = node_edge_connectivity[second_node].indices
+    node_index = np.repeat(second_node, n_downstream)
+    valid = downstream_edges != upstream_edges
+    return sparse.csr_matrix(
+        (node_index[valid], (upstream_edges[valid], downstream_edges[valid])),
+        shape=(n_edge, n_edge),
+    )
+
+
 def structured_connectivity(active: IntArray) -> AdjacencyMatrix:
     nrow, ncol = active.shape
     nodes = np.arange(nrow * ncol).reshape(nrow, ncol)

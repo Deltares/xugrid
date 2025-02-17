@@ -30,7 +30,8 @@ Added
 - This method is used in :meth:`xugrid.UgridDataArray.from_structured2d` and
   :meth:`xugrid.UgridDataset.from_structured2d` when the optional arguments
   ``x_bounds`` and ``y_bounds`` are provided.
-
+- Added :attr:`xugrid.Ugrid1d.directed_edge_edge_connectivity` and
+  :attr:`xugrid.Ugrid2d.directed_edge_edge_connectivity`.
 
 [0.12.2] 2025-01-31
 -------------------
