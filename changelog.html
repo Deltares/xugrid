@@ -473,6 +473,8 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.edge_bounds.html">xugrid.Ugrid1d.edge_bounds</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.node_edge_connectivity.html">xugrid.Ugrid1d.node_edge_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.node_node_connectivity.html">xugrid.Ugrid1d.node_node_connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.directed_node_node_connectivity.html">xugrid.Ugrid1d.directed_node_node_connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.directed_edge_edge_connectivity.html">xugrid.Ugrid1d.directed_edge_edge_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.get_connectivity_matrix.html">xugrid.Ugrid1d.get_connectivity_matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.copy.html">xugrid.Ugrid1d.copy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.rename.html">xugrid.Ugrid1d.rename</a></li>
@@ -537,6 +539,8 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.edge_node_connectivity.html">xugrid.Ugrid2d.edge_node_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.face_edge_connectivity.html">xugrid.Ugrid2d.face_edge_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.face_face_connectivity.html">xugrid.Ugrid2d.face_face_connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.directed_node_node_connectivity.html">xugrid.Ugrid1d.directed_node_node_connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.directed_edge_edge_connectivity.html">xugrid.Ugrid1d.directed_edge_edge_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.get_connectivity_matrix.html">xugrid.Ugrid2d.get_connectivity_matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.validate_edge_node_connectivity.html">xugrid.Ugrid2d.validate_edge_node_connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.exterior_edges.html">xugrid.Ugrid2d.exterior_edges</a></li>
@@ -682,6 +686,8 @@ identified by one or more NaNs in its bounds.</p></li>
 <li><p>This method is used in <a class="reference internal" href="api/xugrid.UgridDataArray.from_structured2d.html#xugrid.UgridDataArray.from_structured2d" title="xugrid.UgridDataArray.from_structured2d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.from_structured2d()</span></code></a> and
 <a class="reference internal" href="api/xugrid.UgridDataset.from_structured2d.html#xugrid.UgridDataset.from_structured2d" title="xugrid.UgridDataset.from_structured2d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataset.from_structured2d()</span></code></a> when the optional arguments
 <code class="docutils literal notranslate"><span class="pre">x_bounds</span></code> and <code class="docutils literal notranslate"><span class="pre">y_bounds</span></code> are provided.</p></li>
+<li><p>Added <a class="reference internal" href="api/xugrid.Ugrid1d.directed_edge_edge_connectivity.html#xugrid.Ugrid1d.directed_edge_edge_connectivity" title="xugrid.Ugrid1d.directed_edge_edge_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.directed_edge_edge_connectivity</span></code></a> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.directed_edge_edge_connectivity</span></code>.</p></li>
 </ul>
 </section>
 </section>
@@ -1186,7 +1192,7 @@ on repeated calls with the “mode” method.</p></li>
 <li><p>Initializing a Ugrid2d topology with an invalid edge_node_connectivity will
 no longer raise an error.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.node_node_connectivity.html#xugrid.Ugrid1d.node_node_connectivity" title="xugrid.Ugrid1d.node_node_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.node_node_connectivity</span></code></a>,
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.directed_node_node_connectivity</span></code>,
+<a class="reference internal" href="api/xugrid.Ugrid1d.directed_node_node_connectivity.html#xugrid.Ugrid1d.directed_node_node_connectivity" title="xugrid.Ugrid1d.directed_node_node_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.directed_node_node_connectivity</span></code></a>,
 <a class="reference internal" href="api/xugrid.Ugrid2d.node_node_connectivity.html#xugrid.Ugrid2d.node_node_connectivity" title="xugrid.Ugrid2d.node_node_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.node_node_connectivity</span></code></a>,
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.directed_node_node_connectivity</span></code>, and
 <a class="reference internal" href="api/xugrid.Ugrid2d.face_face_connectivity.html#xugrid.Ugrid2d.face_face_connectivity" title="xugrid.Ugrid2d.face_face_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.face_face_connectivity</span></code></a> now contain the associated edge
