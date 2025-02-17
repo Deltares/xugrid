@@ -95,6 +95,8 @@ def test_ugrid1d_properties():
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)
     assert isinstance(grid.node_edge_connectivity, sparse.csr_matrix)
     assert isinstance(grid.node_node_connectivity, sparse.csr_matrix)
+    assert isinstance(grid.directed_node_node_connectivity, sparse.csr_matrix)
+    assert isinstance(grid.directed_edge_edge_connectivity, sparse.csr_matrix)
 
     expected_coords = [
         [[0.0, 0.0], [1.0, 1.0]],
