@@ -32,6 +32,7 @@ Added
   ``x_bounds`` and ``y_bounds`` are provided.
 - Added :attr:`xugrid.Ugrid1d.directed_edge_edge_connectivity` and
   :attr:`xugrid.Ugrid2d.directed_edge_edge_connectivity`.
+- Added :func:`xugrid.load_dataset` and :func:`xugrid.load_dataarray`.
 
 [0.12.2] 2025-01-31
 -------------------

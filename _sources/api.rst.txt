@@ -21,7 +21,9 @@ Top-level functions
 .. autosummary::
    :toctree: api/
 
+    load_dataarray
     open_dataarray
+    load_dataset
     open_dataset
     open_mfdataset
     open_zarr

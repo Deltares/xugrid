@@ -394,12 +394,16 @@
 
 
 
-<div class="viewcode-block" id="open_dataarray">
-<a class="viewcode-back" href="../../../api/xugrid.open_dataarray.html#xugrid.open_dataarray">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">open_dataarray</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<div class="viewcode-block" id="load_dataset">
+<a class="viewcode-back" href="../../../api/xugrid.load_dataset.html#xugrid.load_dataset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dataarray_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;Given file dataset contains more than one data &quot;</span>
@@ -420,7 +424,22 @@
     <span class="k">if</span> <span class="n">data_array</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">DATAARRAY_VARIABLE</span><span class="p">:</span>
         <span class="n">data_array</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_dataarray">
+<a class="viewcode-back" href="../../../api/xugrid.load_dataarray.html#xugrid.load_dataarray">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_dataarray</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_dataarray_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="open_dataarray">
+<a class="viewcode-back" href="../../../api/xugrid.open_dataarray.html#xugrid.open_dataarray">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_dataarray</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_dataarray_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
 
 
@@ -443,7 +462,9 @@
 
 
 
+<span class="n">load_dataset</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="o">.</span><span class="vm">__doc__</span>
 <span class="n">open_dataset</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="o">.</span><span class="vm">__doc__</span>
+<span class="n">load_dataarray</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataarray</span><span class="o">.</span><span class="vm">__doc__</span>
 <span class="n">open_dataarray</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataarray</span><span class="o">.</span><span class="vm">__doc__</span>
 <span class="n">open_mfdataset</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="o">.</span><span class="vm">__doc__</span>
 <span class="n">open_zarr</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="o">.</span><span class="vm">__doc__</span>
