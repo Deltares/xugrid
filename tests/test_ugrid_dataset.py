@@ -1015,6 +1015,18 @@ def test_open_dataset(tmp_path):
     assert "mesh2d_face_nodes" not in back.ugrid.obj
 
 
+def test_load_dataset(tmp_path):
+    path = tmp_path / "ugrid-dataset.nc"
+    uds = xugrid.UgridDataset(UGRID_DS())
+    uds.ugrid.to_netcdf(path)
+
+    back = xugrid.load_dataset(path)
+    assert isinstance(back, xugrid.UgridDataset)
+    assert "b" in back
+    assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
+    assert "mesh2d_face_nodes" not in back.ugrid.obj
+
+
 def test_open_dataset_cast_invalid(tmp_path):
     grid = GRID()
     vorgrid = grid.tesselate_centroidal_voronoi()
@@ -1036,6 +1048,20 @@ def test_open_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataarray.nc"
     uds["a"].ugrid.to_netcdf(path)
     back = xugrid.open_dataarray(path)
+    assert isinstance(back, xugrid.UgridDataArray)
+    assert back.name == "a"
+
+
+def test_load_dataarray_roundtrip(tmp_path):
+    path = tmp_path / "ugrid-dataset.nc"
+    uds = xugrid.UgridDataset(UGRID_DS())
+    uds.ugrid.to_netcdf(path)
+    with pytest.raises(ValueError, match="Given file dataset contains more than one"):
+        xugrid.load_dataarray(path)
+
+    path = tmp_path / "ugrid-dataarray.nc"
+    uds["a"].ugrid.to_netcdf(path)
+    back = xugrid.load_dataarray(path)
     assert isinstance(back, xugrid.UgridDataArray)
     assert back.name == "a"
 

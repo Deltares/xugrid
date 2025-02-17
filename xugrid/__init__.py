@@ -2,6 +2,8 @@ from xugrid import data
 from xugrid.core.common import (
     concat,
     full_like,
+    load_dataarray,
+    load_dataset,
     merge,
     ones_like,
     open_dataarray,
@@ -38,6 +40,8 @@ __all__ = (
     "data",
     "concat",
     "full_like",
+    "load_dataarray",
+    "load_dataset",
     "merge",
     "ones_like",
     "open_dataarray",

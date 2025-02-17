@@ -14,10 +14,13 @@ def open_dataset(*args, **kwargs):
     return UgridDataset(ds)
 
 
-def open_dataarray(*args, **kwargs):
-    ds = xr.open_dataset(*args, **kwargs)
-    dataset = UgridDataset(ds)
+def load_dataset(*args, **kwargs):
+    ds = xr.load_dataset(*args, **kwargs)
+    return UgridDataset(ds)
 
+
+def _dataarray_helper(ds: xr.Dataset):
+    dataset = UgridDataset(ds)
     if len(dataset.data_vars) != 1:
         raise ValueError(
             "Given file dataset contains more than one data "
@@ -41,6 +44,16 @@ def open_dataarray(*args, **kwargs):
     return UgridDataArray(data_array, dataset.grid)
 
 
+def load_dataarray(*args, **kwargs):
+    ds = xr.load_dataset(*args, **kwargs)
+    return _dataarray_helper(ds)
+
+
+def open_dataarray(*args, **kwargs):
+    ds = xr.open_dataset(*args, **kwargs)
+    return _dataarray_helper(ds)
+
+
 def open_mfdataset(*args, **kwargs):
     if "data_vars" in kwargs:
         raise ValueError("data_vars kwargs is not supported in xugrid.open_mfdataset")
@@ -54,7 +67,9 @@ def open_zarr(*args, **kwargs):
     return UgridDataset(ds)
 
 
+load_dataset.__doc__ = xr.load_dataset.__doc__
 open_dataset.__doc__ = xr.open_dataset.__doc__
+load_dataarray.__doc__ = xr.load_dataarray.__doc__
 open_dataarray.__doc__ = xr.open_dataarray.__doc__
 open_mfdataset.__doc__ = xr.open_mfdataset.__doc__
 open_zarr.__doc__ = xr.open_zarr.__doc__
