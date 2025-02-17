@@ -252,8 +252,8 @@ class UgridDataArray(DataArrayForwardMixin):
         2. "longitude" and "latitude" dimensions
         3. "axis" attributes of "X" or "Y" on coordinates
         4. "standard_name" attributes of "longitude", "latitude",
-          "projection_x_coordinate", or "projection_y_coordinate" on coordinate
-          variables
+           "projection_x_coordinate", or "projection_y_coordinate" on coordinate
+           variables
 
         Parameters
         ----------
