@@ -353,6 +353,24 @@ class Ugrid1d(AbstractUgrid):
             self._meshkernel.mesh1d_set(self.mesh)
         return self._meshkernel
 
+    @property
+    def is_cyclic(self) -> bool:
+        """
+        Return True if the directed node node connectivity contains cycles. If
+        False, then the directed node node connectivity is a directed acyclic
+        graph (DAG).
+
+        Runs a depth-first-search.
+        """
+        # topological sort returns a ValueError if it detects a cycle.
+        try:
+            self.topological_sort_by_dfs()
+            return False
+        except ValueError as e:
+            if str(e) == "The graph contains at least one cycle":
+                return True
+            raise  # Re-raise any other ValueError
+
     @classmethod
     def from_geodataframe(cls, geodataframe: "geopandas.GeoDataFrame") -> "Ugrid1d":  # type: ignore # noqa
         """

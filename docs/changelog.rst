@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Added
+~~~~~
+
+- Added :attr:`xugrid.Ugrid1d.is_cyclic` property to check if grid topology
+  contains cycles.
+
 [0.12.3] 2025-02-17
 -------------------
 

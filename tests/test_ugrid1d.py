@@ -301,6 +301,30 @@ def test_meshkernel():
     assert isinstance(grid.meshkernel, mk.MeshKernel)
 
 
+def test_is_cyclic():
+    x = np.array([0.0, 1.0, 2.0])
+    y = np.array([0.0, 1.0, 0.0])
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 0],
+        ]
+    )
+    cycle = xugrid.Ugrid1d(x, y, -1, edge_nodes)
+    assert cycle.is_cyclic
+
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [0, 2],
+        ]
+    )
+    dag = xugrid.Ugrid1d(x, y, -1, edge_nodes)
+    assert not dag.is_cyclic
+
+
 def test_from_shapely():
     with pytest.raises(TypeError):
         xy = np.array(

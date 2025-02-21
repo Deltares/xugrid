@@ -223,6 +223,7 @@ UGRID1D Topology
     Ugrid1d.directed_node_node_connectivity
     Ugrid1d.directed_edge_edge_connectivity
     Ugrid1d.get_connectivity_matrix
+    Ugrid1d.is_cyclic
 
     Ugrid1d.copy
     Ugrid1d.rename
