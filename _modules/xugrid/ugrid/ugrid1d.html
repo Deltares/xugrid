@@ -750,6 +750,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span><span class="o">.</span><span class="n">mesh1d_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_cyclic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return True if the directed node node connectivity contains cycles. If</span>
+<span class="sd">        False, then the directed node node connectivity is a directed acyclic</span>
+<span class="sd">        graph (DAG).</span>
+
+<span class="sd">        Runs a depth-first-search.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># topological sort returns a ValueError if it detects a cycle.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topological_sort_by_dfs</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The graph contains at least one cycle&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">raise</span>  <span class="c1"># Re-raise any other ValueError</span>
+
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_geodataframe.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>
     <span class="nd">@classmethod</span>
