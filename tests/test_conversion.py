@@ -335,7 +335,8 @@ def test_bounds2d_to_topology2d():
     )
 
     with pytest.warns(
-        UserWarning, match="A UGRID2D face requires at least three unique vertices."
+        UserWarning,
+        match="A UGRID2D face requires at least three unique non-collinear vertices.",
     ):
         x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
 
@@ -345,6 +346,21 @@ def test_bounds2d_to_topology2d():
         [2.0, 3.0, 2.0, 3.0],  # repeated node moved to last one
     ]
     assert np.array_equal(x[faces], expected_x)
+
+    # Add an example with collinear vertices
+    x_bounds = np.array(
+        [[[0.0, 0.33, 0.67, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
+    )
+    y_bounds = np.array(
+        [[[0.5, 0.5, 0.5, 0.5], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
+    )
+    with pytest.warns(
+        UserWarning,
+        match="A UGRID2D face requires at least three unique non-collinear vertices",
+    ):
+        _, _, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
+        assert len(faces) == 2
+        assert np.array_equal(index, [False, True, True])
 
 
 def test_infer_xy_coords():

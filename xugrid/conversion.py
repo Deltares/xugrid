@@ -22,7 +22,7 @@ from xugrid.constants import (
     PointArray,
     PolygonArray,
 )
-from xugrid.ugrid.connectivity import ragged_index
+from xugrid.ugrid.connectivity import cross2d, ragged_index
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
@@ -281,6 +281,18 @@ def bounds1d_to_vertices(bounds: np.ndarray):
     return vertices
 
 
+def quad_area(coordinates: FloatArray):
+    # Subtly different from connectivity.area_from_coordinates
+    # Due to lexsort (for repeated values), coordinates are not in CCW order.
+    # We might get conflicting sign on the determinant; we always get two triangles,
+    # so call abs() before summing.
+    xy0 = coordinates[:, 0]
+    a = coordinates[:, :-1] - xy0[:, np.newaxis]
+    b = coordinates[:, 1:] - xy0[:, np.newaxis]
+    determinant = cross2d(a, b)
+    return 0.5 * abs(determinant).sum(axis=1)
+
+
 def bounds2d_to_topology2d(
     x_bounds: np.ndarray, y_bounds: np.ndarray
 ) -> Tuple[FloatArray, BoolArray]:
@@ -299,15 +311,16 @@ def bounds2d_to_topology2d(
 
     # Check whether all coordinates form valid UGRID topologies.
     # We can only maintain triangles and quadrangles.
+    # We also have to discard collinear triangles or quadrangles.
     n_unique = (
         (face_node_coordinates != np.roll(face_node_coordinates, 1, axis=1))
         .any(axis=-1)
         .sum(axis=1)
     )
-    valid = n_unique >= 3
+    valid = (n_unique >= 3) & (quad_area(face_node_coordinates) > 0)
     if not valid.all():
         warnings.warn(
-            "A UGRID2D face requires at least three unique vertices.\n"
+            "A UGRID2D face requires at least three unique non-collinear vertices.\n"
             f"Your structured bounds contain {len(valid) - valid.sum()} invalid faces.\n"
             "These will be omitted from the Ugrid2d topology.",
         )
