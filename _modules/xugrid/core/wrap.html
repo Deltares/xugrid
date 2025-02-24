@@ -982,6 +982,7 @@
 
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">dss</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">xy_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># store x, y, x_bounds, y_bounds to drop.</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">x_bounds</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">y_bounds</span> <span class="o">=</span> <span class="kc">None</span>
@@ -993,6 +994,7 @@
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x and y must be provided for bounds&quot;</span><span class="p">)</span>
                     <span class="n">x_bounds</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;x_bounds&quot;</span><span class="p">]]</span>
                     <span class="n">y_bounds</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;y_bounds&quot;</span><span class="p">]]</span>
+                    <span class="n">xy_vars</span><span class="o">.</span><span class="n">update</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;x_bounds&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;y_bounds&quot;</span><span class="p">]))</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1018,10 +1020,11 @@
             <span class="c1"># Use subset to check that ALL dims of stackdims are present in the</span>
             <span class="c1"># variable.</span>
             <span class="n">checkdims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stackdims</span><span class="p">)</span>
+            <span class="n">xy_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">checkdims</span><span class="p">)</span>
             <span class="n">ugrid_vars</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">name</span>
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">checkdims</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">checkdims</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xy_vars</span>
             <span class="p">]</span>
             <span class="n">dss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">dataset</span><span class="p">[</span><span class="n">ugrid_vars</span><span class="p">]</span>  <span class="c1"># noqa: PD013</span>
@@ -1032,7 +1035,7 @@
             <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 
         <span class="c1"># Add the original dataset to include all non-UGRID variables.</span>
-        <span class="n">dss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">dss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">xy_vars</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">))</span>
         <span class="c1"># Then merge with compat=&quot;override&quot;. This&#39;ll pick the first available</span>
         <span class="c1"># variable: i.e. it will prioritize the UGRID form.</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">dss</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
