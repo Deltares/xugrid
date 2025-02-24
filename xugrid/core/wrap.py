@@ -583,6 +583,7 @@ class UgridDataset(DatasetForwardMixin):
 
         grids = []
         dss = []
+        xy_vars = set()  # store x, y, x_bounds, y_bounds to drop.
         for name, args in topology.items():
             x_bounds = None
             y_bounds = None
@@ -594,6 +595,7 @@ class UgridDataset(DatasetForwardMixin):
                         raise ValueError("x and y must be provided for bounds")
                     x_bounds = dataset[args["x_bounds"]]
                     y_bounds = dataset[args["y_bounds"]]
+                    xy_vars.update((args["x_bounds"], args["y_bounds"]))
             elif isinstance(args, tuple):
                 x, y = args
             else:
@@ -619,10 +621,11 @@ class UgridDataset(DatasetForwardMixin):
             # Use subset to check that ALL dims of stackdims are present in the
             # variable.
             checkdims = set(stackdims)
+            xy_vars.update(checkdims)
             ugrid_vars = [
                 name
                 for name, var in dataset.data_vars.items()
-                if checkdims.issubset(var.dims)
+                if checkdims.issubset(var.dims) and name not in xy_vars
             ]
             dss.append(
                 dataset[ugrid_vars]  # noqa: PD013
@@ -633,7 +636,7 @@ class UgridDataset(DatasetForwardMixin):
             grids.append(grid)
 
         # Add the original dataset to include all non-UGRID variables.
-        dss.append(dataset)
+        dss.append(dataset.drop_vars(xy_vars, errors="ignore"))
         # Then merge with compat="override". This'll pick the first available
         # variable: i.e. it will prioritize the UGRID form.
         merged = xr.merge(dss, compat="override")
