@@ -937,7 +937,7 @@ class TestFromStructured:
                 }
             },
         )
-        assert set(uds.data_vars) == {"a", "b", "c", "grid_x", "grid_y"}
+        assert set(uds.data_vars) == {"a", "b", "c"}
         assert uds["a"].dims == ("layer", "mesh2d_nFaces")
         assert uds["b"].dims == ("x",)
         assert uds["c"].dims == ()
