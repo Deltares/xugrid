@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Changed
+-------
+
+- :func:`xugrid.open_dataarray`, :func:`xugrid.load_dataarray`,
+  :func:`xugrid.open_dataset`, :func:`xugrid.load_dataset` now error when no
+  UGRID conventions data is present in the file or object.
+
 Added
 ~~~~~
 

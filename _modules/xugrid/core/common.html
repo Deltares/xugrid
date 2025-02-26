@@ -386,11 +386,22 @@
 <span class="n">DATAARRAY_VARIABLE</span> <span class="o">=</span> <span class="s2">&quot;__xarray_dataarray_variable__&quot;</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_dataset_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="n">n_topology</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_topology</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The file or object does not contain UGRID conventions data. &quot;</span>
+            <span class="s2">&quot;One or more UGRID topologies are required. Perhaps you wrote &quot;</span>
+            <span class="s2">&quot;the file using `data.to_netcdf()` instead of `data.ugrid.to_netcdf()`?&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="open_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.open_dataset.html#xugrid.open_dataset">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_dataset_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
 
 
@@ -398,15 +409,15 @@
 <a class="viewcode-back" href="../../../api/xugrid.load_dataset.html#xugrid.load_dataset">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_dataset_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataarray_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">UgridDataset</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">_dataset_helper</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Given file dataset contains more than one data &quot;</span>
+            <span class="s2">&quot;The file or object contains more than one data &quot;</span>
             <span class="s2">&quot;variable. Please read with xarray.open_dataset and &quot;</span>
             <span class="s2">&quot;then select the variable you want.&quot;</span>
         <span class="p">)</span>
