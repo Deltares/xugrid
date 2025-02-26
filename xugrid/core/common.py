@@ -9,21 +9,32 @@ DATAARRAY_NAME = "__xarray_dataarray_name__"
 DATAARRAY_VARIABLE = "__xarray_dataarray_variable__"
 
 
+def _dataset_helper(ds: xr.Dataset):
+    n_topology = len(ds.ugrid_roles.topology)
+    if n_topology == 0:
+        raise ValueError(
+            "The file or object does not contain UGRID conventions data. "
+            "One or more UGRID topologies are required. Perhaps you wrote "
+            "the file using `data.to_netcdf()` instead of `data.ugrid.to_netcdf()`?"
+        )
+    return UgridDataset(ds)
+
+
 def open_dataset(*args, **kwargs):
     ds = xr.open_dataset(*args, **kwargs)
-    return UgridDataset(ds)
+    return _dataset_helper(ds)
 
 
 def load_dataset(*args, **kwargs):
     ds = xr.load_dataset(*args, **kwargs)
-    return UgridDataset(ds)
+    return _dataset_helper(ds)
 
 
 def _dataarray_helper(ds: xr.Dataset):
-    dataset = UgridDataset(ds)
+    dataset = _dataset_helper(ds)
     if len(dataset.data_vars) != 1:
         raise ValueError(
-            "Given file dataset contains more than one data "
+            "The file or object contains more than one data "
             "variable. Please read with xarray.open_dataset and "
             "then select the variable you want."
         )

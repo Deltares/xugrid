@@ -1014,6 +1014,13 @@ def test_open_dataset(tmp_path):
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
 
+    path = tmp_path / "no-topology-dataset.nc"
+    uds.to_netcdf(path)
+    with pytest.raises(
+        ValueError, match="The file or object does not contain UGRID conventions data."
+    ):
+        xugrid.open_dataset(path)
+
 
 def test_load_dataset(tmp_path):
     path = tmp_path / "ugrid-dataset.nc"
@@ -1042,7 +1049,7 @@ def test_open_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.nc"
     uds = xugrid.UgridDataset(UGRID_DS())
     uds.ugrid.to_netcdf(path)
-    with pytest.raises(ValueError, match="Given file dataset contains more than one"):
+    with pytest.raises(ValueError, match="The file or object contains more than one"):
         xugrid.open_dataarray(path)
 
     path = tmp_path / "ugrid-dataarray.nc"
@@ -1052,11 +1059,21 @@ def test_open_dataarray_roundtrip(tmp_path):
     assert back.name == "a"
 
 
+def test_open_dataarray_ugrid_errors(tmp_path):
+    uds = ugrid1d_ds()
+    path = tmp_path / "no-topology-dataarray.nc"
+    uds.to_netcdf(path)
+    with pytest.raises(
+        ValueError, match="The file or object does not contain UGRID conventions data."
+    ):
+        xugrid.open_dataarray(path)
+
+
 def test_load_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.nc"
     uds = xugrid.UgridDataset(UGRID_DS())
     uds.ugrid.to_netcdf(path)
-    with pytest.raises(ValueError, match="Given file dataset contains more than one"):
+    with pytest.raises(ValueError, match="The file or object contains more than one"):
         xugrid.load_dataarray(path)
 
     path = tmp_path / "ugrid-dataarray.nc"
