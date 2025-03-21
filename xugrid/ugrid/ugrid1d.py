@@ -18,6 +18,7 @@ from xugrid.constants import (
     LineArray,
 )
 from xugrid.core.utils import either_dict_or_kwargs
+from xugrid.regrid.utils import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 
@@ -681,6 +682,47 @@ class Ugrid1d(AbstractUgrid):
             crs=self.crs,
             attrs=self._attrs,
         )
+
+    def refine_by_vertices(self, vertices: FloatArray, edge_index) -> "Ugrid1d":
+        # TODO: make sure vertices are new additions to the grid
+        # Use np.unique, and return the index?
+        # TODO: remove edge_index and get it from locate_points instead.
+        # edge_index = self.celltree.locate_points(vertices)
+        # valid = edge_index != -1
+        # edge_index = edge_index[valid]
+
+        xy0 = self.node_coordinates[self.edge_node_connectivity[edge_index, 0]]
+        distance = np.linalg.norm(vertices - xy0, axis=1)
+        grid_edge_index = np.arange(self.n_edge)
+        repeats = np.bincount(np.concatenate((grid_edge_index, edge_index)))
+        new_edges = np.repeat(self.edge_node_connectivity, repeats, axis=0)
+        order = np.lexsort((distance, edge_index))
+
+        # Index for new vertices
+        node_index = np.arange(self.n_node, self.n_node + len(edge_index))[order]
+
+        # For the new edges, modify:
+        #
+        # * all but the last entry per edge of the second column
+        # * all but the first entry per edge of the first column
+        #
+        i = np.arange(len(new_edges))
+        mask0 = np.repeat(alt_cumsum(repeats), repeats)
+        mask1 = np.repeat(np.cumsum(repeats), repeats) - 1
+        new_edges[i > mask0, 0] = node_index
+        new_edges[i < mask1, 1] = node_index
+
+        grid = Ugrid1d(
+            np.concatenate((self.node_x, vertices[:, 0])),
+            np.concatenate((self.node_y, vertices[:, 1])),
+            self.fill_value,
+            new_edges,
+            name=self.name,
+            projected=self.projected,
+            crs=self.crs,
+        )
+        self._propagate_properties(grid)
+        return grid
 
     @staticmethod
     def merge_partitions(
