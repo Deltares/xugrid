@@ -683,16 +683,28 @@ class Ugrid1d(AbstractUgrid):
             attrs=self._attrs,
         )
 
-    def refine_by_vertices(self, vertices: FloatArray, edge_index) -> "Ugrid1d":
-        # TODO: make sure vertices are new additions to the grid
-        # Use np.unique, and return the index?
-        # TODO: remove edge_index and get it from locate_points instead.
-        # edge_index = self.celltree.locate_points(vertices)
-        # valid = edge_index != -1
-        # edge_index = edge_index[valid]
+    def refine_by_vertices(
+        self, vertices: FloatArray, edge_index, return_index: bool = False
+    ) -> "Ugrid1d":
+        # TODO: create the edge_index here
+        # edge_index = self.celltree.locate_points(new_vertices)
+        # invalid = edge_index == -1
+        # if invalid.any():
+        #     raise ValueError(f"The following vertices are not located on any edge:\n{vertices[invalid]}
 
-        xy0 = self.node_coordinates[self.edge_node_connectivity[edge_index, 0]]
-        distance = np.linalg.norm(vertices - xy0, axis=1)
+        # Do not insert vertices that are already present in the grid.
+        node_xy = self.node_coordinates
+        combined = np.concatenate((node_xy, vertices))
+        _, index, inverse = np.unique(
+            combined, return_index=True, return_inverse=True, axis=0
+        )
+        index_to_vertices = index[inverse][self.n_node :]
+        not_duplicated = index_to_vertices >= self.n_node
+        new_vertices = vertices[not_duplicated]
+        edge_index = edge_index[not_duplicated]
+
+        first_node = self.edge_node_connectivity[edge_index, 0]
+        distance = np.linalg.norm(new_vertices - node_xy[first_node], axis=1)
         grid_edge_index = np.arange(self.n_edge)
         repeats = np.bincount(np.concatenate((grid_edge_index, edge_index)))
         new_edges = np.repeat(self.edge_node_connectivity, repeats, axis=0)
@@ -713,8 +725,8 @@ class Ugrid1d(AbstractUgrid):
         new_edges[i < mask1, 1] = node_index
 
         grid = Ugrid1d(
-            np.concatenate((self.node_x, vertices[:, 0])),
-            np.concatenate((self.node_y, vertices[:, 1])),
+            np.concatenate((self.node_x, new_vertices[:, 0])),
+            np.concatenate((self.node_y, new_vertices[:, 1])),
             self.fill_value,
             new_edges,
             name=self.name,
@@ -722,7 +734,10 @@ class Ugrid1d(AbstractUgrid):
             crs=self.crs,
         )
         self._propagate_properties(grid)
-        return grid
+        if return_index:
+            grid, index_to_vertices
+        else:
+            return grid
 
     @staticmethod
     def merge_partitions(
