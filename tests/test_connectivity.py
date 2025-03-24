@@ -492,9 +492,23 @@ def test_directed_node_node_connectivity():
     assert np.array_equal(expected_edges, coo.data)
 
 
-def test_directed_edge_edge_connectivity():
+class TestEdgeConnectivity:
     r"""
-    Derive connectivity for this network:
+    Test networks:
+    
+    Simple:
+
+                    3
+                   /
+                  / 2
+       0     1   /
+    0 --- 1 --- 2 
+                 \
+                  \ 3
+                   \
+                    4 
+
+    And:
 
                              5
                           4 --- 6
@@ -507,28 +521,71 @@ def test_directed_edge_edge_connectivity():
                          \
                           5 
     """
-    edge_node_connectivity = np.array(
-        [
-            [0, 1],  # edge 0
-            [1, 2],  # edge 1
-            [2, 3],  # edge 2
-            [3, 4],  # edge 3
-            [3, 5],  # edge 4
-            [4, 6],  # edge 5
-        ]
-    )
-    node_edge_connectivity = connectivity.invert_dense_to_sparse(edge_node_connectivity)
-    csr = connectivity.directed_edge_edge_connectivity(
-        edge_node_connectivity, node_edge_connectivity
-    )
-    assert isinstance(csr, sparse.csr_matrix)
 
-    coo = csr.tocoo()
-    actual = np.column_stack([coo.row, coo.col])
-    expected = np.array([[0, 1], [1, 2], [2, 3], [2, 4], [3, 5]])
-    assert np.array_equal(actual, expected)
-    # Test through which node the connection is formed.
-    assert np.array_equal(coo.data, [1, 2, 3, 3, 4])
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.simple_edge_node_connectivity = np.array(
+            [
+                [0, 1],
+                [1, 2],
+                [2, 3],
+                [2, 4],
+            ]
+        )
+        self.simple_node_edge_connectivity = connectivity.invert_dense_to_sparse(
+            self.simple_edge_node_connectivity
+        )
+        self.edge_node_connectivity = np.array(
+            [
+                [0, 1],  # edge 0
+                [1, 2],  # edge 1
+                [2, 3],  # edge 2
+                [3, 4],  # edge 3
+                [3, 5],  # edge 4
+                [4, 6],  # edge 5
+            ]
+        )
+        self.node_edge_connectivity = connectivity.invert_dense_to_sparse(
+            self.edge_node_connectivity
+        )
+
+    def test_edge_edge_connectivity_simple(self):
+        csr = connectivity.edge_edge_connectivity(
+            self.simple_edge_node_connectivity, self.simple_node_edge_connectivity
+        )
+        assert isinstance(csr, sparse.csr_matrix)
+        coo = csr.tocoo()
+        actual = np.column_stack([coo.row, coo.col])
+        expected = np.array(
+            [[0, 1], [1, 0], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]]
+        )
+        assert np.array_equal(actual, expected)
+        # Test through which node the connection is formed.
+        assert np.array_equal(coo.data, [1, 1, 2, 2, 2, 2, 2, 2])
+
+    def test_direct_edge_edge_connectivity_simple(self):
+        csr = connectivity.directed_edge_edge_connectivity(
+            self.simple_edge_node_connectivity, self.simple_node_edge_connectivity
+        )
+        coo = csr.tocoo()
+        actual = np.column_stack([coo.row, coo.col])
+        expected = np.array([[0, 1], [1, 2], [1, 3]])
+        assert np.array_equal(actual, expected)
+        # Test through which node the connection is formed.
+        assert np.array_equal(coo.data, [1, 2, 2])
+
+    def test_directed_edge_edge_connectivity(self):
+        csr = connectivity.directed_edge_edge_connectivity(
+            self.edge_node_connectivity, self.node_edge_connectivity
+        )
+        assert isinstance(csr, sparse.csr_matrix)
+
+        coo = csr.tocoo()
+        actual = np.column_stack([coo.row, coo.col])
+        expected = np.array([[0, 1], [1, 2], [2, 3], [2, 4], [3, 5]])
+        assert np.array_equal(actual, expected)
+        # Test through which node the connection is formed.
+        assert np.array_equal(coo.data, [1, 2, 3, 3, 4])
 
 
 def test_face_face_connectivity():

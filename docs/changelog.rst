@@ -17,6 +17,8 @@ Added
   :meth:`xugrid.Ugrid2d.format_connectivity_as_dense`, and
   :meth:`xugrid.Ugrid2d.format_connectivity_as_sparse` utilities to convert
   between sparse and dense rectangular form of the connectivity arrays.
+- Added :attr:`xugrid.Ugrid1d.edge_edge_connectivity` and
+  attr:`xugrid.Ugrid2d.edge_edge_connectivity`.
 
 [0.12.4] 2025-03-05
 -------------------
