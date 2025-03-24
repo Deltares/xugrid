@@ -1,10 +1,12 @@
 from itertools import chain
 from typing import Any, Dict, Sequence, Tuple, Union
+import warnings
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 from numpy.typing import ArrayLike
+from numba_celltree import EdgeCellTree2d
 
 import xugrid
 from xugrid import conversion
@@ -19,7 +21,7 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
-from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, section_coordinates
 
 
 class Ugrid1d(AbstractUgrid):
@@ -625,14 +627,216 @@ class Ugrid1d(AbstractUgrid):
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
-    def sel_points(self, obj, x, y, out_of_bounds, fill_value):
-        return obj
+    @property
+    def celltree(self):
+        """
+        Initializes the celltree if needed, and returns celltree.
 
-    def intersect_line(self, obj, start, stop):
-        return obj
+        A celltree is a search structure for spatial lookups in unstructured grids.
+        """
+        if self._celltree is None:
+            self._celltree = EdgeCellTree2d(
+                self.node_coordinates, self.edge_node_coordinates, FILL_VALUE
+            )
+        return self._celltree
 
-    def intersect_linestring(self, obj, linestring):
-        return obj
+    def locate_points(self, points: FloatArray):
+        """
+        Find on which edge points are located.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+
+        Returns
+        -------
+        edge_index: ndarray of integers with shape ``(n_points,)``
+        """
+        return self.celltree.locate_points(points)
+
+    def intersect_edges(self, edges: FloatArray):
+        """
+        Find in which grid edges are edges are located and compute the
+        intersection with the edges.
+
+        Parameters
+        ----------
+        edges: ndarray of floats with shape ``(n_edge, 2, 2)``
+            The first dimensions represents the different edges.
+            The second dimensions represents the start and end of every edge.
+            The third dimensions reresent the x and y coordinate of every vertex.
+
+        Returns
+        -------
+        edge_index: ndarray of integers with shape ``(n_intersection,)``
+        edge_tree_index: ndarray of integers with shape ``(n_intersection,)``
+        intersections: ndarray of float with shape ``(n_intersection, 2, 2)``
+        """
+        return self.celltree.intersect_edges(edges)
+
+    def sel_points(
+        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
+    ):
+        """
+        Select points in the unstructured grid.
+
+
+        Parameters
+        ----------
+        x: 1d array of floats with shape ``(n_points,)``
+        y: 1d array of floats with shape ``(n_points,)``
+        obj: xr.DataArray or xr.Dataset
+        out_of_bounds: str, default ``"warn"``
+            What to do when points are located outside of any feature:
+
+            * raise: raise a ValueError.
+            * ignore: return ``fill_value`` for the out of bounds points.
+            * warn: give a warning and return NaN for the out of bounds points.
+            * drop: drop the out of bounds points. They may be identified
+              via the ``index`` coordinate of the returned selection.
+        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
+            Value to assign to out-of-bounds points if out_of_bounds is warn
+            or ignore. Forwarded to xarray's ``.where()`` method.
+
+        Returns
+        -------
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates.
+        """
+        options = ("warn", "raise", "ignore", "drop")
+        if out_of_bounds not in options:
+            str_options = ", ".join(options)
+            raise ValueError(
+                f"out_of_bounds must be one of {str_options}, "
+                f"received: {out_of_bounds}"
+            )
+
+        x = np.atleast_1d(x)
+        y = np.atleast_1d(y)
+        if x.shape != y.shape:
+            raise ValueError("shape of x does not match shape of y")
+        if x.ndim != 1:
+            raise ValueError("x and y must be 1d")
+        dim = self.edge_dimension
+        xy = np.column_stack([x, y])
+        index = self.locate_points(xy)
+
+        keep = slice(None, None)  # keep all by default
+        condition = None
+        valid = index != -1
+        if not valid.all():
+            msg = "Not all points are located inside of the grid."
+            if out_of_bounds == "raise":
+                raise ValueError(msg)
+            elif out_of_bounds in ("warn", "ignore"):
+                if out_of_bounds == "warn":
+                    warnings.warn(msg)
+                condition = xr.DataArray(valid, dims=(dim,))
+            elif out_of_bounds == "drop":
+                index = index[valid]
+                keep = valid
+
+        # Create the selection DataArray or Dataset
+        coords = {
+            f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
+            f"{self.name}_x": (dim, xy[keep, 0]),
+            f"{self.name}_y": (dim, xy[keep, 1]),
+        }
+        selection = obj.isel({dim: index}).assign_coords(coords)
+
+        # Set values to fill_value for out-of-bounds
+        if condition is not None:
+            selection = selection.where(condition, other=fill_value)
+        return selection
+
+    def intersect_line(self, obj, start: Sequence[float], end: Sequence[float]):
+        """
+        Intersect a line with this grid, and fetch the values of the
+        intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        start: sequence of two floats
+            coordinate pair (x, y), designating the start point of the line.
+        end: sequence of two floats
+            coordinate pair (x, y), designating the end point of the line.
+
+        Returns
+        -------
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        if (len(start) != 2) or (len(end) != 2):
+            raise ValueError("Start and end coordinate pairs must have length two")
+        return self._sel_line(obj, start, end)
+
+    def _sel_line(
+        self,
+        obj,
+        start,
+        end,
+    ):
+        edges = np.array([[start, end]])
+        _, index, xy = self.intersect_edges(edges)
+        coords, index = section_coordinates(
+            edges, xy, self.edge_dimension, index, self.name
+        )
+        return obj.isel({self.edge_dimension: index}).assign_coords(coords)
+
+    def intersect_linestring(
+        self,
+        obj: Union[xr.DataArray, xr.Dataset],
+        linestring: "shapely.geometry.LineString",  # type: ignore # noqa
+    ) -> Union[xr.DataArray, xr.Dataset]:
+        """
+        Intersect linestrings with this grid, and fetch the values of the
+        intersected faces.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        linestring: shapely.geometry.lineString
+
+        Returns
+        -------
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y and s
+            (spatium=distance) coordinates.
+        """
+        import shapely
+
+        xy = shapely.get_coordinates([linestring])
+        edges = np.stack((xy[:-1], xy[1:]), axis=1)
+        edge_index, face_index, intersections = self.intersect_edges(edges)
+
+        # Compute the cumulative length along the edges
+        edge_length = np.linalg.norm(edges[:, 1] - edges[:, 0], axis=1)
+        cumulative_length = np.empty_like(edge_length)
+        cumulative_length[0] = 0
+        np.cumsum(edge_length[:-1], out=cumulative_length[1:])
+
+        # Compute the distance for every intersection to the start of the linestring.
+        intersection_centroid = intersections.mean(axis=1)
+        distance_node_to_intersection = np.linalg.norm(
+            intersection_centroid - edges[edge_index, 0], axis=1
+        )
+        s = distance_node_to_intersection + cumulative_length[edge_index]
+
+        # Now sort everything according to s.
+        sorter = np.argsort(s)
+        face_index = face_index[sorter]
+        intersection_centroid = intersection_centroid[sorter]
+        intersections = intersections[sorter]
+
+        facedim = self.face_dimension
+        coords = {
+            f"{self.name}_s": (facedim, s[sorter]),
+            f"{self.name}_x": (facedim, intersection_centroid[:, 0]),
+            f"{self.name}_y": (facedim, intersection_centroid[:, 1]),
+        }
+        return obj.isel({facedim: face_index}).assign_coords(coords)
 
     def to_periodic(self, obj):
         return self, obj

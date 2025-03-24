@@ -27,23 +27,9 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
-from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, section_coordinates
 from xugrid.ugrid.voronoi import voronoi_topology
 
-
-def section_coordinates(
-    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
-) -> Tuple[IntArray, dict]:
-    # TODO: add boundaries xy[:, 0] and xy[:, 1]
-    xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
-    s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
-    order = np.argsort(s)
-    coords = {
-        f"{name}_x": (dim, xy_mid[order, 0]),
-        f"{name}_y": (dim, xy_mid[order, 1]),
-        f"{name}_s": (dim, s[order]),
-    }
-    return coords, index[order]
 
 
 def numeric_bound(v: Union[float, None], other: float):

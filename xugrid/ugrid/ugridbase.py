@@ -13,6 +13,20 @@ from scipy.sparse import csr_matrix
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
 
+def section_coordinates(
+    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+) -> Tuple[IntArray, dict]:
+    # TODO: add boundaries xy[:, 0] and xy[:, 1]
+    xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
+    s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
+    order = np.argsort(s)
+    coords = {
+        f"{name}_x": (dim, xy_mid[order, 0]),
+        f"{name}_y": (dim, xy_mid[order, 1]),
+        f"{name}_s": (dim, s[order]),
+    }
+    return coords, index[order]
+
 
 def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
     if isinstance(index, np.ndarray):
