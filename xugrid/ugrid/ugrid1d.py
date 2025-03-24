@@ -636,7 +636,7 @@ class Ugrid1d(AbstractUgrid):
         """
         if self._celltree is None:
             self._celltree = EdgeCellTree2d(
-                self.node_coordinates, self.edge_node_coordinates, FILL_VALUE
+                self.node_coordinates, self.edge_node_connectivity,
             )
         return self._celltree
 
