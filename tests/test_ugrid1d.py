@@ -391,15 +391,22 @@ def test_sel():
 def test_sel_points():
     grid = grid1d()
     obj = xr.DataArray(
-        data=[0, 1],
+        data=[10, 11],
         dims=[grid.edge_dimension],
     )
     # For now, this function does nothing so it'll work for multi-topology
     # UgridDatasets.
+    x = [1.5, 0.5]
+    y = [1.5, 0.5]
+
     actual = grid.sel_points(
-        obj=obj, x=None, y=None, out_of_bounds=None, fill_value=None
+        obj=obj, x=x, y=y,
     )
-    assert actual.identical(obj)
+    np.testing.assert_allclose(actual.values, [11, 10])
+    np.testing.assert_allclose(actual["network1d_x"].values, x)
+    np.testing.assert_allclose(actual["network1d_y"].values, y)
+    np.testing.assert_allclose(actual["network1d_index"].values, [0, 1])
+
 
 
 def test_topology_subset():
