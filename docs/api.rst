@@ -220,6 +220,7 @@ UGRID1D Topology
 
     Ugrid1d.node_edge_connectivity
     Ugrid1d.node_node_connectivity
+    Ugrid1d.edge_edge_connectivity
     Ugrid1d.directed_node_node_connectivity
     Ugrid1d.directed_edge_edge_connectivity
     Ugrid1d.get_connectivity_matrix
@@ -305,6 +306,7 @@ UGRID2D Topology
     Ugrid2d.node_edge_connectivity
     Ugrid2d.node_face_connectivity
     Ugrid2d.edge_node_connectivity
+    Ugrid2d.edge_edge_connectivity
     Ugrid2d.face_edge_connectivity
     Ugrid2d.face_face_connectivity
     Ugrid2d.directed_node_node_connectivity

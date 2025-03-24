@@ -760,6 +760,25 @@ class AbstractUgrid(abc.ABC):
         return self._node_node_connectivity
 
     @property
+    def edge_edge_connectivity(self) -> csr_matrix:
+        """
+        Edge to edge connectivity.
+
+        The connectivity is represented as an adjacency matrix in CSR format,
+        with the row and column indices as a (0-based) edge index. The data of
+        the matrix contains the node index of the common node through which
+        the connection is formed.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
+        return connectivity.edge_edge_connectivity(
+            self.edge_node_connectivity,
+            self.node_edge_connectivity,
+        )
+
+    @property
     def directed_node_node_connectivity(self) -> csr_matrix:
         """
         Directed node to node connectivity.
