@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Added
+~~~~~
+
+- Added :meth:`xugrid.Ugrid1d.format_connectivity_as_dense`,
+  :meth:`xugrid.Ugrid1d.format_connectivity_as_sparse`,
+  :meth:`xugrid.Ugrid2d.format_connectivity_as_dense`, and
+  :meth:`xugrid.Ugrid2d.format_connectivity_as_sparse` utilities to convert
+  between sparse and dense rectangular form of the connectivity arrays.
+
 [0.12.4] 2025-03-05
 -------------------
 
