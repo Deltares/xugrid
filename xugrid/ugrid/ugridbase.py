@@ -880,5 +880,51 @@ class AbstractUgrid(abc.ABC):
 
         return line(self, **kwargs)
 
+    def _sel_points_on_dim(self, obj, dim: str, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan):
+        options = ("warn", "raise", "ignore", "drop")
+        if out_of_bounds not in options:
+            str_options = ", ".join(options)
+            raise ValueError(
+                f"out_of_bounds must be one of {str_options}, "
+                f"received: {out_of_bounds}"
+            )
+
+        x = np.atleast_1d(x)
+        y = np.atleast_1d(y)
+        if x.shape != y.shape:
+            raise ValueError("shape of x does not match shape of y")
+        if x.ndim != 1:
+            raise ValueError("x and y must be 1d")
+        xy = np.column_stack([x, y])
+        index = self.locate_points(xy)
+
+        keep = slice(None, None)  # keep all by default
+        condition = None
+        valid = index != -1
+        if not valid.all():
+            msg = "Not all points are located inside of the grid."
+            if out_of_bounds == "raise":
+                raise ValueError(msg)
+            elif out_of_bounds in ("warn", "ignore"):
+                if out_of_bounds == "warn":
+                    warnings.warn(msg)
+                condition = xr.DataArray(valid, dims=(dim,))
+            elif out_of_bounds == "drop":
+                index = index[valid]
+                keep = valid
+
+        # Create the selection DataArray or Dataset
+        coords = {
+            f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
+            f"{self.name}_x": (dim, xy[keep, 0]),
+            f"{self.name}_y": (dim, xy[keep, 1]),
+        }
+        selection = obj.isel({dim: index}).assign_coords(coords)
+
+        # Set values to fill_value for out-of-bounds
+        if condition is not None:
+            selection = selection.where(condition, other=fill_value)
+        return selection
+
 
 UgridType = Type[AbstractUgrid]
