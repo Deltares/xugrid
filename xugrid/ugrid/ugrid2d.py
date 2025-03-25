@@ -869,7 +869,7 @@ class Ugrid2d(AbstractUgrid):
         return np.unique(exterior_faces[exterior_faces != FILL_VALUE])
 
     @property
-    def celltree(self):
+    def celltree(self) -> CellTree2d:
         """
         Initializes the celltree if needed, and returns celltree.
 
@@ -944,40 +944,6 @@ class Ugrid2d(AbstractUgrid):
             ),
         }
         return obj.assign_coords(coords)
-
-    def locate_points(self, points: FloatArray):
-        """
-        Find in which face points are located.
-
-        Parameters
-        ----------
-        points: ndarray of floats with shape ``(n_point, 2)``
-
-        Returns
-        -------
-        face_index: ndarray of integers with shape ``(n_points,)``
-        """
-        return self.celltree.locate_points(points)
-
-    def intersect_edges(self, edges: FloatArray):
-        """
-        Find in which face edges are located and compute the intersection with
-        the face edges.
-
-        Parameters
-        ----------
-        edges: ndarray of floats with shape ``(n_edge, 2, 2)``
-            The first dimensions represents the different edges.
-            The second dimensions represents the start and end of every edge.
-            The third dimensions reresent the x and y coordinate of every vertex.
-
-        Returns
-        -------
-        edge_index: ndarray of integers with shape ``(n_intersection,)``
-        face_index: ndarray of integers with shape ``(n_intersection,)``
-        intersections: ndarray of float with shape ``(n_intersection, 2, 2)``
-        """
-        return self.celltree.intersect_edges(edges)
 
     def locate_bounding_box(
         self, xmin: float, ymin: float, xmax: float, ymax: float
@@ -1283,160 +1249,6 @@ class Ugrid2d(AbstractUgrid):
         indexes = {k: v for k, v in indexes.items() if k in obj.dims}
         new_obj = obj.isel(indexes)
         return new_obj, grid
-
-    def _sel_line(
-        self,
-        obj,
-        start,
-        end,
-    ):
-        edges = np.array([[start, end]])
-        _, index, xy = self.intersect_edges(edges)
-        coords, index = section_coordinates(
-            edges, xy, self.face_dimension, index, self.name
-        )
-        return obj.isel({self.face_dimension: index}).assign_coords(coords)
-
-    def _sel_yline(
-        self,
-        obj,
-        x: float,
-        y: slice,
-    ):
-        xmin, _, xmax, _ = self.bounds
-        if y.size != 1:
-            raise ValueError(
-                "If x is a slice without steps, y should be a single value"
-            )
-        y = y[0]
-        xstart = numeric_bound(x.start, xmin)
-        xstop = numeric_bound(x.stop, xmax)
-        return self._sel_line(obj, start=(xstart, y), end=(xstop, y))
-
-    def _sel_xline(
-        self,
-        obj,
-        x: float,
-        y: slice,
-    ):
-        _, ymin, _, ymax = self.bounds
-        if x.size != 1:
-            raise ValueError(
-                "If y is a slice without steps, x should be a single value"
-            )
-        x = x[0]
-        ystart = numeric_bound(y.start, ymin)
-        ystop = numeric_bound(y.stop, ymax)
-        return self._sel_line(obj, start=(x, ystart), end=(x, ystop))
-
-
-    def sel_points(
-        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
-    ):
-        """
-        Select points in the unstructured grid.
-
-
-        Parameters
-        ----------
-        x: 1d array of floats with shape ``(n_points,)``
-        y: 1d array of floats with shape ``(n_points,)``
-        obj: xr.DataArray or xr.Dataset
-        out_of_bounds: str, default ``"warn"``
-            What to do when points are located outside of any feature:
-
-            * raise: raise a ValueError.
-            * ignore: return ``fill_value`` for the out of bounds points.
-            * warn: give a warning and return NaN for the out of bounds points.
-            * drop: drop the out of bounds points. They may be identified
-              via the ``index`` coordinate of the returned selection.
-        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
-            Value to assign to out-of-bounds points if out_of_bounds is warn
-            or ignore. Forwarded to xarray's ``.where()`` method.
-
-        Returns
-        -------
-        selection: xr.DataArray or xr.Dataset
-            The name of the topology is prefixed in the x, y coordinates.
-        """
-        dim = self.face_dimension
-        return self._sel_points_on_dim(obj, dim, x, y, out_of_bounds, fill_value)
-
-    def intersect_line(self, obj, start: Sequence[float], end: Sequence[float]):
-        """
-        Intersect a line with this grid, and fetch the values of the
-        intersected faces.
-
-        Parameters
-        ----------
-        obj: xr.DataArray or xr.Dataset
-        start: sequence of two floats
-            coordinate pair (x, y), designating the start point of the line.
-        end: sequence of two floats
-            coordinate pair (x, y), designating the end point of the line.
-
-        Returns
-        -------
-        selection: xr.DataArray or xr.Dataset
-            The name of the topology is prefixed in the x, y and s
-            (spatium=distance) coordinates.
-        """
-        if (len(start) != 2) or (len(end) != 2):
-            raise ValueError("Start and end coordinate pairs must have length two")
-        return self._sel_line(obj, start, end)
-
-    def intersect_linestring(
-        self,
-        obj: Union[xr.DataArray, xr.Dataset],
-        linestring: "shapely.geometry.LineString",  # type: ignore # noqa
-    ) -> Union[xr.DataArray, xr.Dataset]:
-        """
-        Intersect linestrings with this grid, and fetch the values of the
-        intersected faces.
-
-        Parameters
-        ----------
-        obj: xr.DataArray or xr.Dataset
-        linestring: shapely.geometry.lineString
-
-        Returns
-        -------
-        selection: xr.DataArray or xr.Dataset
-            The name of the topology is prefixed in the x, y and s
-            (spatium=distance) coordinates.
-        """
-        import shapely
-
-        xy = shapely.get_coordinates([linestring])
-        edges = np.stack((xy[:-1], xy[1:]), axis=1)
-        edge_index, face_index, intersections = self.intersect_edges(edges)
-
-        # Compute the cumulative length along the edges
-        edge_length = np.linalg.norm(edges[:, 1] - edges[:, 0], axis=1)
-        cumulative_length = np.empty_like(edge_length)
-        cumulative_length[0] = 0
-        np.cumsum(edge_length[:-1], out=cumulative_length[1:])
-
-        # Compute the distance for every intersection to the start of the linestring.
-        intersection_centroid = intersections.mean(axis=1)
-        distance_node_to_intersection = np.linalg.norm(
-            intersection_centroid - edges[edge_index, 0], axis=1
-        )
-        s = distance_node_to_intersection + cumulative_length[edge_index]
-
-        # Now sort everything according to s.
-        sorter = np.argsort(s)
-        face_index = face_index[sorter]
-        intersection_centroid = intersection_centroid[sorter]
-        intersections = intersections[sorter]
-
-        facedim = self.face_dimension
-        coords = {
-            f"{self.name}_s": (facedim, s[sorter]),
-            f"{self.name}_x": (facedim, intersection_centroid[:, 0]),
-            f"{self.name}_y": (facedim, intersection_centroid[:, 1]),
-        }
-        return obj.isel({facedim: face_index}).assign_coords(coords)
 
     def sel(self, obj, x=None, y=None):
         """
