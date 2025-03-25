@@ -396,17 +396,22 @@ def test_sel_points():
     )
     # For now, this function does nothing so it'll work for multi-topology
     # UgridDatasets.
-    x = [1.5, 0.5]
-    y = [1.5, 0.5]
+    x = [1.5, 0.5, -0.1]
+    y = [1.5, 0.5, -0.1]
 
     actual = grid.sel_points(
-        obj=obj, x=x, y=y,
+        obj=obj,
+        x=x,
+        y=y,
     )
-    np.testing.assert_allclose(actual.values, [11, 10])
+    np.testing.assert_allclose(actual.values, [11, 10, np.nan])
     np.testing.assert_allclose(actual["network1d_x"].values, x)
     np.testing.assert_allclose(actual["network1d_y"].values, y)
-    np.testing.assert_allclose(actual["network1d_index"].values, [0, 1])
+    np.testing.assert_allclose(actual["network1d_index"].values, [0, 1, 2])
 
+    # Check if out_of_bounds raises ValueError
+    with pytest.raises(ValueError):
+        grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="raise")
 
 
 def test_topology_subset():
