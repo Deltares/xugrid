@@ -15,6 +15,12 @@ from xugrid.ugrid import connectivity, conventions
 
 from numba_celltree import EdgeCellTree2d, CellTree2d
 
+def numeric_bound(v: Union[float, None], other: float):
+    if v is None:
+        return other
+    else:
+        return v
+
 def section_coordinates(
     edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
 ) -> Tuple[IntArray, dict]:
@@ -1031,6 +1037,38 @@ class AbstractUgrid(abc.ABC):
         )
         return obj.isel({dim: index}).assign_coords(coords)
 
+    def _sel_yline(
+        self,
+        obj,
+        x: slice,
+        y: FloatArray,
+    ):
+        xmin, _, xmax, _ = self.bounds
+        if y.size != 1:
+            raise ValueError(
+                "If x is a slice without steps, y should be a single value"
+            )
+        y = y[0]
+        xstart = numeric_bound(x.start, xmin)
+        xstop = numeric_bound(x.stop, xmax)
+        return self._sel_line(obj, start=(xstart, y), end=(xstop, y))
+
+    def _sel_xline(
+        self,
+        obj,
+        x: FloatArray,
+        y: slice,
+    ):
+        _, ymin, _, ymax = self.bounds
+        if x.size != 1:
+            raise ValueError(
+                "If y is a slice without steps, x should be a single value"
+            )
+        x = x[0]
+        ystart = numeric_bound(y.start, ymin)
+        ystop = numeric_bound(y.stop, ymax)
+        return self._sel_line(obj, start=(x, ystart), end=(x, ystop))
+
     def intersect_linestring(
         self,
         obj: Union[xr.DataArray, xr.Dataset],
@@ -1083,6 +1121,52 @@ class AbstractUgrid(abc.ABC):
             f"{self.name}_y": (dim, intersection_centroid[:, 1]),
         }
         return obj.isel({dim: face_index}).assign_coords(coords)
+
+    def sel(self, obj, x=None, y=None):
+        """
+        Find selection in the UGRID x and y coordinates.
+
+        The indexing for x and y always occurs orthogonally, i.e.:
+        ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For
+        vectorized indexing (equal to ``zip``ing through x and y), see
+        ``.sel_points``.
+
+        Parameters
+        ----------
+        obj: xr.DataArray or xr.Dataset
+        x: float, 1d array, slice
+        y: float, 1d array, slice
+
+        Returns
+        -------
+        dimension: str
+        as_ugrid: bool
+        index: 1d array of integers
+        coords: dict
+        """
+
+        if x is None:
+            x = slice(None, None)
+        if y is None:
+            y = slice(None, None)
+
+        x = self._validate_indexer(x)
+        y = self._validate_indexer(y)
+        if isinstance(x, slice) and isinstance(y, slice):
+            f = self._sel_box
+        elif isinstance(x, slice) and isinstance(y, np.ndarray):
+            f = self._sel_yline
+        elif isinstance(x, np.ndarray) and isinstance(y, slice):
+            f = self._sel_xline
+        elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
+            # Orthogonal points
+            y, x = [a.ravel() for a in np.meshgrid(y, x, indexing="ij")]
+            f = self.sel_points
+        else:
+            raise TypeError(
+                f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
+            )
+        return f(obj, x, y)
 
 
 UgridType = Type[AbstractUgrid]

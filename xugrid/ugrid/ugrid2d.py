@@ -27,16 +27,8 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
-from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, section_coordinates
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, numeric_bound
 from xugrid.ugrid.voronoi import voronoi_topology
-
-
-
-def numeric_bound(v: Union[float, None], other: float):
-    if v is None:
-        return other
-    else:
-        return v
 
 
 class Ugrid2d(AbstractUgrid):
@@ -1249,52 +1241,6 @@ class Ugrid2d(AbstractUgrid):
         indexes = {k: v for k, v in indexes.items() if k in obj.dims}
         new_obj = obj.isel(indexes)
         return new_obj, grid
-
-    def sel(self, obj, x=None, y=None):
-        """
-        Find selection in the UGRID x and y coordinates.
-
-        The indexing for x and y always occurs orthogonally, i.e.:
-        ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For
-        vectorized indexing (equal to ``zip``ing through x and y), see
-        ``.sel_points``.
-
-        Parameters
-        ----------
-        obj: xr.DataArray or xr.Dataset
-        x: float, 1d array, slice
-        y: float, 1d array, slice
-
-        Returns
-        -------
-        dimension: str
-        as_ugrid: bool
-        index: 1d array of integers
-        coords: dict
-        """
-
-        if x is None:
-            x = slice(None, None)
-        if y is None:
-            y = slice(None, None)
-
-        x = self._validate_indexer(x)
-        y = self._validate_indexer(y)
-        if isinstance(x, slice) and isinstance(y, slice):
-            f = self._sel_box
-        elif isinstance(x, slice) and isinstance(y, np.ndarray):
-            f = self._sel_yline
-        elif isinstance(x, np.ndarray) and isinstance(y, slice):
-            f = self._sel_xline
-        elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
-            # Orthogonal points
-            y, x = [a.ravel() for a in np.meshgrid(y, x, indexing="ij")]
-            f = self.sel_points
-        else:
-            raise TypeError(
-                f"Invalid indexer types: {type(x).__name__}, and {type(y).__name__}"
-            )
-        return f(obj, x, y)
 
     def label_partitions(self, n_part: int) -> "xugrid.UgridDataArray":
         """
