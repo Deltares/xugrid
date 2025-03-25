@@ -12,6 +12,7 @@ from scipy.sparse import csr_matrix
 
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.selection_utils import get_sorted_section_coords
 
 from numba_celltree import EdgeCellTree2d, CellTree2d
 
@@ -1067,7 +1068,7 @@ class AbstractUgrid(abc.ABC):
 
         xy = shapely.get_coordinates([linestring])
         edges = np.stack((xy[:-1], xy[1:]), axis=1)
-        edge_index, face_index, intersections = self.intersect_edges(edges)
+        edge_index, core_index, intersections = self.intersect_edges(edges)
 
         # Compute the cumulative length along the edges
         edge_length = np.linalg.norm(edges[:, 1] - edges[:, 0], axis=1)
@@ -1086,18 +1087,12 @@ class AbstractUgrid(abc.ABC):
         s = distance_node_to_intersection + cumulative_length[edge_index]
 
         # Now sort everything according to s.
-        sorter = np.argsort(s)
-        face_index = face_index[sorter]
-        intersection_for_coord = intersection_for_coord[sorter]
-        intersections = intersections[sorter]
-
         dim = self.core_dimension
-        coords = {
-            f"{self.name}_s": (dim, s[sorter]),
-            f"{self.name}_x": (dim, intersection_for_coord[:, 0]),
-            f"{self.name}_y": (dim, intersection_for_coord[:, 1]),
-        }
-        return obj.isel({dim: face_index}).assign_coords(coords)
+        coords, core_index = get_sorted_section_coords(
+            s, intersection_for_coord, dim, core_index, self.name
+        )
+
+        return obj.isel({dim: core_index}).assign_coords(coords)
 
     def sel(self, obj, x=None, y=None):
         """
