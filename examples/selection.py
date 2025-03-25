@@ -22,6 +22,7 @@ Imports
 
 The following imports suffice for the examples.
 """
+
 # %%
 import matplotlib.pyplot as plt
 import numpy as np

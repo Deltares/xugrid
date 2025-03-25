@@ -718,7 +718,7 @@ def triangulate_dense(face_node_connectivity: IntArray) -> Tuple[IntArray, IntAr
 
 
 def triangulate_coo(
-    face_node_connectivity: sparse.coo_matrix
+    face_node_connectivity: sparse.coo_matrix,
 ) -> Tuple[IntArray, IntArray]:
     ncol_per_row = face_node_connectivity.getnnz(axis=1)
 

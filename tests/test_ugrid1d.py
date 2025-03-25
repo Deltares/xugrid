@@ -421,16 +421,17 @@ def test_intersect_line():
     p0 = (2.0, 0.0)
     p1 = (0.0, 1.0)
     actual = grid.intersect_line(obj, start=p0, end=p1)
-    expected_s = np.sqrt((2/3) ** 2 + (1+1/3) ** 2)
+    expected_s = np.sqrt((2 / 3) ** 2 + (1 + 1 / 3) ** 2)
     assert isinstance(actual, xr.DataArray)
     assert actual.dims == (grid.edge_dimension,)
     assert np.array_equal(actual.to_numpy(), [0])
-    assert np.allclose(actual[f"{NAME}_x"], [(2/3)])
-    assert np.allclose(actual[f"{NAME}_y"], [(2/3)])
+    assert np.allclose(actual[f"{NAME}_x"], [(2 / 3)])
+    assert np.allclose(actual[f"{NAME}_y"], [(2 / 3)])
     assert np.allclose(actual[f"{NAME}_s"], [expected_s])
 
     actual = grid.intersect_line(obj, start=p1, end=p0)
     assert np.array_equal(actual.to_numpy(), [0])
+
 
 def test_intersect_linestring():
     grid = grid1d()
@@ -446,9 +447,10 @@ def test_intersect_linestring():
     assert isinstance(actual, xr.DataArray)
     assert actual.dims == (grid.edge_dimension,)
     assert np.array_equal(actual.to_numpy(), [0, 1])
-    assert np.allclose(actual[f"{NAME}_x"], [(2/3), 1+(1/3)])
-    assert np.allclose(actual[f"{NAME}_y"], [(2/3), 1+(1/3)])
+    assert np.allclose(actual[f"{NAME}_x"], [(2 / 3), 1 + (1 / 3)])
+    assert np.allclose(actual[f"{NAME}_y"], [(2 / 3), 1 + (1 / 3)])
     assert np.allclose(actual[f"{NAME}_s"], [1.491, 3.610], atol=1e-3)
+
 
 def test_topology_subset():
     grid = grid1d()

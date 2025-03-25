@@ -1,4 +1,5 @@
 """Logic for snapping points and lines to face nodes and face edges."""
+
 from typing import Tuple, TypeVar, Union
 
 import numba as nb

@@ -27,9 +27,10 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.selection_utils import section_coordinates_2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, numeric_bound
 from xugrid.ugrid.voronoi import voronoi_topology
-from xugrid.ugrid.selection_utils import section_coordinates_2d
+
 
 class Ugrid2d(AbstractUgrid):
     """
@@ -874,7 +875,9 @@ class Ugrid2d(AbstractUgrid):
         return self._celltree
 
     @staticmethod
-    def _section_coordinates(edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str):
+    def _section_coordinates(
+        edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+    ):
         return section_coordinates_2d(edges, xy, dim, index, name)
 
     def validate_edge_node_connectivity(self):

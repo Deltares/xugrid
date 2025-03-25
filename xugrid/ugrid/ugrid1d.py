@@ -1,12 +1,11 @@
 from itertools import chain
 from typing import Any, Dict, Sequence, Tuple, Union
-import warnings
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numpy.typing import ArrayLike
 from numba_celltree import EdgeCellTree2d
+from numpy.typing import ArrayLike
 
 import xugrid
 from xugrid import conversion
@@ -21,8 +20,9 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
-from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 from xugrid.ugrid.selection_utils import section_coordinates_1d
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+
 
 class Ugrid1d(AbstractUgrid):
     """
@@ -636,14 +636,16 @@ class Ugrid1d(AbstractUgrid):
         """
         if self._celltree is None:
             self._celltree = EdgeCellTree2d(
-                self.node_coordinates, self.edge_node_connectivity,
+                self.node_coordinates,
+                self.edge_node_connectivity,
             )
         return self._celltree
 
     @staticmethod
-    def _section_coordinates(edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str):
+    def _section_coordinates(
+        edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+    ):
         return section_coordinates_1d(edges, xy, dim, index, name)
-
 
     def to_periodic(self, obj):
         return self, obj
@@ -695,7 +697,7 @@ class Ugrid1d(AbstractUgrid):
 
     @staticmethod
     def merge_partitions(
-        grids: Sequence["Ugrid1d"]
+        grids: Sequence["Ugrid1d"],
     ) -> tuple["Ugrid1d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.

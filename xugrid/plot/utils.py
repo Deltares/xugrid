@@ -16,6 +16,7 @@ Some minor edits are necessary. These are marked by an comment with "EDIT:".
 Xarray is licensed under Apache License 2.0:
 https://github.com/pydata/xarray/blob/main/LICENSE
 """
+
 from __future__ import annotations
 
 import importlib

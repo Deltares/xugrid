@@ -3,6 +3,7 @@ Wrap in advance instead of overloading __getattr__.
 
 This allows for tab completion and documentation.
 """
+
 from __future__ import annotations
 
 import types
@@ -195,8 +196,7 @@ class UgridDataArray(DataArrayForwardMixin):
     def __init__(self, obj: xr.DataArray, grid: UgridType):
         if not isinstance(obj, xr.DataArray):
             raise TypeError(
-                "obj must be xarray.DataArray. Received instead: "
-                f"{type(obj).__name__}"
+                f"obj must be xarray.DataArray. Received instead: {type(obj).__name__}"
             )
         if not isinstance(grid, AbstractUgrid):
             raise TypeError(

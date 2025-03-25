@@ -2,11 +2,12 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Literal, Set, Tuple, Type, Union, cast, Sequence
+from typing import Dict, Literal, Sequence, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
+from numba_celltree import CellTree2d, EdgeCellTree2d
 from numpy.typing import ArrayLike
 from scipy.sparse import csr_matrix
 
@@ -14,13 +15,13 @@ from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import get_sorted_section_coords
 
-from numba_celltree import EdgeCellTree2d, CellTree2d
 
 def numeric_bound(v: Union[float, None], other: float):
     if v is None:
         return other
     else:
         return v
+
 
 def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
     if isinstance(index, np.ndarray):
@@ -183,10 +184,12 @@ class AbstractUgrid(abc.ABC):
     @abc.abstractmethod
     def get_coordinates(self, dim: str):
         pass
-    
+
     @staticmethod
     @abc.abstractmethod
-    def _section_coordinates(edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str):
+    def _section_coordinates(
+        edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+    ):
         pass
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
@@ -867,7 +870,9 @@ class AbstractUgrid(abc.ABC):
     def celltree(self) -> Union[EdgeCellTree2d, CellTree2d]:
         raise NotImplementedError("Celltree must be implemented in subclass")
 
-    def sel_points(self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(
+        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
+    ):
         """
         Select points in the unstructured grid.
 
@@ -900,8 +905,7 @@ class AbstractUgrid(abc.ABC):
         if out_of_bounds not in options:
             str_options = ", ".join(options)
             raise ValueError(
-                f"out_of_bounds must be one of {str_options}, "
-                f"received: {out_of_bounds}"
+                f"out_of_bounds must be one of {str_options}, received: {out_of_bounds}"
             )
 
         x = np.atleast_1d(x)
@@ -1007,9 +1011,7 @@ class AbstractUgrid(abc.ABC):
         dim = self.core_dimension
         edges = np.array([[start, end]])
         _, index, xy = self.intersect_edges(edges)
-        coords, index = self._section_coordinates(
-            edges, xy, dim, index, self.name
-        )
+        coords, index = self._section_coordinates(edges, xy, dim, index, self.name)
         return obj.isel({dim: index}).assign_coords(coords)
 
     def _sel_yline(

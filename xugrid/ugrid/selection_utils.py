@@ -1,10 +1,12 @@
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 from xugrid.constants import FloatArray, IntArray
 
+
 def get_sorted_section_coords(
-        s: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+    s: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
 ):
     order = np.argsort(s)
     coords = {
@@ -14,11 +16,13 @@ def get_sorted_section_coords(
     }
     return coords, index[order]
 
+
 def section_coordinates_1d(
     edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
 ) -> Tuple[IntArray, dict]:
     s = np.linalg.norm(xy - edges[0, 0], axis=1)
     return get_sorted_section_coords(s, xy, dim, index, name)
+
 
 def section_coordinates_2d(
     edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str

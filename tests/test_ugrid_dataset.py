@@ -1561,7 +1561,7 @@ def test_interpolate_na_1d():
 
 def test_ugriddataset_wrap_twice(tmp_path):
     """
-    in issue https://github.com/Deltares/xugrid/issues/208 wrapping a ds
+    In issue https://github.com/Deltares/xugrid/issues/208 wrapping a ds
     twice with UgridDataset resulted in "ValueError: connectivity contains negative values",
     because the original connectivity array in the xarray dataset was altered.
     This tests ensures that future changes will not cause this issue again.
