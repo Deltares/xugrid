@@ -21,21 +21,6 @@ def numeric_bound(v: Union[float, None], other: float):
     else:
         return v
 
-def section_coordinates(
-    edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
-) -> Tuple[IntArray, dict]:
-    # TODO: add boundaries xy[:, 0] and xy[:, 1]
-    xy_mid = 0.5 * (xy[:, 0, :] + xy[:, 1, :])
-    s = np.linalg.norm(xy_mid - edges[0, 0], axis=1)
-    order = np.argsort(s)
-    coords = {
-        f"{name}_x": (dim, xy_mid[order, 0]),
-        f"{name}_y": (dim, xy_mid[order, 1]),
-        f"{name}_s": (dim, s[order]),
-    }
-    return coords, index[order]
-
-
 def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
     if isinstance(index, np.ndarray):
         if index.size > n:
@@ -174,22 +159,6 @@ class AbstractUgrid(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def sel_points(self, obj, x, y, out_bounds, fill_value):
-        pass
-
-    @abc.abstractmethod
-    def intersect_line(self):
-        pass
-
-    @abc.abstractmethod
-    def intersect_linestring(self):
-        pass
-
-    @abc.abstractmethod
-    def sel(self):
-        pass
-
-    @abc.abstractmethod
     def _clear_geometry_properties(self):
         pass
 
@@ -212,6 +181,11 @@ class AbstractUgrid(abc.ABC):
 
     @abc.abstractmethod
     def get_coordinates(self, dim: str):
+        pass
+    
+    @staticmethod
+    @abc.abstractmethod
+    def _section_coordinates(edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str):
         pass
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
@@ -1032,7 +1006,7 @@ class AbstractUgrid(abc.ABC):
         dim = self.core_dimension
         edges = np.array([[start, end]])
         _, index, xy = self.intersect_edges(edges)
-        coords, index = section_coordinates(
+        coords, index = self._section_coordinates(
             edges, xy, dim, index, self.name
         )
         return obj.isel({dim: index}).assign_coords(coords)
@@ -1102,23 +1076,26 @@ class AbstractUgrid(abc.ABC):
         np.cumsum(edge_length[:-1], out=cumulative_length[1:])
 
         # Compute the distance for every intersection to the start of the linestring.
-        intersection_centroid = intersections.mean(axis=1)
+        if self.topology_dimension == 2:
+            intersection_for_coord = intersections.mean(axis=1)
+        else:
+            intersection_for_coord = intersections
         distance_node_to_intersection = np.linalg.norm(
-            intersection_centroid - edges[edge_index, 0], axis=1
+            intersection_for_coord - edges[edge_index, 0], axis=1
         )
         s = distance_node_to_intersection + cumulative_length[edge_index]
 
         # Now sort everything according to s.
         sorter = np.argsort(s)
         face_index = face_index[sorter]
-        intersection_centroid = intersection_centroid[sorter]
+        intersection_for_coord = intersection_for_coord[sorter]
         intersections = intersections[sorter]
 
         dim = self.core_dimension
         coords = {
             f"{self.name}_s": (dim, s[sorter]),
-            f"{self.name}_x": (dim, intersection_centroid[:, 0]),
-            f"{self.name}_y": (dim, intersection_centroid[:, 1]),
+            f"{self.name}_x": (dim, intersection_for_coord[:, 0]),
+            f"{self.name}_y": (dim, intersection_for_coord[:, 1]),
         }
         return obj.isel({dim: face_index}).assign_coords(coords)
 

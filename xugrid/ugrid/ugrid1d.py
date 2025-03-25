@@ -21,8 +21,8 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
-from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, section_coordinates
-
+from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+from xugrid.ugrid.selection_utils import section_coordinates_1d
 
 class Ugrid1d(AbstractUgrid):
     """
@@ -639,6 +639,11 @@ class Ugrid1d(AbstractUgrid):
                 self.node_coordinates, self.edge_node_connectivity,
             )
         return self._celltree
+
+    @staticmethod
+    def _section_coordinates(edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str):
+        return section_coordinates_1d(edges, xy, dim, index, name)
+
 
     def to_periodic(self, obj):
         return self, obj
