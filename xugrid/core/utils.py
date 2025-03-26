@@ -7,6 +7,7 @@ Hence, Xarray provides no guarantees on breaking changes.
 Xarray is licensed under Apache License 2.0:
 https://github.com/pydata/xarray/blob/main/LICENSE
 """
+
 from __future__ import annotations
 
 from collections.abc import Hashable, Mapping

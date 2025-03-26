@@ -1,4 +1,5 @@
 """Create and merge partitioned UGRID topologies."""
+
 from collections import defaultdict
 from itertools import accumulate, chain
 from typing import List
@@ -45,7 +46,7 @@ def partition_by_label(grid, obj, labels: IntArray):
     """
     if not isinstance(labels, UgridDataArray):
         raise TypeError(
-            "labels must be a UgridDataArray, " f"received: {type(labels).__name__}"
+            f"labels must be a UgridDataArray, received: {type(labels).__name__}"
         )
     if not np.issubdtype(labels.dtype, np.integer):
         raise TypeError(f"labels must have integer dtype, received {labels.dtype}")
@@ -177,7 +178,7 @@ def group_grids_by_name(partitions: list[UgridDataset]) -> defaultdict[str, Ugri
 
 
 def group_data_objects_by_gridname(
-    partitions: list[UgridDataset]
+    partitions: list[UgridDataset],
 ) -> defaultdict[str, xr.Dataset]:
     # Convert to dataset for convenience
     data_objects = [partition.obj for partition in partitions]
@@ -195,7 +196,7 @@ def group_data_objects_by_gridname(
 
 
 def validate_partition_objects(
-    objects_by_gridname: defaultdict[str, xr.Dataset]
+    objects_by_gridname: defaultdict[str, xr.Dataset],
 ) -> None:
     for data_objects in objects_by_gridname.values():
         allvars = list({tuple(sorted(ds.data_vars)) for ds in data_objects})

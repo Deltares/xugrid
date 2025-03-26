@@ -14,6 +14,7 @@ Dealing with the mesh exterior (beyond which no centroids are located) is the
 tricky part. Refer to the docstrings and especially the visual examples in the
 developer documentation.
 """
+
 from typing import Tuple
 
 import numpy as np

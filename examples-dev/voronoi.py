@@ -19,6 +19,7 @@ For simplicity this example will only deal with (bare) ``numpy`` and
 modules, should you not want to rely on more complex dependencies such as
 ``xugrid`` and ``xarray``.
 """
+
 # %%
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri

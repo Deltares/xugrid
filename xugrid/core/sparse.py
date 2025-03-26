@@ -5,6 +5,7 @@ Numba cannot deal with scipy.sparse objects directly. The data
 structures are mostly a collection of numpy arrays, which can
 be neatly represented by (typed) namedtuples, which numba accepts.
 """
+
 from typing import NamedTuple
 
 import numba
