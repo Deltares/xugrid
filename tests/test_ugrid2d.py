@@ -1625,3 +1625,20 @@ def test_ugrid2d_create_data_array():
     # Error on size
     with pytest.raises(ValueError, match="Conflicting sizes"):
         grid.create_data_array([1, 2, 3, 4, 5], facet="face")
+
+
+def test_ugrid2d_format_connectivity():
+    grid = grid2d()
+    assert isinstance(grid.face_node_connectivity, np.ndarray)
+    assert isinstance(
+        grid.format_connectivity_as_sparse(grid.face_node_connectivity),
+        sparse.csr_matrix,
+    )
+    assert isinstance(grid.node_node_connectivity, sparse.csr_matrix)
+    assert isinstance(
+        grid.format_connectivity_as_dense(grid.node_node_connectivity), np.ndarray
+    )
+    assert isinstance(
+        grid.format_connectivity_as_sparse(grid.node_node_connectivity.tocoo()),
+        sparse.csr_matrix,
+    )

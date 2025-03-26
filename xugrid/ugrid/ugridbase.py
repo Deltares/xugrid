@@ -9,7 +9,7 @@ import pandas as pd
 import xarray as xr
 from numba_celltree import CellTree2d, EdgeCellTree2d
 from numpy.typing import ArrayLike
-from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix, csr_matrix
 
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
@@ -191,6 +191,60 @@ class AbstractUgrid(abc.ABC):
         edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
     ):
         pass
+
+    def format_connectivity_as_dense(
+        sparse_connectivity: Union[csr_matrix, coo_matrix, np.ndarray],
+    ):
+        """
+        Return a rectangular representation of a sparse (CSR or COO)
+        connectivity array. The number of columns in the dense array will be
+        determined by the maximum number of connections for any row in the
+        sparse matrix. Irregular connectivities are represented by a fill value
+        of -1.
+
+        Parameters
+        ----------
+        sparse_connectivity: scipy.sparse.csr_matrix, scipy.sparse.coo_matrix, np.ndarray
+            Connectivity in CSR or COO form. Connectivities already in dense
+            rectangular form are returned as-is.
+
+        Returns
+        -------
+        dense: np.ndarray
+            Connectivity in rectangular form.
+        """
+        if isinstance(sparse_connectivity, np.ndarray):
+            return sparse_connectivity
+        else:
+            return connectivity.to_dense(sparse_connectivity)
+
+    @staticmethod
+    def format_connectivity_as_sparse(dense_connectivity: np.ndarray) -> csr_matrix:
+        """
+        Convert a rectangular dense connectivity array to a sparse CSR matrix.
+
+        This function converts a dense rectangular array with fill values
+        representing irregular connectivities into a sparse CSR matrix where
+        only the valid connections are stored. Irregular connectivities must be
+        marked with a fill value of -1.
+
+        Parameters
+        ----------
+        dense_connectivity: np.ndarray
+            Connectivity in rectangular dense form, where each row contains the
+            connections for an entity and -1 represents missing connections.
+
+        Returns
+        -------
+        sparse: scipy.sparse.csr_matrix
+            Connectivity in CSR sparse format.
+        """
+        if isinstance(dense_connectivity, csr_matrix):
+            return dense_connectivity
+        elif isinstance(dense_connectivity, coo_matrix):
+            return dense_connectivity.tocsr()
+        else:
+            return connectivity.to_sparse(dense_connectivity)
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
         from xugrid import UgridDataArray
@@ -703,6 +757,25 @@ class AbstractUgrid(abc.ABC):
                 self.edge_node_connectivity
             )
         return self._node_node_connectivity
+
+    @property
+    def edge_edge_connectivity(self) -> csr_matrix:
+        """
+        Edge to edge connectivity.
+
+        The connectivity is represented as an adjacency matrix in CSR format,
+        with the row and column indices as a (0-based) edge index. The data of
+        the matrix contains the node index of the common node through which
+        the connection is formed.
+
+        Returns
+        -------
+        connectivity: csr_matrix
+        """
+        return connectivity.edge_edge_connectivity(
+            self.edge_node_connectivity,
+            self.node_edge_connectivity,
+        )
 
     @property
     def directed_node_node_connectivity(self) -> csr_matrix:

@@ -526,6 +526,26 @@ def node_node_connectivity(edge_node_connectivity: IntArray) -> sparse.csr_matri
     return coo_matrix.tocsr()
 
 
+def edge_edge_connectivity(
+    edge_node_connectivity: IntArray,
+    node_edge_connectivity: sparse.csr_matrix,
+) -> sparse.csr_matrix:
+    # - Flatten both nodes of the edge so we can index to the sparse matrix.
+    # - Count the number of connected nodes for both the first and second node.
+    # - Filter self -> self away.
+    n_edge = len(edge_node_connectivity)
+    node_index = edge_node_connectivity.ravel()
+    j = node_edge_connectivity[node_index].indices
+    n_connection = node_edge_connectivity.getnnz(axis=1)[node_index]
+    # This way i comes pre-sorted in the COO constructor.
+    i = np.repeat(np.arange(n_edge), n_connection.reshape((-1, 2)).sum(axis=1))
+    is_connection = i != j
+    data = np.repeat(node_index, n_connection)
+    coo_content = (data[is_connection], (i[is_connection], j[is_connection]))
+    coo_matrix = sparse.coo_matrix(coo_content)
+    return coo_matrix.tocsr()
+
+
 def directed_edge_edge_connectivity(
     edge_node_connectivity: IntArray,
     node_edge_connectivity: sparse.csr_matrix,
