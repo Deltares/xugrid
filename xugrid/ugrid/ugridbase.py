@@ -192,6 +192,7 @@ class AbstractUgrid(abc.ABC):
     ):
         pass
 
+    @staticmethod
     def format_connectivity_as_dense(
         sparse_connectivity: Union[csr_matrix, coo_matrix, np.ndarray],
     ):
