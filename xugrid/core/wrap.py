@@ -36,7 +36,7 @@ def maybe_xugrid(obj, topology, old_indexes=None):
     if isinstance(topology, (list, set, tuple)):
         grids = {dim: grid for grid in topology for dim in grid.dims}
     else:
-        grids = {dim: topology for dim in topology.dims}
+        grids = dict.fromkeys(topology.dims, topology)
 
     item_grids = unique_grids([grids[dim] for dim in obj.dims if dim in grids])
 
