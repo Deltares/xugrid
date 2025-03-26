@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Changed
+-------
+
+- :meth:`xugrid.Ugrid1d.sel`, :meth:`xugrid.Ugrid1d.sel_points`,
+  :meth:`xugrid.Ugrid1d.intersect_lines`, and
+  :meth:`xugrid.Ugrid1d.intersect_linestring` now actually conduct spatial
+  indexing instead of just returning the object.
+
 [0.12.4] 2025-03-05
 -------------------
 
