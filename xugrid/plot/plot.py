@@ -1,4 +1,5 @@
 """This module is strongly inspired by / copied from xarray/plot/plot.py."""
+
 import functools
 
 import numpy as np
@@ -36,7 +37,7 @@ def get_ugrid_dim(grid, da) -> int:
     else:
         allowed_dims = [grid.node_dimension, grid.edge_dimension, grid.face_dimension]
         raise ValueError(
-            f"Not a valid UGRID dimension: {dim}," f"should be one of: {allowed_dims}"
+            f"Not a valid UGRID dimension: {dim},should be one of: {allowed_dims}"
         )
 
 

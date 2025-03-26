@@ -11,7 +11,7 @@ requires-python = ">=3.9"
 dependencies = [
     'pandas',
     'numba',
-    'numba_celltree',
+    'numba_celltree>=0.3.0',
     'numpy',
     'pooch',
     'scipy',
@@ -70,7 +70,7 @@ exclude_lines = [
 ]
 
 [tool.pixi.project]
-channels = ["conda-forge"]
+channels = ["conda-forge", "cf-staging"]
 platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
@@ -82,7 +82,7 @@ geopandas = "*"
 mapbox_earcut = "*"
 matplotlib-base = "*"
 netcdf4 = "*"
-numba_celltree = ">=0.2.0"
+numba_celltree = ">=0.3.0"
 numpy = "*"
 pip = "*"
 pooch = "*"

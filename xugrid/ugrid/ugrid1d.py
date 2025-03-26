@@ -4,6 +4,7 @@ from typing import Any, Dict, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 import xarray as xr
+from numba_celltree import EdgeCellTree2d
 from numpy.typing import ArrayLike
 
 import xugrid
@@ -20,6 +21,7 @@ from xugrid.constants import (
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.regrid.utils import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.selection_utils import section_coordinates_1d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
 
 
@@ -268,7 +270,7 @@ class Ugrid1d(AbstractUgrid):
 
     @property
     def core_dimension(self):
-        return self.node_dimension
+        return self.edge_dimension
 
     @property
     def dims(self):
@@ -626,14 +628,25 @@ class Ugrid1d(AbstractUgrid):
     ):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
-    def sel_points(self, obj, x, y, out_of_bounds, fill_value):
-        return obj
+    @property
+    def celltree(self) -> EdgeCellTree2d:
+        """
+        Initializes the celltree if needed, and returns celltree.
 
-    def intersect_line(self, obj, start, stop):
-        return obj
+        A celltree is a search structure for spatial lookups in unstructured grids.
+        """
+        if self._celltree is None:
+            self._celltree = EdgeCellTree2d(
+                self.node_coordinates,
+                self.edge_node_connectivity,
+            )
+        return self._celltree
 
-    def intersect_linestring(self, obj, linestring):
-        return obj
+    @staticmethod
+    def _section_coordinates(
+        edges: FloatArray, xy: FloatArray, dim: str, index: IntArray, name: str
+    ):
+        return section_coordinates_1d(edges, xy, dim, index, name)
 
     def to_periodic(self, obj):
         return self, obj
@@ -741,7 +754,7 @@ class Ugrid1d(AbstractUgrid):
 
     @staticmethod
     def merge_partitions(
-        grids: Sequence["Ugrid1d"]
+        grids: Sequence["Ugrid1d"],
     ) -> tuple["Ugrid1d", dict[str, np.array]]:
         """
         Merge grid partitions into a single whole.

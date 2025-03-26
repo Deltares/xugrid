@@ -3,6 +3,7 @@ Wrap in advance instead of overloading __getattr__.
 
 This allows for tab completion and documentation.
 """
+
 from __future__ import annotations
 
 import types
@@ -35,7 +36,7 @@ def maybe_xugrid(obj, topology, old_indexes=None):
     if isinstance(topology, (list, set, tuple)):
         grids = {dim: grid for grid in topology for dim in grid.dims}
     else:
-        grids = {dim: topology for dim in topology.dims}
+        grids = dict.fromkeys(topology.dims, topology)
 
     item_grids = unique_grids([grids[dim] for dim in obj.dims if dim in grids])
 
@@ -195,8 +196,7 @@ class UgridDataArray(DataArrayForwardMixin):
     def __init__(self, obj: xr.DataArray, grid: UgridType):
         if not isinstance(obj, xr.DataArray):
             raise TypeError(
-                "obj must be xarray.DataArray. Received instead: "
-                f"{type(obj).__name__}"
+                f"obj must be xarray.DataArray. Received instead: {type(obj).__name__}"
             )
         if not isinstance(grid, AbstractUgrid):
             raise TypeError(
