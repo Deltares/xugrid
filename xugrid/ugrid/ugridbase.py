@@ -941,6 +941,7 @@ class AbstractUgrid(abc.ABC):
         return line(self, **kwargs)
 
     @property
+    @abc.abstractmethod
     def celltree(self) -> Union[EdgeCellTree2d, CellTree2d]:
         raise NotImplementedError("Celltree must be implemented in subclass")
 

@@ -394,8 +394,6 @@ def test_sel_points():
         data=[10, 11],
         dims=[grid.edge_dimension],
     )
-    # For now, this function does nothing so it'll work for multi-topology
-    # UgridDatasets.
     x = [1.5, 0.5, -0.1]
     y = [1.5, 0.5, -0.1]
 
