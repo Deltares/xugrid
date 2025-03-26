@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xarray.core.concat &#8212; Xugrid 0.12.4 documentation</title>
+    <title>xarray.structure.concat &#8212; Xugrid 0.12.4 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
     <script src="../../../_static/documentation_options.js?v=9dbdab56"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/concat';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/structure/concat';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -357,7 +357,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">xarray.core.concat</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">xarray.structure.concat</span></li>
   </ul>
 </nav>
 </div>
@@ -374,7 +374,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for xarray.core.concat</h1><div class="highlight"><pre>
+  <h1>Source code for xarray.structure.concat</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
@@ -384,19 +384,19 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">dtypes</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">align</span><span class="p">,</span> <span class="n">reindex_variables</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.duck_array_ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">lazy_array_equiv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.merge</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">T_DataArray</span><span class="p">,</span> <span class="n">T_Dataset</span><span class="p">,</span> <span class="n">T_Variable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat</span> <span class="k">as</span> <span class="n">concat_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">align</span><span class="p">,</span> <span class="n">reindex_variables</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.merge</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_VALID_COMPAT</span><span class="p">,</span>
     <span class="n">collect_variables_and_indexes</span><span class="p">,</span>
     <span class="n">merge_attrs</span><span class="p">,</span>
     <span class="n">merge_collected</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">T_DataArray</span><span class="p">,</span> <span class="n">T_Dataset</span><span class="p">,</span> <span class="n">T_Variable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat</span> <span class="k">as</span> <span class="n">concat_vars</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>

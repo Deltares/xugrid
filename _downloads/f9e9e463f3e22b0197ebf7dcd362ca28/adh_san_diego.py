@@ -7,6 +7,7 @@ This is small dataset containing the output of a hydraulic simulation.
 It contains a static dataset (bed elevation) and a time varying dataset
 (water depth).
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 

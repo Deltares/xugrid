@@ -233,6 +233,12 @@ UGRID1D Topology
 
     Ugrid1d.isel
     Ugrid1d.sel
+    Ugrid1d.sel_points
+    Ugrid1d.intersect_line
+    Ugrid1d.intersect_linestring
+    Ugrid1d.celltree
+    Ugrid1d.locate_points
+    Ugrid1d.intersect_edges
     Ugrid1d.topology_subset
     Ugrid1d.merge_partitions
     Ugrid1d.topological_sort_by_dfs

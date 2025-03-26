@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>xarray.core.merge &#8212; Xugrid 0.12.4 documentation</title>
+    <title>xarray.structure.merge &#8212; Xugrid 0.12.4 documentation</title>
   
   
   
@@ -45,7 +45,7 @@
     <script src="../../../_static/documentation_options.js?v=9dbdab56"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/core/merge';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/structure/merge';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -357,7 +357,7 @@
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">xarray.core.merge</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">xarray.structure.merge</span></li>
   </ul>
 </nav>
 </div>
@@ -374,7 +374,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for xarray.core.merge</h1><div class="highlight"><pre>
+  <h1>Source code for xarray.structure.merge</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
@@ -384,7 +384,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">dtypes</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_align</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.duck_array_ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">lazy_array_equiv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Index</span><span class="p">,</span>
@@ -394,12 +393,18 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_align</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span> <span class="n">CompatOptions</span><span class="p">,</span> <span class="n">JoinOptions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CombineAttrsOptions</span><span class="p">,</span>
+        <span class="n">CompatOptions</span><span class="p">,</span>
+        <span class="n">DataVars</span><span class="p">,</span>
+        <span class="n">JoinOptions</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">DimsLike</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span>
     <span class="n">ArrayLike</span> <span class="o">=</span> <span class="n">Any</span>
@@ -1049,10 +1054,6 @@
 <span class="sd">        Dictionary mapping from dimension names to sizes.</span>
 <span class="sd">    attrs : dict</span>
 <span class="sd">        Dictionary of attributes</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    MergeError if the merge cannot be done successfully.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
@@ -1437,6 +1438,28 @@
         <span class="n">priority_arg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">indexes</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">xindexes</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_data_and_coords</span><span class="p">(</span><span class="n">data_vars</span><span class="p">:</span> <span class="n">DataVars</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Used in Dataset.__init__.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span><span class="p">,</span> <span class="n">create_coords_with_default_indexes</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">Coordinates</span><span class="p">):</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">create_coords_with_default_indexes</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">)</span>
+
+    <span class="c1"># exclude coords from alignment (all variables in a Coordinates object should</span>
+    <span class="c1"># already be aligned together) and use coordinates&#39; indexes to align data_vars</span>
+    <span class="k">return</span> <span class="n">merge_core</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">],</span>
+        <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
+        <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+        <span class="n">explicit_coords</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">coords</span><span class="p">),</span>
+        <span class="n">indexes</span><span class="o">=</span><span class="n">coords</span><span class="o">.</span><span class="n">xindexes</span><span class="p">,</span>
+        <span class="n">priority_arg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">skip_align_args</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="p">)</span>
 </pre></div>
 

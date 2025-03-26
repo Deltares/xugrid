@@ -404,30 +404,9 @@
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">either_dict_or_kwargs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">conventions</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.selection_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">section_coordinates_2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugridbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractUgrid</span><span class="p">,</span> <span class="n">as_pandas_index</span><span class="p">,</span> <span class="n">numeric_bound</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.voronoi</span><span class="w"> </span><span class="kn">import</span> <span class="n">voronoi_topology</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">section_coordinates</span><span class="p">(</span>
-    <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">xy</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-    <span class="c1"># TODO: add boundaries xy[:, 0] and xy[:, 1]</span>
-    <span class="n">xy_mid</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xy_mid</span> <span class="o">-</span> <span class="n">edges</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy_mid</span><span class="p">[</span><span class="n">order</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">order</span><span class="p">]),</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">coords</span><span class="p">,</span> <span class="n">index</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">numeric_bound</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">other</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">other</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">v</span>
 
 
 <div class="viewcode-block" id="Ugrid2d">
@@ -1280,7 +1259,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">exterior_faces</span><span class="p">[</span><span class="n">exterior_faces</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">])</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CellTree2d</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the celltree if needed, and returns celltree.</span>
 
@@ -1291,6 +1270,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_node_connectivity</span><span class="p">,</span> <span class="n">FILL_VALUE</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_section_coordinates</span><span class="p">(</span>
+        <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">xy</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">section_coordinates_2d</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Ugrid2d.validate_edge_node_connectivity">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.validate_edge_node_connectivity.html#xugrid.Ugrid2d.validate_edge_node_connectivity">[docs]</a>
@@ -1360,46 +1345,6 @@
             <span class="p">),</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.locate_points">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">locate_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find in which face points are located.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        points: ndarray of floats with shape ``(n_point, 2)``</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        face_index: ndarray of integers with shape ``(n_points,)``</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.intersect_edges">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_edges.html#xugrid.Ugrid2d.intersect_edges">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find in which face edges are located and compute the intersection with</span>
-<span class="sd">        the face edges.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        edges: ndarray of floats with shape ``(n_edge, 2, 2)``</span>
-<span class="sd">            The first dimensions represents the different edges.</span>
-<span class="sd">            The second dimensions represents the start and end of every edge.</span>
-<span class="sd">            The third dimensions reresent the x and y coordinate of every vertex.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        edge_index: ndarray of integers with shape ``(n_intersection,)``</span>
-<span class="sd">        face_index: ndarray of integers with shape ``(n_intersection,)``</span>
-<span class="sd">        intersections: ndarray of float with shape ``(n_intersection, 2, 2)``</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.locate_bounding_box">
@@ -1724,260 +1669,6 @@
         <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">}</span>
         <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_obj</span><span class="p">,</span> <span class="n">grid</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_sel_line</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">obj</span><span class="p">,</span>
-        <span class="n">start</span><span class="p">,</span>
-        <span class="n">end</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">]])</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
-        <span class="n">coords</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">section_coordinates</span><span class="p">(</span>
-            <span class="n">edges</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_sel_yline</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">obj</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">y</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
-        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;If x is a slice without steps, y should be a single value&quot;</span>
-            <span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">xstart</span> <span class="o">=</span> <span class="n">numeric_bound</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
-        <span class="n">xstop</span> <span class="o">=</span> <span class="n">numeric_bound</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">xstart</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="n">xstop</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_sel_xline</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">obj</span><span class="p">,</span>
-        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">y</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;If y is a slice without steps, x should be a single value&quot;</span>
-            <span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">ystart</span> <span class="o">=</span> <span class="n">numeric_bound</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">ymin</span><span class="p">)</span>
-        <span class="n">ystop</span> <span class="o">=</span> <span class="n">numeric_bound</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ystart</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ystop</span><span class="p">))</span>
-
-<div class="viewcode-block" id="Ugrid2d.sel_points">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Select points in the unstructured grid.</span>
-
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        x: 1d array of floats with shape ``(n_points,)``</span>
-<span class="sd">        y: 1d array of floats with shape ``(n_points,)``</span>
-<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
-<span class="sd">        out_of_bounds: str, default ``&quot;warn&quot;``</span>
-<span class="sd">            What to do when points are located outside of any feature:</span>
-
-<span class="sd">            * raise: raise a ValueError.</span>
-<span class="sd">            * ignore: return ``fill_value`` for the out of bounds points.</span>
-<span class="sd">            * warn: give a warning and return NaN for the out of bounds points.</span>
-<span class="sd">            * drop: drop the out of bounds points. They may be identified</span>
-<span class="sd">              via the ``index`` coordinate of the returned selection.</span>
-<span class="sd">        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan</span>
-<span class="sd">            Value to assign to out-of-bounds points if out_of_bounds is warn</span>
-<span class="sd">            or ignore. Forwarded to xarray&#39;s ``.where()`` method.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        selection: xr.DataArray or xr.Dataset</span>
-<span class="sd">            The name of the topology is prefixed in the x, y coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">options</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;drop&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out_of_bounds</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
-            <span class="n">str_options</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;out_of_bounds must be one of </span><span class="si">{</span><span class="n">str_options</span><span class="si">}</span><span class="s2">, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;received: </span><span class="si">{</span><span class="n">out_of_bounds</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;shape of x does not match shape of y&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;x and y must be 1d&quot;</span><span class="p">)</span>
-        <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span>
-        <span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
-
-        <span class="n">keep</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># keep all by default</span>
-        <span class="n">condition</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">valid</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Not all points are located inside of the grid.&quot;</span>
-            <span class="k">if</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">out_of_bounds</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="n">condition</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">dim</span><span class="p">,))</span>
-            <span class="k">elif</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;drop&quot;</span><span class="p">:</span>
-                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
-                <span class="n">keep</span> <span class="o">=</span> <span class="n">valid</span>
-
-        <span class="c1"># Create the selection DataArray or Dataset</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_index&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xy</span><span class="p">))[</span><span class="n">keep</span><span class="p">]),</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">xy</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
-        <span class="p">}</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-
-        <span class="c1"># Set values to fill_value for out-of-bounds</span>
-        <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">selection</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.intersect_line">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_line.html#xugrid.Ugrid2d.intersect_line">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Intersect a line with this grid, and fetch the values of the</span>
-<span class="sd">        intersected faces.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
-<span class="sd">        start: sequence of two floats</span>
-<span class="sd">            coordinate pair (x, y), designating the start point of the line.</span>
-<span class="sd">        end: sequence of two floats</span>
-<span class="sd">            coordinate pair (x, y), designating the end point of the line.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        selection: xr.DataArray or xr.Dataset</span>
-<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
-<span class="sd">            (spatium=distance) coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Start and end coordinate pairs must have length two&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.intersect_linestring">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.intersect_linestring.html#xugrid.Ugrid2d.intersect_linestring">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">intersect_linestring</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
-        <span class="n">linestring</span><span class="p">:</span> <span class="s2">&quot;shapely.geometry.LineString&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Intersect linestrings with this grid, and fetch the values of the</span>
-<span class="sd">        intersected faces.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
-<span class="sd">        linestring: shapely.geometry.lineString</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        selection: xr.DataArray or xr.Dataset</span>
-<span class="sd">            The name of the topology is prefixed in the x, y and s</span>
-<span class="sd">            (spatium=distance) coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
-
-        <span class="n">xy</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">([</span><span class="n">linestring</span><span class="p">])</span>
-        <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">xy</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">edge_index</span><span class="p">,</span> <span class="n">face_index</span><span class="p">,</span> <span class="n">intersections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
-
-        <span class="c1"># Compute the cumulative length along the edges</span>
-        <span class="n">edge_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">cumulative_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">edge_length</span><span class="p">)</span>
-        <span class="n">cumulative_length</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">edge_length</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">cumulative_length</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-
-        <span class="c1"># Compute the distance for every intersection to the start of the linestring.</span>
-        <span class="n">intersection_centroid</span> <span class="o">=</span> <span class="n">intersections</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">distance_node_to_intersection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-            <span class="n">intersection_centroid</span> <span class="o">-</span> <span class="n">edges</span><span class="p">[</span><span class="n">edge_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
-        <span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">distance_node_to_intersection</span> <span class="o">+</span> <span class="n">cumulative_length</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
-
-        <span class="c1"># Now sort everything according to s.</span>
-        <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-        <span class="n">face_index</span> <span class="o">=</span> <span class="n">face_index</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
-        <span class="n">intersection_centroid</span> <span class="o">=</span> <span class="n">intersection_centroid</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
-        <span class="n">intersections</span> <span class="o">=</span> <span class="n">intersections</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
-
-        <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_dimension</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_s&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">s</span><span class="p">[</span><span class="n">sorter</span><span class="p">]),</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,</span> <span class="n">intersection_centroid</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]),</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="n">face_index</span><span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.sel">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.sel.html#xugrid.Ugrid2d.sel">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find selection in the UGRID x and y coordinates.</span>
-
-<span class="sd">        The indexing for x and y always occurs orthogonally, i.e.:</span>
-<span class="sd">        ``.sel(x=[0.0, 5.0], y=[10.0, 15.0])`` results in a four points. For</span>
-<span class="sd">        vectorized indexing (equal to ``zip``ing through x and y), see</span>
-<span class="sd">        ``.sel_points``.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
-<span class="sd">        x: float, 1d array, slice</span>
-<span class="sd">        y: float, 1d array, slice</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        dimension: str</span>
-<span class="sd">        as_ugrid: bool</span>
-<span class="sd">        index: 1d array of integers</span>
-<span class="sd">        coords: dict</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_indexer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_indexer</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_box</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_yline</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_xline</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="c1"># Orthogonal points</span>
-            <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)]</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel_points</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid indexer types: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, and </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
-
 
 <div class="viewcode-block" id="Ugrid2d.label_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions">[docs]</a>

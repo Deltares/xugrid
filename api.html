@@ -486,6 +486,12 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.rename.html">xugrid.Ugrid1d.rename</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.isel.html">xugrid.Ugrid1d.isel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.sel.html">xugrid.Ugrid1d.sel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.sel_points.html">xugrid.Ugrid1d.sel_points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_line.html">xugrid.Ugrid1d.intersect_line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_linestring.html">xugrid.Ugrid1d.intersect_linestring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.celltree.html">xugrid.Ugrid1d.celltree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.locate_points.html">xugrid.Ugrid1d.locate_points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_edges.html">xugrid.Ugrid1d.intersect_edges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.topology_subset.html">xugrid.Ugrid1d.topology_subset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.merge_partitions.html">xugrid.Ugrid1d.merge_partitions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.topological_sort_by_dfs.html">xugrid.Ugrid1d.topological_sort_by_dfs</a></li>
@@ -1160,6 +1166,24 @@ UgridDataArray.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel" title="xugrid.Ugrid1d.sel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.sel</span></code></a>(obj, x, y)</p></td>
 <td><p>Select a selection of edges, based on edge centroids.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.sel_points.html#xugrid.Ugrid1d.sel_points" title="xugrid.Ugrid1d.sel_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.sel_points</span></code></a>(obj, x, y[, ...])</p></td>
+<td><p>Select points in the unstructured grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_line.html#xugrid.Ugrid1d.intersect_line" title="xugrid.Ugrid1d.intersect_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.intersect_line</span></code></a>(obj, start, end)</p></td>
+<td><p>Intersect a line with this grid, and fetch the values of the intersected faces.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_linestring.html#xugrid.Ugrid1d.intersect_linestring" title="xugrid.Ugrid1d.intersect_linestring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.intersect_linestring</span></code></a>(obj, linestring)</p></td>
+<td><p>Intersect linestrings with this grid, and fetch the values of the intersected faces.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.celltree.html#xugrid.Ugrid1d.celltree" title="xugrid.Ugrid1d.celltree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.celltree</span></code></a></p></td>
+<td><p>Initializes the celltree if needed, and returns celltree.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.locate_points.html#xugrid.Ugrid1d.locate_points" title="xugrid.Ugrid1d.locate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.locate_points</span></code></a>(points)</p></td>
+<td><p>Find on which edge points are located.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.intersect_edges.html#xugrid.Ugrid1d.intersect_edges" title="xugrid.Ugrid1d.intersect_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.intersect_edges</span></code></a>(edges)</p></td>
+<td><p>Find in which grid edges are edges are located and compute the intersection with the edges.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid1d.topology_subset.html#xugrid.Ugrid1d.topology_subset" title="xugrid.Ugrid1d.topology_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid1d.topology_subset</span></code></a>(edge_index[, ...])</p></td>
 <td><p>Create a new UGRID1D topology for a subset of this topology.</p></td>
 </tr>
@@ -1415,10 +1439,10 @@ UgridDataArray.</p>
 <td><p>Initializes the celltree if needed, and returns celltree.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points" title="xugrid.Ugrid2d.locate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.locate_points</span></code></a>(points)</p></td>
-<td><p>Find in which face points are located.</p></td>
+<td><p>Find on which edge points are located.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.intersect_edges.html#xugrid.Ugrid2d.intersect_edges" title="xugrid.Ugrid2d.intersect_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.intersect_edges</span></code></a>(edges)</p></td>
-<td><p>Find in which face edges are located and compute the intersection with the face edges.</p></td>
+<td><p>Find in which grid edges are edges are located and compute the intersection with the edges.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/xugrid.Ugrid2d.locate_bounding_box.html#xugrid.Ugrid2d.locate_bounding_box" title="xugrid.Ugrid2d.locate_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ugrid2d.locate_bounding_box</span></code></a>(xmin, ymin, ...)</p></td>
 <td><p>Find which faces are located in the bounding box.</p></td>
