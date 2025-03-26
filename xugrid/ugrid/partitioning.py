@@ -127,9 +127,9 @@ def merge_faces(grids, node_inverse):
         faces = grid.face_node_connectivity
         n_face, n_node_per_face = faces.shape
         valid = faces != FILL_VALUE
-        all_faces[face_offset : face_offset + n_face, :n_node_per_face][valid] = (
-            node_inverse[faces[valid] + node_offset]
-        )
+        all_faces[face_offset : face_offset + n_face, :n_node_per_face][
+            valid
+        ] = node_inverse[faces[valid] + node_offset]
 
     return _merge_connectivity(all_faces, slices)
 
