@@ -697,13 +697,14 @@ class Ugrid1d(AbstractUgrid):
         )
 
     def refine_by_vertices(
-        self, vertices: FloatArray, edge_index, return_index: bool = False
+        self, vertices: FloatArray, return_index: bool = False
     ) -> "Ugrid1d":
-        # TODO: create the edge_index here
-        # edge_index = self.celltree.locate_points(new_vertices)
-        # invalid = edge_index == -1
-        # if invalid.any():
-        #     raise ValueError(f"The following vertices are not located on any edge:\n{vertices[invalid]}
+        edge_index = self.celltree.locate_points(vertices)
+        invalid = edge_index == -1
+        if invalid.any():
+            raise ValueError(
+                f"The following vertices are not located on any edge:\n{vertices[invalid]}"
+            )
 
         # Do not insert vertices that are already present in the grid.
         node_xy = self.node_coordinates
@@ -748,7 +749,7 @@ class Ugrid1d(AbstractUgrid):
         )
         self._propagate_properties(grid)
         if return_index:
-            grid, index_to_vertices
+            return grid, index_to_vertices
         else:
             return grid
 
