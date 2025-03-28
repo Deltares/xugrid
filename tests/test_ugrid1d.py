@@ -625,3 +625,79 @@ def test_ugrid1d_format_connectivity():
         grid.format_connectivity_as_sparse(grid.node_node_connectivity.tocoo()),
         sparse.csr_matrix,
     )
+
+
+def test_ugrid1d_refine_by_vertices():
+    node_xy = np.array(
+        [
+            [0.0, 0.0],
+            [5.0, 5.0],
+            [10.0, 5.0],
+            [15.0, 0.0],
+            [15.0, 10.0],
+        ]
+    )
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [2, 4],
+        ]
+    )
+    grid = xugrid.Ugrid1d(*node_xy.T, -1, edge_nodes)
+    vertices = np.array(
+        [
+            [7.5, 5.0],
+            [12.5, 2.5],
+            [12.5, 7.5],
+            [1.0, 1.0],
+            [4.0, 4.0],
+        ]
+    )
+    expected_edge_node_coordinates = np.array(
+        [
+            [[0.0, 0.0], [1.0, 1.0]],
+            [[1.0, 1.0], [4.0, 4.0]],
+            [[4.0, 4.0], [5.0, 5.0]],
+            [[5.0, 5.0], [7.5, 5.0]],
+            [[7.5, 5.0], [10.0, 5.0]],
+            [[10.0, 5.0], [12.5, 2.5]],
+            [[12.5, 2.5], [15.0, 0.0]],
+            [[10.0, 5.0], [12.5, 7.5]],
+            [[12.5, 7.5], [15.0, 10.0]],
+        ]
+    )
+    expected_edge_node_connectivity = np.array(
+        [[0, 8], [8, 9], [9, 1], [1, 5], [5, 2], [2, 6], [6, 3], [2, 7], [7, 4]]
+    )
+    expected_new_index = np.array([8, 9, 5, 6, 7])
+    new = grid.refine_by_vertices(vertices)
+    np.testing.assert_allclose(
+        new.edge_node_coordinates, expected_edge_node_coordinates
+    )
+    np.testing.assert_equal(new.edge_node_connectivity, expected_edge_node_connectivity)
+    # Test with return_index option = True
+    new, new_index = grid.refine_by_vertices(vertices, return_index=True)
+    np.testing.assert_allclose(
+        new.edge_node_coordinates, expected_edge_node_coordinates
+    )
+    np.testing.assert_equal(new_index, expected_new_index)
+    actual_vertices = new.node_coordinates[new_index]
+    # Test if returned indices indeed point to inserted vertices (regardless of order)
+    np.testing.assert_array_almost_equal(
+        np.sort(actual_vertices.flat), np.sort(vertices.flat)
+    )
+
+    # Test if error upon trying to insert vertices that are not present
+    vertices = np.array(
+        [
+            [5.0, 6.0],
+            [12.5, 2.5],
+            [12.5, 7.5],
+        ]
+    )
+    with pytest.raises(
+        ValueError, match="The following vertices are not located on any edge"
+    ):
+        grid.refine_by_vertices(vertices)

@@ -19,6 +19,7 @@ from xugrid.constants import (
     LineArray,
 )
 from xugrid.core.utils import either_dict_or_kwargs
+from xugrid.regrid.utils import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import section_coordinates_1d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
@@ -694,6 +695,105 @@ class Ugrid1d(AbstractUgrid):
             crs=self.crs,
             attrs=self._attrs,
         )
+
+    def refine_by_vertices(
+        self, vertices: FloatArray, return_index: bool = False
+    ) -> "Ugrid1d":
+        """
+        Refine Ugrid1d with extra vertices to be inserted and returns new grid.
+        Vertices need to be located on existing grid edges, if not, a ValueError
+        will be returned.
+
+        Parameters
+        ----------
+        vertices: np.ndarray of floats
+            Coordinates of vertices to be inserted in the grid. Must have shape
+            (N, 2).
+        return_index: bool, optional
+            If set to to True, the index of the new vertices in the grid will be
+            returned. Defaults to False.
+
+        Returns
+        -------
+        grid: Ugrid1d
+            Refined grid with new vertices.
+
+        Examples
+        --------
+        Let's first create a simple grid with 3 nodes and 2 edges:
+
+        >>> import numpy as np
+        >>> import xugrid as xu
+        >>> node_xy = np.array([[0.0, 0.0], [5.0, 5.0], [10.0, 5.0]])
+        >>> edge_nodes = np.array([[0, 1],[1, 2]])
+        >>> grid = xu.Ugrid1d(*node_xy.T, -1, edge_nodes)
+
+        Now refine the grid by adding new vertices:
+
+        >>> vertices = np.array([[2.0, 2.0], [7.0, 5.0]])
+        >>> new = grid.refine_by_vertices(vertices)
+        >>> print(new.node_coordinates)
+
+        To return the indices of the inserted vertices:
+
+        >>> new, new_vertices_index = grid.refine_by_vertices(vertices, return_index=True)
+        >>> print(new_vertices_index)
+        >>> print(new.node_coordinates[new_vertices_index])
+
+        """
+        edge_index = self.celltree.locate_points(vertices)
+        invalid = edge_index == -1
+        if invalid.any():
+            raise ValueError(
+                f"The following vertices are not located on any edge:\n{vertices[invalid]}"
+            )
+
+        # Do not insert vertices that are already present in the grid.
+        node_xy = self.node_coordinates
+        combined = np.concatenate((node_xy, vertices))
+        _, index, inverse = np.unique(
+            combined, return_index=True, return_inverse=True, axis=0
+        )
+        index_to_vertices = index[inverse][self.n_node :]
+        not_duplicated = index_to_vertices >= self.n_node
+        new_vertices = vertices[not_duplicated]
+        edge_index = edge_index[not_duplicated]
+
+        first_node = self.edge_node_connectivity[edge_index, 0]
+        distance = np.linalg.norm(new_vertices - node_xy[first_node], axis=1)
+        grid_edge_index = np.arange(self.n_edge)
+        repeats = np.bincount(np.concatenate((grid_edge_index, edge_index)))
+        new_edges = np.repeat(self.edge_node_connectivity, repeats, axis=0)
+        order = np.lexsort((distance, edge_index))
+
+        # Index for new vertices
+        node_index = np.arange(self.n_node, self.n_node + len(edge_index))[order]
+
+        # For the new edges, modify:
+        #
+        # * all but the last entry per edge of the second column
+        # * all but the first entry per edge of the first column
+        #
+        i = np.arange(len(new_edges))
+        mask0 = np.repeat(alt_cumsum(repeats), repeats)
+        mask1 = np.repeat(np.cumsum(repeats), repeats) - 1
+        new_edges[i > mask0, 0] = node_index
+        new_edges[i < mask1, 1] = node_index
+
+        grid = Ugrid1d(
+            np.concatenate((self.node_x, new_vertices[:, 0])),
+            np.concatenate((self.node_y, new_vertices[:, 1])),
+            self.fill_value,
+            new_edges,
+            name=self.name,
+            projected=self.projected,
+            crs=self.crs,
+        )
+        self._propagate_properties(grid)
+        if return_index:
+            return grid, node_index
+        else:
+            return grid
 
     @staticmethod
     def merge_partitions(

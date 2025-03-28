@@ -27,6 +27,8 @@ Added
   between sparse and dense rectangular form of the connectivity arrays.
 - Added :attr:`xugrid.Ugrid1d.edge_edge_connectivity` and
   :attr:`xugrid.Ugrid2d.edge_edge_connectivity`.
+- Added :meth:`xugrid.Ugrid1d.refine_by_vertices` to refine a network with
+  inserted vertices.
 
 [0.12.4] 2025-03-05
 -------------------
