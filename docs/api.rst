@@ -227,6 +227,7 @@ UGRID1D Topology
     Ugrid1d.is_cyclic
     Ugrid1d.format_connectivity_as_dense
     Ugrid1d.format_connectivity_as_sparse
+    Ugrid1d.refine_by_vertices
 
     Ugrid1d.copy
     Ugrid1d.rename
