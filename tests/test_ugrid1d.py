@@ -625,3 +625,50 @@ def test_ugrid1d_format_connectivity():
         grid.format_connectivity_as_sparse(grid.node_node_connectivity.tocoo()),
         sparse.csr_matrix,
     )
+
+
+def test_ugrid1d_refine_by_vertices():
+    node_xy = np.array(
+        [
+            [0.0, 0.0],
+            [5.0, 5.0],
+            [10.0, 5.0],
+            [15.0, 0.0],
+            [15.0, 10.0],
+        ]
+    )
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [2, 4],
+        ]
+    )
+    grid = xugrid.Ugrid1d(*node_xy.T, -1, edge_nodes)
+    vertices = np.array(
+        [
+            [7.5, 5.0],
+            [12.5, 2.5],
+            [12.5, 7.5],
+            [1.0, 1.0],
+            [4.0, 4.0],
+        ]
+    )
+
+    new = grid.refine_by_vertices(vertices)
+    expected_edge_node_coordinates = np.array(
+        [
+            [[0.0, 0.0], [1.0, 1.0]],
+            [[1.0, 1.0], [4.0, 4.0]],
+            [[4.0, 4.0], [5.0, 5.0]],
+            [[5.0, 5.0], [7.5, 5.0]],
+            [[7.5, 5.0], [10.0, 5.0]],
+            [[10.0, 5.0], [12.5, 2.5]],
+            [[12.5, 2.5], [15.0, 0.0]],
+            [[10.0, 5.0], [12.5, 7.5]],
+            [[12.5, 7.5], [15.0, 10.0]],
+        ]
+    )
+
+    assert np.allclose(new.edge_node_coordinates, expected_edge_node_coordinates)
