@@ -749,7 +749,7 @@ class Ugrid1d(AbstractUgrid):
         )
         self._propagate_properties(grid)
         if return_index:
-            return grid, index_to_vertices
+            return grid, node_index
         else:
             return grid
 
