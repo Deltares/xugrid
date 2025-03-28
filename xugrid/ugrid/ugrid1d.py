@@ -734,6 +734,12 @@ class Ugrid1d(AbstractUgrid):
         >>> new = grid.refine_by_vertices(vertices)
         >>> print(new.node_coordinates)
 
+        To return the indices of the inserted vertices:
+
+        >>> new, new_vertices_index = grid.refine_by_vertices(vertices, return_index=True)
+        >>> print(new_vertices_index)
+        >>> print(new.node_coordinates[new_vertices_index])
+
         """
         edge_index = self.celltree.locate_points(vertices)
         invalid = edge_index == -1
