@@ -699,6 +699,42 @@ class Ugrid1d(AbstractUgrid):
     def refine_by_vertices(
         self, vertices: FloatArray, return_index: bool = False
     ) -> "Ugrid1d":
+        """
+        Refine Ugrid1d with extra vertices to be inserted and returns new grid.
+        Vertices need to be located on existing grid edges, if not, a ValueError
+        will be returned.
+
+        Parameters
+        ----------
+        vertices: np.ndarray of floats
+            Coordinates of vertices to be inserted in the grid. Must have shape
+            (N, 2).
+        return_index: bool, optional
+            If set to to True, the index of the new vertices in the grid will be
+            returned. Defaults to False.
+
+        Returns
+        -------
+        grid: Ugrid1d
+            Refined grid with new vertices.
+
+        Examples
+        --------
+        Let's first create a simple grid with 3 nodes and 2 edges:
+
+        >>> import numpy as np
+        >>> import xugrid as xu
+        >>> node_xy = np.array([[0.0, 0.0], [5.0, 5.0], [10.0, 5.0]])
+        >>> edge_nodes = np.array([[0, 1],[1, 2]])
+        >>> grid = xu.Ugrid1d(*node_xy.T, -1, edge_nodes)
+
+        Now refine the grid by adding new vertices:
+
+        >>> vertices = np.array([[2.0, 2.0], [7.0, 5.0]])
+        >>> new = grid.refine_by_vertices(vertices)
+        >>> print(new.node_coordinates)
+
+        """
         edge_index = self.celltree.locate_points(vertices)
         invalid = edge_index == -1
         if invalid.any():
