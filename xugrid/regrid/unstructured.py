@@ -63,6 +63,7 @@ class UnstructuredGrid2d:
     """
 
     def __init__(self, obj):
+        # TODO: do not omit type check on grid!
         if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
             self.ugrid_topology = obj.grid
         elif isinstance(obj, Ugrid2d):
@@ -190,6 +191,20 @@ class UnstructuredGrid2d:
 
         order = np.argsort(target_index)
         return source_index[order], target_index[order], weights[order]
+
+    def intersection_length(self, other: "xu.regrid.network.Network2d", relative: bool):
+        (
+            target_index,
+            source_index,
+            intersections,
+        ) = self.ugrid_topology.celltree.intersect_edges(
+            other.ugrid_topology.edge_node_coordinates
+        )
+        order = np.argsort(target_index)
+        length = np.linalg.norm(np.diff(intersections, axis=1), axis=-1)[:, 0]
+        if relative:
+            length /= other.length[source_index]
+        return target_index[order], source_index[order], length[order]
 
     def to_dataset(self, name: str):
         ds = self.ugrid_topology.rename(name).to_dataset()
