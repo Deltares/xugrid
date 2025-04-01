@@ -200,7 +200,7 @@ class UnstructuredGrid2d:
         ) = self.ugrid_topology.celltree.intersect_edges(
             other.ugrid_topology.edge_node_coordinates
         )
-        order = np.argsort(target_index)
+        order = np.argsort(source_index)
         length = np.linalg.norm(np.diff(intersections, axis=1), axis=-1)[:, 0]
         if relative:
             length /= other.length[source_index]
