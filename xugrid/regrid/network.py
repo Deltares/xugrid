@@ -1,5 +1,4 @@
 import xugrid as xu
-from xugrid import Ugrid1d
 
 
 class Network2d:
@@ -7,7 +6,7 @@ class Network2d:
         # TODO: do not omit type check on grid!
         if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
             self.ugrid_topology = obj.grid
-        elif isinstance(obj, Ugrid1d):
+        elif isinstance(obj, xu.Ugrid1d):
             self.ugrid_topology = obj
         else:
             options = {"Ugrid1d", "UgridDataArray", "UgridDataset"}
