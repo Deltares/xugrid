@@ -73,48 +73,126 @@ uda_1d
 # %%
 #
 # Let's plot the 1D network on top of the 2D grid. The 1D network is shown in
-# gray, the 2D grid in blue. The network's nodes are colored by data values.
+# light gray, the 2D grid in dark gray. The network's nodes are colored by data
+# values.
 
-uda_1d.ugrid.plot()
-uda_1d.ugrid.grid.plot(color="gray", alpha=0.5)
-ugrid2d.plot()
+uda_1d.ugrid.plot(zorder=10)
+uda_1d.ugrid.grid.plot(color="black", alpha=0.5)
+ugrid2d.plot(color="gray", alpha=0.5)
 
-# %% Intersect edges
+# %%
 #
-# Let's first
+# Intersect edges
+# ---------------
+#
+# First, we need to find the intersection points between the edges of the
+# network and the 2D grid. We can do this by using the
+# :meth:`xugrid.Ugrid1D.intersect_edges` method.
 
 edges_coords = ugrid2d.node_coordinates[ugrid2d.edge_node_connectivity]
 _, _, intersections_xy = network.intersect_edges(edges_coords)
 
+# %%
+# Let's look at the intersection points.
+
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+ugrid2d.plot(
+    ax=ax,
+    color="gray",
+    alpha=0.5,
+)
+plt.scatter(*intersections_xy.T)
+
+# %%
+# Let's take a look at the individual values. We can see that the intersection
+# points are located at the vertices of the 2D grid. This introduces duplicate
+# intersection points.
+
+intersections_xy
+
+# %%
+# Because the line interesects cell vertices, we have duplicate intersection
+# points. Remove duplicates by finding the uniques, as duplicates are not
+# allowed in the network refinement we'll do in the next step.
+
 _intersections_xy = np.unique(intersections_xy, axis=0)
+
+_intersections_xy
+
+# %%
+#
+# Refining the network
+# --------------------
+#
+# Let's refine the network by the intersection points. This will create new nodes at
+# the intersection points and add edges between the new nodes and the original
+
 refined_network, refined_node_index = network.refine_by_vertices(
     _intersections_xy, return_index=True
 )
 
+refined_network
+
 # %%
+# We'll create a new UgridDataArray with the refined network. The data will be set to
+# NaN at the refined nodes. The original data will be set to the original nodes.
 refined_data = xr.DataArray(
     np.empty_like(refined_network.node_x), dims=(refined_network.node_dimension,)
 )
 uda_1d_refined = xu.UgridDataArray(refined_data, grid=refined_network)
 
-# %%
 # Set data
 node_dim = uda_1d.ugrid.grid.node_dimension
 uda_1d_refined.data[uda_1d[node_dim].data] = uda_1d.data
 uda_1d_refined.data[refined_node_index] = np.nan
 
-# Interpolate nodes
-uda_1d_interpolated = uda_1d_refined.ugrid.laplace_interpolate()
+uda_1d_refined
 
 # %%
-# Set data to edge centroids
+#
+# Interpolation
+# -------------
+#
+# Next, interpolate the data to the refined nodes, we can do this with a laplace
+# interpolation. This nicely interpolates the data along the network: Notice
+# that the two branches on the right-hand side are interpolated separately.
+
+uda_1d_interpolated = uda_1d_refined.ugrid.laplace_interpolate()
+
+fig, ax = plt.subplots()
+uda_1d_interpolated.ugrid.plot(ax=ax, zorder=10)
+uda_1d_interpolated.ugrid.grid.plot(ax=ax, color="black", alpha=0.5, zorder=2)
+ugrid2d.plot(ax=ax, color="gray", alpha=0.5, zorder=3)
+
+# %%
+#
+# The final step before we can grid the network is setting the data to edge
+# centroids. We do this by averaging the data at the nodes that are connected to
+# the edges. This is done by using the edge_node_connectivity of the network.
+
 edge_data = xr.DataArray(
     data=uda_1d_interpolated.data[refined_network.edge_node_connectivity].mean(axis=1),
     dims=(refined_network.edge_dimension,),
 )
 uda_1d_edge = xu.UgridDataArray(edge_data, grid=refined_network)
 
+fig, ax = plt.subplots()
+uda_1d_edge.ugrid.plot(ax=ax, zorder=10)
+ugrid2d.plot(ax=ax, color="gray", alpha=0.5, zorder=3)
+
 # %%
+#
+# Gridding
+# --------
+#
+# Finally, we can grid the data to the 2D grid. We can do this by using the
+# :class:`xugrid.regrid.gridder.NetworkGridder` class. This class takes the
+# Ugrid1d grid as source and Ugrid2d grit as target, the method to use for
+# gridding and the data to grid.
+
 from xugrid.regrid.gridder import NetworkGridder
 
 gridder = NetworkGridder(
@@ -123,20 +201,18 @@ gridder = NetworkGridder(
     method="mean",
 )
 
+gridder
+
 # %%
+#
+# Next, we can grid the data. Call the
+# :meth:`xugrid.regrid.gridder.NetworkGridder.regrid` method to grid the data.
+
 network_gridded = gridder.regrid(uda_1d_edge)
 
-# %%
-network_gridded.ugrid.plot()
-
-# %%
-
-import matplotlib.pyplot as plt
-
 fig, ax = plt.subplots()
-
-ugrid2d.plot(ax=ax)
-plt.scatter(*intersections_xy.T)
-
+network_gridded.ugrid.plot(ax=ax)
+uda_1d_edge.ugrid.grid.plot(ax=ax, color="black", alpha=0.5, zorder=2)
+ugrid2d.plot(ax=ax, color="gray", alpha=0.5, zorder=3)
 
 # %%
