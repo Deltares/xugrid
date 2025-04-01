@@ -29,6 +29,8 @@ Added
   :attr:`xugrid.Ugrid2d.edge_edge_connectivity`.
 - Added :meth:`xugrid.Ugrid1d.refine_by_vertices` to refine a network with
   inserted vertices.
+- Added :class:`xugrid.NetworkGridder` to grid networks (Ugrid1d) to a 2D grid.
+  Currently only support gridding to a Ugrid2d grid.
 
 [0.12.4] 2025-03-05
 -------------------
