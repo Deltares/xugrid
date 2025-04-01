@@ -46,7 +46,7 @@ def network():
     return xu.UgridDataArray(data, grid=ugrid1d)
 
 
-def test_network_gridder__init(network, unstructured_grid):
+def test_network_gridder_init__unstructured(network, unstructured_grid):
     gridder = xu.NetworkGridder(network, unstructured_grid, method="mean")
 
     assert isinstance(gridder, xu.NetworkGridder)
@@ -57,7 +57,7 @@ def test_network_gridder__init(network, unstructured_grid):
     assert gridder._weights.nnz == 8
 
 
-def test_network_gridder__regrid(network, unstructured_grid):
+def test_network_gridder_regrid__unstructured(network, unstructured_grid):
     gridder = xu.NetworkGridder(network, unstructured_grid, method="mean")
     gridded = gridder.regrid(network)
 
@@ -77,3 +77,8 @@ def test_network_gridder__regrid(network, unstructured_grid):
     )
     np.testing.assert_allclose(grid_values[3], -4.0)
     np.testing.assert_allclose(grid_values[4], 4.0)
+
+
+def test_network_gridder_init__structured(network, structured_grid):
+    with pytest.raises(NotImplementedError):
+        xu.NetworkGridder(network, structured_grid, method="mean")
