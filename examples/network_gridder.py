@@ -2,8 +2,8 @@
 Network gridder example
 =======================
 
-In this example, we demonstrate how to interpolate and grid
-data from a 1D network grid to a 2D structured grid.
+In this example, we demonstrate how to interpolate and grid data from a network
+of line elements (UGRID1D) to a 2D structured grid.
 """
 
 # %%
@@ -42,8 +42,9 @@ uda
 
 # %%
 #
-# Next, we create a 1D network. This network consists of 5 nodes and 4 edges.
-# At node 2 the network forks to two branches. The data is located no the nodes.
+# Next, we create a 1D network. This network consists of 5 nodes and 4 edges. At
+# node 2 the network forks to two branches. The data is located assigned to the
+# nodes.
 
 node_xy = np.array(
     [
