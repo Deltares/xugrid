@@ -232,7 +232,7 @@ class BaseRegridder(abc.ABC):
             source_dims = ("y", "x")
         elif isinstance(data, UgridDataArray):
             obj = data.ugrid.obj
-            source_dims = (data.ugrid.grid.face_dimension,)
+            source_dims = (data.ugrid.grid.core_dimension,)
         else:
             raise TypeError(
                 f"Expected DataArray or UgridDataAray, received: {type(data).__name__}"

@@ -16,6 +16,7 @@ from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
+from xugrid.regrid.gridder import NetworkGridder
 from xugrid.regrid.regridder import (
     BarycentricInterpolator,
     CentroidLocatorRegridder,
@@ -60,6 +61,7 @@ __all__ = (
     "RelativeOverlapRegridder",
     "burn_vector_geometry",
     "earcut_triangulate_polygons",
+    "NetworkGridder",
     "UgridRolesAccessor",
     "merge_partitions",
     "polygonize",

@@ -289,6 +289,12 @@ class Ugrid1d(AbstractUgrid):
             self.edge_dimension: self.edge_coordinates,
         }
 
+    @property
+    def length(self):
+        return np.linalg.norm(
+            np.diff(self.edge_node_coordinates, axis=1)[:, 0, :], axis=-1
+        )
+
     def get_coordinates(self, dim: str) -> FloatArray:
         """Return the coordinates for the specified UGRID dimension."""
         if dim == self.node_dimension:

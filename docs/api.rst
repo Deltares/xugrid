@@ -167,6 +167,17 @@ data, represented as xugrid objects.
        OverlapRegridder
        RelativeOverlapRegridder
 
+Gridding
+--------
+
+Gridding is the process of converting a network of line elements (UGRID1D) to 2D
+grids, either structured or unstructured (UGRID2D). 
+
+.. autosummary::
+      :toctree: api/
+
+       NetworkGridder
+
 Plotting
 --------
 
