@@ -362,7 +362,7 @@ def grid_from_earcut_polygons(
         all_triangles.append(triangles + offset)
         offset += len(vertices)
 
-    face_nodes = np.concatenate(all_triangles).reshape((-1, 3))
+    face_nodes = np.concatenate(all_triangles, dtype=int).reshape((-1, 3))
     all_vertices = shapely.get_coordinates(geometry)
     node_x = all_vertices[:, 0]
     node_y = all_vertices[:, 1]

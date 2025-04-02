@@ -1592,6 +1592,7 @@ def test_earcut_triangulate_polygons():
 
     grid = xugrid.Ugrid2d.earcut_triangulate_polygons(polygons=gdf)
     assert isinstance(grid, xugrid.Ugrid2d)
+    assert np.issubdtype(grid.face_node_connectivity.dtype, np.signedinteger)
     assert np.allclose(polygon.area, grid.area.sum())
 
     grid, index = xugrid.Ugrid2d.earcut_triangulate_polygons(
