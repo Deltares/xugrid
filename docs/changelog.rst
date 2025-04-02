@@ -30,6 +30,15 @@ Added
 - Added :meth:`xugrid.Ugrid1d.refine_by_vertices` to refine a network with
   inserted vertices.
 
+Fixed
+-----
+
+- :meth:`xugrid.Ugrid2d.earcut_triangulate_polygons` and
+  :func:`xugrid.earcut_triangulate_polygons` will now return grid objects
+  with a signed integer type instead of unsigned integer, as the unsigned
+  integer type does not support the default negative fill value of -1 and
+  would result in an error when writing to a NetCDF file.
+
 [0.12.4] 2025-03-05
 -------------------
 
