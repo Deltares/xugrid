@@ -192,7 +192,7 @@ class UnstructuredGrid2d:
         order = np.argsort(target_index)
         return source_index[order], target_index[order], weights[order]
 
-    def intersection_length(self, other: "xu.regrid.network.Network2d", relative: bool):
+    def intersection_length(self, other: "xu.regrid.network.Network1d", relative: bool):
         (
             target_index,
             source_index,

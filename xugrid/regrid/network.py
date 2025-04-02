@@ -1,7 +1,7 @@
 import xugrid as xu
 
 
-class Network2d:
+class Network1d:
     def __init__(self, obj):
         # TODO: do not omit type check on grid!
         if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):

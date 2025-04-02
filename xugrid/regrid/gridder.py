@@ -5,7 +5,7 @@ import xarray as xr
 import xugrid
 from xugrid.core.sparse import MatrixCSR
 from xugrid.regrid import reduce
-from xugrid.regrid.network import Network2d
+from xugrid.regrid.network import Network1d
 from xugrid.regrid.regridder import BaseRegridder, make_regrid, setup_grid
 from xugrid.regrid.structured import StructuredGrid2d
 from xugrid.regrid.unstructured import UnstructuredGrid2d
@@ -41,7 +41,7 @@ class NetworkGridder(BaseRegridder):
         target: "xugrid.Ugrid2d",
         method: Union[str, Callable] = "mean",
     ):
-        self._source = Network2d(source)
+        self._source = Network1d(source)
         self._target = setup_grid(target)
         self._weights = None
         self._compute_weights(self._source, self._target, relative=False)
