@@ -201,7 +201,7 @@ class UnstructuredGrid2d:
             other.ugrid_topology.edge_node_coordinates
         )
         order = np.argsort(source_index)
-        length = np.linalg.norm(np.diff(intersections, axis=1), axis=-1)[:, 0]
+        length = np.linalg.norm(np.diff(intersections, axis=1)[:, 0, :], axis=-1)
         if relative:
             length /= other.length[source_index]
         return target_index[order], source_index[order], length[order]
