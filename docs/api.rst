@@ -170,7 +170,7 @@ data, represented as xugrid objects.
 Gridding
 --------
 
-Gridding is the process of converting network of line elements (UGRID1D) to 2D
+Gridding is the process of converting a network of line elements (UGRID1D) to 2D
 grids, either structured or unstructured (UGRID2D). 
 
 .. autosummary::
