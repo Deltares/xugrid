@@ -13,15 +13,11 @@ from xugrid.regrid.unstructured import UnstructuredGrid2d
 
 def convert_to_match(source, target):
     PROMOTIONS = {
-        frozenset({StructuredGrid2d}): StructuredGrid2d,
+        frozenset({StructuredGrid2d}): UnstructuredGrid2d,
         frozenset({UnstructuredGrid2d}): UnstructuredGrid2d,
     }
     types = set({type(target)})
     matched_type = PROMOTIONS[frozenset(types)]
-    if matched_type is StructuredGrid2d:
-        raise NotImplementedError(
-            "Gridding networks to structured grids is not yet supported. Convert to unstructured grid first by calling UgridDataArray.from_structured()"
-        )
     return source, target.convert_to(matched_type)
 
 

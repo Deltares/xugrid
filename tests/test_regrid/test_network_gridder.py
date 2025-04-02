@@ -117,5 +117,58 @@ def test_network_gridder_regrid__unstructured_transient(
 
 
 def test_network_gridder_init__structured(network, structured_grid):
-    with pytest.raises(NotImplementedError):
-        xu.NetworkGridder(network, structured_grid, method="mean")
+    gridder = xu.NetworkGridder(network, structured_grid, method="mean")
+
+    assert isinstance(gridder, xu.NetworkGridder)
+    assert gridder._source.ugrid_topology == network.grid
+    np.testing.assert_array_equal(
+        gridder._target.coords["x"], structured_grid.x.to_numpy()
+    )
+    np.testing.assert_array_equal(
+        gridder._target.coords["y"], structured_grid.y.to_numpy()
+    )
+    assert gridder._weights.n == structured_grid.size
+    assert gridder._weights.m == network.grid.n_edge
+    assert gridder._weights.nnz == 8
+
+
+def test_network_gridder_regrid__structured(network, structured_grid, points_to_sample):
+    gridder = xu.NetworkGridder(network, structured_grid, method="mean")
+    gridded = gridder.regrid(network)
+
+    assert isinstance(gridded, type(structured_grid))
+    assert gridded.shape == structured_grid.shape
+    assert np.count_nonzero(np.isnan(gridded)) == 11
+
+    x_loc, y_loc, expected_values = points_to_sample
+    x_loc = xr.DataArray(x_loc, dims="points")
+    y_loc = xr.DataArray(y_loc, dims="points")
+    grid_values = gridded.sel(x=x_loc, y=y_loc).to_numpy()
+
+    np.testing.assert_allclose(grid_values, expected_values)
+
+
+def test_network_gridder_regrid__structured_transient(
+    network, structured_grid, points_to_sample
+):
+    # Make transient network
+    times = [np.datetime64("2022-01-01"), np.datetime64("2023-01-01")]
+    time_multiplier = xr.DataArray([1.0, 2.0], dims="time", coords={"time": times})
+    network = (network * time_multiplier).transpose(
+        "time", network.ugrid.grid.core_dimension
+    )
+
+    gridder = xu.NetworkGridder(network, structured_grid, method="mean")
+    gridded = gridder.regrid(network)
+
+    assert isinstance(gridded, type(structured_grid))
+    assert np.count_nonzero(np.isnan(gridded)) == 22
+
+    x_loc, y_loc, expected_values = points_to_sample
+    x_loc = xr.DataArray(x_loc, dims="points")
+    y_loc = xr.DataArray(y_loc, dims="points")
+    grid_values_t0 = gridded.isel(time=0).sel(x=x_loc, y=y_loc).to_numpy()
+    grid_values_t1 = gridded.isel(time=1).sel(x=x_loc, y=y_loc).to_numpy()
+
+    np.testing.assert_allclose(grid_values_t0, expected_values)
+    np.testing.assert_allclose(grid_values_t1, 2 * expected_values)
