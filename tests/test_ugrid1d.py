@@ -627,6 +627,14 @@ def test_ugrid1d_format_connectivity():
     )
 
 
+def test_ugrid1d_length():
+    grid = grid1d()
+    length = grid.length
+    assert isinstance(length, np.ndarray)
+    assert length.shape == (grid.n_edge,)
+    assert np.allclose(length, [np.sqrt(2), np.sqrt(2)])
+
+
 def test_ugrid1d_refine_by_vertices():
     node_xy = np.array(
         [
