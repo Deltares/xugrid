@@ -390,7 +390,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">interpolate_na_helper</span><span class="p">,</span>
     <span class="n">laplace_interpolate</span><span class="p">,</span>
-    <span class="n">nearest_interpolate</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugrid1d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ugrid1d</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.ugrid2d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ugrid2d</span>
@@ -1066,9 +1065,9 @@
         <span class="n">da_filled</span> <span class="o">=</span> <span class="n">interpolate_na_helper</span><span class="p">(</span>
             <span class="n">da</span><span class="p">,</span>
             <span class="n">ugrid_dim</span><span class="o">=</span><span class="n">ugrid_dim</span><span class="p">,</span>
-            <span class="n">func</span><span class="o">=</span><span class="n">nearest_interpolate</span><span class="p">,</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_nearest_interpolate</span><span class="p">,</span>
             <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">ugrid_dim</span><span class="p">),</span>
+                <span class="s2">&quot;ugrid_dim&quot;</span><span class="p">:</span> <span class="n">ugrid_dim</span><span class="p">,</span>
                 <span class="s2">&quot;max_distance&quot;</span><span class="p">:</span> <span class="n">max_distance</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span>

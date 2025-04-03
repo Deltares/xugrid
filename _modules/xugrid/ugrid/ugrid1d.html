@@ -383,6 +383,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeCellTree2d</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">conversion</span>
@@ -1224,6 +1225,51 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">grid</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nearest_interpolate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+        <span class="n">ugrid_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+        <span class="n">isnull</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isnull</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All values are NA.&quot;</span><span class="p">)</span>
+
+        <span class="n">edge_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="k">if</span> <span class="n">ugrid_dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
+            <span class="c1"># Set the edge length as the graph weights.</span>
+            <span class="c1"># We can do this easily since the data of the node_node_connectivity CSR matrix</span>
+            <span class="c1"># contains the edge through which the connection is made.</span>
+            <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">edge_length</span><span class="p">[</span><span class="n">connectivity</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">ugrid_dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
+            <span class="c1"># Convert to COO-form so we can index with rows and columns.</span>
+            <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_edge_connectivity</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+            <span class="c1"># Compute distance from edge centroid to centroid along the edges.</span>
+            <span class="c1"># I.e. half of both edge lengths</span>
+            <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">edge_length</span><span class="p">[</span><span class="n">connectivity</span><span class="o">.</span><span class="n">row</span><span class="p">]</span> <span class="o">+</span> <span class="n">edge_length</span><span class="p">[</span><span class="n">connectivity</span><span class="o">.</span><span class="n">col</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;received instead: </span><span class="si">{</span><span class="n">ugrid_dim</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csgraph</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">(</span>
+            <span class="n">csgraph</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
+            <span class="n">indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="o">~</span><span class="n">isnull</span><span class="p">),</span>
+            <span class="n">return_predecessors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">limit</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span>
+            <span class="n">min_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># dijkstra returns -9999 when no path could be found.</span>
+        <span class="c1"># There, we&#39;ll keep the NaN value.</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">9999</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">found</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">found</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="Ugrid1d.merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.merge_partitions.html#xugrid.Ugrid1d.merge_partitions">[docs]</a>

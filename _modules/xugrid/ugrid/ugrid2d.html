@@ -388,6 +388,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">coo_matrix</span><span class="p">,</span> <span class="n">csr_matrix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.csgraph</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse_cuthill_mckee</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">KDTree</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">conversion</span>
@@ -2017,6 +2018,37 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nearest_interpolate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+        <span class="n">ugrid_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
+        <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="n">ugrid_dim</span><span class="p">)</span>
+        <span class="n">isnull</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isnull</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All values are NA.&quot;</span><span class="p">)</span>
+
+        <span class="n">i_source</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="o">~</span><span class="n">isnull</span><span class="p">)</span>
+        <span class="n">i_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">isnull</span><span class="p">)</span>
+        <span class="n">source_coordinates</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">i_source</span><span class="p">]</span>
+        <span class="n">target_coordinates</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">i_target</span><span class="p">]</span>
+        <span class="c1"># Locate the nearest notnull for each null value.</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="n">source_coordinates</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">target_coordinates</span><span class="p">,</span> <span class="n">distance_upper_bound</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">workers</span><span class="o">=-</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="c1"># Remove entries beyond max distance, returned by .query as self.n.</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_coordinates</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+        <span class="n">i_target</span> <span class="o">=</span> <span class="n">i_target</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+        <span class="c1"># index contains an index of the target coordinates to the source</span>
+        <span class="c1"># coordinates, not the direct index into the data, so we need an additional</span>
+        <span class="c1"># indexing step.</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">i_target</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i_source</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="Ugrid2d.triangulate">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.triangulate.html#xugrid.Ugrid2d.triangulate">[docs]</a>
