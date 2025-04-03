@@ -868,7 +868,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.clip : equivalent function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># When this was a unary func, the default was True, so retaining the</span>
@@ -1688,7 +1688,7 @@
 <span class="sd">        array([False,  True, False])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1731,7 +1731,7 @@
 <span class="sd">        array([ True, False,  True])</span>
 <span class="sd">        Dimensions without coordinates: x</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1770,7 +1770,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        numpy.isin</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
@@ -1853,7 +1853,7 @@
 <span class="sd">        dask.array.Array.astype</span>
 <span class="sd">        sparse.COO.astype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.computation</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="n">casting</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="n">subok</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
