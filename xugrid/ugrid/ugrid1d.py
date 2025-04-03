@@ -6,6 +6,7 @@ import pandas as pd
 import xarray as xr
 from numba_celltree import EdgeCellTree2d
 from numpy.typing import ArrayLike
+from scipy import sparse
 
 import xugrid
 from xugrid import conversion
@@ -800,6 +801,51 @@ class Ugrid1d(AbstractUgrid):
             return grid, node_index
         else:
             return grid
+
+    def _nearest_interpolate(
+        self,
+        data: FloatArray,
+        ugrid_dim: str,
+        max_distance: float,
+    ) -> FloatArray:
+        isnull = np.isnan(data)
+        if isnull.all():
+            raise ValueError("All values are NA.")
+
+        edge_length = self.length
+        if ugrid_dim == self.node_dimension:
+            # Set the edge length as the graph weights.
+            # We can do this easily since the data of the node_node_connectivity CSR matrix
+            # contains the edge through which the connection is made.
+            connectivity = self.node_node_connectivity.copy()
+            connectivity.data = edge_length[connectivity.data]
+        elif ugrid_dim == self.edge_dimension:
+            # Convert to COO-form so we can index with rows and columns.
+            connectivity = self.edge_edge_connectivity.tocoo()
+            # Compute distance from edge centroid to centroid along the edges.
+            # I.e. half of both edge lengths
+            connectivity.data = 0.5 * (
+                edge_length[connectivity.row] + edge_length[connectivity.col]
+            )
+        else:
+            raise ValueError(
+                f"Expected {self.node_dimension} or {self.edge_dimension}, "
+                f"received instead: {ugrid_dim}"
+            )
+        _, _, index = sparse.csgraph.dijkstra(
+            csgraph=connectivity,
+            indices=np.flatnonzero(~isnull),
+            return_predecessors=True,
+            limit=max_distance,
+            min_only=True,
+        )
+        # dijkstra returns -9999 when no path could be found.
+        # There, we'll keep the NaN value.
+        found = index != -9999
+        index = index[found]
+        out = data.copy()
+        out[found] = data[index]
+        return out
 
     @staticmethod
     def merge_partitions(

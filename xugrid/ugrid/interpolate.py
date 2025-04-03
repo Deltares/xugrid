@@ -7,7 +7,6 @@ import numba as nb
 import numpy as np
 import xarray as xr
 from scipy import sparse
-from scipy.spatial import KDTree
 
 from xugrid.constants import FloatArray, IntArray
 from xugrid.core.sparse import MatrixCSR, columns_and_values, nzrange, row_slice
@@ -308,36 +307,6 @@ def laplace_interpolate(
             warnings.warn(f"Failed to converge after {maxiter} iterations")
 
     return x
-
-
-def nearest_interpolate(
-    data: FloatArray,
-    coordinates: FloatArray,
-    max_distance: float,
-) -> FloatArray:
-    isnull = np.isnan(data)
-    if isnull.all():
-        raise ValueError("All values are NA.")
-
-    i_source = np.flatnonzero(~isnull)
-    i_target = np.flatnonzero(isnull)
-    source_coordinates = coordinates[i_source]
-    target_coordinates = coordinates[i_target]
-    # Locate the nearest notnull for each null value.
-    tree = KDTree(source_coordinates)
-    _, index = tree.query(
-        target_coordinates, distance_upper_bound=max_distance, workers=-1
-    )
-    # Remove entries beyond max distance, returned by .query as self.n.
-    keep = index < len(source_coordinates)
-    index = index[keep]
-    i_target = i_target[keep]
-    # index contains an index of the target coordinates to the source
-    # coordinates, not the direct index into the data, so we need an additional
-    # indexing step.
-    out = data.copy()
-    out[i_target] = data[i_source[index]]
-    return out
 
 
 def interpolate_na_helper(
