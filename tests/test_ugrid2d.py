@@ -1643,3 +1643,46 @@ def test_ugrid2d_format_connectivity():
         grid.format_connectivity_as_sparse(grid.node_node_connectivity.tocoo()),
         sparse.csr_matrix,
     )
+
+
+def test_nearest_interpolate():
+    node_x = np.array([-0.5, -0.5, 0.5, 0.5, 1.5, 1.5, 2.5, 2.5, 3.5, 3.5, 4.5, 4.5])
+    node_y = np.array(
+        [-1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0]
+    )
+    face_node_connectivity = np.array(
+        [
+            [0, 1, 2, 3],  # First quad
+            [3, 2, 4, 5],  # Second quad
+            [5, 4, 6, 7],  # Third quad
+            [7, 6, 8, 9],  # Fourth quad
+            [9, 8, 10, 11],  # Fifth quad
+        ]
+    )
+    grid = xugrid.Ugrid2d(node_x, node_y, -1, face_node_connectivity)
+
+    # Centroids are:
+    # x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+    # y = np.zeros_like(x)
+    data = np.array([0.0, np.nan, np.nan, np.nan, 4.0])
+    facedim = grid.face_dimension
+    actual = grid._nearest_interpolate(data, facedim, np.inf)
+    assert np.allclose(actual, np.array([0.0, 0.0, 0.0, 4.0, 4.0]))
+
+    actual = grid._nearest_interpolate(data, facedim, 1.1)
+    assert np.allclose(actual, np.array([0.0, 0.0, np.nan, 4.0, 4.0]), equal_nan=True)
+
+    with pytest.raises(ValueError, match="All values are NA."):
+        grid._nearest_interpolate(np.full_like(data, np.nan), facedim, np.inf)
+
+    # Test for node_dimension
+    data = np.full(grid.n_node, np.nan)
+    data[0] = 1.0
+    actual = grid._nearest_interpolate(data, grid.node_dimension, np.inf)
+    assert np.allclose(actual, 1.0)
+
+    # Test for edge_dimension
+    data = np.full(grid.n_edge, np.nan)
+    data[0] = 1.0
+    actual = grid._nearest_interpolate(data, grid.edge_dimension, np.inf)
+    assert np.allclose(actual, 1.0)

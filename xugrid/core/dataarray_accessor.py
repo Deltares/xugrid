@@ -13,7 +13,6 @@ from xugrid.ugrid import connectivity
 from xugrid.ugrid.interpolate import (
     interpolate_na_helper,
     laplace_interpolate,
-    nearest_interpolate,
 )
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
@@ -619,9 +618,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         da_filled = interpolate_na_helper(
             da,
             ugrid_dim=ugrid_dim,
-            func=nearest_interpolate,
+            func=grid._nearest_interpolate,
             kwargs={
-                "coordinates": grid.get_coordinates(ugrid_dim),
+                "ugrid_dim": ugrid_dim,
                 "max_distance": max_distance,
             },
         )

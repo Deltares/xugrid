@@ -11,6 +11,7 @@ from numba_celltree import CellTree2d
 from numpy.typing import ArrayLike
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
+from scipy.spatial import KDTree
 
 import xugrid
 from xugrid import conversion
@@ -1578,6 +1579,37 @@ class Ugrid2d(AbstractUgrid):
                 tolerance=tolerance,
             )
         return obj.isel(indexers, missing_dims="ignore")
+
+    def _nearest_interpolate(
+        self,
+        data: FloatArray,
+        ugrid_dim: str,
+        max_distance: float,
+    ) -> FloatArray:
+        coordinates = self.get_coordinates(ugrid_dim)
+        isnull = np.isnan(data)
+        if isnull.all():
+            raise ValueError("All values are NA.")
+
+        i_source = np.flatnonzero(~isnull)
+        i_target = np.flatnonzero(isnull)
+        source_coordinates = coordinates[i_source]
+        target_coordinates = coordinates[i_target]
+        # Locate the nearest notnull for each null value.
+        tree = KDTree(source_coordinates)
+        _, index = tree.query(
+            target_coordinates, distance_upper_bound=max_distance, workers=-1
+        )
+        # Remove entries beyond max distance, returned by .query as self.n.
+        keep = index < len(source_coordinates)
+        index = index[keep]
+        i_target = i_target[keep]
+        # index contains an index of the target coordinates to the source
+        # coordinates, not the direct index into the data, so we need an additional
+        # indexing step.
+        out = data.copy()
+        out[i_target] = data[i_source[index]]
+        return out
 
     def triangulate(self):
         """

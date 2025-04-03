@@ -709,3 +709,32 @@ def test_ugrid1d_refine_by_vertices():
         ValueError, match="The following vertices are not located on any edge"
     ):
         grid.refine_by_vertices(vertices)
+
+
+def test_nearest_interpolate():
+    node_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+    node_y = np.zeros_like(node_x)
+    edge_node_connectivity = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 4],
+        ]
+    )
+    grid = xugrid.Ugrid1d(node_x, node_y, -1, edge_node_connectivity)
+    data = np.array([0.0, np.nan, np.nan, np.nan, 4.0])
+    nodedim = grid.node_dimension
+    actual = grid._nearest_interpolate(data, nodedim, np.inf)
+    assert np.allclose(actual, np.array([0.0, 0.0, 0.0, 4.0, 4.0]))
+
+    actual = grid._nearest_interpolate(data, nodedim, 1.1)
+    assert np.allclose(actual, np.array([0.0, 0.0, np.nan, 4.0, 4.0]), equal_nan=True)
+
+    with pytest.raises(ValueError, match="All values are NA."):
+        grid._nearest_interpolate(np.full_like(data, np.nan), nodedim, np.inf)
+
+    # Test for edge dimension
+    data = np.array([0.0, np.nan, np.nan, 4.0])
+    actual = grid._nearest_interpolate(data, grid.edge_dimension, np.inf)
+    assert np.allclose(actual, np.array([0.0, 0.0, 4.0, 4.0]))

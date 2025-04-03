@@ -50,18 +50,3 @@ def test_laplace_interpolate():
         data, con, use_weights=False, direct_solve=False
     )
     assert np.allclose(actual, expected)
-
-
-def test_nearest_interpolate():
-    x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
-    y = np.zeros_like(x)
-    coordinates = np.column_stack((x, y))
-    data = np.array([0.0, np.nan, np.nan, np.nan, 4.0])
-    actual = interpolate.nearest_interpolate(data, coordinates, np.inf)
-    assert np.allclose(actual, np.array([0.0, 0.0, 0.0, 4.0, 4.0]))
-
-    actual = interpolate.nearest_interpolate(data, coordinates, 1.1)
-    assert np.allclose(actual, np.array([0.0, 0.0, np.nan, 4.0, 4.0]), equal_nan=True)
-
-    with pytest.raises(ValueError, match="All values are NA."):
-        interpolate.nearest_interpolate(np.full_like(data, np.nan), coordinates, np.inf)
