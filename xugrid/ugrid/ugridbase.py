@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Literal, Sequence, Set, Tuple, Type, Union, cast
+from typing import Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -946,7 +946,13 @@ class AbstractUgrid(abc.ABC):
         raise NotImplementedError("Celltree must be implemented in subclass")
 
     def sel_points(
-        self, obj, x: FloatArray, y: FloatArray, out_of_bounds="warn", fill_value=np.nan
+        self,
+        obj,
+        x: FloatArray,
+        y: FloatArray,
+        out_of_bounds="warn",
+        fill_value=np.nan,
+        tolerance: Optional[float] = None,
     ):
         """
         Select points in the unstructured grid.
@@ -968,6 +974,10 @@ class AbstractUgrid(abc.ABC):
         fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
             Value to assign to out-of-bounds points if out_of_bounds is warn
             or ignore. Forwarded to xarray's ``.where()`` method.
+        tolerance: float, optional
+            Tolerance for point location. Points within this distance from an
+            edge are considered located on it. Defaults to default in
+            numba_celltree if None.
 
         Returns
         -------
@@ -990,7 +1000,7 @@ class AbstractUgrid(abc.ABC):
         if x.ndim != 1:
             raise ValueError("x and y must be 1d")
         xy = np.column_stack([x, y])
-        index = self.locate_points(xy)
+        index = self.locate_points(xy, tolerance)
 
         keep = slice(None, None)  # keep all by default
         condition = None
@@ -1020,19 +1030,23 @@ class AbstractUgrid(abc.ABC):
             selection = selection.where(condition, other=fill_value)
         return selection
 
-    def locate_points(self, points: FloatArray):
+    def locate_points(self, points: FloatArray, tolerance: Optional[float] = None):
         """
         Find on which edge points are located.
 
         Parameters
         ----------
         points: ndarray of floats with shape ``(n_point, 2)``
+        tolerance: float, optional
+            Tolerance for point location. Points within this distance from an
+            edge are considered located on it. Defaults to default in
+            numba_celltree if None.
 
         Returns
         -------
         edge_index: ndarray of integers with shape ``(n_points,)``
         """
-        return self.celltree.locate_points(points)
+        return self.celltree.locate_points(points, tolerance)
 
     def intersect_edges(self, edges: FloatArray):
         """

@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, Sequence, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -704,7 +704,10 @@ class Ugrid1d(AbstractUgrid):
         )
 
     def refine_by_vertices(
-        self, vertices: FloatArray, return_index: bool = False
+        self,
+        vertices: FloatArray,
+        return_index: bool = False,
+        tolerance: Optional[float] = None,
     ) -> "Ugrid1d":
         """
         Refine Ugrid1d with extra vertices to be inserted and returns new grid.
@@ -719,6 +722,10 @@ class Ugrid1d(AbstractUgrid):
         return_index: bool, optional
             If set to to True, the index of the new vertices in the grid will be
             returned. Defaults to False.
+        tolerance: float, optional
+            Tolerance for point location. Points within this distance from an
+            edge are considered located on it. Defaults to default in
+            numba_celltree if None.
 
         Returns
         -------
@@ -748,7 +755,7 @@ class Ugrid1d(AbstractUgrid):
         >>> print(new.node_coordinates[new_vertices_index])
 
         """
-        edge_index = self.celltree.locate_points(vertices)
+        edge_index = self.celltree.locate_points(vertices, tolerance)
         invalid = edge_index == -1
         if invalid.any():
             raise ValueError(

@@ -384,7 +384,8 @@ class StructuredGrid1d:
         return self.sorted_output(source_index, target_index, weights)
 
     def locate_centroids(
-        self, other: "StructuredGrid1d"
+        self,
+        other: "StructuredGrid1d",
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
         Return source and target indexes based on nearest neighbor of
@@ -545,7 +546,9 @@ class StructuredGrid2d(StructuredGrid1d):
             weights_x,
         )
 
-    def locate_centroids(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+    def locate_centroids(
+        self, other, tolerance
+    ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
         Locate centroids of other in self.
 
