@@ -976,8 +976,8 @@ class AbstractUgrid(abc.ABC):
             or ignore. Forwarded to xarray's ``.where()`` method.
         tolerance: float, optional
             Tolerance for point location. Points within this distance from an
-            edge are considered located on it. Defaults to default in
-            numba_celltree if None.
+            edge are considered located on it. If ``None``, numba_celltree
+            estimates an appropriate tolerance value based on the source grid.
 
         Returns
         -------
@@ -1039,8 +1039,8 @@ class AbstractUgrid(abc.ABC):
         points: ndarray of floats with shape ``(n_point, 2)``
         tolerance: float, optional
             Tolerance for point location. Points within this distance from an
-            edge are considered located on it. Defaults to default in
-            numba_celltree if None.
+            edge are considered located on it. If ``None``, numba_celltree
+            estimates an appropriate tolerance value based on the grid.
 
         Returns
         -------

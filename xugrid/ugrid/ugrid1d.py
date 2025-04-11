@@ -724,8 +724,8 @@ class Ugrid1d(AbstractUgrid):
             returned. Defaults to False.
         tolerance: float, optional
             Tolerance for point location. Points within this distance from an
-            edge are considered located on it. Defaults to default in
-            numba_celltree if None.
+            edge are considered located on it. If ``None``, numba_celltree
+            estimates an appropriate tolerance value based on the network.
 
         Returns
         -------
