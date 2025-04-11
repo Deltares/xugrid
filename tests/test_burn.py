@@ -85,12 +85,12 @@ def test_point_in_triangle():
     triangle = Triangle(a, b, c)
     rtriangle = Triangle(c, b, a)
     p = Point(0.5, 0.5)
-    assert burn.point_in_triangle(p, triangle)
-    assert burn.point_in_triangle(p, rtriangle)
+    assert burn.point_in_triangle(p, triangle, tolerance=1e-9)
+    assert burn.point_in_triangle(p, rtriangle, tolerance=1e-9)
 
     p = Point(0.0, 0.0)
-    assert not burn.point_in_triangle(p, triangle)
-    assert not burn.point_in_triangle(p, rtriangle)
+    assert not burn.point_in_triangle(p, triangle, tolerance=1e-9)
+    assert not burn.point_in_triangle(p, rtriangle, tolerance=1e-9)
 
 
 def test_points_in_triangle():
@@ -125,6 +125,7 @@ def test_points_in_triangle():
         face_indices=face_indices,
         faces=faces,
         vertices=vertices,
+        tolerance=1e-9,
     )
     assert np.array_equal(expected, actual)
 
