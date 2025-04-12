@@ -276,6 +276,60 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
         return UgridDataArray(obj, grid)
 
+    def to_facet(self, facet: str):
+        """
+        Map the data from one facet (e.g. node, edge, or face) to another.
+
+        This method creates a new UgridDataArray with values mapped from the
+        current facet to the target facet. The result includes a new dimension
+        with the name of the target facet, containing all connections to the
+        source facet.
+
+        As the result of ``.to_facet`` is an ordinary UgridDataArray, any
+        reduction can be applied along the newly created dimension (e.g. min,
+        max, sum, mean, etc.) to easily re-associate data. See the examples.
+
+        Parameters
+        ----------
+        facet: str
+            The target facet type: 'node', 'edge', or 'face'. If the data is already
+            associated with this facet, returns a copy.
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the target facet.
+
+        Examples
+        --------
+        Map node-based temperature data to faces by calculating the mean of all
+        nodes connected to each face:
+
+        >>> face_temperature = node_temperature.to_facet("face").mean("node")
+        """
+        grid = self.grid
+        obj = self.obj
+
+        gridfacets = grid.facets
+        if facet not in gridfacets:
+            return ValueError(f"facet must be one: {set(gridfacets)}")
+
+        source_dim = set(grid.dimensions).intersection(obj.dims).pop()
+        target_dim = getattr(grid, f"{facet}_dimension")
+        # If already on the facet, return a copy.
+        if source_dim == target_dim:
+            return UgridDataArray(obj.copy(), grid)
+
+        # Find out on which facet we're currently located
+        source = {v: k for k, v in gridfacets}[source_dim]
+        connectivity = grid.format_connectivity_as_dense(
+            getattr(grid, f"{facet}_{source}_connectivity")
+        )
+        indexer = xr.DataArray(connectivity, dims=(target_dim, source))
+        # Set the fill values (-1) to NaN
+        mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
+        return UgridDataArray(mapped, grid)
+
     def intersect_line(
         self, start: Sequence[float], end: Sequence[float]
     ) -> xr.DataArray:
