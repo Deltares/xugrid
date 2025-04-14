@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, NamedTuple, Tuple
 
 import numba as nb
 import numpy as np
+import pandas as pd
 import xarray as xr
 from scipy import sparse
 
@@ -202,6 +203,7 @@ class ILU0Preconditioner(NamedTuple):
 def laplace_interpolate(
     data: FloatArray,
     connectivity: sparse.csr_matrix,
+    components_labels: IntArray,
     use_weights: bool,
     direct_solve: bool = False,
     delta=0.0,
@@ -224,6 +226,9 @@ def laplace_interpolate(
     data: ndarray of floats with shape ``(n,)``
     connectivity: scipy.sparse.csr_matrix with shape ``(n, n)``
         Sparse connectivity matrix containing ``n_nonzero`` indices and weight values.
+    components_labels: array of int with shape ``(n,)``
+        The labels of the connected components, result of
+        ``scipy.sparse.csgraph.connected_components``.
     use_weights: bool, default False.
         Wether to use the data attribute of the connectivity matrix as
         coefficients. If ``False``, defaults to uniform coefficients of 1.
@@ -254,12 +259,22 @@ def laplace_interpolate(
         raise ValueError(f"expected data of shape ({n},), received: {data.shape}")
 
     # Find the elements with data
-    variable = np.isnan(data)
-    constant = ~variable
-    if variable.all():
+    isnull = np.isnan(data)
+    constant = ~isnull
+    if isnull.all():
         raise ValueError("data is fully nodata")
-    elif constant.all():
+    if constant.all():
         return data.copy()
+
+    # Check for parts without any values; these result in a singular matrix.
+    # Each label should have at least one notnull value.
+    # In case the entirety is null, keep the NaNs there.
+    all_null = (
+        pd.DataFrame({"label": components_labels, "isnull": isnull})
+        .groupby("label")["isnull"]
+        .all()
+    ).to_numpy()[components_labels]
+    constant = all_null | constant
 
     coo = connectivity.tocoo()
     i = coo.row

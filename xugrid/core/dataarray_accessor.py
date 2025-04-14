@@ -690,6 +690,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             raise ValueError("Laplace interpolation along edges is not allowed.")
 
         connectivity = grid.get_connectivity_matrix(ugrid_dim, xy_weights=xy_weights)
+        _, components_labels = scipy.sparse.csgraph.connected_components(connectivity)
         da_filled = interpolate_na_helper(
             da,
             ugrid_dim,
@@ -697,6 +698,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             kwargs={
                 "connectivity": connectivity,
                 "use_weights": xy_weights,
+                "components_labels": components_labels,
                 "direct_solve": direct_solve,
                 "delta": delta,
                 "relax": relax,

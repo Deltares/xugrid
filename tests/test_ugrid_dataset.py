@@ -1536,7 +1536,7 @@ def test_laplace_interpolate_1d():
 def test_laplace_interpolate_1d__disconnected():
     """
     Test laplace_interpolate on a 1D grid with disconnected edges. Should throw
-    no ZeroDivisionErrors.
+    no ZeroDivisionErrors, and should preserve NaNs on the disconnected group.
     """
     xy = np.array(
         [
@@ -1560,10 +1560,10 @@ def test_laplace_interpolate_1d__disconnected():
     ds["b1d"] = xr.DataArray([1.0, 2.0, 3.0], dims=[grid.edge_dimension])
     uda = xugrid.UgridDataset(ds)["a1d"]
 
-    actual = uda.ugrid.laplace_interpolate(direct_solve=False)
+    actual = uda.ugrid.laplace_interpolate(direct_solve=True)
     assert isinstance(actual, xugrid.UgridDataArray)
     np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
-    np.testing.assert_allclose(actual[3:], 0.0)
+    assert np.isnan(actual[3:]).all()
 
 
 def test_interpolate_na_1d():
