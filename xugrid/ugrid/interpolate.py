@@ -64,7 +64,9 @@ def _update(ilu: ILU0Preconditioner, A: MatrixCSR, delta: float, relax: float):
         diag = ilu.work[i]
         multiplier = (1.0 + delta) * diag - (relax * rs)
         # Work around a zero-valued pivot
-        if (np.sign(multiplier) != np.sign(diag)) or (multiplier == 0):
+        if multiplier == 0:
+            multiplier = 1e-6
+        elif np.sign(multiplier) != np.sign(diag):
             multiplier = np.sign(diag) * 1.0e-6
         ilu.diagonal[i] = 1.0 / multiplier
 
