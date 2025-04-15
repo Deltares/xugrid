@@ -2,7 +2,6 @@ import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
-from numba_celltree.constants import Point, Triangle
 from shapely.geometry import Polygon
 
 import xugrid as xu
@@ -75,59 +74,6 @@ def polygons_and_values():
         ]
     )
     return polygons, values
-
-
-def test_point_in_triangle():
-    a = Point(0.1, 0.1)
-    b = Point(0.7, 0.5)
-    c = Point(0.4, 0.7)
-    # Should work for clockwise and ccw orientation.
-    triangle = Triangle(a, b, c)
-    rtriangle = Triangle(c, b, a)
-    p = Point(0.5, 0.5)
-    assert burn.point_in_triangle(p, triangle, tolerance=1e-9)
-    assert burn.point_in_triangle(p, rtriangle, tolerance=1e-9)
-
-    p = Point(0.0, 0.0)
-    assert not burn.point_in_triangle(p, triangle, tolerance=1e-9)
-    assert not burn.point_in_triangle(p, rtriangle, tolerance=1e-9)
-
-
-def test_points_in_triangle():
-    vertices = np.array(
-        [
-            [0.0, 0.0],
-            [1.0, 0.0],
-            [1.0, 1.0],
-            [2.0, 0.0],
-        ]
-    )
-    faces = np.array(
-        [
-            [0, 1, 2],
-            [1, 3, 2],
-        ]
-    )
-    points = np.array(
-        [
-            [-0.5, 0.25],
-            [0.0, 0.0],  # on vertex
-            [0.5, 0.5],  # on edge
-            [0.5, 0.25],
-            [1.5, 0.25],
-            [2.5, 0.25],
-        ]
-    )
-    face_indices = np.array([0, 0, 0, 0, 1, 1])
-    expected = [False, True, True, True, True, False]
-    actual = burn.points_in_triangles(
-        points=points,
-        face_indices=face_indices,
-        faces=faces,
-        vertices=vertices,
-        tolerance=1e-9,
-    )
-    assert np.array_equal(expected, actual)
 
 
 def test_locate_polygon(grid):
