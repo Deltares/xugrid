@@ -394,8 +394,8 @@ def test_sel_points():
         data=[10, 11],
         dims=[grid.edge_dimension],
     )
-    x = [1.5, 0.5, -0.1]
-    y = [1.5, 0.5, -0.1]
+    x = [1.5, 0.5, 0.0]
+    y = [1.5, 0.5, 0.1]
 
     actual = grid.sel_points(
         obj=obj,
