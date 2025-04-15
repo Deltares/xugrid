@@ -1040,9 +1040,11 @@ class AbstractUgrid(abc.ABC):
         ----------
         points: ndarray of floats with shape ``(n_point, 2)``
         tolerance: float, optional
-            Tolerance for point location. Points within this distance from an
-            edge are considered located on it. If ``None``, numba_celltree
-            estimates an appropriate tolerance value based on the grid.
+            The tolerance used to determine whether a point is on an edge. This
+            accounts for the inherent inexactness of floating point calculations.
+            If None, an appropriate tolerance is automatically estimated based on
+            the geometry size. Consider adjusting this value if edge detection
+            results are unsatisfactory.
 
         Returns
         -------

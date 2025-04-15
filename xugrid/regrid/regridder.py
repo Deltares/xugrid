@@ -373,10 +373,10 @@ class CentroidLocatorRegridder(BaseRegridder):
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This
-        is a floating point precision criterion, thus cannot be directly be
-        interpreted as a distance. If None, ``numba_celltree`` estimates an
-        appropriate tolerance by multiplying the maximum diagonal of the
-        bounding boxes with 1e-12.
+        accounts for the inherent inexactness of floating point calculations.
+        If None, an appropriate tolerance is automatically estimated based on
+        the geometry size. Consider adjusting this value if edge detection
+        results are unsatisfactory.
     """
 
     def _compute_weights(self, source, target, tolerance: Optional[float] = None):
@@ -598,10 +598,10 @@ class BarycentricInterpolator(BaseRegridder):
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This
-        is a floating point precision criterion, thus cannot be directly be
-        interpreted as a distance. If None, the numba_celltree estimates an
-        appropriate tolerance by multiplying the maximum diagonal of the
-        bounding boxes with 1e-12.
+        accounts for the inherent inexactness of floating point calculations.
+        If None, an appropriate tolerance is automatically estimated based on
+        the geometry size. Consider adjusting this value if edge detection
+        results are unsatisfactory.
     """
 
     _JIT_FUNCTIONS = {"mean": make_regrid(reduce.mean)}
