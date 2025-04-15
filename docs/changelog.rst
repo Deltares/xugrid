@@ -31,8 +31,12 @@ Added
   inserted vertices.
 - Added :class:`xugrid.NetworkGridder` to grid networks (Ugrid1d) to a 2D grid.
   Currently only support gridding to a Ugrid2d grid.
-- :meth:`xugrid.UgridDataArray.interpolate_na` will now also work for Ugrid1d
+- :meth:`xugrid.UgridDataArrayAccessor.interpolate_na` will now also work for Ugrid1d
   topologies.
+- :meth:`xugrid.UgridDataArrayAccessor.to_node`,
+  :meth:`xugrid.UgridDataArrayAccessor.to_edge`, and
+  :meth:`xugrid.UgridDataArrayAccessor.to_face` have been added to map data
+  from one facet of a grid to another.
 
 Fixed
 -----

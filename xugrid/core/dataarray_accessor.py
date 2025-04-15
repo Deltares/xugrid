@@ -276,59 +276,115 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
         return UgridDataArray(obj, grid)
 
-    def to_facet(self, facet: str):
+    def _to_facet(self, facet: str, contributors_dim: str):
         """
-        Map the data from one facet (e.g. node, edge, or face) to another.
-
-        This method creates a new UgridDataArray with values mapped from the
-        current facet to the target facet. The result includes a new dimension
-        with the name of the target facet, containing all connections to the
-        source facet.
-
-        As the result of ``.to_facet`` is an ordinary UgridDataArray, any
-        reduction can be applied along the newly created dimension (e.g. min,
-        max, sum, mean, etc.) to easily re-associate data. See the examples.
+        Map the data from one facet to another.
 
         Parameters
         ----------
         facet: str
-            The target facet type: 'node', 'edge', or 'face'. If the data is already
-            associated with this facet, returns a copy.
-
-        Returns
-        -------
-        mapped: UgridDataArray
-            A new UgridDataArray with data mapped to the target facet.
-
-        Examples
-        --------
-        Map node-based temperature data to faces by calculating the mean of all
-        nodes connected to each face:
-
-        >>> face_temperature = node_temperature.to_facet("face").mean("node")
+            node, edge, face
+        contributors_dim: str
+            how to name the dimension for the contributors (e.g. three nodes
+            per triangle face, two nodes per edge, etc.).
         """
         grid = self.grid
         obj = self.obj
 
         gridfacets = grid.facets
         if facet not in gridfacets:
-            return ValueError(f"facet must be one: {set(gridfacets)}")
+            raise ValueError(
+                f"Cannot map to {facet} for a {type(grid).__name__} topology."
+            )
 
         source_dim = set(grid.dimensions).intersection(obj.dims).pop()
         target_dim = getattr(grid, f"{facet}_dimension")
-        # If already on the facet, return a copy.
         if source_dim == target_dim:
-            return UgridDataArray(obj.copy(), grid)
+            raise ValueError(
+                f"No conversion needed, data is already {facet}-associated."
+            )
 
         # Find out on which facet we're currently located
-        source = {v: k for k, v in gridfacets}[source_dim]
+        source = {v: k for k, v in gridfacets.items()}[source_dim]
         connectivity = grid.format_connectivity_as_dense(
             getattr(grid, f"{facet}_{source}_connectivity")
         )
-        indexer = xr.DataArray(connectivity, dims=(target_dim, source))
+        indexer = xr.DataArray(connectivity, dims=(target_dim, contributors_dim))
         # Set the fill values (-1) to NaN
         mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
         return UgridDataArray(mapped, grid)
+
+    def to_node(self, dim="contributors"):
+        """
+        Map data to nodes.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as multiple faces/edges can connect to a single node.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the nodes of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the surrounding faces for each node:
+
+        >>> node_elevation = face_elevation.to_node().mean("contributors")
+        """
+        return self._to_facet("node", dim)
+
+    def to_edge(self, dim="contributors"):
+        """
+        Map data to edges.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as two nodes or two faces are connected to an edge.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the edges of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the nodes for each edge:
+
+        >>> edge_elevation = node_elevation.to_edge().mean("contributors")
+        """
+        return self._to_facet("edge", dim)
+
+    def to_face(self, dim="contributors"):
+        """
+        Map data to faces.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as two edges or multiple nodes are connected to a face.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the faces of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the nodes for each face:
+
+        >>> face_elevation = node_elevation.to_face().mean("contributors")
+        """
+        return self._to_facet("face", dim)
 
     def intersect_line(
         self, start: Sequence[float], end: Sequence[float]

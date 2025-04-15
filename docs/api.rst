@@ -123,6 +123,9 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.rasterize
     UgridDataArrayAccessor.rasterize_like
     UgridDataArrayAccessor.reindex_like
+    UgridDataArrayAccessor.to_node
+    UgridDataArrayAccessor.to_edge
+    UgridDataArrayAccessor.to_face
     UgridDataArrayAccessor.to_periodic
     UgridDataArrayAccessor.to_nonperiodic
     UgridDataArrayAccessor.to_geodataframe
