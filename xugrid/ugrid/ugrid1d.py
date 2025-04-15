@@ -723,9 +723,11 @@ class Ugrid1d(AbstractUgrid):
             If set to to True, the index of the new vertices in the grid will be
             returned. Defaults to False.
         tolerance: float, optional
-            Tolerance for point location. Points within this distance from an
-            edge are considered located on it. If ``None``, numba_celltree
-            estimates an appropriate tolerance value based on the network.
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------

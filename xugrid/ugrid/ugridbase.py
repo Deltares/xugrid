@@ -975,9 +975,11 @@ class AbstractUgrid(abc.ABC):
             Value to assign to out-of-bounds points if out_of_bounds is warn
             or ignore. Forwarded to xarray's ``.where()`` method.
         tolerance: float, optional
-            Tolerance for point location. Points within this distance from an
-            edge are considered located on it. If ``None``, numba_celltree
-            estimates an appropriate tolerance value based on the source grid.
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------

@@ -371,10 +371,12 @@ class CentroidLocatorRegridder(BaseRegridder):
         Source grid to regrid from.
     target: Ugrid2d, UgridDataArray
         Target grid to regrid to.
-    tolerance: Optional[float]
-        Tolerance distance used to determine if a target face centroid is
-        located on an edge between two source faces. If ``None``, numba_celltree
-        estimates an appropriate tolerance value based on the source grid.
+    tolerance: float, optional
+        The tolerance used to determine whether a point is on an edge. This
+        is a floating point precision criterion, thus cannot be directly be
+        interpreted as a distance. If None, ``numba_celltree`` estimates an
+        appropriate tolerance by multiplying the maximum diagonal of the
+        bounding boxes with 1e-12.
     """
 
     def _compute_weights(self, source, target, tolerance: Optional[float] = None):
@@ -594,10 +596,12 @@ class BarycentricInterpolator(BaseRegridder):
         Source grid to regrid from.
     target: Ugrid2d, UgridDataArray
         Target grid to regrid to.
-    tolerance: Optional[float]
-        Tolerance distance used to determine if points are located on edges in
-        the computation of barycentric weights. If ``None``, numba_celltree
-        estimates an appropriate tolerance value based on the source grid.
+    tolerance: float, optional
+        The tolerance used to determine whether a point is on an edge. This
+        is a floating point precision criterion, thus cannot be directly be
+        interpreted as a distance. If None, the numba_celltree estimates an
+        appropriate tolerance by multiplying the maximum diagonal of the
+        bounding boxes with 1e-12.
     """
 
     _JIT_FUNCTIONS = {"mean": make_regrid(reduce.mean)}

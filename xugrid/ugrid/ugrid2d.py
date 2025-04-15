@@ -982,10 +982,12 @@ class Ugrid2d(AbstractUgrid):
         Parameters
         ----------
         points: ndarray of floats with shape ``(n_point, 2)``
-        tolerance: Optional[float]
-            Tolerance distance used to determine if a target face centroid is
-            located on an edge between two source faces. If ``None``, numba_celltree
-            estimates an appropriate tolerance value based on the source grid.
+        tolerance: float, optional
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------
