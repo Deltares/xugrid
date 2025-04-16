@@ -121,6 +121,9 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        self._node_kdtree = None
+        self._edge_kdtree = None
+        self._face_kdtree = None
         # Perimeter
         self._perimeter = None
         # Area
@@ -166,6 +169,9 @@ class Ugrid2d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        self._node_kdtree = None
+        self._edge_kdtree = None
+        self._face_kdtree = None
         # Perimeter
         self._perimeter = None
         # Area
@@ -863,6 +869,12 @@ class Ugrid2d(AbstractUgrid):
         return np.unique(exterior_faces[exterior_faces != FILL_VALUE])
 
     @property
+    def face_kdtree(self):
+        if self._face_kdtree is None:
+            self._face_kdtree = KDTree(self.face_coordinates)
+        return self._face_kdtree
+
+    @property
     def celltree(self) -> CellTree2d:
         """
         Initializes the celltree if needed, and returns celltree.
@@ -944,6 +956,28 @@ class Ugrid2d(AbstractUgrid):
             ),
         }
         return obj.assign_coords(coords)
+
+    def locate_nearest_face(self, points: FloatArray, max_distance: float = np.inf):
+        """
+        Find which grid face is nearest for a collection of points.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+        max_distance: optional, float
+
+        Returns
+        -------
+        indices: ndarray of integers with shape ``(n_point,)``
+            Missing indices are indicated with -1.
+        """
+        _, indices = self.face_kdtree.query(
+            points, distance_upper_bound=max_distance, workers=-1
+        )
+        # The scipy KDTree returns missing indices (e.g. out of max_distance) with n.
+        # We use -1 for consistency.
+        indices[indices == self.n_face] = -1
+        return indices
 
     def locate_bounding_box(
         self, xmin: float, ymin: float, xmax: float, ymax: float

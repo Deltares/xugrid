@@ -8,7 +8,7 @@ import pytest
 import shapely
 import xarray as xr
 from matplotlib.collections import LineCollection
-from scipy import sparse
+from scipy import sparse, spatial
 
 import xugrid
 
@@ -173,6 +173,10 @@ def test_ugrid2d_properties():
         grid.start_index = 2
     grid.start_index = 1
     assert grid._start_index == 1
+
+    assert isinstance(grid.node_kdtree, spatial.KDTree)
+    assert isinstance(grid.edge_kdtree, spatial.KDTree)
+    assert isinstance(grid.face_kdtree, spatial.KDTree)
 
 
 def test_validate_edge_node_connectivity():
@@ -464,6 +468,9 @@ def test_clear_geometry_properties():
         "_mesh",
         "_meshkernel",
         "_celltree",
+        "_node_kdtree",
+        "_edge_kdtree",
+        "_face_kdtree",
         "_centroids",
         "_xmin",
         "_xmax",
@@ -1711,3 +1718,20 @@ def test_nearest_interpolate():
     data[0] = 1.0
     actual = grid._nearest_interpolate(data, grid.edge_dimension, np.inf)
     assert np.allclose(actual, 1.0)
+
+
+def test_locate_nearest():
+    grid = grid2d()
+
+    indices = grid.locate_nearest_node(grid.node_coordinates)
+    assert np.array_equal(indices, [0, 1, 2, 3, 4, 5, 6])
+
+    indices = grid.locate_nearest_edge(grid.edge_coordinates)
+    assert np.array_equal(indices, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+    indices = grid.locate_nearest_face(grid.face_coordinates)
+    assert np.array_equal(indices, [0, 1, 2, 3])
+
+    assert np.array_equal(grid.locate_nearest_node([[-10.0, 0.0]], 1.0), [-1])
+    assert np.array_equal(grid.locate_nearest_edge([[-10.0, 0.0]], 1.0), [-1])
+    assert np.array_equal(grid.locate_nearest_face([[-10.0, 0.0]], 1.0), [-1])

@@ -36,6 +36,14 @@ Added
 - Added ``tolerance`` argument to :meth:`xugrid.Ugrid1d.sel_points`,
   :meth:`xugrid.Ugrid1d.refine_by_vertices` and
   :meth:`xugrid.Ugrid2d.sel_points`, :meth:`xugrid.Ugrid2d.locate_centroids`.
+- Added: :attr:`xugrid.Ugrid1d.node_kdtree`,
+  :attr:`xugrid.Ugrid1d.edge_kdtree`, :attr:`xugrid.Ugrid2d.node_kdtree`,
+  :attr:`xugrid.Ugrid2d.edge_kdtree`, :attr:`xugrid.Ugrid2d.face_kdtree`,
+  :attr:`xugrid.Ugrid1d.locate_nearest_node`,
+  :meth:`xugrid.Ugrid1d.locate_nearest_edge`,
+  :meth:`xugrid.Ugrid2d.locate_nearest_node`,
+  :meth:`xugrid.Ugrid2d.locate_nearest_edge`, and
+  :meth:`xugrid.Ugrid2d.locate_nearest_face` to search based on proximity.
 
 Fixed
 -----
