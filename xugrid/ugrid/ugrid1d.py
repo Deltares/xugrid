@@ -91,6 +91,8 @@ class Ugrid1d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        self._node_kdtree = None
+        self._edge_kdtree = None
         # Bounds
         self._xmin = None
         self._xmax = None
@@ -182,6 +184,8 @@ class Ugrid1d(AbstractUgrid):
         self._meshkernel = None
         # Celltree
         self._celltree = None
+        self._node_kdtree = None
+        self._edge_kdtree = None
         # Bounds
         self._xmin = None
         self._xmax = None

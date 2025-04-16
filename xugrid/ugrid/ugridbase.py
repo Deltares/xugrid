@@ -10,6 +10,7 @@ import xarray as xr
 from numba_celltree import CellTree2d, EdgeCellTree2d
 from numpy.typing import ArrayLike
 from scipy.sparse import coo_matrix, csr_matrix
+from scipy.spatial import KDTree
 
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
@@ -945,6 +946,18 @@ class AbstractUgrid(abc.ABC):
     def celltree(self) -> Union[EdgeCellTree2d, CellTree2d]:
         raise NotImplementedError("Celltree must be implemented in subclass")
 
+    @property
+    def node_kdtree(self):
+        if self._node_kdtree is None:
+            self._node_kdtree = KDTree(self.node_coordinates)
+        return self._node_kdtree
+
+    @property
+    def edge_kdtree(self):
+        if self._edge_kdtree is None:
+            self._edge_kdtree = KDTree(self.edge_coordinates)
+        return self._edge_kdtree
+
     def sel_points(
         self,
         obj,
@@ -1031,6 +1044,50 @@ class AbstractUgrid(abc.ABC):
         if condition is not None:
             selection = selection.where(condition, other=fill_value)
         return selection
+
+    def locate_nearest_node(self, points: FloatArray, max_distance: float = np.inf):
+        """
+        Find which grid node is nearest for a collection of points.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+        max_distance: optional, float
+
+        Returns
+        -------
+        indices: ndarray of integers with shape ``(n_point,)``
+            Missing indices are indicated with -1.
+        """
+        _, indices = self.node_kdtree.query(
+            points, distance_upper_bound=max_distance, workers=-1
+        )
+        # The scipy KDTree returns missing indices (e.g. out of max_distance) with n.
+        # We use -1 for consistency.
+        indices[indices == self.n_node] = -1
+        return indices
+
+    def locate_nearest_edge(self, points: FloatArray, max_distance: float = np.inf):
+        """
+        Find which grid node is nearest for a collection of points.
+
+        Parameters
+        ----------
+        points: ndarray of floats with shape ``(n_point, 2)``
+        max_distance: optional, float
+
+        Returns
+        -------
+        indices: ndarray of integers with shape ``(n_point,)``
+            Missing indices are indicated with -1.
+        """
+        _, indices = self.edge_kdtree.query(
+            points, distance_upper_bound=max_distance, workers=-1
+        )
+        # The scipy KDTree returns missing indices (e.g. out of max_distance) with n.
+        # We use -1 for consistency.
+        indices[indices == self.n_edge] = -1
+        return indices
 
     def locate_points(self, points: FloatArray, tolerance: Optional[float] = None):
         """

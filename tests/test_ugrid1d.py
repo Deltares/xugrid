@@ -7,7 +7,7 @@ import pytest
 import shapely
 import xarray as xr
 from matplotlib.collections import LineCollection
-from scipy import sparse
+from scipy import sparse, spatial
 
 import xugrid
 
@@ -116,6 +116,9 @@ def test_ugrid1d_properties():
         grid.start_index = 2
     grid.start_index = 1
     assert grid._start_index == 1
+
+    assert isinstance(grid.node_kdtree, spatial.KDTree)
+    assert isinstance(grid.edge_kdtree, spatial.KDTree)
 
 
 def test_ugrid1d_egde_bounds():
@@ -258,6 +261,8 @@ def test_clear_geometry_properties():
     for attr in [
         "_mesh",
         "_meshkernel",
+        "_node_kdtree",
+        "_edge_kdtree",
         "_celltree",
         "_xmin",
         "_xmax",
@@ -768,3 +773,25 @@ def test_nearest_interpolate():
     data = np.array([0.0, np.nan, np.nan, 4.0])
     actual = grid._nearest_interpolate(data, grid.edge_dimension, np.inf)
     assert np.allclose(actual, np.array([0.0, 0.0, 4.0, 4.0]))
+
+
+def test_locate_nearest():
+    grid = grid1d()
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+        ]
+    )
+    indices = grid.locate_nearest_node(xy)
+    assert np.array_equal(indices, [0, 1, 2])
+
+    indices = grid.locate_nearest_edge(grid.edge_coordinates)
+    assert np.array_equal(indices, [0, 1])
+
+    indices = grid.locate_nearest_node([[0.0, 10.0]], max_distance=1.0)
+    assert np.array_equal(indices, [-1])
+
+    indices = grid.locate_nearest_edge([[0.0, 10.0]], max_distance=1.0)
+    assert np.array_equal(indices, [-1])
