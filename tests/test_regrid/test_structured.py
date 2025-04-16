@@ -255,7 +255,7 @@ def test_locate_centroids_2d(grid_data_a_2d, grid_data_b_2d):
     # 4        10      1
     # --------
     assert_expected_overlap(
-        *grid_data_a_2d.locate_centroids(grid_data_b_2d),
+        *grid_data_a_2d.locate_centroids(grid_data_b_2d, None),
         np.array([0, 1, 3, 4]),
         np.array([5, 6, 9, 10]),
         np.ones(4),

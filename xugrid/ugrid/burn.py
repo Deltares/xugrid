@@ -5,13 +5,9 @@ from typing import List, Union
 import numba as nb
 import numpy as np
 import xarray as xr
-from numba_celltree.constants import TOLERANCE_ON_EDGE, Point, Triangle
-from numba_celltree.geometry_utils import (
-    as_point,
-    as_triangle,
-    cross_product,
-    to_vector,
-)
+from numba_celltree.celltree_base import default_tolerance
+from numba_celltree.constants import Point
+from numba_celltree.geometry_utils import points_in_triangles
 
 import xugrid
 from xugrid.constants import FloatArray, IntArray, MissingOptionalModule
@@ -52,58 +48,6 @@ def in_bounds(p: Point, a: Point, b: Point) -> bool:
         if dy > 0:
             return a.y <= p.y and p.y <= b.y
         return b.y <= p.y and p.y <= a.y
-
-
-@nb.njit(inline="always")
-def point_in_triangle(p: Point, t: Triangle) -> bool:
-    # TODO: move this into numba_celltree instead?
-    ap = to_vector(t.a, p)
-    bp = to_vector(t.b, p)
-    cp = to_vector(t.c, p)
-    ab = to_vector(t.a, t.b)
-    bc = to_vector(t.b, t.c)
-    ca = to_vector(t.c, t.a)
-    # Do a half plane check.
-    A = cross_product(ab, ap)
-    B = cross_product(bc, bp)
-    C = cross_product(ca, cp)
-    signA = A > 0
-    signB = B > 0
-    signC = C > 0
-    if (signA == signB) and (signB == signC):
-        return True
-
-    # Test whether p is located on/very close to edges.
-    if (
-        (abs(A) < TOLERANCE_ON_EDGE)
-        and in_bounds(p, t.a, t.b)
-        or (abs(B) < TOLERANCE_ON_EDGE)
-        and in_bounds(p, t.b, t.c)
-        or (abs(C) < TOLERANCE_ON_EDGE)
-        and in_bounds(p, t.c, t.a)
-    ):
-        return True
-
-    return False
-
-
-@nb.njit(inline="always", parallel=True, cache=True)
-def points_in_triangles(
-    points: FloatArray,
-    face_indices: IntArray,
-    faces: IntArray,
-    vertices: FloatArray,
-):
-    # TODO: move this into numba_celltree instead?
-    n_points = len(points)
-    inside = np.empty(n_points, dtype=np.bool_)
-    for i in nb.prange(n_points):
-        face_index = face_indices[i]
-        face = faces[face_index]
-        triangle = as_triangle(vertices, face)
-        point = as_point(points[i])
-        inside[i] = point_in_triangle(point, triangle)
-    return inside
 
 
 def _locate_polygon(
@@ -148,12 +92,14 @@ def _locate_polygon(
     if all_touched:
         return grid_indices
     else:
+        tolerance = default_tolerance(grid.celltree.bb_distances[:, 2])
         centroids = grid.centroids[grid_indices]
         inside = points_in_triangles(
             points=centroids,
             face_indices=triangle_indices,
             faces=triangles,
             vertices=vertices,
+            tolerance=tolerance,
         )
         return grid_indices[inside]
 

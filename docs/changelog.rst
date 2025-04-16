@@ -33,6 +33,9 @@ Added
   Currently only support gridding to a Ugrid2d grid.
 - :meth:`xugrid.UgridDataArray.interpolate_na` will now also work for Ugrid1d
   topologies.
+- Added ``tolerance`` argument to :meth:`xugrid.Ugrid1d.sel_points`,
+  :meth:`xugrid.Ugrid1d.refine_by_vertices` and
+  :meth:`xugrid.Ugrid2d.sel_points`, :meth:`xugrid.Ugrid2d.locate_centroids`.
 
 Fixed
 -----

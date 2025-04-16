@@ -670,6 +670,9 @@ def test_celltree():
 def test_locate_points():
     grid = grid2d()
     assert np.array_equal(grid.locate_points(CENTROIDS), [0, 1, 2, 3])
+    # Test tolerance
+    centroids_offset = [[-0.01, 1.0], [-0.01, 0.5]]
+    assert np.array_equal(grid.locate_points(centroids_offset, 0.011), [0, 0])
 
 
 def test_locate_bounding_box():
@@ -702,6 +705,22 @@ def test_compute_barycentric_weights():
     face, weights = grid.compute_barycentric_weights(xy)
     assert np.array_equal(face, expected_face)
     assert np.allclose(weights, expected_weights)
+    # Test with tolerance. First point goes out of bounds, tolerance shouldn't
+    # matter.
+    xy[:, 0] -= 0.01
+    face, weights = grid.compute_barycentric_weights(xy, tolerance=0.01)
+    expected_face = np.array([-1, 0, 1, 2, -1])
+    expected_weights = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0],
+            [0.25, 0.25, 0.25, 0.25],
+            [0.25, 0.25, 0.25, 0.25],
+            [0.5, 0.0, 0.5, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    assert np.array_equal(face, expected_face)
+    assert np.allclose(weights, expected_weights, atol=0.05)
 
 
 def test_rasterize():
@@ -794,6 +813,12 @@ class TestUgrid2dSelection:
             obj=self.obj, x=x, y=y, out_of_bounds="ignore", fill_value=-1
         )
         assert np.allclose(actual, [-1, 0, -1, 3, -1])
+        # Case with tolerance, tolerance shouldn't affect results since points
+        # are out of bounds
+        actual = self.grid.sel_points(
+            obj=self.obj, x=x, y=y, out_of_bounds="drop", tolerance=11.0
+        )
+        assert np.array_equal(actual[f"{NAME}_index"], [1, 3])
 
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):

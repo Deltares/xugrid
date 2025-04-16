@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numba as nb
 import numpy as np
 import xarray as xr
@@ -128,16 +130,16 @@ class UnstructuredGrid2d:
             weights /= self.area[source_index]
         return source_index, target_index, weights
 
-    def locate_centroids(self, other):
+    def locate_centroids(self, other, tolerance: Optional[float] = None):
         tree = self.ugrid_topology.celltree
-        source_index = tree.locate_points(other.ugrid_topology.centroids)
+        source_index = tree.locate_points(other.ugrid_topology.centroids, tolerance)
         inside = source_index != -1
         source_index = source_index[inside]
         target_index = np.arange(other.size, dtype=source_index.dtype)[inside]
         weight_values = np.ones_like(source_index, dtype=FloatDType)
         return source_index, target_index, weight_values
 
-    def barycentric(self, other):
+    def barycentric(self, other, tolerance: Optional[float] = None):
         points = other.ugrid_topology.centroids
         grid = self.ugrid_topology
 
@@ -164,7 +166,9 @@ class UnstructuredGrid2d:
             -1,
             faces,
         )
-        face_index, weights = voronoi_grid.compute_barycentric_weights(points)
+        face_index, weights = voronoi_grid.compute_barycentric_weights(
+            points, tolerance
+        )
 
         # Find which nodes are interpolated. Redistribute their weights
         # according to distance to projection vertex.
