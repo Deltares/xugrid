@@ -310,6 +310,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             getattr(grid, f"{facet}_{source}_connectivity")
         )
         indexer = xr.DataArray(connectivity, dims=(target_dim, contributors_dim))
+        # Ensure the source dimension is not chunked for efficient indexing.
+        obj = obj.chunk({source_dim: -1})
         # Set the fill values (-1) to NaN
         mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
         return UgridDataArray(mapped, grid)
