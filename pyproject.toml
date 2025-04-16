@@ -12,6 +12,7 @@ dependencies = [
     'pandas',
     'numba',
     'numba_celltree>=0.4.1',
+    'dask>=2025.1.0',
     'numpy',
     'pooch',
     'scipy',
@@ -74,15 +75,14 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
 xugrid = { path = ".", editable = true }
-numba_celltree = ">=0.4.1"
 
 [tool.pixi.dependencies]
-dask = "*"
+dask = ">=2025.1.0"
 geopandas = "*"
 mapbox_earcut = "*"
 matplotlib-base = "*"
 netcdf4 = "*"
-# numba_celltree = ">=0.4.0"
+numba_celltree = ">=0.4.1"
 numpy = "*"
 pip = "*"
 pooch = "*"
@@ -93,7 +93,7 @@ pyproj = "*"
 pytest = "*"
 pytest-cases = "*"
 pytest-cov = "*"
-python = ">=3.9"
+python = ">=3.10"
 ruff = "*"
 shapely = ">=2.0"
 scipy = "*"
