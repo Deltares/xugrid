@@ -416,6 +416,9 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rasterize.html">xugrid.UgridDataArrayAccessor.rasterize</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.rasterize_like.html">xugrid.UgridDataArrayAccessor.rasterize_like</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.reindex_like.html">xugrid.UgridDataArrayAccessor.reindex_like</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_node.html">xugrid.UgridDataArrayAccessor.to_node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_edge.html">xugrid.UgridDataArrayAccessor.to_edge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_face.html">xugrid.UgridDataArrayAccessor.to_face</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_periodic.html">xugrid.UgridDataArrayAccessor.to_periodic</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_nonperiodic.html">xugrid.UgridDataArrayAccessor.to_nonperiodic</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_geodataframe.html">xugrid.UgridDataArrayAccessor.to_geodataframe</a></li>
@@ -776,19 +779,28 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_dataset.html#xugrid.UgridDataArrayAccessor.to_dataset" title="xugrid.UgridDataArrayAccessor.to_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dataset</span></code></a>([optional_attributes])</p></td>
 <td><p>Convert this UgridDataArray or UgridDataset into a standard xarray.Dataset.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_edge.html#xugrid.UgridDataArrayAccessor.to_edge" title="xugrid.UgridDataArrayAccessor.to_edge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_edge</span></code></a>([dim])</p></td>
+<td><p>Map data to edges.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_face.html#xugrid.UgridDataArrayAccessor.to_face" title="xugrid.UgridDataArrayAccessor.to_face"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_face</span></code></a>([dim])</p></td>
+<td><p>Map data to faces.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_geodataframe.html#xugrid.UgridDataArrayAccessor.to_geodataframe" title="xugrid.UgridDataArrayAccessor.to_geodataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_geodataframe</span></code></a>([name, dim_order])</p></td>
 <td><p>Convert data and topology of one facet (node, edge, face) of the grid to a geopandas GeoDataFrame.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_netcdf.html#xugrid.UgridDataArrayAccessor.to_netcdf" title="xugrid.UgridDataArrayAccessor.to_netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant netCDF file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_nonperiodic.html#xugrid.UgridDataArrayAccessor.to_nonperiodic" title="xugrid.UgridDataArrayAccessor.to_nonperiodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nonperiodic</span></code></a>(xmax)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_node.html#xugrid.UgridDataArrayAccessor.to_node" title="xugrid.UgridDataArrayAccessor.to_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_node</span></code></a>([dim])</p></td>
+<td><p>Map data to nodes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_nonperiodic.html#xugrid.UgridDataArrayAccessor.to_nonperiodic" title="xugrid.UgridDataArrayAccessor.to_nonperiodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_nonperiodic</span></code></a>(xmax)</p></td>
 <td><p>Convert this grid from a periodic grid (where the rightmost boundary shares its nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes are separate from the rightmost nodes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_periodic.html#xugrid.UgridDataArrayAccessor.to_periodic" title="xugrid.UgridDataArrayAccessor.to_periodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodic</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_periodic.html#xugrid.UgridDataArrayAccessor.to_periodic" title="xugrid.UgridDataArrayAccessor.to_periodic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodic</span></code></a>()</p></td>
 <td><p>Convert this grid to a periodic grid, where the rightmost boundary shares its nodes with the leftmost boundary.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.UgridDataArrayAccessor.to_zarr.html#xugrid.UgridDataArrayAccessor.to_zarr" title="xugrid.UgridDataArrayAccessor.to_zarr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_zarr</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a UGRID compliant Zarr file.</p></td>
 </tr>
 </tbody>

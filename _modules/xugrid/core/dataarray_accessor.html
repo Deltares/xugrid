@@ -691,6 +691,132 @@
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_facet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">newdim</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map the data from one facet to another.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        facet: str</span>
+<span class="sd">            node, edge, face</span>
+<span class="sd">        newdim: str</span>
+<span class="sd">            how to name the new dimension, e.g. three nodes</span>
+<span class="sd">            per triangle face, two nodes per edge, etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+
+        <span class="n">gridfacets</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">facets</span>
+        <span class="k">if</span> <span class="n">facet</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gridfacets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot map to </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2"> for a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> topology.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">newdim</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dimension </span><span class="si">{</span><span class="n">newdim</span><span class="si">}</span><span class="s2"> already exists. Please provide a new dimension name.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">source_dim</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">target_dim</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">_dimension&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">source_dim</span> <span class="o">==</span> <span class="n">target_dim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;No conversion needed, data is already </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">-associated.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Find out on which facet we&#39;re currently located</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">gridfacets</span><span class="o">.</span><span class="n">items</span><span class="p">()}[</span><span class="n">source_dim</span><span class="p">]</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">format_connectivity_as_dense</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">_connectivity&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">indexer</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">target_dim</span><span class="p">,</span> <span class="n">newdim</span><span class="p">))</span>
+        <span class="c1"># Ensure the source dimension is not chunked for efficient indexing.</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">chunk</span><span class="p">({</span><span class="n">source_dim</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+        <span class="c1"># Set the fill values (-1) to NaN</span>
+        <span class="n">mapped</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">source_dim</span><span class="p">:</span> <span class="n">indexer</span><span class="p">})</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">connectivity</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">mapped</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_node">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.to_node.html#xugrid.UgridDataArrayAccessor.to_node">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nmax&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map data to nodes.</span>
+
+<span class="sd">        Creates a new dimension representing the contributing source elements</span>
+<span class="sd">        for each node, as multiple faces/edges can connect to a single node.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mapped: UgridDataArray</span>
+<span class="sd">            A new UgridDataArray with data mapped to the nodes of the grid.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Compute the mean elevation based on the surrounding faces for each node:</span>
+
+<span class="sd">        &gt;&gt;&gt; node_elevation = face_elevation.to_node().mean(&quot;contributors&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_facet</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_edge">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.to_edge.html#xugrid.UgridDataArrayAccessor.to_edge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nmax&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map data to edges.</span>
+
+<span class="sd">        Creates a new dimension representing the contributing source elements</span>
+<span class="sd">        for each node, as two nodes or two faces are connected to an edge.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mapped: UgridDataArray</span>
+<span class="sd">            A new UgridDataArray with data mapped to the edges of the grid.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Compute the mean elevation based on the nodes for each edge:</span>
+
+<span class="sd">        &gt;&gt;&gt; edge_elevation = node_elevation.to_edge().mean(&quot;contributors&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_facet</span><span class="p">(</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UgridDataArrayAccessor.to_face">
+<a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.to_face.html#xugrid.UgridDataArrayAccessor.to_face">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_face</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nmax&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Map data to faces.</span>
+
+<span class="sd">        Creates a new dimension representing the contributing source elements</span>
+<span class="sd">        for each node, as two edges or multiple nodes are connected to a face.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dim : str, optional</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mapped: UgridDataArray</span>
+<span class="sd">            A new UgridDataArray with data mapped to the faces of the grid.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Compute the mean elevation based on the nodes for each face:</span>
+
+<span class="sd">        &gt;&gt;&gt; face_elevation = node_elevation.to_face().mean(&quot;contributors&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_facet</span><span class="p">(</span><span class="s2">&quot;face&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="UgridDataArrayAccessor.intersect_line">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.intersect_line.html#xugrid.UgridDataArrayAccessor.intersect_line">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">intersect_line</span><span class="p">(</span>
