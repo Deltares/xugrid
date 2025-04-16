@@ -276,7 +276,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
         return UgridDataArray(obj, grid)
 
-    def _to_facet(self, facet: str, contributors_dim: str):
+    def _to_facet(self, facet: str, newdim: str):
         """
         Map the data from one facet to another.
 
@@ -284,9 +284,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         ----------
         facet: str
             node, edge, face
-        contributors_dim: str
-            how to name the dimension for the contributors (e.g. three nodes
-            per triangle face, two nodes per edge, etc.).
+        newdim: str
+            how to name the new dimension, e.g. three nodes
+            per triangle face, two nodes per edge, etc.
         """
         grid = self.grid
         obj = self.obj
@@ -295,6 +295,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         if facet not in gridfacets:
             raise ValueError(
                 f"Cannot map to {facet} for a {type(grid).__name__} topology."
+            )
+
+        if newdim in obj.dims:
+            raise ValueError(
+                f"Dimension {newdim} already exists. Please provide a new dimension name."
             )
 
         source_dim = set(grid.dimensions).intersection(obj.dims).pop()
@@ -309,14 +314,14 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         connectivity = grid.format_connectivity_as_dense(
             getattr(grid, f"{facet}_{source}_connectivity")
         )
-        indexer = xr.DataArray(connectivity, dims=(target_dim, contributors_dim))
+        indexer = xr.DataArray(connectivity, dims=(target_dim, newdim))
         # Ensure the source dimension is not chunked for efficient indexing.
         obj = obj.chunk({source_dim: -1})
         # Set the fill values (-1) to NaN
         mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
         return UgridDataArray(mapped, grid)
 
-    def to_node(self, dim="contributors"):
+    def to_node(self, dim: str = "nmax"):
         """
         Map data to nodes.
 
@@ -340,7 +345,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         return self._to_facet("node", dim)
 
-    def to_edge(self, dim="contributors"):
+    def to_edge(self, dim: str = "nmax"):
         """
         Map data to edges.
 
@@ -364,7 +369,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         return self._to_facet("edge", dim)
 
-    def to_face(self, dim="contributors"):
+    def to_face(self, dim: str = "nmax"):
         """
         Map data to faces.
 

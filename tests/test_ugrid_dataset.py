@@ -380,30 +380,32 @@ class TestUgridDataArray:
         assert isinstance(actual.data, dask.array.Array)
 
     def test_to_facets(self):
-        with pytest.raises(ValueError, match="No conversion needed"):
-            self.uda.ugrid.to_face()
-
         face_da = self.uda
         grid = face_da.ugrid.grid
+
+        with pytest.raises(ValueError, match="No conversion needed"):
+            face_da.ugrid.to_face()
+        with pytest.raises(ValueError, match="already exists"):
+            face_da.ugrid.to_face(grid.face_dimension)
 
         node_da = face_da.ugrid.to_node()
         edge_da = face_da.ugrid.to_edge()
         assert isinstance(node_da, xugrid.UgridDataArray)
         assert isinstance(edge_da, xugrid.UgridDataArray)
 
-        back1 = node_da.mean("contributors").ugrid.to_face()
-        back2 = edge_da.mean("contributors").ugrid.to_face()
-        cross1 = node_da.mean("contributors").ugrid.to_edge()
-        cross2 = edge_da.mean("contributors").ugrid.to_node()
+        back1 = node_da.mean("nmax").ugrid.to_face()
+        back2 = edge_da.mean("nmax").ugrid.to_face()
+        cross1 = node_da.mean("nmax").ugrid.to_edge()
+        cross2 = edge_da.mean("nmax").ugrid.to_node()
 
         assert isinstance(back1, xugrid.UgridDataArray)
         assert isinstance(back2, xugrid.UgridDataArray)
         assert isinstance(cross1, xugrid.UgridDataArray)
         assert isinstance(cross2, xugrid.UgridDataArray)
 
-        assert node_da.dims == (grid.node_dimension, "contributors")
-        assert edge_da.dims == (grid.edge_dimension, "contributors")
-        assert back1.dims == (grid.face_dimension, "contributors")
+        assert node_da.dims == (grid.node_dimension, "nmax")
+        assert edge_da.dims == (grid.edge_dimension, "nmax")
+        assert back1.dims == (grid.face_dimension, "nmax")
 
         # Check fill values, should contain two NaNs for the fill value.
         assert back1[2:, -1].isnull().all()
@@ -1568,8 +1570,8 @@ def test_to_facets_1d():
     to_node = uds["b1d"].ugrid.to_node()
     assert isinstance(to_edge, xugrid.UgridDataArray)
     assert isinstance(to_node, xugrid.UgridDataArray)
-    assert to_edge.dims == (grid.edge_dimension, "contributors")
-    assert to_node.dims == (grid.node_dimension, "contributors")
+    assert to_edge.dims == (grid.edge_dimension, "nmax")
+    assert to_node.dims == (grid.node_dimension, "nmax")
 
 
 def test_laplace_interpolate_1d():
