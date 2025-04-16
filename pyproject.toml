@@ -7,11 +7,12 @@ name = "xugrid"
 description = "Xarray extension for unstructured grids"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     'pandas',
     'numba',
     'numba_celltree>=0.4.1',
+    'dask>=2025.1.0',
     'numpy',
     'pooch',
     'scipy',
@@ -25,7 +26,6 @@ classifiers = [
     'Programming Language :: Python',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
@@ -75,15 +75,14 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 
 [tool.pixi.pypi-dependencies]
 xugrid = { path = ".", editable = true }
-numba_celltree = ">=0.4.1"
 
 [tool.pixi.dependencies]
-dask = "*"
+dask = ">=2025.1.0"
 geopandas = "*"
 mapbox_earcut = "*"
 matplotlib-base = "*"
 netcdf4 = "*"
-# numba_celltree = ">=0.4.0"
+numba_celltree = ">=0.4.1"
 numpy = "*"
 pip = "*"
 pooch = "*"
@@ -94,7 +93,7 @@ pyproj = "*"
 pytest = "*"
 pytest-cases = "*"
 pytest-cov = "*"
-python = ">=3.9"
+python = ">=3.10"
 ruff = "*"
 shapely = ">=2.0"
 scipy = "*"
@@ -126,16 +125,12 @@ python = "3.11.*"
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"
 
-[tool.pixi.feature.py309.dependencies]
-python = "3.9.*"
-
 [tool.pixi.environments]
 default = { features = ["py312"], solve-group = "py312" }
 py313 = { features = ["py313"], solve-group = "py313" }
 py312 = { features = ["py312"], solve-group = "py312" }
 py311 = ["py311"]
 py310 = ["py310"]
-py309 = ["py309"]
 
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/

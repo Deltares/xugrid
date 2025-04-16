@@ -276,6 +276,123 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
         return UgridDataArray(obj, grid)
 
+    def _to_facet(self, facet: str, newdim: str):
+        """
+        Map the data from one facet to another.
+
+        Parameters
+        ----------
+        facet: str
+            node, edge, face
+        newdim: str
+            how to name the new dimension, e.g. three nodes
+            per triangle face, two nodes per edge, etc.
+        """
+        grid = self.grid
+        obj = self.obj
+
+        gridfacets = grid.facets
+        if facet not in gridfacets:
+            raise ValueError(
+                f"Cannot map to {facet} for a {type(grid).__name__} topology."
+            )
+
+        if newdim in obj.dims:
+            raise ValueError(
+                f"Dimension {newdim} already exists. Please provide a new dimension name."
+            )
+
+        source_dim = set(grid.dimensions).intersection(obj.dims).pop()
+        target_dim = getattr(grid, f"{facet}_dimension")
+        if source_dim == target_dim:
+            raise ValueError(
+                f"No conversion needed, data is already {facet}-associated."
+            )
+
+        # Find out on which facet we're currently located
+        source = {v: k for k, v in gridfacets.items()}[source_dim]
+        connectivity = grid.format_connectivity_as_dense(
+            getattr(grid, f"{facet}_{source}_connectivity")
+        )
+        indexer = xr.DataArray(connectivity, dims=(target_dim, newdim))
+        # Ensure the source dimension is not chunked for efficient indexing.
+        obj = obj.chunk({source_dim: -1})
+        # Set the fill values (-1) to NaN
+        mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
+        return UgridDataArray(mapped, grid)
+
+    def to_node(self, dim: str = "nmax"):
+        """
+        Map data to nodes.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as multiple faces/edges can connect to a single node.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the nodes of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the surrounding faces for each node:
+
+        >>> node_elevation = face_elevation.to_node().mean("contributors")
+        """
+        return self._to_facet("node", dim)
+
+    def to_edge(self, dim: str = "nmax"):
+        """
+        Map data to edges.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as two nodes or two faces are connected to an edge.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the edges of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the nodes for each edge:
+
+        >>> edge_elevation = node_elevation.to_edge().mean("contributors")
+        """
+        return self._to_facet("edge", dim)
+
+    def to_face(self, dim: str = "nmax"):
+        """
+        Map data to faces.
+
+        Creates a new dimension representing the contributing source elements
+        for each node, as two edges or multiple nodes are connected to a face.
+
+        Parameters
+        ----------
+        dim : str, optional
+
+        Returns
+        -------
+        mapped: UgridDataArray
+            A new UgridDataArray with data mapped to the faces of the grid.
+
+        Examples
+        --------
+        Compute the mean elevation based on the nodes for each face:
+
+        >>> face_elevation = node_elevation.to_face().mean("contributors")
+        """
+        return self._to_facet("face", dim)
+
     def intersect_line(
         self, start: Sequence[float], end: Sequence[float]
     ) -> xr.DataArray:

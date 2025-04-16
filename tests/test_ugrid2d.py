@@ -146,6 +146,11 @@ def test_ugrid2d_properties():
     assert grid.n_edge == 10
     assert grid.n_face == 4
     assert grid.n_max_node_per_face == 4
+    assert grid.facets == {
+        "node": grid.node_dimension,
+        "edge": grid.edge_dimension,
+        "face": grid.face_dimension,
+    }
     assert np.array_equal(grid.n_node_per_face, [4, 4, 3, 3])
     assert np.allclose(grid.node_coordinates, VERTICES)
     assert grid.bounds == (0.0, 0.0, 2.0, 2.0)

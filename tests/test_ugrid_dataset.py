@@ -379,6 +379,38 @@ class TestUgridDataArray:
         assert set(actual.dims) == set(nd_uda2.dims)
         assert isinstance(actual.data, dask.array.Array)
 
+    def test_to_facets(self):
+        face_da = self.uda
+        grid = face_da.ugrid.grid
+
+        with pytest.raises(ValueError, match="No conversion needed"):
+            face_da.ugrid.to_face()
+        with pytest.raises(ValueError, match="already exists"):
+            face_da.ugrid.to_face(grid.face_dimension)
+
+        node_da = face_da.ugrid.to_node()
+        edge_da = face_da.ugrid.to_edge()
+        assert isinstance(node_da, xugrid.UgridDataArray)
+        assert isinstance(edge_da, xugrid.UgridDataArray)
+
+        back1 = node_da.mean("nmax").ugrid.to_face()
+        back2 = edge_da.mean("nmax").ugrid.to_face()
+        cross1 = node_da.mean("nmax").ugrid.to_edge()
+        cross2 = edge_da.mean("nmax").ugrid.to_node()
+
+        assert isinstance(back1, xugrid.UgridDataArray)
+        assert isinstance(back2, xugrid.UgridDataArray)
+        assert isinstance(cross1, xugrid.UgridDataArray)
+        assert isinstance(cross2, xugrid.UgridDataArray)
+
+        assert node_da.dims == (grid.node_dimension, "nmax")
+        assert edge_da.dims == (grid.edge_dimension, "nmax")
+        assert back1.dims == (grid.face_dimension, "nmax")
+
+        # Check fill values, should contain two NaNs for the fill value.
+        assert back1[2:, -1].isnull().all()
+        assert back1.isnull().sum() == 2
+
     def test_to_dataset(self):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
@@ -1522,6 +1554,24 @@ def test_laplace_interpolate_facets():
         actual = uda.ugrid.interpolate_na()
         assert isinstance(actual, xugrid.UgridDataArray)
         assert np.allclose(actual, 1.0)
+
+
+def test_to_facets_1d():
+    uds = ugrid1d_ds()
+    with pytest.raises(ValueError, match="Cannot map to face"):
+        uds["a1d"].ugrid.to_face()
+    with pytest.raises(ValueError, match="No conversion needed"):
+        uds["a1d"].ugrid.to_node()
+    with pytest.raises(ValueError, match="No conversion needed"):
+        uds["b1d"].ugrid.to_edge()
+
+    grid = uds.ugrid.grid
+    to_edge = uds["a1d"].ugrid.to_edge()
+    to_node = uds["b1d"].ugrid.to_node()
+    assert isinstance(to_edge, xugrid.UgridDataArray)
+    assert isinstance(to_node, xugrid.UgridDataArray)
+    assert to_edge.dims == (grid.edge_dimension, "nmax")
+    assert to_node.dims == (grid.node_dimension, "nmax")
 
 
 def test_laplace_interpolate_1d():

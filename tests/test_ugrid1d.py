@@ -87,6 +87,7 @@ def test_ugrid1d_properties():
     assert grid.edge_dimension == f"{NAME}_nEdges"
     assert grid.n_node == 3
     assert grid.n_edge == 2
+    assert grid.facets == {"node": grid.node_dimension, "edge": grid.edge_dimension}
     expected_coords = np.array([[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]])
     assert np.allclose(grid.node_coordinates, expected_coords)
     assert np.allclose(grid.edge_x, [0.5, 1.5])

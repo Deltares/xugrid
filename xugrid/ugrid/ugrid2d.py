@@ -712,6 +712,14 @@ class Ugrid2d(AbstractUgrid):
                 f"{self.face_dimension}; got: {dim}",
             )
 
+    @property
+    def facets(self) -> dict[str, str]:
+        return {
+            "node": self.node_dimension,
+            "edge": self.edge_dimension,
+            "face": self.face_dimension,
+        }
+
     def get_connectivity_matrix(self, dim: str, xy_weights: bool):
         """Return the connectivity matrix for the specified UGRID dimension."""
         if dim == self.node_dimension:
