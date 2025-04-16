@@ -35,7 +35,7 @@ from xugrid.ugrid.snapping import (
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
-__version__ = "0.12.4"
+__version__ = "0.13.0"
 
 __all__ = (
     "data",
