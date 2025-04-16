@@ -382,13 +382,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nb</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">,</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Triangle</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.geometry_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">as_point</span><span class="p">,</span>
-    <span class="n">as_triangle</span><span class="p">,</span>
-    <span class="n">cross_product</span><span class="p">,</span>
-    <span class="n">to_vector</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.celltree_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_tolerance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree.geometry_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">points_in_triangles</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xugrid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span>
@@ -429,58 +425,6 @@
         <span class="k">if</span> <span class="n">dy</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span>
         <span class="k">return</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span>
-
-
-<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">point_in_triangle</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Triangle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="c1"># TODO: move this into numba_celltree instead?</span>
-    <span class="n">ap</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">bp</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">cp</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">ab</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">bc</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">to_vector</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
-    <span class="c1"># Do a half plane check.</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">ab</span><span class="p">,</span> <span class="n">ap</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">bc</span><span class="p">,</span> <span class="n">bp</span><span class="p">)</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">ca</span><span class="p">,</span> <span class="n">cp</span><span class="p">)</span>
-    <span class="n">signA</span> <span class="o">=</span> <span class="n">A</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="n">signB</span> <span class="o">=</span> <span class="n">B</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="n">signC</span> <span class="o">=</span> <span class="n">C</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">signA</span> <span class="o">==</span> <span class="n">signB</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">signB</span> <span class="o">==</span> <span class="n">signC</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="c1"># Test whether p is located on/very close to edges.</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">TOLERANCE_ON_EDGE</span><span class="p">)</span>
-        <span class="ow">and</span> <span class="n">in_bounds</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="k">return</span> <span class="kc">False</span>
-
-
-<span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">points_in_triangles</span><span class="p">(</span>
-    <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
-    <span class="n">face_indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
-    <span class="n">faces</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
-    <span class="n">vertices</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="c1"># TODO: move this into numba_celltree instead?</span>
-    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-    <span class="n">inside</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">n_points</span><span class="p">):</span>
-        <span class="n">face_index</span> <span class="o">=</span> <span class="n">face_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">face_index</span><span class="p">]</span>
-        <span class="n">triangle</span> <span class="o">=</span> <span class="n">as_triangle</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">face</span><span class="p">)</span>
-        <span class="n">point</span> <span class="o">=</span> <span class="n">as_point</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">inside</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">point_in_triangle</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">triangle</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">inside</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_locate_polygon</span><span class="p">(</span>
@@ -525,12 +469,14 @@
     <span class="k">if</span> <span class="n">all_touched</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">grid_indices</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">tolerance</span> <span class="o">=</span> <span class="n">default_tolerance</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">bb_distances</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
         <span class="n">centroids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">centroids</span><span class="p">[</span><span class="n">grid_indices</span><span class="p">]</span>
         <span class="n">inside</span> <span class="o">=</span> <span class="n">points_in_triangles</span><span class="p">(</span>
             <span class="n">points</span><span class="o">=</span><span class="n">centroids</span><span class="p">,</span>
             <span class="n">face_indices</span><span class="o">=</span><span class="n">triangle_indices</span><span class="p">,</span>
             <span class="n">faces</span><span class="o">=</span><span class="n">triangles</span><span class="p">,</span>
             <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
+            <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">grid_indices</span><span class="p">[</span><span class="n">inside</span><span class="p">]</span>
 

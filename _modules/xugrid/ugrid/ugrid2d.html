@@ -1379,7 +1379,9 @@
 <div class="viewcode-block" id="Ugrid2d.compute_barycentric_weights">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.compute_barycentric_weights.html#xugrid.Ugrid2d.compute_barycentric_weights">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_barycentric_weights</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find in which face the points are located, and compute the barycentric</span>
@@ -1388,13 +1390,19 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        points: ndarray of floats with shape ``(n_point, 2)``</span>
+<span class="sd">        tolerance: float, optional</span>
+<span class="sd">            The tolerance used to determine whether a point is on an edge. This</span>
+<span class="sd">            accounts for the inherent inexactness of floating point calculations.</span>
+<span class="sd">            If None, an appropriate tolerance is automatically estimated based on</span>
+<span class="sd">            the geometry size. Consider adjusting this value if edge detection</span>
+<span class="sd">            results are unsatisfactory.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        face_index: ndarray of integers with shape ``(n_points,)``</span>
 <span class="sd">        weights: ndarray of floats with shape ```(n_points, n_max_node)``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">compute_barycentric_weights</span><span class="p">(</span><span class="n">points</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">compute_barycentric_weights</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid2d.rasterize_like">

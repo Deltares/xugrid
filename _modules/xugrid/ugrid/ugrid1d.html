@@ -376,7 +376,7 @@
                   
   <h1>Source code for xugrid.ugrid.ugrid1d</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -1127,7 +1127,10 @@
 <div class="viewcode-block" id="Ugrid1d.refine_by_vertices">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.refine_by_vertices.html#xugrid.Ugrid1d.refine_by_vertices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">refine_by_vertices</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vertices</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
+        <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Refine Ugrid1d with extra vertices to be inserted and returns new grid.</span>
@@ -1142,6 +1145,12 @@
 <span class="sd">        return_index: bool, optional</span>
 <span class="sd">            If set to to True, the index of the new vertices in the grid will be</span>
 <span class="sd">            returned. Defaults to False.</span>
+<span class="sd">        tolerance: float, optional</span>
+<span class="sd">            The tolerance used to determine whether a point is on an edge. This</span>
+<span class="sd">            accounts for the inherent inexactness of floating point calculations.</span>
+<span class="sd">            If None, an appropriate tolerance is automatically estimated based on</span>
+<span class="sd">            the geometry size. Consider adjusting this value if edge detection</span>
+<span class="sd">            results are unsatisfactory.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1171,7 +1180,7 @@
 <span class="sd">        &gt;&gt;&gt; print(new.node_coordinates[new_vertices_index])</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">edge_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
