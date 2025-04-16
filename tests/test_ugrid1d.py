@@ -395,8 +395,8 @@ def test_sel_points():
         data=[10, 11],
         dims=[grid.edge_dimension],
     )
-    x = [1.5, 0.5, -0.1]
-    y = [1.5, 0.5, -0.1]
+    x = [1.5, 0.5, 0.0]
+    y = [1.5, 0.5, 0.1]
 
     actual = grid.sel_points(
         obj=obj,
@@ -411,6 +411,15 @@ def test_sel_points():
     # Check if out_of_bounds raises ValueError
     with pytest.raises(ValueError):
         grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="raise")
+
+    # Test with tolerance
+    actual = grid.sel_points(
+        obj=obj,
+        x=x,
+        y=y,
+        tolerance=0.1,
+    )
+    np.testing.assert_allclose(actual.values, [11, 10, 10])
 
 
 def test_intersect_line():
@@ -699,7 +708,7 @@ def test_ugrid1d_refine_by_vertices():
     )
 
     # Test if error upon trying to insert vertices that are not present
-    vertices = np.array(
+    vertices_wrong = np.array(
         [
             [5.0, 6.0],
             [12.5, 2.5],
@@ -709,7 +718,28 @@ def test_ugrid1d_refine_by_vertices():
     with pytest.raises(
         ValueError, match="The following vertices are not located on any edge"
     ):
-        grid.refine_by_vertices(vertices)
+        grid.refine_by_vertices(vertices_wrong)
+
+    # Test tolerance passed through correctly
+    vertices[:, 0] += 0.01
+    expected_edge_node_coordinates = np.array(
+        [
+            [[0.0, 0.0], [1.01, 1.0]],
+            [[1.01, 1.0], [4.01, 4.0]],
+            [[4.01, 4.0], [5.0, 5.0]],
+            [[5.0, 5.0], [7.51, 5.0]],
+            [[7.51, 5.0], [10.0, 5.0]],
+            [[10.0, 5.0], [12.51, 2.5]],
+            [[12.51, 2.5], [15.0, 0.0]],
+            [[10.0, 5.0], [12.51, 7.5]],
+            [[12.51, 7.5], [15.0, 10.0]],
+        ]
+    )
+    new = grid.refine_by_vertices(vertices, tolerance=0.01)
+    np.testing.assert_allclose(
+        new.edge_node_coordinates, expected_edge_node_coordinates
+    )
+    np.testing.assert_equal(new.edge_node_connectivity, expected_edge_node_connectivity)
 
 
 def test_nearest_interpolate():

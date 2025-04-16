@@ -99,11 +99,13 @@ class BaseRegridder(abc.ABC):
         self,
         source: "xugrid.Ugrid2d",
         target: "xugrid.Ugrid2d",
+        tolerance: Optional[float] = None,
     ):
         self._source = setup_grid(source)
         self._target = setup_grid(target)
         self._weights = None
-        self._compute_weights(self._source, self._target)
+
+        self._compute_weights(self._source, self._target, tolerance)
         return
 
     @property
@@ -112,7 +114,7 @@ class BaseRegridder(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _compute_weights(self, source, target):
+    def _compute_weights(self, source, target, tolerance: Optional[float] = None):
         pass
 
     def _setup_regrid(self, func) -> Callable:
@@ -366,13 +368,22 @@ class CentroidLocatorRegridder(BaseRegridder):
     Parameters
     ----------
     source: Ugrid2d, UgridDataArray
+        Source grid to regrid from.
     target: Ugrid2d, UgridDataArray
-    weights: Optional[MatrixCOO]
+        Target grid to regrid to.
+    tolerance: float, optional
+        The tolerance used to determine whether a point is on an edge. This
+        accounts for the inherent inexactness of floating point calculations.
+        If None, an appropriate tolerance is automatically estimated based on
+        the geometry size. Consider adjusting this value if edge detection
+        results are unsatisfactory.
     """
 
-    def _compute_weights(self, source, target):
+    def _compute_weights(self, source, target, tolerance: Optional[float] = None):
         source, target = convert_to_match(source, target)
-        source_index, target_index, weight_values = source.locate_centroids(target)
+        source_index, target_index, weight_values = source.locate_centroids(
+            target, tolerance
+        )
         self._weights = MatrixCOO.from_triplet(
             target_index,
             source_index,
@@ -496,7 +507,9 @@ class OverlapRegridder(BaseOverlapRegridder):
         super().__init__(source=source, target=target)
         self._setup_regrid(method)
 
-    def _compute_weights(self, source, target) -> None:
+    def _compute_weights(
+        self, source, target, tolerance: Optional[float] = None
+    ) -> None:
         super()._compute_weights(source, target, relative=False)
 
     @staticmethod
@@ -549,10 +562,12 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
         target: UgridDataArray,
         method: Union[str, Callable] = "first_order_conservative",
     ):
-        super().__init__(source=source, target=target)
+        super().__init__(source=source, target=target, tolerance=None)
         self._setup_regrid(method)
 
-    def _compute_weights(self, source, target) -> None:
+    def _compute_weights(
+        self, source, target, tolerance: Optional[float] = None
+    ) -> None:
         super()._compute_weights(source, target, relative=True)
 
     @classmethod
@@ -578,8 +593,15 @@ class BarycentricInterpolator(BaseRegridder):
     Parameters
     ----------
     source: Ugrid2d, UgridDataArray
+        Source grid to regrid from.
     target: Ugrid2d, UgridDataArray
-
+        Target grid to regrid to.
+    tolerance: float, optional
+        The tolerance used to determine whether a point is on an edge. This
+        accounts for the inherent inexactness of floating point calculations.
+        If None, an appropriate tolerance is automatically estimated based on
+        the geometry size. Consider adjusting this value if edge detection
+        results are unsatisfactory.
     """
 
     _JIT_FUNCTIONS = {"mean": make_regrid(reduce.mean)}
@@ -588,18 +610,24 @@ class BarycentricInterpolator(BaseRegridder):
         self,
         source: UgridDataArray,
         target: UgridDataArray,
+        tolerance: Optional[float] = None,
     ):
-        super().__init__(source, target)
+        super().__init__(source, target, tolerance)
         # Since the weights for a target face sum up to 1.0, a weight mean is
         # appropriate, and takes care of NaN values in the source data.
         self._setup_regrid("mean")
 
-    def _compute_weights(self, source, target):
+    def _compute_weights(
+        self,
+        source,
+        target,
+        tolerance: Optional[float] = None,
+    ):
         source, target = convert_to_match(source, target)
         if isinstance(source, StructuredGrid2d):
             source_index, target_index, weights = source.linear_weights(target)
         else:
-            source_index, target_index, weights = source.barycentric(target)
+            source_index, target_index, weights = source.barycentric(target, tolerance)
         self._weights = MatrixCSR.from_triplet(
             target_index, source_index, weights, n=target.size, m=source.size
         )

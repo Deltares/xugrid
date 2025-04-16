@@ -37,6 +37,9 @@ Added
   :meth:`xugrid.UgridDataArrayAccessor.to_edge`, and
   :meth:`xugrid.UgridDataArrayAccessor.to_face` have been added to map data
   from one facet of a grid to another.
+- Added ``tolerance`` argument to :meth:`xugrid.Ugrid1d.sel_points`,
+  :meth:`xugrid.Ugrid1d.refine_by_vertices` and
+  :meth:`xugrid.Ugrid2d.sel_points`, :meth:`xugrid.Ugrid2d.locate_centroids`.
 
 Fixed
 -----

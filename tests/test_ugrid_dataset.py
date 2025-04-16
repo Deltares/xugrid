@@ -1583,6 +1583,39 @@ def test_laplace_interpolate_1d():
     assert np.allclose(actual, 1.0)
 
 
+def test_laplace_interpolate_1d__disconnected():
+    """
+    Test laplace_interpolate on a 1D grid with disconnected edges. Should throw
+    no ZeroDivisionErrors, and should preserve NaNs on the disconnected group.
+    """
+    xy = np.array(
+        [
+            [0.0, 0.0],
+            [1.0, 1.0],
+            [2.0, 2.0],
+            [3.0, 3.0],
+            [4.0, 4.0],
+        ]
+    )
+    grid = xugrid.Ugrid1d(
+        node_x=xy[:, 0],
+        node_y=xy[:, 1],
+        fill_value=-1,
+        edge_node_connectivity=np.array([[0, 1], [1, 2], [3, 4]]),
+    )
+    ds = grid.to_dataset()
+    ds["a1d"] = xr.DataArray(
+        [1.0, np.nan, 0.0, np.nan, np.nan], dims=[grid.node_dimension]
+    )
+    ds["b1d"] = xr.DataArray([1.0, 2.0, 3.0], dims=[grid.edge_dimension])
+    uda = xugrid.UgridDataset(ds)["a1d"]
+
+    actual = uda.ugrid.laplace_interpolate(direct_solve=True)
+    assert isinstance(actual, xugrid.UgridDataArray)
+    np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
+    assert np.isnan(actual[3:]).all()
+
+
 def test_interpolate_na_1d():
     uda = ugrid1d_ds()["a1d"]
     with pytest.raises(ValueError, match='"abc" is not a valid interpolator.'):
