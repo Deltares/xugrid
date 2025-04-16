@@ -249,6 +249,10 @@ UGRID1D Topology
     Ugrid1d.intersect_line
     Ugrid1d.intersect_linestring
     Ugrid1d.celltree
+    Ugrid1d.node_kdtree
+    Ugrid1d.edge_kdtree
+    Ugrid1d.locate_nearest_node
+    Ugrid1d.locate_nearest_edge
     Ugrid1d.locate_points
     Ugrid1d.intersect_edges
     Ugrid1d.topology_subset
@@ -356,6 +360,12 @@ UGRID2D Topology
     Ugrid2d.intersect_line
     Ugrid2d.intersect_linestring
     Ugrid2d.celltree
+    Ugrid2d.node_kdtree
+    Ugrid2d.edge_kdtree
+    Ugrid2d.face_kdtree
+    Ugrid2d.locate_nearest_node
+    Ugrid2d.locate_nearest_edge
+    Ugrid2d.locate_nearest_face
     Ugrid2d.locate_points
     Ugrid2d.intersect_edges
     Ugrid2d.locate_bounding_box

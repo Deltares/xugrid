@@ -494,6 +494,10 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.intersect_line.html">xugrid.Ugrid1d.intersect_line</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.intersect_linestring.html">xugrid.Ugrid1d.intersect_linestring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.celltree.html">xugrid.Ugrid1d.celltree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.node_kdtree.html">xugrid.Ugrid1d.node_kdtree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.edge_kdtree.html">xugrid.Ugrid1d.edge_kdtree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.locate_nearest_node.html">xugrid.Ugrid1d.locate_nearest_node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.locate_nearest_edge.html">xugrid.Ugrid1d.locate_nearest_edge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.locate_points.html">xugrid.Ugrid1d.locate_points</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.intersect_edges.html">xugrid.Ugrid1d.intersect_edges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.topology_subset.html">xugrid.Ugrid1d.topology_subset</a></li>
@@ -580,6 +584,12 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_line.html">xugrid.Ugrid2d.intersect_line</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_linestring.html">xugrid.Ugrid2d.intersect_linestring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.celltree.html">xugrid.Ugrid2d.celltree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.node_kdtree.html">xugrid.Ugrid2d.node_kdtree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.edge_kdtree.html">xugrid.Ugrid2d.edge_kdtree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.face_kdtree.html">xugrid.Ugrid2d.face_kdtree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_nearest_node.html">xugrid.Ugrid2d.locate_nearest_node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_nearest_edge.html">xugrid.Ugrid2d.locate_nearest_edge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_nearest_face.html">xugrid.Ugrid2d.locate_nearest_face</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_points.html">xugrid.Ugrid2d.locate_points</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.intersect_edges.html">xugrid.Ugrid2d.intersect_edges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.locate_bounding_box.html">xugrid.Ugrid2d.locate_bounding_box</a></li>
@@ -779,6 +789,12 @@ of the provided face_node_connectivity and edge_node_connectivity.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.isel.html#xugrid.Ugrid1d.isel" title="xugrid.Ugrid1d.isel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code></a>([indexers, return_index])</p></td>
 <td><p>Select based on node or edge.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.locate_nearest_edge.html#xugrid.Ugrid1d.locate_nearest_edge" title="xugrid.Ugrid1d.locate_nearest_edge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_nearest_edge</span></code></a>(points[, max_distance])</p></td>
+<td><p>Find which grid node is nearest for a collection of points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.locate_nearest_node.html#xugrid.Ugrid1d.locate_nearest_node" title="xugrid.Ugrid1d.locate_nearest_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_nearest_node</span></code></a>(points[, max_distance])</p></td>
+<td><p>Find which grid node is nearest for a collection of points.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.locate_points.html#xugrid.Ugrid1d.locate_points" title="xugrid.Ugrid1d.locate_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_points</span></code></a>(points[, tolerance])</p></td>
 <td><p>Find on which edge points are located.</p></td>
 </tr>
@@ -878,53 +894,59 @@ of the provided face_node_connectivity and edge_node_connectivity.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_edge_connectivity.html#xugrid.Ugrid1d.edge_edge_connectivity" title="xugrid.Ugrid1d.edge_edge_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_edge_connectivity</span></code></a></p></td>
 <td><p>Edge to edge connectivity.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_node_coordinates</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_kdtree.html#xugrid.Ugrid1d.edge_kdtree" title="xugrid.Ugrid1d.edge_kdtree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_kdtree</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_node_coordinates</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">n_edge,</span> <span class="pre">2,</span> <span class="pre">2</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_x.html#xugrid.Ugrid1d.edge_x" title="xugrid.Ugrid1d.edge_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_x</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_x.html#xugrid.Ugrid1d.edge_x" title="xugrid.Ugrid1d.edge_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_x</span></code></a></p></td>
 <td><p>x-coordinate of every edge in the UGRID topology</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_y.html#xugrid.Ugrid1d.edge_y" title="xugrid.Ugrid1d.edge_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_y</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.edge_y.html#xugrid.Ugrid1d.edge_y" title="xugrid.Ugrid1d.edge_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_y</span></code></a></p></td>
 <td><p>y-coordinate of every edge in the UGRID topology</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.fill_value.html#xugrid.Ugrid1d.fill_value" title="xugrid.Ugrid1d.fill_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_value</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.fill_value.html#xugrid.Ugrid1d.fill_value" title="xugrid.Ugrid1d.fill_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_value</span></code></a></p></td>
 <td><p>Fill value for UGRID connectivity arrays.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.is_cyclic.html#xugrid.Ugrid1d.is_cyclic" title="xugrid.Ugrid1d.is_cyclic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_cyclic</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.is_cyclic.html#xugrid.Ugrid1d.is_cyclic" title="xugrid.Ugrid1d.is_cyclic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_cyclic</span></code></a></p></td>
 <td><p>Return True if the directed node node connectivity contains cycles.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_geographic</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_geographic</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_connectivity_dimensions</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_connectivity_dimensions</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_connectivity_sizes</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_connectivity_sizes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.mesh.html#xugrid.Ugrid1d.mesh" title="xugrid.Ugrid1d.mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mesh</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.mesh.html#xugrid.Ugrid1d.mesh" title="xugrid.Ugrid1d.mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mesh</span></code></a></p></td>
 <td><p>Create if needed, and return meshkernel Mesh1d object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.meshkernel.html#xugrid.Ugrid1d.meshkernel" title="xugrid.Ugrid1d.meshkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meshkernel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.meshkernel.html#xugrid.Ugrid1d.meshkernel" title="xugrid.Ugrid1d.meshkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meshkernel</span></code></a></p></td>
 <td><p>Create if needed, and return meshkernel MeshKernel instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.n_edge.html#xugrid.Ugrid1d.n_edge" title="xugrid.Ugrid1d.n_edge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_edge</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.n_edge.html#xugrid.Ugrid1d.n_edge" title="xugrid.Ugrid1d.n_edge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_edge</span></code></a></p></td>
 <td><p>Number of edges in the UGRID topology</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.n_node.html#xugrid.Ugrid1d.n_node" title="xugrid.Ugrid1d.n_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_node</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.n_node.html#xugrid.Ugrid1d.n_node" title="xugrid.Ugrid1d.n_node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n_node</span></code></a></p></td>
 <td><p>Number of nodes (vertices) in the UGRID topology</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_coordinates.html#xugrid.Ugrid1d.node_coordinates" title="xugrid.Ugrid1d.node_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_coordinates</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_coordinates.html#xugrid.Ugrid1d.node_coordinates" title="xugrid.Ugrid1d.node_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_coordinates</span></code></a></p></td>
 <td><p>Coordinates (x, y) of the nodes (vertices)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_dimension.html#xugrid.Ugrid1d.node_dimension" title="xugrid.Ugrid1d.node_dimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_dimension</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_dimension.html#xugrid.Ugrid1d.node_dimension" title="xugrid.Ugrid1d.node_dimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_dimension</span></code></a></p></td>
 <td><p>Name of node dimension</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_edge_connectivity.html#xugrid.Ugrid1d.node_edge_connectivity" title="xugrid.Ugrid1d.node_edge_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_edge_connectivity</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_edge_connectivity.html#xugrid.Ugrid1d.node_edge_connectivity" title="xugrid.Ugrid1d.node_edge_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_edge_connectivity</span></code></a></p></td>
 <td><p>Node to edge connectivity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_kdtree.html#xugrid.Ugrid1d.node_kdtree" title="xugrid.Ugrid1d.node_kdtree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_kdtree</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="xugrid.Ugrid1d.node_node_connectivity.html#xugrid.Ugrid1d.node_node_connectivity" title="xugrid.Ugrid1d.node_node_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">node_node_connectivity</span></code></a></p></td>
 <td><p>Node to node connectivity.</p></td>
