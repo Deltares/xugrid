@@ -122,9 +122,9 @@ class AbstractUgrid(abc.ABC):
         """
 
         warnings.warn(
-            ".dimensions will is replaced by .dims and its return type is a set "
-            "of dimension names in future. To access a mapping of names to "
-            "lengths, use .sizes instead.",
+            ".dimensions will be removed and is replaced by .dims."
+            "The return type of .dims is a set of dimension names. "
+            "To access a mapping of names to lengths, use .sizes instead.",
             FutureWarning,
         )
         return self.sizes

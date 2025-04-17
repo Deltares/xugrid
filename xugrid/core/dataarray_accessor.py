@@ -302,7 +302,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 f"Dimension {newdim} already exists. Please provide a new dimension name."
             )
 
-        source_dim = set(grid.dimensions).intersection(obj.dims).pop()
+        source_dim = grid.dims.intersection(obj.dims).pop()
         target_dim = getattr(grid, f"{facet}_dimension")
         if source_dim == target_dim:
             raise ValueError(
