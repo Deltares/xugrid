@@ -296,9 +296,9 @@ def laplace_interpolate(
         weights[constant_j],
         (i[constant_j], j[constant_j]),
     )
-    rhs = -sparse.csr_matrix(rhs_coo_content, shape=(n, n)).dot(data)
+    rhs = sparse.csr_matrix(rhs_coo_content, shape=(n, n)).dot(data)
     diag_coo_content = (weights, (i, j))
-    diagonal = -sparse.csr_matrix(diag_coo_content, shape=(n, n)).sum(axis=1).A1
+    diagonal = sparse.csr_matrix(diag_coo_content, shape=(n, n)).sum(axis=1).A1
     # Create the diagonal numbering.
     ii = np.arange(n)
 
@@ -306,12 +306,14 @@ def laplace_interpolate(
     diagonal[constant] = 1.0
     rhs[constant] = data[constant]
     # Remove all zero values and add the diagonal.
-    weights = np.concatenate([weights[nonzero], diagonal])
+    weights = np.concatenate([-weights[nonzero], diagonal])
     i = np.concatenate([i[nonzero], ii])
     j = np.concatenate([j[nonzero], ii])
     coo_content = (weights, (i, j))
     A = sparse.csr_matrix(coo_content, shape=(n, n))
 
+    # Avoid NaN pollution in iterative solve
+    rhs[all_null] = 0.0
     if direct_solve:
         x = sparse.linalg.spsolve(A, rhs)
     else:
@@ -324,6 +326,7 @@ def laplace_interpolate(
         elif info > 0:
             warnings.warn(f"Failed to converge after {maxiter} iterations")
 
+    x[all_null] = np.nan
     return x
 
 

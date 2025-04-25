@@ -358,6 +358,10 @@ class TestUgridDataArray:
         assert isinstance(actual, xugrid.UgridDataArray)
         assert np.allclose(actual, 1.0)
 
+        actual = uda2.ugrid.laplace_interpolate(direct_solve=False)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+
     def test_broadcasted_laplace_interpolate(self):
         uda2 = self.uda.copy()
         uda2.obj[:-2] = np.nan
@@ -372,9 +376,19 @@ class TestUgridDataArray:
         assert np.allclose(actual, 1.0)
         assert set(actual.dims) == set(nd_uda2.dims)
 
+        actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=False)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+        assert set(actual.dims) == set(nd_uda2.dims)
+
         # Test delayed evaluation too.
         nd_uda2 = uda2 * multiplier.chunk({"time": 1})
         actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=True)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert set(actual.dims) == set(nd_uda2.dims)
+        assert isinstance(actual.data, dask.array.Array)
+
+        actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=False)
         assert isinstance(actual, xugrid.UgridDataArray)
         assert set(actual.dims) == set(nd_uda2.dims)
         assert isinstance(actual.data, dask.array.Array)
@@ -1546,6 +1560,11 @@ def test_laplace_interpolate_facets():
         assert isinstance(actual, xugrid.UgridDataArray)
         assert np.allclose(actual, 1.0)
 
+    for uda in (node_uda, face_uda):
+        actual = uda.ugrid.laplace_interpolate(direct_solve=False)
+        assert isinstance(actual, xugrid.UgridDataArray)
+        assert np.allclose(actual, 1.0)
+
     msg = "Laplace interpolation along edges is not allowed."
     with pytest.raises(ValueError, match=msg):
         edge_uda.ugrid.laplace_interpolate(direct_solve=True)
@@ -1582,6 +1601,10 @@ def test_laplace_interpolate_1d():
     assert isinstance(actual, xugrid.UgridDataArray)
     assert np.allclose(actual, 1.0)
 
+    actual = uda.ugrid.laplace_interpolate(direct_solve=False)
+    assert isinstance(actual, xugrid.UgridDataArray)
+    assert np.allclose(actual, 1.0)
+
 
 def test_laplace_interpolate_1d__disconnected():
     """
@@ -1611,6 +1634,11 @@ def test_laplace_interpolate_1d__disconnected():
     uda = xugrid.UgridDataset(ds)["a1d"]
 
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
+    assert isinstance(actual, xugrid.UgridDataArray)
+    np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
+    assert np.isnan(actual[3:]).all()
+
+    actual = uda.ugrid.laplace_interpolate(direct_solve=False)
     assert isinstance(actual, xugrid.UgridDataArray)
     np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
     assert np.isnan(actual[3:]).all()
