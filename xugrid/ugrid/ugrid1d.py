@@ -294,12 +294,6 @@ class Ugrid1d(AbstractUgrid):
             self.edge_dimension: self.edge_coordinates,
         }
 
-    @property
-    def length(self):
-        return np.linalg.norm(
-            np.diff(self.edge_node_coordinates, axis=1)[:, 0, :], axis=-1
-        )
-
     def get_coordinates(self, dim: str) -> FloatArray:
         """Return the coordinates for the specified UGRID dimension."""
         if dim == self.node_dimension:
@@ -684,6 +678,32 @@ class Ugrid1d(AbstractUgrid):
             self.directed_node_node_connectivity
         )
 
+    def remove_self_loops(self) -> "Ugrid1d":
+        """
+        Remove degenerate edges: those that join a node to itself, also called
+        a self-loop. These edges have a length of exactly zero.
+
+        Returns
+        -------
+        grid: Ugrid1d
+        """
+        a, b = self.edge_node_connectivity.T
+        not_self_loop = a != b
+        edge_subset = self.edge_node_connectivity[not_self_loop]
+        valid = np.bincount(edge_subset.ravel()) > 0
+        new_edges = connectivity.renumber(edge_subset)
+        return Ugrid1d(
+            node_x=self.node_x[valid],
+            node_y=self.node_y[valid],
+            fill_value=self.fill_value,
+            edge_node_connectivity=new_edges,
+            name=self.name,
+            indexes=self._indexes,
+            projected=self.projected,
+            crs=self.crs,
+            attrs=self._attrs,
+        )
+
     def contract_vertices(self, indices: IntArray) -> "Ugrid1d":
         """
         Return a simplified network topology by removing all nodes that are
@@ -832,7 +852,7 @@ class Ugrid1d(AbstractUgrid):
         if isnull.all():
             raise ValueError("All values are NA.")
 
-        edge_length = self.length
+        edge_length = self.edge_length
         if ugrid_dim == self.node_dimension:
             # Set the edge length as the graph weights.
             # We can do this easily since the data of the node_node_connectivity CSR matrix

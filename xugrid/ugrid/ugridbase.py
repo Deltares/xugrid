@@ -814,6 +814,13 @@ class AbstractUgrid(abc.ABC):
             self.node_edge_connectivity,
         )
 
+    @property
+    def edge_length(self):
+        """Length of each edge."""
+        return np.linalg.norm(
+            np.diff(self.edge_node_coordinates, axis=1)[:, 0, :], axis=-1
+        )
+
     @staticmethod
     def _connectivity_weights(connectivity: csr_matrix, coordinates: FloatArray):
         xy = coordinates

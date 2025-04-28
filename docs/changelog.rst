@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Changed
+-------
+
+- :attr:`xugrid.Ugrid1d.length` has been renamed to :attr:`xugrid.Ugrid1d.edge_length`.
+
+Added
+~~~~~
+
+- :attr:`xugrid.Ugrid2d.edge_length` has been added.
+  :meth:`xugrid.Ugrid1d.remove_self_loops` has been added to remove self-loop
+  edges (those that join a node to itself, resulting in a zero length edge).
+
 [0.13.0] 2025-04-16
 -------------------
 

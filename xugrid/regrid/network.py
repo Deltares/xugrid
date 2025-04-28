@@ -32,4 +32,4 @@ class Network1d:
 
     @property
     def length(self):
-        return self.ugrid_topology.length
+        return self.ugrid_topology.edge_length

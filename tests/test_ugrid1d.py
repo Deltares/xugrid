@@ -545,6 +545,35 @@ def test_contract_vertices():
     assert np.array_equal(new.edge_node_connectivity, [[0, 1]])
 
 
+def test_remove_self_loops():
+    xy = np.array(
+        [
+            [0.0, 10.0],
+            [3.0, 13.0],  # Disconnected
+            [1.0, 11.0],
+            [2.0, 12.0],
+        ]
+    )
+    edges = np.array(
+        [
+            [0, 0],
+            [1, 1],
+            [0, 2],
+            [2, 2],
+            [2, 3],
+            [3, 3],
+        ]
+    )
+    grid = xugrid.Ugrid1d(*xy.T, -1, edges)
+    actual = grid.remove_self_loops()
+    assert isinstance(actual, xugrid.Ugrid1d)
+    assert actual.n_node == 3
+    assert actual.n_edge == 2
+    assert np.array_equal(actual.node_x, [0.0, 1.0, 2.0])
+    assert np.array_equal(actual.node_y, [10.0, 11.0, 12.0])
+    assert np.array_equal(actual.edge_node_connectivity, [[0, 1], [1, 2]])
+
+
 def test_get_connectivity_matrix():
     xy = np.array(
         [
@@ -644,7 +673,7 @@ def test_ugrid1d_format_connectivity():
 
 def test_ugrid1d_length():
     grid = grid1d()
-    length = grid.length
+    length = grid.edge_length
     assert isinstance(length, np.ndarray)
     assert length.shape == (grid.n_edge,)
     assert np.allclose(length, [np.sqrt(2), np.sqrt(2)])

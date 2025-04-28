@@ -162,6 +162,7 @@ def test_ugrid2d_properties():
     face_node_coords = grid.face_node_coordinates
     assert edge_node_coords.shape == (10, 2, 2)
     assert face_node_coords.shape == (4, 4, 2)
+    assert grid.edge_length.shape == (grid.n_edge,)
     assert grid.area.shape == (grid.n_face,)
     assert grid.perimeter.shape == (grid.n_face,)
     are_nan = np.isnan(face_node_coords)
