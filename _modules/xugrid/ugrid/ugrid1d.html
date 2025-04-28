@@ -685,12 +685,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_coordinates</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
-        <span class="p">)</span>
-
 <div class="viewcode-block" id="Ugrid1d.get_coordinates">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_coordinates.html#xugrid.Ugrid1d.get_coordinates">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
@@ -1102,6 +1096,35 @@
         <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Ugrid1d.remove_self_loops">
+<a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.remove_self_loops.html#xugrid.Ugrid1d.remove_self_loops">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_self_loops</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove degenerate edges: those that join a node to itself, also called</span>
+<span class="sd">        a self-loop. These edges have a length of exactly zero.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grid: Ugrid1d</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">not_self_loop</span> <span class="o">=</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span>
+        <span class="n">edge_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">not_self_loop</span><span class="p">]</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">edge_subset</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">new_edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">edge_subset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ugrid1d</span><span class="p">(</span>
+            <span class="n">node_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+            <span class="n">node_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">edge_node_connectivity</span><span class="o">=</span><span class="n">new_edges</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">,</span>
+            <span class="n">projected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projected</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Ugrid1d.contract_vertices">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
@@ -1256,7 +1279,7 @@
         <span class="k">if</span> <span class="n">isnull</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All values are NA.&quot;</span><span class="p">)</span>
 
-        <span class="n">edge_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="n">edge_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_length</span>
         <span class="k">if</span> <span class="n">ugrid_dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="c1"># Set the edge length as the graph weights.</span>
             <span class="c1"># We can do this easily since the data of the node_node_connectivity CSR matrix</span>

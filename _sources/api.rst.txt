@@ -231,6 +231,7 @@ UGRID1D Topology
 
     Ugrid1d.bounds
     Ugrid1d.edge_bounds
+    Ugrid1d.edge_length
 
     Ugrid1d.node_edge_connectivity
     Ugrid1d.node_node_connectivity
@@ -262,6 +263,7 @@ UGRID1D Topology
     Ugrid1d.merge_partitions
     Ugrid1d.topological_sort_by_dfs
     Ugrid1d.contract_vertices
+    Ugrid1d.remove_self_loops
     Ugrid1d.reindex_like
 
     Ugrid1d.from_meshkernel
@@ -311,6 +313,7 @@ UGRID2D Topology
     Ugrid2d.edge_coordinates
     Ugrid2d.edge_x
     Ugrid2d.edge_y
+    Ugrid2d.edge_length
 
     Ugrid2d.n_face
     Ugrid2d.face_dimension
