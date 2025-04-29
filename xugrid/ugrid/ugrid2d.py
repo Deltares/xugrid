@@ -1300,7 +1300,9 @@ class Ugrid2d(AbstractUgrid):
         new_obj = obj.isel(indexes)
         return new_obj, grid
 
-    def label_partitions(self, n_part: int) -> "xugrid.UgridDataArray":
+    def label_partitions(
+        self, n_part: int, weights: Optional[FloatArray] = None
+    ) -> "xugrid.UgridDataArray":
         """
         Generate partition labesl for this grid topology using METIS:
         https://github.com/KarypisLab/METIS
@@ -1312,6 +1314,8 @@ class Ugrid2d(AbstractUgrid):
         ----------
         n_part: integer
             The number of parts to partition the mesh.
+        weights: optional, np.ndarray of floats
+            The weight associated with each face.
 
         Returns
         -------
@@ -1320,10 +1324,17 @@ class Ugrid2d(AbstractUgrid):
         import pymetis
 
         adjacency_matrix = self.face_face_connectivity
+        if weights is not None and weights.shape != (self.n_face,):
+            raise ValueError(
+                f"Wrong shape on weights. Expected a 1D array with {self.n_face} elements, "
+                f"received: {weights.shape}"
+            )
+
         _, partition_index = pymetis.part_graph(
             nparts=n_part,
             xadj=adjacency_matrix.indptr,
             adjncy=adjacency_matrix.indices,
+            vweights=weights,
         )
         return xugrid.UgridDataArray(
             obj=xr.DataArray(
