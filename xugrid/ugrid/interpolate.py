@@ -242,7 +242,7 @@ def laplace_interpolate(
         Modified ILU0 preconditioner relaxation factor.
     atol: float, optional, default 0.0
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
-    tol: float, optional, default 1.0e-5.
+    rtol: float, optional, default 1.0e-5.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
     maxiter: int, default 500.
         Maximum number of iterations for ``scipy.sparse.linalg.cg``.
@@ -320,7 +320,12 @@ def laplace_interpolate(
         # Create preconditioner M
         M = ILU0Preconditioner.from_csr_matrix(A, delta=delta, relax=relax)
         # Call conjugate gradient solver
-        x, info = sparse.linalg.cg(A, rhs, rtol=rtol, atol=atol, maxiter=maxiter, M=M)
+        # TODO: running into some issues with CG and xy_weights.
+        # Possibly due to: symmetry issues with ILU0?
+        # Poor conditioning?
+        x, info = sparse.linalg.gmres(
+            A, rhs, rtol=rtol, atol=atol, maxiter=maxiter, M=M
+        )
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:
