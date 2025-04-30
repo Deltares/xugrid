@@ -696,14 +696,17 @@
 <h1>xugrid.Ugrid2d.label_partitions<a class="headerlink" href="#xugrid-ugrid2d-label-partitions" title="Link to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.Ugrid2d.label_partitions">
-<span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">label_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_part</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xugrid.UgridDataArray.html#xugrid.UgridDataArray" title="xugrid.core.wrap.UgridDataArray"><span class="pre">UgridDataArray</span></a></span></span><a class="reference internal" href="../_modules/xugrid/ugrid/ugrid2d.html#Ugrid2d.label_partitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.Ugrid2d.label_partitions" title="Link to this definition">#</a></dt>
-<dd><p>Generate partition labesl for this grid topology using METIS:
+<span class="sig-prename descclassname"><span class="pre">Ugrid2d.</span></span><span class="sig-name descname"><span class="pre">label_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_part</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xugrid.Ugrid2d.label_partitions" title="Link to this definition">#</a></dt>
+<dd><p>Generate partition labels for this grid topology using METIS:
 <a class="github reference external" href="https://github.com/KarypisLab/METIS">KarypisLab/METIS</a></p>
 <p>This method utilizes the pymetis Python bindings:
 <a class="github reference external" href="https://github.com/inducer/pymetis">inducer/pymetis</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_part</strong> (<em>integer</em>) – The number of parts to partition the mesh.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_part</strong> (<em>integer</em>) – The number of parts to partition the mesh.</p></li>
+<li><p><strong>weights</strong> (<em>optional</em><em>, </em><em>np.ndarray</em><em> of </em><em>integers</em>) – The weight associated with each elements.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>partition_labels</strong></p>

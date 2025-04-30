@@ -1153,6 +1153,37 @@
         <span class="p">)</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">label_partitions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate partition labels for this grid topology using METIS:</span>
+<span class="sd">        https://github.com/KarypisLab/METIS</span>
+
+<span class="sd">        This method utilizes the pymetis Python bindings:</span>
+<span class="sd">        https://github.com/inducer/pymetis</span>
+
+<span class="sd">        The data of the UgridDataArray are treated as weights.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_part: integer</span>
+<span class="sd">            The number of parts to partition the mesh.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        partition_labels: UgridDataArray of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Weights must be associated with the core-dimension &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;of the grid: </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">label_partitions</span><span class="p">(</span><span class="n">n_part</span><span class="o">=</span><span class="n">n_part</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+
 <div class="viewcode-block" id="UgridDataArrayAccessor.interpolate_na">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.interpolate_na.html#xugrid.UgridDataArrayAccessor.interpolate_na">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">interpolate_na</span><span class="p">(</span>

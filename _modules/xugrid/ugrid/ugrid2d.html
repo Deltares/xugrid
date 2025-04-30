@@ -1724,69 +1724,6 @@
         <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_obj</span><span class="p">,</span> <span class="n">grid</span>
 
-<div class="viewcode-block" id="Ugrid2d.label_partitions">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.label_partitions.html#xugrid.Ugrid2d.label_partitions">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">label_partitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate partition labesl for this grid topology using METIS:</span>
-<span class="sd">        https://github.com/KarypisLab/METIS</span>
-
-<span class="sd">        This method utilizes the pymetis Python bindings:</span>
-<span class="sd">        https://github.com/inducer/pymetis</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        n_part: integer</span>
-<span class="sd">            The number of parts to partition the mesh.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        partition_labels: UgridDataArray of integers</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">pymetis</span>
-
-        <span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_face_connectivity</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">partition_index</span> <span class="o">=</span> <span class="n">pymetis</span><span class="o">.</span><span class="n">part_graph</span><span class="p">(</span>
-            <span class="n">nparts</span><span class="o">=</span><span class="n">n_part</span><span class="p">,</span>
-            <span class="n">xadj</span><span class="o">=</span><span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">indptr</span><span class="p">,</span>
-            <span class="n">adjncy</span><span class="o">=</span><span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">xugrid</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span>
-            <span class="n">obj</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">partition_index</span><span class="p">),</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">core_dimension</span><span class="p">,),</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">grid</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Ugrid2d.partition">
-<a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.partition.html#xugrid.Ugrid2d.partition">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_part</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Partition this grid topology using METIS:</span>
-<span class="sd">        https://github.com/KarypisLab/METIS</span>
-
-<span class="sd">        This method utilizes the pymetis Python bindings:</span>
-<span class="sd">        https://github.com/inducer/pymetis</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        n_part: integer</span>
-<span class="sd">            The number of parts to partition the mesh.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        partitions</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid.partitioning</span><span class="w"> </span><span class="kn">import</span> <span class="n">labels_to_indices</span>
-
-        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_partitions</span><span class="p">(</span><span class="n">n_part</span><span class="p">)</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span></div>
-
-
 <div class="viewcode-block" id="Ugrid2d.merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.merge_partitions.html#xugrid.Ugrid2d.merge_partitions">[docs]</a>
     <span class="nd">@staticmethod</span>
