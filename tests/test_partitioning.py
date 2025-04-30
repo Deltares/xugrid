@@ -138,6 +138,10 @@ def test_label_partitions_with_weights__error(grid):
     with pytest.raises(TypeError, match="Wrong type on weights."):
         grid.label_partitions(n_part=n_part, weights=weights)
 
+    weights = np.ones(grid_size, dtype=int) * -1
+    with pytest.raises(ValueError, match="Wrong values on weights."):
+        grid.label_partitions(n_part=n_part, weights=weights)
+
 
 @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
 def test_partition_with_weights(grid):

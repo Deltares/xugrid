@@ -1303,14 +1303,20 @@ class AbstractUgrid(abc.ABC):
         """Validate weights for partitioning. Check shape and type."""
         facet = {v: k for k, v in self.facets.items()}[self.core_dimension]
         n_expected = getattr(self, f"n_{facet}")
-        if weights is not None and weights.shape != (n_expected,):
+        if weights is None:
+            return
+        if weights.shape != (n_expected,):
             raise ValueError(
                 f"Wrong shape on weights. Expected a 1D array with {n_expected} elements, "
                 f"received array with shape: {weights.shape}"
             )
-        if weights is not None and not np.issubdtype(weights.dtype, np.integer):
+        if not np.issubdtype(weights.dtype, np.integer):
             raise TypeError(
                 f"Wrong type on weights. Expected an integer array, received: {weights.dtype}"
+            )
+        if np.any(weights < 0):
+            raise ValueError(
+                "Wrong values on weights. Weights should be greater or equal to zero."
             )
 
     def label_partitions(self, n_part: int, weights: Optional[IntArray] = None):
