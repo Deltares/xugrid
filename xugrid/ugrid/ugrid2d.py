@@ -1300,63 +1300,6 @@ class Ugrid2d(AbstractUgrid):
         new_obj = obj.isel(indexes)
         return new_obj, grid
 
-    def label_partitions(self, n_part: int) -> "xugrid.UgridDataArray":
-        """
-        Generate partition labesl for this grid topology using METIS:
-        https://github.com/KarypisLab/METIS
-
-        This method utilizes the pymetis Python bindings:
-        https://github.com/inducer/pymetis
-
-        Parameters
-        ----------
-        n_part: integer
-            The number of parts to partition the mesh.
-
-        Returns
-        -------
-        partition_labels: UgridDataArray of integers
-        """
-        import pymetis
-
-        adjacency_matrix = self.face_face_connectivity
-        _, partition_index = pymetis.part_graph(
-            nparts=n_part,
-            xadj=adjacency_matrix.indptr,
-            adjncy=adjacency_matrix.indices,
-        )
-        return xugrid.UgridDataArray(
-            obj=xr.DataArray(
-                data=np.array(partition_index),
-                dims=(self.core_dimension,),
-                name="labels",
-            ),
-            grid=self,
-        )
-
-    def partition(self, n_part: int):
-        """
-        Partition this grid topology using METIS:
-        https://github.com/KarypisLab/METIS
-
-        This method utilizes the pymetis Python bindings:
-        https://github.com/inducer/pymetis
-
-        Parameters
-        ----------
-        n_part: integer
-            The number of parts to partition the mesh.
-
-        Returns
-        -------
-        partitions
-        """
-        from xugrid.ugrid.partitioning import labels_to_indices
-
-        labels = self.label_partitions(n_part)
-        indices = labels_to_indices(labels.values)
-        return [self.topology_subset(index) for index in indices]
-
     @staticmethod
     def merge_partitions(
         grids: Sequence["Ugrid2d"],

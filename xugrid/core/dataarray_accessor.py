@@ -699,6 +699,37 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             reordered_grid,
         )
 
+    def label_partitions(
+        self,
+        n_part: int,
+    ):
+        """
+        Generate partition labels for this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        The data of the UgridDataArray are treated as weights.
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+
+        Returns
+        -------
+        partition_labels: UgridDataArray of integers
+        """
+        obj = self.obj
+        grid = self.grid
+        if obj.dims != (grid.core_dimension,):
+            raise ValueError(
+                "Weights must be associated with the core-dimension "
+                f"of the grid: {grid.core_dimension}"
+            )
+        return grid.label_partitions(n_part=n_part, weights=obj.to_numpy())
+
     def interpolate_na(
         self,
         method: str = "nearest",

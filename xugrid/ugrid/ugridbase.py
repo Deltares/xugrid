@@ -1299,5 +1299,87 @@ class AbstractUgrid(abc.ABC):
             )
         return f(obj, x, y)
 
+    def _validate_partitioning_weights(self, weights: Optional[IntArray]) -> None:
+        """Validate weights for partitioning. Check shape and type."""
+        facet = {v: k for k, v in self.facets.items()}[self.core_dimension]
+        n_expected = getattr(self, f"n_{facet}")
+        if weights is not None and weights.shape != (n_expected,):
+            raise ValueError(
+                f"Wrong shape on weights. Expected a 1D array with {n_expected} elements, "
+                f"received array with shape: {weights.shape}"
+            )
+        if weights is not None and not np.issubdtype(weights.dtype, np.integer):
+            raise TypeError(
+                f"Wrong type on weights. Expected an integer array, received: {weights.dtype}"
+            )
+
+    def label_partitions(self, n_part: int, weights: Optional[IntArray] = None):
+        """
+        Generate partition labels for this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+        weights: optional, np.ndarray of integers
+            The weight associated with each elements.
+
+        Returns
+        -------
+        partition_labels: UgridDataArray of integers
+        """
+        import pymetis
+
+        import xugrid
+
+        self._validate_partitioning_weights(weights)
+        facet = {v: k for k, v in self.facets.items()}[self.core_dimension]
+        # E.g. node_node_connectivity (1D) or face_face_connectivity (2D)
+        adjacency_matrix = getattr(self, f"{facet}_{facet}_connectivity")
+
+        _, partition_index = pymetis.part_graph(
+            nparts=n_part,
+            xadj=adjacency_matrix.indptr,
+            adjncy=adjacency_matrix.indices,
+            vweights=weights,
+        )
+        return xugrid.UgridDataArray(
+            obj=xr.DataArray(
+                data=np.array(partition_index),
+                dims=(self.core_dimension,),
+                name="labels",
+            ),
+            grid=self,
+        )
+
+    def partition(self, n_part: int, weights: Optional[IntArray] = None):
+        """
+        Partition this grid topology using METIS:
+        https://github.com/KarypisLab/METIS
+
+        This method utilizes the pymetis Python bindings:
+        https://github.com/inducer/pymetis
+
+        Parameters
+        ----------
+        n_part: integer
+            The number of parts to partition the mesh.
+        weights: optional, np.ndarray of integers
+            The weight associated with each elements.
+
+        Returns
+        -------
+        partitions
+        """
+        from xugrid.ugrid.partitioning import labels_to_indices
+
+        labels = self.label_partitions(n_part, weights)
+        indices = labels_to_indices(labels.values)
+        return [self.topology_subset(index) for index in indices]
+
 
 UgridType = Type[AbstractUgrid]
