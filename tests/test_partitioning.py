@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+from pytest_cases import parametrize_with_cases
 
 import xugrid as xu
 from xugrid.ugrid import partitioning as pt
@@ -60,32 +61,106 @@ def test_single_ugrid_chunk():
     )
 
 
-class TestGridPartitioning:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        """
-        Generate simple 2D mesh connectivity with rectangular elements, eg:
+def case_grid_mesh2d():
+    """
+    Case simple 2D mesh connectivity with rectangular elements, eg:
 
-              10 -- 11 -- 12 -- 13 -- 14
-              |     |     |     |     |
-              5 --- 6 --- 7 --- 8 --- 9
-              |     |     |     |     |
-              0 --- 1 --- 2 --- 3 --- 4
-        """
-        self.grid = generate_mesh_2d(5, 3)
+            10 -- 11 -- 12 -- 13 -- 14
+            |     |     |     |     |
+            5 --- 6 --- 7 --- 8 --- 9
+            |     |     |     |     |
+            0 --- 1 --- 2 --- 3 --- 4
+    """
+    grid = generate_mesh_2d(5, 3)
+    return grid
 
-    def test_label_partition(self):
-        labels = self.grid.label_partitions(n_part=3)
-        assert isinstance(labels, xu.UgridDataArray)
-        assert labels.name == "labels"
-        assert labels.ugrid.grid == self.grid
-        assert np.allclose(np.unique(labels.values), [0, 1, 2])
 
-    def test_partition(self):
-        parts = self.grid.partition(n_part=3)
-        assert len(parts) == 3
-        for part in parts:
-            assert isinstance(part, xu.Ugrid2d)
+def case_grid_mesh1d():
+    """
+    Case simple 1D mesh connectivity:
+
+            0 --- 1 --- 2 --- 3 --- 4 --- 5 --- 6
+    """
+    grid = generate_mesh_1d(6)
+    return grid
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_label_partitions(grid):
+    n_part = 3
+    labels = grid.label_partitions(n_part=n_part)
+    assert isinstance(labels, xu.UgridDataArray)
+    assert labels.name == "labels"
+    assert labels.ugrid.grid == grid
+    assert np.allclose(np.unique(labels.values), [0, 1, 2])
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_partition(grid):
+    n_part = 3
+    grid_type = type(grid)
+    grid_size = grid.sizes[grid.core_dimension]
+    expected_part_size = grid_size // n_part
+    parts = grid.partition(n_part=n_part)
+    assert len(parts) == n_part
+    for part in parts:
+        assert isinstance(part, grid_type)
+        part_size = part.sizes[grid.core_dimension]
+        assert part_size == expected_part_size
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_label_partitions_with_weights(grid):
+    n_part = 3
+    grid_size = grid.sizes[grid.core_dimension]
+    half_size = grid_size // 2
+    weights = np.ones(grid_size, dtype=int)
+    weights[:half_size] = 2
+    labels = grid.label_partitions(n_part=n_part, weights=weights)
+    assert isinstance(labels, xu.UgridDataArray)
+    assert labels.name == "labels"
+    assert labels.ugrid.grid == grid
+    uniques, counts = np.unique(labels.values, return_counts=True)
+    np.testing.assert_array_equal(uniques, [0, 1, 2])
+    # Test if the partition sizes are different
+    assert np.max(counts) != np.min(counts)
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_partition_with_weights(grid):
+    n_part = 3
+    grid_type = type(grid)
+    grid_size = grid.sizes[grid.core_dimension]
+    half_size = grid_size // 2
+    weights = np.ones(grid_size, dtype=int)
+    weights[:half_size] = 2
+    parts = grid.partition(n_part=n_part, weights=weights)
+    assert len(parts) == n_part
+    part_sizes = []
+    for part in parts:
+        assert isinstance(part, grid_type)
+        part_sizes.append(part.sizes[grid.core_dimension])
+    assert np.max(part_sizes) != np.min(part_sizes)
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_label_partitions_dataarray_with_weights(grid):
+    n_part = 3
+    core_dim = grid.core_dimension
+    grid_size = grid.sizes[core_dim]
+    half_size = grid_size // 2
+    weights = np.ones(grid_size, dtype=int)
+    weights[:half_size] = 2
+    weights_da = xr.DataArray(weights, dims=(core_dim,))
+    weights_uda = xu.UgridDataArray(weights_da, grid=grid)
+    labels = weights_uda.ugrid.label_partitions(n_part=n_part)
+    assert isinstance(labels, xu.UgridDataArray)
+    assert labels.name == "labels"
+    assert labels.ugrid.grid == grid
+    uniques, counts = np.unique(labels.values, return_counts=True)
+    np.testing.assert_array_equal(uniques, [0, 1, 2])
+    # Test if the partition sizes are different
+    assert np.max(counts) != np.min(counts)
 
 
 class TestDatasetPartition:
@@ -308,9 +383,7 @@ class TestMergeDataset1D:
     @pytest.fixture(autouse=True)
     def setup(self):
         grid = generate_mesh_1d(6, "mesh1d")
-        # TODO: If partitioning implemented for 1D grids, replace with that.
-        i_edges = [[0, 1, 2], [3, 4, 5]]
-        parts = [grid.isel(mesh1d_nEdges=np.array(ls)) for ls in i_edges]
+        parts = grid.partition(n_part=2)
 
         values_parts = [np.arange(part.n_edge) for part in parts]
 
@@ -338,7 +411,8 @@ class TestMergeDataset1D:
         # In case of non-UGRID data, it should default to the last partition of
         # the grid that's checked last.
         assert merged["c"] == 1
-
+        # Ensure indexes are consistent with the expected dataset
+        merged = merged.ugrid.reindex_like(self.dataset_expected.ugrid.grid)
         assert self.dataset_expected.ugrid.grid.equals(merged.ugrid.grid)
         assert self.dataset_expected["a"].equals(merged["a"])
         assert self.dataset_expected.equals(merged)
@@ -350,9 +424,7 @@ class TestMultiTopology1D2DMergePartitions:
         grid_a = generate_mesh_2d(2, 3, "mesh2d")
         grid_b = generate_mesh_1d(6, "mesh1d")
         parts_a = grid_a.partition(n_part=2)
-        # TODO: If partitioning implemented for 1D grids, replace with that.
-        i_edges = [[0, 1, 2], [3, 4, 5]]
-        parts_b = [grid_b.isel(mesh1d_nEdges=np.array(ls)) for ls in i_edges]
+        parts_b = grid_b.partition(n_part=2)
 
         values_parts_a = [np.arange(part.n_face) for part in parts_a]
         values_parts_b = [np.arange(part.n_edge) for part in parts_b]
