@@ -127,6 +127,19 @@ def test_label_partitions_with_weights(grid):
 
 
 @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+def test_label_partitions_with_weights__error(grid):
+    n_part = 3
+    grid_size = grid.sizes[grid.core_dimension]
+    weights = np.ones(grid_size + 10, dtype=int)
+    with pytest.raises(ValueError, match="Wrong shape on weights."):
+        grid.label_partitions(n_part=n_part, weights=weights)
+
+    weights = np.ones(grid_size, dtype=float)
+    with pytest.raises(TypeError, match="Wrong type on weights."):
+        grid.label_partitions(n_part=n_part, weights=weights)
+
+
+@parametrize_with_cases("grid", cases=".", prefix="case_grid_")
 def test_partition_with_weights(grid):
     n_part = 3
     grid_type = type(grid)
