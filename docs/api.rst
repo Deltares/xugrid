@@ -118,6 +118,7 @@ UgridDataArray or UgridDataset.
     UgridDataArrayAccessor.sel_points
     UgridDataArrayAccessor.intersect_line
     UgridDataArrayAccessor.intersect_linestring
+    UgridDataArrayAccessor.label_partitions
     UgridDataArrayAccessor.partition
     UgridDataArrayAccessor.partition_by_label
     UgridDataArrayAccessor.rasterize
