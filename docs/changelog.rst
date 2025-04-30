@@ -6,20 +6,38 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-Unreleased
-----------
+[0.14.0] 2025-04-30
+-------------------
 
 Changed
--------
+~~~~~~~
 
 - :attr:`xugrid.Ugrid1d.length` has been renamed to :attr:`xugrid.Ugrid1d.edge_length`.
+- :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` with
+  ``direct_solve=False`` now interpolates using ``scipy.sparse.linalg.gmres``
+  instead of ``scipy.sparse.linalg.cg``. This works better with the ILU0
+  preconditioner used in xugrid.
 
 Added
 ~~~~~
 
 - :attr:`xugrid.Ugrid2d.edge_length` has been added.
-  :meth:`xugrid.Ugrid1d.remove_self_loops` has been added to remove self-loop
+- :meth:`xugrid.Ugrid1d.remove_self_loops` has been added to remove self-loop
   edges (those that join a node to itself, resulting in a zero length edge).
+- ``weights`` argument to :meth:`xugrid.Ugrid1d.label_partitions`,
+  :meth:`xugrid.Ugrid2d.label_partitions`, :meth:`xugrid.Ugrid1d.partition`, and
+  :meth:`xugrid.Ugrid2d.partition`. This allows setting weights, which are taken
+  into account when partitioning the grid. 
+- :meth:`xugrid.UgridDataArray.label_partitions` which uses the data in the
+  :class:`xugrid.UgridDataArray` as weights.
+
+Fixed
+~~~~~
+
+- Bug in :meth:`xugrid.UgridDataArrayAccessor.laplace_interpolate` with
+  ``direct_solve=False`` and ``xy_weights=True`` which sometimes caused the
+  preconditioner to return problematic values, troubling solver convergence.
+
 
 [0.13.0] 2025-04-16
 -------------------
