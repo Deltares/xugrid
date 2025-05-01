@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+UNRELEASED
+----------
+
+Fixed
+~~~~~
+
+- Bug in :meth:`xugrid.UgridDataArrayAccessor._to_facet` that caused the method
+  to crash in case of additional dimensions in the DataArray.
+
 [0.14.0] 2025-04-30
 -------------------
 
