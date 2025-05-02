@@ -733,7 +733,7 @@
         <span class="c1"># Ensure the source dimension is not chunked for efficient indexing.</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">chunk</span><span class="p">({</span><span class="n">source_dim</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
         <span class="c1"># Set the fill values (-1) to NaN</span>
-        <span class="n">mapped</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">source_dim</span><span class="p">:</span> <span class="n">indexer</span><span class="p">})</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">connectivity</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">mapped</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">source_dim</span><span class="p">:</span> <span class="n">indexer</span><span class="p">})</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indexer</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">mapped</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.to_node">
