@@ -12,8 +12,8 @@ UNRELEASED
 Fixed
 ~~~~~
 
-- Bug in :meth:`xugrid.UgridDataArrayAccessor._to_facet` that caused the method
-  to crash in case of additional dimensions in the DataArray.
+- :meth:`xugrid.UgridDataArrayAccessor._to_facet` no longer fails works when the DataArray
+  has multiple dimensions.
 
 [0.14.0] 2025-04-30
 -------------------

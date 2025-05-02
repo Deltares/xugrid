@@ -425,6 +425,14 @@ class TestUgridDataArray:
         assert back1[2:, -1].isnull().all()
         assert back1.isnull().sum() == 2
 
+        # Multiple dimensions
+        dim_multiplier = xr.DataArray([[1, 2, 3]], dims=("dim0", "dim1"))
+        face_da_nd = face_da * dim_multiplier
+        node_da_nd = face_da_nd.ugrid.to_node()
+        assert node_da_nd.dims == (grid.node_dimension, "nmax", "dim0", "dim1")
+        node_da_ndT = face_da_nd.transpose().ugrid.to_node()
+        assert node_da_ndT.dims == ("dim1", "dim0", grid.node_dimension, "nmax")
+
     def test_to_dataset(self):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
@@ -1591,6 +1599,14 @@ def test_to_facets_1d():
     assert isinstance(to_node, xugrid.UgridDataArray)
     assert to_edge.dims == (grid.edge_dimension, "nmax")
     assert to_node.dims == (grid.node_dimension, "nmax")
+
+    # Multidim
+    dim_multiplier = xr.DataArray([[1, 2, 3]], dims=("dim0", "dim1"))
+    uda = uds["a1d"] * dim_multiplier
+    to_edge_nd = uda.ugrid.to_edge()
+    assert to_edge_nd.dims == (grid.edge_dimension, "nmax", "dim0", "dim1")
+    to_edge_ndT = uda.transpose().ugrid.to_edge()
+    assert to_edge_ndT.dims == ("dim1", "dim0", grid.edge_dimension, "nmax")
 
 
 def test_laplace_interpolate_1d():
