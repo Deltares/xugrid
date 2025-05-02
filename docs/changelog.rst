@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+UNRELEASED
+----------
+
+Fixed
+~~~~~
+
+- :meth:`xugrid.UgridDataArrayAccessor._to_facet` no longer fails works when the DataArray
+  has multiple dimensions.
+
 [0.14.0] 2025-04-30
 -------------------
 

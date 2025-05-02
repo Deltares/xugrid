@@ -318,7 +318,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         # Ensure the source dimension is not chunked for efficient indexing.
         obj = obj.chunk({source_dim: -1})
         # Set the fill values (-1) to NaN
-        mapped = obj.isel({source_dim: indexer}).where(connectivity != -1)
+        mapped = obj.isel({source_dim: indexer}).where(indexer != -1)
         return UgridDataArray(mapped, grid)
 
     def to_node(self, dim: str = "nmax"):
