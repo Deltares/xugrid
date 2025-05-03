@@ -742,7 +742,7 @@
                 <span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">indexes</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">variable</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="n">name</span><span class="p">,):</span>
                 <span class="n">idx</span><span class="p">,</span> <span class="n">idx_vars</span> <span class="o">=</span> <span class="n">create_default_index_implicit</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-                <span class="n">append_all</span><span class="p">(</span><span class="n">idx_vars</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">idx_vars</span><span class="p">})</span>
+                <span class="n">append_all</span><span class="p">(</span><span class="n">idx_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">idx_vars</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -1321,7 +1321,7 @@
 <span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], join=&quot;exact&quot;)</span>
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">    ...</span>
-<span class="sd">    ValueError: cannot align objects with join=&#39;exact&#39; where ...</span>
+<span class="sd">    xarray.structure.alignment.AlignmentError: cannot align objects with join=&#39;exact&#39; where ...</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
