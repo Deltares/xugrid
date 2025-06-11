@@ -44,7 +44,7 @@ def test_overlap(circle, relative):
 
 
 def test_locate_centroids(circle):
-    source, target, weights = circle.locate_centroids(circle)
+    source, target, weights = circle.locate_inside(circle)
     sorter = np.argsort(source)
     assert np.array_equal(source[sorter], np.arange(circle.size))
     assert np.array_equal(target[sorter], np.arange(circle.size))

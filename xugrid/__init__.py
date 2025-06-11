@@ -16,13 +16,15 @@ from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
-from xugrid.regrid.gridder import NetworkGridder
-from xugrid.regrid.regridder import (
+from xugrid.regrid import (
     BarycentricInterpolator,
-    CentroidLocatorRegridder,
+    InverseDistanceRegridder,
+    LocatorRegridder,
+    NearestRegridder,
     OverlapRegridder,
     RelativeOverlapRegridder,
 )
+from xugrid.regrid.gridder import NetworkGridder
 from xugrid.ugrid.burn import burn_vector_geometry, earcut_triangulate_polygons
 from xugrid.ugrid.conventions import UgridRolesAccessor
 from xugrid.ugrid.partitioning import merge_partitions
@@ -56,9 +58,11 @@ __all__ = (
     "UgridDataset",
     "plot",
     "BarycentricInterpolator",
-    "CentroidLocatorRegridder",
+    "LocatorRegridder",
     "OverlapRegridder",
     "RelativeOverlapRegridder",
+    "NearestRegridder",
+    "InverseDistanceRegridder",
     "burn_vector_geometry",
     "earcut_triangulate_polygons",
     "NetworkGridder",
