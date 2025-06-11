@@ -6,6 +6,7 @@ other.
 While the unstructured logic would work for structured data as well, it is much
 less efficient than utilizing the structure of the coordinates.
 """
+from __future__ import annotations
 
 import abc
 from functools import singledispatchmethod
@@ -393,24 +394,30 @@ class StructuredGrid1d(StructuredGrid):
         distance = np.where(first_nearest, distance_first, distance_second)
         return self.sorted_output(source_index, target_index, distance)
 
-    @singledispatchmethod
-    def barycentric(
-        self, other: "StructuredGrid1d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        raise NotImplementedError(
-            f"barycentric method not supported for {type(self).__name__} -> {type(other).__name__}"
-        )
 
-    @barycentric.register
-    def _(self, other: "StructuredGrid1d") -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index, target_index, weights = self.linear_weights(other.coordinates)
-        target_index = other.flip_if_needed(target_index)
-        return self.sorted_output(source_index, target_index, weights)
+@singledispatchmethod
+def _1d_barycentric(
+    self, other: "StructuredGrid1d"
+) -> Tuple[IntArray, IntArray, FloatArray]:
+    raise NotImplementedError(
+        f"barycentric method not supported for {type(self).__name__} -> {type(other).__name__}"
+    )
 
-    @barycentric.register
-    def _(self, other: FloatArray) -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index, target_index, weights = self.linear_weights(other)
-        return self.sorted_output(source_index, target_index, weights)
+
+@_1d_barycentric.register
+def _(self, other: StructuredGrid1d) -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index, target_index, weights = self.linear_weights(other.coordinates)
+    target_index = other.flip_if_needed(target_index)
+    return self.sorted_output(source_index, target_index, weights)
+
+
+@_1d_barycentric.register
+def _(self, other: FloatArray) -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index, target_index, weights = self.linear_weights(other)
+    return self.sorted_output(source_index, target_index, weights)
+
+
+StructuredGrid1d.barycentric = _1d_barycentric
 
 
 class StructuredGrid2d(StructuredGrid):
@@ -496,180 +503,169 @@ class StructuredGrid2d(StructuredGrid):
         ds[name + "_type"] = xr.DataArray(-1, attrs={"type": "StructuredGrid2d"})
         return ds
 
-    # Locate inside
-    # -------------
 
-    @singledispatchmethod
-    def locate_inside(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
-        raise NotImplementedError(
-            f"locate_inside method not supported for {type(self).__name__} -> {type(other).__name__}"
-        )
+@singledispatchmethod
+def _2d_locate_inside(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+    raise NotImplementedError(
+        f"locate_inside method not supported for {type(self).__name__} -> {type(other).__name__}"
+    )
 
-    @locate_inside.register
-    def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index_x, target_index_x, weights_x = self.xbounds.locate_inside(
-            other.xbounds
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.locate_inside(
-            other.ybounds
-        )
-        return self.broadcast_sorted(
-            other,
-            source_index_y,
-            source_index_x,
-            target_index_y,
-            target_index_x,
-            weights_y,
-            weights_x,
-        )
 
-    @locate_inside.register
-    def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
-        x, y = other.coordinates.T
-        source_index_x, target_index = self.xbounds.locate_points(x)
-        source_index_y, _ = self.ybounds.locate_points(y)
-        weights = np.ones(source_index_x.size, dtype=float)
-        source_index = np.ravel_multi_index(
-            (source_index_y, source_index_x), self.shape
-        )
-        return self.sorted_output(source_index, target_index, weights)
+@singledispatchmethod
+def _2d_locate_nearest(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+    raise NotImplementedError(
+        f"locate_nearest method not supported for {type(self).__name__} -> {type(other).__name__}"
+    )
 
-    # Locate nearest
-    # --------------
 
-    @singledispatchmethod
-    def locate_nearest(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
-        raise NotImplementedError(
-            f"locate_nearest method not supported for {type(self).__name__} -> {type(other).__name__}"
-        )
+@singledispatchmethod
+def _2d_overlap(self, other, relative: bool) -> Tuple[IntArray, IntArray, FloatArray]:
+    """
+    Compute (relative) overlap with other.
 
-    @locate_nearest.register
-    def locate_nearest(
-        self, other: "StructuredGrid2d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index_x, target_index_x, weights_x = self.xbounds.locate_nearest(
-            other.xbounds.coordinates
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.locate_nearest(
-            other.ybounds.coordinates
-        )
-        return self.broadcast_sorted(
-            other,
-            source_index_y,
-            source_index_x,
-            target_index_y,
-            target_index_x,
-            weights_y,
-            weights_x,
-        )
+    Returns
+    -------
+    source_index: 1d np.ndarray of int
+    target_index: 1d np.ndarray of int
+    weights: 1d np.ndarray of float
+    """
+    raise NotImplementedError(
+        f"overlap method not supported for {type(self).__name__} -> {type(other).__name__}"
+    )
 
-    def locate_nearest(
-        self, other: "UnstructuredGrid2d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        x, y = other.coordinates.T
-        source_index_x, target_index, _ = self.xbounds.locate_nearest(x)
-        source_index_y, _, _ = self.xbounds.locate_nearest(y)
-        weights = np.ones(source_index_x.size, dtype=float)
-        source_index = np.ravel_multi_index(
-            (source_index_y, source_index_x), self.shape
-        )
-        return self.sorted_output(source_index, target_index, weights)
 
-    # Overlap
-    # -------
+@singledispatchmethod
+def _2d_barycentric(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+    """
+    Compute linear interpolation weights with other.
 
-    @singledispatchmethod
-    def overlap(self, other, relative: bool) -> Tuple[IntArray, IntArray, FloatArray]:
-        """
-        Compute (relative) overlap with other.
+    Returns
+    -------
+    source_index: 1d np.ndarray of int
+    target_index: 1d np.ndarray of int
+    weights: 1d np.ndarray of float
+    """
+    raise NotImplementedError(
+        f"barycentric method not supported for {type(self).__name__} -> {type(other).__name__}"
+    )
 
-        Returns
-        -------
-        source_index: 1d np.ndarray of int
-        target_index: 1d np.ndarray of int
-        weights: 1d np.ndarray of float
-        """
-        raise NotImplementedError(
-            f"overlap method not supported for {type(self).__name__} -> {type(other).__name__}"
-        )
 
-    @overlap.register
-    def _(
-        self, other: "StructuredGrid2d", relative: bool
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index_x, target_index_x, weights_x = self.xbounds.overlap(
-            other.xbounds, relative
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.overlap(
-            other.ybounds, relative
-        )
-        return self.broadcast_sorted(
-            other,
-            source_index_y,
-            source_index_x,
-            target_index_y,
-            target_index_x,
-            weights_y,
-            weights_x,
-        )
+@_2d_locate_inside.register
+def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index_x, target_index_x, weights_x = self.xbounds.locate_inside(
+        other.xbounds
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.locate_inside(
+        other.ybounds
+    )
+    return self.broadcast_sorted(
+        other,
+        source_index_y,
+        source_index_x,
+        target_index_y,
+        target_index_x,
+        weights_y,
+        weights_x,
+    )
 
-    @overlap.register
-    def _(
-        self, other: "UnstructuredGrid2d", relative: bool
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        converted = self.convert_to(other)
-        return converted.overlap(other, relative=relative)
 
-    # Barycentric / linear interpolation
-    # ----------------------------------
+@_2d_locate_inside.register
+def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    x, y = other.coordinates.T
+    source_index_x, target_index = self.xbounds.locate_points(x)
+    source_index_y, _ = self.ybounds.locate_points(y)
+    weights = np.ones(source_index_x.size, dtype=float)
+    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
+    return self.sorted_output(source_index, target_index, weights)
 
-    @singledispatchmethod
-    def barycentric(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
-        """
-        Compute linear interpolation weights with other.
 
-        Returns
-        -------
-        source_index: 1d np.ndarray of int
-        target_index: 1d np.ndarray of int
-        weights: 1d np.ndarray of float
-        """
-        raise NotImplementedError(
-            f"barycentric method not supported for {type(self).__name__} -> {type(other).__name__}"
-        )
+@_2d_locate_nearest.register
+def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index_x, target_index_x, weights_x = self.xbounds.locate_nearest(
+        other.xbounds.coordinates
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.locate_nearest(
+        other.ybounds.coordinates
+    )
+    return self.broadcast_sorted(
+        other,
+        source_index_y,
+        source_index_x,
+        target_index_y,
+        target_index_x,
+        weights_y,
+        weights_x,
+    )
 
-    @barycentric.register
-    def barycentric(
-        self, other: "StructuredGrid2d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index_x, target_index_x, weights_x = self.xbounds.barycentric(
-            other.xbounds
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.barycentric(
-            other.ybounds
-        )
-        return self.broadcast_sorted(
-            other,
-            source_index_y,
-            source_index_x,
-            target_index_y,
-            target_index_x,
-            weights_y,
-            weights_x,
-        )
 
-    @barycentric.register
-    def barycentric(
-        self, other: "UnstructuredGrid2d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        x, y = other.coordinates.T
-        source_index_x, target_index, weights_x = self.xbounds.linear_weights(x)
-        source_index_y, _, weights_y = self.ybounds.linear_weights(y)
-        source_index = np.ravel_multi_index(
-            (source_index_y, source_index_x), self.shape
-        )
-        weights = weights_x * weights_y
-        return self.sorted_output(source_index, target_index, weights)
+@_2d_locate_nearest.register
+def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    x, y = other.coordinates.T
+    source_index_x, target_index, _ = self.xbounds.locate_nearest(x)
+    source_index_y, _, _ = self.xbounds.locate_nearest(y)
+    weights = np.ones(source_index_x.size, dtype=float)
+    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
+    return self.sorted_output(source_index, target_index, weights)
+
+
+@_2d_overlap.register
+def _(
+    self, other: "StructuredGrid2d", relative: bool
+) -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index_x, target_index_x, weights_x = self.xbounds.overlap(
+        other.xbounds, relative
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.overlap(
+        other.ybounds, relative
+    )
+    return self.broadcast_sorted(
+        other,
+        source_index_y,
+        source_index_x,
+        target_index_y,
+        target_index_x,
+        weights_y,
+        weights_x,
+    )
+
+
+@_2d_overlap.register
+def _(
+    self, other: "UnstructuredGrid2d", relative: bool
+) -> Tuple[IntArray, IntArray, FloatArray]:
+    converted = self.convert_to(other)
+    return converted.overlap(other, relative=relative)
+
+
+@_2d_barycentric.register
+def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    source_index_x, target_index_x, weights_x = self.xbounds.barycentric(other.xbounds)
+    source_index_y, target_index_y, weights_y = self.ybounds.barycentric(other.ybounds)
+    return self.broadcast_sorted(
+        other,
+        source_index_y,
+        source_index_x,
+        target_index_y,
+        target_index_x,
+        weights_y,
+        weights_x,
+    )
+
+
+@_2d_barycentric.register
+def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+    x, y = other.coordinates.T
+    source_index_x, target_index, weights_x = self.xbounds.linear_weights(x)
+    source_index_y, _, weights_y = self.ybounds.linear_weights(y)
+    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
+    weights = weights_x * weights_y
+    return self.sorted_output(source_index, target_index, weights)
+
+
+StructuredGrid2d.locate_inside = _2d_locate_inside
+StructuredGrid2d.locate_nearest = _2d_locate_nearest
+StructuredGrid2d.overlap = _2d_overlap
+StructuredGrid2d.barycentric = _2d_barycentric
 
 
 class StructuredGrid3d(StructuredGrid):
@@ -840,64 +836,70 @@ class ExplicitStructuredGrid3d:
     def volume(self):
         return np.multiply.outer(self.zbounds.length, self.area)
 
-    @singledispatchmethod
-    def overlap(self, other, relative: bool):
-        """
-        Compute (relative) overlap with other.
 
-        Returns
-        -------
-        source_index: 1d np.ndarray of int
-        target_index: 1d np.ndarray of int
-        weights: 1d np.ndarray of float
-        """
-        raise NotImplementedError()
+@singledispatchmethod
+def _3d_overlap(self, other, relative: bool):
+    """
+    Compute (relative) overlap with other.
 
-    @overlap.register
-    def _(self, other: StructuredGrid3d, relative: bool):
-        source_index_x, target_index_x, weights_x = self.xbounds.overlap(
-            other.xbounds, relative
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.overlap(
-            other.ybounds, relative
-        )
-        source_index_z, target_index_z, weights_z = self.zbounds.overlap(
-            other.zbounds, relative
-        )
-        source_index, target_index, weights = broadcast(
-            self.shape,
-            other.shape,
-            (source_index_z, source_index_y, source_index_x),
-            (target_index_z, target_index_y, target_index_x),
-            (weights_z, weights_y, weights_x),
-        )
-        return self.sorted_output(source_index, target_index, weights)
+    Returns
+    -------
+    source_index: 1d np.ndarray of int
+    target_index: 1d np.ndarray of int
+    weights: 1d np.ndarray of float
+    """
+    raise NotImplementedError()
 
-    @overlap.register
-    def _(self, other: "ExplicitStructuredGrid3d", relative: bool):
-        source_index_x, target_index_x, weights_x = self.xbounds.overlap(
-            other.xbounds, relative
-        )
-        source_index_y, target_index_y, weights_y = self.ybounds.overlap(
-            other.ybounds, relative
-        )
-        source_index_yx, target_index_yx, weights_yx = broadcast(
-            self.shape,
-            other.shape,
-            (source_index_y, source_index_x),
-            (target_index_y, target_index_x),
-            (weights_y, weights_x),
-        )
 
-        zbounds = other.zbounds
-        target_index = target_index_yx
+@_3d_overlap.register
+def _(self, other: StructuredGrid3d, relative: bool):
+    source_index_x, target_index_x, weights_x = self.xbounds.overlap(
+        other.xbounds, relative
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.overlap(
+        other.ybounds, relative
+    )
+    source_index_z, target_index_z, weights_z = self.zbounds.overlap(
+        other.zbounds, relative
+    )
+    source_index, target_index, weights = broadcast(
+        self.shape,
+        other.shape,
+        (source_index_z, source_index_y, source_index_x),
+        (target_index_z, target_index_y, target_index_x),
+        (weights_z, weights_y, weights_x),
+    )
+    return self.sorted_output(source_index, target_index, weights)
 
-        source_index, target_index, weights_z = overlap_1d_nd(
-            self.zbounds,
-            zbounds,
-            source_index_yx,
-            target_index,
-        )
-        # TODO: check array dims
-        weights_zyx = weights_z * weights_yx
-        return self.sorted_output(source_index, target_index, weights_zyx)
+
+@_3d_overlap.register
+def _(self, other: "ExplicitStructuredGrid3d", relative: bool):
+    source_index_x, target_index_x, weights_x = self.xbounds.overlap(
+        other.xbounds, relative
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.overlap(
+        other.ybounds, relative
+    )
+    source_index_yx, target_index_yx, weights_yx = broadcast(
+        self.shape,
+        other.shape,
+        (source_index_y, source_index_x),
+        (target_index_y, target_index_x),
+        (weights_y, weights_x),
+    )
+
+    zbounds = other.zbounds
+    target_index = target_index_yx
+
+    source_index, target_index, weights_z = overlap_1d_nd(
+        self.zbounds,
+        zbounds,
+        source_index_yx,
+        target_index,
+    )
+    # TODO: check array dims
+    weights_zyx = weights_z * weights_yx
+    return self.sorted_output(source_index, target_index, weights_zyx)
+
+
+StructuredGrid3d.overlap = _3d_overlap

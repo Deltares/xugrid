@@ -2,7 +2,7 @@ import numba
 import numpy as np
 
 from xugrid.constants import IntDType
-from xugrid.regrid.utils import alt_cumsum
+from xugrid.regrid.utils.array import alt_cumsum
 
 
 @numba.njit(inline="always")

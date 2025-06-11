@@ -4,11 +4,11 @@ import xarray as xr
 
 import xugrid
 from xugrid.core.sparse import MatrixCSR
-from xugrid.regrid import reduce
 from xugrid.regrid.base_regridder import BaseRegridder
+from xugrid.regrid.grid.network import Network1d
 from xugrid.regrid.grid.structured import StructuredGrid2d
 from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
-from xugrid.regrid.network import Network1d
+from xugrid.regrid.utils import reduce
 
 
 def convert_to_match(source, target):

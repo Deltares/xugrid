@@ -1,6 +1,5 @@
 from typing import Optional
 
-import xugrid
 from xugrid.core.sparse import MatrixCSR
 from xugrid.regrid.base_regridder import BaseRegridder
 
@@ -8,8 +7,8 @@ from xugrid.regrid.base_regridder import BaseRegridder
 class InverseDistanceRegridder(BaseRegridder):
     def __init__(
         self,
-        source: xugrid.UgridDataArray,
-        target: xugrid.UgridDataArray,
+        source,
+        target,
         target_dim: Optional[str] = None,
         max_distance: Optional[float] = None,
         min_points: int = 0,

@@ -6,7 +6,7 @@ import xarray as xr
 
 import xugrid as xu
 from xugrid.constants import FloatDType
-from xugrid.regrid.basegrid import Grid
+from xugrid.regrid.grid.basegrid import Grid
 from xugrid.ugrid import voronoi
 from xugrid.ugrid.ugrid2d import Ugrid2d
 

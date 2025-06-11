@@ -5,8 +5,8 @@ import xarray as xr
 
 import xugrid
 from xugrid.core.sparse import MatrixCOO, MatrixCSR
-from xugrid.regrid import reduce
 from xugrid.regrid.base_regridder import BaseRegridder
+from xugrid.regrid.utils import reduce
 
 
 class BaseOverlapRegridder(BaseRegridder, abc.ABC):
@@ -89,8 +89,8 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     def __init__(
         self,
-        source: xugrid.UgridDataArray,
-        target: xugrid.UgridDataArray,
+        source,
+        target,
         target_dim: Optional[str] = None,
         method: Union[str, Callable] = "mean",
     ):
@@ -149,8 +149,8 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
 
     def __init__(
         self,
-        source: xugrid.UgridDataArray,
-        target: xugrid.UgridDataArray,
+        source,
+        target,
         target_dim: Optional[str] = None,
         method: Union[str, Callable] = "first_order_conservative",
     ):

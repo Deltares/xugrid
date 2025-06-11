@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-import xugrid as xu
+import xugrid
 
 # dask as optional dependency
 try:
@@ -18,10 +18,8 @@ try:
 except ImportError:
     DaskArray = ()
 
-import xugrid
 from xugrid.constants import FloatArray
 from xugrid.core.sparse import MatrixCOO, MatrixCSR, row_slice
-from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.regrid.grid.structured import StructuredGrid2d
 from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
 
@@ -31,8 +29,8 @@ class BaseRegridder(abc.ABC):
 
     def __init__(
         self,
-        source: "xugrid.Ugrid2d",
-        target: "xugrid.Ugrid2d",
+        source,
+        target,
         target_dim: Optional[str] = None,
         tolerance: Optional[float] = None,
     ):
@@ -45,7 +43,9 @@ class BaseRegridder(abc.ABC):
 
     @staticmethod
     def setup_grid(obj, **kwargs):
-        if isinstance(obj, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+        if isinstance(
+            obj, (xugrid.Ugrid2d, xugrid.UgridDataArray, xugrid.UgridDataset)
+        ):
             return UnstructuredGrid2d(obj)
         elif isinstance(obj, (xr.DataArray, xr.Dataset)):
             return StructuredGrid2d(
@@ -205,7 +205,9 @@ class BaseRegridder(abc.ABC):
         )
         return out
 
-    def regrid(self, data: Union[xr.DataArray, UgridDataArray]) -> UgridDataArray:
+    def regrid(
+        self, data: Union[xr.DataArray, "xugrid.UgridDataArray"]
+    ) -> "xugrid.UgridDataArray":
         """
         Regrid the data from a DataArray from its old grid topology to the new
         target topology.
@@ -232,7 +234,7 @@ class BaseRegridder(abc.ABC):
         if isinstance(data, (xr.DataArray, xr.Dataset)):
             obj = data
             source_dims = ("y", "x")
-        elif isinstance(data, (UgridDataArray, UgridDataset)):
+        elif isinstance(data, (xugrid.UgridDataArray, xugrid.UgridDataset)):
             obj = data.ugrid.obj
             source_dims = (data.ugrid.grid.core_dimension,)
         else:
@@ -252,7 +254,7 @@ class BaseRegridder(abc.ABC):
             regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
-            return UgridDataArray(
+            return xugrid.UgridDataArray(
                 regridded,
                 self._target.ugrid_topology,
             )
@@ -337,7 +339,7 @@ class BaseRegridder(abc.ABC):
         unstructured = weights["__source_type"].attrs["type"] == "UnstructuredGrid2d"
         if unstructured:
             instance._source = cls.setup_grid(
-                xu.Ugrid2d.from_dataset(weights, "__source")
+                xugrid.Ugrid2d.from_dataset(weights, "__source")
             )
         else:
             instance._source = cls.setup_grid(
@@ -353,7 +355,7 @@ class BaseRegridder(abc.ABC):
         """
         unstructured = dataset["__target_type"].attrs["type"] == "UnstructuredGrid2d"
         if unstructured:
-            target = xu.Ugrid2d.from_dataset(dataset, "__target")
+            target = xugrid.Ugrid2d.from_dataset(dataset, "__target")
 
         # weights = cls._weights_from_dataset(dataset)
         return cls.from_weights(dataset, target)

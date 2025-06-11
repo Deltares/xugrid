@@ -34,8 +34,8 @@ class BarycentricInterpolator(BaseRegridder):
 
     def __init__(
         self,
-        source: xugrid.UgridDataArray,
-        target: xugrid.UgridDataArray,
+        source,
+        target,
         target_dim: Optional[str] = None,
         tolerance: Optional[float] = None,
     ):
