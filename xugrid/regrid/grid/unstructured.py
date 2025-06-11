@@ -65,19 +65,8 @@ class UnstructuredGrid2d(Grid):
     grid: Ugrid2d
     """
 
-    def __init__(self, obj, dim: str):
-        # TODO: do not omit type check on grid!
-        if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
-            self.ugrid_topology = obj.grid
-        elif isinstance(obj, Ugrid2d):
-            self.ugrid_topology = obj
-        else:
-            options = {"Ugrid2d", "UgridDataArray", "UgridDataset"}
-            raise TypeError(
-                f"Expected one of {options}, received: {type(obj).__name__}"
-            )
-
-        grid = self.ugrid_topology
+    def __init__(self, grid, dim: str):
+        self.ugrid_topology = grid
         if dim == grid.node_dimension:
             self._coordinates = grid.node_coordinates
             self._dims = (grid.node_dimension,)

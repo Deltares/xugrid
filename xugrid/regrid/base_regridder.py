@@ -1,6 +1,7 @@
 """This module is heavily inspired by xemsf.frontend.py"""
 
 import abc
+import warnings
 from typing import Callable, Optional, Tuple, Union
 
 import numba
@@ -34,23 +35,48 @@ class BaseRegridder(abc.ABC):
         target_dim: Optional[str] = None,
         tolerance: Optional[float] = None,
     ):
-        self._source = self.setup_grid(source)
-        self._target = self.setup_grid(target)
+        self._source = self.setup_grid(source, None)
+        self._target = self.setup_grid(target, target_dim)
         self._weights = None
-        self._target_dim = target_dim
-        self._compute_weights(self._source, self._target, self._target_dim, tolerance)
+        self._compute_weights(self._source, self._target, tolerance)
         return
 
     @staticmethod
-    def setup_grid(obj, **kwargs):
-        if isinstance(
-            obj, (xugrid.Ugrid2d, xugrid.UgridDataArray, xugrid.UgridDataset)
-        ):
-            return UnstructuredGrid2d(obj)
+    def setup_grid(obj, dim, **kwargs):
+        if isinstance(obj, xugrid.Ugrid2d):
+            grid = obj
+            if dim is None:
+                warnings.warn(
+                    "In the future, passing a Ugrid2d target requires an explicit target_dim.",
+                    FutureWarning,
+                    stacklevel=2,
+                )
+                dim = grid.face_dimension
+            return UnstructuredGrid2d(grid, dim)
+
+        elif isinstance(obj, (xugrid.UgridDataArray, xugrid.UgridDataset)):
+            # TODO: Make error more meaningful.
+            #  Can only infer from a UgridDataset if:
+            #
+            # * it has a single topology
+            # * it has a single UGRID dim in its data.
+            #
+            grid = obj.ugrid.grid
+            if dim is None:
+                candidates = set(obj.dims).intersection(grid.dims)
+                if len(candidates) > 1:
+                    # TODO:
+                    raise ValueError(
+                        f"Could not derive a single target dimension from multiple candidates: {candidates}"
+                    )
+                dim = candidates.pop()
+            return UnstructuredGrid2d(grid, dim)
+
         elif isinstance(obj, (xr.DataArray, xr.Dataset)):
             return StructuredGrid2d(
                 obj, name_y=kwargs.get("name_y", "y"), name_x=kwargs.get("name_x", "x")
             )
+
         else:
             raise TypeError()
 
@@ -236,7 +262,7 @@ class BaseRegridder(abc.ABC):
             source_dims = ("y", "x")
         elif isinstance(data, (xugrid.UgridDataArray, xugrid.UgridDataset)):
             obj = data.ugrid.obj
-            source_dims = (data.ugrid.grid.core_dimension,)
+            source_dims = self._source.dims
         else:
             raise TypeError(
                 f"Expected DataArray or UgridDataAray, received: {type(data).__name__}"

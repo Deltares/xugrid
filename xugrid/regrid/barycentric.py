@@ -50,9 +50,7 @@ class BarycentricInterpolator(BaseRegridder):
         target,
         tolerance: Optional[float] = None,
     ):
-        source_index, target_index, weights = source.barycentric(
-            source, target, tolerance
-        )
+        source_index, target_index, weights = source.barycentric(target, tolerance)
         self._weights = MatrixCSR.from_triplet(
             target_index, source_index, weights, n=target.size, m=source.size
         )

@@ -31,11 +31,6 @@ class Grid(abc.ABC):
     def size(self) -> int:
         pass
 
-    @property
-    @abc.abstractmethod
-    def length(self) -> FloatArray:
-        pass
-
     def sorted_output(
         self, source_index: IntArray, target_index: IntArray, weights: FloatArray
     ) -> Tuple[IntArray, IntArray, FloatArray]:
