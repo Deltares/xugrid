@@ -2,6 +2,7 @@ from typing import Optional
 
 from xugrid.core.sparse import MatrixCOO
 from xugrid.regrid.base_regridder import BasePointRegridder
+from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
 
 
 class LocatorRegridder(BasePointRegridder):
@@ -27,6 +28,15 @@ class LocatorRegridder(BasePointRegridder):
     """
 
     def _compute_weights(self, source, target, tolerance: Optional[float] = None):
+        if isinstance(source, UnstructuredGrid2d):
+            if source.dimension == "node":
+                raise ValueError(
+                    "Cannot regrid node-associated data with the LocatorRegridder. "
+                    "This regridder locates points within grid faces, which "
+                    "is incompatible with node data. Try using a different "
+                    "regridder or convert your data to face-associated values."
+                )
+
         source_index, target_index, weight_values = source.locate_inside(
             target, tolerance
         )
