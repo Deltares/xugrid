@@ -44,7 +44,7 @@ class NetworkGridder(BaseRegridder):
         method: Union[str, Callable] = "mean",
     ):
         self._source = Network1d(source)
-        self._target = self.setup_grid(target)
+        self._target, self._target_flipper = self.setup_grid(target)
         self._target_dim = target_dim
         self._weights = None
         self._compute_weights(self._source, self._target, relative=False)

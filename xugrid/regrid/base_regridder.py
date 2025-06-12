@@ -35,14 +35,34 @@ class BaseRegridder(abc.ABC):
         target_dim: Optional[str] = None,
         tolerance: Optional[float] = None,
     ):
-        self._source = self.setup_grid(source, None)
-        self._target = self.setup_grid(target, target_dim)
+        self._source, _ = self.setup_grid(source, None)
+        self._target, self._target_flipper = self.setup_grid(target, target_dim)
         self._weights = None
         self._compute_weights(self._source, self._target, tolerance)
         return
 
     @staticmethod
-    def setup_grid(obj, dim, **kwargs):
+    def _monotonic_increasing_indexer(
+        obj: Union[xr.DataArray, xr.Dataset], name_x: str, name_y: str
+    ) -> dict[str, slice]:
+        x = obj.indexes[name_x]
+        y = obj.indexes[name_y]
+
+        if not (x.is_monotonic_increasing or x.is_monotonic_decreasing):
+            raise ValueError(f"x-coordinate {name_x} is not monotonic")
+        if not (y.is_monotonic_increasing or y.is_monotonic_decreasing):
+            raise ValueError(f"x-coordinate {name_y} is not monotonic")
+
+        flipper = {"x": slice(None, None), "y": slice(None, None)}
+        if x.is_monotonic_decreasing:
+            flipper["x"] = slice(None, None, -1)
+        if y.is_monotonic_decreasing:
+            flipper["y"] = slice(None, None, -1)
+        return flipper
+
+    @classmethod
+    def setup_grid(cls, obj, dim, **kwargs):
+        flipper = None
         if isinstance(obj, xugrid.Ugrid2d):
             grid = obj
             if dim is None:
@@ -52,7 +72,7 @@ class BaseRegridder(abc.ABC):
                     stacklevel=2,
                 )
                 dim = grid.face_dimension
-            return UnstructuredGrid2d(grid, dim)
+            return UnstructuredGrid2d(grid, dim), flipper
 
         elif isinstance(obj, (xugrid.UgridDataArray, xugrid.UgridDataset)):
             # TODO: Make error more meaningful.
@@ -70,12 +90,16 @@ class BaseRegridder(abc.ABC):
                         f"Could not derive a single target dimension from multiple candidates: {candidates}"
                     )
                 dim = candidates.pop()
-            return UnstructuredGrid2d(grid, dim)
+            return UnstructuredGrid2d(grid, dim), flipper
 
         elif isinstance(obj, (xr.DataArray, xr.Dataset)):
+            # Make sure x and y are increasing.
+            name_x = kwargs.get("name_x", "x")
+            name_y = kwargs.get("name_y", "y")
+            flipper = cls._monotonic_increasing_indexer(obj, name_x, name_y)
             return StructuredGrid2d(
-                obj, name_y=kwargs.get("name_y", "y"), name_x=kwargs.get("name_x", "x")
-            )
+                obj.isel(flipper), name_y=name_y, name_x=name_x
+            ), flipper
 
         else:
             raise TypeError()
@@ -258,7 +282,8 @@ class BaseRegridder(abc.ABC):
         # from_dataset, because the name has been changed to
         # __source_nFace.
         if isinstance(data, (xr.DataArray, xr.Dataset)):
-            obj = data
+            flipper = self._monotonic_increasing_indexer(data, name_x="x", name_y="y")
+            obj = data.isel(flipper)
             source_dims = ("y", "x")
         elif isinstance(data, (xugrid.UgridDataArray, xugrid.UgridDataset)):
             obj = data.ugrid.obj
@@ -278,7 +303,7 @@ class BaseRegridder(abc.ABC):
 
         if isinstance(self._target, StructuredGrid2d):
             regridded = regridded.assign_coords(coords=self._target.coords)
-            return regridded
+            return regridded.isel(self._target_flipper)
         else:
             return xugrid.UgridDataArray(
                 regridded,

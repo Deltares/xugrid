@@ -4,13 +4,17 @@ structured form. All coordinates are assumed to be fully orthogonal to each
 other.
 
 While the unstructured logic would work for structured data as well, it is much
-less efficient than utilizing the structure of the coordinates.
+less efficient than utilizing the structure of the coordinates. These classes use
+singledispatch methods to achieve some sense of multiple (or rather: dual)
+dispatch, where it specializes on the type of self (standard single dispatch) and
+the type of other (thereby effective multiple dispatch).
+
+Note: This is equivalent to a big if-else instance function.
 """
 from __future__ import annotations
 
-import abc
 from functools import singledispatchmethod
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -22,27 +26,11 @@ from xugrid.regrid.utils.array import broadcast
 from xugrid.regrid.utils.overlap_1d import overlap_1d, overlap_1d_nd
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
-
-class StructuredGrid(Grid, abc.ABC):
-    def flip_if_needed(self, index: IntArray) -> IntArray:
-        """
-        Flips the index if needed for descending coordinates.
-
-        Parameters
-        ----------
-        index: np.ndarray
-
-        Returns
-        -------
-        checked_index: np.ndarray
-        """
-        if self.flipped:
-            return self.size - index - 1
-        else:
-            return index
+# Define a sentinel index value to keep shapes constant and allow broadcasting.
+OUT_OF_BOUNDS = -1
 
 
-class StructuredGrid1d(StructuredGrid):
+class StructuredGrid1d(Grid):
     """
     e.g. z -> z; so also works for unstructured
 
@@ -56,16 +44,9 @@ class StructuredGrid1d(StructuredGrid):
         size_name = f"d{name}"  # e.g. dx
 
         index = obj.indexes[name]
+        midpoints = index.to_numpy()
         # take care of potentially decreasing coordinate values
-        if index.is_monotonic_decreasing:
-            midpoints = index.to_numpy()[::-1]
-            flipped = True
-            side = "right"
-        elif index.is_monotonic_increasing:
-            midpoints = index.to_numpy()
-            flipped = False
-            side = "left"
-        else:
+        if not index.is_monotonic_increasing or index.is_monotonic_decreasing:
             raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
         if bounds_name in obj.coords:
@@ -97,8 +78,6 @@ class StructuredGrid1d(StructuredGrid):
         self.name = name
         self.midpoints = midpoints
         self.bounds = bounds
-        self.flipped = flipped
-        self.side = side
         self.dname = size_name
         self.dvalue = size
         self.index = index.to_numpy()
@@ -134,11 +113,7 @@ class StructuredGrid1d(StructuredGrid):
 
     @property
     def directional_bounds(self):
-        # Only flip bounds if needed
-        if self.flipped:
-            return self.bounds[::-1, :].copy()
-        else:
-            return self.bounds
+        return self.bounds
 
     def to_dataset(self, name: str) -> xr.DataArray:
         export_name = name + "_" + self.name
@@ -160,16 +135,17 @@ class StructuredGrid1d(StructuredGrid):
         self,
         points: np.ndarray,
     ) -> Tuple[IntArray, IntArray]:
-        start = np.searchsorted(self.bounds[:, 0], points, side=self.side)
-        end = np.searchsorted(self.bounds[:, 1], points, side=self.side)
-        valid = (
+        start = np.searchsorted(self.bounds[:, 0], points, side="left")
+        end = np.searchsorted(self.bounds[:, 1], points, side="left")
+        in_bounds = (
             (start == (end + 1))
             & (points > self.bounds[0, 0])
             & (points < self.bounds[-1, 1])
         )
-        other_index = np.arange(len(points))[valid]
-        self_index = end[valid]
-        self_index = self.flip_if_needed(self_index)
+        out_of_bounds = ~in_bounds
+        other_index = np.arange(len(points))
+        self_index = end
+        self_index[out_of_bounds] = OUT_OF_BOUNDS
         return self_index, other_index
 
     def overlap_1d_structured(
@@ -194,8 +170,6 @@ class StructuredGrid1d(StructuredGrid):
             length of overlap
         """
         source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
-        source_index = self.flip_if_needed(source_index)
-        target_index = other.flip_if_needed(target_index)
         return source_index, target_index, weights
 
     def centroids_to_linear_pairs(
@@ -222,18 +196,18 @@ class StructuredGrid1d(StructuredGrid):
         weights: np.array
             lineair interpolation weights.
         """
-        # if source_index is flipped, source-index is decreasing and neighbor
-        # need to be flipped
-        if self.flipped:
-            neighbor = -neighbor
         source_index = np.column_stack((source_index, source_index + neighbor)).ravel()
         target_index = np.repeat(target_index, 2)
         weights = np.column_stack((weights, 1.0 - weights)).ravel()
 
         # correct for possibility of out of bound due to column-stack
         # source_index + 1 and -1
-        valid = np.logical_and(source_index <= self.size - 1, source_index >= 0)
-        return source_index[valid], target_index[valid], weights[valid]
+        out_of_bounds = ~np.logical_and(
+            source_index <= self.size - 1, source_index >= 0
+        )
+        source_index[out_of_bounds] = OUT_OF_BOUNDS
+        weights[out_of_bounds] = 0.0
+        return source_index, target_index, weights
 
     def find_neighbor(
         self, points, source_index: IntArray, target_index: IntArray
@@ -251,13 +225,13 @@ class StructuredGrid1d(StructuredGrid):
             1,
         )
 
-        # When we exceed the original domain, it should still interpolate
-        # within the bounds.
         # Make sure neighbor falls in [0, n)
-        neighbor_index = np.clip(source_index + neighbor, 0, self.midpoints.size - 1)
-        # Update neighbor since we return it
-        neighbor = neighbor_index - source_index
-        return neighbor, neighbor_index
+        n = self.midpoints.size - 1
+        # Left side
+        neighbor[
+            (source_index == 0) | (source_index == n) | (source_index == OUT_OF_BOUNDS)
+        ] = 0
+        return neighbor
 
     def compute_linear_weights_to_points(
         self, points, source_index: IntArray, target_index: IntArray
@@ -281,15 +255,14 @@ class StructuredGrid1d(StructuredGrid):
         weights: np.array
         neighbor: np.narray
         """
-        neighbor, neighbor_index = self.find_neighbor(
-            points, source_index, target_index
-        )
+        neighbor = self.find_neighbor(points, source_index, target_index)
+        neighbor_index = source_index + neighbor
 
         # If neighbor is 0, we end up computing zero distance, since we're
         # comparing a midpoint to iself. Instead, set a weight of 1.0 on one,
         # (and impliclity 0 in the other). Similarly, if source and target
         # midpoints coincide, the distance may end up 0.
-        length = points.coordinates[target_index] - self.midpoints[source_index]
+        length = points[target_index] - self.midpoints[source_index]
         total_length = self.midpoints[neighbor_index] - self.midpoints[source_index]
         # Do not divide by zero.
         # We will overwrite the value anyway at neighbor == 0.
@@ -346,7 +319,6 @@ class StructuredGrid1d(StructuredGrid):
         weights: np.array
         """
         source_index, target_index = self.locate_points(other.coordinates)
-        target_index = other.flip_if_needed(target_index)
         weights = np.ones(source_index.size, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
 
@@ -382,9 +354,8 @@ class StructuredGrid1d(StructuredGrid):
         points: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         source_index, target_index = self.locate_points(points)
-        neighbor, neighbor_index = self.find_neighbor(source_index)
-        if self.flipped:
-            neighbor = -neighbor
+        neighbor = self.find_neighbor(source_index)
+        neighbor_index = source_index + neighbor
         distance_first = np.linalg.norm(self.midpoints[source_index] - points, axis=1)
         distance_second = np.linalg.norm(
             self.midpoints[neighbor_index] - points, axis=1
@@ -393,6 +364,10 @@ class StructuredGrid1d(StructuredGrid):
         source_index = np.where(first_nearest, source_index, neighbor_index)
         distance = np.where(first_nearest, distance_first, distance_second)
         return self.sorted_output(source_index, target_index, distance)
+
+
+# Note: the dispatch methods are defined outside of the class, since they need
+# type of self.
 
 
 @singledispatchmethod
@@ -407,7 +382,6 @@ def _1d_barycentric(
 @_1d_barycentric.register
 def _(self, other: StructuredGrid1d) -> Tuple[IntArray, IntArray, FloatArray]:
     source_index, target_index, weights = self.linear_weights(other.coordinates)
-    target_index = other.flip_if_needed(target_index)
     return self.sorted_output(source_index, target_index, weights)
 
 
@@ -420,7 +394,7 @@ def _(self, other: FloatArray) -> Tuple[IntArray, IntArray, FloatArray]:
 StructuredGrid1d.barycentric = _1d_barycentric
 
 
-class StructuredGrid2d(StructuredGrid):
+class StructuredGrid2d(Grid):
     """Represent e.g. raster data topology."""
 
     def __init__(
@@ -496,6 +470,26 @@ class StructuredGrid2d(StructuredGrid):
         )
         return self.sorted_output(source_index, target_index, weights)
 
+    def ravel_sorted(
+        self,
+        source_index_x: IntArray,
+        source_index_y: IntArray,
+        target_index_x: IntArray,
+        target_index_y: IntArray,
+        weights_y: Optional[FloatArray] = None,
+        weights_x: Optional[FloatArray] = None,
+    ) -> Tuple[IntArray, IntArray, FloatArray]:
+        valid = (source_index_x != OUT_OF_BOUNDS) & (source_index_y != OUT_OF_BOUNDS)
+        source_index = np.ravel_multi_index(
+            (source_index_y[valid], source_index_x[valid]), self.shape
+        )
+        target_index = target_index_x[valid]
+        if weights_x is not None and weights_y is not None:
+            weights = weights_x[valid] * weights_y[valid]
+        else:
+            weights = np.ones(source_index.size, dtype=float)
+        return self.sorted_output(source_index, target_index, weights)
+
     def to_dataset(self, name: str) -> xr.Dataset:
         ds_x = self.xbounds.to_dataset(name)
         ds_y = self.ybounds.to_dataset(name)
@@ -504,15 +498,19 @@ class StructuredGrid2d(StructuredGrid):
         return ds
 
 
+# Note: the dispatch methods are defined outside of the class, since they need
+# type of self.
+
+
 @singledispatchmethod
-def _2d_locate_inside(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+def _2d_locate_inside(self, other, tolerance) -> Tuple[IntArray, IntArray, FloatArray]:
     raise NotImplementedError(
         f"locate_inside method not supported for {type(self).__name__} -> {type(other).__name__}"
     )
 
 
 @singledispatchmethod
-def _2d_locate_nearest(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+def _2d_locate_nearest(self, other, tolerance) -> Tuple[IntArray, IntArray, FloatArray]:
     raise NotImplementedError(
         f"locate_nearest method not supported for {type(self).__name__} -> {type(other).__name__}"
     )
@@ -535,7 +533,7 @@ def _2d_overlap(self, other, relative: bool) -> Tuple[IntArray, IntArray, FloatA
 
 
 @singledispatchmethod
-def _2d_barycentric(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
+def _2d_barycentric(self, other, tolerance) -> Tuple[IntArray, IntArray, FloatArray]:
     """
     Compute linear interpolation weights with other.
 
@@ -551,7 +549,9 @@ def _2d_barycentric(self, other) -> Tuple[IntArray, IntArray, FloatArray]:
 
 
 @_2d_locate_inside.register
-def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: StructuredGrid2d, tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     source_index_x, target_index_x, weights_x = self.xbounds.locate_inside(
         other.xbounds
     )
@@ -570,17 +570,24 @@ def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
 
 
 @_2d_locate_inside.register
-def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: "UnstructuredGrid2d", tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     x, y = other.coordinates.T
-    source_index_x, target_index = self.xbounds.locate_points(x)
-    source_index_y, _ = self.ybounds.locate_points(y)
-    weights = np.ones(source_index_x.size, dtype=float)
-    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
-    return self.sorted_output(source_index, target_index, weights)
+    source_index_x, target_index_x = self.xbounds.locate_points(x)
+    source_index_y, target_index_y = self.ybounds.locate_points(y)
+    return self.ravel_sorted(
+        source_index_x,
+        source_index_y,
+        target_index_x,
+        target_index_y,
+    )
 
 
 @_2d_locate_nearest.register
-def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: "StructuredGrid2d", tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     source_index_x, target_index_x, weights_x = self.xbounds.locate_nearest(
         other.xbounds.coordinates
     )
@@ -599,13 +606,15 @@ def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
 
 
 @_2d_locate_nearest.register
-def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: "UnstructuredGrid2d", tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     x, y = other.coordinates.T
-    source_index_x, target_index, _ = self.xbounds.locate_nearest(x)
-    source_index_y, _, _ = self.xbounds.locate_nearest(y)
-    weights = np.ones(source_index_x.size, dtype=float)
-    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
-    return self.sorted_output(source_index, target_index, weights)
+    source_index_x, target_index_x, _ = self.xbounds.locate_nearest(x)
+    source_index_y, target_index_y, _ = self.xbounds.locate_nearest(y)
+    return self.ravel_sorted(
+        source_index_x, source_index_x, target_index_x, target_index_y
+    )
 
 
 @_2d_overlap.register
@@ -638,7 +647,9 @@ def _(
 
 
 @_2d_barycentric.register
-def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: "StructuredGrid2d", tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     source_index_x, target_index_x, weights_x = self.xbounds.barycentric(other.xbounds)
     source_index_y, target_index_y, weights_y = self.ybounds.barycentric(other.ybounds)
     return self.broadcast_sorted(
@@ -653,13 +664,20 @@ def _(self, other: "StructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
 
 
 @_2d_barycentric.register
-def _(self, other: "UnstructuredGrid2d") -> Tuple[IntArray, IntArray, FloatArray]:
+def _(
+    self, other: "UnstructuredGrid2d", tolerance
+) -> Tuple[IntArray, IntArray, FloatArray]:
     x, y = other.coordinates.T
-    source_index_x, target_index, weights_x = self.xbounds.linear_weights(x)
-    source_index_y, _, weights_y = self.ybounds.linear_weights(y)
-    source_index = np.ravel_multi_index((source_index_y, source_index_x), self.shape)
-    weights = weights_x * weights_y
-    return self.sorted_output(source_index, target_index, weights)
+    source_index_x, target_index_x, weights_x = self.xbounds.linear_weights(x)
+    source_index_y, target_index_y, weights_y = self.ybounds.linear_weights(y)
+    return self.ravel_sorted(
+        source_index_x,
+        source_index_y,
+        target_index_x,
+        target_index_y,
+        weights_x,
+        weights_y,
+    )
 
 
 StructuredGrid2d.locate_inside = _2d_locate_inside
@@ -668,7 +686,7 @@ StructuredGrid2d.overlap = _2d_overlap
 StructuredGrid2d.barycentric = _2d_barycentric
 
 
-class StructuredGrid3d(StructuredGrid):
+class StructuredGrid3d(Grid):
     """
     e.g. (x,y,z) -> (x,y,z)
 
