@@ -319,7 +319,7 @@ class StructuredGrid1d(Grid):
         weights: np.array
         """
         source_index, target_index = self.locate_points(other.coordinates)
-        weights = np.ones(source_index.size, dtype=float)
+        weights = np.ones_like(source_index, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
 
     def linear_weights(
@@ -365,33 +365,12 @@ class StructuredGrid1d(Grid):
         distance = np.where(first_nearest, distance_first, distance_second)
         return self.sorted_output(source_index, target_index, distance)
 
-
-# Note: the dispatch methods are defined outside of the class, since they need
-# type of self.
-
-
-@singledispatchmethod
-def _1d_barycentric(
-    self, other: "StructuredGrid1d"
-) -> Tuple[IntArray, IntArray, FloatArray]:
-    raise NotImplementedError(
-        f"barycentric method not supported for {type(self).__name__} -> {type(other).__name__}"
-    )
-
-
-@_1d_barycentric.register
-def _(self, other: StructuredGrid1d) -> Tuple[IntArray, IntArray, FloatArray]:
-    source_index, target_index, weights = self.linear_weights(other.coordinates)
-    return self.sorted_output(source_index, target_index, weights)
-
-
-@_1d_barycentric.register
-def _(self, other: FloatArray) -> Tuple[IntArray, IntArray, FloatArray]:
-    source_index, target_index, weights = self.linear_weights(other)
-    return self.sorted_output(source_index, target_index, weights)
-
-
-StructuredGrid1d.barycentric = _1d_barycentric
+    def barycentric(
+        self,
+        points: FloatArray,
+    ) -> Tuple[IntArray, IntArray, FloatArray]:
+        source_index, target_index, weights = self.linear_weights(points)
+        return self.sorted_output(source_index, target_index, weights)
 
 
 class StructuredGrid2d(Grid):
@@ -487,7 +466,7 @@ class StructuredGrid2d(Grid):
         if weights_x is not None and weights_y is not None:
             weights = weights_x[valid] * weights_y[valid]
         else:
-            weights = np.ones(source_index.size, dtype=float)
+            weights = np.ones_like(source_index, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
 
     def to_dataset(self, name: str) -> xr.Dataset:
@@ -553,10 +532,10 @@ def _(
     self, other: StructuredGrid2d, tolerance
 ) -> Tuple[IntArray, IntArray, FloatArray]:
     source_index_x, target_index_x, weights_x = self.xbounds.locate_inside(
-        other.xbounds
+        other.xbounds.coordinates
     )
     source_index_y, target_index_y, weights_y = self.ybounds.locate_inside(
-        other.ybounds
+        other.ybounds.coordinates
     )
     return self.broadcast_sorted(
         other,
@@ -650,8 +629,12 @@ def _(
 def _(
     self, other: "StructuredGrid2d", tolerance
 ) -> Tuple[IntArray, IntArray, FloatArray]:
-    source_index_x, target_index_x, weights_x = self.xbounds.barycentric(other.xbounds)
-    source_index_y, target_index_y, weights_y = self.ybounds.barycentric(other.ybounds)
+    source_index_x, target_index_x, weights_x = self.xbounds.barycentric(
+        other.xbounds.coordinates
+    )
+    source_index_y, target_index_y, weights_y = self.ybounds.barycentric(
+        other.ybounds.coordinates
+    )
     return self.broadcast_sorted(
         other,
         source_index_y,
