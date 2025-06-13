@@ -34,11 +34,12 @@ class BaseRegridder(abc.ABC):
         target,
         target_dim: Optional[str] = None,
         tolerance: Optional[float] = None,
+        **kwargs,
     ):
         self._source, _ = self.setup_grid(source, None)
         self._target, self._target_flipper = self.setup_grid(target, target_dim)
         self._weights = None
-        self._compute_weights(self._source, self._target, tolerance)
+        self._compute_weights(self._source, self._target, tolerance, **kwargs)
         return
 
     @staticmethod
@@ -103,22 +104,6 @@ class BaseRegridder(abc.ABC):
 
         else:
             raise TypeError()
-
-    @staticmethod
-    def convert_to_match(source, target):
-        PROMOTIONS = {
-            frozenset({StructuredGrid2d}): StructuredGrid2d,
-            frozenset({StructuredGrid2d, UnstructuredGrid2d}): UnstructuredGrid2d,
-            frozenset({UnstructuredGrid2d, UnstructuredGrid2d}): UnstructuredGrid2d,
-            #    {StructuredGrid3d, ExplicitStructuredGrid3d}: ExplicitStructuredGrid3d,
-            #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
-            #    {LayeredUnstructuredGrid2d, StructuredGrid2d}: StructuredGrid2d,
-            #    {StructuredGrid3d, StructuredGrid2d}: StructuredGrid2d,
-            #    # etc.
-        }
-        types = set({type(source), type(target)})
-        matched_type = PROMOTIONS[frozenset(types)]
-        return source.convert_to(matched_type), target.convert_to(matched_type)
 
     @staticmethod
     def make_regrid(func):

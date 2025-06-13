@@ -18,6 +18,7 @@ from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
+from scipy.spatial import KDTree
 
 from xugrid.constants import FloatArray, IntArray
 from xugrid.regrid.grid.basegrid import Grid
@@ -111,10 +112,6 @@ class StructuredGrid1d(Grid):
     def length(self) -> FloatArray:
         return np.squeeze(abs(np.diff(self.bounds, axis=1)))
 
-    @property
-    def directional_bounds(self):
-        return self.bounds
-
     def to_dataset(self, name: str) -> xr.DataArray:
         export_name = name + "_" + self.name
         return xr.DataArray(
@@ -134,7 +131,7 @@ class StructuredGrid1d(Grid):
     def locate_points(
         self,
         points: np.ndarray,
-    ) -> Tuple[IntArray, IntArray]:
+    ) -> IntArray:
         start = np.searchsorted(self.bounds[:, 0], points, side="left")
         end = np.searchsorted(self.bounds[:, 1], points, side="left")
         in_bounds = (
@@ -143,10 +140,9 @@ class StructuredGrid1d(Grid):
             & (points < self.bounds[-1, 1])
         )
         out_of_bounds = ~in_bounds
-        other_index = np.arange(len(points))
         self_index = end
         self_index[out_of_bounds] = OUT_OF_BOUNDS
-        return self_index, other_index
+        return self_index
 
     def overlap_1d_structured(
         self, other: "StructuredGrid1d"
@@ -302,7 +298,7 @@ class StructuredGrid1d(Grid):
 
     def locate_inside(
         self,
-        other: "StructuredGrid1d",
+        points: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
         Return source and target indexes based on nearest neighbor of
@@ -318,7 +314,8 @@ class StructuredGrid1d(Grid):
         target_index: np.array
         weights: np.array
         """
-        source_index, target_index = self.locate_points(other.coordinates)
+        source_index = self.locate_points(points)
+        target_index = np.arange(len(points))
         weights = np.ones_like(source_index, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
 
@@ -338,7 +335,8 @@ class StructuredGrid1d(Grid):
         target_index: np.array
         weights: np.array
         """
-        source_index, target_index = self.locate_points(points)
+        source_index = self.locate_points(points)
+        target_index = np.arange(len(points))
         weights, neighbor = self.compute_linear_weights_to_points(
             points, source_index, target_index
         )
@@ -353,13 +351,12 @@ class StructuredGrid1d(Grid):
         self,
         points: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
-        source_index, target_index = self.locate_points(points)
-        neighbor = self.find_neighbor(source_index)
+        source_index = self.locate_points(points)
+        target_index = np.arange(len(points))
+        neighbor = self.find_neighbor(points, source_index, target_index)
         neighbor_index = source_index + neighbor
-        distance_first = np.linalg.norm(self.midpoints[source_index] - points, axis=1)
-        distance_second = np.linalg.norm(
-            self.midpoints[neighbor_index] - points, axis=1
-        )
+        distance_first = self.midpoints[source_index] - points
+        distance_second = self.midpoints[neighbor_index] - points
         first_nearest = distance_first <= distance_second
         source_index = np.where(first_nearest, source_index, neighbor_index)
         distance = np.where(first_nearest, distance_first, distance_second)
@@ -384,6 +381,8 @@ class StructuredGrid2d(Grid):
     ):
         self.xbounds = StructuredGrid1d(obj, name_x)
         self.ybounds = StructuredGrid1d(obj, name_y)
+        self.facet = "face"
+        self._kdtree = None
 
     @property
     def coords(self) -> dict:
@@ -416,19 +415,37 @@ class StructuredGrid2d(Grid):
     def area(self) -> FloatArray:
         return np.multiply.outer(self.ybounds.length, self.xbounds.length)
 
+    @property
+    def kdtree(self):
+        if self._kdtree is None:
+            self._kdtree = KDTree(self.coordinates)
+        return self._kdtree
+
     def convert_to(self, matched_type: Any) -> Any:
         if matched_type == StructuredGrid2d:
             return self
         elif matched_type == UnstructuredGrid2d:
             ugrid2d = Ugrid2d.from_structured_bounds(
-                self.xbounds.directional_bounds,
-                self.ybounds.directional_bounds,
+                self.xbounds.bounds,
+                self.ybounds.bounds,
             )
-            return UnstructuredGrid2d(ugrid2d)
+            return UnstructuredGrid2d(ugrid2d, dim=ugrid2d.face_dimension)
         else:
             raise TypeError(
                 f"Cannot convert StructuredGrid2d to {matched_type.__name__}"
             )
+
+    def locate_points(self, points, tolerance) -> IntArray:
+        x, y = points.T
+        index_x = self.xbounds.locate_points(x)
+        index_y = self.ybounds.locate_points(y)
+        out_x = index_x == OUT_OF_BOUNDS
+        out_y = index_y == OUT_OF_BOUNDS
+        index_x[out_x] = 0
+        index_y[out_y] = 0
+        source_index = np.ravel_multi_index((index_y, index_x), self.shape)
+        source_index[out_y | out_x] = OUT_OF_BOUNDS
+        return source_index
 
     def broadcast_sorted(
         self,
@@ -440,12 +457,13 @@ class StructuredGrid2d(Grid):
         weights_y: FloatArray,
         weights_x: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
+        valid = (source_index_x != OUT_OF_BOUNDS) & (source_index_y != OUT_OF_BOUNDS)
         source_index, target_index, weights = broadcast(
             self.shape,
             other.shape,
-            (source_index_y, source_index_x),
-            (target_index_y, target_index_x),
-            (weights_y, weights_x),
+            (source_index_y[valid], source_index_x[valid]),
+            (target_index_y[valid], target_index_x[valid]),
+            (weights_y[valid], weights_x[valid]),
         )
         return self.sorted_output(source_index, target_index, weights)
 
@@ -485,13 +503,6 @@ class StructuredGrid2d(Grid):
 def _2d_locate_inside(self, other, tolerance) -> Tuple[IntArray, IntArray, FloatArray]:
     raise NotImplementedError(
         f"locate_inside method not supported for {type(self).__name__} -> {type(other).__name__}"
-    )
-
-
-@singledispatchmethod
-def _2d_locate_nearest(self, other, tolerance) -> Tuple[IntArray, IntArray, FloatArray]:
-    raise NotImplementedError(
-        f"locate_nearest method not supported for {type(self).__name__} -> {type(other).__name__}"
     )
 
 
@@ -553,46 +564,15 @@ def _(
     self, other: "UnstructuredGrid2d", tolerance
 ) -> Tuple[IntArray, IntArray, FloatArray]:
     x, y = other.coordinates.T
-    source_index_x, target_index_x = self.xbounds.locate_points(x)
-    source_index_y, target_index_y = self.ybounds.locate_points(y)
+    source_index_x, target_index_x, weights_x = self.xbounds.locate_inside(x)
+    source_index_y, target_index_y, weights_y = self.ybounds.locate_inside(y)
     return self.ravel_sorted(
         source_index_x,
         source_index_y,
         target_index_x,
         target_index_y,
-    )
-
-
-@_2d_locate_nearest.register
-def _(
-    self, other: "StructuredGrid2d", tolerance
-) -> Tuple[IntArray, IntArray, FloatArray]:
-    source_index_x, target_index_x, weights_x = self.xbounds.locate_nearest(
-        other.xbounds.coordinates
-    )
-    source_index_y, target_index_y, weights_y = self.ybounds.locate_nearest(
-        other.ybounds.coordinates
-    )
-    return self.broadcast_sorted(
-        other,
-        source_index_y,
-        source_index_x,
-        target_index_y,
-        target_index_x,
         weights_y,
         weights_x,
-    )
-
-
-@_2d_locate_nearest.register
-def _(
-    self, other: "UnstructuredGrid2d", tolerance
-) -> Tuple[IntArray, IntArray, FloatArray]:
-    x, y = other.coordinates.T
-    source_index_x, target_index_x, _ = self.xbounds.locate_nearest(x)
-    source_index_y, target_index_y, _ = self.xbounds.locate_nearest(y)
-    return self.ravel_sorted(
-        source_index_x, source_index_x, target_index_x, target_index_y
     )
 
 
@@ -664,7 +644,6 @@ def _(
 
 
 StructuredGrid2d.locate_inside = _2d_locate_inside
-StructuredGrid2d.locate_nearest = _2d_locate_nearest
 StructuredGrid2d.overlap = _2d_overlap
 StructuredGrid2d.barycentric = _2d_barycentric
 

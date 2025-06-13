@@ -18,7 +18,7 @@ from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
 from xugrid.regrid import (
     BarycentricInterpolator,
-    InverseDistanceRegridder,
+    InverseDistanceInterpolator,
     LocatorRegridder,
     NearestRegridder,
     OverlapRegridder,
@@ -58,11 +58,11 @@ __all__ = (
     "UgridDataset",
     "plot",
     "BarycentricInterpolator",
+    "InverseDistanceInterpolator",
     "LocatorRegridder",
     "OverlapRegridder",
     "RelativeOverlapRegridder",
     "NearestRegridder",
-    "InverseDistanceRegridder",
     "burn_vector_geometry",
     "earcut_triangulate_polygons",
     "NetworkGridder",

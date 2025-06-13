@@ -1,6 +1,7 @@
 import abc
 from typing import Callable, Optional, Union
 
+import numpy as np
 import xarray as xr
 
 import xugrid
@@ -10,10 +11,26 @@ from xugrid.regrid.utils import reduce
 
 
 class BaseOverlapRegridder(BaseRegridder, abc.ABC):
-    def _compute_weights(self, source, target, relative: bool) -> None:
-        source_index, target_index, weight_values = source.overlap(
-            target, relative=relative
-        )
+    def _compute_weights(
+        self, source, target, relative: bool, tolerance: Optional[float] = None
+    ) -> None:
+        if source.facet == "face" and target.facet == "face":
+            source_index, target_index, weight_values = source.overlap(
+                target, relative=relative
+            )
+        elif source.facet == "node" and target.facet == "face":
+            target_index, source_index, weight_values = target.locate_inside(
+                source, tolerance
+            )
+            sorter = np.argsort(target_index)
+            target_index = target_index[sorter]
+            source_index = source_index[sorter]
+        else:
+            raise ValueError(
+                f"source is {source.facet} associated, target is {target.facet} "
+                "associated. OverlapRegridder can only regrid face to face, or "
+                "node to face."
+            )
         self._weights = MatrixCSR.from_triplet(
             target_index, source_index, weight_values, n=target.size, m=source.size
         )

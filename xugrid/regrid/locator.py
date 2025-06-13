@@ -29,7 +29,7 @@ class LocatorRegridder(BasePointRegridder):
 
     def _compute_weights(self, source, target, tolerance: Optional[float] = None):
         if isinstance(source, UnstructuredGrid2d):
-            if source.dimension == "node":
+            if source.facet == "node":
                 raise ValueError(
                     "Cannot regrid node-associated data with the LocatorRegridder. "
                     "This regridder locates points within grid faces, which "

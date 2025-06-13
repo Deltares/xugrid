@@ -68,11 +68,13 @@ class UnstructuredGrid2d(Grid):
     def __init__(self, grid, dim: str):
         self.ugrid_topology = grid
         if dim == grid.node_dimension:
+            self.facet = "node"
             self._coordinates = grid.node_coordinates
             self._dims = (grid.node_dimension,)
             self._shape = (grid.n_node,)
             self._size = grid.n_node
         elif dim == grid.face_dimension:
+            self.facet = "face"
             self._coordinates = grid.face_coordinates
             self._dims = (grid.face_dimension,)
             self._shape = (grid.n_face,)
@@ -139,6 +141,7 @@ class UnstructuredGrid2d(Grid):
         target_index: 1d np.ndarray of int
         weights: 1d np.ndarray of float
         """
+        other = other.convert_to(type(self))
         (
             target_index,
             source_index,
@@ -152,18 +155,13 @@ class UnstructuredGrid2d(Grid):
             weights /= self.area[source_index]
         return source_index, target_index, weights
 
-    def locate_nearest(self, other, tolerance: Optional[float] = None):
-        _, source_index = self.kdtree.query(other.coordinates, workers=-1)
+    def locate_points(self, points, tolerance):
         celltree = self.ugrid_topology.celltree
-        inside = celltree.locate_points(other.coordinates, tolerance=tolerance) != -1
-        source_index = source_index[inside]
-        target_index = np.arange(other.size, dtype=source_index.dtype)[inside]
-        weight_values = np.ones_like(source_index, dtype=FloatDType)
-        return source_index, target_index, weight_values
+        index = celltree.locate_points(points, tolerance=tolerance)
+        return index
 
     def locate_inside(self, other, tolerance: Optional[float] = None):
-        celltree = self.ugrid_topology.celltree
-        source_index = celltree.locate_points(other.coordinates, tolerance)
+        source_index = self.locate_points(other.coordinates, tolerance=tolerance)
         inside = source_index != -1
         source_index = source_index[inside]
         target_index = np.arange(other.size, dtype=source_index.dtype)[inside]
