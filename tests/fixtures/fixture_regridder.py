@@ -92,10 +92,10 @@ def grid_data_a():
         data=np.arange(9).reshape((3, 3)),
         dims=["y", "x"],
         coords={
-            "y": np.array([150, 100, 50]),
+            "y": np.array([50, 100, 150]),
             "x": np.array([50, 100, 150]),
             "dx": 50.0,
-            "dy": -50.0,
+            "dy": 50.0,
         },
     )
 
@@ -107,10 +107,10 @@ def grid_data_a_layered():
         dims=["layer", "y", "x"],
         coords={
             "layer": np.arange(2) + 1,
-            "y": np.array([150, 100, 50]),
+            "y": np.array([50, 100, 150]),
             "x": np.array([50, 100, 150]),
             "dx": 50.0,
-            "dy": -50.0,
+            "dy": 50.0,
         },
     )
 
@@ -121,10 +121,10 @@ def grid_data_b():
         data=np.zeros(16).reshape((4, 4)),
         dims=["y", "x"],
         coords={
-            "y": np.array([175, 125, 75, 25]),
+            "y": np.array([25, 75, 125, 175]),
             "x": np.array([25, 75, 125, 175]),
             "dx": 50.0,
-            "dy": -50.0,
+            "dy": 50.0,
         },
     )
 
@@ -135,10 +135,10 @@ def grid_data_c():
         data=np.arange(16).reshape((4, 4)),
         dims=["y", "x"],
         coords={
-            "y": np.array([175, 125, 75, 25]),
+            "y": np.array([25, 75, 125, 175]),
             "x": np.array([40, 90, 140, 190]),
             "dx": 50.0,
-            "dy": -50.0,
+            "dy": 50.0,
         },
     )
 
@@ -149,10 +149,10 @@ def grid_data_d():
         data=np.arange(16).reshape((4, 4)),
         dims=["y", "x"],
         coords={
-            "y": np.array([175, 125, 75, 25]),
+            "y": np.array([25, 75, 125, 175]),
             "x": np.array([30, 55, 80, 105]),
             "dx": 25.0,
-            "dy": -50.0,
+            "dy": 50.0,
         },
     )
 
@@ -163,10 +163,10 @@ def grid_data_e():
         data=np.zeros((4, 3, 2)),
         dims=["y", "x", "nbounds"],
         coords={
-            "y": np.array([175, 125, 75, 25]),
+            "y": np.array([25, 75, 125, 175]),
             "x": np.array([30, 67.5, 105]),
             "dx": 25,
-            "dy": -50.0,
+            "dy": 50.0,
             "xbounds": (
                 ["x", "nbounds"],
                 np.column_stack(
@@ -201,11 +201,6 @@ def grid_data_a_layered_2d(grid_data_a_layered):
 @pytest.fixture(scope="function")
 def grid_data_b_1d(grid_data_b):
     return StructuredGrid1d(grid_data_b, "x")
-
-
-@pytest.fixture(scope="function")
-def grid_data_b_flipped_1d(grid_data_b):
-    return StructuredGrid1d(grid_data_b, "y")
 
 
 @pytest.fixture(scope="function")

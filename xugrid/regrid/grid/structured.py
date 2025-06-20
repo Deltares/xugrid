@@ -136,40 +136,11 @@ class StructuredGrid1d(Grid):
         self,
         points: np.ndarray,
     ) -> IntArray:
-        start = np.searchsorted(self.bounds[:, 0], points, side="left")
-        end = np.searchsorted(self.bounds[:, 1], points, side="left")
-        in_bounds = (
-            (start == (end + 1))
-            & (points > self.bounds[0, 0])
-            & (points < self.bounds[-1, 1])
-        )
+        index = np.searchsorted(self.bounds[:, 1], points, side="left")
+        in_bounds = (points >= self.bounds[0, 0]) & (points < self.bounds[-1, 1])
         out_of_bounds = ~in_bounds
-        self_index = end
-        self_index[out_of_bounds] = OUT_OF_BOUNDS
-        return self_index
-
-    def overlap_1d_structured(
-        self, other: "StructuredGrid1d"
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        """
-        Return source and target nodes and overlapping length via overlap_1d().
-
-        Parameters
-        ----------
-        other: StructuredGrid1d
-            The target grid.
-
-        Returns
-        -------
-        valid_self_index: np.array
-            valid source indexes
-        valid_other_index: np.array
-            valid target indexes
-        weights: np.array
-            length of overlap
-        """
-        source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
-        return source_index, target_index, weights
+        index[out_of_bounds] = OUT_OF_BOUNDS
+        return index
 
     def overlap(
         self, other: "StructuredGrid1d", relative: bool
@@ -190,7 +161,7 @@ class StructuredGrid1d(Grid):
         weights: np.array
             Overlapping length
         """
-        source_index, target_index, weights = self.overlap_1d_structured(other)
+        source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
         if relative:
             weights /= self.length[source_index]
         return self.sorted_output(source_index, target_index, weights)
@@ -233,19 +204,14 @@ class StructuredGrid1d(Grid):
                 "At least two points are required for interpolation."
             )
 
-        # cases where midpoint target <= midpoint source: set neighbor to -1
-        neighbor = np.where(
-            points[target_index] <= self.midpoints[source_index],
-            -1,
-            1,
-        )
+        # Start with direction based on target vs source position
+        neighbor = np.where(points[target_index] <= self.midpoints[source_index], -1, 1)
 
-        # Make sure neighbor falls in [0, n)
-        n = self.midpoints.size - 1
-        # Left side
-        neighbor[
-            (source_index == 0) | (source_index == n) | (source_index == OUT_OF_BOUNDS)
-        ] = 0
+        # Set to 0 (self) when at boundaries or out of bounds
+        at_left_edge = (source_index == 0) & (neighbor == -1)
+        at_right_edge = (source_index == self.midpoints.size - 1) & (neighbor == 1)
+        out_of_bounds = source_index == OUT_OF_BOUNDS
+        neighbor[at_left_edge | at_right_edge | out_of_bounds] = 0
         return neighbor
 
     def linear_weights(
@@ -266,7 +232,7 @@ class StructuredGrid1d(Grid):
         """
         source_index = self.locate_points(points)
         target_index = np.arange(len(points))
-        neighbor = self.find_neighbor(points, source_index, target_index)
+        neighbor = self._find_neighbor(points, source_index, target_index)
         neighbor_index = source_index + neighbor
 
         # If neighbor is 0, we end up computing zero distance, since we're
@@ -308,10 +274,10 @@ class StructuredGrid1d(Grid):
         # and this measures only along one axis.
         source_index = self.locate_points(points)
         target_index = np.arange(len(points))
-        neighbor = self.find_neighbor(points, source_index, target_index)
+        neighbor = self._find_neighbor(points, source_index, target_index)
         neighbor_index = source_index + neighbor
-        distance_first = self.midpoints[source_index] - points
-        distance_second = self.midpoints[neighbor_index] - points
+        distance_first = np.abs(self.midpoints[source_index] - points)
+        distance_second = np.abs(self.midpoints[neighbor_index] - points)
         first_nearest = distance_first <= distance_second
         source_index = np.where(first_nearest, source_index, neighbor_index)
         distance = np.where(first_nearest, distance_first, distance_second)
@@ -336,7 +302,6 @@ class StructuredGrid2d(Grid):
     ):
         self.xbounds = StructuredGrid1d(obj, name_x)
         self.ybounds = StructuredGrid1d(obj, name_y)
-        self.facet = "face"
         self._kdtree = None
 
     @property

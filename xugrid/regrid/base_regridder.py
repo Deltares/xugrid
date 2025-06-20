@@ -63,6 +63,9 @@ class BaseRegridder(abc.ABC):
 
     @classmethod
     def setup_grid(cls, obj, dim, **kwargs):
+        # For structured grids, make sure the axes are increasing.
+        # Then return the indexer so we maintain increasing/decreasing order
+        # on the result to match the provided template.
         flipper = None
         if isinstance(obj, xugrid.Ugrid2d):
             grid = obj
@@ -86,9 +89,9 @@ class BaseRegridder(abc.ABC):
             if dim is None:
                 candidates = set(obj.dims).intersection(grid.dims)
                 if len(candidates) > 1:
-                    # TODO:
                     raise ValueError(
-                        f"Could not derive a single target dimension from multiple candidates: {candidates}"
+                        "Data contains multiple UGRID dimensions. Could not derive a "
+                        f"single target UGRID dimension from multiple candidates: {candidates}"
                     )
                 dim = candidates.pop()
             return UnstructuredGrid2d(grid, dim), flipper
