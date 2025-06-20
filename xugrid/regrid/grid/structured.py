@@ -33,7 +33,7 @@ OUT_OF_BOUNDS = -1
 
 class StructuredGrid1d(Grid):
     """
-    e.g. z -> z; so also works for unstructured
+    e.g. z -> z; so should also work the constant depth layers of unstructured2d (x, y).
 
     Parameters
     ----------
@@ -46,41 +46,41 @@ class StructuredGrid1d(Grid):
 
         index = obj.indexes[name]
         midpoints = index.to_numpy()
-        # take care of potentially decreasing coordinate values
-        if not index.is_monotonic_increasing or index.is_monotonic_decreasing:
+        # Note: the regridder should ensure all axes are increasing!
+        if not index.is_monotonic_increasing:
             raise ValueError(f"{name} is not monotonic for array {obj.name}")
 
         if bounds_name in obj.coords:
             bounds = obj[bounds_name].to_numpy()
-            size = bounds[:, 1] - bounds[:, 0]
+            length = bounds[:, 1] - bounds[:, 0]
         else:
             if size_name in obj.coords:
                 # works for scalar size and array size
-                size = obj[size_name].to_numpy()
+                length = obj[size_name].to_numpy()
             else:
                 # no bounds defined, no dx defined
                 # make an estimate of cell size
-                size = np.diff(midpoints)
+                length = np.diff(midpoints)
                 # Check if equidistant
-                atolx = 1.0e-4 * size[0]
-                if not np.allclose(size, size[0], atolx):
+                atolx = 1.0e-4 * length[0]
+                if not np.allclose(length, length[0], atolx):
                     raise ValueError(
                         f"DataArray has to be equidistant along {name}, or "
                         f'explicit bounds must be given as "{name}bounds", or '
                         f'cellsizes must be as "d{name}"'
                     )
-                size = np.full_like(midpoints, size[0])
+                length = np.full_like(midpoints, length[0])
 
-            abs_size = np.abs(size)
-            start = midpoints - 0.5 * abs_size
-            end = midpoints + 0.5 * abs_size
+            abs_length = np.abs(length)
+            start = midpoints - 0.5 * abs_length
+            end = midpoints + 0.5 * abs_length
             bounds = np.column_stack((start, end))
 
         self.name = name
         self.midpoints = midpoints
         self.bounds = bounds
         self.dname = size_name
-        self.dvalue = size
+        self.dvalue = length
         self.index = index.to_numpy()
 
     @property
@@ -91,6 +91,10 @@ class StructuredGrid1d(Grid):
         else:
             coords[self.dname] = (self.name, self.dvalue)
         return coords
+
+    @property
+    def facet(self) -> str:
+        return "face"
 
     @property
     def coordinates(self) -> FloatArray:
@@ -148,8 +152,7 @@ class StructuredGrid1d(Grid):
         self, other: "StructuredGrid1d"
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Return source and target nodes and overlapping length. It utilises overlap_1d()
-        and does an aditional flip in cases of reversed midpoints
+        Return source and target nodes and overlapping length via overlap_1d().
 
         Parameters
         ----------
@@ -167,110 +170,6 @@ class StructuredGrid1d(Grid):
         """
         source_index, target_index, weights = overlap_1d(self.bounds, other.bounds)
         return source_index, target_index, weights
-
-    def centroids_to_linear_pairs(
-        self,
-        source_index: np.array,
-        target_index: np.array,
-        weights: np.array,
-        neighbor: np.array,
-    ) -> Tuple[IntArray, IntArray, FloatArray]:
-        """
-        Return for every target node an pair of connected source nodes based
-        on centroids connection inputs.
-
-        Parameters
-        ----------
-        source_index: np.array
-        target_index: np.array
-        weights: np.array
-
-        Returns
-        -------
-        valid_self_index: np.array
-        valid_other_index: np.array
-        weights: np.array
-            lineair interpolation weights.
-        """
-        source_index = np.column_stack((source_index, source_index + neighbor)).ravel()
-        target_index = np.repeat(target_index, 2)
-        weights = np.column_stack((weights, 1.0 - weights)).ravel()
-
-        # correct for possibility of out of bound due to column-stack
-        # source_index + 1 and -1
-        out_of_bounds = ~np.logical_and(
-            source_index <= self.size - 1, source_index >= 0
-        )
-        source_index[out_of_bounds] = OUT_OF_BOUNDS
-        weights[out_of_bounds] = 0.0
-        return source_index, target_index, weights
-
-    def find_neighbor(
-        self, points, source_index: IntArray, target_index: IntArray
-    ) -> IntArray:
-        if self.midpoints.size < 2:
-            raise ValueError(
-                f"Coordinate {self.name} has length: {len(self.midpoints)}. "
-                "At least two points are required for interpolation."
-            )
-
-        # cases where midpoint target <= midpoint source: set neighbor to -1
-        neighbor = np.where(
-            points[target_index] <= self.midpoints[source_index],
-            -1,
-            1,
-        )
-
-        # Make sure neighbor falls in [0, n)
-        n = self.midpoints.size - 1
-        # Left side
-        neighbor[
-            (source_index == 0) | (source_index == n) | (source_index == OUT_OF_BOUNDS)
-        ] = 0
-        return neighbor
-
-    def compute_linear_weights_to_points(
-        self, points, source_index: IntArray, target_index: IntArray
-    ) -> Tuple[FloatArray, IntArray]:
-        """
-        Compute linear weights bases on centroid indexes.
-
-        Parameters
-        ----------
-        other: StructuredGrid1d
-        source_index: np.array
-        target_index: np.array
-
-        Raises
-        ------
-        ValueError
-            When the coordinate contains only a single point.
-
-        Returns
-        -------
-        weights: np.array
-        neighbor: np.narray
-        """
-        neighbor = self.find_neighbor(points, source_index, target_index)
-        neighbor_index = source_index + neighbor
-
-        # If neighbor is 0, we end up computing zero distance, since we're
-        # comparing a midpoint to iself. Instead, set a weight of 1.0 on one,
-        # (and impliclity 0 in the other). Similarly, if source and target
-        # midpoints coincide, the distance may end up 0.
-        length = points[target_index] - self.midpoints[source_index]
-        total_length = self.midpoints[neighbor_index] - self.midpoints[source_index]
-        # Do not divide by zero.
-        # We will overwrite the value anyway at neighbor == 0.
-        total_length[total_length == 0] = 1
-        weights = 1 - (length / total_length)
-        weights[neighbor == 0] = 0.0
-        condition = np.logical_and(weights < 0.0, weights > 1.0)
-        if condition.any():
-            raise ValueError(
-                f"Computed invalid weights for dimensions: {self.name} at coords: {self.midpoints[condition]}"
-            )
-        return weights, neighbor
 
     def overlap(
         self, other: "StructuredGrid1d", relative: bool
@@ -301,8 +200,8 @@ class StructuredGrid1d(Grid):
         points: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
-        Return source and target indexes based on nearest neighbor of
-        centroids.
+        Return source and target indexes based on source cells containing
+        the points.
 
         Parameters
         ----------
@@ -318,6 +217,36 @@ class StructuredGrid1d(Grid):
         target_index = np.arange(len(points))
         weights = np.ones_like(source_index, dtype=float)
         return self.sorted_output(source_index, target_index, weights)
+
+    def _find_neighbor(
+        self, points, source_index: IntArray, target_index: IntArray
+    ) -> IntArray:
+        """
+        Find the relative neighbor, either +1 or -1 depending on whether
+        the point is to the left or right of the midpoint.
+
+        When there is no neighbor, return 0 (points to self).
+        """
+        if self.midpoints.size < 2:
+            raise ValueError(
+                f"Coordinate {self.name} has length: {len(self.midpoints)}. "
+                "At least two points are required for interpolation."
+            )
+
+        # cases where midpoint target <= midpoint source: set neighbor to -1
+        neighbor = np.where(
+            points[target_index] <= self.midpoints[source_index],
+            -1,
+            1,
+        )
+
+        # Make sure neighbor falls in [0, n)
+        n = self.midpoints.size - 1
+        # Left side
+        neighbor[
+            (source_index == 0) | (source_index == n) | (source_index == OUT_OF_BOUNDS)
+        ] = 0
+        return neighbor
 
     def linear_weights(
         self, points: FloatArray
@@ -337,20 +266,46 @@ class StructuredGrid1d(Grid):
         """
         source_index = self.locate_points(points)
         target_index = np.arange(len(points))
-        weights, neighbor = self.compute_linear_weights_to_points(
-            points, source_index, target_index
+        neighbor = self.find_neighbor(points, source_index, target_index)
+        neighbor_index = source_index + neighbor
+
+        # If neighbor is 0, we end up computing zero distance, since we're
+        # comparing a midpoint to iself. Instead, set a weight of 1.0 on one,
+        # (and impliclity 0 in the other). Similarly, if source and target
+        # midpoints coincide, the distance may end up 0.
+        length = points[target_index] - self.midpoints[source_index]
+        total_length = self.midpoints[neighbor_index] - self.midpoints[source_index]
+        # Do not divide by zero.
+        # We will overwrite the value anyway at neighbor == 0.
+        total_length[total_length == 0] = 1
+        weights = 1 - (length / total_length)
+        weights[neighbor == 0] = 0.0
+        condition = np.logical_and(weights < 0.0, weights > 1.0)
+        if condition.any():
+            raise ValueError(
+                f"Computed invalid weights for dimensions: {self.name} at coords: {self.midpoints[condition]}"
+            )
+
+        # Create pairs of weights and source for each target.
+        source_index = np.column_stack((source_index, source_index + neighbor)).ravel()
+        target_index = np.repeat(target_index, 2)
+        weights = np.column_stack((weights, 1.0 - weights)).ravel()
+
+        # correct for possibility of out of bound due to column-stack
+        # source_index + 1 and -1
+        out_of_bounds = ~np.logical_and(
+            source_index <= self.size - 1, source_index >= 0
         )
-        return self.centroids_to_linear_pairs(
-            source_index,
-            target_index,
-            weights,
-            neighbor,
-        )
+        source_index[out_of_bounds] = OUT_OF_BOUNDS
+        weights[out_of_bounds] = 0.0
+        return source_index, target_index, weights
 
     def locate_nearest(
         self,
         points: FloatArray,
     ) -> Tuple[IntArray, IntArray, FloatArray]:
+        # This might be of dubious value since we need Euclidian distance,
+        # and this measures only along one axis.
         source_index = self.locate_points(points)
         target_index = np.arange(len(points))
         neighbor = self.find_neighbor(points, source_index, target_index)
@@ -394,6 +349,10 @@ class StructuredGrid2d(Grid):
             self.ybounds.coordinates, self.xbounds.coordinates, indexing="ij"
         )
         return np.column_stack((xx.ravel(), yy.ravel()))
+
+    @property
+    def facet(self) -> str:
+        return "face"
 
     @property
     def ndim(self) -> int:

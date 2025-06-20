@@ -68,13 +68,13 @@ class UnstructuredGrid2d(Grid):
     def __init__(self, grid, dim: str):
         self.ugrid_topology = grid
         if dim == grid.node_dimension:
-            self.facet = "node"
+            self._facet = "node"
             self._coordinates = grid.node_coordinates
             self._dims = (grid.node_dimension,)
             self._shape = (grid.n_node,)
             self._size = grid.n_node
         elif dim == grid.face_dimension:
-            self.facet = "face"
+            self._facet = "face"
             self._coordinates = grid.face_coordinates
             self._dims = (grid.face_dimension,)
             self._shape = (grid.n_face,)
@@ -89,6 +89,10 @@ class UnstructuredGrid2d(Grid):
     @property
     def ndim(self):
         return 1
+
+    @property
+    def facet(self):
+        return self._facet
 
     @property
     def coordinates(self) -> np.ndarray:
@@ -124,7 +128,9 @@ class UnstructuredGrid2d(Grid):
         if isinstance(self, matched_type):
             return self
         else:
-            TypeError(f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}")
+            raise TypeError(
+                f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}"
+            )
 
     def overlap(self, other, relative: bool):
         """
@@ -141,6 +147,8 @@ class UnstructuredGrid2d(Grid):
         target_index: 1d np.ndarray of int
         weights: 1d np.ndarray of float
         """
+        if self.facet != "face" or other.facet != "face":
+            raise ValueError("Can only compute areal overlap between faces.")
         other = other.convert_to(type(self))
         (
             target_index,
@@ -161,6 +169,8 @@ class UnstructuredGrid2d(Grid):
         return index
 
     def locate_inside(self, other, tolerance: Optional[float] = None):
+        if self.facet != "face":
+            raise ValueError("Can only locate coordinates inside of faces")
         source_index = self.locate_points(other.coordinates, tolerance=tolerance)
         inside = source_index != -1
         source_index = source_index[inside]
@@ -223,10 +233,9 @@ class UnstructuredGrid2d(Grid):
         return source_index, weights
 
     def barycentric(self, other, tolerance: Optional[float] = None):
-        grid = self.ugrid_topology
-        if self.dimension == grid.node_dimension:
+        if self.facet == "node":
             source_index, weights = self._nodes_barycentric(other, tolerance)
-        elif self.dimension == grid.face_dimension:
+        elif self.facet == "face":
             source_index, weights = self._faces_barycentric(other, tolerance)
 
         n_points, n_max_node = weights.shape

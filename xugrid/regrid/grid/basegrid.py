@@ -8,6 +8,10 @@ from xugrid.constants import FloatArray, IntArray
 
 class Grid(abc.ABC):
     @property
+    def facet(self) -> str:
+        pass
+
+    @property
     def coords(self) -> dict:
         pass
 
@@ -87,9 +91,19 @@ class Grid(abc.ABC):
             distance_upper_bound=max_distance,
             workers=-1,
         )
+
         # Eliminate entries that have insufficient neighbors.
         n_found = np.isfinite(distance).sum(axis=1)
         distance[n_found < min_points] = np.inf
+
+        # Exact match (distance of zero), avoid the singularity.
+        if smoothing == 0:
+            exact_match = distance < 1e-12
+            # Eliminate the entire row
+            distance[exact_match.any(axis=1)] = np.inf
+            # Then restore the exact match.
+            distance[exact_match] = 1.0
+
         keep = (inside[:, None] & np.isfinite(distance)).ravel()
         # Generate target index and weights.
         target_index = np.repeat(np.arange(len(points)), max_points)[keep]
