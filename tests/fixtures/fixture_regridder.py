@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 
 import xugrid as xu
-from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
+from xugrid.regrid.grid.structured import StructuredGrid1d, StructuredGrid2d
 
 # Testgrids
 # --------

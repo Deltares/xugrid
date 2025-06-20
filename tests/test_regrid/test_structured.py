@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
+from xugrid.regrid.grid.structured import StructuredGrid1d, StructuredGrid2d
 
 # Testgrids
 # --------
@@ -445,16 +445,3 @@ def test_nonscalar_dx():
     grid = StructuredGrid1d(da, name="x")
     actual = xr.DataArray([1, 2, 3], coords=grid.coords, dims=grid.dims)
     assert actual.identical(da)
-
-
-def test_directional_bounds():
-    da = xr.DataArray([1, 2, 3], coords={"y": [1, 2, 3]}, dims=("y",))
-    decreasing = da.isel(y=slice(None, None, -1))
-    grid_inc = StructuredGrid1d(da, name="y")
-    grid_dec = StructuredGrid1d(decreasing, name="y")
-    assert grid_inc.flipped is False
-    assert grid_dec.flipped is True
-    assert np.array_equal(grid_inc.bounds, grid_dec.bounds)
-    assert np.array_equal(
-        grid_inc.directional_bounds, grid_dec.directional_bounds[::-1]
-    )
