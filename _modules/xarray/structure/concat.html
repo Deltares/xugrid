@@ -704,9 +704,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine which dataset variables need to be concatenated in the result,</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Return values</span>
+    <span class="c1"># variables to be concatenated</span>
     <span class="n">concat_over</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="c1"># variables checked for equality</span>
     <span class="n">equals</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># skip merging these variables.</span>
+    <span class="c1">#   if concatenating over a dimension &#39;x&#39; that is associated with an index over 2 variables,</span>
+    <span class="c1">#   &#39;x&#39; and &#39;y&#39;, then we assert join=&quot;equals&quot; on `y` and don&#39;t need to merge it.</span>
+    <span class="c1">#   that assertion happens in the align step prior to this function being called</span>
+    <span class="n">skip_merge</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="p">:</span>
         <span class="n">concat_over_existing_dim</span> <span class="o">=</span> <span class="kc">True</span>
@@ -716,11 +722,12 @@
 
     <span class="n">concat_dim_lengths</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">concat_over_existing_dim</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-                    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">set_coords</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">concat_over_existing_dim</span> <span class="ow">and</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">set_coords</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
         <span class="n">concat_over</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">idx_vars</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">xindexes</span><span class="o">.</span><span class="n">group_by_index</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">idx_vars</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">skip_merge</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idx_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">concat_dim_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">process_subset_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">subset</span><span class="p">):</span>
@@ -818,7 +825,7 @@
 
     <span class="n">process_subset_opt</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="s2">&quot;data_vars&quot;</span><span class="p">)</span>
     <span class="n">process_subset_opt</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="s2">&quot;coords&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span>
+    <span class="k">return</span> <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">,</span> <span class="n">skip_merge</span>
 
 
 <span class="c1"># determine dimensional coordinate names and a dict mapping name to DataArray</span>
@@ -922,12 +929,12 @@
         <span class="p">]</span>
 
     <span class="c1"># determine which variables to concatenate</span>
-    <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span> <span class="o">=</span> <span class="n">_calc_concat_over</span><span class="p">(</span>
+    <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">,</span> <span class="n">skip_merge</span> <span class="o">=</span> <span class="n">_calc_concat_over</span><span class="p">(</span>
         <span class="n">datasets</span><span class="p">,</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">dim_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span>
     <span class="p">)</span>
 
     <span class="c1"># determine which variables to merge, and then merge them according to compat</span>
-    <span class="n">variables_to_merge</span> <span class="o">=</span> <span class="p">(</span><span class="n">coord_names</span> <span class="o">|</span> <span class="n">data_names</span><span class="p">)</span> <span class="o">-</span> <span class="n">concat_over</span>
+    <span class="n">variables_to_merge</span> <span class="o">=</span> <span class="p">(</span><span class="n">coord_names</span> <span class="o">|</span> <span class="n">data_names</span><span class="p">)</span> <span class="o">-</span> <span class="n">concat_over</span> <span class="o">-</span> <span class="n">skip_merge</span>
 
     <span class="n">result_vars</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">result_indexes</span> <span class="o">=</span> <span class="p">{}</span>

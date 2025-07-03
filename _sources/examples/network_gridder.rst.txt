@@ -92,28 +92,76 @@ Ugrid2d grid.
      */
 
     :root {
-      --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
-      --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
-      --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
-      --xr-border-color: var(--jp-border-color2, #e0e0e0);
-      --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
-      --xr-background-color: var(--jp-layout-color0, white);
-      --xr-background-color-row-even: var(--jp-layout-color1, white);
-      --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
     }
 
     html[theme="dark"],
     html[data-theme="dark"],
     body[data-theme="dark"],
     body.vscode-dark {
-      --xr-font-color0: rgba(255, 255, 255, 1);
-      --xr-font-color2: rgba(255, 255, 255, 0.54);
-      --xr-font-color3: rgba(255, 255, 255, 0.38);
-      --xr-border-color: #1f1f1f;
-      --xr-disabled-color: #515151;
-      --xr-background-color: #111111;
-      --xr-background-color-row-even: #111111;
-      --xr-background-color-row-odd: #313131;
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
     }
 
     .xr-wrap {
@@ -169,6 +217,7 @@ Ugrid2d grid.
 
     .xr-section-item input + label {
       color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
     }
 
     .xr-section-item input:enabled + label {
@@ -177,7 +226,7 @@ Ugrid2d grid.
     }
 
     .xr-section-item input:focus + label {
-      border: 2px solid var(--xr-font-color0);
+      border: 2px solid var(--xr-font-color0) !important;
     }
 
     .xr-section-item input:enabled + label:hover {
@@ -309,7 +358,9 @@ Ugrid2d grid.
     .xr-var-item label,
     .xr-var-item > .xr-var-name span {
       background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
       margin-bottom: 0;
+      padding-top: 2px;
     }
 
     .xr-var-item > .xr-var-name:hover span {
@@ -320,6 +371,7 @@ Ugrid2d grid.
     .xr-var-list > li:nth-child(odd) > label,
     .xr-var-list > li:nth-child(odd) > .xr-var-name span {
       background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
     }
 
     .xr-var-name {
@@ -369,8 +421,15 @@ Ugrid2d grid.
     .xr-var-data,
     .xr-index-data {
       display: none;
-      background-color: var(--xr-background-color) !important;
-      padding-bottom: 5px !important;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
     }
 
     .xr-var-attrs-in:checked ~ .xr-var-attrs,
@@ -381,6 +440,12 @@ Ugrid2d grid.
 
     .xr-var-data > table {
       float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
     }
 
     .xr-var-name span,
@@ -442,6 +507,14 @@ Ugrid2d grid.
       stroke: currentColor;
       fill: currentColor;
     }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (mesh2d_nFaces: 100)&gt; Size: 400B
     array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -449,16 +522,16 @@ Ugrid2d grid.
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)
     Coordinates:
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-5f8d8170-2484-490e-87b8-532c17422d86' class='xr-array-in' type='checkbox' checked><label for='section-5f8d8170-2484-490e-87b8-532c17422d86' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-ccc47715-3bb2-4e45-a827-efa71eed2ec4' class='xr-array-in' type='checkbox' checked><label for='section-ccc47715-3bb2-4e45-a827-efa71eed2ec4' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-24efc459-7dfa-4511-b2d2-7b9494b285d3' class='xr-section-summary-in' type='checkbox'  checked><label for='section-24efc459-7dfa-4511-b2d2-7b9494b285d3' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-791203b9-27bd-4f2b-8cbf-f884800c0879' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-791203b9-27bd-4f2b-8cbf-f884800c0879' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b5126b3b-447f-440f-b25e-449b8ffddf1a' class='xr-var-data-in' type='checkbox'><label for='data-b5126b3b-447f-440f-b25e-449b8ffddf1a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
+           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-6327ac24-70fc-40b7-b4f8-8d35ed356f51' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6327ac24-70fc-40b7-b4f8-8d35ed356f51' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-7b78b346-8064-4517-8bef-b938ccd0b68a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7b78b346-8064-4517-8bef-b938ccd0b68a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-10fc444a-fecc-4675-8d11-a1beffbd8b93' class='xr-var-data-in' type='checkbox'><label for='data-10fc444a-fecc-4675-8d11-a1beffbd8b93' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
            36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
            54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
            72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
-           90, 91, 92, 93, 94, 95, 96, 97, 98, 99])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e3974ff7-99d2-4fef-bc24-51fd6e0b3a27' class='xr-section-summary-in' type='checkbox'  ><label for='section-e3974ff7-99d2-4fef-bc24-51fd6e0b3a27' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-96e34f72-86e0-4c33-b358-4989368cc13c' class='xr-index-data-in' type='checkbox'/><label for='index-96e34f72-86e0-4c33-b358-4989368cc13c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=100, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e188a171-606c-42ae-9a20-df745db7dfa1' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-e188a171-606c-42ae-9a20-df745db7dfa1' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+           90, 91, 92, 93, 94, 95, 96, 97, 98, 99])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-360ec8a4-3c60-443e-bb53-7dbe89d0d933' class='xr-section-summary-in' type='checkbox'  ><label for='section-360ec8a4-3c60-443e-bb53-7dbe89d0d933' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-c8ac33b1-e118-482e-85ef-4da72ec34125' class='xr-index-data-in' type='checkbox'/><label for='index-c8ac33b1-e118-482e-85ef-4da72ec34125' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=100, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8fbcf887-a4a1-40f8-8894-23efc71238ee' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-8fbcf887-a4a1-40f8-8894-23efc71238ee' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -527,28 +600,76 @@ nodes.
      */
 
     :root {
-      --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
-      --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
-      --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
-      --xr-border-color: var(--jp-border-color2, #e0e0e0);
-      --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
-      --xr-background-color: var(--jp-layout-color0, white);
-      --xr-background-color-row-even: var(--jp-layout-color1, white);
-      --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
     }
 
     html[theme="dark"],
     html[data-theme="dark"],
     body[data-theme="dark"],
     body.vscode-dark {
-      --xr-font-color0: rgba(255, 255, 255, 1);
-      --xr-font-color2: rgba(255, 255, 255, 0.54);
-      --xr-font-color3: rgba(255, 255, 255, 0.38);
-      --xr-border-color: #1f1f1f;
-      --xr-disabled-color: #515151;
-      --xr-background-color: #111111;
-      --xr-background-color-row-even: #111111;
-      --xr-background-color-row-odd: #313131;
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
     }
 
     .xr-wrap {
@@ -604,6 +725,7 @@ nodes.
 
     .xr-section-item input + label {
       color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
     }
 
     .xr-section-item input:enabled + label {
@@ -612,7 +734,7 @@ nodes.
     }
 
     .xr-section-item input:focus + label {
-      border: 2px solid var(--xr-font-color0);
+      border: 2px solid var(--xr-font-color0) !important;
     }
 
     .xr-section-item input:enabled + label:hover {
@@ -744,7 +866,9 @@ nodes.
     .xr-var-item label,
     .xr-var-item > .xr-var-name span {
       background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
       margin-bottom: 0;
+      padding-top: 2px;
     }
 
     .xr-var-item > .xr-var-name:hover span {
@@ -755,6 +879,7 @@ nodes.
     .xr-var-list > li:nth-child(odd) > label,
     .xr-var-list > li:nth-child(odd) > .xr-var-name span {
       background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
     }
 
     .xr-var-name {
@@ -804,8 +929,15 @@ nodes.
     .xr-var-data,
     .xr-index-data {
       display: none;
-      background-color: var(--xr-background-color) !important;
-      padding-bottom: 5px !important;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
     }
 
     .xr-var-attrs-in:checked ~ .xr-var-attrs,
@@ -816,6 +948,12 @@ nodes.
 
     .xr-var-data > table {
       float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
     }
 
     .xr-var-name span,
@@ -877,10 +1015,18 @@ nodes.
       stroke: currentColor;
       fill: currentColor;
     }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (network1d_nNodes: 5)&gt; Size: 40B
     array([ 1. ,  1.5,  2. ,  4. , -4. ])
     Coordinates:
-      * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e9c4412b-d959-410a-a51e-93a1be89c46d' class='xr-array-in' type='checkbox' checked><label for='section-e9c4412b-d959-410a-a51e-93a1be89c46d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-c0bac25b-8b4a-435b-b825-70304a1b5383' class='xr-section-summary-in' type='checkbox'  checked><label for='section-c0bac25b-8b4a-435b-b825-70304a1b5383' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-127f0ffb-c0c6-49d7-ac94-651e50348aa1' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-127f0ffb-c0c6-49d7-ac94-651e50348aa1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c455f26b-d453-4557-95c9-dfe149c1b0d0' class='xr-var-data-in' type='checkbox'><label for='data-c455f26b-d453-4557-95c9-dfe149c1b0d0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8f14afdc-160d-41de-9f3c-3e0ab614d538' class='xr-section-summary-in' type='checkbox'  ><label for='section-8f14afdc-160d-41de-9f3c-3e0ab614d538' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>network1d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-e9def82d-1f33-4b1b-a549-b61edfec424a' class='xr-index-data-in' type='checkbox'/><label for='index-e9def82d-1f33-4b1b-a549-b61edfec424a' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5, step=1, name=&#x27;network1d_nNodes&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-530f1293-4249-416c-9da4-feb2ec446a74' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-530f1293-4249-416c-9da4-feb2ec446a74' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+      * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-905e73e2-1ccb-485e-a62d-e2a02f97d187' class='xr-array-in' type='checkbox' checked><label for='section-905e73e2-1ccb-485e-a62d-e2a02f97d187' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-4ea14e97-b67d-4741-be3b-eba2a824d42c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-4ea14e97-b67d-4741-be3b-eba2a824d42c' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-df8ca536-3c02-407e-a10c-ea03267d01dc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-df8ca536-3c02-407e-a10c-ea03267d01dc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-245b18da-81ac-4c46-8bf2-d06ce66caf3b' class='xr-var-data-in' type='checkbox'><label for='data-245b18da-81ac-4c46-8bf2-d06ce66caf3b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([0, 1, 2, 3, 4])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7c6b272d-5459-4faa-a323-5de3908c8813' class='xr-section-summary-in' type='checkbox'  ><label for='section-7c6b272d-5459-4faa-a323-5de3908c8813' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>network1d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-159b4222-b1fe-411f-9e34-274c0cf0acd8' class='xr-index-data-in' type='checkbox'/><label for='index-159b4222-b1fe-411f-9e34-274c0cf0acd8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5, step=1, name=&#x27;network1d_nNodes&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1ef93139-d19f-46bd-9c53-7fc79e9b431f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-1ef93139-d19f-46bd-9c53-7fc79e9b431f' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -914,7 +1060,7 @@ values.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f87bd2ffc80>
+    <matplotlib.collections.LineCollection object at 0x7f0f42bebcb0>
 
 
 
@@ -976,7 +1122,7 @@ Let's look at the intersection points.
  .. code-block:: none
 
 
-    <matplotlib.collections.PathCollection object at 0x7f87c15ff440>
+    <matplotlib.collections.PathCollection object at 0x7f0f42caac00>
 
 
 
@@ -1161,28 +1307,76 @@ NaN at the refined nodes. The original data will be set to the original nodes.
      */
 
     :root {
-      --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
-      --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
-      --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
-      --xr-border-color: var(--jp-border-color2, #e0e0e0);
-      --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
-      --xr-background-color: var(--jp-layout-color0, white);
-      --xr-background-color-row-even: var(--jp-layout-color1, white);
-      --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base rgba(0, 0, 0, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, white)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+      );
     }
 
     html[theme="dark"],
     html[data-theme="dark"],
     body[data-theme="dark"],
     body.vscode-dark {
-      --xr-font-color0: rgba(255, 255, 255, 1);
-      --xr-font-color2: rgba(255, 255, 255, 0.54);
-      --xr-font-color3: rgba(255, 255, 255, 0.38);
-      --xr-border-color: #1f1f1f;
-      --xr-disabled-color: #515151;
-      --xr-background-color: #111111;
-      --xr-background-color-row-even: #111111;
-      --xr-background-color-row-odd: #313131;
+      --xr-font-color0: var(
+        --jp-content-font-color0,
+        var(--pst-color-text-base, rgba(255, 255, 255, 1))
+      );
+      --xr-font-color2: var(
+        --jp-content-font-color2,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+      );
+      --xr-font-color3: var(
+        --jp-content-font-color3,
+        var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+      );
+      --xr-border-color: var(
+        --jp-border-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+      );
+      --xr-disabled-color: var(
+        --jp-layout-color3,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+      );
+      --xr-background-color: var(
+        --jp-layout-color0,
+        var(--pst-color-on-background, #111111)
+      );
+      --xr-background-color-row-even: var(
+        --jp-layout-color1,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+      );
+      --xr-background-color-row-odd: var(
+        --jp-layout-color2,
+        hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+      );
     }
 
     .xr-wrap {
@@ -1238,6 +1432,7 @@ NaN at the refined nodes. The original data will be set to the original nodes.
 
     .xr-section-item input + label {
       color: var(--xr-disabled-color);
+      border: 2px solid transparent !important;
     }
 
     .xr-section-item input:enabled + label {
@@ -1246,7 +1441,7 @@ NaN at the refined nodes. The original data will be set to the original nodes.
     }
 
     .xr-section-item input:focus + label {
-      border: 2px solid var(--xr-font-color0);
+      border: 2px solid var(--xr-font-color0) !important;
     }
 
     .xr-section-item input:enabled + label:hover {
@@ -1378,7 +1573,9 @@ NaN at the refined nodes. The original data will be set to the original nodes.
     .xr-var-item label,
     .xr-var-item > .xr-var-name span {
       background-color: var(--xr-background-color-row-even);
+      border-color: var(--xr-background-color-row-odd);
       margin-bottom: 0;
+      padding-top: 2px;
     }
 
     .xr-var-item > .xr-var-name:hover span {
@@ -1389,6 +1586,7 @@ NaN at the refined nodes. The original data will be set to the original nodes.
     .xr-var-list > li:nth-child(odd) > label,
     .xr-var-list > li:nth-child(odd) > .xr-var-name span {
       background-color: var(--xr-background-color-row-odd);
+      border-color: var(--xr-background-color-row-even);
     }
 
     .xr-var-name {
@@ -1438,8 +1636,15 @@ NaN at the refined nodes. The original data will be set to the original nodes.
     .xr-var-data,
     .xr-index-data {
       display: none;
-      background-color: var(--xr-background-color) !important;
-      padding-bottom: 5px !important;
+      border-top: 2px dotted var(--xr-background-color);
+      padding-bottom: 20px !important;
+      padding-top: 10px !important;
+    }
+
+    .xr-var-attrs-in + label,
+    .xr-var-data-in + label,
+    .xr-index-data-in + label {
+      padding: 0 1px;
     }
 
     .xr-var-attrs-in:checked ~ .xr-var-attrs,
@@ -1450,6 +1655,12 @@ NaN at the refined nodes. The original data will be set to the original nodes.
 
     .xr-var-data > table {
       float: right;
+    }
+
+    .xr-var-data > pre,
+    .xr-index-data > pre,
+    .xr-var-data > table > tbody > tr {
+      background-color: transparent !important;
     }
 
     .xr-var-name span,
@@ -1511,13 +1722,21 @@ NaN at the refined nodes. The original data will be set to the original nodes.
       stroke: currentColor;
       fill: currentColor;
     }
+
+    .xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+    .xr-var-data-in:checked + label > .xr-icon-database,
+    .xr-index-data-in:checked + label > .xr-icon-database {
+      color: var(--xr-font-color0);
+      filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+      stroke-width: 0.8px;
+    }
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (network1d_nNodes: 20)&gt; Size: 160B
     array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
             nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])
     Coordinates:
-      * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-ffcb8b6e-ce60-4ca7-88be-fa240e9f91d8' class='xr-array-in' type='checkbox' checked><label for='section-ffcb8b6e-ce60-4ca7-88be-fa240e9f91d8' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
-            nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-5a938596-5760-444b-8397-fe98dab9be56' class='xr-section-summary-in' type='checkbox'  checked><label for='section-5a938596-5760-444b-8397-fe98dab9be56' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-79545bf1-d4c7-4ab6-9483-3d20ac8766d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-79545bf1-d4c7-4ab6-9483-3d20ac8766d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3ac9e791-befd-405d-93af-cc92cb15ab3d' class='xr-var-data-in' type='checkbox'><label for='data-3ac9e791-befd-405d-93af-cc92cb15ab3d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
-           18, 19])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c17b068e-18f9-4e51-8a37-d47b522a130c' class='xr-section-summary-in' type='checkbox'  ><label for='section-c17b068e-18f9-4e51-8a37-d47b522a130c' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>network1d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-501d06f1-40bd-4c39-8c47-c54f3057a08e' class='xr-index-data-in' type='checkbox'/><label for='index-501d06f1-40bd-4c39-8c47-c54f3057a08e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=20, step=1, name=&#x27;network1d_nNodes&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f91c18b9-13c7-4c82-8d53-c6790d29ecae' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-f91c18b9-13c7-4c82-8d53-c6790d29ecae' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+      * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-29b66ea2-2a9c-4140-a8f8-0af419c393a9' class='xr-array-in' type='checkbox' checked><label for='section-29b66ea2-2a9c-4140-a8f8-0af419c393a9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
+            nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-af63fe7b-24a8-4d97-a2f2-5d8c33660386' class='xr-section-summary-in' type='checkbox'  checked><label for='section-af63fe7b-24a8-4d97-a2f2-5d8c33660386' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-a490aec3-0c5b-4817-9352-a94cadb8f000' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a490aec3-0c5b-4817-9352-a94cadb8f000' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-451e33a7-16ae-48a8-8a10-ca3bb903cb82' class='xr-var-data-in' type='checkbox'><label for='data-451e33a7-16ae-48a8-8a10-ca3bb903cb82' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
+           18, 19])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7a5dac7a-ceb1-4bbd-82d8-6f818703b32b' class='xr-section-summary-in' type='checkbox'  ><label for='section-7a5dac7a-ceb1-4bbd-82d8-6f818703b32b' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>network1d_nNodes</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-7f4a5182-ed38-469a-a966-0b1d910e2c8f' class='xr-index-data-in' type='checkbox'/><label for='index-7f4a5182-ed38-469a-a966-0b1d910e2c8f' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=20, step=1, name=&#x27;network1d_nNodes&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-40160936-543e-4142-be29-124b2d61b9ee' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-40160936-543e-4142-be29-124b2d61b9ee' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -1557,7 +1776,7 @@ that the two branches on the right-hand side are interpolated separately.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f87c164fe60>
+    <matplotlib.collections.LineCollection object at 0x7f0f4760c5f0>
 
 
 
@@ -1596,7 +1815,7 @@ the edges. This is done by using the edge_node_connectivity of the network.
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f87c15ffe00>
+    <matplotlib.collections.LineCollection object at 0x7f0f50d9bcb0>
 
 
 
@@ -1634,7 +1853,7 @@ gridding and the data to grid.
  .. code-block:: none
 
 
-    <xugrid.regrid.gridder.NetworkGridder object at 0x7f87ca399130>
+    <xugrid.regrid.gridder.NetworkGridder object at 0x7f0f50d8e2a0>
 
 
 
@@ -1669,14 +1888,14 @@ Next, we can grid the data. Call the
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7f87bd2ff320>
+    <matplotlib.collections.LineCollection object at 0x7f0f50b3b710>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.373 seconds)
+   **Total running time of the script:** (0 minutes 0.368 seconds)
 
 
 .. _sphx_glr_download_examples_network_gridder.py:
