@@ -777,7 +777,7 @@ def test_ugrid1d_refine_by_vertices():
 
 
 def test_nearest_interpolate():
-    node_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+    node_x = np.array([0.0, 1.0, 1.9, 3.0, 4.0])
     node_y = np.zeros_like(node_x)
     edge_node_connectivity = np.array(
         [

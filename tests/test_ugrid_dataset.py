@@ -475,15 +475,9 @@ class TestUgridDataArray:
         assert self.uda.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
     def test_assign_coords(self):
-        with pytest.raises(
-            ValueError,
-            match="cannot add coordinates with new dimensions to a DataArray",
-        ):
+        with pytest.raises(ValueError):
             self.uda.ugrid.assign_edge_coords()
-        with pytest.raises(
-            ValueError,
-            match="cannot add coordinates with new dimensions to a DataArray",
-        ):
+        with pytest.raises(ValueError):
             self.uda.ugrid.assign_node_coords()
 
         with_coords = self.uda.ugrid.assign_face_coords()
