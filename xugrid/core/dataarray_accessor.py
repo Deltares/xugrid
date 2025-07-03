@@ -6,6 +6,7 @@ import xarray as xr
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
+from xugrid.core.index import UgridIndex
 from xugrid.core.utils import UncachedAccessor
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot.plot import _PlotMethods
@@ -19,15 +20,23 @@ from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
+@xr.register_dataarray_accessor("ugrid")
 class UgridDataArrayAccessor(AbstractUgridAccessor):
     """
     This "accessor" makes operations using the UGRID topology available via the
     ``.ugrid`` attribute for UgridDataArrays and UgridDatasets.
     """
 
-    def __init__(self, obj: xr.DataArray, grid: UgridType):
+    def __init__(self, obj: xr.DataArray):
         self.obj = obj
-        self.grid = grid
+
+    @property
+    def grid(self) -> UgridType:
+        indexes = list(self.obj.xindexes.values())
+        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        if len(grids) != 1:
+            raise ValueError("DataArray should contain exactly one UgridIndex")
+        return grids.pop()
 
     @property
     def grids(self) -> List[UgridType]:
@@ -855,7 +864,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 "maxiter": maxiter,
             },
         )
-        return UgridDataArray(da_filled, grid)
+        return da_filled
 
     def to_dataset(self, optional_attributes: bool = False):
         """
@@ -874,3 +883,107 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         dataset: UgridDataset
         """
         return self.grid.to_dataset(self.obj, optional_attributes)
+
+    @staticmethod
+    def from_structured2d(
+        da: xr.DataArray,
+        x: str | None = None,
+        y: str | None = None,
+        x_bounds: xr.DataArray = None,
+        y_bounds: xr.DataArray = None,
+    ) -> xr.DataArray:
+        """
+        Create a UgridDataArray from a (structured) xarray DataArray.
+
+        The spatial dimensions are flattened into a single UGRID face dimension.
+        By default, this method looks for:
+
+        1. "x" and "y" dimensions
+        2. "longitude" and "latitude" dimensions
+        3. "axis" attributes of "X" or "Y" on coordinates
+        4. "standard_name" attributes of "longitude", "latitude",
+            "projection_x_coordinate", or "projection_y_coordinate" on coordinate
+            variables
+
+        Parameters
+        ----------
+        da : xr.DataArray
+            The structured data array to convert. The last two dimensions must be
+            the y and x dimensions (in that order).
+        x : str, optional
+            Name of the UGRID x-coordinate, or x-dimension if bounds are provided.
+            Defaults to None.
+        y : str, optional
+            Name of the UGRID y-coordinate, or y-dimension if bounds are provided.
+            Defaults to None.
+        x_bounds : xr.DataArray, optional
+            Bounds for x-coordinates. Required for non-monotonic coordinates.
+            Defaults to None.
+        y_bounds : xr.DataArray, optional
+            Bounds for y-coordinates. Required for non-monotonic coordinates.
+            Defaults to None.
+
+        Returns
+        -------
+        UgridDataArray
+            The unstructured grid data array.
+
+        Notes
+        -----
+        When using bounds, they should have one of these shapes:
+        * x bounds: (M, 2) or (N, M, 4)
+        * y bounds: (N, 2) or (N, M, 4)
+        where N is the number of rows (along y) and M is columns (along x).
+        Cells with NaN bounds coordinates are omitted.
+
+        Examples
+        --------
+        Basic usage with default coordinate detection:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(data_array)
+
+        Specifying explicit coordinate names:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(
+        ...     data_array,
+        ...     x="longitude",
+        ...     y="latitude"
+        ... )
+
+        Using bounds for curvilinear grids:
+
+        >>> uda = xugrid.UgridDataArray.from_structured2d(
+        ...     data_array,
+        ...     x="x_dim",
+        ...     y="y_dim",
+        ...     x_bounds=x_bounds_array,
+        ...     y_bounds=y_bounds_array
+        ... )
+        """
+        if da.ndim < 2:
+            raise ValueError(
+                "DataArray must have at least two spatial dimensions. "
+                f"Found: {da.dims}."
+            )
+        if x_bounds is not None and y_bounds is not None:
+            if x is None or y is None:
+                raise ValueError("x and y must be provided for bounds")
+            yx = (y, x)
+            grid, index = Ugrid2d.from_structured_bounds(
+                x_bounds=x_bounds.transpose(y, x, ...).to_numpy(),
+                y_bounds=y_bounds.transpose(y, x, ...).to_numpy(),
+                return_index=True,
+            )
+        else:
+            # Possibly rely on inference of x and y dims.
+            grid, yx = Ugrid2d.from_structured(da, x, y, return_dims=True)
+            index = slice(None, None)
+
+        face_da = (
+            da.stack(  # noqa: PD013
+                {grid.face_dimension: (yx)}, create_index=False
+            )
+            .isel({grid.face_dimension: index})
+            .drop_vars(yx, errors="ignore")
+        )
+        return face_da.initialize(grid=grid)

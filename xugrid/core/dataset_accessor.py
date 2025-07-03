@@ -4,18 +4,43 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from xugrid.conversion import grid_from_geodataframe
+
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
+from xugrid.core.index import UgridIndex, UgridIndex2d
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
+@xr.register_dataset_accessor("ugrid")
 class UgridDatasetAccessor(AbstractUgridAccessor):
-    def __init__(self, obj: xr.Dataset, grids: Sequence[UgridType]):
+    def __init__(self, obj: xr.Dataset):
         self.obj = obj
-        self.grids = grids
+
+    def initialize(self):  # , grids=None):
+        new = self.obj
+        for topology in self.obj.ugrid_roles.topology:
+            # TODO: currently hardcoded for Ugrid2d
+            ugrid_vars = self.obj.ugrid_roles[topology]
+            node_xs, node_ys = ugrid_vars["node_coordinates"]
+            variables = (
+                node_xs[0],
+                node_ys[0],
+                ugrid_vars["face_node_connectivity"],
+            )
+            new = new.set_coords(variables).set_xindex(variables, UgridIndex2d)
+        return new
+
+    @property
+    def grids(self) -> list[UgridType]:
+        indexes = list(self.obj.xindexes.values())
+        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        if len(grids) == 0:
+            raise ValueError("Dataset contains no UgridIndex")
+        return list(grids)
 
     @property
     def grid(self) -> UgridType:
@@ -612,3 +637,167 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             else:
                 new_grids.append(grid)
         return UgridDataset(result, new_grids)
+
+    @staticmethod
+    def from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ignore # noqa
+        """
+        Convert a geodataframe into the appropriate Ugrid topology and dataset.
+
+        Parameters
+        ----------
+        geodataframe: gpd.GeoDataFrame
+
+        Returns
+        -------
+        dataset: UGridDataset
+        """
+        grid = grid_from_geodataframe(geodataframe)
+        ds = xr.Dataset.from_dataframe(geodataframe.drop("geometry", axis=1))
+        return ds.ugrid.initialize(grids=[grid])
+
+    @staticmethod
+    def from_structured2d(
+        dataset: xr.Dataset, topology: dict | None = None
+    ) -> "UgridDataset":
+        """
+        Create a UgridDataset from a (structured) xarray Dataset.
+
+        The spatial dimensions are flattened into a single UGRID face dimension.
+        By default, this method looks for:
+
+        1. "x" and "y" dimensions
+        2. "longitude" and "latitude" dimensions
+        3. "axis" attributes of "X" or "Y" on coordinates
+        4. "standard_name" attributes of "longitude", "latitude",
+            "projection_x_coordinate", or "projection_y_coordinate" on coordinate
+            variables
+
+        Parameters
+        ----------
+        dataset : xr.Dataset
+            The structured dataset to convert.
+        topology : dict, optional
+            Either:
+            * A mapping of topology name to (x, y) coordinate names
+            * A mapping of topology name to a dict containing:
+            - "x": x-dimension name
+            - "y": y-dimension name
+            - "bounds_x": x-bounds variable name
+            - "bounds_y": y-bounds variable name
+            Defaults to {"mesh2d": (None, None)}.
+
+        Returns
+        -------
+        UgridDataset
+            The unstructured grid dataset.
+
+        Notes
+        -----
+        When using bounds, they should have one of these shapes:
+        * x bounds: (M, 2) or (N, M, 4)
+        * y bounds: (N, 2) or (N, M, 4)
+        where N is the number of rows (along y) and M is columns (along x).
+        Cells with NaN bounds coordinates are omitted.
+
+        Examples
+        --------
+        Basic usage with default coordinate names:
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(dataset)
+
+        Specifying custom coordinate names:
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(
+        ...     dataset,
+        ...     topology={"my_mesh2d": {"x": "xc", "y": "yc"}}
+        ... )
+
+        Multiple grid topologies in a single dataset:
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(
+        ...     dataset,
+        ...     topology={
+        ...         "mesh2d_xy": {"x": "x", "y": "y"},
+        ...         "mesh2d_lonlat": {"x": "lon", "y": "lat"}
+        ...     }
+        ... )
+
+        Using bounds for non-monotonic coordinates (e.g., curvilinear grids):
+
+        >>> uds = xugrid.UgridDataset.from_structured2d(
+        ...     dataset,
+        ...     topology={
+        ...         "my_mesh2d": {
+        ...             "x": "M",
+        ...             "y": "N",
+        ...             "bounds_x": "grid_x",
+        ...             "bounds_y": "grid_y"
+        ...         }
+        ...     }
+        ... )
+        """
+        if topology is None:
+            # By default, set None. This communicates to
+            # Ugrid2d.from_structured to infer x and y dims.
+            topology = {"mesh2d": (None, None)}
+
+        grids = []
+        dss = []
+        xy_vars = set()  # store x, y, x_bounds, y_bounds to drop.
+        for name, args in topology.items():
+            x_bounds = None
+            y_bounds = None
+            if isinstance(args, dict):
+                x = args.get("x")
+                y = args.get("y")
+                if "x_bounds" in args and "y_bounds" in args:
+                    if x is None or y is None:
+                        raise ValueError("x and y must be provided for bounds")
+                    x_bounds = dataset[args["x_bounds"]]
+                    y_bounds = dataset[args["y_bounds"]]
+                    xy_vars.update((args["x_bounds"], args["y_bounds"]))
+            elif isinstance(args, tuple):
+                x, y = args
+            else:
+                raise TypeError(
+                    "Expected dict or tuple in topology, received: "
+                    f"{type(args).__name__}"
+                )
+
+            if x_bounds is not None and y_bounds is not None:
+                stackdims = (y, x)
+                grid, index = Ugrid2d.from_structured_bounds(
+                    x_bounds.transpose(*stackdims, ...).to_numpy(),
+                    y_bounds.transpose(*stackdims, ...).to_numpy(),
+                    name=name,
+                    return_index=True,
+                )
+            else:
+                grid, stackdims = Ugrid2d.from_structured(
+                    dataset, x=x, y=y, name=name, return_dims=True
+                )
+                index = slice(None, None)
+
+            # Use subset to check that ALL dims of stackdims are present in the
+            # variable.
+            checkdims = set(stackdims)
+            xy_vars.update(checkdims)
+            ugrid_vars = [
+                name
+                for name, var in dataset.data_vars.items()
+                if checkdims.issubset(var.dims) and name not in xy_vars
+            ]
+            dss.append(
+                dataset[ugrid_vars]  # noqa: PD013
+                .stack({grid.face_dimension: stackdims})
+                .isel({grid.face_dimension: index})
+                .drop_vars(stackdims + (grid.face_dimension,))
+            )
+            grids.append(grid)
+
+        # Add the original dataset to include all non-UGRID variables.
+        dss.append(dataset.drop_vars(xy_vars, errors="ignore"))
+        # Then merge with compat="override". This'll pick the first available
+        # variable: i.e. it will prioritize the UGRID form.
+        merged = xr.merge(dss, compat="override")
+        return merged.ugrid.initialize(merged, grid=grids)
