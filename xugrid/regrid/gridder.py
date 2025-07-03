@@ -39,12 +39,12 @@ class NetworkGridder(BaseRegridder):
     def __init__(
         self,
         source: "xugrid.Ugrid1d",
-        target: "xugrid.Ugrid2d",
+        target: "xugrid.Ugrid2d",  # TODO: may also be a DataArray...
         target_dim: Optional[str] = None,
         method: Union[str, Callable] = "mean",
     ):
         self._source = Network1d(source)
-        self._target, self._target_flipper = self.setup_grid(target)
+        self._target, self._target_flipper = self.setup_grid(target, target_dim)
         self._target_dim = target_dim
         self._weights = None
         self._compute_weights(self._source, self._target, relative=False)
