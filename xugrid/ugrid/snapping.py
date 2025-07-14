@@ -253,8 +253,8 @@ def snap_to_edges(
     face_indices: IntArray,
     intersection_edges: FloatArray,
     face_edge_connectivity: AdjacencyMatrix,
+    edge_face_connectivity: IntArray,
     centroids: FloatArray,
-    edge_centroids: FloatArray,
     edges: IntArray,
     segment_index: IntArray,
 ) -> Tuple[IntArray, IntArray]:
@@ -293,7 +293,15 @@ def snap_to_edges(
 
         a_left = left_of(a, p, U)
         for edge in connectivity.neighbors(face_edge_connectivity, face):
-            b = as_point(edge_centroids[edge])
+            face_a, face_b = edge_face_connectivity[edge]
+            if face_a == face:
+                face_b = face_b
+            else:
+                face_b = face_a
+            if face_b == -1:
+                continue
+
+            b = as_point(centroids[face_b])
             b_left = left_of(b, p, U)
             if a_left != b_left:
                 V = to_vector(a, b)
@@ -401,11 +409,11 @@ def create_snap_to_grid_dataframe(
 
     topology = grid
     vertices = topology.node_coordinates
-    edge_centroids = topology.edge_coordinates
     face_edge_connectivity = topology.face_edge_connectivity
     A = connectivity.to_sparse(face_edge_connectivity)
     n, m = A.shape
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
+    edge_face_connectivity = topology.edge_face_connectivity
 
     # Create geometric data
     line_geometry = coerce_geometry(lines)
@@ -447,8 +455,8 @@ def create_snap_to_grid_dataframe(
         face_indices,
         segment_edges,
         face_edge_connectivity,
+        edge_face_connectivity,
         topology.centroids,
-        edge_centroids,
         edge_index,  # out
         segment_index,  # out
     )
