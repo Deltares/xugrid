@@ -239,11 +239,6 @@ def left_of(a: Point, p: Point, U: Vector) -> bool:
     return U.x * (a.y - p.y) > U.y * (a.x - p.x)
 
 
-@nb.njit(inline="always")
-def sign(x: float) -> float:
-    return x / abs(x)
-
-
 def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
     geometry = lines.geometry.to_numpy()
     geom_type = shapely.get_type_id(geometry)
@@ -297,10 +292,14 @@ def snap_to_edges(
             continue
 
         # Slightly enlargen the vector for edge cases.
-        signx = sign(U.x)
-        signy = sign(U.y)
-        p = Point(p.x - signx * tolerance, p.y - signy * tolerance)
-        q = Point(q.x + signx * tolerance, q.y + signy * tolerance)
+        # Note: np.sign function returns a 0 on values of -0 and 0.
+        absUx = abs(U.x)
+        absUy = abs(U.y)
+        signx = U.x / absUx
+        signy = U.y / absUy
+        increase = tolerance * max(absUx, absUy)
+        p = Point(p.x - signx * increase, p.y - signy * increase)
+        q = Point(q.x + signx * increase, q.y + signy * increase)
         U = to_vector(p, q)
 
         a_left = left_of(a, p, U)
@@ -366,6 +365,7 @@ def create_snap_to_grid_dataframe(
     lines: GeoDataFrameType,
     grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
+    tolerance: float = 1e-12,
 ) -> pd.DataFrame:
     """
     Create a dataframe required to snap line geometries to a Ugrid2d topology.
@@ -380,6 +380,9 @@ def create_snap_to_grid_dataframe(
     grid: xugrid.Ugrid2d
         Grid of cells to snap lines to.
     max_snap_distance: float
+    tolerance: float, optional, default value is 1e-12.
+        Relative tolerance value to resolve edge cases. Increase the value if a
+        line is unexpectedly not snapped to a grid cell edge.
 
     Returns
     -------
@@ -469,6 +472,7 @@ def create_snap_to_grid_dataframe(
         topology.centroids,
         edge_index,  # out
         segment_index,  # out
+        tolerance,
     )
     line_index = line_index[segment_index]
     segment_edges = segment_edges[segment_index]
