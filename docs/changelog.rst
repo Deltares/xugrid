@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Edge case in :func:`xugrid.snap_to_grid` wich caused the snapping to fail when
+  the line intersected an edge exactly at the intersection point between the
+  line connecting two face centroids and the edge itsself.
+
 [0.14.1] 2025-05-08
 -------------------
 
