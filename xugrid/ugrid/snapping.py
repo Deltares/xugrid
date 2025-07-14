@@ -293,11 +293,9 @@ def snap_to_edges(
 
         # Slightly enlargen the vector for edge cases.
         # Note: np.sign function returns a 0 on values of -0 and 0.
-        absUx = abs(U.x)
-        absUy = abs(U.y)
-        signx = U.x / absUx
-        signy = U.y / absUy
-        increase = tolerance * max(absUx, absUy)
+        signx = np.sign(U.x)
+        signy = np.sign(U.y)
+        increase = tolerance * max(abs(U.x), abs(U.y))
         p = Point(p.x - signx * increase, p.y - signy * increase)
         q = Point(q.x + signx * increase, q.y + signy * increase)
         U = to_vector(p, q)
