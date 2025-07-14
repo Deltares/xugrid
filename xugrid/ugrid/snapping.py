@@ -236,8 +236,12 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
 def left_of(a: Point, p: Point, U: Vector) -> bool:
     # Whether point a is left of vector U
     # U: p -> q direction vector
-    # TODO: maybe add epsilon for floating point
     return U.x * (a.y - p.y) > U.y * (a.x - p.x)
+
+
+@nb.njit(inline="always")
+def sign(x: float) -> float:
+    return x / abs(x)
 
 
 def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
@@ -257,6 +261,7 @@ def snap_to_edges(
     centroids: FloatArray,
     edges: IntArray,
     segment_index: IntArray,
+    tolerance: float,
 ) -> Tuple[IntArray, IntArray]:
     """
     Snap the intersected edges to the edges of the surrounding face.
@@ -267,8 +272,8 @@ def snap_to_edges(
       within a single face.
     * For a face, we take the centroid (a).
     * We loop through every edge of the face.
-    * If the edge separates the centroid (a) from the centroid of the edge (b)
-      we store that edge as a separating edge.
+    * If the edge separates the centroid (a) from the centroid of the other
+      connected face (b) we store that edge as a separating edge.
 
     We test for separation by:
 
@@ -291,12 +296,17 @@ def snap_to_edges(
         if U.x == 0 and U.y == 0:
             continue
 
+        # Slightly enlargen the vector for edge cases.
+        signx = sign(U.x)
+        signy = sign(U.y)
+        p = Point(p.x - signx * tolerance, p.y - signy * tolerance)
+        q = Point(q.x + signx * tolerance, q.y + signy * tolerance)
+        U = to_vector(p, q)
+
         a_left = left_of(a, p, U)
         for edge in connectivity.neighbors(face_edge_connectivity, face):
             face_a, face_b = edge_face_connectivity[edge]
-            if face_a == face:
-                face_b = face_b
-            else:
+            if face_b == face:
                 face_b = face_a
             if face_b == -1:
                 continue
