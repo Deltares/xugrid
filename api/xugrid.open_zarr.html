@@ -785,6 +785,12 @@ Experimental API that should not be relied upon.</p></li>
 chunked arrays, via whichever chunk manager is specified through the <code class="docutils literal notranslate"><span class="pre">chunked_array_type</span></code> kwarg.
 Defaults to <code class="docutils literal notranslate"><span class="pre">{'manager':</span> <span class="pre">'dask'}</span></code>, meaning additional kwargs will be passed eventually to
 <code class="xref py py-func docutils literal notranslate"><span class="pre">dask.array.from_array()</span></code>. Experimental API that should not be relied upon.</p></li>
+<li><p><strong>create_default_indexes</strong> (<em>bool</em><em>, </em><em>default: True</em>) – <p>If True, create pandas indexes for <span class="xref std std-term">dimension coordinates</span>,
+which loads the coordinate data into memory. Set it to False if you want to avoid loading
+data into memory.</p>
+<p>Note that backends can still choose to create other indexes. If you want to control that,
+please refer to the backend’s documentation.</p>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

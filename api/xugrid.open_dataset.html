@@ -793,6 +793,12 @@ will be silently ignored.</p>
 <li><p><strong>drop_variables</strong> (<em>str</em><em> or </em><em>iterable</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – A variable or list of variables to exclude from being parsed from the
 dataset. This may be useful to drop variables with problems or
 inconsistent values.</p></li>
+<li><p><strong>create_default_indexes</strong> (<em>bool</em><em>, </em><em>default: True</em>) – <p>If True, create pandas indexes for <span class="xref std std-term">dimension coordinates</span>,
+which loads the coordinate data into memory. Set it to False if you want to avoid loading
+data into memory.</p>
+<p>Note that backends can still choose to create other indexes. If you want to control that,
+please refer to the backend’s documentation.</p>
+</p></li>
 <li><p><strong>inline_array</strong> (<em>bool</em><em>, </em><em>default: False</em>) – How to include the array in the dask task graph.
 By default(<code class="docutils literal notranslate"><span class="pre">inline_array=False</span></code>) the array is included in a task by
 itself, and each chunk refers to that task by its key. With

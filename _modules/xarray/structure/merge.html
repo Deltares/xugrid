@@ -677,7 +677,7 @@
                 <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">variable</span> <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">elements_list</span><span class="p">]</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">unique_variable</span><span class="p">(</span>
-                        <span class="n">name</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">compat</span><span class="p">,</span> <span class="n">equals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">compat</span><span class="p">,</span> <span class="n">equals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                     <span class="p">)</span>
                 <span class="k">except</span> <span class="n">MergeError</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">compat</span> <span class="o">!=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
@@ -1095,7 +1095,7 @@
         <span class="n">coord_names</span><span class="o">.</span><span class="n">intersection_update</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">explicit_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">coord_names</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">explicit_coords</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
             <span class="n">coord_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
     <span class="n">ambiguous_coords</span> <span class="o">=</span> <span class="n">coord_names</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">noncoord_names</span><span class="p">)</span>
