@@ -12,6 +12,7 @@ from typing import Tuple, Union
 import numpy as np
 import xarray as xr
 
+import xugrid
 from xugrid.constants import (
     FILL_VALUE,
     BoolArray,
@@ -24,8 +25,6 @@ from xugrid.constants import (
     PolygonArray,
 )
 from xugrid.ugrid.connectivity import cross2d, ragged_index
-from xugrid.ugrid.ugrid1d import Ugrid1d
-from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
     import shapely
@@ -370,9 +369,9 @@ def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ign
 
     geom_type = geom_types[0]
     if geom_type == "LineString":
-        grid = Ugrid1d.from_geodataframe(gdf)
+        grid = xugrid.Ugrid1d.from_geodataframe(gdf)
     elif geom_type == "Polygon":
-        grid = Ugrid2d.from_geodataframe(gdf)
+        grid = xugrid.Ugrid2d.from_geodataframe(gdf)
     else:
         raise ValueError(
             f"Invalid geometry type: {geom_type}. Expected Linestring or Polygon."
@@ -383,9 +382,9 @@ def grid_from_geodataframe(geodataframe: "geopandas.GeoDataFrame"):  # type: ign
 def grid_from_dataset(dataset: xr.Dataset, topology: str):
     topodim = dataset[topology].attrs["topology_dimension"]
     if topodim == 1:
-        return Ugrid1d.from_dataset(dataset, topology)
+        return xugrid.Ugrid1d.from_dataset(dataset, topology)
     elif topodim == 2:
-        return Ugrid2d.from_dataset(dataset, topology)
+        return xugrid.Ugrid2d.from_dataset(dataset, topology)
     elif topodim == 3:
         raise NotImplementedError
     else:
