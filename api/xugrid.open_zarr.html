@@ -713,8 +713,10 @@ directory in file system where a Zarr DirectoryStore has been stored.</p></li>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
 engine preferred chunks.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask, which is generally faster for
-small arrays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask. This uses xarray’s internally private
+<span class="xref std std-ref">lazy indexing classes</span>,
+but data is eagerly loaded into memory as numpy arrays when accessed.
+This can be more efficient for smaller arrays, though results may vary.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the data with dask using a single chunk for all arrays.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the data with dask using engine preferred chunks if
 exposed by the backend, otherwise with a single chunk for all arrays.</p></li>
@@ -904,7 +906,7 @@ please refer to the backend’s documentation.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     <br/>
   </p>
 </div>

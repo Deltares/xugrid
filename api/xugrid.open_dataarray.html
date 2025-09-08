@@ -705,11 +705,12 @@ multiple variables are present then a ValueError is raised.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_or_obj</strong> (<em>str</em><em>, </em><em>Path</em><em>, </em><em>file-like</em><em> or </em><em>DataStore</em>) – Strings and Path objects are interpreted as a path to a netCDF file
+<li><p><strong>filename_or_obj</strong> (<em>str</em><em>, </em><em>Path</em><em>, </em><em>file-like</em><em>, </em><em>bytes</em><em>, </em><em>memoryview</em><em> or </em><em>DataStore</em>) – Strings and Path objects are interpreted as a path to a netCDF file
 or an OpenDAP URL and opened with python-netCDF4, unless the filename
 ends with .gz, in which case the file is gunzipped and opened with
-scipy.io.netcdf (only netCDF3 supported). Byte-strings or file-like
-objects are opened by scipy.io.netcdf (netCDF3) or h5py (netCDF4/HDF).</p></li>
+scipy.io.netcdf (only netCDF3 supported). Bytes, memoryview and
+file-like objects are opened by scipy.io.netcdf (netCDF3) or h5netcdf
+(netCDF4).</p></li>
 <li><p><strong>engine</strong> (<em>{&quot;netcdf4&quot;</em><em>, </em><em>&quot;scipy&quot;</em><em>, </em><em>&quot;pydap&quot;</em><em>, </em><em>&quot;h5netcdf&quot;</em><em>, </em><em>&quot;zarr&quot;</em><em>, </em><em>None}</em><em>        , </em><em>installed backend</em><em>         or </em><em>subclass</em><em> of </em><em>xarray.backends.BackendEntrypoint</em><em>, </em><em>optional</em>) – Engine to use when reading files. If not provided, the default engine
 is chosen based on available dependencies, with a preference for
 “netcdf4”.</p></li>
@@ -717,8 +718,10 @@ is chosen based on available dependencies, with a preference for
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
 engine preferred chunks.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask, which is generally faster for
-small arrays.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chunks=None</span></code> skips using dask. This uses xarray’s internally private
+<span class="xref std std-ref">lazy indexing classes</span>,
+but data is eagerly loaded into memory as numpy arrays when accessed.
+This can be more efficient for smaller arrays, though results may vary.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks=-1</span></code> loads the data with dask using a single chunk for all arrays.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> loads the data with dask using engine preferred chunks if
 exposed by the backend, otherwise with a single chunk for all arrays.</p></li>
@@ -930,7 +933,7 @@ documentation for further details.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     <br/>
   </p>
 </div>

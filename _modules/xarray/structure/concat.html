@@ -378,7 +378,7 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -388,6 +388,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.duck_array_ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">lazy_array_equiv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.indexes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Index</span><span class="p">,</span> <span class="n">PandasIndex</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">T_DataArray</span><span class="p">,</span> <span class="n">T_Dataset</span><span class="p">,</span> <span class="n">T_Variable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">emit_user_level_warning</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat</span> <span class="k">as</span> <span class="n">concat_vars</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">align</span><span class="p">,</span> <span class="n">reindex_variables</span>
@@ -396,6 +397,13 @@
     <span class="n">collect_variables_and_indexes</span><span class="p">,</span>
     <span class="n">merge_attrs</span><span class="p">,</span>
     <span class="n">merge_collected</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.util.deprecation_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_COMPAT_CONCAT_DEFAULT</span><span class="p">,</span>
+    <span class="n">_COORDS_DEFAULT</span><span class="p">,</span>
+    <span class="n">_DATA_VARS_DEFAULT</span><span class="p">,</span>
+    <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
+    <span class="n">CombineKwargDefault</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -406,7 +414,7 @@
         <span class="n">JoinOptions</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">T_DataVars</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConcatOptions</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span>
+    <span class="n">T_DataVars</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConcatOptions</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
 <span class="c1"># TODO: replace dim: Any by 1D array_likes</span>
@@ -414,12 +422,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;different&quot;</span><span class="p">,</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_DATA_VARS_DEFAULT</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COORDS_DEFAULT</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_CONCAT_DEFAULT</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span> <span class="o">...</span>
@@ -429,12 +437,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_DataArray</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;different&quot;</span><span class="p">,</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_DATA_VARS_DEFAULT</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COORDS_DEFAULT</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_CONCAT_DEFAULT</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataArray</span><span class="p">:</span> <span class="o">...</span>
@@ -445,12 +453,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>
     <span class="n">objs</span><span class="p">,</span>
     <span class="n">dim</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-    <span class="n">coords</span><span class="o">=</span><span class="s2">&quot;different&quot;</span><span class="p">,</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_DATA_VARS_DEFAULT</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COORDS_DEFAULT</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_CONCAT_DEFAULT</span><span class="p">,</span>
     <span class="n">positions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="o">=</span><span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
@@ -469,7 +477,7 @@
 <span class="sd">        unchanged. If dimension is provided as a Variable, DataArray or Index, its name</span>
 <span class="sd">        is used as the dimension to concatenate along and the values are added</span>
 <span class="sd">        as a coordinate.</span>
-<span class="sd">    data_vars : {&quot;minimal&quot;, &quot;different&quot;, &quot;all&quot;} or list of Hashable, optional</span>
+<span class="sd">    data_vars : {&quot;minimal&quot;, &quot;different&quot;, &quot;all&quot;, None} or list of Hashable, optional</span>
 <span class="sd">        These data variables will be concatenated together:</span>
 <span class="sd">          * &quot;minimal&quot;: Only data variables in which the dimension already</span>
 <span class="sd">            appears are included.</span>
@@ -479,6 +487,8 @@
 <span class="sd">            load the data payload of data variables into memory if they are not</span>
 <span class="sd">            already loaded.</span>
 <span class="sd">          * &quot;all&quot;: All data variables will be concatenated.</span>
+<span class="sd">          * None: Means ``&quot;all&quot;`` if ``dim`` is not present in any of the ``objs``,</span>
+<span class="sd">            and ``&quot;minimal&quot;`` if ``dim`` is present in any of ``objs``.</span>
 <span class="sd">          * list of dims: The listed data variables will be concatenated, in</span>
 <span class="sd">            addition to the &quot;minimal&quot; data variables.</span>
 
@@ -486,7 +496,9 @@
 <span class="sd">    coords : {&quot;minimal&quot;, &quot;different&quot;, &quot;all&quot;} or list of Hashable, optional</span>
 <span class="sd">        These coordinate variables will be concatenated together:</span>
 <span class="sd">          * &quot;minimal&quot;: Only coordinates in which the dimension already appears</span>
-<span class="sd">            are included.</span>
+<span class="sd">            are included. If concatenating over a dimension _not_</span>
+<span class="sd">            present in any of the objects, then all data variables will</span>
+<span class="sd">            be concatenated along that new dimension.</span>
 <span class="sd">          * &quot;different&quot;: Coordinates which are not equal (ignoring attributes)</span>
 <span class="sd">            across all datasets are also concatenated (as well as all for which</span>
 <span class="sd">            dimension already appears). Beware: this option may load the data</span>
@@ -578,7 +590,7 @@
 <span class="sd">      * x        (x) &lt;U1 8B &#39;a&#39; &#39;b&#39;</span>
 <span class="sd">      * y        (y) int64 24B 10 20 30</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.concat([da.isel(x=0), da.isel(x=1)], &quot;x&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; xr.concat([da.isel(x=0), da.isel(x=1)], &quot;x&quot;, coords=&quot;minimal&quot;)</span>
 <span class="sd">    &lt;xarray.DataArray (x: 2, y: 3)&gt; Size: 48B</span>
 <span class="sd">    array([[0, 1, 2],</span>
 <span class="sd">           [3, 4, 5]])</span>
@@ -586,7 +598,7 @@
 <span class="sd">      * x        (x) &lt;U1 8B &#39;a&#39; &#39;b&#39;</span>
 <span class="sd">      * y        (y) int64 24B 10 20 30</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.concat([da.isel(x=0), da.isel(x=1)], &quot;new_dim&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; xr.concat([da.isel(x=0), da.isel(x=1)], &quot;new_dim&quot;, coords=&quot;all&quot;)</span>
 <span class="sd">    &lt;xarray.DataArray (new_dim: 2, y: 3)&gt; Size: 48B</span>
 <span class="sd">    array([[0, 1, 2],</span>
 <span class="sd">           [3, 4, 5]])</span>
@@ -595,7 +607,11 @@
 <span class="sd">      * y        (y) int64 24B 10 20 30</span>
 <span class="sd">    Dimensions without coordinates: new_dim</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.concat([da.isel(x=0), da.isel(x=1)], pd.Index([-90, -100], name=&quot;new_dim&quot;))</span>
+<span class="sd">    &gt;&gt;&gt; xr.concat(</span>
+<span class="sd">    ...     [da.isel(x=0), da.isel(x=1)],</span>
+<span class="sd">    ...     pd.Index([-90, -100], name=&quot;new_dim&quot;),</span>
+<span class="sd">    ...     coords=&quot;all&quot;,</span>
+<span class="sd">    ... )</span>
 <span class="sd">    &lt;xarray.DataArray (new_dim: 2, y: 3)&gt; Size: 48B</span>
 <span class="sd">    array([[0, 1, 2],</span>
 <span class="sd">           [3, 4, 5]])</span>
@@ -634,7 +650,9 @@
     <span class="k">except</span> <span class="ne">StopIteration</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;must supply at least one object to concatenate&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
 
-    <span class="k">if</span> <span class="n">compat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">_VALID_COMPAT</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;minimal&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="ow">and</span> <span class="n">compat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="n">_VALID_COMPAT</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;minimal&quot;</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;compat=</span><span class="si">{</span><span class="n">compat</span><span class="si">!r}</span><span class="s2"> invalid: must be &#39;broadcast_equals&#39;, &#39;equals&#39;, &#39;identical&#39;, &#39;no_conflicts&#39; or &#39;override&#39;&quot;</span>
         <span class="p">)</span>
@@ -700,25 +718,43 @@
     <span class="k">return</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_calc_concat_over</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calc_concat_over</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span>
+    <span class="n">all_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine which dataset variables need to be concatenated in the result,</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># variables to be concatenated</span>
     <span class="n">concat_over</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="c1"># variables checked for equality</span>
-    <span class="n">equals</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">equals</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># skip merging these variables.</span>
     <span class="c1">#   if concatenating over a dimension &#39;x&#39; that is associated with an index over 2 variables,</span>
     <span class="c1">#   &#39;x&#39; and &#39;y&#39;, then we assert join=&quot;equals&quot; on `y` and don&#39;t need to merge it.</span>
     <span class="c1">#   that assertion happens in the align step prior to this function being called</span>
-    <span class="n">skip_merge</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">skip_merge</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">all_dims</span><span class="p">:</span>
         <span class="n">concat_over_existing_dim</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">concat_over</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">concat_over_existing_dim</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">data_vars</span> <span class="o">==</span> <span class="s2">&quot;minimal&quot;</span> <span class="ow">and</span> <span class="n">coords</span> <span class="o">==</span> <span class="s2">&quot;minimal&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">concat_over_existing_dim</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot specify both data_vars=&#39;minimal&#39; and coords=&#39;minimal&#39; when &quot;</span>
+            <span class="s2">&quot;concatenating over a new dimension.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data_vars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data_vars</span><span class="o">.</span><span class="n">_value</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="n">data_vars</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span> <span class="k">if</span> <span class="n">concat_over_existing_dim</span> <span class="k">else</span> <span class="s2">&quot;all&quot;</span>
 
     <span class="n">concat_dim_lengths</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
@@ -730,17 +766,41 @@
                 <span class="n">skip_merge</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idx_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">concat_dim_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">process_subset_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">subset</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_subset_opt</span><span class="p">(</span>
+        <span class="n">opt</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+        <span class="n">subset</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;coords&quot;</span><span class="p">,</span> <span class="s2">&quot;data_vars&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">concat_over</span><span class="p">)</span>
+        <span class="n">compat_str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">compat</span><span class="o">.</span><span class="n">_value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="k">else</span> <span class="n">compat</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">compat_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;different&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="ow">and</span> <span class="n">compat</span> <span class="o">!=</span> <span class="s2">&quot;override&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">):</span>
+                        <span class="n">emit_user_level_warning</span><span class="p">(</span>
+                            <span class="n">compat</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                                <span class="s2">&quot;This change will result in the following ValueError: &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;Cannot specify both </span><span class="si">{</span><span class="n">subset</span><span class="si">}</span><span class="s2">=&#39;different&#39; and compat=&#39;override&#39;.&quot;</span><span class="p">,</span>
+                                <span class="n">recommend_set_options</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="p">),</span>
+                            <span class="ne">FutureWarning</span><span class="p">,</span>
+                        <span class="p">)</span>
+
                 <span class="k">if</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;override&quot;</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Cannot specify both </span><span class="si">{</span><span class="n">subset</span><span class="si">}</span><span class="s2">=&#39;different&#39; and compat=&#39;override&#39;.&quot;</span>
+                        <span class="o">+</span> <span class="p">(</span>
+                            <span class="n">compat</span><span class="o">.</span><span class="n">error_message</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                        <span class="p">)</span>
                     <span class="p">)</span>
                 <span class="c1"># all nonindexes that are not the same in each dataset</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subset</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">concat_over</span><span class="p">:</span>
-                        <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">equal</span> <span class="o">=</span> <span class="kc">None</span>
 
                         <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span>
                             <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span>
@@ -759,19 +819,19 @@
 
                         <span class="c1"># first check without comparing values i.e. no computes</span>
                         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-                            <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat</span><span class="p">)(</span>
+                            <span class="n">equal</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">compat_str</span><span class="p">)(</span>
                                 <span class="n">var</span><span class="p">,</span> <span class="n">equiv</span><span class="o">=</span><span class="n">lazy_array_equiv</span>
                             <span class="p">)</span>
-                            <span class="k">if</span> <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">equal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
                                 <span class="c1"># exit early if we know these are not equal or that</span>
                                 <span class="c1"># equality cannot be determined i.e. one or all of</span>
                                 <span class="c1"># the variables wraps a numpy array</span>
                                 <span class="k">break</span>
 
-                        <span class="k">if</span> <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">equal</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                             <span class="n">concat_over</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
-                        <span class="k">elif</span> <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">elif</span> <span class="n">equal</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="c1"># Compare the variable of all datasets vs. the one</span>
                             <span class="c1"># of the first dataset. Perform the minimum amount of</span>
                             <span class="c1"># loads in order to avoid multiple loads from disk</span>
@@ -782,7 +842,7 @@
                             <span class="k">for</span> <span class="n">ds_rhs</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
                                 <span class="n">v_rhs</span> <span class="o">=</span> <span class="n">ds_rhs</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
                                 <span class="n">computed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_rhs</span><span class="p">)</span>
-                                <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v_lhs</span><span class="p">,</span> <span class="n">compat</span><span class="p">)(</span><span class="n">v_rhs</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v_lhs</span><span class="p">,</span> <span class="n">compat_str</span><span class="p">)(</span><span class="n">v_rhs</span><span class="p">):</span>
                                     <span class="n">concat_over</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                                     <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                                     <span class="c1"># computed variables are not to be re-computed</span>
@@ -793,7 +853,10 @@
                                         <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span>
                                     <span class="k">break</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                                <span class="n">equal</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">equal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                        <span class="n">equals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal</span>
 
             <span class="k">elif</span> <span class="n">opt</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="n">concat_over</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
@@ -805,6 +868,19 @@
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unexpected value for </span><span class="si">{</span><span class="n">subset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">opt</span><span class="o">.</span><span class="n">_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="n">original</span> <span class="o">!=</span> <span class="n">concat_over</span>
+                <span class="ow">and</span> <span class="n">concat_over_existing_dim</span>
+            <span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">opt</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                        <span class="s2">&quot;This is likely to lead to different results when multiple datasets &quot;</span>
+                        <span class="s2">&quot;have matching variables with overlapping values.&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">valid_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subset</span><span class="p">))</span>
             <span class="n">invalid_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_vars</span><span class="p">]</span>
@@ -823,8 +899,13 @@
                     <span class="p">)</span>
             <span class="n">concat_over</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
 
+    <span class="n">warnings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">process_subset_opt</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="s2">&quot;data_vars&quot;</span><span class="p">)</span>
     <span class="n">process_subset_opt</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="s2">&quot;coords&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">:</span>
+        <span class="n">emit_user_level_warning</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="ne">FutureWarning</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">,</span> <span class="n">skip_merge</span>
 
 
@@ -832,6 +913,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_parse_datasets</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+    <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
     <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span>
     <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
@@ -860,20 +942,27 @@
                 <span class="n">dim_coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">variable</span>
         <span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">all_coord_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">variables_order</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">dims</span><span class="p">,</span>
+        <span class="n">dim_coords</span><span class="p">,</span>
+        <span class="n">dims_sizes</span><span class="p">,</span>
+        <span class="n">all_coord_names</span><span class="p">,</span>
+        <span class="n">data_vars</span><span class="p">,</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">variables_order</span><span class="p">),</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_concat</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span>
-    <span class="n">coords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
-    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
-    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Concatenate a sequence of datasets along a new or existing dimension</span>
@@ -905,10 +994,10 @@
         <span class="p">)</span>
     <span class="p">)</span>
 
-    <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">data_names</span><span class="p">,</span> <span class="n">vars_order</span> <span class="o">=</span> <span class="n">_parse_datasets</span><span class="p">(</span>
-        <span class="n">datasets</span>
+    <span class="n">all_dims</span><span class="p">,</span> <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">data_names</span><span class="p">,</span> <span class="n">vars_order</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">_parse_datasets</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="n">dim_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dim_coords</span><span class="p">)</span>
+    <span class="n">indexed_dim_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dim_coords</span><span class="p">)</span>
 
     <span class="n">both_data_and_coords</span> <span class="o">=</span> <span class="n">coord_names</span> <span class="o">&amp;</span> <span class="n">data_names</span>
     <span class="k">if</span> <span class="n">both_data_and_coords</span><span class="p">:</span>
@@ -922,15 +1011,19 @@
     <span class="c1"># case where concat dimension is a coordinate or data_var but not a dimension</span>
     <span class="k">if</span> <span class="p">(</span>
         <span class="n">dim_name</span> <span class="ow">in</span> <span class="n">coord_names</span> <span class="ow">or</span> <span class="n">dim_name</span> <span class="ow">in</span> <span class="n">data_names</span>
-    <span class="p">)</span> <span class="ow">and</span> <span class="n">dim_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="p">:</span>
+    <span class="p">)</span> <span class="ow">and</span> <span class="n">dim_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indexed_dim_names</span><span class="p">:</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">ds</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">dim_name</span><span class="p">,</span> <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span>
         <span class="p">]</span>
+        <span class="n">all_dims</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dim_name</span><span class="p">)</span>
+        <span class="c1"># This isn&#39;t being used any more, but keeping it up to date</span>
+        <span class="c1"># just in case we decide to use it later.</span>
+        <span class="n">indexed_dim_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dim_name</span><span class="p">)</span>
 
     <span class="c1"># determine which variables to concatenate</span>
     <span class="n">concat_over</span><span class="p">,</span> <span class="n">equals</span><span class="p">,</span> <span class="n">concat_dim_lengths</span><span class="p">,</span> <span class="n">skip_merge</span> <span class="o">=</span> <span class="n">_calc_concat_over</span><span class="p">(</span>
-        <span class="n">datasets</span><span class="p">,</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">dim_names</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span>
+        <span class="n">datasets</span><span class="p">,</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">all_dims</span><span class="p">,</span> <span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">compat</span>
     <span class="p">)</span>
 
     <span class="c1"># determine which variables to merge, and then merge them according to compat</span>
@@ -1105,14 +1198,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataarray_concat</span><span class="p">(</span>
     <span class="n">arrays</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_DataArray</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span><span class="p">,</span>
-    <span class="n">coords</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
-    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
-    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_DataArray</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
 
@@ -1123,7 +1216,12 @@
             <span class="s2">&quot;The elements in the input list need to be either all &#39;Dataset&#39;s or all &#39;DataArray&#39;s&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">data_vars</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+    <span class="c1"># Allow passing `all` or `None` even though we always use `data_vars=&#39;all&#39;`</span>
+    <span class="c1"># when passing off to `_dataset_concat`.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data_vars</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">,</span>
+    <span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;data_vars is not a valid argument when concatenating DataArray objects&quot;</span>
         <span class="p">)</span>
@@ -1141,11 +1239,11 @@
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">_dataset_concat</span><span class="p">(</span>
         <span class="n">datasets</span><span class="p">,</span>
-        <span class="n">dim</span><span class="p">,</span>
-        <span class="n">data_vars</span><span class="p">,</span>
-        <span class="n">coords</span><span class="p">,</span>
-        <span class="n">compat</span><span class="p">,</span>
-        <span class="n">positions</span><span class="p">,</span>
+        <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+        <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
         <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
         <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
@@ -1208,7 +1306,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     <br/>
   </p>
 </div>

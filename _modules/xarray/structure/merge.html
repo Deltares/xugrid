@@ -392,9 +392,20 @@
     <span class="n">filter_indexes_from_coords</span><span class="p">,</span>
     <span class="n">indexes_equal</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frozen</span><span class="p">,</span> <span class="n">compat_dict_union</span><span class="p">,</span> <span class="n">dict_equiv</span><span class="p">,</span> <span class="n">equivalent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Frozen</span><span class="p">,</span>
+    <span class="n">compat_dict_union</span><span class="p">,</span>
+    <span class="n">dict_equiv</span><span class="p">,</span>
+    <span class="n">emit_user_level_warning</span><span class="p">,</span>
+    <span class="n">equivalent</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_align</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.util.deprecation_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_COMPAT_DEFAULT</span><span class="p">,</span>
+    <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
+    <span class="n">CombineKwargDefault</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
@@ -466,9 +477,9 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">unique_variable</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span>
     <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Variable</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
     <span class="n">equals</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the unique variable from a list of variables or raise MergeError.</span>
 
 <span class="sd">    Parameters</span>
@@ -494,7 +505,7 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;override&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">equals</span><span class="p">,</span> <span class="n">out</span>
 
     <span class="n">combine_method</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -508,18 +519,25 @@
     <span class="k">if</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;no_conflicts&quot;</span><span class="p">:</span>
         <span class="n">combine_method</span> <span class="o">=</span> <span class="s2">&quot;fillna&quot;</span>
 
+    <span class="c1"># we return the lazy equals, so we can warn about behaviour changes</span>
+    <span class="n">lazy_equals</span> <span class="o">=</span> <span class="n">equals</span>
     <span class="k">if</span> <span class="n">equals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">compat_str</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">compat</span><span class="o">.</span><span class="n">_value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="k">else</span> <span class="n">compat</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">compat_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="c1"># first check without comparing values i.e. no computes</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">equals</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">compat</span><span class="p">)(</span><span class="n">var</span><span class="p">,</span> <span class="n">equiv</span><span class="o">=</span><span class="n">lazy_array_equiv</span><span class="p">)</span>
+            <span class="n">equals</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">compat_str</span><span class="p">)(</span><span class="n">var</span><span class="p">,</span> <span class="n">equiv</span><span class="o">=</span><span class="n">lazy_array_equiv</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">equals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">break</span>
 
+        <span class="n">lazy_equals</span> <span class="o">=</span> <span class="n">equals</span>
         <span class="k">if</span> <span class="n">equals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># now compare values with minimum number of computes</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-                <span class="n">equals</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">compat</span><span class="p">)(</span><span class="n">var</span><span class="p">)</span>
+                <span class="n">equals</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">compat_str</span><span class="p">)(</span><span class="n">var</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">equals</span><span class="p">:</span>
                     <span class="k">break</span>
 
@@ -533,11 +551,11 @@
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">combine_method</span><span class="p">)(</span><span class="n">var</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">out</span>
+    <span class="k">return</span> <span class="n">lazy_equals</span><span class="p">,</span> <span class="n">out</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_assert_compat_valid</span><span class="p">(</span><span class="n">compat</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">compat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_COMPAT</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span> <span class="ow">and</span> <span class="n">compat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_COMPAT</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;compat=</span><span class="si">{</span><span class="n">compat</span><span class="si">!r}</span><span class="s2"> invalid: must be </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">_VALID_COMPAT</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
@@ -579,7 +597,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">merge_collected</span><span class="p">(</span>
     <span class="n">grouped</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MergeElement</span><span class="p">]],</span>
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">equals</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
@@ -635,6 +653,7 @@
             <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">merged_indexes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">indexed_elements</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">elements_list</span>
@@ -665,20 +684,29 @@
                     <span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">attrs</span> <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">indexed_elements</span><span class="p">],</span>
                     <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">or</span> <span class="n">attrs</span><span class="p">:</span>
-                    <span class="c1"># Make a shallow copy to so that assigning merged_vars[name].attrs</span>
-                    <span class="c1"># does not affect the original input variable.</span>
-                    <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                    <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
+                <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
                 <span class="n">merged_indexes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">variable</span> <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">elements_list</span><span class="p">]</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">unique_variable</span><span class="p">(</span>
+                    <span class="n">equals_this_var</span><span class="p">,</span> <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">unique_variable</span><span class="p">(</span>
                         <span class="n">name</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">compat</span><span class="p">,</span> <span class="n">equals</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                     <span class="p">)</span>
+                    <span class="c1"># This is very likely to result in false positives, but there is no way</span>
+                    <span class="c1"># to tell if the output will change without computing.</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">compat</span><span class="p">,</span> <span class="n">CombineKwargDefault</span><span class="p">)</span>
+                        <span class="ow">and</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;no_conflicts&quot;</span>
+                        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                        <span class="ow">and</span> <span class="ow">not</span> <span class="n">equals_this_var</span>
+                    <span class="p">):</span>
+                        <span class="n">emit_user_level_warning</span><span class="p">(</span>
+                            <span class="n">compat</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                                <span class="s2">&quot;This is likely to lead to different results when &quot;</span>
+                                <span class="s2">&quot;combining overlapping variables with the same name.&quot;</span><span class="p">,</span>
+                            <span class="p">),</span>
+                            <span class="ne">FutureWarning</span><span class="p">,</span>
+                        <span class="p">)</span>
                 <span class="k">except</span> <span class="n">MergeError</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">compat</span> <span class="o">!=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
                         <span class="c1"># we need more than &quot;minimal&quot; compatibility (for which</span>
@@ -686,9 +714,14 @@
                         <span class="k">raise</span>
 
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">merged_vars</span><span class="p">:</span>
-                    <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">merge_attrs</span><span class="p">(</span>
+                    <span class="n">attrs</span> <span class="o">=</span> <span class="n">merge_attrs</span><span class="p">(</span>
                         <span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">attrs</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">],</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
                     <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">merged_vars</span> <span class="ow">and</span> <span class="p">(</span><span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">or</span> <span class="n">attrs</span><span class="p">):</span>
+                <span class="c1"># Ensure that assigning attrs does not affect the original input variable.</span>
+                <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">merged_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
 
     <span class="k">return</span> <span class="n">merged_vars</span><span class="p">,</span> <span class="n">merged_indexes</span>
 
@@ -883,7 +916,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_priority_vars_and_indexes</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DatasetLike</span><span class="p">],</span>
     <span class="n">priority_arg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="s2">&quot;equals&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the priority variable from a list of mappings.</span>
 
@@ -1015,8 +1048,8 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">merge_core</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CoercibleMapping</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
     <span class="n">priority_arg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">explicit_coords</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1075,7 +1108,11 @@
 
     <span class="n">coerced</span> <span class="o">=</span> <span class="n">coerce_pandas_values</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
     <span class="n">aligned</span> <span class="o">=</span> <span class="n">deep_align</span><span class="p">(</span>
-        <span class="n">coerced</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span>
+        <span class="n">coerced</span><span class="p">,</span>
+        <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
+        <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
+        <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">skip_align_objs</span><span class="p">:</span>
@@ -1084,7 +1121,10 @@
     <span class="n">collected</span> <span class="o">=</span> <span class="n">collect_variables_and_indexes</span><span class="p">(</span><span class="n">aligned</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
     <span class="n">prioritized</span> <span class="o">=</span> <span class="n">_get_priority_vars_and_indexes</span><span class="p">(</span><span class="n">aligned</span><span class="p">,</span> <span class="n">priority_arg</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">)</span>
     <span class="n">variables</span><span class="p">,</span> <span class="n">out_indexes</span> <span class="o">=</span> <span class="n">merge_collected</span><span class="p">(</span>
-        <span class="n">collected</span><span class="p">,</span> <span class="n">prioritized</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
+        <span class="n">collected</span><span class="p">,</span>
+        <span class="n">prioritized</span><span class="p">,</span>
+        <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+        <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">dims</span> <span class="o">=</span> <span class="n">calculate_dimensions</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
@@ -1117,8 +1157,8 @@
 <a class="viewcode-back" href="../../../api/xugrid.merge.html#xugrid.merge">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">CoercibleMapping</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">=</span> <span class="s2">&quot;no_conflicts&quot;</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">=</span> <span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_DEFAULT</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
@@ -1229,7 +1269,7 @@
 <span class="sd">      * time     (time) float64 16B 30.0 60.0</span>
 <span class="sd">      * lon      (lon) float64 16B 100.0 150.0</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z])</span>
+<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], join=&quot;outer&quot;)</span>
 <span class="sd">    &lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="sd">    Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="sd">    Coordinates:</span>
@@ -1241,7 +1281,7 @@
 <span class="sd">        var2     (lat, lon) float64 72B 5.0 nan 6.0 nan nan nan 7.0 nan 8.0</span>
 <span class="sd">        var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;identical&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;identical&quot;, join=&quot;outer&quot;)</span>
 <span class="sd">    &lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="sd">    Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="sd">    Coordinates:</span>
@@ -1253,7 +1293,7 @@
 <span class="sd">        var2     (lat, lon) float64 72B 5.0 nan 6.0 nan nan nan 7.0 nan 8.0</span>
 <span class="sd">        var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;equals&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;equals&quot;, join=&quot;outer&quot;)</span>
 <span class="sd">    &lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="sd">    Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="sd">    Coordinates:</span>
@@ -1265,7 +1305,7 @@
 <span class="sd">        var2     (lat, lon) float64 72B 5.0 nan 6.0 nan nan nan 7.0 nan 8.0</span>
 <span class="sd">        var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 
-<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;equals&quot;, fill_value=-999.0)</span>
+<span class="sd">    &gt;&gt;&gt; xr.merge([x, y, z], compat=&quot;equals&quot;, join=&quot;outer&quot;, fill_value=-999.0)</span>
 <span class="sd">    &lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="sd">    Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="sd">    Coordinates:</span>
@@ -1362,8 +1402,8 @@
 
     <span class="n">merge_result</span> <span class="o">=</span> <span class="n">merge_core</span><span class="p">(</span>
         <span class="n">dict_like_objects</span><span class="p">,</span>
-        <span class="n">compat</span><span class="p">,</span>
-        <span class="n">join</span><span class="p">,</span>
+        <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+        <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
         <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1375,8 +1415,8 @@
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">other</span><span class="p">:</span> <span class="n">CoercibleMapping</span><span class="p">,</span>
     <span class="n">overwrite_vars</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
-    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span><span class="p">,</span>
-    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_MergeResult</span><span class="p">:</span>
@@ -1409,8 +1449,8 @@
 
     <span class="k">return</span> <span class="n">merge_core</span><span class="p">(</span>
         <span class="n">objs</span><span class="p">,</span>
-        <span class="n">compat</span><span class="p">,</span>
-        <span class="n">join</span><span class="p">,</span>
+        <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+        <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
         <span class="n">priority_arg</span><span class="o">=</span><span class="n">priority_arg</span><span class="p">,</span>
         <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
@@ -1442,6 +1482,8 @@
 
     <span class="k">return</span> <span class="n">merge_core</span><span class="p">(</span>
         <span class="p">[</span><span class="n">dataset</span><span class="p">,</span> <span class="n">other</span><span class="p">],</span>
+        <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
+        <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span>
         <span class="n">priority_arg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">indexes</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">xindexes</span><span class="p">,</span>
         <span class="n">combine_attrs</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">,</span>
@@ -1463,6 +1505,7 @@
         <span class="p">[</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="p">],</span>
         <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;broadcast_equals&quot;</span><span class="p">,</span>
         <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+        <span class="n">combine_attrs</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">,</span>
         <span class="n">explicit_coords</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">coords</span><span class="p">),</span>
         <span class="n">indexes</span><span class="o">=</span><span class="n">coords</span><span class="o">.</span><span class="n">xindexes</span><span class="p">,</span>
         <span class="n">priority_arg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -1518,7 +1561,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     <br/>
   </p>
 </div>

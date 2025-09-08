@@ -697,7 +697,7 @@
 <h1>xugrid.merge<a class="headerlink" href="#xugrid-merge" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="xugrid.merge">
-<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects:</span> <span class="pre">Iterable[DataArray</span> <span class="pre">|</span> <span class="pre">CoercibleMapping],</span> <span class="pre">compat:</span> <span class="pre">CompatOptions</span> <span class="pre">=</span> <span class="pre">'no_conflicts',</span> <span class="pre">join:</span> <span class="pre">JoinOptions</span> <span class="pre">=</span> <span class="pre">'outer',</span> <span class="pre">fill_value:</span> <span class="pre">object</span> <span class="pre">=</span> <span class="pre">&lt;NA&gt;,</span> <span class="pre">combine_attrs:</span> <span class="pre">CombineAttrsOptions</span> <span class="pre">=</span> <span class="pre">'override'</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/xarray/structure/merge.html#merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.merge" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">xugrid.</span></span><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects:</span> <span class="pre">Iterable[DataArray</span> <span class="pre">|</span> <span class="pre">CoercibleMapping],</span> <span class="pre">compat:</span> <span class="pre">CompatOptions</span> <span class="pre">|</span> <span class="pre">CombineKwargDefault</span> <span class="pre">=</span> <span class="pre">no_conflicts,</span> <span class="pre">join:</span> <span class="pre">JoinOptions</span> <span class="pre">|</span> <span class="pre">CombineKwargDefault</span> <span class="pre">=</span> <span class="pre">outer,</span> <span class="pre">fill_value:</span> <span class="pre">object</span> <span class="pre">=</span> <span class="pre">&lt;NA&gt;,</span> <span class="pre">combine_attrs:</span> <span class="pre">CombineAttrsOptions</span> <span class="pre">=</span> <span class="pre">'override'</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/xarray/structure/merge.html#merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#xugrid.merge" title="Link to this definition">#</a></dt>
 <dd><p>Merge any number of xarray objects into a single Dataset as variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -807,7 +807,7 @@ as its only parameters.</p>
 <span class="go">  * lon      (lon) float64 16B 100.0 150.0</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="go">Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="go">Coordinates:</span>
@@ -820,7 +820,7 @@ as its only parameters.</p>
 <span class="go">    var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;identical&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;identical&quot;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="go">Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="go">Coordinates:</span>
@@ -833,7 +833,7 @@ as its only parameters.</p>
 <span class="go">    var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;equals&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;equals&quot;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)</span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="go">Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="go">Coordinates:</span>
@@ -846,7 +846,7 @@ as its only parameters.</p>
 <span class="go">    var3     (time, lon) float64 48B 0.0 nan 3.0 4.0 nan 9.0</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;equals&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mf">999.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;equals&quot;</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mf">999.0</span><span class="p">)</span>
 <span class="go">&lt;xarray.Dataset&gt; Size: 256B</span>
 <span class="go">Dimensions:  (lat: 3, lon: 3, time: 2)</span>
 <span class="go">Coordinates:</span>
@@ -1024,7 +1024,7 @@ as its only parameters.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
     <br/>
   </p>
 </div>
