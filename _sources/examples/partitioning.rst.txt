@@ -76,7 +76,7 @@ into several parts.
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7fe47ff9caa0>
+    <matplotlib.collections.PolyCollection object at 0x7f69381700b0>
 
 
 
@@ -145,7 +145,7 @@ We can easily plot this data to visualize the partitions:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7fe488b66a50>
+    <matplotlib.collections.PolyCollection object at 0x7f6938d6a570>
 
 
 
@@ -213,7 +213,7 @@ merge these partitions back into one whole for post-processing:
  .. code-block:: none
 
 
-    <matplotlib.collections.PolyCollection object at 0x7fe488ee72c0>
+    <matplotlib.collections.PolyCollection object at 0x7f693826b8f0>
 
 
 
@@ -275,7 +275,7 @@ data:
  .. code-block:: none
 
 
-    <matplotlib.collections.LineCollection object at 0x7fe47e0e4260>
+    <matplotlib.collections.LineCollection object at 0x7f692e757170>
 
 
 
@@ -316,9 +316,7 @@ Note that partioning and merging does not preserve order!
     </symbol>
     </defs>
     </svg>
-    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
-     *
-     */
+    <style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
     :root {
       --xr-font-color0: var(
@@ -397,6 +395,7 @@ Note that partioning and merging does not preserve order!
       display: block !important;
       min-width: 300px;
       max-width: 700px;
+      line-height: 1.6;
     }
 
     .xr-text-repr-fallback {
@@ -419,11 +418,18 @@ Note that partioning and merging does not preserve order!
     }
 
     .xr-obj-type,
-    .xr-array-name {
+    .xr-obj-name,
+    .xr-group-name {
       margin-left: 2px;
       margin-right: 10px;
     }
 
+    .xr-group-name::before {
+      content: "📁";
+      padding-right: 0.3em;
+    }
+
+    .xr-group-name,
     .xr-obj-type {
       color: var(--xr-font-color2);
     }
@@ -432,6 +438,8 @@ Note that partioning and merging does not preserve order!
       padding-left: 0 !important;
       display: grid;
       grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+      margin-block-start: 0;
+      margin-block-end: 0;
     }
 
     .xr-section-item {
@@ -442,6 +450,7 @@ Note that partioning and merging does not preserve order!
       display: inline-block;
       opacity: 0;
       height: 0;
+      margin: 0;
     }
 
     .xr-section-item input + label {
@@ -500,7 +509,6 @@ Note that partioning and merging does not preserve order!
     .xr-section-summary,
     .xr-section-inline-details {
       padding-top: 4px;
-      padding-bottom: 4px;
     }
 
     .xr-section-inline-details {
@@ -510,11 +518,38 @@ Note that partioning and merging does not preserve order!
     .xr-section-details {
       display: none;
       grid-column: 1 / -1;
+      margin-top: 4px;
       margin-bottom: 5px;
     }
 
     .xr-section-summary-in:checked ~ .xr-section-details {
       display: contents;
+    }
+
+    .xr-group-box {
+      display: inline-grid;
+      grid-template-columns: 0px 20px auto;
+      width: 100%;
+    }
+
+    .xr-group-box-vline {
+      grid-column-start: 1;
+      border-right: 0.2em solid;
+      border-color: var(--xr-border-color);
+      width: 0px;
+    }
+
+    .xr-group-box-hline {
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 1em;
+      width: 20px;
+      border-bottom: 0.2em solid;
+      border-color: var(--xr-border-color);
+    }
+
+    .xr-group-box-contents {
+      grid-column-start: 3;
     }
 
     .xr-array-wrap {
@@ -747,7 +782,7 @@ Note that partioning and merging does not preserve order!
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (mesh2d_nFaces: 5248)&gt; Size: 5kB
     array([False, False, False, ..., False, False, False], shape=(5248,))
     Coordinates:
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-dbb71cb4-4850-4f6a-ba38-6c78df520d8f' class='xr-array-in' type='checkbox' checked><label for='section-dbb71cb4-4850-4f6a-ba38-6c78df520d8f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>False False False False False False ... False False False False False</span></div><div class='xr-array-data'><pre>array([False, False, False, ..., False, False, False], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-880793c7-852b-43b0-8ec6-5e6517366234' class='xr-section-summary-in' type='checkbox'  checked><label for='section-880793c7-852b-43b0-8ec6-5e6517366234' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-b0b8efad-61c7-4d04-8452-65849da58dc3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b0b8efad-61c7-4d04-8452-65849da58dc3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2f52c0f6-dadd-4610-84ec-825b9ff1316c' class='xr-var-data-in' type='checkbox'><label for='data-2f52c0f6-dadd-4610-84ec-825b9ff1316c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-09c585ee-288c-40f2-8acc-1f201c31d5fd' class='xr-section-summary-in' type='checkbox'  ><label for='section-09c585ee-288c-40f2-8acc-1f201c31d5fd' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-d768763e-9bb6-4c29-8094-69d2d2735ccc' class='xr-index-data-in' type='checkbox'/><label for='index-d768763e-9bb6-4c29-8094-69d2d2735ccc' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-64571884-3c3b-4231-bcb4-f212e482f6b9' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-64571884-3c3b-4231-bcb4-f212e482f6b9' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-66a814cb-2ce7-443e-9ab8-23c6b3e2e951' class='xr-array-in' type='checkbox' checked><label for='section-66a814cb-2ce7-443e-9ab8-23c6b3e2e951' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>False False False False False False ... False False False False False</span></div><div class='xr-array-data'><pre>array([False, False, False, ..., False, False, False], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-92f43cd8-725d-452c-ab83-56dde6b09609' class='xr-section-summary-in' type='checkbox'  checked><label for='section-92f43cd8-725d-452c-ab83-56dde6b09609' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-01825b80-8886-447a-aee0-ade392f637a4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-01825b80-8886-447a-aee0-ade392f637a4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c6e5b93c-8ea1-42e2-8aa4-dbd0cfb2f615' class='xr-var-data-in' type='checkbox'><label for='data-c6e5b93c-8ea1-42e2-8aa4-dbd0cfb2f615' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -793,9 +828,7 @@ original topology. ``reindex_like`` looks at the coordinates of both
     </symbol>
     </defs>
     </svg>
-    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
-     *
-     */
+    <style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
     :root {
       --xr-font-color0: var(
@@ -874,6 +907,7 @@ original topology. ``reindex_like`` looks at the coordinates of both
       display: block !important;
       min-width: 300px;
       max-width: 700px;
+      line-height: 1.6;
     }
 
     .xr-text-repr-fallback {
@@ -896,11 +930,18 @@ original topology. ``reindex_like`` looks at the coordinates of both
     }
 
     .xr-obj-type,
-    .xr-array-name {
+    .xr-obj-name,
+    .xr-group-name {
       margin-left: 2px;
       margin-right: 10px;
     }
 
+    .xr-group-name::before {
+      content: "📁";
+      padding-right: 0.3em;
+    }
+
+    .xr-group-name,
     .xr-obj-type {
       color: var(--xr-font-color2);
     }
@@ -909,6 +950,8 @@ original topology. ``reindex_like`` looks at the coordinates of both
       padding-left: 0 !important;
       display: grid;
       grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+      margin-block-start: 0;
+      margin-block-end: 0;
     }
 
     .xr-section-item {
@@ -919,6 +962,7 @@ original topology. ``reindex_like`` looks at the coordinates of both
       display: inline-block;
       opacity: 0;
       height: 0;
+      margin: 0;
     }
 
     .xr-section-item input + label {
@@ -977,7 +1021,6 @@ original topology. ``reindex_like`` looks at the coordinates of both
     .xr-section-summary,
     .xr-section-inline-details {
       padding-top: 4px;
-      padding-bottom: 4px;
     }
 
     .xr-section-inline-details {
@@ -987,11 +1030,38 @@ original topology. ``reindex_like`` looks at the coordinates of both
     .xr-section-details {
       display: none;
       grid-column: 1 / -1;
+      margin-top: 4px;
       margin-bottom: 5px;
     }
 
     .xr-section-summary-in:checked ~ .xr-section-details {
       display: contents;
+    }
+
+    .xr-group-box {
+      display: inline-grid;
+      grid-template-columns: 0px 20px auto;
+      width: 100%;
+    }
+
+    .xr-group-box-vline {
+      grid-column-start: 1;
+      border-right: 0.2em solid;
+      border-color: var(--xr-border-color);
+      width: 0px;
+    }
+
+    .xr-group-box-hline {
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 1em;
+      width: 20px;
+      border-bottom: 0.2em solid;
+      border-color: var(--xr-border-color);
+    }
+
+    .xr-group-box-contents {
+      grid-column-start: 3;
     }
 
     .xr-array-wrap {
@@ -1224,11 +1294,11 @@ original topology. ``reindex_like`` looks at the coordinates of both
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (mesh2d_nFaces: 5248)&gt; Size: 5kB
     array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))
     Coordinates:
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247
         mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
-        mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e3cdab0a-bcbb-4a7f-8a1d-085026f4cd93' class='xr-array-in' type='checkbox' checked><label for='section-e3cdab0a-bcbb-4a7f-8a1d-085026f4cd93' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-a74bdbb1-469f-4653-9149-c5bb5f925f96' class='xr-section-summary-in' type='checkbox'  checked><label for='section-a74bdbb1-469f-4653-9149-c5bb5f925f96' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-eb9d51cf-9e6a-482b-ac2e-a270837e1834' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-eb9d51cf-9e6a-482b-ac2e-a270837e1834' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-56bfb4b1-24cb-4cc5-a587-abb1009662c6' class='xr-var-data-in' type='checkbox'><label for='data-56bfb4b1-24cb-4cc5-a587-abb1009662c6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-            33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-a66bb987-141f-4673-b22d-b01b2d666162' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-a66bb987-141f-4673-b22d-b01b2d666162' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ab7a39a-229c-492b-8d45-cfcc6e22a888' class='xr-var-data-in' type='checkbox'><label for='data-9ab7a39a-229c-492b-8d45-cfcc6e22a888' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-           397494.51640391, 400187.85011645, 396399.29036318], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-a2728e7e-9ed5-4dcc-bfba-dd0e362639fb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a2728e7e-9ed5-4dcc-bfba-dd0e362639fb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9b59ea4f-3eec-4247-a25c-6e93466f7a65' class='xr-var-data-in' type='checkbox'><label for='data-9b59ea4f-3eec-4247-a25c-6e93466f7a65' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-3b541c0f-d83b-45d2-b7fd-b375d44ed9d3' class='xr-section-summary-in' type='checkbox'  ><label for='section-3b541c0f-d83b-45d2-b7fd-b375d44ed9d3' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-43c93e46-04d8-479b-a506-0428c6c9f70f' class='xr-index-data-in' type='checkbox'/><label for='index-43c93e46-04d8-479b-a506-0428c6c9f70f' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-28766023-cb1e-4b92-abcb-f0693a9aa70c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-28766023-cb1e-4b92-abcb-f0693a9aa70c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+        mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-b0e1f1c2-edb5-45c2-819a-250d78b269c9' class='xr-array-in' type='checkbox' checked><label for='section-b0e1f1c2-edb5-45c2-819a-250d78b269c9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-19123fae-343b-4ff5-b520-5982fbdeb9a0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-19123fae-343b-4ff5-b520-5982fbdeb9a0' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-89986ac7-33b7-48e8-a407-6202344b42ec' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-89986ac7-33b7-48e8-a407-6202344b42ec' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3e7e1035-c03c-4eaf-9217-91e850991bd6' class='xr-var-data-in' type='checkbox'><label for='data-3e7e1035-c03c-4eaf-9217-91e850991bd6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-7bb64af6-a51e-4441-8c2c-e55ec0485070' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-7bb64af6-a51e-4441-8c2c-e55ec0485070' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a36c9b6c-232e-4c6f-9813-e8cb1ff592c3' class='xr-var-data-in' type='checkbox'><label for='data-a36c9b6c-232e-4c6f-9813-e8cb1ff592c3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+            33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-be8f1d67-0b69-49ae-8d06-9ec27d43bdd9' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-be8f1d67-0b69-49ae-8d06-9ec27d43bdd9' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-690e9e5e-fafd-40ac-83d2-50b3af267c59' class='xr-var-data-in' type='checkbox'><label for='data-690e9e5e-fafd-40ac-83d2-50b3af267c59' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+           397494.51640391, 400187.85011645, 396399.29036318], shape=(5248,))</pre></div></li></ul></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -1277,9 +1347,7 @@ reorder the data after merging.
     </symbol>
     </defs>
     </svg>
-    <style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
-     *
-     */
+    <style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
     :root {
       --xr-font-color0: var(
@@ -1358,6 +1426,7 @@ reorder the data after merging.
       display: block !important;
       min-width: 300px;
       max-width: 700px;
+      line-height: 1.6;
     }
 
     .xr-text-repr-fallback {
@@ -1380,11 +1449,18 @@ reorder the data after merging.
     }
 
     .xr-obj-type,
-    .xr-array-name {
+    .xr-obj-name,
+    .xr-group-name {
       margin-left: 2px;
       margin-right: 10px;
     }
 
+    .xr-group-name::before {
+      content: "📁";
+      padding-right: 0.3em;
+    }
+
+    .xr-group-name,
     .xr-obj-type {
       color: var(--xr-font-color2);
     }
@@ -1393,6 +1469,8 @@ reorder the data after merging.
       padding-left: 0 !important;
       display: grid;
       grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+      margin-block-start: 0;
+      margin-block-end: 0;
     }
 
     .xr-section-item {
@@ -1403,6 +1481,7 @@ reorder the data after merging.
       display: inline-block;
       opacity: 0;
       height: 0;
+      margin: 0;
     }
 
     .xr-section-item input + label {
@@ -1461,7 +1540,6 @@ reorder the data after merging.
     .xr-section-summary,
     .xr-section-inline-details {
       padding-top: 4px;
-      padding-bottom: 4px;
     }
 
     .xr-section-inline-details {
@@ -1471,11 +1549,38 @@ reorder the data after merging.
     .xr-section-details {
       display: none;
       grid-column: 1 / -1;
+      margin-top: 4px;
       margin-bottom: 5px;
     }
 
     .xr-section-summary-in:checked ~ .xr-section-details {
       display: contents;
+    }
+
+    .xr-group-box {
+      display: inline-grid;
+      grid-template-columns: 0px 20px auto;
+      width: 100%;
+    }
+
+    .xr-group-box-vline {
+      grid-column-start: 1;
+      border-right: 0.2em solid;
+      border-color: var(--xr-border-color);
+      width: 0px;
+    }
+
+    .xr-group-box-hline {
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 1em;
+      width: 20px;
+      border-bottom: 0.2em solid;
+      border-color: var(--xr-border-color);
+    }
+
+    .xr-group-box-contents {
+      grid-column-start: 3;
     }
 
     .xr-array-wrap {
@@ -1708,11 +1813,11 @@ reorder the data after merging.
     </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;elevation&#x27; (mesh2d_nFaces: 5248)&gt; Size: 5kB
     array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))
     Coordinates:
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247
         mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
-        mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 42kB 0 1 2 3 4 ... 5244 5245 5246 5247</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'elevation'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-20f86922-c466-4568-97eb-0cc4f9cea2cc' class='xr-array-in' type='checkbox' checked><label for='section-20f86922-c466-4568-97eb-0cc4f9cea2cc' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-0a0cc736-0384-46f0-ab5a-e60cf575a205' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0a0cc736-0384-46f0-ab5a-e60cf575a205' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-6d547ca6-690b-40e2-9c89-cb03456dd25c' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-6d547ca6-690b-40e2-9c89-cb03456dd25c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5695d9c3-80bd-4736-9060-969ed74344cc' class='xr-var-data-in' type='checkbox'><label for='data-5695d9c3-80bd-4736-9060-969ed74344cc' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-            33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-8024ffd8-d451-4182-b08f-e9f378960672' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-8024ffd8-d451-4182-b08f-e9f378960672' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-9ff66060-4bdc-4def-bec3-396e0e64de43' class='xr-var-data-in' type='checkbox'><label for='data-9ff66060-4bdc-4def-bec3-396e0e64de43' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
-           397494.51640391, 400187.85011645, 396399.29036318], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-7abde48d-666a-4605-aadc-8242e02e14ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7abde48d-666a-4605-aadc-8242e02e14ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a6600785-a588-403d-8391-234455b2a72b' class='xr-var-data-in' type='checkbox'><label for='data-a6600785-a588-403d-8391-234455b2a72b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-aeea617e-0182-43bc-9309-010ef84bf77b' class='xr-section-summary-in' type='checkbox'  ><label for='section-aeea617e-0182-43bc-9309-010ef84bf77b' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><input type='checkbox' disabled/><label></label><input id='index-e4f658f1-cbbb-4e05-90c7-d7b0acc82bf8' class='xr-index-data-in' type='checkbox'/><label for='index-e4f658f1-cbbb-4e05-90c7-d7b0acc82bf8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=5248, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-489ef012-3144-4ef7-881e-0350c8d16ab6' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-489ef012-3144-4ef7-881e-0350c8d16ab6' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+        mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-18d0b162-afb9-48dd-a916-593b8560bb97' class='xr-array-in' type='checkbox' checked><label for='section-18d0b162-afb9-48dd-a916-593b8560bb97' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>True True True True True True True ... True True True True True True</span></div><div class='xr-array-data'><pre>array([ True,  True,  True, ...,  True,  True,  True], shape=(5248,))</pre></div></div></li><li class='xr-section-item'><input id='section-33bb9c68-2813-4b51-902e-551dc48dc945' class='xr-section-summary-in' type='checkbox'  checked><label for='section-33bb9c68-2813-4b51-902e-551dc48dc945' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-416f65db-8ddc-4ccf-ab28-fcba074737a3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-416f65db-8ddc-4ccf-ab28-fcba074737a3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-efe0f1fe-3d8e-463c-8b71-d75aa0ec1a53' class='xr-var-data-in' type='checkbox'><label for='data-efe0f1fe-3d8e-463c-8b71-d75aa0ec1a53' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-e8b859c4-a357-4112-bbe9-886efc92be5f' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-e8b859c4-a357-4112-bbe9-886efc92be5f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-089eb832-1d56-4641-ac65-6d550277da38' class='xr-var-data-in' type='checkbox'><label for='data-089eb832-1d56-4641-ac65-6d550277da38' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+            33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-befdea8b-6cd5-41c2-a7e2-9030558f34a1' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-befdea8b-6cd5-41c2-a7e2-9030558f34a1' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a9c4beb9-ecfc-4277-9319-68d8e2dc3901' class='xr-var-data-in' type='checkbox'><label for='data-a9c4beb9-ecfc-4277-9319-68d8e2dc3901' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+           397494.51640391, 400187.85011645, 396399.29036318], shape=(5248,))</pre></div></li></ul></div></li></ul></div></div>
     </div>
     <br />
     <br />
@@ -1729,7 +1834,7 @@ partitions.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.839 seconds)
+   **Total running time of the script:** (0 minutes 3.533 seconds)
 
 
 .. _sphx_glr_download_examples_partitioning.py:

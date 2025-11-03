@@ -984,6 +984,25 @@
     <span class="k">return</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_indexes</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">equivalent_attrs</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if two attribute values are equivalent.</span>
+
+<span class="sd">    Returns False if the comparison raises ValueError or TypeError.</span>
+<span class="sd">    This handles cases like numpy arrays with ambiguous truth values</span>
+<span class="sd">    and xarray Datasets which can&#39;t be directly converted to numpy arrays.</span>
+
+<span class="sd">    Since equivalent() now handles non-boolean returns by returning False,</span>
+<span class="sd">    this wrapper mainly catches exceptions from comparisons that can&#39;t be</span>
+<span class="sd">    evaluated at all.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">equivalent</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="c1"># These exceptions indicate the comparison is truly ambiguous</span>
+        <span class="c1"># (e.g., nested numpy arrays that would raise &quot;ambiguous truth value&quot;)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">merge_attrs</span><span class="p">(</span><span class="n">variable_attrs</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine attributes from different variables according to combine_attrs&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">variable_attrs</span><span class="p">:</span>
@@ -1010,20 +1029,18 @@
     <span class="k">elif</span> <span class="n">combine_attrs</span> <span class="o">==</span> <span class="s2">&quot;drop_conflicts&quot;</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">dropped_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
         <span class="k">for</span> <span class="n">attrs</span> <span class="ow">in</span> <span class="n">variable_attrs</span><span class="p">:</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
-                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dropped_keys</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">key</span><span class="p">:</span> <span class="n">value</span>
-                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="ow">or</span> <span class="n">equivalent</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
-            <span class="p">}</span>
-            <span class="n">dropped_keys</span> <span class="o">|=</span> <span class="p">{</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dropped_keys</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">equivalent_attrs</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">):</span>
+                    <span class="k">del</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">dropped_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">elif</span> <span class="n">combine_attrs</span> <span class="o">==</span> <span class="s2">&quot;identical&quot;</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">variable_attrs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
