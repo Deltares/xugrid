@@ -670,7 +670,8 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._face_face_connectivity is None:
             self._face_face_connectivity = connectivity.face_face_connectivity(
-                self.edge_face_connectivity
+                self.edge_face_connectivity,
+                self.n_face,
             )
         return self._face_face_connectivity
 
