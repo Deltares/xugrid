@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Network gridder example &#8212; Xugrid 0.14.2 documentation</title>
+    <title>Gridding Ugrid1d Network Data to 2D Grids &#8212; Xugrid 0.14.2 documentation</title>
   
   
   
@@ -49,6 +49,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/network_gridder';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sample Data" href="../sample_data/index.html" />
+    <link rel="prev" title="Processing Elevation Data Along Ugrid1d Networks" href="hydamo_network.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.14.2" />
@@ -135,7 +137,7 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../user_guide.html">
     User Guide
   </a>
@@ -254,7 +256,7 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../user_guide.html">
     User Guide
   </a>
@@ -327,7 +329,29 @@
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_overview.html">Quick overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plot unstructured mesh data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Select unstructured data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regridder_overview.html">Regridding overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overlap_regridder.html">OverlapRegridder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vector_conversion.html">Vector geometry conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connectivity.html">Connectivity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="partitioning.html">Partitioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hydamo_network.html">Processing Elevation Data Along Ugrid1d Networks</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Gridding Ugrid1d Network Data to 2D Grids</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../sample_data/index.html">Sample Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/provinces_nl.html">Provinces NL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/xoxo.html">Xoxo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/elevation_nl.html">Elevation NL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/adh_san_diego.html">ADH San Diego</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/disk.html">Disk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sample_data/network.html">HyDAMO Network</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
 </nav></div>
     </div>
   
@@ -366,7 +390,10 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Network gridder example</span></li>
+    
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Gridding Ugrid1d Network Data to 2D Grids</span></li>
   </ul>
 </nav>
 </div>
@@ -388,10 +415,20 @@
 <p><a class="reference internal" href="#sphx-glr-download-examples-network-gridder-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="network-gridder-example">
-<span id="sphx-glr-examples-network-gridder-py"></span><h1>Network gridder example<a class="headerlink" href="#network-gridder-example" title="Link to this heading">#</a></h1>
+<section class="sphx-glr-example-title" id="gridding-ugrid1d-network-data-to-2d-grids">
+<span id="sphx-glr-examples-network-gridder-py"></span><h1>Gridding Ugrid1d Network Data to 2D Grids<a class="headerlink" href="#gridding-ugrid1d-network-data-to-2d-grids" title="Link to this heading">#</a></h1>
 <p>In this example, we demonstrate how to interpolate and grid data from a network
-of line elements (UGRID1D) to a 2D structured grid.</p>
+of line elements (UGRID1D) to a 2D structured grid. We’ll cover the following
+xugrid techniques:</p>
+<ul class="simple">
+<li><p>Creating Ugrid1d networks from node and edge arrays</p></li>
+<li><p>Finding intersections between 1D and 2D grid edges</p></li>
+<li><p>Refining networks by inserting intersection points</p></li>
+<li><p>Topology-aware Laplace interpolation along networks</p></li>
+<li><p>Converting node data to edge data</p></li>
+<li><p>Regridding from 1D networks to 2D grids using NetworkGridder</p></li>
+<li><p>Visualization of mixed 1D and 2D grids</p></li>
+</ul>
 <p>We’ll start by setting up the structured grid first and converting it to a
 Ugrid2d grid.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -912,11 +949,11 @@ array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)
 Coordinates:
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-dfe1e5ee-f97d-4aba-bf7a-b7270c625373' class='xr-array-in' type='checkbox' checked><label for='section-dfe1e5ee-f97d-4aba-bf7a-b7270c625373' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-9583d75f-557a-40d4-b900-c26d3bc68a5b' class='xr-array-in' type='checkbox' checked><label for='section-9583d75f-557a-40d4-b900-c26d3bc68a5b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-852c31f7-50b0-4b7d-a13f-c16c5ca47d23' class='xr-section-summary-in' type='checkbox'  checked><label for='section-852c31f7-50b0-4b7d-a13f-c16c5ca47d23' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-22b17b5a-ee66-4f2d-93f5-bfa2f19a03f4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-22b17b5a-ee66-4f2d-93f5-bfa2f19a03f4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-afdb7949-1ffe-43a2-a86c-cf139a56719b' class='xr-var-data-in' type='checkbox'><label for='data-afdb7949-1ffe-43a2-a86c-cf139a56719b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[100 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-7b56c016-6548-4b89-85e0-899b39e91537' class='xr-section-summary-in' type='checkbox'  checked><label for='section-7b56c016-6548-4b89-85e0-899b39e91537' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-704e3c87-29f2-4f0d-a5cf-09cda9b42481' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-704e3c87-29f2-4f0d-a5cf-09cda9b42481' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f3bd4fc3-5560-432b-aa78-6ad77912867e' class='xr-var-data-in' type='checkbox'><label for='data-f3bd4fc3-5560-432b-aa78-6ad77912867e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[100 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Next, we create a 1D network. This network consists of 5 nodes and 4 edges. At
@@ -1430,7 +1467,7 @@ dl.xr-attrs {
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (network1d_nNodes: 5)&gt; Size: 40B
 array([ 1. ,  1.5,  2. ,  4. , -4. ])
 Coordinates:
-  * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-c075329e-8311-4133-8254-dbfef92a2b92' class='xr-array-in' type='checkbox' checked><label for='section-c075329e-8311-4133-8254-dbfef92a2b92' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-042600bb-be1c-44b7-bf6e-3c5b0437e3b6' class='xr-section-summary-in' type='checkbox'  checked><label for='section-042600bb-be1c-44b7-bf6e-3c5b0437e3b6' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-cd322a78-693f-4483-99ee-d8076346b5c3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cd322a78-693f-4483-99ee-d8076346b5c3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b19b9a5b-74ce-4d54-88e5-ac77eea80192' class='xr-var-data-in' type='checkbox'><label for='data-b19b9a5b-74ce-4d54-88e5-ac77eea80192' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+  * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-39ed506f-e612-4d53-8639-8f530d7adaf5' class='xr-array-in' type='checkbox' checked><label for='section-39ed506f-e612-4d53-8639-8f530d7adaf5' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-0748d16f-7003-4233-9058-b9c63b631258' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0748d16f-7003-4233-9058-b9c63b631258' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-10081cda-58b4-4c41-b35b-18f35f318df3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-10081cda-58b4-4c41-b35b-18f35f318df3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-66715f4a-e770-48f1-b5b3-3d70c9770e35' class='xr-var-data-in' type='checkbox'><label for='data-66715f4a-e770-48f1-b5b3-3d70c9770e35' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Let’s plot the 1D network on top of the 2D grid. The 1D network is shown in
@@ -1441,7 +1478,7 @@ values.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_001.png" srcset="../_images/sphx_glr_network_gridder_001.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fe8aea4d7f0&gt;
+<img src="../_images/sphx_glr_network_gridder_001.png" srcset="../_images/sphx_glr_network_gridder_001.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4bf2e60b30&gt;
 </pre></div>
 </div>
 <section id="intersect-edges">
@@ -1466,7 +1503,7 @@ network and the 2D grid. We can do this by using the
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">intersections_xy</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_002.png" srcset="../_images/sphx_glr_network_gridder_002.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fe8aeba1670&gt;
+<img src="../_images/sphx_glr_network_gridder_002.png" srcset="../_images/sphx_glr_network_gridder_002.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f4bf2e099d0&gt;
 </pre></div>
 </div>
 <p>Let’s take a look at the individual values. We can see that the intersection
@@ -2048,8 +2085,8 @@ dl.xr-attrs {
 array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
         nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])
 Coordinates:
-  * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-9b69ce56-c307-40c1-8e27-b266131b0bf4' class='xr-array-in' type='checkbox' checked><label for='section-9b69ce56-c307-40c1-8e27-b266131b0bf4' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
-        nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-2b8ab9aa-73e3-4ba8-b959-22987ad769c0' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2b8ab9aa-73e3-4ba8-b959-22987ad769c0' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-b44e0b78-5b4c-477e-8ebc-630c8a8ab052' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b44e0b78-5b4c-477e-8ebc-630c8a8ab052' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-306b6a6f-4f20-4fd8-ac02-57f59da0ef14' class='xr-var-data-in' type='checkbox'><label for='data-306b6a6f-4f20-4fd8-ac02-57f59da0ef14' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[20 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+  * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-801df938-0678-4be5-a865-c769f2aae0e5' class='xr-array-in' type='checkbox' checked><label for='section-801df938-0678-4be5-a865-c769f2aae0e5' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
+        nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-ba240690-102d-43ab-9450-64801b24ba1e' class='xr-section-summary-in' type='checkbox'  checked><label for='section-ba240690-102d-43ab-9450-64801b24ba1e' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-fd445287-4670-4e9a-afea-ad24357f3a2f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fd445287-4670-4e9a-afea-ad24357f3a2f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-134f5c35-c321-4f7c-95b8-68728c051d1c' class='xr-var-data-in' type='checkbox'><label for='data-134f5c35-c321-4f7c-95b8-68728c051d1c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[20 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /></section>
@@ -2066,7 +2103,7 @@ that the two branches on the right-hand side are interpolated separately.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_003.png" srcset="../_images/sphx_glr_network_gridder_003.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fe8b1b8ef30&gt;
+<img src="../_images/sphx_glr_network_gridder_003.png" srcset="../_images/sphx_glr_network_gridder_003.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4bf818bf80&gt;
 </pre></div>
 </div>
 <p>The final step before we can grid the network is setting the data to edge
@@ -2083,7 +2120,7 @@ the edges. This is done by using the edge_node_connectivity of the network.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_004.png" srcset="../_images/sphx_glr_network_gridder_004.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fe8b1b8c080&gt;
+<img src="../_images/sphx_glr_network_gridder_004.png" srcset="../_images/sphx_glr_network_gridder_004.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4bf79bd250&gt;
 </pre></div>
 </div>
 </section>
@@ -2104,7 +2141,7 @@ gridding and the data to grid.</p>
 <span class="n">gridder</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xugrid.regrid.gridder.NetworkGridder object at 0x7fe8b3039820&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xugrid.regrid.gridder.NetworkGridder object at 0x7f4c013938f0&gt;
 </pre></div>
 </div>
 <p>Next, we can grid the data. Call the
@@ -2117,10 +2154,10 @@ gridding and the data to grid.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_005.png" srcset="../_images/sphx_glr_network_gridder_005.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fe8bbf22f30&gt;
+<img src="../_images/sphx_glr_network_gridder_005.png" srcset="../_images/sphx_glr_network_gridder_005.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f4c00371d60&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.355 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.341 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-network-gridder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7b2d082df2d28713d544af1dfa35845f/network_gridder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">network_gridder.ipynb</span></code></a></p>
@@ -2146,6 +2183,24 @@ gridding and the data to grid.</p>
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="hydamo_network.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Processing Elevation Data Along Ugrid1d Networks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../sample_data/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Sample Data</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
