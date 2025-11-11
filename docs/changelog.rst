@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[0.14.3] 2025-11-11
+-------------------
+
+Fixed
+~~~~~
+
+- Ensure that :attr:`xugrid.Ugrid2d.face_face_connectivity` returns
+  a sparse matrix that is shaped ``(n_face, n_face)``. Previously,
+  the sparse matrix constructor inferred dimensions from the maximum 
+  row/column indices, causing empty trailing rows or columns to be 
+  omitted. This resulted in dimension mismatches in operations like
+  ``.ugrid.to_dataset(optional_attributes=True)`
+
 [0.14.2] 2025-07-15
 -------------------
 
@@ -14,7 +27,7 @@ Fixed
 
 - Edge case in :func:`xugrid.snap_to_grid` wich caused the snapping to fail when
   the line intersected an edge exactly at the intersection point between the
-  line connecting two face centroids and the edge itsself.
+  line connecting two face centroids and the edge itself.
 
 [0.14.1] 2025-05-08
 -------------------
