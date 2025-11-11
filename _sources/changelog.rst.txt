@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [0.14.3] 2025-11-11
 -------------------
 
+Added
+~~~~~
+
+- Added :meth:`xugrid.data.hydamo_network` to download sample data
+  of a small surface water network.
+
 Fixed
 ~~~~~
 
@@ -18,6 +24,7 @@ Fixed
   row/column indices, causing empty trailing rows or columns to be 
   omitted. This resulted in dimension mismatches in operations like
   ``.ugrid.to_dataset(optional_attributes=True)`
+
 
 [0.14.2] 2025-07-15
 -------------------
