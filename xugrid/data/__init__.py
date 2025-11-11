@@ -1,4 +1,10 @@
-from xugrid.data.sample_data import adh_san_diego, elevation_nl, provinces_nl, xoxo
+from xugrid.data.sample_data import (
+    adh_san_diego,
+    elevation_nl,
+    hydamo_network,
+    provinces_nl,
+    xoxo,
+)
 from xugrid.data.synthetic import disk, generate_disk
 
 __all__ = (
@@ -8,4 +14,5 @@ __all__ = (
     "xoxo",
     "disk",
     "generate_disk",
+    "hydamo_network",
 )

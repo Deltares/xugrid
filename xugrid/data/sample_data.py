@@ -66,3 +66,26 @@ def provinces_nl():
     fname = REGISTRY.fetch("provinces-nl.geojson")
     gdf = gpd.read_file(fname)
     return gdf
+
+
+def hydamo_network():
+    """Fetch some surface water data for the Netherlands."""
+    import geopandas as gpd
+    import pandas as pd
+
+    def read_wkt_csv(path):
+        df = pd.read_csv(path)
+        return gpd.GeoDataFrame(
+            data=df,
+            geometry=gpd.GeoSeries.from_wkt(df["geometry"]),
+        )
+
+    objects_fname = REGISTRY.fetch("hydamo_objects.csv")
+    points_fname = REGISTRY.fetch("hydamo_points.csv")
+    profiles_fname = REGISTRY.fetch("hydamo_profiles.csv")
+
+    return (
+        read_wkt_csv(objects_fname),
+        read_wkt_csv(points_fname),
+        read_wkt_csv(profiles_fname),
+    )
