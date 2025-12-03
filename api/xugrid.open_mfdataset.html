@@ -717,10 +717,10 @@ nested list-of-lists (see <code class="docutils literal notranslate"><span class
 be expanded to a 1-dimensional list.)</p></li>
 <li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Dictionary with keys given by dimension names and values given by chunk sizes.
 In general, these should divide the dimensions of each dataset. If int, chunk
-each dimension by <code class="docutils literal notranslate"><span class="pre">chunks</span></code>. By default, chunks will be chosen to load entire
-input files into memory at once. This has a major impact on performance: please
-see the full documentation for more details <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. This argument is evaluated
-on a per-file basis, so chunk sizes that span multiple files will be ignored.</p></li>
+each dimension by <code class="docutils literal notranslate"><span class="pre">chunks</span></code>. By default, chunks will be chosen to match the
+chunks on disk. This may impact performance: please see the full documentation
+for more details <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. This argument is evaluated on a per-file basis, so chunk
+sizes that span multiple files will be ignored.</p></li>
 <li><p><strong>concat_dim</strong> (<em>str</em><em>, </em><em>DataArray</em><em>, </em><em>Index</em><em> or </em><em>a Sequence</em><em> of </em><em>these</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Dimensions to concatenate files along.  You only need to provide this argument
 if <code class="docutils literal notranslate"><span class="pre">combine='nested'</span></code>, and if any of the dimensions along which you want to
 concatenate is not a dimension in the original datasets, e.g., if you want to

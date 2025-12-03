@@ -380,7 +380,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Set</span> <span class="k">as</span> <span class="n">AbstractSet</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">overload</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
@@ -411,6 +411,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">CombineAttrsOptions</span><span class="p">,</span>
         <span class="n">CompatOptions</span><span class="p">,</span>
@@ -1170,20 +1171,91 @@
     <span class="k">return</span> <span class="n">_MergeResult</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">out_indexes</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="merge">
-<a class="viewcode-back" href="../../../api/xugrid.merge.html#xugrid.merge">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
-    <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">CoercibleMapping</span><span class="p">],</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_trees</span><span class="p">(</span>
+    <span class="n">trees</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DataTree</span><span class="p">],</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_DEFAULT</span><span class="p">,</span>
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
     <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTree</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge specialized to DataTree objects.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_path_context_to_errors</span>
+
+    <span class="k">if</span> <span class="n">fill_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">:</span>
+        <span class="c1"># fill_value support dicts, which probably should be mapped to sub-groups?</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;fill_value is not yet supported for DataTree objects in merge&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">node_lists</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataTree</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">subtree_with_keys</span><span class="p">:</span>
+            <span class="n">node_lists</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="n">root_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">dataset</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">node_lists</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)]</span>
+    <span class="k">with</span> <span class="n">add_path_context_to_errors</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+        <span class="n">root_ds</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span>
+            <span class="n">root_datasets</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
+        <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">DataTree</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">root_ds</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">level</span><span class="p">(</span><span class="n">kv</span><span class="p">):</span>
+        <span class="c1"># all trees with the same path have the same level</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">trees</span> <span class="o">=</span> <span class="n">kv</span>
+        <span class="k">return</span> <span class="n">trees</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">level</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">nodes</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">node_lists</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">level</span><span class="p">):</span>
+        <span class="c1"># Merge datasets, including inherited indexes to ensure alignment.</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">dataset</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">add_path_context_to_errors</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">merge_result</span> <span class="o">=</span> <span class="n">merge_core</span><span class="p">(</span>
+                <span class="n">datasets</span><span class="p">,</span>
+                <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+                <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
+                <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">merged_ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">_construct_direct</span><span class="p">(</span><span class="o">**</span><span class="n">merge_result</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataTree</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">merged_ds</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
+    <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataTree</span><span class="p">],</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTree</span><span class="p">:</span> <span class="o">...</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
+    <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataArray</span> <span class="o">|</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">Coordinates</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">],</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span> <span class="o">...</span>
+
+
+<div class="viewcode-block" id="merge">
+<a class="viewcode-back" href="../../../api/xugrid.merge.html#xugrid.merge">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span>
+    <span class="n">objects</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataTree</span> <span class="o">|</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">Coordinates</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">],</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_DEFAULT</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTree</span> <span class="o">|</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge any number of xarray objects into a single Dataset as variables.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    objects : iterable of Dataset or iterable of DataArray or iterable of dict-like</span>
+<span class="sd">    objects : iterable of DataArray, Dataset, DataTree or dict</span>
 <span class="sd">        Merge together all variables from these objects. If any of them are</span>
 <span class="sd">        DataArray objects, they must have a name.</span>
 <span class="sd">    compat : {&quot;identical&quot;, &quot;equals&quot;, &quot;broadcast_equals&quot;, &quot;no_conflicts&quot;, \</span>
@@ -1238,8 +1310,9 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Dataset</span>
-<span class="sd">        Dataset with combined variables from each object.</span>
+<span class="sd">    Dataset or DataTree</span>
+<span class="sd">        Objects with combined variables from the inputs. If any inputs are a</span>
+<span class="sd">        DataTree, this will also be a DataTree. Otherwise it will be a Dataset.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1402,13 +1475,31 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.coordinates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinates</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DataTree</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DataTree</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;merge does not support mixed type arguments when one argument &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;is a DataTree: </span><span class="si">{</span><span class="n">objects</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">trees</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">DataTree</span><span class="p">],</span> <span class="n">objects</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">merge_trees</span><span class="p">(</span>
+            <span class="n">trees</span><span class="p">,</span>
+            <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+            <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
+            <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="n">dict_like_objects</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DataArray</span> <span class="o">|</span> <span class="n">Dataset</span> <span class="o">|</span> <span class="n">Coordinates</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;objects must be an iterable containing only &quot;</span>
-                <span class="s2">&quot;Dataset(s), DataArray(s), and dictionaries.&quot;</span>
+                <span class="s2">&quot;objects must be an iterable containing only DataTree(s), &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Dataset(s), DataArray(s), and dictionaries: </span><span class="si">{</span><span class="n">objects</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>

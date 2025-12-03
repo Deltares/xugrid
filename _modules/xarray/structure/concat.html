@@ -407,6 +407,7 @@
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">CombineAttrsOptions</span><span class="p">,</span>
         <span class="n">CompatOptions</span><span class="p">,</span>
@@ -415,6 +416,21 @@
     <span class="p">)</span>
 
     <span class="n">T_DataVars</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">ConcatOptions</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>
+    <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataTree</span><span class="p">],</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_DATA_VARS_DEFAULT</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COORDS_DEFAULT</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_COMPAT_CONCAT_DEFAULT</span><span class="p">,</span>
+    <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">NA</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="n">_JOIN_DEFAULT</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTree</span><span class="p">:</span> <span class="o">...</span>
 
 
 <span class="c1"># TODO: replace dim: Any by 1D array_likes</span>
@@ -466,7 +482,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    objs : sequence of Dataset and DataArray</span>
+<span class="sd">    objs : sequence of DataArray, Dataset or DataTree</span>
 <span class="sd">        xarray objects to concatenate together. Each object is expected to</span>
 <span class="sd">        consist of variables and coordinates with matching shapes except for</span>
 <span class="sd">        along the concatenated dimension.</span>
@@ -496,9 +512,7 @@
 <span class="sd">    coords : {&quot;minimal&quot;, &quot;different&quot;, &quot;all&quot;} or list of Hashable, optional</span>
 <span class="sd">        These coordinate variables will be concatenated together:</span>
 <span class="sd">          * &quot;minimal&quot;: Only coordinates in which the dimension already appears</span>
-<span class="sd">            are included. If concatenating over a dimension _not_</span>
-<span class="sd">            present in any of the objects, then all data variables will</span>
-<span class="sd">            be concatenated along that new dimension.</span>
+<span class="sd">            are included.</span>
 <span class="sd">          * &quot;different&quot;: Coordinates which are not equal (ignoring attributes)</span>
 <span class="sd">            across all datasets are also concatenated (as well as all for which</span>
 <span class="sd">            dimension already appears). Beware: this option may load the data</span>
@@ -559,7 +573,8 @@
 <span class="sd">        If a callable, it must expect a sequence of ``attrs`` dicts and a context object</span>
 <span class="sd">        as its only parameters.</span>
 <span class="sd">    create_index_for_new_dim : bool, default: True</span>
-<span class="sd">        Whether to create a new ``PandasIndex`` object when the objects being concatenated contain scalar variables named ``dim``.</span>
+<span class="sd">        Whether to create a new ``PandasIndex`` object when the objects being</span>
+<span class="sd">        concatenated contain scalar variables named ``dim``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -644,6 +659,7 @@
     <span class="c1"># dimension already exists</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataarray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArray</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">first_obj</span><span class="p">,</span> <span class="n">objs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">peek_at</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
@@ -657,7 +673,20 @@
             <span class="sa">f</span><span class="s2">&quot;compat=</span><span class="si">{</span><span class="n">compat</span><span class="si">!r}</span><span class="s2"> invalid: must be &#39;broadcast_equals&#39;, &#39;equals&#39;, &#39;identical&#39;, &#39;no_conflicts&#39; or &#39;override&#39;&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_obj</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_obj</span><span class="p">,</span> <span class="n">DataTree</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_datatree_concat</span><span class="p">(</span>
+            <span class="n">objs</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+            <span class="n">data_vars</span><span class="o">=</span><span class="n">data_vars</span><span class="p">,</span>
+            <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+            <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+            <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
+            <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
+            <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+            <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first_obj</span><span class="p">,</span> <span class="n">DataArray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_dataarray_concat</span><span class="p">(</span>
             <span class="n">objs</span><span class="p">,</span>
             <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
@@ -722,7 +751,7 @@
     <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
     <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span>
     <span class="n">all_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">set</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]:</span>
@@ -954,7 +983,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_concat</span><span class="p">(</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_Dataset</span><span class="p">],</span>
-    <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
     <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
@@ -963,6 +992,8 @@
     <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
     <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">preexisting_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Concatenate a sequence of datasets along a new or existing dimension</span>
@@ -998,6 +1029,11 @@
     <span class="n">all_dims</span><span class="p">,</span> <span class="n">dim_coords</span><span class="p">,</span> <span class="n">dims_sizes</span><span class="p">,</span> <span class="n">coord_names</span><span class="p">,</span> <span class="n">data_names</span><span class="p">,</span> <span class="n">vars_order</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_parse_datasets</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
     <span class="p">)</span>
+    <span class="k">if</span> <span class="n">preexisting_dim</span><span class="p">:</span>
+        <span class="c1"># When concatenating DataTree objects, a dimension may be pre-existing</span>
+        <span class="c1"># because it exists elsewhere on the trees, even if it does not exist</span>
+        <span class="c1"># on the dataset objects at this node.</span>
+        <span class="n">all_dims</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dim_name</span><span class="p">)</span>
     <span class="n">indexed_dim_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dim_coords</span><span class="p">)</span>
 
     <span class="n">both_data_and_coords</span> <span class="o">=</span> <span class="n">coord_names</span> <span class="o">&amp;</span> <span class="n">data_names</span>
@@ -1089,10 +1125,11 @@
                         <span class="k">yield</span> <span class="n">PandasIndex</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">coord_dtype</span><span class="o">=</span><span class="n">var</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># create concatenation index, needed for later reindexing</span>
+    <span class="c1"># use np.cumulative_sum(concat_dim_lengths, include_initial=True) when we support numpy&gt;=2</span>
     <span class="n">file_start_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">concat_dim_lengths</span><span class="p">))</span>
-    <span class="n">concat_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">file_start_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">concat_index_size</span> <span class="o">=</span> <span class="n">concat_index</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">concat_index_size</span> <span class="o">=</span> <span class="n">file_start_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">variable_index_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">concat_index_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">variable_reindexer</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># stack up each variable and/or index to fill-out the dataset (in order)</span>
     <span class="c1"># n.b. this loop preserves variable order, needed for groupby.</span>
@@ -1120,7 +1157,6 @@
                     <span class="n">end</span> <span class="o">=</span> <span class="n">file_start_indexes</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
                     <span class="n">variable_index_mask</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="n">variable_index</span> <span class="o">=</span> <span class="n">concat_index</span><span class="p">[</span><span class="n">variable_index_mask</span><span class="p">]</span>
             <span class="nb">vars</span> <span class="o">=</span> <span class="n">ensure_common_dims</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">var_concat_dim_length</span><span class="p">)</span>
 
             <span class="c1"># Try to concatenate the indexes, concatenate the variables when no index</span>
@@ -1151,12 +1187,22 @@
                     <span class="nb">vars</span><span class="p">,</span> <span class="n">dim_name</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
                 <span class="p">)</span>
                 <span class="c1"># reindex if variable is not present in all datasets</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">concat_index_size</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">variable_index_mask</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">variable_reindexer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1"># allocate only once</span>
+                        <span class="n">variable_reindexer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+                            <span class="n">concat_index_size</span><span class="p">,</span>
+                            <span class="c1"># cannot use uint since we need -1 as a sentinel for reindexing</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min_scalar_type</span><span class="p">(</span><span class="o">-</span><span class="n">concat_index_size</span><span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">variable_index_mask</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">variable_reindexer</span><span class="p">)</span>
+                    <span class="c1"># variable_index_mask is boolean, so the first element is 1.</span>
+                    <span class="c1"># offset by 1 to start at 0.</span>
+                    <span class="n">variable_reindexer</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="n">variable_reindexer</span><span class="p">[</span><span class="o">~</span><span class="n">variable_index_mask</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                     <span class="n">combined_var</span> <span class="o">=</span> <span class="n">reindex_variables</span><span class="p">(</span>
                         <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">combined_var</span><span class="p">},</span>
-                        <span class="n">dim_pos_indexers</span><span class="o">=</span><span class="p">{</span>
-                            <span class="n">dim_name</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">variable_index</span><span class="p">)</span><span class="o">.</span><span class="n">get_indexer</span><span class="p">(</span><span class="n">concat_index</span><span class="p">)</span>
-                        <span class="p">},</span>
+                        <span class="n">dim_pos_indexers</span><span class="o">=</span><span class="p">{</span><span class="n">dim_name</span><span class="p">:</span> <span class="n">variable_reindexer</span><span class="p">},</span>
                         <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
                     <span class="p">)[</span><span class="n">name</span><span class="p">]</span>
                 <span class="n">result_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_var</span>
@@ -1198,8 +1244,8 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataarray_concat</span><span class="p">(</span>
     <span class="n">arrays</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T_DataArray</span><span class="p">],</span>
-    <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
-    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">T_Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
     <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1257,6 +1303,59 @@
     <span class="n">result</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">merged_attrs</span>
 
     <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_datatree_concat</span><span class="p">(</span>
+    <span class="n">objs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">DataTree</span><span class="p">],</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">|</span> <span class="n">Variable</span> <span class="o">|</span> <span class="n">T_DataArray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span> <span class="o">|</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">data_vars</span><span class="p">:</span> <span class="n">T_DataVars</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">:</span> <span class="n">ConcatOptions</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">positions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fill_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="n">JoinOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span><span class="p">,</span>
+    <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span><span class="p">,</span>
+    <span class="n">create_index_for_new_dim</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTree</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Concatenate a sequence of datatrees along a new or existing dimension</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.datatree</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTree</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.treenode</span><span class="w"> </span><span class="kn">import</span> <span class="n">TreeIsomorphismError</span><span class="p">,</span> <span class="n">group_subtrees</span>
+
+    <span class="n">dim_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_calc_concat_dim_index</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="n">objs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DataTree</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All objects to concatenate must be DataTree objects&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;identical&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataTree names not identical&quot;</span><span class="p">)</span>
+
+    <span class="n">dim_in_tree</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">dim_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">subtree</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">nodes</span> <span class="ow">in</span> <span class="n">group_subtrees</span><span class="p">(</span><span class="o">*</span><span class="n">objs</span><span class="p">):</span>
+            <span class="n">datasets_to_concat</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">]</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_dataset_concat</span><span class="p">(</span>
+                <span class="n">datasets_to_concat</span><span class="p">,</span>
+                <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+                <span class="n">data_vars</span><span class="o">=</span><span class="n">data_vars</span><span class="p">,</span>
+                <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+                <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span>
+                <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span>
+                <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span><span class="p">,</span>
+                <span class="n">create_index_for_new_dim</span><span class="o">=</span><span class="n">create_index_for_new_dim</span><span class="p">,</span>
+                <span class="n">preexisting_dim</span><span class="o">=</span><span class="n">dim_in_tree</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">except</span> <span class="n">TreeIsomorphismError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All trees must be isomorphic to be concatenated&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="k">return</span> <span class="n">DataTree</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 
                 </article>

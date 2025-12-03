@@ -1580,14 +1580,6 @@
 <span class="sd">               [-20, -21, -22, -23, -24]])</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 
-<span class="sd">        &gt;&gt;&gt; a.where(a.x + a.y &lt; 4, drop=True)</span>
-<span class="sd">        &lt;xarray.DataArray (x: 4, y: 4)&gt; Size: 128B</span>
-<span class="sd">        array([[ 0.,  1.,  2.,  3.],</span>
-<span class="sd">               [ 5.,  6.,  7., nan],</span>
-<span class="sd">               [10., 11., nan, nan],</span>
-<span class="sd">               [15., nan, nan, nan]])</span>
-<span class="sd">        Dimensions without coordinates: x, y</span>
-
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        numpy.where : corresponding numpy function</span>
@@ -1691,7 +1683,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">apply_ufunc</span><span class="p">(</span>
             <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">isnull</span><span class="p">,</span>
@@ -1734,7 +1726,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.computation.apply_ufunc</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_ufunc</span>
 
         <span class="k">if</span> <span class="n">keep_attrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">keep_attrs</span> <span class="o">=</span> <span class="n">_get_keep_attrs</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">apply_ufunc</span><span class="p">(</span>
             <span class="n">duck_array_ops</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>
