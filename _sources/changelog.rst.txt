@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Changed
+~~~~~~~
+
+- :meth:`xugrid.DataArrayAccessor.laplace_interpolate` now uses
+  diagonal scaling to improve conditioning. Default tolerances
+  have been changed from ``atol=0.0, rtol=1e-5`` to ``atol=1e-4, rtol=0.0``
+  for better robustness of the found solution.
+
 [0.14.3] 2025-11-11
 -------------------
 
