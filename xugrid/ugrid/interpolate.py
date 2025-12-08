@@ -208,8 +208,8 @@ def laplace_interpolate(
     direct_solve: bool = False,
     delta=0.0,
     relax=0.0,
-    atol: float = 0.0,
-    rtol: float = 1.0e-5,
+    atol: float = 1e-4,
+    rtol: float = 0.0,
     maxiter: int = 500,
 ):
     """
@@ -240,9 +240,9 @@ def laplace_interpolate(
         ILU0 preconditioner non-diagonally dominant correction.
     relax: float, default 0.0
         Modified ILU0 preconditioner relaxation factor.
-    atol: float, optional, default 0.0
+    atol: float, optional, default 1.0e-4.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
-    rtol: float, optional, default 1.0e-5.
+    rtol: float, optional, default 0.0.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
     maxiter: int, default 500.
         Maximum number of iterations for ``scipy.sparse.linalg.cg``.
@@ -291,23 +291,34 @@ def laplace_interpolate(
     A = L[unknown][:, unknown]
     rhs = -L[unknown][:, known].dot(data[known])
 
+    # Diagonal scaling for better conditioning
+    diagA = A.diagonal().copy()
+    # Guard against non-positive diagonals just in case:
+    diagA[diagA <= 0.0] = 1e-10 * abs(diagA).mean()
+    scale = 1.0 / np.sqrt(diagA)
+    S = sparse.diags(scale)
+    A_scaled = S @ A @ S
+    rhs_scaled = scale * rhs
+
     if direct_solve:
-        x = sparse.linalg.spsolve(A, rhs)
+        x = sparse.linalg.spsolve(A_scaled, rhs_scaled)
     else:
         # Create preconditioner M
-        M = ILU0Preconditioner.from_csr_matrix(A, delta=delta, relax=relax)
+        M = ILU0Preconditioner.from_csr_matrix(A_scaled, delta=delta, relax=relax)
         # IILU isn't guaranteed to preserve symmetry, which could cause technically
         # cause problems for CG. The ILU0 is a port of MODFLOW 6's preconditioner,
         # which is also combined with CG; it (apparently) often works fine although
         # it's not strictly mathematically pure CG.
-        x, info = sparse.linalg.cg(A, rhs, rtol=rtol, atol=atol, maxiter=maxiter, M=M)
+        x, info = sparse.linalg.cg(
+            A_scaled, rhs_scaled, rtol=rtol, atol=atol, maxiter=maxiter, M=M
+        )
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:
             warnings.warn(f"Failed to converge after {maxiter} iterations")
 
     out = data.copy()
-    out[unknown] = x
+    out[unknown] = scale * x
     return out
 
 
