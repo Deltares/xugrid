@@ -43,8 +43,8 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../_static/documentation_options.js?v=a9ba800c"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/xarray/structure/merge';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -399,7 +399,12 @@
     <span class="n">emit_user_level_warning</span><span class="p">,</span>
     <span class="n">equivalent</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">as_variable</span><span class="p">,</span> <span class="n">calculate_dimensions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xarray.core.variable</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IndexVariable</span><span class="p">,</span>
+    <span class="n">Variable</span><span class="p">,</span>
+    <span class="n">as_variable</span><span class="p">,</span>
+    <span class="n">calculate_dimensions</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.structure.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_align</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xarray.util.deprecation_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_COMPAT_DEFAULT</span><span class="p">,</span>
@@ -1586,7 +1591,11 @@
                     <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">coords</span>
                 <span class="p">]</span>
                 <span class="k">if</span> <span class="n">coord_names</span><span class="p">:</span>
-                    <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">coord_names</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">coord_names</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">IndexVariable</span><span class="p">):</span>
+                    <span class="n">variable</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">to_base_variable</span><span class="p">()</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">)</span>
+                <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">return</span> <span class="n">merge_core</span><span class="p">(</span>
         <span class="p">[</span><span class="n">dataset</span><span class="p">,</span> <span class="n">other</span><span class="p">],</span>
@@ -1669,7 +1678,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
