@@ -715,7 +715,7 @@ dimension name, in which case the location of the dimension is
 unchanged. If dimension is provided as a Variable, DataArray or Index, its name
 is used as the dimension to concatenate along and the values are added
 as a coordinate.</p></li>
-<li><p><strong>data_vars</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;</em><em>, </em><em>None}</em><em> or </em><em>list</em><em> of </em><em>Hashable</em><em>, </em><em>optional</em>) – <dl class="simple">
+<li><p><strong>data_vars</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;</em><em>, </em><em>None}</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default: &quot;all&quot;</em>) – <dl class="simple">
 <dt>These data variables will be concatenated together:</dt><dd><ul>
 <li><p>”minimal”: Only data variables in which the dimension already
 appears are included.</p></li>
@@ -727,14 +727,14 @@ already loaded.</p></li>
 <li><p>”all”: All data variables will be concatenated.</p></li>
 <li><p>None: Means <code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code> if <code class="docutils literal notranslate"><span class="pre">dim</span></code> is not present in any of the <code class="docutils literal notranslate"><span class="pre">objs</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">&quot;minimal&quot;</span></code> if <code class="docutils literal notranslate"><span class="pre">dim</span></code> is present in any of <code class="docutils literal notranslate"><span class="pre">objs</span></code>.</p></li>
-<li><p>list of dims: The listed data variables will be concatenated, in
+<li><p>list of str: The listed data variables will be concatenated, in
 addition to the “minimal” data variables.</p></li>
 </ul>
 </dd>
 </dl>
-<p>If objects are DataArrays, data_vars must be “all”.</p>
+<p>If objects are DataArrays, data_vars must be “all” or None.</p>
 </p></li>
-<li><p><strong>coords</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;}</em><em> or </em><em>list</em><em> of </em><em>Hashable</em><em>, </em><em>optional</em>) – <dl class="simple">
+<li><p><strong>coords</strong> (<em>{&quot;minimal&quot;</em><em>, </em><em>&quot;different&quot;</em><em>, </em><em>&quot;all&quot;}</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>default: &quot;different&quot;</em>) – <dl class="simple">
 <dt>These coordinate variables will be concatenated together:</dt><dd><ul>
 <li><p>”minimal”: Only coordinates in which the dimension already appears
 are included.</p></li>
@@ -745,13 +745,13 @@ payload of coordinate variables into memory if they are not already
 loaded.</p></li>
 <li><p>”all”: All coordinate variables will be concatenated, except
 those corresponding to other dimensions.</p></li>
-<li><p>list of Hashable: The listed coordinate variables will be concatenated,
+<li><p>list of str: The listed coordinate variables will be concatenated,
 in addition to the “minimal” coordinates.</p></li>
 </ul>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>compat</strong> (<em>{&quot;identical&quot;</em><em>, </em><em>&quot;equals&quot;</em><em>, </em><em>&quot;broadcast_equals&quot;</em><em>, </em><em>&quot;no_conflicts&quot;</em><em>, </em><em>&quot;override&quot;}</em><em>, </em><em>optional</em>) – <p>String indicating how to compare non-concatenated variables of the same name for
+<li><p><strong>compat</strong> (<em>{&quot;identical&quot;</em><em>, </em><em>&quot;equals&quot;</em><em>, </em><em>&quot;broadcast_equals&quot;</em><em>, </em><em>&quot;no_conflicts&quot;</em><em>, </em><em>&quot;override&quot;}</em><em>,              </em><em>default: &quot;equals&quot;</em>) – <p>String indicating how to compare non-concatenated variables of the same name for
 potential conflicts. This is passed down to merge.</p>
 <ul>
 <li><p>”broadcast_equals”: all values must be equal when variables are
@@ -771,7 +771,7 @@ supplied, objects are concatenated in the provided order.</p></li>
 <li><p><strong>fill_value</strong> (<em>scalar</em><em> or </em><em>dict-like</em><em>, </em><em>optional</em>) – Value to use for newly missing values. If a dict-like, maps
 variable names to fill values. Use a data array’s name to
 refer to its values.</p></li>
-<li><p><strong>join</strong> (<em>{&quot;outer&quot;</em><em>, </em><em>&quot;inner&quot;</em><em>, </em><em>&quot;left&quot;</em><em>, </em><em>&quot;right&quot;</em><em>, </em><em>&quot;exact&quot;}</em><em>, </em><em>optional</em>) – <p>String indicating how to combine differing indexes
+<li><p><strong>join</strong> (<em>{&quot;outer&quot;</em><em>, </em><em>&quot;inner&quot;</em><em>, </em><em>&quot;left&quot;</em><em>, </em><em>&quot;right&quot;</em><em>, </em><em>&quot;exact&quot;}</em><em>, </em><em>default: &quot;outer&quot;</em>) – <p>String indicating how to combine differing indexes
 (excluding dim) in objects</p>
 <ul>
 <li><p>”outer”: use the union of object indexes</p></li>
@@ -851,8 +851,8 @@ concatenated contain scalar variables named <code class="docutils literal notran
 <span class="go">array([[0, 1, 2],</span>
 <span class="go">       [3, 4, 5]])</span>
 <span class="go">Coordinates:</span>
-<span class="go">  * y        (y) int64 24B 10 20 30</span>
 <span class="go">    x        (new_dim) &lt;U1 8B &#39;a&#39; &#39;b&#39;</span>
+<span class="go">  * y        (y) int64 24B 10 20 30</span>
 <span class="go">Dimensions without coordinates: new_dim</span>
 </pre></div>
 </div>
@@ -866,8 +866,8 @@ concatenated contain scalar variables named <code class="docutils literal notran
 <span class="go">       [3, 4, 5]])</span>
 <span class="go">Coordinates:</span>
 <span class="go">  * new_dim  (new_dim) int64 16B -90 -100</span>
-<span class="go">  * y        (y) int64 24B 10 20 30</span>
 <span class="go">    x        (new_dim) &lt;U1 8B &#39;a&#39; &#39;b&#39;</span>
+<span class="go">  * y        (y) int64 24B 10 20 30</span>
 </pre></div>
 </div>
 <p># Concatenate a scalar variable along a new dimension of the same name with and without creating a new index</p>

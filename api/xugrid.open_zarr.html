@@ -709,7 +709,8 @@ variables must contain dimension metadata encoded in the
 directory in file system where a Zarr DirectoryStore has been stored.</p></li>
 <li><p><strong>synchronizer</strong> (<em>object</em><em>, </em><em>optional</em>) – Array synchronizer provided to zarr</p></li>
 <li><p><strong>group</strong> (<em>str</em><em>, </em><em>optional</em>) – Group path. (a.k.a. <cite>path</cite> in zarr terminology.)</p></li>
-<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>'auto'</em><em> or </em><em>None</em><em>, </em><em>default: 'auto'</em>) – <p>If provided, used to load the data into dask arrays.</p>
+<li><p><strong>chunks</strong> (<em>int</em><em>, </em><em>dict</em><em>, </em><em>&quot;auto&quot;</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Used to load the data into dask arrays. Default behavior is to use
+<code class="docutils literal notranslate"><span class="pre">chunks={}</span></code> if dask is available, otherwise <code class="docutils literal notranslate"><span class="pre">chunks=None</span></code>.</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">chunks='auto'</span></code> will use dask <code class="docutils literal notranslate"><span class="pre">auto</span></code> chunking taking into account the
 engine preferred chunks.</p></li>

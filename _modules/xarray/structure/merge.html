@@ -815,6 +815,7 @@
     <span class="n">prioritized</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">MergeElement</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude_dims</span><span class="p">:</span> <span class="n">AbstractSet</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(),</span>
     <span class="n">combine_attrs</span><span class="p">:</span> <span class="n">CombineAttrsOptions</span> <span class="o">=</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span>
+    <span class="n">compat</span><span class="p">:</span> <span class="n">CompatOptions</span> <span class="o">|</span> <span class="n">CombineKwargDefault</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Variable</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="n">Index</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge variables/indexes from coordinates without automatic alignments.</span>
 
@@ -839,7 +840,7 @@
     <span class="c1"># TODO: indexes should probably be filtered in collected elements</span>
     <span class="c1"># before merging them</span>
     <span class="n">merged_coords</span><span class="p">,</span> <span class="n">merged_indexes</span> <span class="o">=</span> <span class="n">merge_collected</span><span class="p">(</span>
-        <span class="n">filtered</span><span class="p">,</span> <span class="n">prioritized</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
+        <span class="n">filtered</span><span class="p">,</span> <span class="n">prioritized</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="n">compat</span><span class="p">,</span> <span class="n">combine_attrs</span><span class="o">=</span><span class="n">combine_attrs</span>
     <span class="p">)</span>
     <span class="n">merged_indexes</span> <span class="o">=</span> <span class="n">filter_indexes_from_coords</span><span class="p">(</span><span class="n">merged_indexes</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="n">merged_coords</span><span class="p">))</span>
 
