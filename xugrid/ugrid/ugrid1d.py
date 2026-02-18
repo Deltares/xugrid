@@ -46,7 +46,7 @@ class Ugrid1d(AbstractUgrid):
     projected: bool, optional
         Whether node_x and node_y are longitude and latitude or projected x and
         y coordinates. Used to write the appropriate standard_name in the
-        coordinate attributes.
+        coordinate attributes. If crs is provided, its value will take priority.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -80,7 +80,9 @@ class Ugrid1d(AbstractUgrid):
         self.start_index = start_index
         self.edge_node_connectivity = edge_node_connectivity - self.start_index
         self.name = name
-        self.projected = projected
+
+        # projected, crs
+        self.crs, self.projected = self._validate_crs(crs, projected)
 
         self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
@@ -104,13 +106,6 @@ class Ugrid1d(AbstractUgrid):
         # Connectivity
         self._node_node_connectivity = None
         self._node_edge_connectivity = None
-        # crs
-        if crs is None:
-            self.crs = None
-        else:
-            import pyproj
-
-            self.crs = pyproj.CRS.from_user_input(crs)
 
     @classmethod
     def from_dataset(cls, dataset: xr.Dataset, topology: str = None):

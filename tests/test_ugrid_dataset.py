@@ -321,12 +321,15 @@ class TestUgridDataArray:
     def test_is_geographic(self):
         uda = self.uda
         assert uda.grid.is_geographic is False
+        assert uda.grid.is_projected is True
 
         uda.ugrid.set_crs(epsg=4326)
         assert uda.grid.is_geographic is True
+        assert uda.grid.is_projected is False
 
         result = uda.ugrid.to_crs(epsg=28992)
         assert result.grid.is_geographic is False
+        assert result.grid.is_projected is True
 
     def test_to_geodataframe(self):
         uda1 = self.uda.copy()

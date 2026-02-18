@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -392,17 +392,50 @@ class AbstractUgrid(abc.ABC):
     @staticmethod
     def _extract_crs(dataset: xr.Dataset, topology: str):
         grid_mapping_name = dataset.ugrid_roles.grid_mapping_names[topology]
+        stdname_projected = dataset.ugrid_roles.is_projected[topology]
         if grid_mapping_name is not None:
             crs = crs_from_attrs(dataset[grid_mapping_name].attrs)
         else:
             crs = None
 
-        if crs is not None:
+        if not (crs is None or isinstance(crs, CrsPlaceholder)):
+            # Then it's pyproj
             projected = crs.is_projected
-        else:
-            projected = False  # TODO fallback to standard_name on coordinates
+            if stdname_projected is not None and stdname_projected != projected:
+                warnings.warn(
+                    f"standard_name suggests {'projected' if stdname_projected else 'geographic'} "
+                    f"coordinates, but the CRS ({crs}) is "
+                    f"{'projected' if projected else 'geographic'}. "
+                    "The CRS will take priority."
+                )
+            return crs, projected
 
+        if stdname_projected is not None:
+            projected = stdname_projected
+        else:
+            warnings.warn(
+                f"No CRS or recognizable standard_name found for topology '{topology}'. "
+                "Assuming projected coordinates."
+            )
+            projected = True
         return crs, projected
+
+    @staticmethod
+    def _validate_crs(crs: Any, projected: bool):
+        if crs is None or isinstance(crs, CrsPlaceholder):
+            _crs = crs
+            _projected = projected
+        else:
+            import pyproj
+
+            _crs = pyproj.CRS.from_user_input(crs)
+            if not (_crs.is_projected ^ _crs.is_geographic):
+                raise ValueError(
+                    f"Unsupported CRS: {crs}.\n"
+                    "CRS should either be geographic (latitude / longitude) or projected."
+                )
+            _projected = crs.is_projected
+        return _crs, _projected
 
     def _write_grid_mapping(self, dataset):
         if self.crs is not None:
@@ -641,6 +674,7 @@ class AbstractUgrid(abc.ABC):
         node_y: str,
         obj: Union[xr.DataArray, xr.Dataset],
         projected: bool = True,
+        crs: Any = None,
     ):
         """
         Given names of x and y coordinates of the nodes of an object, set them
@@ -652,6 +686,15 @@ class AbstractUgrid(abc.ABC):
             Name of the x coordinate of the nodes in the object.
         node_y: str
             Name of the y coordinate of the nodes in the object.
+        obj: xr.DataArray, xr.Dataset
+        projected: bool, optional
+            Whether node_x and node_y are longitude and latitude or projected x and
+            y coordinates. Used to write the appropriate standard_name in the
+            coordinate attributes. If crs is provided, its value will take priority.
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
         """
         if " " in node_x or " " in node_y:
             raise ValueError("coordinate names may not contain spaces")
@@ -684,7 +727,7 @@ class AbstractUgrid(abc.ABC):
         self._attrs["node_coordinates"] = " ".join(node_coords)
         self._indexes["node_x"] = node_x
         self._indexes["node_y"] = node_y
-        self.projected = projected
+        self.crs, self.projected = self._validate_crs(crs, projected)
 
     def assign_node_coords(
         self,
@@ -706,8 +749,8 @@ class AbstractUgrid(abc.ABC):
         """
         xname = self._indexes["node_x"]
         yname = self._indexes["node_y"]
-        x_attrs = conventions.DEFAULT_ATTRS["node_x"][self.projected]
-        y_attrs = conventions.DEFAULT_ATTRS["node_y"][self.projected]
+        x_attrs = conventions.DEFAULT_ATTRS["node_x"][self.is_projected]
+        y_attrs = conventions.DEFAULT_ATTRS["node_y"][self.is_projected]
         coords = {
             xname: xr.DataArray(
                 data=self.node_x,
@@ -897,6 +940,7 @@ class AbstractUgrid(abc.ABC):
             crs = pyproj.CRS.from_epsg(epsg)
         else:
             raise ValueError("Must pass either crs or epsg.")
+        crs, projected = self._validate_crs(crs, crs.is_projected)
 
         if not allow_override and self.crs is not None and not self.crs == crs:
             raise ValueError(
@@ -906,6 +950,7 @@ class AbstractUgrid(abc.ABC):
                 "transform the geometries, use '.to_crs' instead."
             )
         self.crs = crs
+        self.projected = projected
 
     def to_crs(
         self,
@@ -954,6 +999,7 @@ class AbstractUgrid(abc.ABC):
         else:
             raise ValueError("Must pass either crs or epsg.")
 
+        crs, projected = self._validate_crs(crs, crs.is_projected)
         grid = self.copy()
         if self.crs.is_exact_same(crs):
             return grid
@@ -967,14 +1013,16 @@ class AbstractUgrid(abc.ABC):
         grid._clear_geometry_properties()
         grid._dataset = None
         grid.crs = crs
-
+        grid.projected = projected
         return grid
 
     @property
     def is_geographic(self):
-        if self.crs is None:
-            return False
-        return self.crs.is_geographic
+        return not self.projected
+
+    @property
+    def is_projected(self):
+        return self.projected
 
     def plot(self, **kwargs):
         """

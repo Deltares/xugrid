@@ -53,7 +53,7 @@ class Ugrid2d(AbstractUgrid):
     projected: bool, optional
         Whether node_x and node_y are longitude and latitude or projected x and
         y coordinates. Used to write the appropriate standard_name in the
-        coordinate attributes.
+        coordinate attributes. If crs is provided, its value will take priority.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -87,7 +87,7 @@ class Ugrid2d(AbstractUgrid):
         self.fill_value = fill_value
         self.start_index = start_index
         self.name = name
-        self.projected = projected
+        self.crs, self.projected = self._validate_crs(crs, projected)
 
         if isinstance(face_node_connectivity, np.ndarray):
             self.face_node_connectivity = face_node_connectivity.copy()
@@ -154,13 +154,6 @@ class Ugrid2d(AbstractUgrid):
         self._triangulation = None
         self._voronoi_topology = None
         self._centroid_triangulation = None
-        # crs
-        if crs is None:
-            self.crs = None
-        else:
-            import pyproj
-
-            self.crs = pyproj.CRS.from_user_input(crs)
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
@@ -952,8 +945,8 @@ class Ugrid2d(AbstractUgrid):
         """
         xname = self._indexes.get("face_x", f"{self.name}_face_x")
         yname = self._indexes.get("face_y", f"{self.name}_face_y")
-        x_attrs = conventions.DEFAULT_ATTRS["face_x"][self.projected]
-        y_attrs = conventions.DEFAULT_ATTRS["face_y"][self.projected]
+        x_attrs = conventions.DEFAULT_ATTRS["face_x"][self.is_projected]
+        y_attrs = conventions.DEFAULT_ATTRS["face_y"][self.is_projected]
         coords = {
             xname: xr.DataArray(
                 data=self.face_x,
