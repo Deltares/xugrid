@@ -161,6 +161,14 @@ def test_set_crs():
     grid.set_crs(epsg=28992)
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
+    # Cannot set crs if a placeholder is in place.
+    grid.crs = xugrid.ugrid.crs.CrsPlaceholder({})
+    with pytest.raises(ValueError, match="The Ugrid already has a CRS"):
+        grid.set_crs(epsg=28992)
+    # Unless allow_override
+    grid.set_crs(epsg=28992, allow_override=True)
+    assert grid.crs == pyproj.CRS.from_epsg(28992)
+
 
 def test_to_crs():
     grid = grid1d()
@@ -177,6 +185,10 @@ def test_to_crs():
     reprojected = grid.to_crs("epsg:28992")
     assert reprojected.crs == pyproj.CRS.from_epsg(28992)
     assert (~(grid.node_coordinates == reprojected.node_coordinates)).all()
+
+    grid.crs = xugrid.ugrid.crs.CrsPlaceholder({})
+    with pytest.raises(ValueError, match="Cannot transform geometries"):
+        grid.to_crs(epsg=28992)
 
 
 def test_to_dataset():

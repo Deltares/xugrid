@@ -891,14 +891,6 @@ class AbstractUgrid(abc.ABC):
         """
         import pyproj
 
-        if isinstance(self.crs, CrsPlaceholder):
-            raise ValueError(
-                "Cannot transform geometries: the CRS could not be parsed. "
-                "This may be because pyproj is not installed, or because the "
-                "grid mapping attributes could not be interpreted. "
-                "Use set_crs() to set a valid pyproj CRS explicitly."
-            )
-
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)
         elif epsg is not None:
@@ -947,6 +939,14 @@ class AbstractUgrid(abc.ABC):
                 "Cannot transform naive geometries.  "
                 "Please set a crs on the object first."
             )
+        elif isinstance(self.crs, CrsPlaceholder):
+            raise ValueError(
+                "Cannot transform geometries: the current CRS is a placeholder and has "
+                "not been parsed.\nThis may be because pyproj is not installed, or because pyproj"
+                "failed to interpret the grid mapping attributes.\n"
+                "Use .set_crs(..., allow_override=True) to set a valid pyproj CRS explicitly.\n"
+            )
+
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)
         elif epsg is not None:
