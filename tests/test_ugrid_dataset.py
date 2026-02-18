@@ -294,7 +294,7 @@ class TestUgridDataArray:
         assert isinstance(back, xugrid.UgridDataArray)
 
     def test_crs(self):
-        uda = self.uda
+        uda = self.uda.copy()
         crs = uda.ugrid.crs
         assert crs == {"mesh2d": None}
 
@@ -308,6 +308,15 @@ class TestUgridDataArray:
         assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
         assert not np.array_equal(result.ugrid.grid.node_x, uda.ugrid.grid.node_x)
         assert not np.array_equal(result.ugrid.grid.node_y, uda.ugrid.grid.node_y)
+
+    def test_crs_roundtrip(self):
+        uda = self.uda.copy()
+        uda.ugrid.set_crs(epsg=28992)
+        ds = uda.ugrid.to_dataset()
+        assert ds["a"].encoding == {"grid_mapping": "mesh2d_crs"}
+        assert "mesh2d_crs" in ds.data_vars
+        back = xugrid.UgridDataset(ds)
+        assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
 
     def test_is_geographic(self):
         uda = self.uda
@@ -732,7 +741,7 @@ class TestUgridDataset:
         assert isinstance(back, xugrid.UgridDataset)
 
     def test_crs(self):
-        uds = self.uds
+        uds = self.uds.copy()
         crs = uds.ugrid.crs
         assert crs == {"mesh2d": None}
 
@@ -752,6 +761,17 @@ class TestUgridDataset:
         assert uds is not result
         assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
         assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
+
+    def test_crs_roundtrip(self):
+        uds = self.uds.copy()
+        uds.ugrid.set_crs(epsg=28992, topology="mesh2d")
+        ds = uds.ugrid.to_dataset()
+        expected = {"grid_mapping": "mesh2d_crs"}
+        assert ds["a"].encoding == expected
+        assert ds["b"].encoding == expected
+        assert "mesh2d_crs" in ds.data_vars
+        back = xugrid.UgridDataset(ds)
+        assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
 
     def test_assign_coords(self):
         with_coords = (

@@ -7,7 +7,7 @@ It takes some inspiration from: https://github.com/xarray-contrib/cf-xarray
 import warnings
 from collections import ChainMap
 from itertools import chain
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import xarray as xr
 
@@ -346,6 +346,47 @@ def _get_connectivity(
     return topology_dict
 
 
+def _get_grid_mapping_names(
+    ds: xr.Dataset,
+    topologies: List[str],
+    dimensions: Dict[str, Dict[str, str]],
+) -> Dict[str, str | None]:
+    topology_dict = {}
+    for topology in topologies:
+        topology_dict[topology] = None
+        # The grid mapping should be specified per variable.
+        # Check which variables have the relevant UGRID dimensions, and extract
+        # the grid mapping.
+        topo_dims = set(dimensions[topology].values())
+        names = {
+            var.attrs.get("grid_mapping") or var.encoding.get("grid_mapping")
+            for var in ds.variables.values()
+            if topo_dims & set(var.dims)
+        } - {None}
+
+        if names:
+            # In principle, multiple coordinates are allowed to be specified
+            # in the topology variable. Let's say there are two sets of coordinates
+            # node_coordinates: "mesh2d_node_x1 mesh2d_node_y1 mesh2d_node_x2 mesh2d_node_y2"
+            # In this case, we need a grid mapping for (x1, y1) and for (x2, y2),
+            # but given that the grid mapping is defined on a data variable, there is no
+            # way to link them correctly. Hence the ValueError.
+            # See also: https://github.com/ugrid-conventions/ugrid-conventions/issues/64
+            if len(names) > 1:
+                raise ValueError(
+                    f"Multiple grid mappings found for topology '{topology}': "
+                    f"{names}. Variables on the same topology are expected to "
+                    f"share a single coordinate reference system (CRS). "
+                    f"Load the dataset with xarray.open_dataset() and modify "
+                    f"the grid_mapping attributes before converting to a "
+                    f"UgridDataset."
+                )
+
+            topology_dict[topology] = next(iter(names))
+
+    return topology_dict
+
+
 @xr.register_dataset_accessor("ugrid_roles")
 class UgridRolesAccessor:
     """
@@ -444,6 +485,17 @@ class UgridRolesAccessor:
         connectivity: Dict[str, Dict[str, str]]
         """
         return _get_connectivity(self._ds, self.topology)
+
+    @property
+    def grid_mapping_names(self) -> Dict[str, Optional[Set[str]]]:
+        """
+        Get the names of the grid mapping variables associated with each topology.
+
+        Returns
+        -------
+        grid_mapping: dict[str, str | None]
+        """
+        return _get_grid_mapping_names(self._ds, self.topology, self.dimensions)
 
     def __repr__(self):
         dimensions = self.dimensions

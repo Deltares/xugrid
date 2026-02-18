@@ -14,6 +14,7 @@ from scipy.spatial import KDTree
 
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
 from xugrid.ugrid.selection_utils import get_sorted_section_coords
 
 
@@ -387,6 +388,38 @@ class AbstractUgrid(abc.ABC):
                     attrs.pop(coord)
 
         return attrs
+
+    @staticmethod
+    def _extract_crs(dataset: xr.Dataset, topology: str):
+        grid_mapping_name = dataset.ugrid_roles.grid_mapping_names[topology]
+        if grid_mapping_name is not None:
+            crs = crs_from_attrs(dataset[grid_mapping_name].attrs)
+        else:
+            crs = None
+
+        if crs is not None:
+            projected = crs.is_projected
+        else:
+            projected = False  # TODO fallback to standard_name on coordinates
+
+        return crs, projected
+
+    def _write_grid_mapping(self, dataset):
+        if self.crs is not None:
+            grid_mapping_name = f"{self.name}_crs"
+            dataset[grid_mapping_name] = xr.Variable(
+                (), 0, attrs=crs_to_attrs(self.crs)
+            )
+            # Stamp grid_mapping on data variables that sit on this topology
+            for var in dataset.data_vars:
+                if set(self.dims) & set(dataset[var].dims):
+                    # In netCDF, grid_mapping is a regular attribute on the variable.
+                    # xarray distinguishes between attrs and encoding internally;
+                    # grid_mapping may end up in either depending on how the file was
+                    # read. We write to encoding following rioxarray's convention,
+                    # and read from both to handle either case.
+                    dataset[var].encoding["grid_mapping"] = grid_mapping_name
+        return
 
     def __repr__(self):
         if self._dataset:
@@ -857,6 +890,14 @@ class AbstractUgrid(abc.ABC):
             existing CRS, even when both are not equal.
         """
         import pyproj
+
+        if isinstance(self.crs, CrsPlaceholder):
+            raise ValueError(
+                "Cannot transform geometries: the CRS could not be parsed. "
+                "This may be because pyproj is not installed, or because the "
+                "grid mapping attributes could not be interpreted. "
+                "Use set_crs() to set a valid pyproj CRS explicitly."
+            )
 
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)

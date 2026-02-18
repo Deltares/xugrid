@@ -162,7 +162,8 @@ class Ugrid1d(AbstractUgrid):
 
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
-        projected = False  # TODO
+
+        crs, projected = cls._extract_crs(ds, topology)
 
         return cls(
             node_x_coordinates,
@@ -173,7 +174,7 @@ class Ugrid1d(AbstractUgrid):
             dataset=dataset[ugrid_vars],
             indexes=indexes,
             projected=projected,
-            crs=None,
+            crs=crs,
             start_index=start_index,
         )
 

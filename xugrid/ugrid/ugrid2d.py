@@ -301,7 +301,8 @@ class Ugrid2d(AbstractUgrid):
 
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
-        projected = False  # TODO
+
+        crs, projected = cls._extract_crs(ds, topology)
 
         return cls(
             node_x_coordinates,
@@ -313,7 +314,7 @@ class Ugrid2d(AbstractUgrid):
             dataset=ds[ugrid_vars],
             indexes=indexes,
             projected=projected,
-            crs=None,
+            crs=crs,
             start_index=start_index,
         )
 
@@ -397,6 +398,7 @@ class Ugrid2d(AbstractUgrid):
             dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
+        self._write_grid_mapping(dataset)
         return dataset
 
     # These are all optional/derived UGRID attributes. They are not computed by

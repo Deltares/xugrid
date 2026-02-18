@@ -1,6 +1,7 @@
 from collections import ChainMap
 
 import numpy as np
+import pyproj
 import pytest
 import xarray as xr
 
@@ -155,6 +156,38 @@ class TestConventionsElevation:
     def test_repr(self):
         result = self.ds.ugrid_roles.__repr__()
         assert isinstance(result, str)
+
+    def test_get_grid_mapping_names(self):
+        # Setup doesn't contain any CRS data.
+        expected = {"mesh2d": None}
+        assert (
+            cv._get_grid_mapping_names(self.ds, ["mesh2d"], self.dimensions) == expected
+        )
+        assert self.ds.ugrid_roles.grid_mapping_names == expected
+
+        # Now add the CRS
+        attrs = xugrid.ugrid.crs.crs_to_attrs(pyproj.CRS.from_epsg(28992))
+        expected = {"mesh2d": "mesh2d_crs"}
+        # Via attrs
+        ds = self.ds.copy()
+        ds["mesh2d_crs"] = xr.Variable((), 0, attrs=attrs)
+        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs"
+        assert cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+        assert ds.ugrid_roles.grid_mapping_names == expected
+        # Via encoding
+        ds = self.ds.copy()
+        ds["mesh2d_crs"] = xr.Variable((), 0, attrs=attrs)
+        ds["elevation"].encoding["grid_mapping"] = "mesh2d_crs"
+        assert cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+        assert ds.ugrid_roles.grid_mapping_names == expected
+
+        # Multiple grid mappings should raise
+        ds["elevation2"] = ds["elevation"].copy()
+        ds["elevation"].encoding["grid_mapping"] = "mesh2d_crs2"
+        with pytest.raises(
+            ValueError, match="Multiple grid mappings found for topology"
+        ):
+            ds.ugrid_roles.grid_mapping_names
 
 
 class TestCompleteSpecification:
