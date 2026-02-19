@@ -166,6 +166,10 @@ class AbstractUgrid(abc.ABC):
     def _clear_geometry_properties(self):
         pass
 
+    @abc.abstractmethod
+    def _assign_derived_coords(self, obj):
+        pass
+
     @staticmethod
     @abc.abstractmethod
     def merge_partitions():
@@ -434,25 +438,49 @@ class AbstractUgrid(abc.ABC):
                     f"Unsupported CRS: {crs}.\n"
                     "CRS should either be geographic (latitude / longitude) or projected."
                 )
-            _projected = crs.is_projected
+            _projected = _crs.is_projected
         return _crs, _projected
 
-    def _write_grid_mapping(self, dataset):
+    def write_grid_mapping(self, dataset, grid_mapping_name: str = None):
+        """
+        Use the CRS of the topology, if set, to write the CF grid_mapping
+        attributes to a newly created mapping variable.
+
+        The grid mapping variable is stamped onto all data variables that share
+        dimensions with this topology via the ``grid_mapping`` attribute, following
+        CF conventions. Additionally, coordinate variables are also stamped, which
+        is not strictly CF-compliant but is required for compatibility for e.g.
+        QGIS-MDAL, which reads ``grid_mapping`` from coordinates rather than
+        data variables.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+        grid_mapping_name: str
+
+        Returns
+        -------
+        dataset: xr.Dataset
+            Modified dataset with CF compliant CRS information.
+        """
+
         if self.crs is not None:
-            grid_mapping_name = f"{self.name}_crs"
+            dataset = dataset.copy()
+            if grid_mapping_name is None:
+                grid_mapping_name = f"{self.name}_crs"
+
+            # Needs to be this int value for DFM/Interacter...
+            # TODO: might change if DFM is changed; we could then simply use 0.
             dataset[grid_mapping_name] = xr.Variable(
-                (), 0, attrs=crs_to_attrs(self.crs)
+                (), np.int32(np.iinfo(np.int32).min + 1), attrs=crs_to_attrs(self.crs)
             )
             # Stamp grid_mapping on data variables that sit on this topology
-            for var in dataset.data_vars:
-                if set(self.dims) & set(dataset[var].dims):
-                    # In netCDF, grid_mapping is a regular attribute on the variable.
-                    # xarray distinguishes between attrs and encoding internally;
-                    # grid_mapping may end up in either depending on how the file was
-                    # read. We write to encoding following rioxarray's convention,
-                    # and read from both to handle either case.
-                    dataset[var].encoding["grid_mapping"] = grid_mapping_name
-        return
+            # QGIS-MDAL reads the grid_mapping off the coordinates, hence
+            # we will stamp those as well (.variables instead of .data_vars).
+            for var in dataset.variables.values():
+                if set(self.dims) & set(var.dims):
+                    var.attrs["grid_mapping"] = grid_mapping_name
+        return dataset
 
     def __repr__(self):
         if self._dataset:
@@ -907,6 +935,17 @@ class AbstractUgrid(abc.ABC):
         # The inverse distance is a measure of the strength of the connection.
         # Normalize so the weights are around 1.0
         return distance.mean() / distance
+
+    def _update_coordinate_attrs(self, obj: xr.DataArray | xr.Dataset):
+        for role, name in self._indexes.items():
+            if name in obj.coords:
+                obj[name].attrs = conventions.DEFAULT_ATTRS[role][self.is_projected]
+            # Also update internal storage where data is preserved for roundtripping.
+            if self._dataset is not None and name in self._dataset.coords:
+                self._dataset[name].attrs = conventions.DEFAULT_ATTRS[role][
+                    self.is_projected
+                ]
+        return
 
     def set_crs(
         self,

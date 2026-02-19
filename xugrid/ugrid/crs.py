@@ -77,6 +77,7 @@ def crs_to_attrs(crs: pyproj.CRS) -> dict:
     attrs = crs.to_cf()  # already includes crs_wkt and CF attrs when possible.
     # GDAL compat: GDAL uses spatial_ref also.
     attrs["spatial_ref"] = attrs["crs_wkt"]
+    attrs["name"] = crs.name
     epsg = crs.to_epsg()
     if epsg is not None:
         attrs["epsg"] = epsg

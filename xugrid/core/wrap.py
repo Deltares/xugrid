@@ -394,12 +394,23 @@ class UgridDataset(DatasetForwardMixin):
                     "obj must be xarray.Dataset. Received instead: "
                     f"{type(obj).__name__}"
                 )
+            # Remove UGRID data and associated data such as grid mapping,
+            # since the CRS will be managed by the topology instead.
             connectivity_vars = [
                 name
                 for v in obj.ugrid_roles.connectivity.values()
                 for name in v.values()
             ]
-            ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
+            grid_mapping_vars = [
+                name
+                for name in obj.ugrid_roles.grid_mapping_names.values()
+                if name is not None
+            ]
+            ds = obj.drop_vars(
+                obj.ugrid_roles.topology + connectivity_vars + grid_mapping_vars
+            )
+            for var in ds.variables.values():
+                var.attrs.pop("grid_mapping", None)
             original = obj
 
         if grids is None:

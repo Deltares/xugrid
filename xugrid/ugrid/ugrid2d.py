@@ -185,6 +185,15 @@ class Ugrid2d(AbstractUgrid):
         self._voronoi_topology = None
         self._centroid_triangulation = None
 
+    def _assign_derived_coords(self, obj):
+        if self.node_dimension in obj.dims:
+            obj = self.assign_node_coords(obj)
+        if self.edge_dimension in obj.dims:
+            obj = self.assign_edge_coords(obj)
+        if self.face_dimension in obj.dims:
+            obj = self.assign_face_coords(obj)
+        return obj
+
     @classmethod
     def from_meshkernel(
         cls,
@@ -204,7 +213,7 @@ class Ugrid2d(AbstractUgrid):
         projected: bool
             Whether node_x and node_y are longitude and latitude or projected x and
             y coordinates. Used to write the appropriate standard_name in the
-            coordinate attributes.
+            coordinate attributes. If crs is provided, its value will take priority.
         crs: Any, optional
             Coordinate Reference System of the geometry objects. Can be anything accepted by
             :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -292,8 +301,17 @@ class Ugrid2d(AbstractUgrid):
         else:
             edge_node_connectivity = None
 
+        # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
+        edge_indexes = coordinates.get("edge_coordinates")
+        if edge_indexes is not None:
+            indexes["edge_x"] = edge_indexes[0][0]
+            indexes["edge_y"] = edge_indexes[1][0]
+        face_indexes = coordinates.get("face_coordinates")
+        if face_indexes is not None:
+            indexes["face_x"] = face_indexes[0][0]
+            indexes["face_y"] = face_indexes[1][0]
 
         crs, projected = cls._extract_crs(ds, topology)
 
@@ -391,7 +409,7 @@ class Ugrid2d(AbstractUgrid):
             dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
-        self._write_grid_mapping(dataset)
+        dataset = self.write_grid_mapping(dataset)
         return dataset
 
     # These are all optional/derived UGRID attributes. They are not computed by

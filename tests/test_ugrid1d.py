@@ -10,6 +10,7 @@ from matplotlib.collections import LineCollection
 from scipy import sparse, spatial
 
 import xugrid
+from xugrid.ugrid.crs import CrsPlaceholder
 
 from . import requires_meshkernel
 
@@ -122,6 +123,18 @@ def test_ugrid1d_properties():
     assert isinstance(grid.edge_kdtree, spatial.KDTree)
 
 
+def test_ugrid1d_optional_attributes():
+    # Check whether edge coordinates end up in the _indexes
+    ds = grid1d().to_dataset(optional_attributes=True)
+    grid = xugrid.Ugrid1d.from_dataset(ds)
+    assert grid._indexes == {
+        "node_x": "network1d_node_x",
+        "node_y": "network1d_node_y",
+        "edge_x": "network1d_edge_x",
+        "edge_y": "network1d_edge_y",
+    }
+
+
 def test_ugrid1d_egde_bounds():
     grid = grid1d()
     expected = np.array(
@@ -133,6 +146,43 @@ def test_ugrid1d_egde_bounds():
     actual = grid.edge_bounds
     assert actual.shape == (2, 4)
     assert np.allclose(actual, expected)
+
+
+def test_validate_crs():
+    grid = grid1d()
+    assert grid._validate_crs(None, True) == (None, True)
+    assert grid._validate_crs(None, False) == (None, False)
+
+    placeholder = CrsPlaceholder({})
+    assert grid._validate_crs(placeholder, True) == (placeholder, True)
+    assert grid._validate_crs(placeholder, False) == (placeholder, False)
+
+    crs = pyproj.CRS.from_epsg(28992)
+    # CRS overrides projected argument
+    expected = (crs, True)
+    assert grid._validate_crs(crs, True) == expected
+    assert grid._validate_crs(crs, False) == expected
+    assert grid._validate_crs("EPSG:28992", True) == expected
+    assert grid._validate_crs("EPSG:28992", False) == expected
+    expected = (pyproj.CRS.from_epsg(4326), False)
+    assert grid._validate_crs("EPSG:4326", True) == expected
+    assert grid._validate_crs("EPSG:4326", False) == expected
+
+    with pytest.raises(ValueError, match="Unsupported CRS"):
+        # Test a geocentric non-projected, non-geographic CRS
+        grid._validate_crs("EPSG:4328", True) == expected
+
+
+def test_ugrid1d_update_coordinate_attrs():
+    grid = grid1d()
+    obj = xr.DataArray(np.ones(grid.n_edge), dims=(grid.edge_dimension,))
+    obj = grid.assign_edge_coords(obj)
+    grid._indexes["edge_x"] = "network1d_edge_x"
+    grid._indexes["edge_y"] = "network1d_edge_y"
+    grid.set_crs(epsg=4326)
+    grid._update_coordinate_attrs(obj)
+    assert obj["network1d_edge_x"].attrs["standard_name"] == "longitude"
+    assert obj["network1d_edge_y"].attrs["standard_name"] == "latitude"
 
 
 def test_set_crs():
@@ -170,6 +220,14 @@ def test_set_crs():
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
 
+def test_ugrid1d_assign_derived_coordinates():
+    grid = grid1d()
+    obj = xr.DataArray(np.ones(grid.n_edge), dims=(grid.edge_dimension,))
+    obj = grid._assign_derived_coords(obj)
+    assert "network1d_edge_x" in obj.coords
+    assert "network1d_edge_y" in obj.coords
+
+
 def test_to_crs():
     grid = grid1d()
 
@@ -189,6 +247,14 @@ def test_to_crs():
     grid.crs = xugrid.ugrid.crs.CrsPlaceholder({})
     with pytest.raises(ValueError, match="Cannot transform geometries"):
         grid.to_crs(epsg=28992)
+
+
+def test_ugrid1d_write_grid_mapping():
+    grid = grid1d()
+    grid.set_crs(epsg=28992)
+    dataset = grid.to_dataset()
+    assert "network1d_crs" in dataset
+    assert dataset["network1d_crs"].attrs["name"] == "Amersfoort / RD New"
 
 
 def test_to_dataset():

@@ -155,8 +155,13 @@ class Ugrid1d(AbstractUgrid):
             ds[edge_nodes], fill_value, dtype=IntDType
         ).to_numpy()
 
+        # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
+        edge_indexes = coordinates.get("edge_coordinates")
+        if edge_indexes is not None:
+            indexes["edge_x"] = edge_indexes[0][0]
+            indexes["edge_y"] = edge_indexes[1][0]
 
         crs, projected = cls._extract_crs(ds, topology)
 
@@ -190,6 +195,15 @@ class Ugrid1d(AbstractUgrid):
         # Edges
         self._edge_x = None
         self._edge_y = None
+
+    def _assign_derived_coords(self, obj):
+        if self.node_dimension in obj.dims:
+            obj = self.assign_node_coords(obj)
+        if self.edge_dimension in obj.dims:
+            obj = self.assign_edge_coords(obj)
+        if self._dataset is not None:
+            self._dataset.drop_vars(self._indexes.values(), errors="ignore")
+        return obj
 
     @classmethod
     def from_meshkernel(
@@ -262,6 +276,7 @@ class Ugrid1d(AbstractUgrid):
             dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
+        dataset = self.write_grid_mapping(dataset)
         return dataset
 
     @property

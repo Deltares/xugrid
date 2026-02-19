@@ -133,6 +133,7 @@ class TestCrsToAttrs:
         attrs = crs_to_attrs(crs)
         assert "crs_wkt" in attrs
         assert "spatial_ref" in attrs
+        assert attrs["name"] == "WGS 84"
         assert attrs["crs_wkt"] == attrs["spatial_ref"]
         assert attrs["epsg"] == 4326
         assert "grid_mapping_name" in attrs
@@ -143,6 +144,7 @@ class TestCrsToAttrs:
         attrs = crs_to_attrs(crs)
         assert "crs_wkt" in attrs
         assert "spatial_ref" in attrs
+        assert attrs["name"] == "Amersfoort / RD New"
         assert attrs["epsg"] == 28992
         # Oblique stereographic has no CF grid_mapping_name
         assert "grid_mapping_name" not in attrs

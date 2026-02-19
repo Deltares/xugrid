@@ -313,7 +313,7 @@ class TestUgridDataArray:
         uda = self.uda.copy()
         uda.ugrid.set_crs(epsg=28992)
         ds = uda.ugrid.to_dataset()
-        assert ds["a"].encoding == {"grid_mapping": "mesh2d_crs"}
+        assert ds["a"].attrs == {"grid_mapping": "mesh2d_crs"}
         assert "mesh2d_crs" in ds.data_vars
         back = xugrid.UgridDataset(ds)
         assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
@@ -770,8 +770,8 @@ class TestUgridDataset:
         uds.ugrid.set_crs(epsg=28992, topology="mesh2d")
         ds = uds.ugrid.to_dataset()
         expected = {"grid_mapping": "mesh2d_crs"}
-        assert ds["a"].encoding == expected
-        assert ds["b"].encoding == expected
+        assert ds["a"].attrs == expected
+        assert ds["b"].attrs == expected
         assert "mesh2d_crs" in ds.data_vars
         back = xugrid.UgridDataset(ds)
         assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
@@ -807,6 +807,127 @@ class TestUgridDataset:
 
     def test_total_bounds(self):
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
+
+
+class TestDatasetOptionalCoordinates:
+    """Test whether all coordinates, not just nodes, are kept in sync."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.grid = GRID()
+        self.ds = self.grid.to_dataset(optional_attributes=True)
+        self.ds["a"] = DARRAY()
+        self.X = ("mesh2d_node_x", "mesh2d_edge_x", "mesh2d_face_x")
+        self.Y = ("mesh2d_node_y", "mesh2d_edge_y", "mesh2d_face_y")
+
+    def test_indexes(self):
+        uds = xugrid.UgridDataset(self.ds)
+        expected = {
+            "node_x": "mesh2d_node_x",
+            "node_y": "mesh2d_node_y",
+            "edge_x": "mesh2d_edge_x",
+            "edge_y": "mesh2d_edge_y",
+            "face_x": "mesh2d_face_x",
+            "face_y": "mesh2d_face_y",
+        }
+        assert uds.grid._indexes == expected
+
+    def test_dataset_set_crs(self):
+        uds = xugrid.UgridDataset(self.ds)
+        for x in self.X:
+            assert uds[x].attrs["standard_name"] == "projection_x_coordinate"
+        for x in self.Y:
+            assert uds[x].attrs["standard_name"] == "projection_y_coordinate"
+        uds.ugrid.set_crs(epsg=28992)
+        for x in self.X:
+            assert uds[x].attrs["standard_name"] == "projection_x_coordinate"
+        for x in self.Y:
+            assert uds[x].attrs["standard_name"] == "projection_y_coordinate"
+        uds.ugrid.set_crs(epsg=4326, allow_override=True)
+        for x in self.X:
+            assert uds[x].attrs["standard_name"] == "longitude"
+        for x in self.Y:
+            assert uds[x].attrs["standard_name"] == "latitude"
+
+        back = uds.ugrid.to_dataset()
+        for x in self.X:
+            assert back[x].attrs["standard_name"] == "longitude"
+        for x in self.Y:
+            assert back[x].attrs["standard_name"] == "latitude"
+
+    def test_dataset_to_crs(self):
+        uds = xugrid.UgridDataset(self.ds)
+        uds.ugrid.set_crs(epsg=28992)
+        for x in self.X:
+            assert uds[x].attrs["standard_name"] == "projection_x_coordinate"
+        for x in self.Y:
+            assert uds[x].attrs["standard_name"] == "projection_y_coordinate"
+        new = uds.ugrid.to_crs(epsg=4326)
+        for x in self.X:
+            assert new[x].attrs["standard_name"] == "longitude"
+        for x in self.Y:
+            assert new[x].attrs["standard_name"] == "latitude"
+
+        def is_different(a, b, name):
+            return (a[name] != b[name]).all()
+
+        names = (
+            "mesh2d_node_x",
+            "mesh2d_node_y",
+            "mesh2d_edge_x",
+            "mesh2d_edge_y",
+            "mesh2d_face_x",
+            "mesh2d_face_y",
+        )
+        for name in names:
+            assert is_different(uds, new, name)
+
+        back = new.ugrid.to_dataset()
+        for x in self.X:
+            assert back[x].attrs["standard_name"] == "longitude"
+        for x in self.Y:
+            assert back[x].attrs["standard_name"] == "latitude"
+
+    def test_dropped_grid_mapping(self):
+        grid = self.grid.copy()
+        grid.set_crs(epsg=28992)
+        ds = grid.to_dataset()
+        ds["a"] = DARRAY()
+        ds["a"].attrs["grid_mapping"] = "mesh2d_crs"
+        assert "mesh2d_crs" in ds
+        uds = xugrid.UgridDataset(ds)
+        assert "mesh2d_crs" not in uds
+        assert "grid_mapping" not in uds["a"].attrs
+        back = uds.ugrid.to_dataset()
+        assert "mesh2d_crs" in back
+        assert "grid_mapping" in back["a"].attrs
+
+    def test_dataarray_set_crs(self):
+        uds = xugrid.UgridDataset(self.ds)
+        uda = uds["a"]
+        uda.ugrid.set_crs(epsg=4326)
+        assert uda["mesh2d_face_x"].attrs["standard_name"] == "longitude"
+        assert uda["mesh2d_face_y"].attrs["standard_name"] == "latitude"
+
+        back = uda.ugrid.to_dataset()
+        for x in self.X:
+            assert back[x].attrs["standard_name"] == "longitude"
+        for x in self.Y:
+            assert back[x].attrs["standard_name"] == "latitude"
+
+    def test_dataarray_to_crs(self):
+        uds = xugrid.UgridDataset(self.ds)
+        uda = uds["a"]
+        uda.ugrid.set_crs(epsg=28992)
+        new = uda.ugrid.to_crs(epsg=4326)
+        assert new["mesh2d_face_x"].attrs["standard_name"] == "longitude"
+        assert new["mesh2d_face_y"].attrs["standard_name"] == "latitude"
+        back = new.ugrid.to_dataset()
+        assert back["mesh2d_face_x"].attrs["standard_name"] == "longitude"
+        assert back["mesh2d_face_y"].attrs["standard_name"] == "latitude"
+        # These have been invalidated and should not longer be present.
+        assert "mesh2d_edge_x" not in back
+        assert "mesh2d_edge_y" not in back
 
 
 class TestMultiTopologyUgridDataset:
@@ -1046,7 +1167,13 @@ def test_multiple_coordinates():
 
     # Make sure everything goes right when subsetting: tests whether all
     # attributes and grid indexes are propagated to the new grid object.
-    uds = xugrid.UgridDataset(ds)
+    with pytest.warns(UserWarning) as record:
+        uds = xugrid.UgridDataset(ds)
+
+    messages = [str(w.message) for w in record]
+    assert any("Inconsistent standard_names across coordinates" in m for m in messages)
+    assert any("No CRS or recognizable standard_name" in m for m in messages)
+
     subset = uds.isel({grid.face_dimension: [0, 1]})
     assert isinstance(subset, xugrid.UgridDataset)
     subset_ds = uds.ugrid.to_dataset()

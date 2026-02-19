@@ -406,14 +406,19 @@ def _infer_projected(
                 # Check y
                 stdname = ds[y_varname].attrs.get("standard_name")
                 if stdname == Y_STANDARD_NAMES[0]:
-                    inferred.append((x_varname, True))
+                    inferred.append((y_varname, True))
                 elif stdname == Y_STANDARD_NAMES[1]:
-                    inferred.append((x_varname, False))
+                    inferred.append((y_varname, False))
 
-        # In principle, a geocentric CRS is neither projected nor geographic, but
-        # it is very niche we cannot easily support it within xugrid.
-        values = [v for _, v in inferred]
-        if len(set(values)) > 1:
+        # In principle, a geocentric CRS like EPSG:4328 is neither projected
+        # nor geographic, but it is very niche we cannot easily support it
+        # within xugrid.
+        values = {v for _, v in inferred}
+        if len(values) == 0:
+            projected = None
+        elif len(values) == 1:
+            projected = values.pop()
+        else:
             details = ", ".join(
                 f"{n}: {'projected' if v else 'geographic'}" for n, v in inferred
             )
@@ -421,11 +426,8 @@ def _infer_projected(
                 f"Inconsistent standard_names across coordinates for topology "
                 f"'{topology}': {details}. Returning None."
             )
-            topology_dict[topology] = None
-        elif values:
-            topology_dict[topology] = values[0]
-        else:
-            topology_dict[topology] = None
+            projected = None
+        topology_dict[topology] = projected
 
     return topology_dict
 

@@ -461,6 +461,8 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         for grid in grids:
             grid.set_crs(crs, epsg, allow_override)
+            grid._update_coordinate_attrs(self.obj)
+        return
 
     def to_crs(
         self,
@@ -490,20 +492,30 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         topology: str, optional
             Name of the grid topology to reproject.
             Reprojects all grids if left unspecified.
-        """
-        if topology is None:
-            grids = [grid.to_crs(crs, epsg) for grid in self.grids]
-        else:
-            names = [grid.name for grid in self.grids]
-            if topology not in names:
-                raise ValueError(f"{topology} not found. Expected one of: {names}")
-            grids = [
-                grid.to_crs(crs, epsg) if grid.name == topology else grid.copy()
-                for grid in self.grids
-            ]
 
-        uds = UgridDataset(self.obj, grids)
-        return uds.ugrid.assign_node_coords()
+        Notes
+        -----
+        Node coordinates are always recomputed from the reprojected node positions.
+        Face and edge coordinates, if present, are also recomputed from the new
+        node positions. Coordinates not governed by the UGRID conventions
+        are left untouched.
+        """
+        obj = self.obj.copy()
+
+        names = [grid.name for grid in self.grids]
+        if topology is not None and topology not in names:
+            raise ValueError(f"{topology} not found. Expected one of: {names}")
+
+        grids = []
+        for grid in self.grids:
+            if topology is None or grid.name == topology:
+                newgrid = grid.to_crs(crs, epsg)
+                obj = newgrid._assign_derived_coords(obj)
+            else:
+                newgrid = grid.copy()
+            grids.append(newgrid)
+
+        return UgridDataset(obj, grids)
 
     def to_geodataframe(self, dim_order=None) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """

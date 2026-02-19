@@ -470,6 +470,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             existing CRS, even when both are not equal.
         """
         self.grid.set_crs(crs, epsg, allow_override)
+        self.grid._update_coordinate_attrs(self.obj)
 
     def to_crs(
         self,
@@ -495,12 +496,17 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             such as an authority string (eg "EPSG:4326") or a WKT string.
         epsg : int, optional if `crs` is specified
             EPSG code specifying output projection.
+
+        Notes
+        -----
+        Node coordinates are always recomputed from the reprojected node positions.
+        Face and edge coordinates, if present, are also recomputed from the new
+        node positions. Coordinates not governed by the UGRID conventions
+        are left untouched.
         """
-        uda = UgridDataArray(self.obj, self.grid.to_crs(crs, epsg))
-        if self.grid.node_dimension in self.obj.dims:
-            return uda.ugrid.assign_node_coords()
-        else:
-            return uda
+        grid = self.grid.to_crs(crs, epsg)
+        obj = grid._assign_derived_coords(self.obj)
+        return UgridDataArray(obj, grid)
 
     def to_geodataframe(
         self, name: str = None, dim_order=None
