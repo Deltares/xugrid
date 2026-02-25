@@ -1,6 +1,7 @@
 from collections import ChainMap
 
 import numpy as np
+import pyproj
 import pytest
 import xarray as xr
 
@@ -155,6 +156,121 @@ class TestConventionsElevation:
     def test_repr(self):
         result = self.ds.ugrid_roles.__repr__()
         assert isinstance(result, str)
+
+
+class TestCrsConventions:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.ds = xugrid.data.elevation_nl(xarray=True)
+        self.coordinates = {
+            "mesh2d": {
+                "node_coordinates": (
+                    ["mesh2d_node_x"],
+                    ["mesh2d_node_y"],
+                ),
+                "face_coordinates": (
+                    ["mesh2d_face_x"],
+                    ["mesh2d_face_y"],
+                ),
+            }
+        }
+        self.connectivity = {
+            "mesh2d": {
+                "face_node_connectivity": "mesh2d_face_nodes",
+            }
+        }
+        self.dimensions = {
+            "mesh2d": {
+                "edge_dimension": "mesh2d_nEdges",
+                "face_dimension": "mesh2d_nFaces",
+                "node_dimension": "mesh2d_nNodes",
+            },
+        }
+
+    def test_get_grid_mapping_names(self):
+        # Setup doesn't contain any CRS data.
+        expected = {"mesh2d": None}
+        assert (
+            cv._get_grid_mapping_names(self.ds, ["mesh2d"], self.dimensions) == expected
+        )
+        assert self.ds.ugrid_roles.grid_mapping_names == expected
+
+        # Now add the CRS
+        attrs = xugrid.ugrid.crs.crs_to_attrs(pyproj.CRS.from_epsg(28992))
+        expected = {"mesh2d": "mesh2d_crs"}
+        # Via attrs
+        ds = self.ds.copy()
+        ds["mesh2d_crs"] = xr.Variable((), 0, attrs=attrs)
+        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs"
+        assert cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+        assert ds.ugrid_roles.grid_mapping_names == expected
+        # Via encoding
+        ds = self.ds.copy()
+        ds["mesh2d_crs"] = xr.Variable((), 0, attrs=attrs)
+        ds["elevation"].encoding["grid_mapping"] = "mesh2d_crs"
+        assert cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+        assert ds.ugrid_roles.grid_mapping_names == expected
+
+        # Multiple grid mappings should raise
+        ds["elevation2"] = ds["elevation"].copy()
+        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs2"
+        with pytest.raises(
+            ValueError, match="Multiple grid mappings found for topology"
+        ):
+            ds.ugrid_roles.grid_mapping_names
+
+    def test_infer_projected(self):
+        ds = self.ds.copy()
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": True}
+
+        # Test accessor as well
+        assert ds.ugrid_roles.is_projected == {"mesh2d": True}
+
+        coordnames = (
+            "mesh2d_node_x",
+            "mesh2d_node_y",
+            "mesh2d_face_x",
+            "mesh2d_face_y",
+        )
+        # Remove two.
+        for name in coordnames[:2]:
+            ds[name].attrs["standard_name"] = None
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": True}
+
+        # Remove all.
+        for name in coordnames:
+            ds[name].attrs["standard_name"] = None
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": None}
+
+        # Pop two.
+        ds = self.ds.copy()
+        for name in coordnames[:2]:
+            ds[name].attrs.pop("standard_name")
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": True}
+
+        # Pop all.
+        ds = self.ds.copy()
+        for name in coordnames:
+            ds[name].attrs.pop("standard_name")
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": None}
+
+        # Make it inconsistent
+        ds = self.ds.copy()
+        ds["mesh2d_node_x"].attrs["standard_name"] = "longitude"
+        ds["mesh2d_node_y"].attrs["standard_name"] = "latitude"
+        with pytest.warns(UserWarning):
+            cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+
+        # Make it geograhic
+        ds["mesh2d_face_x"].attrs["standard_name"] = "longitude"
+        ds["mesh2d_face_y"].attrs["standard_name"] = "latitude"
+        result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
+        assert result == {"mesh2d": False}
 
 
 class TestCompleteSpecification:

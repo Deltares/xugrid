@@ -46,7 +46,7 @@ class Ugrid1d(AbstractUgrid):
     projected: bool, optional
         Whether node_x and node_y are longitude and latitude or projected x and
         y coordinates. Used to write the appropriate standard_name in the
-        coordinate attributes.
+        coordinate attributes. If crs is provided, its value will take priority.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -80,7 +80,9 @@ class Ugrid1d(AbstractUgrid):
         self.start_index = start_index
         self.edge_node_connectivity = edge_node_connectivity - self.start_index
         self.name = name
-        self.projected = projected
+
+        # projected, crs
+        self.crs, self.projected = self._validate_crs(crs, projected)
 
         self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
@@ -104,13 +106,6 @@ class Ugrid1d(AbstractUgrid):
         # Connectivity
         self._node_node_connectivity = None
         self._node_edge_connectivity = None
-        # crs
-        if crs is None:
-            self.crs = None
-        else:
-            import pyproj
-
-            self.crs = pyproj.CRS.from_user_input(crs)
 
     @classmethod
     def from_dataset(cls, dataset: xr.Dataset, topology: str = None):
@@ -160,9 +155,15 @@ class Ugrid1d(AbstractUgrid):
             ds[edge_nodes], fill_value, dtype=IntDType
         ).to_numpy()
 
+        # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
-        projected = False  # TODO
+        edge_indexes = coordinates.get("edge_coordinates")
+        if edge_indexes is not None:
+            indexes["edge_x"] = edge_indexes[0][0]
+            indexes["edge_y"] = edge_indexes[1][0]
+
+        crs, projected = cls._extract_crs(ds, topology)
 
         return cls(
             node_x_coordinates,
@@ -173,7 +174,7 @@ class Ugrid1d(AbstractUgrid):
             dataset=dataset[ugrid_vars],
             indexes=indexes,
             projected=projected,
-            crs=None,
+            crs=crs,
             start_index=start_index,
         )
 
@@ -194,6 +195,17 @@ class Ugrid1d(AbstractUgrid):
         # Edges
         self._edge_x = None
         self._edge_y = None
+
+    def _assign_derived_coords(self, obj):
+        if self.node_dimension in obj.dims:
+            obj = self.assign_node_coords(obj)
+        if self.edge_dimension in obj.dims:
+            obj = self.assign_edge_coords(obj)
+        if self._dataset is not None:
+            self._dataset = self._dataset.drop_vars(
+                self._indexes.values(), errors="ignore"
+            )
+        return obj
 
     @classmethod
     def from_meshkernel(
@@ -266,6 +278,7 @@ class Ugrid1d(AbstractUgrid):
             dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
+        dataset = self.write_grid_mapping(dataset)
         return dataset
 
     @property

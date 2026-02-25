@@ -7,7 +7,7 @@ It takes some inspiration from: https://github.com/xarray-contrib/cf-xarray
 import warnings
 from collections import ChainMap
 from itertools import chain
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import xarray as xr
 
@@ -60,13 +60,13 @@ X_STANDARD_NAMES = ("projection_x_coordinate", "longitude")
 Y_STANDARD_NAMES = ("projection_y_coordinate", "latitude")
 
 PROJECTED = True
-LATLON = False
+GEOGRAPHIC = False
 DEFAULT_ATTRS = {
     "node_x": {
         PROJECTED: {
             "standard_name": "projection_x_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "longitude",
         },
     },
@@ -74,7 +74,7 @@ DEFAULT_ATTRS = {
         PROJECTED: {
             "standard_name": "projection_y_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "latitude",
         },
     },
@@ -82,7 +82,7 @@ DEFAULT_ATTRS = {
         PROJECTED: {
             "standard_name": "projection_x_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "longitude",
         },
     },
@@ -90,7 +90,7 @@ DEFAULT_ATTRS = {
         PROJECTED: {
             "standard_name": "projection_y_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "latitude",
         },
     },
@@ -98,7 +98,7 @@ DEFAULT_ATTRS = {
         PROJECTED: {
             "standard_name": "projection_x_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "longitude",
         },
     },
@@ -106,7 +106,7 @@ DEFAULT_ATTRS = {
         PROJECTED: {
             "standard_name": "projection_y_coordinate",
         },
-        LATLON: {
+        GEOGRAPHIC: {
             "standard_name": "latitude",
         },
     },
@@ -346,6 +346,92 @@ def _get_connectivity(
     return topology_dict
 
 
+def _get_grid_mapping_names(
+    ds: xr.Dataset,
+    topologies: List[str],
+    dimensions: Dict[str, Dict[str, str]],
+) -> Dict[str, str | None]:
+    topology_dict = {}
+    for topology in topologies:
+        topology_dict[topology] = None
+        # The grid mapping should be specified per variable.
+        # Check which variables have the relevant UGRID dimensions, and extract
+        # the grid mapping.
+        topo_dims = set(dimensions[topology].values())
+        names = {
+            var.attrs.get("grid_mapping") or var.encoding.get("grid_mapping")
+            for var in ds.variables.values()
+            if topo_dims & set(var.dims)
+        } - {None}
+
+        if names:
+            # In principle, multiple coordinates are allowed to be specified
+            # in the topology variable. Let's say there are two sets of coordinates
+            # node_coordinates: "mesh2d_node_x1 mesh2d_node_y1 mesh2d_node_x2 mesh2d_node_y2"
+            # In this case, we need a grid mapping for (x1, y1) and for (x2, y2),
+            # but given that the grid mapping is defined on a data variable, there is no
+            # way to link them correctly. Hence the ValueError.
+            # See also: https://github.com/ugrid-conventions/ugrid-conventions/issues/64
+            if len(names) > 1:
+                raise ValueError(
+                    f"Multiple grid mappings found for topology '{topology}': "
+                    f"{names}. Variables on the same topology are expected to "
+                    f"share a single coordinate reference system (CRS). "
+                    f"Load the dataset with xarray.open_dataset() and modify "
+                    f"the grid_mapping attributes before converting to a "
+                    f"UgridDataset."
+                )
+
+            topology_dict[topology] = next(iter(names))
+
+    return topology_dict
+
+
+def _infer_projected(
+    ds: xr.Dataset,
+    topologies: List[str],
+    coordinates: Dict[str, Dict[str, Tuple[List[str], List[str]]]],
+) -> Dict[str, bool | None]:
+    topology_dict = {}
+    for topology in topologies:
+        inferred = []
+        for role, (x_vars, y_vars) in coordinates[topology].items():
+            for x_varname, y_varname in zip(x_vars, y_vars):
+                # Check x
+                stdname = ds[x_varname].attrs.get("standard_name")
+                if stdname == X_STANDARD_NAMES[0]:
+                    inferred.append((x_varname, True))
+                elif stdname == X_STANDARD_NAMES[1]:
+                    inferred.append((x_varname, False))
+                # Check y
+                stdname = ds[y_varname].attrs.get("standard_name")
+                if stdname == Y_STANDARD_NAMES[0]:
+                    inferred.append((y_varname, True))
+                elif stdname == Y_STANDARD_NAMES[1]:
+                    inferred.append((y_varname, False))
+
+        # In principle, a geocentric CRS like EPSG:4328 is neither projected
+        # nor geographic, but it is very niche we cannot easily support it
+        # within xugrid.
+        values = {v for _, v in inferred}
+        if len(values) == 0:
+            projected = None
+        elif len(values) == 1:
+            projected = values.pop()
+        else:
+            details = ", ".join(
+                f"{n}: {'projected' if v else 'geographic'}" for n, v in inferred
+            )
+            warnings.warn(
+                f"Inconsistent standard_names across coordinates for topology "
+                f"'{topology}': {details}. Returning None."
+            )
+            projected = None
+        topology_dict[topology] = projected
+
+    return topology_dict
+
+
 @xr.register_dataset_accessor("ugrid_roles")
 class UgridRolesAccessor:
     """
@@ -445,10 +531,36 @@ class UgridRolesAccessor:
         """
         return _get_connectivity(self._ds, self.topology)
 
+    @property
+    def grid_mapping_names(self) -> Dict[str, Optional[Set[str]]]:
+        """
+        Get the names of the grid mapping variables associated with each topology.
+
+        Returns
+        -------
+        grid_mapping: dict[str, str | None]
+        """
+        return _get_grid_mapping_names(self._ds, self.topology, self.dimensions)
+
+    @property
+    def is_projected(self) -> Dict[str, bool | None]:
+        """
+        Infer whether each topology uses projected or geographic coordinates
+        from the standard_name attributes of the coordinate variables.
+
+        Returns
+        -------
+        projected: dict[str, bool | None]
+            True if projected, False if geographic, None if indeterminate.
+        """
+        return _infer_projected(self._ds, self.topology, self.coordinates)
+
     def __repr__(self):
         dimensions = self.dimensions
         coordinates = self.coordinates
         connectivity = self.connectivity
+        grid_mapping_names = self.grid_mapping_names
+        is_projected = self.is_projected
 
         def make_text_section(subtitle, entries, vardict):
             tab = "    "
@@ -474,5 +586,21 @@ class UgridRolesAccessor:
             rows += make_text_section(
                 "Coordinates:", _COORD_NAMES[topodim], coordinates[topology]
             )
+
+            # CRS summary line
+            name = grid_mapping_names[topology]
+            projected = is_projected[topology]
+            if projected is True:
+                crs_type = "projected"
+            elif projected is False:
+                crs_type = "geographic"
+            else:
+                crs_type = "unknown"
+            name_str = name if name is not None else "n/a"
+            rows += [
+                f"    Coordinate Type: {crs_type}",
+                f"Grid Mapping Name: {name_str}",
+                "",
+            ]
 
         return "\n".join(rows)
