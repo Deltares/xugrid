@@ -901,7 +901,8 @@
 <span class="sd">            If the the UGRID topology already has a CRS, allow to replace the</span>
 <span class="sd">            existing CRS, even when both are not equal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">allow_override</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">allow_override</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">_update_coordinate_attrs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.to_crs">
@@ -930,12 +931,17 @@
 <span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
 <span class="sd">        epsg : int, optional if `crs` is specified</span>
 <span class="sd">            EPSG code specifying output projection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Node coordinates are always recomputed from the reprojected node positions.</span>
+<span class="sd">        Face and edge coordinates, if present, are also recomputed from the new</span>
+<span class="sd">        node positions. Coordinates not governed by the UGRID conventions</span>
+<span class="sd">        are left untouched.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">uda</span> <span class="o">=</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">node_dimension</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">uda</span></div>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">_assign_derived_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">UgridDataArray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.to_geodataframe">

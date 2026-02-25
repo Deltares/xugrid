@@ -516,6 +516,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.meshkernel.html">xugrid.Ugrid1d.meshkernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.set_crs.html">xugrid.Ugrid1d.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.to_crs.html">xugrid.Ugrid1d.to_crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.write_grid_mapping.html">xugrid.Ugrid1d.write_grid_mapping</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.from_dataset.html">xugrid.Ugrid1d.from_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.to_dataset.html">xugrid.Ugrid1d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid1d.from_geodataframe.html">xugrid.Ugrid1d.from_geodataframe</a></li>
@@ -614,6 +615,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.meshkernel.html">xugrid.Ugrid2d.meshkernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.set_crs.html">xugrid.Ugrid2d.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_crs.html">xugrid.Ugrid2d.to_crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.write_grid_mapping.html">xugrid.Ugrid2d.write_grid_mapping</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_dataset.html">xugrid.Ugrid2d.from_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
@@ -633,6 +635,8 @@
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.connectivity.html">xugrid.UgridRolesAccessor.connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.coordinates.html">xugrid.UgridRolesAccessor.coordinates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.dimensions.html">xugrid.UgridRolesAccessor.dimensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.grid_mapping_names.html">xugrid.UgridRolesAccessor.grid_mapping_names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xugrid.UgridRolesAccessor.is_projected.html">xugrid.UgridRolesAccessor.is_projected</a></li>
 </ul>
 </div>
 </nav></div>
@@ -706,7 +710,7 @@
 <li><p><strong>name</strong> (<em>str</em>) – Mesh name. Defaults to “mesh2d”.</p></li>
 <li><p><strong>projected</strong> (<em>bool</em>) – Whether node_x and node_y are longitude and latitude or projected x and
 y coordinates. Used to write the appropriate standard_name in the
-coordinate attributes.</p></li>
+coordinate attributes. If crs is provided, its value will take priority.</p></li>
 <li><p><strong>crs</strong> (<em>Any</em><em>, </em><em>optional</em>) – Coordinate Reference System of the geometry objects. Can be anything accepted by
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
 such as an authority string (eg “EPSG:4326”) or a WKT string.</p></li>

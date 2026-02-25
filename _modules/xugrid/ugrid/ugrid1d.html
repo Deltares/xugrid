@@ -425,7 +425,7 @@
 <span class="sd">    projected: bool, optional</span>
 <span class="sd">        Whether node_x and node_y are longitude and latitude or projected x and</span>
 <span class="sd">        y coordinates. Used to write the appropriate standard_name in the</span>
-<span class="sd">        coordinate attributes.</span>
+<span class="sd">        coordinate attributes. If crs is provided, its value will take priority.</span>
 <span class="sd">    crs: Any, optional</span>
 <span class="sd">        Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">        :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
@@ -461,7 +461,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span> <span class="o">=</span> <span class="n">start_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">edge_node_connectivity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">projected</span> <span class="o">=</span> <span class="n">projected</span>
+
+        <span class="c1"># projected, crs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">projected</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_indexes_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
@@ -484,14 +486,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_y</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Connectivity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_node_node_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_node_edge_connectivity</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1"># crs</span>
-        <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_node_edge_connectivity</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="Ugrid1d.from_dataset">
@@ -544,9 +539,15 @@
             <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
         <span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
+        <span class="c1"># Fill &quot;indexes&quot;: mark which names point to the UGRID-relevant coordinates.</span>
         <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_index</span>
         <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_index</span>
-        <span class="n">projected</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># TODO</span>
+        <span class="n">edge_indexes</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_coordinates&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edge_indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;edge_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;edge_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">crs</span><span class="p">,</span> <span class="n">projected</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_extract_crs</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">topology</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">node_x_coordinates</span><span class="p">,</span>
@@ -557,7 +558,7 @@
             <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="n">ugrid_vars</span><span class="p">],</span>
             <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
             <span class="n">projected</span><span class="o">=</span><span class="n">projected</span><span class="p">,</span>
-            <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
             <span class="n">start_index</span><span class="o">=</span><span class="n">start_index</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -579,6 +580,17 @@
         <span class="c1"># Edges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_edge_y</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assign_derived_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_edge_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
 
 <div class="viewcode-block" id="Ugrid1d.from_meshkernel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_meshkernel.html#xugrid.Ugrid1d.from_meshkernel">[docs]</a>
@@ -656,6 +668,7 @@
             <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_edge_coords</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
         <span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filtered_attrs</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_grid_mapping</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
 
 

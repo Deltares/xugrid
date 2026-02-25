@@ -516,6 +516,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.meshkernel.html">xugrid.Ugrid1d.meshkernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.set_crs.html">xugrid.Ugrid1d.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.to_crs.html">xugrid.Ugrid1d.to_crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.write_grid_mapping.html">xugrid.Ugrid1d.write_grid_mapping</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.from_dataset.html">xugrid.Ugrid1d.from_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.to_dataset.html">xugrid.Ugrid1d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid1d.from_geodataframe.html">xugrid.Ugrid1d.from_geodataframe</a></li>
@@ -614,6 +615,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.meshkernel.html">xugrid.Ugrid2d.meshkernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.set_crs.html">xugrid.Ugrid2d.set_crs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.to_crs.html">xugrid.Ugrid2d.to_crs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.write_grid_mapping.html">xugrid.Ugrid2d.write_grid_mapping</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_dataset.html">xugrid.Ugrid2d.from_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.to_dataset.html">xugrid.Ugrid2d.to_dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.Ugrid2d.from_geodataframe.html">xugrid.Ugrid2d.from_geodataframe</a></li>
@@ -633,6 +635,8 @@
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridRolesAccessor.connectivity.html">xugrid.UgridRolesAccessor.connectivity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridRolesAccessor.coordinates.html">xugrid.UgridRolesAccessor.coordinates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridRolesAccessor.dimensions.html">xugrid.UgridRolesAccessor.dimensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridRolesAccessor.grid_mapping_names.html">xugrid.UgridRolesAccessor.grid_mapping_names</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/xugrid.UgridRolesAccessor.is_projected.html">xugrid.UgridRolesAccessor.is_projected</a></li>
 </ul>
 </div>
 </nav></div>
@@ -707,27 +711,58 @@
 diagonal scaling to improve conditioning. Default tolerances
 have been changed from <code class="docutils literal notranslate"><span class="pre">atol=0.0,</span> <span class="pre">rtol=1e-5</span></code> to <code class="docutils literal notranslate"><span class="pre">atol=1e-4,</span> <span class="pre">rtol=0.0</span></code>
 for better robustness of the found solution.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.set_crs.html#xugrid.Ugrid1d.set_crs" title="xugrid.Ugrid1d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.set_crs()</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.set_crs.html#xugrid.Ugrid2d.set_crs" title="xugrid.Ugrid2d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.set_crs()</span></code></a> now check
+whether a CRS is either projected or geographic (latitude/longitude); note that
+geocentric coordinates (x, y, z measured from the Earth’s center) are not
+within the current scope of xugrid.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.set_crs.html#xugrid.Ugrid1d.set_crs" title="xugrid.Ugrid1d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.set_crs()</span></code></a>, <a class="reference internal" href="api/xugrid.Ugrid2d.set_crs.html#xugrid.Ugrid2d.set_crs" title="xugrid.Ugrid2d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.set_crs()</span></code></a>,
+<a class="reference internal" href="api/xugrid.Ugrid1d.to_crs.html#xugrid.Ugrid1d.to_crs" title="xugrid.Ugrid1d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.to_crs()</span></code></a>, and <a class="reference internal" href="api/xugrid.Ugrid2d.to_crs.html#xugrid.Ugrid2d.to_crs" title="xugrid.Ugrid2d.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.to_crs()</span></code></a> now
+update the standard names of UGRID coordinates when the CRS changes; e.g.
+when going from a projected to a geographic CRS, the standard name of an
+x-coordinate is updated from <code class="docutils literal notranslate"><span class="pre">projection_x_coordinate</span></code> to <code class="docutils literal notranslate"><span class="pre">longitude</span></code>.</p></li>
+</ul>
+</section>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>CRS roundtripping via CF grid mapping: a grid mapping present in a dataset
+is read into the Ugrid topology as a <code class="docutils literal notranslate"><span class="pre">pyproj.CRS</span></code> (or a placeholder if
+pyproj is unavailable or the attributes cannot be interpreted), and
+conversely a CRS set on a topology is written as a CF grid mapping variable
+when converting to dataset (as occurs when writing to e.g. netCDF).</p></li>
+<li><p><a class="reference internal" href="api/xugrid.UgridRolesAccessor.grid_mapping_names.html#xugrid.UgridRolesAccessor.grid_mapping_names" title="xugrid.UgridRolesAccessor.grid_mapping_names"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor.grid_mapping_names</span></code></a> and
+<a class="reference internal" href="api/xugrid.UgridRolesAccessor.is_projected.html#xugrid.UgridRolesAccessor.is_projected" title="xugrid.UgridRolesAccessor.is_projected"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.UgridRolesAccessor.is_projected</span></code></a> have been added to identify
+grid mapping and CRS related properties in a dataset.</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.from_dataset.html#xugrid.Ugrid1d.from_dataset" title="xugrid.Ugrid1d.from_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.from_dataset()</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.from_dataset.html#xugrid.Ugrid2d.from_dataset" title="xugrid.Ugrid2d.from_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.from_dataset()</span></code></a>:
+The names of optional coordinates such as edge and face coordinates for a
+Ugrid2d topology are now tracked in the grid object, if they were present in
+the dataset.</p></li>
 </ul>
 </section>
 </section>
 <section id="id1">
 <h2>[0.14.3] 2025-11-11<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
-<section id="added">
-<h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
+<section id="id2">
+<h3>Added<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Added <code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.data.hydamo_network()</span></code> to download sample data
 of a small surface water network.</p></li>
 </ul>
 </section>
-<section id="fixed">
-<h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
+<section id="id3">
+<h3>Fixed<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Ensure that <a class="reference internal" href="api/xugrid.Ugrid2d.face_face_connectivity.html#xugrid.Ugrid2d.face_face_connectivity" title="xugrid.Ugrid2d.face_face_connectivity"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.face_face_connectivity</span></code></a> returns
 a sparse matrix that is shaped <code class="docutils literal notranslate"><span class="pre">(n_face,</span> <span class="pre">n_face)</span></code>. Previously,
 the sparse matrix constructor inferred dimensions from the maximum
 row/column indices, causing empty trailing rows or columns to be
 omitted. This resulted in dimension mismatches in operations like
-<a href="#id2"><span class="problematic" id="id3">``</span></a>.ugrid.to_dataset(optional_attributes=True)`</p></li>
+<code class="docutils literal notranslate"><span class="pre">.ugrid.to_dataset(optional_attributes=True)</span></code></p></li>
 </ul>
 </section>
 </section>
@@ -1864,11 +1899,13 @@ as the active coordinates of the Ugrid topology.</p></li>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">Unreleased</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">[0.14.3] 2025-11-11</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Fixed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">[0.14.2] 2025-07-15</a><ul class="nav section-nav flex-column">

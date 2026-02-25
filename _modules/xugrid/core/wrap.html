@@ -787,12 +787,26 @@
                     <span class="s2">&quot;obj must be xarray.Dataset. Received instead: &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
+            <span class="c1"># Remove UGRID data and associated data such as grid mapping,</span>
+            <span class="c1"># since the CRS will be managed by the topology instead.</span>
             <span class="n">connectivity_vars</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">name</span>
                 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">connectivity</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
             <span class="p">]</span>
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span> <span class="o">+</span> <span class="n">connectivity_vars</span><span class="p">)</span>
+            <span class="n">grid_mapping_vars</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">name</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">grid_mapping_names</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">]</span>
+            <span class="c1"># Make a copy of the variables and the attrs, ensure we don&#39;t modify the original,</span>
+            <span class="c1"># since .drop_vars returns a shallow copy/view.</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">topology</span> <span class="o">+</span> <span class="n">connectivity_vars</span> <span class="o">+</span> <span class="n">grid_mapping_vars</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">var</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">var</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;grid_mapping&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">original</span> <span class="o">=</span> <span class="n">obj</span>
 
         <span class="k">if</span> <span class="n">grids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
