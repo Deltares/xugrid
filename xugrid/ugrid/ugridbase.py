@@ -456,7 +456,9 @@ class AbstractUgrid(abc.ABC):
         Parameters
         ----------
         dataset: xr.Dataset
-        grid_mapping_name: str
+        grid_mapping_name: str, optional
+            Name of the CF grid mapping variable. If not provided (or None),
+            defaults to ``f"{self.name}_crs"`` for this topology.
 
         Returns
         -------
@@ -1026,7 +1028,7 @@ class AbstractUgrid(abc.ABC):
         elif isinstance(self.crs, CrsPlaceholder):
             raise ValueError(
                 "Cannot transform geometries: the current CRS is a placeholder and has "
-                "not been parsed.\nThis may be because pyproj is not installed, or because pyproj"
+                "not been parsed.\nThis may be because pyproj is not installed, or because pyproj "
                 "failed to interpret the grid mapping attributes.\n"
                 "Use .set_crs(..., allow_override=True) to set a valid pyproj CRS explicitly.\n"
             )

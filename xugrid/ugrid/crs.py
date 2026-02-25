@@ -70,7 +70,7 @@ def crs_from_attrs(ds_attrs: dict) -> pyproj.CRS | CrsPlaceholder:
     return CrsPlaceholder(ds_attrs)
 
 
-def crs_to_attrs(crs: pyproj.CRS) -> dict:
+def crs_to_attrs(crs: pyproj.CRS | CrsPlaceholder) -> dict:
     if isinstance(crs, CrsPlaceholder):
         return crs._attrs
 

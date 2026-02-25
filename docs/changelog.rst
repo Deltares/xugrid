@@ -17,7 +17,7 @@ Changed
   have been changed from ``atol=0.0, rtol=1e-5`` to ``atol=1e-4, rtol=0.0``
   for better robustness of the found solution.
 - :meth:`xugrid.Ugrid1d.set_crs` and :meth:`xugrid.Ugrid2d.set_crs` now check
-  whether a CRS is either projected or geographic (latitude/longitude); e.g.
+  whether a CRS is either projected or geographic (latitude/longitude); note that
   geocentric coordinates (x, y, z measured from the Earth's center) are not
   within the current scope of xugrid.
 - :meth:`xugrid.Ugrid1d.set_crs`, :meth:`xugrid.Ugrid2d.set_crs`,
