@@ -207,7 +207,7 @@ class TestCrsConventions:
         # Via encoding
         ds = self.ds.copy()
         ds["mesh2d_crs"] = xr.Variable((), 0, attrs=attrs)
-        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs"
+        ds["elevation"].encoding["grid_mapping"] = "mesh2d_crs"
         assert cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
         assert ds.ugrid_roles.grid_mapping_names == expected
 

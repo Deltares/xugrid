@@ -202,7 +202,9 @@ class Ugrid1d(AbstractUgrid):
         if self.edge_dimension in obj.dims:
             obj = self.assign_edge_coords(obj)
         if self._dataset is not None:
-            self._dataset = self._dataset.drop_vars(self._indexes.values(), errors="ignore")
+            self._dataset = self._dataset.drop_vars(
+                self._indexes.values(), errors="ignore"
+            )
         return obj
 
     @classmethod
