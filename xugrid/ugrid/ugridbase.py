@@ -473,8 +473,9 @@ class AbstractUgrid(abc.ABC):
 
             # Needs to be this int value for DFM/Interacter...
             # TODO: might change if DFM is changed; we could then simply use 0.
+            _FILL_ = np.int32(np.iinfo(np.int32).min + 1)
             dataset[grid_mapping_name] = xr.Variable(
-                (), np.int32(np.iinfo(np.int32).min + 1), attrs=crs_to_attrs(self.crs)
+                (), _FILL_, attrs=crs_to_attrs(self.crs)
             )
             # Stamp grid_mapping on data variables that sit on this topology
             # QGIS-MDAL reads the grid_mapping off the coordinates, hence

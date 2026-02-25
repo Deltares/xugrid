@@ -765,6 +765,15 @@ class TestUgridDataset:
         assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
         assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
 
+    def test_crs_from_minimal(self):
+        # Grid mapping on a single variable
+        # Just epsg
+        ds = UGRID_DS()
+        ds["a"].attrs["grid_mapping"] = "projected_crs"
+        ds["projected_crs"] = xr.Variable(dims=(), data=0, attrs={"epsg": 28992})
+        uds = xugrid.UgridDataset(ds)
+        assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+
     def test_crs_roundtrip(self):
         uds = self.uds.copy()
         uds.ugrid.set_crs(epsg=28992, topology="mesh2d")
@@ -775,6 +784,9 @@ class TestUgridDataset:
         assert "mesh2d_crs" in ds.data_vars
         back = xugrid.UgridDataset(ds)
         assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
+        # grid_mapping should still be present on ds, should not have been popped.
+        assert "grid_mapping" in ds["a"].attrs
+        assert "grid_mapping" in ds["b"].attrs
 
     def test_assign_coords(self):
         with_coords = (

@@ -559,6 +559,8 @@ class UgridRolesAccessor:
         dimensions = self.dimensions
         coordinates = self.coordinates
         connectivity = self.connectivity
+        grid_mapping_names = self.grid_mapping_names
+        is_projected = self.is_projected
 
         def make_text_section(subtitle, entries, vardict):
             tab = "    "
@@ -584,5 +586,21 @@ class UgridRolesAccessor:
             rows += make_text_section(
                 "Coordinates:", _COORD_NAMES[topodim], coordinates[topology]
             )
+
+            # CRS summary line
+            name = grid_mapping_names[topology]
+            projected = is_projected[topology]
+            if projected is True:
+                crs_type = "projected"
+            elif projected is False:
+                crs_type = "geographic"
+            else:
+                crs_type = "unknown"
+            name_str = name if name is not None else "n/a"
+            rows += [
+                f"    Coordinate Type: {crs_type}",
+                f"Grid Mapping Name: {name_str}",
+                "",
+            ]
 
         return "\n".join(rows)

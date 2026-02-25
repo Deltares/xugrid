@@ -406,10 +406,13 @@ class UgridDataset(DatasetForwardMixin):
                 for name in obj.ugrid_roles.grid_mapping_names.values()
                 if name is not None
             ]
+            # Make a copy of the variables and the attrs, ensure we don't modify the original,
+            # since .drop_vars returns a shallow copy/view.
             ds = obj.drop_vars(
                 obj.ugrid_roles.topology + connectivity_vars + grid_mapping_vars
-            )
+            ).copy()
             for var in ds.variables.values():
+                var.attrs = var.attrs.copy()
                 var.attrs.pop("grid_mapping", None)
             original = obj
 
