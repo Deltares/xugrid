@@ -436,7 +436,8 @@ class AbstractUgrid(abc.ABC):
             if not (_crs.is_projected ^ _crs.is_geographic):
                 raise ValueError(
                     f"Unsupported CRS: {crs}.\n"
-                    "CRS should either be geographic (latitude / longitude) or projected."
+                    "CRS should either be geographic (latitude / longitude) or projected.\n"
+                    "If your CRS is neither, please file an issue at https://github.com/deltares/xugrid/issues"
                 )
             _is_projected = _crs.is_projected
         return _crs, _is_projected
