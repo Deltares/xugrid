@@ -1477,8 +1477,10 @@ class AbstractUgrid(abc.ABC):
 
         _, partition_index = pymetis.part_graph(
             nparts=n_part,
-            xadj=adjacency_matrix.indptr,
-            adjncy=adjacency_matrix.indices,
+            adjacency=pymetis.CSRAdjacency(
+                adj_starts=adjacency_matrix.indptr,
+                adjacent=adjacency_matrix.indices,
+            ),
             vweights=weights,
         )
         return xugrid.UgridDataArray(

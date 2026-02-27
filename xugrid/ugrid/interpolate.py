@@ -278,7 +278,7 @@ def laplace_interpolate(
     unknown = isnull & ~all_null
 
     # Create uniform weighting if sparse data is not to be used.
-    W = connectivity.copy()
+    W = connectivity.astype(np.float64, copy=True)
     if not use_weights:
         W.data[:] = 1.0
 
