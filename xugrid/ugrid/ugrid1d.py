@@ -43,7 +43,7 @@ class Ugrid1d(AbstractUgrid):
     indexes: Dict[str, str], optional
         When a dataset is provided, a mapping from the UGRID role to the dataset
         variable name. E.g. {"face_x": "mesh2d_face_lon"}.
-    projected: bool, optional
+    is_projected: bool, optional
         Whether node_x and node_y are longitude and latitude or projected x and
         y coordinates. Used to write the appropriate standard_name in the
         coordinate attributes. If crs is provided, its value will take priority.
@@ -69,7 +69,7 @@ class Ugrid1d(AbstractUgrid):
         name: str = "network1d",
         dataset: xr.Dataset = None,
         indexes: Dict[str, str] = None,
-        projected: bool = True,
+        is_projected: bool = True,
         crs: Any = None,
         attrs: Dict[str, str] = None,
         start_index: int = 0,
@@ -82,7 +82,7 @@ class Ugrid1d(AbstractUgrid):
         self.name = name
 
         # projected, crs
-        self.crs, self.projected = self._validate_crs(crs, projected)
+        self.crs, self.is_projected = self._validate_crs(crs, is_projected)
 
         self._initialize_indexes_attrs(name, dataset, indexes, attrs)
         self._dataset = dataset
@@ -163,7 +163,7 @@ class Ugrid1d(AbstractUgrid):
             indexes["edge_x"] = edge_indexes[0][0]
             indexes["edge_y"] = edge_indexes[1][0]
 
-        crs, projected = cls._extract_crs(ds, topology)
+        crs, is_projected = cls._extract_crs(ds, topology)
 
         return cls(
             node_x_coordinates,
@@ -173,7 +173,7 @@ class Ugrid1d(AbstractUgrid):
             name=topology,
             dataset=dataset[ugrid_vars],
             indexes=indexes,
-            projected=projected,
+            is_projected=is_projected,
             crs=crs,
             start_index=start_index,
         )
@@ -212,7 +212,7 @@ class Ugrid1d(AbstractUgrid):
         cls,
         mesh,
         name: str = "network1d",
-        projected: bool = True,
+        is_projected: bool = True,
         crs: Any = None,
     ):
         """
@@ -223,7 +223,7 @@ class Ugrid1d(AbstractUgrid):
         mesh: MeshKernel.Mesh2d
         name: str
             Mesh name. Defaults to "network1d".
-        projected: bool
+        is_projected: bool
             Whether node_x and node_y are longitude and latitude or projected x and
             y coordinates. Used to write the appropriate standard_name in the
             coordinate attributes.
@@ -242,7 +242,7 @@ class Ugrid1d(AbstractUgrid):
             fill_value=FILL_VALUE,
             edge_node_connectivity=mesh.edge_nodes.reshape((-1, 2)),
             name=name,
-            projected=projected,
+            is_projected=is_projected,
             crs=crs,
         )
 
@@ -630,7 +630,7 @@ class Ugrid1d(AbstractUgrid):
             new_edges,
             name=self.name,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self._attrs,
         )
@@ -712,7 +712,7 @@ class Ugrid1d(AbstractUgrid):
             edge_node_connectivity=new_edges,
             name=self.name,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self._attrs,
         )
@@ -742,7 +742,7 @@ class Ugrid1d(AbstractUgrid):
             edge_node_connectivity=new_edges,
             name=self.name,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self._attrs,
         )
@@ -846,7 +846,7 @@ class Ugrid1d(AbstractUgrid):
             self.fill_value,
             new_edges,
             name=self.name,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
         )
         self._propagate_properties(grid)
@@ -936,7 +936,7 @@ class Ugrid1d(AbstractUgrid):
             new_edges,
             name=grid.name,
             indexes=grid._indexes,
-            projected=grid.projected,
+            is_projected=grid.is_projected,
             crs=grid.crs,
             attrs=grid._attrs,
         )

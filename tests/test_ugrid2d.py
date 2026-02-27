@@ -340,12 +340,12 @@ def test_ugrid2d_set_node_coords():
     ):
         grid.set_node_coords("lon", "long_lat", ds)
 
-    grid.set_node_coords("lon", "lat", ds, projected=False)
+    grid.set_node_coords("lon", "lat", ds, is_projected=False)
     assert np.allclose(grid.node_x, lonvalues)
     assert np.allclose(grid.node_y, latvalues)
     assert grid._indexes["node_x"] == "lon"
     assert grid._indexes["node_y"] == "lat"
-    assert not grid.projected
+    assert not grid.is_projected
 
 
 def test_ugrid2d_dataset_roundtrip():

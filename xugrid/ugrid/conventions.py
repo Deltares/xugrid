@@ -550,7 +550,7 @@ class UgridRolesAccessor:
 
         Returns
         -------
-        projected: dict[str, bool | None]
+        is_projected: dict[str, bool | None]
             True if projected, False if geographic, None if indeterminate.
         """
         return _infer_projected(self._ds, self.topology, self.coordinates)
