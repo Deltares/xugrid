@@ -6,7 +6,7 @@ from typing import Callable
 import numba as nb
 import numpy as np
 
-from xugrid.regrid.nanpercentile import _select_two
+from xugrid.regrid.utils.nanpercentile import _select_two
 
 
 def mean(values, weights, workspace):

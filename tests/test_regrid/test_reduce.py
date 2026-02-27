@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from xugrid.regrid import reduce
+from xugrid.regrid.utils import reduce
 
 
 def forward_args():

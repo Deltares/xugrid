@@ -6,6 +6,7 @@ import xarray as xr
 
 import xugrid as xu
 from xugrid.constants import FloatDType
+from xugrid.regrid.grid.basegrid import Grid
 from xugrid.ugrid import voronoi
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
@@ -53,7 +54,7 @@ def replace_interpolated_weights(
     return
 
 
-class UnstructuredGrid2d:
+class UnstructuredGrid2d(Grid):
     """
     Stores only the grid topology.
 
@@ -64,43 +65,72 @@ class UnstructuredGrid2d:
     grid: Ugrid2d
     """
 
-    def __init__(self, obj):
-        # TODO: do not omit type check on grid!
-        if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
-            self.ugrid_topology = obj.grid
-        elif isinstance(obj, Ugrid2d):
-            self.ugrid_topology = obj
+    def __init__(self, grid, dim: str):
+        self.ugrid_topology = grid
+        if dim == grid.node_dimension:
+            self._facet = "node"
+            self._coordinates = grid.node_coordinates
+            self._dims = (grid.node_dimension,)
+            self._shape = (grid.n_node,)
+            self._size = grid.n_node
+        elif dim == grid.face_dimension:
+            self._facet = "face"
+            self._coordinates = grid.face_coordinates
+            self._dims = (grid.face_dimension,)
+            self._shape = (grid.n_face,)
+            self._size = grid.n_face
         else:
-            options = {"Ugrid2d", "UgridDataArray", "UgridDataset"}
-            raise TypeError(
-                f"Expected one of {options}, received: {type(obj).__name__}"
+            raise ValueError(
+                f"Expected {grid.node_dimension} or {grid.face_dimension}, "
+                f"received: {dim}"
             )
+        self.dimension = dim
 
     @property
     def ndim(self):
         return 1
 
     @property
+    def facet(self):
+        return self._facet
+
+    @property
+    def coordinates(self) -> np.ndarray:
+        return self._coordinates
+
+    @property
     def dims(self):
-        return (self.ugrid_topology.face_dimension,)
+        return self._dims
 
     @property
     def shape(self):
-        return (self.ugrid_topology.n_face,)
+        return self._shape
 
     @property
     def size(self):
-        return self.ugrid_topology.n_face
+        return self._size
 
     @property
     def area(self):
         return self.ugrid_topology.area
 
+    @property
+    def kdtree(self):
+        # This instantiates the kdtree, which is expensive.
+        # Only do so when required!
+        grid = self.ugrid_topology
+        if self.dimension == grid.node_dimension:
+            return grid.node_kdtree
+        elif self.dimension == grid.face_dimension:
+            return grid.face_kdtree
+
     def convert_to(self, matched_type):
         if isinstance(self, matched_type):
             return self
         else:
-            TypeError(f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}")
+            raise TypeError(
+                f"Cannot convert UnstructuredGrid2d to {matched_type.__name__}"
+            )
 
     def overlap(self, other, relative: bool):
         """
@@ -117,6 +147,9 @@ class UnstructuredGrid2d:
         target_index: 1d np.ndarray of int
         weights: 1d np.ndarray of float
         """
+        if self.facet != "face" or other.facet != "face":
+            raise ValueError("Can only compute areal overlap between faces.")
+        other = other.convert_to(type(self))
         (
             target_index,
             source_index,
@@ -130,20 +163,34 @@ class UnstructuredGrid2d:
             weights /= self.area[source_index]
         return source_index, target_index, weights
 
-    def locate_centroids(self, other, tolerance: Optional[float] = None):
-        tree = self.ugrid_topology.celltree
-        source_index = tree.locate_points(other.ugrid_topology.centroids, tolerance)
+    def locate_points(self, points, tolerance):
+        celltree = self.ugrid_topology.celltree
+        index = celltree.locate_points(points, tolerance=tolerance)
+        return index
+
+    def locate_inside(self, other, tolerance: Optional[float] = None):
+        if self.facet != "face":
+            raise ValueError("Can only locate coordinates inside of faces")
+        source_index = self.locate_points(other.coordinates, tolerance=tolerance)
         inside = source_index != -1
         source_index = source_index[inside]
         target_index = np.arange(other.size, dtype=source_index.dtype)[inside]
         weight_values = np.ones_like(source_index, dtype=FloatDType)
         return source_index, target_index, weight_values
 
-    def barycentric(self, other, tolerance: Optional[float] = None):
-        points = other.ugrid_topology.centroids
+    def _nodes_barycentric(self, other, tolerance: Optional[float] = None):
+        points = other.coordinates
         grid = self.ugrid_topology
+        outside = grid.locate_points(points) == -1
+        face_index, weights = grid.compute_barycentric_weights(points, tolerance)
+        weights[outside] = 0
+        source_index = grid.face_node_connectivity[face_index].ravel()
+        return source_index, weights
 
-        # Create a voronoi grid to get surrounding nodes as vertices
+    def _faces_barycentric(self, other, tolerance: Optional[float] = None):
+        points = other.coordinates
+        grid = self.ugrid_topology
+        outside = grid.locate_points(points) == -1
         (
             vertices,
             faces,
@@ -159,7 +206,6 @@ class UnstructuredGrid2d:
             add_vertices=True,
             skip_concave=True,
         )
-
         voronoi_grid = Ugrid2d(
             vertices[:, 0],
             vertices[:, 1],
@@ -180,21 +226,24 @@ class UnstructuredGrid2d:
             node_to_node_map=node_to_node_map,
             node_index_threshold=len(vertices) - len(node_to_node_map),
         )
-
-        # Discards 0 weights and points that fall outside of the grid.
-        outside = grid.locate_points(points) == -1
         weights[outside] = 0
-        keep = weights.ravel() > 0
         source_index = node_to_face_index[
             voronoi_grid.face_node_connectivity[face_index]
-        ].ravel()[keep]
+        ].ravel()
+        return source_index, weights
+
+    def barycentric(self, other, tolerance: Optional[float] = None):
+        if self.facet == "node":
+            source_index, weights = self._nodes_barycentric(other, tolerance)
+        elif self.facet == "face":
+            source_index, weights = self._faces_barycentric(other, tolerance)
 
         n_points, n_max_node = weights.shape
+        keep = weights.ravel() > 0
+        source_index = source_index[keep]
         target_index = np.repeat(np.arange(n_points), n_max_node)[keep]
         weights = weights.ravel()[keep]
-
-        order = np.argsort(target_index)
-        return source_index[order], target_index[order], weights[order]
+        return self.sorted_output(source_index, target_index, weights)
 
     def intersection_length(self, other: "xu.regrid.network.Network1d", relative: bool):
         (
@@ -204,11 +253,10 @@ class UnstructuredGrid2d:
         ) = self.ugrid_topology.celltree.intersect_edges(
             other.ugrid_topology.edge_node_coordinates
         )
-        order = np.argsort(source_index)
         length = np.linalg.norm(np.diff(intersections, axis=1)[:, 0, :], axis=-1)
         if relative:
             length /= other.length[source_index]
-        return target_index[order], source_index[order], length[order]
+        return self.sorted_output(source_index, target_index, length)
 
     def to_dataset(self, name: str):
         ds = self.ugrid_topology.rename(name).to_dataset()

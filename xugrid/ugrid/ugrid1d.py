@@ -20,7 +20,7 @@ from xugrid.constants import (
     LineArray,
 )
 from xugrid.core.utils import either_dict_or_kwargs
-from xugrid.regrid.utils import alt_cumsum
+from xugrid.regrid.utils.array import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import section_coordinates_1d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index

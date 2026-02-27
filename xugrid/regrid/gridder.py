@@ -1,14 +1,14 @@
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
 import xarray as xr
 
 import xugrid
 from xugrid.core.sparse import MatrixCSR
-from xugrid.regrid import reduce
-from xugrid.regrid.network import Network1d
-from xugrid.regrid.regridder import BaseRegridder, make_regrid, setup_grid
-from xugrid.regrid.structured import StructuredGrid2d
-from xugrid.regrid.unstructured import UnstructuredGrid2d
+from xugrid.regrid.base_regridder import BaseRegridder
+from xugrid.regrid.grid.network import Network1d
+from xugrid.regrid.grid.structured import StructuredGrid2d
+from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
+from xugrid.regrid.utils import reduce
 
 
 def convert_to_match(source, target):
@@ -32,17 +32,20 @@ class NetworkGridder(BaseRegridder):
     """
 
     _JIT_FUNCTIONS = {
-        k: make_regrid(f) for k, f in reduce.ABSOLUTE_OVERLAP_METHODS.items()
+        k: BaseRegridder.make_regrid(f)
+        for k, f in reduce.ABSOLUTE_OVERLAP_METHODS.items()
     }
 
     def __init__(
         self,
         source: "xugrid.Ugrid1d",
-        target: "xugrid.Ugrid2d",
+        target: "xugrid.Ugrid2d",  # TODO: may also be a DataArray...
+        target_dim: Optional[str] = None,
         method: Union[str, Callable] = "mean",
     ):
         self._source = Network1d(source)
-        self._target = setup_grid(target)
+        self._target, self._target_flipper = self.setup_grid(target, target_dim)
+        self._target_dim = target_dim
         self._weights = None
         self._compute_weights(self._source, self._target, relative=False)
         self._setup_regrid(method)

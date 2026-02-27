@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
+from xugrid.regrid.grid.structured import StructuredGrid1d, StructuredGrid2d
 
 # Testgrids
 # --------
@@ -17,444 +17,408 @@ from xugrid.regrid.structured import StructuredGrid1d, StructuredGrid2d
 # --------
 
 
-def test_init_1d(grid_data_a_1d):
-    assert isinstance(grid_data_a_1d, StructuredGrid1d)
-    with pytest.raises(TypeError):
-        StructuredGrid1d(1)
+class TestStructuredGridBase:
+    """Base class for structured grid test utilities."""
+
+    @staticmethod
+    def assert_expected_overlap(
+        actual_source: np.ndarray,
+        actual_target: np.ndarray,
+        actual_weights: np.ndarray,
+        expected_source: np.ndarray,
+        expected_target: np.ndarray,
+        expected_weights: np.ndarray,
+    ):
+        """
+        Robust comparison method that works for numpy <2.0 and >=2.0.
+        Handles non-stable sorting behavior changes in numpy 2.0.
+        """
+        actual_mapping = np.column_stack((actual_target, actual_source))
+        expected_mapping = np.column_stack((expected_target, expected_source))
+        actual, actual_sorter = np.unique(actual_mapping, axis=0, return_index=True)
+        expected, expected_sorter = np.unique(
+            expected_mapping, axis=0, return_index=True
+        )
+        assert np.array_equal(actual, expected)
+        assert np.allclose(
+            actual_weights[actual_sorter], expected_weights[expected_sorter]
+        )
+
+    @staticmethod
+    def create_overlap_case(source_indices: list, target_indices: list, weights: list):
+        return {
+            "source": np.array(source_indices),
+            "target": np.array(target_indices),
+            "weights": np.array(weights),
+        }
 
 
-def test_init_2d(grid_data_a_2d):
-    assert isinstance(grid_data_a_2d, StructuredGrid2d)
-    with pytest.raises(TypeError):
-        StructuredGrid2d(1)
+class TestStructuredGrid1d(TestStructuredGridBase):
+    """Tests for 1D structured grids."""
 
+    def test_init_valid(self, grid_data_a_1d):
+        assert isinstance(grid_data_a_1d, StructuredGrid1d)
 
-def assert_expected_overlap(
-    actual_source,
-    actual_target,
-    actual_weights,
-    expected_source,
-    expected_target,
-    expected_weights,
-):
-    # Numpy 2.0 release has change sorting behavior of non-stable sorting:
-    # https://numpy.org/doc/stable/release/2.0.0-notes.html#minor-changes-in-behavior-of-sorting-functions
-    # So the comparison method must be robust to work for numpy <2.0 and >=2.0.
-    actual_mapping = np.column_stack((actual_target, actual_source))
-    expected_mapping = np.column_stack((expected_target, expected_source))
-    actual, actual_sorter = np.unique(actual_mapping, axis=0, return_index=True)
-    expected, expected_sorter = np.unique(expected_mapping, axis=0, return_index=True)
-    assert np.array_equal(actual, expected)
-    assert np.allclose(actual_weights[actual_sorter], expected_weights[expected_sorter])
+    def test_init_invalid(self):
+        with pytest.raises(TypeError):
+            StructuredGrid1d(1)
 
+    def test_nonscalar_dx(self):
+        """Test handling of non-scalar dx coordinate."""
+        da = xr.DataArray(
+            [1, 2, 3], coords={"x": [1, 2, 3], "dx": ("x", [1, 1, 1])}, dims=("x",)
+        )
+        grid = StructuredGrid1d(da, name="x")
+        actual = xr.DataArray([1, 2, 3], coords=grid.coords, dims=grid.dims)
+        assert actual.identical(da)
 
-def test_overlap_1d(
-    grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d, grid_data_e_1d
-):
-    # --------
-    # source   targets  weight
-    # node 0   0, 1     25 m
-    # node 1   1, 2     25 m
-    # node 2   2, 3     25 m
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.overlap(grid_data_b_1d, relative=False),
-        np.array([0, 0, 1, 1, 2, 2]),
-        np.array([0, 1, 1, 2, 2, 3]),
-        np.array([25, 25, 25, 25, 25, 25]),
+    def test_basic_properties(self, grid_data_a_1d):
+        grid = grid_data_a_1d
+        assert isinstance(grid.coords, dict)
+        assert grid.facet == "face"
+        assert isinstance(grid.coordinates, np.ndarray)
+        assert grid.ndim == 1
+        assert grid.dims == ("x",)
+        assert np.allclose(grid.length, 50.0)
+
+    def test_locate_points(self, grid_data_a_1d):
+        x = np.array([0.0, 25.0, 40.0, 90.0, 175.0, 200.0])
+        actual = grid_data_a_1d.locate_points(x)
+        expected = [-1, 0, 0, 1, -1, -1]
+        assert np.array_equal(actual, expected)
+
+    @pytest.mark.parametrize(
+        "case_name,target_grid,expected",
+        [
+            (
+                "equidistant",
+                "grid_data_b_1d",
+                {
+                    "source": [0, 0, 1, 1, 2, 2],
+                    "target": [0, 1, 1, 2, 2, 3],
+                    "weights": [25, 25, 25, 25, 25, 25],
+                },
+            ),
+            (
+                "non_equidistant",
+                "grid_data_e_1d",
+                {
+                    "source": [0, 0, 1, 1],
+                    "target": [0, 1, 1, 2],
+                    "weights": [17.5, 32.5, 17.5, 25.0],
+                },
+            ),
+        ],
     )
+    def test_overlap_1d_absolute(
+        self, grid_data_a_1d, case_name, target_grid, expected, request
+    ):
+        """Test 1D overlap with absolute weights."""
+        target = request.getfixturevalue(target_grid)
+        self.assert_expected_overlap(
+            *grid_data_a_1d.overlap(target, relative=False),
+            np.array(expected["source"]),
+            np.array(expected["target"]),
+            np.array(expected["weights"]),
+        )
 
-    # flipped axis (y-axis)
-    # --------
-    # source   targets  weight
-    # 0        0, 1     25 m
-    # 1        1, 2     25 m
-    # 2        2, 3     25 m
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.overlap(grid_data_b_flipped_1d, relative=False),
-        np.array([0, 0, 1, 1, 2, 2]),
-        np.array([2, 3, 1, 2, 0, 1]),
-        np.array([25, 25, 25, 25, 25, 25]),
+    def test_overlap_1d_relative(self, grid_data_a_1d, grid_data_e_1d):
+        """Test 1D overlap with relative weights."""
+        expected_weights = np.array(
+            [17.5 / 50.0, 32.5 / 50.0, 17.5 / 50.0, 25.0 / 50.0]
+        )
+        self.assert_expected_overlap(
+            *grid_data_a_1d.overlap(grid_data_e_1d, relative=True),
+            np.array([0, 0, 1, 1]),
+            np.array([0, 1, 1, 2]),
+            expected_weights,
+        )
+
+    @pytest.mark.parametrize(
+        "case_name,target_grid,expected",
+        [
+            (
+                "equidistant",
+                "grid_data_b_1d",
+                [0, 0, 1, -1],
+            ),
+            (
+                "non_equidistant",
+                "grid_data_e_1d",
+                [0, 0, 1],
+            ),
+        ],
     )
+    def test_locate_points_other(
+        self, grid_data_a_1d, case_name, target_grid, expected, request
+    ):
+        target = request.getfixturevalue(target_grid)
+        index = grid_data_a_1d.locate_points(target.coordinates)
+        assert np.array_equal(index, expected)
 
-    # non-equidistant
-    # --------
-    # source   targets  weight
-    # node 0   0, 1     17.5 m, 32.5 m
-    # node 1   1, 2     17.5 m, 25.0 m
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.overlap(grid_data_e_1d, relative=False),
-        np.array([0, 0, 1, 1]),
-        np.array([0, 1, 1, 2]),
-        np.array([17.5, 32.5, 17.5, 25.0]),
+    @pytest.mark.parametrize(
+        "case_name,target_grid,expected",
+        [
+            (
+                "equidistant",
+                "grid_data_b_1d",
+                {
+                    "source": [0, 0, 0, 1, 1, 2, -1, -1],
+                    "target": [0, 0, 1, 1, 2, 2, 3, 3],
+                    "weights": [0.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0],
+                },
+            ),
+            (
+                "equidistant_c",
+                "grid_data_c_1d",
+                {
+                    "source": [0, 0, 1, 0, 2, 1, -1, -1],
+                    "target": [0, 0, 1, 1, 2, 2, 3, 3],
+                    "weights": [0.0, 1.0, 0.8, 0.2, 0.8, 0.2, 0.0, 0.0],
+                },
+            ),
+            (
+                "equidistant_d",
+                "grid_data_d_1d",
+                {
+                    "source": [0, 0, 0, 1, 1, 0, 1, 2],
+                    "target": [0, 0, 1, 1, 2, 2, 3, 3],
+                    "weights": [0.0, 0.1, 0.9, 0.1, 0.6, 0.4, 0.9, 0.1],
+                },
+            ),
+            (
+                "non_equidistant",
+                "grid_data_e_1d",
+                {
+                    "source": [0, 0, 0, 1, 1, 2],
+                    "target": [0, 0, 1, 1, 2, 2],
+                    "weights": [0.0, 1.0, 0.65, 0.35, 0.9, 0.1],
+                },
+            ),
+        ],
     )
+    def test_linear_weights(
+        self, grid_data_a_1d, case_name, target_grid, expected, request
+    ):
+        target = request.getfixturevalue(target_grid)
+        self.assert_expected_overlap(
+            *grid_data_a_1d.barycentric(target.coordinates),
+            np.array(expected["source"]),
+            np.array(expected["target"]),
+            np.array(expected["weights"]),
+        )
 
-    # relative
-    # --------
-    # source   targets  weight
-    # node 0   0, 1     17.5 m, 32.5 m
-    # node 1   1, 2     17.5 m, 25.0 m
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.overlap(grid_data_e_1d, relative=True),
-        np.array([0, 0, 1, 1]),
-        np.array([0, 1, 1, 2]),
-        np.array([17.5 / 50.0, 32.5 / 50.0, 17.5 / 50.0, 25.0 / 50.0]),
+    def test_linear_weights_identity(self, grid_data_b_1d):
+        """Test linear weights for identity mapping (grid to itself)."""
+        source, target, weights = grid_data_b_1d.linear_weights(
+            grid_data_b_1d.coordinates
+        )
+
+        # Should have identity mapping with weights of 1.0 and 0.0
+        expected_target = np.array([0, 0, 1, 1, 2, 2, 3, 3])
+        expected_weights_unique = [0, 1]
+
+        assert np.array_equal(target, expected_target)
+        assert np.array_equal(np.unique(weights), expected_weights_unique)
+
+        # Check that non-zero weights correspond to identity mapping
+        identity_indices = weights != 0
+        identity_sources = source[identity_indices]
+        identity_targets = target[identity_indices]
+        assert np.array_equal(identity_sources, identity_targets)
+
+    @pytest.mark.parametrize(
+        "case_name,target_grid,expected",
+        [
+            (
+                "equidistant",
+                "grid_data_b_1d",
+                {
+                    "source": [0, 0, 1, -1],  # Left-inclusive
+                    "target": [0, 1, 2, 3],
+                    "weights": [25, 25, 25, 25],
+                },
+            ),
+            (
+                "non_equidistant",
+                "grid_data_e_1d",
+                {"source": [0, 0, 1], "target": [0, 1, 2], "weights": [20, 17.5, 5]},
+            ),
+        ],
     )
+    def test_locate_nearest(
+        self, grid_data_a_1d, case_name, target_grid, expected, request
+    ):
+        target = request.getfixturevalue(target_grid)
+        self.assert_expected_overlap(
+            *grid_data_a_1d.locate_nearest(target.coordinates),
+            np.array(expected["source"]),
+            np.array(expected["target"]),
+            np.array(expected["weights"]),
+        )
 
 
-def test_overlap_2d(grid_data_a_2d, grid_data_b_2d):
-    # --------
-    # source   targets            weights
-    # 0        0,   1,  4,  5     625 m
-    # 1        1,   2,  5,  6     625 m
-    # 2        2,   3,  6,  7     625 m
-    # 3        4,   5,  8,  9     625 m
-    # 4        5,   6,  9, 10     625 m
-    # 5        6,   7, 10, 11     625 m
-    # 6        8,   9, 12, 13     625 m
-    # 7        9,  10, 13, 14     625 m
-    # 8        10, 11, 14, 15     625 m
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_2d.overlap(grid_data_b_2d, relative=False),
-        expected_source=np.array(
+class TestStructuredGrid2d(TestStructuredGridBase):
+    """Tests for 2D structured grids."""
+
+    def test_init_valid(self, grid_data_a_2d):
+        """Test valid initialization."""
+        assert isinstance(grid_data_a_2d, StructuredGrid2d)
+
+    def test_init_invalid(self):
+        """Test invalid initialization."""
+        with pytest.raises(TypeError):
+            StructuredGrid2d(1)
+
+    def test_overlap_2d(self, grid_data_a_2d, grid_data_b_2d):
+        """
+        Test 2D overlap with exact expected values.
+
+        Tests the geometric overlap calculation between two 2D grids:
+        - 3x3 source grid overlapping with 4x4 target grid
+        - Each source cell overlaps with exactly 4 target cells
+        - All overlaps have equal area (625 m²)
+        """
+        expected_source = np.array(
             [
                 0,
                 0,
                 0,
-                0,
+                0,  # Source 0 -> targets 0,1,4,5
                 1,
                 1,
                 1,
-                1,
+                1,  # Source 1 -> targets 1,2,5,6
                 2,
                 2,
                 2,
-                2,
+                2,  # Source 2 -> targets 2,3,6,7
                 3,
                 3,
                 3,
-                3,
+                3,  # Source 3 -> targets 4,5,8,9
                 4,
                 4,
                 4,
-                4,
+                4,  # Source 4 -> targets 5,6,9,10
                 5,
                 5,
                 5,
-                5,
+                5,  # Source 5 -> targets 6,7,10,11
                 6,
                 6,
                 6,
-                6,
+                6,  # Source 6 -> targets 8,9,12,13
                 7,
                 7,
                 7,
-                7,
+                7,  # Source 7 -> targets 9,10,13,14
                 8,
                 8,
                 8,
-                8,
+                8,  # Source 8 -> targets 10,11,14,15
             ]
-        ),
-        expected_target=np.array(
+        )
+        expected_target = np.array(
             [
                 0,
                 4,
                 5,
-                1,
+                1,  # Source 0 overlaps
                 2,
                 6,
                 5,
-                1,
+                1,  # Source 1 overlaps
                 2,
                 3,
                 7,
-                6,
+                6,  # Source 2 overlaps
                 8,
                 9,
                 5,
-                4,
+                4,  # Source 3 overlaps
                 9,
                 5,
                 10,
-                6,
+                6,  # Source 4 overlaps
                 10,
                 11,
                 7,
-                6,
+                6,  # Source 5 overlaps
                 9,
                 8,
                 12,
-                13,
+                13,  # Source 6 overlaps
                 10,
                 14,
                 13,
-                9,
+                9,  # Source 7 overlaps
                 10,
                 11,
                 14,
-                15,
+                15,  # Source 8 overlaps
             ]
-        ),
-        expected_weights=np.full(36, 625.0),
-    )
+        )
+        expected_weights = np.full(36, 625.0)  # All equal area overlaps
 
+        self.assert_expected_overlap(
+            *grid_data_a_2d.overlap(grid_data_b_2d, relative=False),
+            expected_source,
+            expected_target,
+            expected_weights,
+        )
 
-def test_locate_centroids_1d(
-    grid_data_a_1d, grid_data_b_1d, grid_data_b_flipped_1d, grid_data_e_1d
-):
-    # --------
-    # source   target  weight
-    # 0        1       1
-    # 1        2       1
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.locate_centroids(grid_data_b_1d),
-        np.array([0, 1]),
-        np.array([1, 2]),
-        np.ones(2),
-    )
+    def test_locate_inside(self, grid_data_a_2d, grid_data_b_2d):
+        self.assert_expected_overlap(
+            *grid_data_a_2d.locate_inside(grid_data_b_2d, None),
+            np.array([0, 0, 1, 0, 0, 1, 3, 3, 4]),  # Interior source points
+            np.array([0, 1, 2, 4, 5, 6, 8, 9, 10]),  # Corresponding target cells
+            np.ones(9),  # All weights = 1
+        )
 
-    # flipped axis (y-axis)
-    # --------
-    # source   target  weight
-    # 0        1       1
-    # 1        2       1
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.locate_centroids(grid_data_b_flipped_1d),
-        np.array([0, 1]),
-        np.array([2, 1]),
-        np.ones(2),
-    )
+    def test_barycentric_uniform_spacing(self, grid_data_a_2d):
+        """
+        Test 2D linear weights with uniform grid spacing.
 
-    # non-equidistant
-    # --------
-    # source   target  weight
-    # 0        0, 1    1, 1
-    # 1        2       1
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.locate_centroids(grid_data_e_1d),
-        np.array([0, 0, 1]),
-        np.array([0, 1, 2]),
-        np.ones(3),
-    )
+        With uniform spacing, each target point gets equal contribution (25%)
+        from its 4 surrounding source points.
+        """
 
+        b = xr.DataArray(
+            data=np.ones((2, 2)),
+            coords={"y": [75.0, 125.0], "x": [75.0, 125.0]},
+            dims=("y", "x"),
+        )
+        expected_source = np.array([0, 1, 3, 4, 1, 2, 4, 5, 3, 4, 6, 7, 4, 5, 7, 8])
+        expected_target = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3])
+        expected_weights = np.full(16, 0.25)  # Equal contribution from all corners
+        grid_b = StructuredGrid2d(b, "x", "y")
 
-def test_locate_centroids_2d(grid_data_a_2d, grid_data_b_2d):
-    # --------
-    # source   target  weight
-    # 0        5       1
-    # 1        6       1
-    # 3        9       1
-    # 4        10      1
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_2d.locate_centroids(grid_data_b_2d, None),
-        np.array([0, 1, 3, 4]),
-        np.array([5, 6, 9, 10]),
-        np.ones(4),
-    )
+        self.assert_expected_overlap(
+            *grid_data_a_2d.barycentric(grid_b, None),
+            expected_source,
+            expected_target,
+            expected_weights,
+        )
 
+    def test_barycentric_identity(self, grid_data_b_2d):
+        """
+        Test 2D linear weights for identity mapping (grid to itself).
 
-def test_linear_weights_1d(
-    grid_data_a_1d,
-    grid_data_b_1d,
-    grid_data_b_flipped_1d,
-    grid_data_c_1d,
-    grid_data_d_1d,
-    grid_data_e_1d,
-):
-    # --------
-    # source   target  weight
-    # 0   ->   1       50%
-    # 1   ->   1       50%
-    # 1   ->   2       50%
-    # 2   ->   2       50%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.linear_weights(grid_data_b_1d),
-        np.array([0, 1, 1, 2]),
-        np.array([1, 1, 2, 2]),
-        np.array([0.5, 0.5, 0.5, 0.5]),
-    )
+        When interpolating a grid to itself, should get perfect identity mapping
+        with weights of 1.0 for exact matches and 0.0 for others.
+        """
+        source, target, weights = grid_data_b_2d.barycentric(grid_data_b_2d, None)
 
-    # flipped axis (y-axis)
-    # --------
-    # source   target  weight
-    # 0   ->   2       50%
-    # 1   ->   2       50%
-    # 1   ->   1       50%
-    # 2   ->   1       50%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.linear_weights(grid_data_b_flipped_1d),
-        np.array([2, 1, 1, 0]),
-        np.array([1, 1, 2, 2]),
-        np.array([0.5, 0.5, 0.5, 0.5]),
-    )
+        # Should have 4 entries per target (16 targets * 4 = 64 total)
+        expected_target = np.repeat(np.arange(16), 4)
+        assert np.array_equal(target, expected_target)
 
-    # --------
-    # source   target  weight
-    # 1        1       80%
-    # 0        1       20%
-    # 2        2       80%
-    # 1        2       20%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.linear_weights(grid_data_c_1d),
-        np.array([0, 0, 1, 0, 2, 1]),
-        np.array([0, 0, 1, 1, 2, 2]),
-        np.array([0.0, 1.0, 0.8, 0.2, 0.8, 0.2]),
-    )
+        # Should only have weights of 0 and 1 (exact matches or no contribution)
+        assert np.array_equal(np.unique(weights), [0, 1])
 
-    # --------
-    # source   target  weight
-    # 0        1       90%
-    # 1        1       10%
-    # 0        2       40%
-    # 1        2       60% *reversed in output
-    # 1        3       90%
-    # 2        3       10%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.linear_weights(grid_data_d_1d),
-        np.array([0, 0, 0, 1, 1, 0, 1, 2]),
-        np.array([0, 0, 1, 1, 2, 2, 3, 3]),
-        np.array([0.0, 0.1, 0.9, 0.1, 0.6, 0.4, 0.9, 0.1]),
-    )
-
-    # non-equidistant
-    # --------
-    # source   target  weight
-    # 0        1       65%
-    # 1        1       35%
-    # 1        2       90%
-    # 2        2       10%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_1d.linear_weights(grid_data_e_1d),
-        np.array([0, 0, 0, 1, 1, 2]),
-        np.array([0, 0, 1, 1, 2, 2]),
-        np.array([0.0, 1.0, 0.65, 0.35, 0.9, 0.1]),
-    )
-
-    # 1-1 grid
-    # --------
-    # source   target  weight
-    # 1        1       100%
-    # 0        1       0%
-    # 2        2       100%
-    # 1        2       0%
-    # --------
-    assert_expected_overlap(
-        *grid_data_b_1d.linear_weights(grid_data_b_1d),
-        np.array([0, 0, 1, 0, 2, 1, 3, 2]),
-        np.array([0, 0, 1, 1, 2, 2, 3, 3]),
-        np.array([0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]),
-    )
-
-
-def test_linear_weights_2d(
-    grid_data_a_2d, grid_data_a_layered_2d, grid_data_b_2d, grid_data_c_2d
-):
-    # --------
-    # source   targets     weight
-    # 5        0, 1, 3, 4  25%
-    # 6        1, 2, 4, 5  25%
-    # 9        3, 4, 6, 7  25%
-    # 10       4, 5, 7, 8  25%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_2d.linear_weights(grid_data_b_2d),
-        np.array([3, 4, 1, 0, 5, 4, 1, 2, 6, 7, 4, 3, 8, 7, 4, 5]),
-        np.array([5, 5, 5, 5, 6, 6, 6, 6, 9, 9, 9, 9, 10, 10, 10, 10]),
-        np.array([0.25] * 16),
-    )
-
-    # --------
-    # source   targets      weight
-    # 4        0, 0, 3, 3   0%  50% 0%  50%
-    # 5        0, 1, 3, 4   10%	40%	10%	40%
-    # 6        1, 2, 4, 5   10%	40%	10%	40%
-    # 8        3, 3, 6, 6   0%  50% 0%  50%
-    # 9        3, 4, 6, 7   10%	40%	10%	40%
-    # 10       4, 5, 7, 8   10%	40%	10%	40%
-    # --------
-    assert_expected_overlap(
-        *grid_data_a_layered_2d.linear_weights(grid_data_c_2d),
-        np.array(
-            [0, 0, 3, 3, 1, 0, 3, 4, 5, 4, 2, 1, 3, 3, 6, 6, 4, 3, 7, 6, 8, 5, 4, 7]
-        ),
-        np.array(
-            [4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10]
-        ),
-        np.array(
-            [
-                0.0,
-                0.5,
-                0.0,
-                0.5,
-                0.4,
-                0.1,
-                0.1,
-                0.4,
-                0.4,
-                0.1,
-                0.4,
-                0.1,
-                0.0,
-                0.5,
-                0.0,
-                0.5,
-                0.4,
-                0.1,
-                0.4,
-                0.1,
-                0.4,
-                0.4,
-                0.1,
-                0.1,
-            ]
-        ),
-    )
-
-    # 1-1
-    # --------
-    # source   targets      weight
-    # 0-15     0-15         0% 0% 0% 100% (or shuffled)
-    # result should be 1:1 mapping
-    # --------
-    source, target, weights = grid_data_b_2d.linear_weights(grid_data_b_2d)
-    expected_target = np.repeat(np.arange(16), 4)
-    assert np.array_equal(target, expected_target)
-    assert np.array_equal(np.unique(weights), [0, 1])
-    check_source = source[weights != 0]
-    assert np.array_equal(check_source, np.arange(16))
-
-
-def test_nonscalar_dx():
-    da = xr.DataArray(
-        [1, 2, 3], coords={"x": [1, 2, 3], "dx": ("x", [1, 1, 1])}, dims=("x",)
-    )
-    grid = StructuredGrid1d(da, name="x")
-    actual = xr.DataArray([1, 2, 3], coords=grid.coords, dims=grid.dims)
-    assert actual.identical(da)
-
-
-def test_directional_bounds():
-    da = xr.DataArray([1, 2, 3], coords={"y": [1, 2, 3]}, dims=("y",))
-    decreasing = da.isel(y=slice(None, None, -1))
-    grid_inc = StructuredGrid1d(da, name="y")
-    grid_dec = StructuredGrid1d(decreasing, name="y")
-    assert grid_inc.flipped is False
-    assert grid_dec.flipped is True
-    assert np.array_equal(grid_inc.bounds, grid_dec.bounds)
-    assert np.array_equal(
-        grid_inc.directional_bounds, grid_dec.directional_bounds[::-1]
-    )
+        # Non-zero weights should correspond to perfect identity mapping
+        identity_mask = weights != 0
+        identity_sources = source[identity_mask]
+        identity_targets = target[identity_mask]
+        assert np.array_equal(identity_sources, identity_targets)
