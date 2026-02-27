@@ -504,9 +504,9 @@
         <span class="n">faces</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_node_connectivity</span>
         <span class="n">n_face</span><span class="p">,</span> <span class="n">n_node_per_face</span> <span class="o">=</span> <span class="n">faces</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">faces</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span>
-        <span class="n">all_faces</span><span class="p">[</span><span class="n">face_offset</span> <span class="p">:</span> <span class="n">face_offset</span> <span class="o">+</span> <span class="n">n_face</span><span class="p">,</span> <span class="p">:</span><span class="n">n_node_per_face</span><span class="p">][</span>
-            <span class="n">valid</span>
-        <span class="p">]</span> <span class="o">=</span> <span class="n">node_inverse</span><span class="p">[</span><span class="n">faces</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_offset</span><span class="p">]</span>
+        <span class="n">all_faces</span><span class="p">[</span><span class="n">face_offset</span> <span class="p">:</span> <span class="n">face_offset</span> <span class="o">+</span> <span class="n">n_face</span><span class="p">,</span> <span class="p">:</span><span class="n">n_node_per_face</span><span class="p">][</span><span class="n">valid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">node_inverse</span><span class="p">[</span><span class="n">faces</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">+</span> <span class="n">node_offset</span><span class="p">]</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_merge_connectivity</span><span class="p">(</span><span class="n">all_faces</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
 
