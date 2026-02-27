@@ -707,10 +707,11 @@
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.DataArrayAccessor.laplace_interpolate()</span></code> now uses
-diagonal scaling to improve conditioning. Default tolerances
-have been changed from <code class="docutils literal notranslate"><span class="pre">atol=0.0,</span> <span class="pre">rtol=1e-5</span></code> to <code class="docutils literal notranslate"><span class="pre">atol=1e-4,</span> <span class="pre">rtol=0.0</span></code>
-for better robustness of the found solution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.projected</span></code> and <code class="docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.projected</span></code> have been
+replaced by <code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.is_projected</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.is_projected</span></code> for consistency with packages such as
+pyproj and geopandas. The projected keyword argument in the constructors has
+also been renamed to <code class="docutils literal notranslate"><span class="pre">is_projected</span></code>.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.Ugrid1d.set_crs.html#xugrid.Ugrid1d.set_crs" title="xugrid.Ugrid1d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.set_crs()</span></code></a> and <a class="reference internal" href="api/xugrid.Ugrid2d.set_crs.html#xugrid.Ugrid2d.set_crs" title="xugrid.Ugrid2d.set_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.set_crs()</span></code></a> now check
 whether a CRS is either projected or geographic (latitude/longitude); note that
 geocentric coordinates (x, y, z measured from the Earth’s center) are not
@@ -720,6 +721,10 @@ within the current scope of xugrid.</p></li>
 update the standard names of UGRID coordinates when the CRS changes; e.g.
 when going from a projected to a geographic CRS, the standard name of an
 x-coordinate is updated from <code class="docutils literal notranslate"><span class="pre">projection_x_coordinate</span></code> to <code class="docutils literal notranslate"><span class="pre">longitude</span></code>.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.DataArrayAccessor.laplace_interpolate()</span></code> now uses
+diagonal scaling to improve conditioning. Default tolerances
+have been changed from <code class="docutils literal notranslate"><span class="pre">atol=0.0,</span> <span class="pre">rtol=1e-5</span></code> to <code class="docutils literal notranslate"><span class="pre">atol=1e-4,</span> <span class="pre">rtol=0.0</span></code>
+for better robustness of the found solution.</p></li>
 </ul>
 </section>
 <section id="added">

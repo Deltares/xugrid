@@ -12,10 +12,11 @@ Unreleased
 Changed
 ~~~~~~~
 
-- :meth:`xugrid.DataArrayAccessor.laplace_interpolate` now uses
-  diagonal scaling to improve conditioning. Default tolerances
-  have been changed from ``atol=0.0, rtol=1e-5`` to ``atol=1e-4, rtol=0.0``
-  for better robustness of the found solution.
+- ``xugrid.Ugrid1d.projected`` and ``xugrid.Ugrid2d.projected`` have been
+  replaced by :attr:`xugrid.Ugrid1d.is_projected` and
+  :attr:`xugrid.Ugrid2d.is_projected` for consistency with packages such as
+  pyproj and geopandas. The projected keyword argument in the constructors has
+  also been renamed to ``is_projected``.
 - :meth:`xugrid.Ugrid1d.set_crs` and :meth:`xugrid.Ugrid2d.set_crs` now check
   whether a CRS is either projected or geographic (latitude/longitude); note that
   geocentric coordinates (x, y, z measured from the Earth's center) are not
@@ -25,6 +26,10 @@ Changed
   update the standard names of UGRID coordinates when the CRS changes; e.g.
   when going from a projected to a geographic CRS, the standard name of an
   x-coordinate is updated from ``projection_x_coordinate`` to ``longitude``.
+- :meth:`xugrid.DataArrayAccessor.laplace_interpolate` now uses
+  diagonal scaling to improve conditioning. Default tolerances
+  have been changed from ``atol=0.0, rtol=1e-5`` to ``atol=1e-4, rtol=0.0``
+  for better robustness of the found solution.
 
 Added
 ~~~~~
