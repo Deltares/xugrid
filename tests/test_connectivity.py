@@ -599,11 +599,27 @@ def test_face_face_connectivity():
             [1, -1],
         ]
     )
-    face_face = connectivity.face_face_connectivity(edge_faces)
+    face_face = connectivity.face_face_connectivity(edge_faces, n_face=2)
     assert isinstance(face_face, sparse.csr_matrix)
     assert np.array_equal(face_face.indices, [1, 0])
     assert np.array_equal(face_face.indptr, [0, 1, 2])
     assert np.array_equal(face_face.data, [2, 2])
+
+    # Test two isolated faces
+    # Two triangles:
+    edge_faces = np.array(
+        [
+            [0, -1],
+            [0, -1],
+            [0, -1],
+            [1, -1],
+            [1, -1],
+            [1, -1],
+        ]
+    )
+    face_face = connectivity.face_face_connectivity(edge_faces, n_face=2)
+    assert isinstance(face_face, sparse.csr_matrix)
+    assert face_face.shape == (2, 2)
 
 
 def test_centroids(mixed_mesh):

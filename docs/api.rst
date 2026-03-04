@@ -273,6 +273,7 @@ UGRID1D Topology
 
     Ugrid1d.set_crs
     Ugrid1d.to_crs
+    Ugrid1d.write_grid_mapping
 
     Ugrid1d.from_dataset
     Ugrid1d.to_dataset
@@ -392,6 +393,7 @@ UGRID2D Topology
 
     Ugrid2d.set_crs
     Ugrid2d.to_crs
+    Ugrid2d.write_grid_mapping
 
     Ugrid2d.from_dataset
     Ugrid2d.to_dataset
@@ -419,3 +421,6 @@ UGRID Roles Accessor
     UgridRolesAccessor.connectivity
     UgridRolesAccessor.coordinates
     UgridRolesAccessor.dimensions
+    UgridRolesAccessor.grid_mapping_names
+    UgridRolesAccessor.is_projected
+

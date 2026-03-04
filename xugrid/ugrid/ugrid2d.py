@@ -50,10 +50,10 @@ class Ugrid2d(AbstractUgrid):
     indexes: Dict[str, str], optional
         When a dataset is provided, a mapping from the UGRID role to the dataset
         variable name. E.g. {"face_x": "mesh2d_face_lon"}.
-    projected: bool, optional
+    is_projected: bool, optional
         Whether node_x and node_y are longitude and latitude or projected x and
         y coordinates. Used to write the appropriate standard_name in the
-        coordinate attributes.
+        coordinate attributes. If crs is provided, its value will take priority.
     crs: Any, optional
         Coordinate Reference System of the geometry objects. Can be anything accepted by
         :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -77,7 +77,7 @@ class Ugrid2d(AbstractUgrid):
         edge_node_connectivity: IntArray = None,
         dataset: xr.Dataset = None,
         indexes: Dict[str, str] = None,
-        projected: bool = True,
+        is_projected: bool = True,
         crs: Any = None,
         attrs: Dict[str, str] = None,
         start_index: int = 0,
@@ -87,7 +87,7 @@ class Ugrid2d(AbstractUgrid):
         self.fill_value = fill_value
         self.start_index = start_index
         self.name = name
-        self.projected = projected
+        self.crs, self.is_projected = self._validate_crs(crs, is_projected)
 
         if isinstance(face_node_connectivity, np.ndarray):
             self.face_node_connectivity = face_node_connectivity.copy()
@@ -154,13 +154,6 @@ class Ugrid2d(AbstractUgrid):
         self._triangulation = None
         self._voronoi_topology = None
         self._centroid_triangulation = None
-        # crs
-        if crs is None:
-            self.crs = None
-        else:
-            import pyproj
-
-            self.crs = pyproj.CRS.from_user_input(crs)
 
     def _clear_geometry_properties(self):
         """Clear all properties that may have been invalidated"""
@@ -192,12 +185,21 @@ class Ugrid2d(AbstractUgrid):
         self._voronoi_topology = None
         self._centroid_triangulation = None
 
+    def _assign_derived_coords(self, obj):
+        if self.node_dimension in obj.dims:
+            obj = self.assign_node_coords(obj)
+        if self.edge_dimension in obj.dims:
+            obj = self.assign_edge_coords(obj)
+        if self.face_dimension in obj.dims:
+            obj = self.assign_face_coords(obj)
+        return obj
+
     @classmethod
     def from_meshkernel(
         cls,
         mesh,
         name: str = "mesh2d",
-        projected: bool = True,
+        is_projected: bool = True,
         crs: Any = None,
     ):
         """
@@ -208,10 +210,10 @@ class Ugrid2d(AbstractUgrid):
         mesh: MeshKernel.Mesh2d
         name: str
             Mesh name. Defaults to "mesh2d".
-        projected: bool
+        is_projected: bool
             Whether node_x and node_y are longitude and latitude or projected x and
             y coordinates. Used to write the appropriate standard_name in the
-            coordinate attributes.
+            coordinate attributes. If crs is provided, its value will take priority.
         crs: Any, optional
             Coordinate Reference System of the geometry objects. Can be anything accepted by
             :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -234,7 +236,7 @@ class Ugrid2d(AbstractUgrid):
             face_node_connectivity=face_node_connectivity,
             edge_node_connectivity=edge_node_connectivity,
             name=name,
-            projected=projected,
+            is_projected=is_projected,
             crs=crs,
         )
 
@@ -299,9 +301,19 @@ class Ugrid2d(AbstractUgrid):
         else:
             edge_node_connectivity = None
 
+        # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
         indexes["node_y"] = y_index
-        projected = False  # TODO
+        edge_indexes = coordinates.get("edge_coordinates")
+        if edge_indexes is not None:
+            indexes["edge_x"] = edge_indexes[0][0]
+            indexes["edge_y"] = edge_indexes[1][0]
+        face_indexes = coordinates.get("face_coordinates")
+        if face_indexes is not None:
+            indexes["face_x"] = face_indexes[0][0]
+            indexes["face_y"] = face_indexes[1][0]
+
+        crs, is_projected = cls._extract_crs(ds, topology)
 
         return cls(
             node_x_coordinates,
@@ -312,8 +324,8 @@ class Ugrid2d(AbstractUgrid):
             edge_node_connectivity=edge_node_connectivity,
             dataset=ds[ugrid_vars],
             indexes=indexes,
-            projected=projected,
-            crs=None,
+            is_projected=is_projected,
+            crs=crs,
             start_index=start_index,
         )
 
@@ -397,6 +409,7 @@ class Ugrid2d(AbstractUgrid):
             dataset = self.assign_edge_coords(dataset)
 
         dataset[self.name].attrs = self._filtered_attrs(dataset)
+        dataset = self.write_grid_mapping(dataset)
         return dataset
 
     # These are all optional/derived UGRID attributes. They are not computed by
@@ -670,7 +683,8 @@ class Ugrid2d(AbstractUgrid):
         """
         if self._face_face_connectivity is None:
             self._face_face_connectivity = connectivity.face_face_connectivity(
-                self.edge_face_connectivity
+                self.edge_face_connectivity,
+                self.n_face,
             )
         return self._face_face_connectivity
 
@@ -949,8 +963,8 @@ class Ugrid2d(AbstractUgrid):
         """
         xname = self._indexes.get("face_x", f"{self.name}_face_x")
         yname = self._indexes.get("face_y", f"{self.name}_face_y")
-        x_attrs = conventions.DEFAULT_ATTRS["face_x"][self.projected]
-        y_attrs = conventions.DEFAULT_ATTRS["face_y"][self.projected]
+        x_attrs = conventions.DEFAULT_ATTRS["face_x"][self.is_projected]
+        y_attrs = conventions.DEFAULT_ATTRS["face_y"][self.is_projected]
         coords = {
             xname: xr.DataArray(
                 data=self.face_x,
@@ -1159,7 +1173,7 @@ class Ugrid2d(AbstractUgrid):
             name=self.name,
             edge_node_connectivity=new_edges,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self._attrs,
         )
@@ -1343,7 +1357,7 @@ class Ugrid2d(AbstractUgrid):
             name=grid.name,
             edge_node_connectivity=new_edges,
             indexes=grid._indexes,
-            projected=grid.projected,
+            is_projected=grid.is_projected,
             crs=grid.crs,
             attrs=grid._attrs,
         )
@@ -1405,7 +1419,7 @@ class Ugrid2d(AbstractUgrid):
             name=self.name,
             edge_node_connectivity=new_edges,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self.attrs,
         )
@@ -1466,7 +1480,7 @@ class Ugrid2d(AbstractUgrid):
             name=self.name,
             edge_node_connectivity=None,
             indexes=self._indexes,
-            projected=self.projected,
+            is_projected=self.is_projected,
             crs=self.crs,
             attrs=self.attrs,
         )

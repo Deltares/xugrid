@@ -208,8 +208,8 @@ def laplace_interpolate(
     direct_solve: bool = False,
     delta=0.0,
     relax=0.0,
-    atol: float = 0.0,
-    rtol: float = 1.0e-5,
+    atol: float = 1e-4,
+    rtol: float = 0.0,
     maxiter: int = 500,
 ):
     """
@@ -240,9 +240,9 @@ def laplace_interpolate(
         ILU0 preconditioner non-diagonally dominant correction.
     relax: float, default 0.0
         Modified ILU0 preconditioner relaxation factor.
-    atol: float, optional, default 0.0
+    atol: float, optional, default 1.0e-4.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
-    rtol: float, optional, default 1.0e-5.
+    rtol: float, optional, default 0.0.
         Convergence tolerance for ``scipy.sparse.linalg.cg``.
     maxiter: int, default 500.
         Maximum number of iterations for ``scipy.sparse.linalg.cg``.
@@ -260,10 +260,10 @@ def laplace_interpolate(
 
     # Find the elements with data
     isnull = np.isnan(data)
-    constant = ~isnull
+    notnull = ~isnull
     if isnull.all():
         raise ValueError("data is fully nodata")
-    if constant.all():
+    if notnull.all():
         return data.copy()
 
     # Check for parts without any values; these result in a singular matrix.
@@ -274,65 +274,52 @@ def laplace_interpolate(
         .groupby("label")["isnull"]
         .all()
     ).to_numpy()[components_labels]
-    constant = all_null | constant
-
-    coo = connectivity.tocoo()
-    i = coo.row
-    j = coo.col
+    known = notnull & ~all_null
+    unknown = isnull & ~all_null
 
     # Create uniform weighting if sparse data is not to be used.
-    if use_weights:
-        weights = connectivity.data
-    else:
-        weights = np.ones(i.size)
+    W = connectivity.astype(np.float64, copy=True)
+    if not use_weights:
+        W.data[:] = 1.0
 
-    # Find the connections to constant cells and the (non-)zero values in the
-    # coefficient matrix.
-    constant_j = constant[j]
-    nonzero = ~(constant[i] | constant[j])
+    # Compute the (weighted) degree matrix
+    D = np.asarray(W.sum(axis=1)).ravel()
+    # Compute the Laplacian
+    L = sparse.diags(D) - W
 
-    # Build the right-hand-side and the diagonal.
-    rhs_coo_content = (
-        weights[constant_j],
-        (i[constant_j], j[constant_j]),
-    )
-    rhs = sparse.csr_matrix(rhs_coo_content, shape=(n, n)).dot(data)
-    diag_coo_content = (weights, (i, j))
-    diagonal = sparse.csr_matrix(diag_coo_content, shape=(n, n)).sum(axis=1).A1
-    # Create the diagonal numbering.
-    ii = np.arange(n)
+    # Extract knowns and unknowns
+    A = L[unknown][:, unknown]
+    rhs = -L[unknown][:, known].dot(data[known])
 
-    # Set the constant values via the diagonal and the rhs.
-    diagonal[constant] = 1.0
-    rhs[constant] = data[constant]
-    # Remove all zero values and add the diagonal.
-    weights = np.concatenate([-weights[nonzero], diagonal])
-    i = np.concatenate([i[nonzero], ii])
-    j = np.concatenate([j[nonzero], ii])
-    coo_content = (weights, (i, j))
-    A = sparse.csr_matrix(coo_content, shape=(n, n))
+    # Diagonal scaling for better conditioning
+    diagA = A.diagonal().copy()
+    # Guard against non-positive diagonals just in case:
+    diagA[diagA <= 0.0] = 1e-10 * abs(diagA).mean()
+    scale = 1.0 / np.sqrt(diagA)
+    S = sparse.diags(scale)
+    A_scaled = S @ A @ S
+    rhs_scaled = scale * rhs
 
-    # Avoid NaN pollution in iterative solve
-    rhs[all_null] = 0.0
     if direct_solve:
-        x = sparse.linalg.spsolve(A, rhs)
+        x = sparse.linalg.spsolve(A_scaled, rhs_scaled)
     else:
         # Create preconditioner M
-        M = ILU0Preconditioner.from_csr_matrix(A, delta=delta, relax=relax)
-        # Call conjugate gradient solver
-        # TODO: running into some issues with CG and xy_weights.
-        # Possibly due to: symmetry issues with ILU0?
-        # Poor conditioning?
-        x, info = sparse.linalg.gmres(
-            A, rhs, rtol=rtol, atol=atol, maxiter=maxiter, M=M
+        M = ILU0Preconditioner.from_csr_matrix(A_scaled, delta=delta, relax=relax)
+        # IILU isn't guaranteed to preserve symmetry, which could cause technically
+        # cause problems for CG. The ILU0 is a port of MODFLOW 6's preconditioner,
+        # which is also combined with CG; it (apparently) often works fine although
+        # it's not strictly mathematically pure CG.
+        x, info = sparse.linalg.cg(
+            A_scaled, rhs_scaled, rtol=rtol, atol=atol, maxiter=maxiter, M=M
         )
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:
             warnings.warn(f"Failed to converge after {maxiter} iterations")
 
-    x[all_null] = np.nan
-    return x
+    out = data.copy()
+    out[unknown] = scale * x
+    return out
 
 
 def interpolate_na_helper(

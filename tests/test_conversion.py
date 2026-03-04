@@ -302,16 +302,31 @@ def test_bounds2d_to_topology2d():
     actual = np.column_stack((x, y))[faces[0]]
     assert np.allclose(actual, expected_first_cell)
 
+
+def test_bounds2d_to_topology2d_invalid_coordinate():
     # Test with some invalid (NaN) coordinates
+    x_bounds = np.array(
+        [[[0.0, 0.0, 1.0, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
+    )
+    y_bounds = np.array(
+        [[[0.0, 1.0, 1.0, 0.0], [2.0, 3.0, 3.0, 2.0], [4.0, 5.0, 5.0, 4.0]]]
+    )
     x_bounds_with_nan = x_bounds.copy()
     x_bounds_with_nan[0, 0, 0] = np.nan
-    x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds_with_nan, y_bounds)
+
+    with pytest.warns(
+        UserWarning,
+        match="A UGRID2D face requires at least three unique non-collinear vertices.",
+    ):
+        _, _, faces, index = cv.bounds2d_to_topology2d(x_bounds_with_nan, y_bounds)
 
     # Test that the first cell is marked invalid
     assert not index[0]
     assert index[1:].all()
     assert faces.shape == (2, 4)
 
+
+def test_bounds2d_to_topology2d_bad_bounds():
     # Test bad bounds. Triangles are allowed, points and lines are not.
     x_bounds = np.array(
         [
@@ -338,7 +353,7 @@ def test_bounds2d_to_topology2d():
         UserWarning,
         match="A UGRID2D face requires at least three unique non-collinear vertices.",
     ):
-        x, y, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
+        x, _, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
 
     assert np.array_equal(index, [False, True, True, False])
     expected_x = [
@@ -347,7 +362,8 @@ def test_bounds2d_to_topology2d():
     ]
     assert np.array_equal(x[faces], expected_x)
 
-    # Add an example with collinear vertices
+
+def test_bounds2d_to_topology2d_collinear_vertices():
     x_bounds = np.array(
         [[[0.0, 0.33, 0.67, 1.0], [2.0, 2.0, 3.0, 3.0], [4.0, 4.0, 5.0, 5.0]]]
     )
@@ -356,7 +372,7 @@ def test_bounds2d_to_topology2d():
     )
     with pytest.warns(
         UserWarning,
-        match="A UGRID2D face requires at least three unique non-collinear vertices",
+        match="A UGRID2D face requires at least three unique non-collinear vertices.",
     ):
         _, _, faces, index = cv.bounds2d_to_topology2d(x_bounds, y_bounds)
         assert len(faces) == 2

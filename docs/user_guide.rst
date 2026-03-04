@@ -20,4 +20,6 @@ Information on specific methods and classes can be found in the API Reference.
    examples/vector_conversion.rst
    examples/connectivity.rst
    examples/partitioning.rst
+   examples/hydamo_network.rst
+   examples/network_gridder.rst
    sample_data/index.rst

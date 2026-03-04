@@ -1,9 +1,18 @@
 """
-Network gridder example
-=======================
+Gridding Ugrid1d Network Data to 2D Grids
+=========================================
 
 In this example, we demonstrate how to interpolate and grid data from a network
-of line elements (UGRID1D) to a 2D structured grid.
+of line elements (UGRID1D) to a 2D structured grid. We'll cover the following
+xugrid techniques:
+
+* Creating Ugrid1d networks from node and edge arrays
+* Finding intersections between 1D and 2D grid edges
+* Refining networks by inserting intersection points
+* Topology-aware Laplace interpolation along networks
+* Converting node data to edge data
+* Regridding from 1D networks to 2D grids using NetworkGridder
+* Visualization of mixed 1D and 2D grids
 """
 
 # %%

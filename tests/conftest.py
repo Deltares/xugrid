@@ -1,3 +1,8 @@
+# Skip Tcl failures
+import matplotlib
+
+matplotlib.use("Agg", force=True)
+
 from tests.fixtures.fixture_regridder import (
     disk,
     disk_layered,

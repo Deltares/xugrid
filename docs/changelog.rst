@@ -6,6 +6,78 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Changed
+~~~~~~~
+
+- ``xugrid.Ugrid1d.projected`` and ``xugrid.Ugrid2d.projected`` have been
+  replaced by :attr:`xugrid.Ugrid1d.is_projected` and
+  :attr:`xugrid.Ugrid2d.is_projected` for consistency with packages such as
+  pyproj and geopandas. The projected keyword argument in the constructors has
+  also been renamed to ``is_projected``.
+- :meth:`xugrid.Ugrid1d.set_crs` and :meth:`xugrid.Ugrid2d.set_crs` now check
+  whether a CRS is either projected or geographic (latitude/longitude); note that
+  geocentric coordinates (x, y, z measured from the Earth's center) are not
+  within the current scope of xugrid.
+- :meth:`xugrid.Ugrid1d.set_crs`, :meth:`xugrid.Ugrid2d.set_crs`,
+  :meth:`xugrid.Ugrid1d.to_crs`, and :meth:`xugrid.Ugrid2d.to_crs` now
+  update the standard names of UGRID coordinates when the CRS changes; e.g.
+  when going from a projected to a geographic CRS, the standard name of an
+  x-coordinate is updated from ``projection_x_coordinate`` to ``longitude``.
+- :meth:`xugrid.DataArrayAccessor.laplace_interpolate` now uses
+  diagonal scaling to improve conditioning. Default tolerances
+  have been changed from ``atol=0.0, rtol=1e-5`` to ``atol=1e-4, rtol=0.0``
+  for better robustness of the found solution.
+
+Added
+~~~~~
+- CRS roundtripping via CF grid mapping: a grid mapping present in a dataset
+  is read into the Ugrid topology as a ``pyproj.CRS`` (or a placeholder if
+  pyproj is unavailable or the attributes cannot be interpreted), and
+  conversely a CRS set on a topology is written as a CF grid mapping variable
+  when converting to dataset (as occurs when writing to e.g. netCDF).
+- :attr:`xugrid.UgridRolesAccessor.grid_mapping_names` and
+  :attr:`xugrid.UgridRolesAccessor.is_projected` have been added to identify
+  grid mapping and CRS related properties in a dataset.
+
+Fixed
+~~~~~
+- :meth:`xugrid.Ugrid1d.from_dataset` and :meth:`xugrid.Ugrid2d.from_dataset`:
+  The names of optional coordinates such as edge and face coordinates for a
+  Ugrid2d topology are now tracked in the grid object, if they were present in
+  the dataset.
+
+[0.14.3] 2025-11-11
+-------------------
+
+Added
+~~~~~
+
+- Added :meth:`xugrid.data.hydamo_network` to download sample data
+  of a small surface water network.
+
+Fixed
+~~~~~
+
+- Ensure that :attr:`xugrid.Ugrid2d.face_face_connectivity` returns
+  a sparse matrix that is shaped ``(n_face, n_face)``. Previously,
+  the sparse matrix constructor inferred dimensions from the maximum 
+  row/column indices, causing empty trailing rows or columns to be 
+  omitted. This resulted in dimension mismatches in operations like
+  ``.ugrid.to_dataset(optional_attributes=True)``
+
+[0.14.2] 2025-07-15
+-------------------
+
+Fixed
+~~~~~
+
+- Edge case in :func:`xugrid.snap_to_grid` wich caused the snapping to fail when
+  the line intersected an edge exactly at the intersection point between the
+  line connecting two face centroids and the edge itself.
+
 [0.14.1] 2025-05-08
 -------------------
 

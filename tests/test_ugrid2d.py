@@ -236,6 +236,26 @@ def test_set_crs():
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
 
+def test_ugrid2d_update_coordinate_attrs():
+    grid = grid2d()
+    obj = xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,))
+    obj = grid.assign_face_coords(obj)
+    grid._indexes["face_x"] = "mesh2d_face_x"
+    grid._indexes["face_y"] = "mesh2d_face_y"
+    grid.set_crs(epsg=4326)
+    grid._update_coordinate_attrs(obj)
+    assert obj["mesh2d_face_x"].attrs["standard_name"] == "longitude"
+    assert obj["mesh2d_face_y"].attrs["standard_name"] == "latitude"
+
+
+def test_ugrid2d_assign_derived_coordinates():
+    grid = grid2d()
+    obj = xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,))
+    obj = grid._assign_derived_coords(obj)
+    assert "mesh2d_face_x" in obj.coords
+    assert "mesh2d_face_y" in obj.coords
+
+
 def test_to_crs():
     grid = grid2d()
     grid.set_crs("epsg:4326")
@@ -320,12 +340,12 @@ def test_ugrid2d_set_node_coords():
     ):
         grid.set_node_coords("lon", "long_lat", ds)
 
-    grid.set_node_coords("lon", "lat", ds, projected=False)
+    grid.set_node_coords("lon", "lat", ds, is_projected=False)
     assert np.allclose(grid.node_x, lonvalues)
     assert np.allclose(grid.node_y, latvalues)
     assert grid._indexes["node_x"] == "lon"
     assert grid._indexes["node_y"] == "lat"
-    assert not grid.projected
+    assert not grid.is_projected
 
 
 def test_ugrid2d_dataset_roundtrip():

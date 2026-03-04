@@ -236,7 +236,6 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
 def left_of(a: Point, p: Point, U: Vector) -> bool:
     # Whether point a is left of vector U
     # U: p -> q direction vector
-    # TODO: maybe add epsilon for floating point
     return U.x * (a.y - p.y) > U.y * (a.x - p.x)
 
 
@@ -253,10 +252,11 @@ def snap_to_edges(
     face_indices: IntArray,
     intersection_edges: FloatArray,
     face_edge_connectivity: AdjacencyMatrix,
+    edge_face_connectivity: IntArray,
     centroids: FloatArray,
-    edge_centroids: FloatArray,
     edges: IntArray,
     segment_index: IntArray,
+    tolerance: float,
 ) -> Tuple[IntArray, IntArray]:
     """
     Snap the intersected edges to the edges of the surrounding face.
@@ -267,8 +267,8 @@ def snap_to_edges(
       within a single face.
     * For a face, we take the centroid (a).
     * We loop through every edge of the face.
-    * If the edge separates the centroid (a) from the centroid of the edge (b)
-      we store that edge as a separating edge.
+    * If the edge separates the centroid (a) from the centroid of the other
+      connected face (b) we store that edge as a separating edge.
 
     We test for separation by:
 
@@ -291,9 +291,24 @@ def snap_to_edges(
         if U.x == 0 and U.y == 0:
             continue
 
+        # Slightly enlargen the vector for edge cases.
+        # Note: np.sign function returns a 0 on values of -0 and 0.
+        signx = np.sign(U.x)
+        signy = np.sign(U.y)
+        increase = tolerance * max(abs(U.x), abs(U.y))
+        p = Point(p.x - signx * increase, p.y - signy * increase)
+        q = Point(q.x + signx * increase, q.y + signy * increase)
+        U = to_vector(p, q)
+
         a_left = left_of(a, p, U)
         for edge in connectivity.neighbors(face_edge_connectivity, face):
-            b = as_point(edge_centroids[edge])
+            face_a, face_b = edge_face_connectivity[edge]
+            if face_b == face:
+                face_b = face_a
+            if face_b == -1:
+                continue
+
+            b = as_point(centroids[face_b])
             b_left = left_of(b, p, U)
             if a_left != b_left:
                 V = to_vector(a, b)
@@ -348,6 +363,7 @@ def create_snap_to_grid_dataframe(
     lines: GeoDataFrameType,
     grid: Union[xr.DataArray, xu.UgridDataArray],
     max_snap_distance: float,
+    tolerance: float = 1e-12,
 ) -> pd.DataFrame:
     """
     Create a dataframe required to snap line geometries to a Ugrid2d topology.
@@ -362,6 +378,9 @@ def create_snap_to_grid_dataframe(
     grid: xugrid.Ugrid2d
         Grid of cells to snap lines to.
     max_snap_distance: float
+    tolerance: float, optional, default value is 1e-12.
+        Relative tolerance value to resolve edge cases. Increase the value if a
+        line is unexpectedly not snapped to a grid cell edge.
 
     Returns
     -------
@@ -401,11 +420,11 @@ def create_snap_to_grid_dataframe(
 
     topology = grid
     vertices = topology.node_coordinates
-    edge_centroids = topology.edge_coordinates
     face_edge_connectivity = topology.face_edge_connectivity
     A = connectivity.to_sparse(face_edge_connectivity)
     n, m = A.shape
     face_edge_connectivity = AdjacencyMatrix(A.indices, A.indptr, A.nnz, n, m)
+    edge_face_connectivity = topology.edge_face_connectivity
 
     # Create geometric data
     line_geometry = coerce_geometry(lines)
@@ -447,10 +466,11 @@ def create_snap_to_grid_dataframe(
         face_indices,
         segment_edges,
         face_edge_connectivity,
+        edge_face_connectivity,
         topology.centroids,
-        edge_centroids,
         edge_index,  # out
         segment_index,  # out
+        tolerance,
     )
     line_index = line_index[segment_index]
     segment_edges = segment_edges[segment_index]
