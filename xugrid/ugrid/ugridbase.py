@@ -1098,6 +1098,7 @@ class AbstractUgrid(abc.ABC):
         obj,
         x: FloatArray,
         y: FloatArray,
+        method: str = "contains",
         out_of_bounds="warn",
         fill_value=np.nan,
         tolerance: Optional[float] = None,
@@ -1105,12 +1106,22 @@ class AbstractUgrid(abc.ABC):
         """
         Select points in the unstructured grid.
 
+        For data on the core dimension (faces for UGRID2D, edges for UGRID1D),
+        points are located by checking containment. For data on other dimensions
+        (e.g. nodes), the nearest entity is found among the candidates associated
+        with the containing core entity via the connectivity.
 
         Parameters
         ----------
         x: 1d array of floats with shape ``(n_points,)``
         y: 1d array of floats with shape ``(n_points,)``
         obj: xr.DataArray or xr.Dataset
+        method: str, {"contains", "nearest"}, default "contains"
+            Selection strategy:
+
+            * contains:
+            * nearest:
+
         out_of_bounds: str, default ``"warn"``
             What to do when points are located outside of any feature:
 
@@ -1133,50 +1144,107 @@ class AbstractUgrid(abc.ABC):
         -------
         selection: xr.DataArray or xr.Dataset
             The name of the topology is prefixed in the x, y coordinates.
-        """
-        dim = self.core_dimension
 
-        options = ("warn", "raise", "ignore", "drop")
-        if out_of_bounds not in options:
-            str_options = ", ".join(options)
+        Notes
+        -----
+        For secondary dimensions (e.g. nodes when selecting from a UGRID2D),
+        the nearest entity among the candidates connected to the containing face
+        is returned. Points equidistant to multiple candidates will return one
+        arbitrarily; equivalent but differently ordered topologies may return
+        different results.
+        """
+
+        def _normalize_points(x, y):
+            x = np.atleast_1d(x)
+            y = np.atleast_1d(y)
+            if x.shape != y.shape:
+                raise ValueError("shape of x does not match shape of y")
+            if x.ndim != 1:
+                raise ValueError("x and y must be 1d")
+            return np.column_stack([x, y])
+
+        def _core_indexer(xy, tolerance, point_dim):
+            core_indexer = self.locate_points(xy, tolerance)
+            keep = slice(None, None)  # keep all by default
+            condition = None
+            valid = core_indexer != -1
+            if not valid.all():
+                msg = "Not all points are located inside of the grid."
+                if out_of_bounds == "raise":
+                    raise ValueError(msg)
+                elif out_of_bounds in ("warn", "ignore"):
+                    if out_of_bounds == "warn":
+                        warnings.warn(msg)
+                    condition = xr.DataArray(valid, dims=(point_dim,))
+                elif out_of_bounds == "drop":
+                    core_indexer = core_indexer[valid]
+                    keep = valid
+            return core_indexer, keep, condition
+
+        def _nearest_connected_indexer(xy, core_indexer, connectivity, coords):
+            candidates = connectivity[core_indexer]
+            cand_xy = coords[candidates]
+            distance = np.linalg.norm(cand_xy - xy[:, None, :], axis=-1)
+            distance[candidates == -1] = np.inf
+            pick = np.argmin(distance, axis=-1)
+            return candidates[np.arange(len(core_indexer)), pick]
+
+        bounds_options = ("warn", "raise", "ignore", "drop")
+        if out_of_bounds not in bounds_options:
+            str_options = ", ".join(bounds_options)
             raise ValueError(
                 f"out_of_bounds must be one of {str_options}, received: {out_of_bounds}"
             )
+        method_options = ("contains", "nearest")
+        if method not in method_options:
+            str_options = ", ".join(bounds_options)
+            raise ValueError(f"method must be one of {str_options}, received: {method}")
 
-        x = np.atleast_1d(x)
-        y = np.atleast_1d(y)
-        if x.shape != y.shape:
-            raise ValueError("shape of x does not match shape of y")
-        if x.ndim != 1:
-            raise ValueError("x and y must be 1d")
-        xy = np.column_stack([x, y])
-        index = self.locate_points(xy, tolerance)
-
-        keep = slice(None, None)  # keep all by default
-        condition = None
-        valid = index != -1
-        if not valid.all():
-            msg = "Not all points are located inside of the grid."
-            if out_of_bounds == "raise":
-                raise ValueError(msg)
-            elif out_of_bounds in ("warn", "ignore"):
-                if out_of_bounds == "warn":
-                    warnings.warn(msg)
-                condition = xr.DataArray(valid, dims=(dim,))
-            elif out_of_bounds == "drop":
-                index = index[valid]
-                keep = valid
+        core_dim = self.core_dimension
+        other_dims = self.dims.intersection(obj.dims) - {core_dim}
+        xy = _normalize_points(x, y)
+        point_dim = f"{self.name}_points"
+        core_indexer, keep, condition = _core_indexer(xy, tolerance, point_dim)
+        xy_sel = xy[keep]
 
         # Create the selection DataArray or Dataset
-        coords = {
-            f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
-            f"{self.name}_x": (dim, xy[keep, 0]),
-            f"{self.name}_y": (dim, xy[keep, 1]),
-        }
-        selection = obj.isel({dim: index}).assign_coords(coords)
+        facets = {v: k for k, v in self.facets.items()}
+        indexers = {core_dim: xr.DataArray(core_indexer, dims=(point_dim,))}
+        core_facet = facets[core_dim]
+        for dim in other_dims:
+            # Find the nearest entity through the connectivity.
+            facet = facets[dim]
+            if method == "contains":
+                connectivity = getattr(self, f"{core_facet}_{facet}_connectivity")
+                coords = getattr(self, f"{facet}_coordinates")
+                indexer = _nearest_connected_indexer(
+                    xy_sel, core_indexer, connectivity, coords
+                )
+            elif method == "nearest":
+                func = getattr(self, f"locate_nearest_{facet}")
+                indexer = func(xy_sel)
+            else:
+                raise ValueError("Invalid method option")
+            indexers[dim] = xr.DataArray(indexer, dims=(point_dim,))
 
+        selection = obj.isel(indexers).assign_coords(
+            {
+                f"{self.name}_x": (point_dim, xy[keep, 0]),
+                f"{self.name}_y": (point_dim, xy[keep, 1]),
+            }
+        )
         # Set values to fill_value for out-of-bounds
         if condition is not None:
+            # Utilize the exact name matching of .where() if our object is a dataset.
+            if isinstance(selection, xr.Dataset):
+                datavars = selection.data_vars.items()
+                condition = xr.Dataset(
+                    {
+                        varname: condition
+                        for varname, var in datavars
+                        if point_dim in var.dims
+                    }
+                )
             selection = selection.where(condition, other=fill_value)
         return selection
 
