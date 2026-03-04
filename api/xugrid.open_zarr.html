@@ -745,8 +745,17 @@ into datetime objects. Otherwise, leave them encoded as numbers.</p></li>
 form string arrays. Dimensions will only be concatenated over (and
 removed) if they have no corresponding variable and if they are only
 used as the last dimension of character arrays.</p></li>
-<li><p><strong>decode_coords</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, decode the ‘coordinates’ attribute to identify coordinates in
-the resulting dataset.</p></li>
+<li><p><strong>decode_coords</strong> (<em>bool</em><em> or </em><em>{&quot;coordinates&quot;</em><em>, </em><em>&quot;all&quot;}</em><em>, </em><em>optional</em>) – <p>Controls which variables are set as coordinate variables:</p>
+<ul>
+<li><p>”coordinates” or True: Set variables referred to in the
+<code class="docutils literal notranslate"><span class="pre">'coordinates'</span></code> attribute of the datasets or individual variables
+as coordinate variables.</p></li>
+<li><p>”all”: Set variables referred to in  <code class="docutils literal notranslate"><span class="pre">'grid_mapping'</span></code>, <code class="docutils literal notranslate"><span class="pre">'bounds'</span></code> and
+other attributes as coordinate variables.</p></li>
+</ul>
+<p>Only existing variables can be set as coordinates. Missing variables
+will be silently ignored.</p>
+</p></li>
 <li><p><strong>drop_variables</strong> (<em>str</em><em> or </em><em>iterable</em><em>, </em><em>optional</em>) – A variable or list of variables to exclude from being parsed from the
 dataset. This may be useful to drop variables with problems or
 inconsistent values.</p></li>

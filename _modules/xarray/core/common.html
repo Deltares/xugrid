@@ -406,7 +406,7 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">cftime</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="c1"># Used as a sentinel value to indicate a all dimensions</span>
+<span class="c1"># Used as a sentinel value to indicate all dimensions</span>
 <span class="n">ALL_DIMS</span> <span class="o">=</span> <span class="o">...</span>
 
 
@@ -998,8 +998,8 @@
 <span class="sd">        Coordinates:</span>
 <span class="sd">            lon             (x, y) float64 32B 260.2 260.7 260.2 260.8</span>
 <span class="sd">            lat             (x, y) float64 32B 42.25 42.21 42.63 42.59</span>
-<span class="sd">          * time            (time) datetime64[ns] 32B 2014-09-06 ... 2014-09-09</span>
-<span class="sd">            reference_time  datetime64[ns] 8B 2014-09-05</span>
+<span class="sd">          * time            (time) datetime64[us] 32B 2014-09-06 ... 2014-09-09</span>
+<span class="sd">            reference_time  datetime64[us] 8B 2014-09-05</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 <span class="sd">        Data variables:</span>
 <span class="sd">            temperature     (x, y, time) float64 128B 20.0 20.8 21.6 ... 30.4 31.2 32.0</span>
@@ -1012,8 +1012,8 @@
 <span class="sd">        Coordinates:</span>
 <span class="sd">            lon             (x, y) float64 32B -99.83 -99.32 -99.79 -99.23</span>
 <span class="sd">            lat             (x, y) float64 32B 42.25 42.21 42.63 42.59</span>
-<span class="sd">          * time            (time) datetime64[ns] 32B 2014-09-06 ... 2014-09-09</span>
-<span class="sd">            reference_time  datetime64[ns] 8B 2014-09-05</span>
+<span class="sd">          * time            (time) datetime64[us] 32B 2014-09-06 ... 2014-09-09</span>
+<span class="sd">            reference_time  datetime64[us] 8B 2014-09-05</span>
 <span class="sd">        Dimensions without coordinates: x, y</span>
 <span class="sd">        Data variables:</span>
 <span class="sd">            temperature     (x, y, time) float64 128B 20.0 20.8 21.6 ... 30.4 31.2 32.0</span>
@@ -1365,12 +1365,12 @@
 <span class="sd">        &lt;xarray.DataArray (time: 12)&gt; Size: 96B</span>
 <span class="sd">        array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</span>
 <span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 96B 1999-12-15 2000-01-15 ... 2000-11-15</span>
+<span class="sd">          * time     (time) datetime64[us] 96B 1999-12-15 2000-01-15 ... 2000-11-15</span>
 <span class="sd">        &gt;&gt;&gt; da.resample(time=&quot;QS-DEC&quot;).mean()</span>
 <span class="sd">        &lt;xarray.DataArray (time: 4)&gt; Size: 32B</span>
 <span class="sd">        array([ 1.,  4.,  7., 10.])</span>
 <span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 32B 1999-12-01 2000-03-01 ... 2000-09-01</span>
+<span class="sd">          * time     (time) datetime64[us] 32B 1999-12-01 2000-03-01 ... 2000-09-01</span>
 
 <span class="sd">        Upsample monthly time-series data to daily data:</span>
 
@@ -1418,7 +1418,7 @@
 <span class="sd">               10.80645161, 10.83870968, 10.87096774, 10.90322581, 10.93548387,</span>
 <span class="sd">               10.96774194, 11.        ])</span>
 <span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 3kB 1999-12-15 1999-12-16 ... 2000-11-15</span>
+<span class="sd">          * time     (time) datetime64[us] 3kB 1999-12-15 1999-12-16 ... 2000-11-15</span>
 
 <span class="sd">        Limit scope of upsampling method</span>
 
@@ -1451,7 +1451,7 @@
 <span class="sd">               nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,</span>
 <span class="sd">               nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, 11., 11.])</span>
 <span class="sd">        Coordinates:</span>
-<span class="sd">          * time     (time) datetime64[ns] 3kB 1999-12-15 1999-12-16 ... 2000-11-15</span>
+<span class="sd">          * time     (time) datetime64[us] 3kB 1999-12-15 1999-12-16 ... 2000-11-15</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
