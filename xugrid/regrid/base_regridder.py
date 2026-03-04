@@ -21,6 +21,7 @@ except ImportError:
 
 from xugrid.constants import FloatArray
 from xugrid.core.sparse import MatrixCOO, MatrixCSR, row_slice
+from xugrid.regrid.grid.points import Points2d
 from xugrid.regrid.grid.structured import StructuredGrid2d
 from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
 
@@ -104,6 +105,14 @@ class BaseRegridder(abc.ABC):
             return StructuredGrid2d(
                 obj.isel(flipper), name_y=name_y, name_x=name_x
             ), flipper
+
+        elif isinstance(obj, np.ndarray):
+            if obj.ndim != 2 or obj.shape[-1] != 2:
+                raise ValueError(
+                    f"Unexpected shape on coordinates: {obj.shape}.\n"
+                    "Point coordinates must be provided as an array shaped (n_points, 2). "
+                )
+            return Points2d(obj), flipper
 
         else:
             raise TypeError()
@@ -292,6 +301,8 @@ class BaseRegridder(abc.ABC):
         if isinstance(self._target, StructuredGrid2d):
             regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded.isel(self._target_flipper)
+        elif isinstance(self._target, Points2d):
+            return regridded.assign_coords(coords=self._target.coords)
         else:
             return xugrid.UgridDataArray(
                 regridded,
@@ -392,6 +403,7 @@ class BaseRegridder(abc.ABC):
         Reconstruct the regridder from a dataset with source, target indices
         and weights.
         """
+        # TODO: add other classes
         unstructured = dataset["__target_type"].attrs["type"] == "UnstructuredGrid2d"
         if unstructured:
             target = xugrid.Ugrid2d.from_dataset(dataset, "__target")
@@ -400,7 +412,7 @@ class BaseRegridder(abc.ABC):
         return cls.from_weights(dataset, target)
 
 
-class BasePointRegridder(BaseRegridder, abc.ABC):
+class BasePointSampler(BaseRegridder, abc.ABC):
     """
     Base class for regridders that search points (nodes, centroids) that provide
     a 1:1 mapping.

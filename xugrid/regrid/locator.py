@@ -1,13 +1,13 @@
 from typing import Optional
 
 from xugrid.core.sparse import MatrixCOO
-from xugrid.regrid.base_regridder import BasePointRegridder
+from xugrid.regrid.base_regridder import BasePointSampler
 from xugrid.regrid.grid.unstructured import UnstructuredGrid2d
 
 
-class LocatorRegridder(BasePointRegridder):
+class LocatorSampler(BasePointSampler):
     """
-    The CentroidLocatorRegridded regrids by searching the source grid for the
+    The LocatorSampler regrids by searching the source grid for the
     centroids of the target grid.
 
     If a centroid is exactly located on an edge between two faces, the value of
@@ -17,7 +17,7 @@ class LocatorRegridder(BasePointRegridder):
     ----------
     source: Ugrid2d, UgridDataArray
         Source grid to regrid from.
-    target: Ugrid2d, UgridDataArray
+    target:
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This

@@ -11,6 +11,7 @@ the type of other (thereby effective multiple dispatch).
 
 Note: This is equivalent to a big if-else instance function.
 """
+
 from __future__ import annotations
 
 from functools import singledispatchmethod

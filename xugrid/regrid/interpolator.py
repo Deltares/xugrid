@@ -49,7 +49,7 @@ class BarycentricInterpolator(Interpolator):
     ----------
     source: Ugrid2d, UgridDataArray
         Source grid to regrid from.
-    target: Ugrid2d, UgridDataArray
+    target:
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This

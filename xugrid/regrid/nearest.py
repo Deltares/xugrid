@@ -1,19 +1,19 @@
 from typing import Optional
 
 from xugrid.core.sparse import MatrixCOO
-from xugrid.regrid.base_regridder import BasePointRegridder
+from xugrid.regrid.base_regridder import BasePointSampler
 
 
-class NearestRegridder(BasePointRegridder):
+class NearestSampler(BasePointSampler):
     """
-    The NearestRegridder regrids by searching the source grid for the
+    The NearestSampler regrids by searching the source grid for the
     nearest centroid or node of the target grid.
 
     Parameters
     ----------
     source: Ugrid2d, UgridDataArray
         Source grid to regrid from.
-    target: Ugrid2d, UgridDataArray
+    target:
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This
