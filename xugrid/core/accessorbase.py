@@ -38,7 +38,7 @@ class AbstractUgridAccessor(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def sel_points(self, x, y, out_of_bounds, fill_value):
+    def sel_points(self, x, y, method, out_of_bounds, fill_value):
         pass
 
     @abc.abstractmethod

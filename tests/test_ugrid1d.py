@@ -481,28 +481,25 @@ def test_sel_points():
     x = [1.5, 0.5, 0.0]
     y = [1.5, 0.5, 0.1]
 
-    actual = grid.sel_points(
-        obj=obj,
-        x=x,
-        y=y,
-    )
+    actual = grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="ignore")
     np.testing.assert_allclose(actual.values, [11, 10, np.nan])
-    np.testing.assert_allclose(actual["network1d_x"].values, x)
-    np.testing.assert_allclose(actual["network1d_y"].values, y)
-    np.testing.assert_allclose(actual["network1d_index"].values, [0, 1, 2])
+    np.testing.assert_allclose(actual["network1d_points_x"].values, x)
+    np.testing.assert_allclose(actual["network1d_points_y"].values, y)
 
     # Check if out_of_bounds raises ValueError
     with pytest.raises(ValueError):
         grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="raise")
 
     # Test with tolerance
-    actual = grid.sel_points(
-        obj=obj,
-        x=x,
-        y=y,
-        tolerance=0.1,
-    )
+    actual = grid.sel_points(obj=obj, x=x, y=y, tolerance=0.1, out_of_bounds="ignore")
     np.testing.assert_allclose(actual.values, [11, 10, 10])
+
+    obj = xr.DataArray(
+        data=np.arange(grid.n_node),
+        dims=[grid.node_dimension],
+    )
+    actual = grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="ignore")
+    np.testing.assert_allclose(actual.values, [1, 0, np.nan])
 
 
 def test_intersect_line():

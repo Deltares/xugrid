@@ -179,18 +179,27 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan):
         """
         Select points in the unstructured grid.
 
-        Out-of-bounds points are ignored. They may be identified via the
-        ``index`` coordinate of the returned selection.
+        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),
+        points are located by checking containment unless method is "nearest".
+        For data on other dimension (e.g. nodes), the nearest entity is found.
 
         Parameters
         ----------
-        x: ndarray of floats with shape ``(n_points,)``
-        y: ndarray of floats with shape ``(n_points,)``
-        out_of_bounds: str, default: "warn"
+        x: 1d array of floats with shape ``(n_points,)``
+        y: 1d array of floats with shape ``(n_points,)``
+        obj: xr.DataArray or xr.Dataset
+        method: str, {None, "nearest"}, optional
+            * None: default, locate the core entity (face for Ugrid2d, edge for
+              Ugrid1d) that contains each point. For secondary entities (nodes
+              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.
+            * "nearest": locate the nearest entity to each point, including the core
+              entity.
+
+        out_of_bounds: str, default ``"warn"``
             What to do when points are located outside of any feature:
 
             * raise: raise a ValueError.
@@ -201,12 +210,20 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
             Value to assign to out-of-bounds points if out_of_bounds is warn
             or ignore. Forwarded to xarray's ``.where()`` method.
+        tolerance: float, optional
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------
-        points: Union[xr.DataArray, xr.Dataset]
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates
+            and in a points dimension.
         """
-        return self.grid.sel_points(self.obj, x, y, out_of_bounds, fill_value)
+        return self.grid.sel_points(self.obj, x, y, method, out_of_bounds, fill_value)
 
     def rasterize(self, resolution: float) -> xr.DataArray:
         """

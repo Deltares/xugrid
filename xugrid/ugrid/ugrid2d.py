@@ -979,6 +979,20 @@ class Ugrid2d(AbstractUgrid):
         }
         return obj.assign_coords(coords)
 
+    def _locate_nearest(
+        self, facet: str, points: FloatArray, max_distance: float = np.inf
+    ):
+        if facet == "node":
+            return self.locate_nearest_node(points, max_distance)
+        elif facet == "edge":
+            return self.locate_nearest_edge(points, max_distance)
+        elif facet == "face":
+            return self.locate_nearest_face(points, max_distance)
+        else:
+            raise ValueError(
+                f"Expected facet as one of {'node', 'edge', 'face'}, received: {facet}"
+            )
+
     def locate_nearest_face(self, points: FloatArray, max_distance: float = np.inf):
         """
         Find which grid face is nearest for a collection of points.

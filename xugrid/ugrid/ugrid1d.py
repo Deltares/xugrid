@@ -338,6 +338,18 @@ class Ugrid1d(AbstractUgrid):
 
         return connectivity
 
+    def _locate_nearest(
+        self, facet: str, points: FloatArray, max_distance: float = np.inf
+    ):
+        if facet == "node":
+            return self.locate_nearest_node(points, max_distance)
+        elif facet == "edge":
+            return self.locate_nearest_edge(points, max_distance)
+        else:
+            raise ValueError(
+                f"Expected facet as one of {'node', 'edge'}, received: {facet}"
+            )
+
     # These are all optional attributes. They are not computed by default, only
     # when called upon.
 
