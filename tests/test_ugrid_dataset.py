@@ -680,8 +680,8 @@ class TestUgridDataset:
                 "mesh2d_nFaces": (dim, [0, 0]),
                 "mesh2d_nEdges": (dim, [0, 3]),
                 "mesh2d_nNodes": (dim, [0, 4]),
-                "mesh2d_points_x": (dim, x),
-                "mesh2d_points_y": (dim, y),
+                "mesh2d_x": (dim, x),
+                "mesh2d_y": (dim, y),
             },
         )
         assert actual.identical(expected)

@@ -483,8 +483,8 @@ def test_sel_points():
 
     actual = grid.sel_points(obj=obj, x=x, y=y, out_of_bounds="ignore")
     np.testing.assert_allclose(actual.values, [11, 10, np.nan])
-    np.testing.assert_allclose(actual["network1d_points_x"].values, x)
-    np.testing.assert_allclose(actual["network1d_points_y"].values, y)
+    np.testing.assert_allclose(actual["network1d_x"].values, x)
+    np.testing.assert_allclose(actual["network1d_y"].values, y)
 
     # Check if out_of_bounds raises ValueError
     with pytest.raises(ValueError):

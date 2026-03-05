@@ -1210,8 +1210,8 @@ class AbstractUgrid(abc.ABC):
 
         selection = obj.isel(indexers).assign_coords(
             {
-                f"{self.name}_points_x": (point_dim, xy[keep, 0]),
-                f"{self.name}_points_y": (point_dim, xy[keep, 1]),
+                f"{self.name}_x": (point_dim, xy[keep, 0]),
+                f"{self.name}_y": (point_dim, xy[keep, 1]),
             }
         )
         # Set values to fill_value for out-of-bounds

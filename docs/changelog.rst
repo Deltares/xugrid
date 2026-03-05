@@ -55,8 +55,7 @@ Fixed
   Previously, the core dimension indexer (edge for Ugrid1d, face for Ugrid2d)
   was incorrectly used to index secondary dimensions, which could produce wrong
   results or unexpected broadcast depending on the ``out_of_bounds`` option.
-  The returned selection now uses ``{name}_points`` as the point dimension, with
-  the coordinates named ``{name}_points_x`` and ``{name}_points_y`` accordingly.
+  The returned selection now uses ``{name}_points`` as the point dimension.
 
 [0.14.3] 2025-11-11
 -------------------

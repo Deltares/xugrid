@@ -815,8 +815,8 @@ class TestUgrid2dSelection:
         expected = xr.DataArray(
             data=[0, 3],
             coords={
-                f"{NAME}_points_x": (dim, x),
-                f"{NAME}_points_y": (dim, y),
+                f"{NAME}_x": (dim, x),
+                f"{NAME}_y": (dim, y),
             },
             dims=[dim],
         )
@@ -1026,8 +1026,8 @@ class TestUgrid2dSelection:
             expected = xr.DataArray(
                 data=[0],
                 coords={
-                    f"{NAME}_points_x": (dim, [0.5]),
-                    f"{NAME}_points_y": (dim, [0.5]),
+                    f"{NAME}_x": (dim, [0.5]),
+                    f"{NAME}_y": (dim, [0.5]),
                 },
                 dims=[dim],
             )
@@ -1049,8 +1049,8 @@ class TestUgrid2dSelection:
             expected = xr.DataArray(
                 data=[0, 0, 1, 2, 2, 3],
                 coords={
-                    f"{NAME}_points_x": (dim, [0.4, 0.8, 1.2, 0.4, 0.8, 1.2]),
-                    f"{NAME}_points_y": (dim, [0.5, 0.5, 0.5, 1.1, 1.1, 1.1]),
+                    f"{NAME}_x": (dim, [0.4, 0.8, 1.2, 0.4, 0.8, 1.2]),
+                    f"{NAME}_y": (dim, [0.5, 0.5, 0.5, 1.1, 1.1, 1.1]),
                 },
                 dims=[dim],
             )
@@ -1058,8 +1058,8 @@ class TestUgrid2dSelection:
             # assert expected.equals(actual)
             assert np.array_equal(expected.values, actual.values)
             assert expected.dims == actual.dims
-            x = f"{NAME}_points_x"
-            y = f"{NAME}_points_y"
+            x = f"{NAME}_x"
+            y = f"{NAME}_y"
             assert np.allclose(expected[y].values, actual[y].values)
             assert np.allclose(expected[x].values, actual[x].values)
 
