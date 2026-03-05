@@ -1101,7 +1101,7 @@ class AbstractUgrid(abc.ABC):
         method: str | None = None,
         out_of_bounds="warn",
         fill_value=np.nan,
-        tolerance: Optional[float] = None,
+        tolerance: float | None = None,
     ):
         """
         Select points in the unstructured grid.

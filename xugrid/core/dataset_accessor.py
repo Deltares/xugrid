@@ -229,7 +229,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(
+        self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan, tolerance=None
+    ):
         """
         Select points in the unstructured grid.
 
@@ -275,7 +277,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         """
         result = self.obj
         for grid in self.grids:
-            result = grid.sel_points(result, x, y, method, out_of_bounds, fill_value)
+            result = grid.sel_points(
+                result, x, y, method, out_of_bounds, fill_value, tolerance
+            )
         return result
 
     def rasterize(self, resolution: float) -> xr.Dataset:

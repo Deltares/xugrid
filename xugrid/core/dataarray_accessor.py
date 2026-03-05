@@ -179,7 +179,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(
+        self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan, tolerance=None
+    ):
         """
         Select points in the unstructured grid.
 
@@ -223,7 +225,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             The name of the topology is prefixed in the x, y coordinates
             and in a points dimension.
         """
-        return self.grid.sel_points(self.obj, x, y, method, out_of_bounds, fill_value)
+        return self.grid.sel_points(
+            self.obj, x, y, method, out_of_bounds, fill_value, tolerance
+        )
 
     def rasterize(self, resolution: float) -> xr.DataArray:
         """
