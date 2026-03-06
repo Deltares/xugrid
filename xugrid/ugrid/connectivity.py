@@ -480,7 +480,7 @@ def validate_edge_node_connectivity(
 
 
 def face_face_connectivity(
-    edge_face_connectivity: IntArray,
+    edge_face_connectivity: IntArray, n_face: int
 ) -> sparse.csr_matrix:
     """
     Derive face to face connectivity.
@@ -498,7 +498,7 @@ def face_face_connectivity(
     ji = np.concatenate([j, i])
     edge_index = np.concatenate([edge_index, edge_index])
     coo_content = (edge_index, (ij, ji))
-    coo_matrix = sparse.coo_matrix(coo_content)
+    coo_matrix = sparse.coo_matrix(coo_content, shape=(n_face, n_face))
     return coo_matrix.tocsr()
 
 

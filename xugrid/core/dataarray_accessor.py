@@ -188,18 +188,29 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(
+        self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan, tolerance=None
+    ):
         """
         Select points in the unstructured grid.
 
-        Out-of-bounds points are ignored. They may be identified via the
-        ``index`` coordinate of the returned selection.
+        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),
+        points are located by checking containment unless method is "nearest".
+        For data on other dimension (e.g. nodes), the nearest entity is found.
 
         Parameters
         ----------
-        x: ndarray of floats with shape ``(n_points,)``
-        y: ndarray of floats with shape ``(n_points,)``
-        out_of_bounds: str, default: "warn"
+        x: 1d array of floats with shape ``(n_points,)``
+        y: 1d array of floats with shape ``(n_points,)``
+        obj: xr.DataArray or xr.Dataset
+        method: str, {None, "nearest"}, optional
+            * None: default, locate the core entity (face for Ugrid2d, edge for
+              Ugrid1d) that contains each point. For secondary entities (nodes
+              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.
+            * "nearest": locate the nearest entity to each point, including the core
+              entity.
+
+        out_of_bounds: str, default ``"warn"``
             What to do when points are located outside of any feature:
 
             * raise: raise a ValueError.
@@ -210,12 +221,22 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
             Value to assign to out-of-bounds points if out_of_bounds is warn
             or ignore. Forwarded to xarray's ``.where()`` method.
+        tolerance: float, optional
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------
-        points: Union[xr.DataArray, xr.Dataset]
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates
+            and in a points dimension.
         """
-        return self.grid.sel_points(self.obj, x, y, out_of_bounds, fill_value)
+        return self.grid.sel_points(
+            self.obj, x, y, method, out_of_bounds, fill_value, tolerance
+        )
 
     def rasterize(self, resolution: float) -> xr.DataArray:
         """
@@ -479,6 +500,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             existing CRS, even when both are not equal.
         """
         self.grid.set_crs(crs, epsg, allow_override)
+        self.grid._update_coordinate_attrs(self.obj)
 
     def to_crs(
         self,
@@ -504,12 +526,17 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             such as an authority string (eg "EPSG:4326") or a WKT string.
         epsg : int, optional if `crs` is specified
             EPSG code specifying output projection.
+
+        Notes
+        -----
+        Node coordinates are always recomputed from the reprojected node positions.
+        Face and edge coordinates, if present, are also recomputed from the new
+        node positions. Coordinates not governed by the UGRID conventions
+        are left untouched.
         """
-        uda = UgridDataArray(self.obj, self.grid.to_crs(crs, epsg))
-        if self.grid.node_dimension in self.obj.dims:
-            return uda.ugrid.assign_node_coords()
-        else:
-            return uda
+        grid = self.grid.to_crs(crs, epsg)
+        obj = grid._assign_derived_coords(self.obj)
+        return UgridDataArray(obj, grid)
 
     def to_geodataframe(
         self, name: str = None, dim_order=None
@@ -789,8 +816,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         direct_solve: bool = False,
         delta=0.0,
         relax=0.0,
-        rtol=1.0e-5,
-        atol=0.0,
+        rtol=0.0,
+        atol=1e-4,
         maxiter: int = 500,
     ):
         """
@@ -826,9 +853,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             ILU0 preconditioner non-diagonally dominant correction.
         relax: float, default 0.0.
             Modified ILU0 preconditioner relaxation factor.
-        rtol: float, optional, default 1.0e-5.
+        rtol: float, optional, default 0.0.
             Convergence tolerance for ``scipy.sparse.linalg.cg``.
-        atol: float, optional, default 0.0.
+        atol: float, optional, default 1.0e-4.
             Convergence tolerance for ``scipy.sparse.linalg.cg``.
         maxiter: int, default 500.
             Maximum number of iterations for ``scipy.sparse.linalg.cg``.

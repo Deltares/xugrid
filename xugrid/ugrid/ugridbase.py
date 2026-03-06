@@ -2,7 +2,7 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -14,6 +14,7 @@ from scipy.spatial import KDTree
 
 from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
 from xugrid.ugrid.selection_utils import get_sorted_section_coords
 
 
@@ -86,13 +87,21 @@ def align(obj, grids, old_indexes):
     new_grids = []
     for grid in grids:
         ugrid_dims = grid.dims.intersection(new_indexes)
-        ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
-        newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
-        indexers = {
-            k: v for k, v in indexers.items() if k in obj.dims and k not in new_indexes
-        }
-        obj = obj.isel(indexers)
-        new_grids.append(newgrid)
+        if ugrid_dims:
+            ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
+            newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
+            indexers = {
+                k: v
+                for k, v in indexers.items()
+                if k in obj.dims and k not in new_indexes
+            }
+            obj = obj.isel(indexers)
+            new_grids.append(newgrid)
+        else:
+            # In case of multiple topologies, not every grid might be indexed.
+            # In that case, just keep the untouched grids.
+            new_grids.append(grid)
+
     return obj, new_grids
 
 
@@ -163,6 +172,10 @@ class AbstractUgrid(abc.ABC):
 
     @abc.abstractmethod
     def _clear_geometry_properties(self):
+        pass
+
+    @abc.abstractmethod
+    def _assign_derived_coords(self, obj):
         pass
 
     @staticmethod
@@ -388,6 +401,99 @@ class AbstractUgrid(abc.ABC):
 
         return attrs
 
+    @staticmethod
+    def _extract_crs(dataset: xr.Dataset, topology: str):
+        grid_mapping_name = dataset.ugrid_roles.grid_mapping_names[topology]
+        stdname_projected = dataset.ugrid_roles.is_projected[topology]
+        if grid_mapping_name is not None:
+            crs = crs_from_attrs(dataset[grid_mapping_name].attrs)
+        else:
+            crs = None
+
+        if not (crs is None or isinstance(crs, CrsPlaceholder)):
+            # Then it's pyproj
+            is_projected = crs.is_projected
+            if stdname_projected is not None and stdname_projected != is_projected:
+                warnings.warn(
+                    f"standard_name suggests {'projected' if stdname_projected else 'geographic'} "
+                    f"coordinates, but the CRS ({crs}) is "
+                    f"{'projected' if is_projected else 'geographic'}. "
+                    "The CRS will take priority."
+                )
+            return crs, is_projected
+
+        if stdname_projected is not None:
+            is_projected = stdname_projected
+        else:
+            warnings.warn(
+                f"No CRS or recognizable standard_name found for topology '{topology}'. "
+                "Assuming projected coordinates."
+            )
+            is_projected = True
+        return crs, is_projected
+
+    @staticmethod
+    def _validate_crs(crs: Any, is_projected: bool):
+        if crs is None or isinstance(crs, CrsPlaceholder):
+            _crs = crs
+            _is_projected = is_projected
+        else:
+            import pyproj
+
+            _crs = pyproj.CRS.from_user_input(crs)
+            if not (_crs.is_projected ^ _crs.is_geographic):
+                raise ValueError(
+                    f"Unsupported CRS: {crs}.\n"
+                    "CRS should either be geographic (latitude / longitude) or projected.\n"
+                    "If your CRS is neither, please file an issue at https://github.com/deltares/xugrid/issues"
+                )
+            _is_projected = _crs.is_projected
+        return _crs, _is_projected
+
+    def write_grid_mapping(self, dataset, grid_mapping_name: str = None):
+        """
+        Use the CRS of the topology, if set, to write the CF grid_mapping
+        attributes to a newly created mapping variable.
+
+        The grid mapping variable is stamped onto all data variables that share
+        dimensions with this topology via the ``grid_mapping`` attribute, following
+        CF conventions. Additionally, coordinate variables are also stamped, which
+        is not strictly CF-compliant but is required for compatibility for e.g.
+        QGIS-MDAL, which reads ``grid_mapping`` from coordinates rather than
+        data variables.
+
+        Parameters
+        ----------
+        dataset: xr.Dataset
+        grid_mapping_name: str, optional
+            Name of the CF grid mapping variable. If not provided (or None),
+            defaults to ``f"{self.name}_crs"`` for this topology.
+
+        Returns
+        -------
+        dataset: xr.Dataset
+            Modified dataset with CF compliant CRS information.
+        """
+
+        if self.crs is not None:
+            dataset = dataset.copy()
+            if grid_mapping_name is None:
+                grid_mapping_name = f"{self.name}_crs"
+
+            # Needs to be this int value for DFM/Interacter...
+            # TODO: might change if DFM is changed; we could then simply use 0.
+            _FILL_ = np.int32(np.iinfo(np.int32).min + 1)
+            dataset[grid_mapping_name] = xr.Variable(
+                (), _FILL_, attrs=crs_to_attrs(self.crs)
+            )
+            # Stamp grid_mapping on data variables that sit on this topology
+            # QGIS-MDAL reads the grid_mapping off the coordinates, hence
+            # we will stamp those as well (.variables instead of .data_vars).
+            for var in dataset.variables.values():
+                if set(self.dims) & set(var.dims):
+                    var.attrs["grid_mapping"] = grid_mapping_name
+        return dataset
+
     def __repr__(self):
         if self._dataset:
             return self._dataset.__repr__()
@@ -607,7 +713,8 @@ class AbstractUgrid(abc.ABC):
         node_x: str,
         node_y: str,
         obj: Union[xr.DataArray, xr.Dataset],
-        projected: bool = True,
+        is_projected: bool = True,
+        crs: Any = None,
     ):
         """
         Given names of x and y coordinates of the nodes of an object, set them
@@ -619,6 +726,15 @@ class AbstractUgrid(abc.ABC):
             Name of the x coordinate of the nodes in the object.
         node_y: str
             Name of the y coordinate of the nodes in the object.
+        obj: xr.DataArray, xr.Dataset
+        is_projected: bool, optional
+            Whether node_x and node_y are longitude and latitude or projected x and
+            y coordinates. Used to write the appropriate standard_name in the
+            coordinate attributes. If crs is provided, its value will take priority.
+        crs: Any, optional
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
         """
         if " " in node_x or " " in node_y:
             raise ValueError("coordinate names may not contain spaces")
@@ -651,7 +767,7 @@ class AbstractUgrid(abc.ABC):
         self._attrs["node_coordinates"] = " ".join(node_coords)
         self._indexes["node_x"] = node_x
         self._indexes["node_y"] = node_y
-        self.projected = projected
+        self.crs, self.is_projected = self._validate_crs(crs, is_projected)
 
     def assign_node_coords(
         self,
@@ -673,8 +789,8 @@ class AbstractUgrid(abc.ABC):
         """
         xname = self._indexes["node_x"]
         yname = self._indexes["node_y"]
-        x_attrs = conventions.DEFAULT_ATTRS["node_x"][self.projected]
-        y_attrs = conventions.DEFAULT_ATTRS["node_y"][self.projected]
+        x_attrs = conventions.DEFAULT_ATTRS["node_x"][self.is_projected]
+        y_attrs = conventions.DEFAULT_ATTRS["node_y"][self.is_projected]
         coords = {
             xname: xr.DataArray(
                 data=self.node_x,
@@ -709,8 +825,8 @@ class AbstractUgrid(abc.ABC):
         """
         xname = self._indexes.get("edge_x", f"{self.name}_edge_x")
         yname = self._indexes.get("edge_y", f"{self.name}_edge_y")
-        x_attrs = conventions.DEFAULT_ATTRS["edge_x"][self.projected]
-        y_attrs = conventions.DEFAULT_ATTRS["edge_y"][self.projected]
+        x_attrs = conventions.DEFAULT_ATTRS["edge_x"][self.is_projected]
+        y_attrs = conventions.DEFAULT_ATTRS["edge_y"][self.is_projected]
         coords = {
             xname: xr.DataArray(
                 data=self.edge_x,
@@ -832,6 +948,17 @@ class AbstractUgrid(abc.ABC):
         # Normalize so the weights are around 1.0
         return distance.mean() / distance
 
+    def _update_coordinate_attrs(self, obj: xr.DataArray | xr.Dataset):
+        for role, name in self._indexes.items():
+            if name in obj.coords:
+                obj[name].attrs = conventions.DEFAULT_ATTRS[role][self.is_projected]
+            # Also update internal storage where data is preserved for roundtripping.
+            if self._dataset is not None and name in self._dataset.coords:
+                self._dataset[name].attrs = conventions.DEFAULT_ATTRS[role][
+                    self.is_projected
+                ]
+        return
+
     def set_crs(
         self,
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
@@ -864,6 +991,7 @@ class AbstractUgrid(abc.ABC):
             crs = pyproj.CRS.from_epsg(epsg)
         else:
             raise ValueError("Must pass either crs or epsg.")
+        crs, is_projected = self._validate_crs(crs, crs.is_projected)
 
         if not allow_override and self.crs is not None and not self.crs == crs:
             raise ValueError(
@@ -873,6 +1001,7 @@ class AbstractUgrid(abc.ABC):
                 "transform the geometries, use '.to_crs' instead."
             )
         self.crs = crs
+        self.is_projected = is_projected
 
     def to_crs(
         self,
@@ -906,6 +1035,14 @@ class AbstractUgrid(abc.ABC):
                 "Cannot transform naive geometries.  "
                 "Please set a crs on the object first."
             )
+        elif isinstance(self.crs, CrsPlaceholder):
+            raise ValueError(
+                "Cannot transform geometries: the current CRS is a placeholder and has "
+                "not been parsed.\nThis may be because pyproj is not installed, or because pyproj "
+                "failed to interpret the grid mapping attributes.\n"
+                "Use .set_crs(..., allow_override=True) to set a valid pyproj CRS explicitly.\n"
+            )
+
         if crs is not None:
             crs = pyproj.CRS.from_user_input(crs)
         elif epsg is not None:
@@ -913,6 +1050,7 @@ class AbstractUgrid(abc.ABC):
         else:
             raise ValueError("Must pass either crs or epsg.")
 
+        crs, is_projected = self._validate_crs(crs, crs.is_projected)
         grid = self.copy()
         if self.crs.is_exact_same(crs):
             return grid
@@ -926,14 +1064,12 @@ class AbstractUgrid(abc.ABC):
         grid._clear_geometry_properties()
         grid._dataset = None
         grid.crs = crs
-
+        grid.is_projected = is_projected
         return grid
 
     @property
     def is_geographic(self):
-        if self.crs is None:
-            return False
-        return self.crs.is_geographic
+        return not self.is_projected
 
     def plot(self, **kwargs):
         """
@@ -970,19 +1106,30 @@ class AbstractUgrid(abc.ABC):
         obj,
         x: FloatArray,
         y: FloatArray,
+        method: str | None = None,
         out_of_bounds="warn",
         fill_value=np.nan,
-        tolerance: Optional[float] = None,
+        tolerance: float | None = None,
     ):
         """
         Select points in the unstructured grid.
 
+        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),
+        points are located by checking containment unless method is "nearest".
+        For data on other dimension (e.g. nodes), the nearest entity is found.
 
         Parameters
         ----------
         x: 1d array of floats with shape ``(n_points,)``
         y: 1d array of floats with shape ``(n_points,)``
         obj: xr.DataArray or xr.Dataset
+        method: str, {None, "nearest"}, optional
+            * None: default, locate the core entity (face for Ugrid2d, edge for
+              Ugrid1d) that contains each point. For secondary entities (nodes
+              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.
+            * "nearest": locate the nearest entity to each point, including the core
+              entity.
+
         out_of_bounds: str, default ``"warn"``
             What to do when points are located outside of any feature:
 
@@ -1004,17 +1151,24 @@ class AbstractUgrid(abc.ABC):
         Returns
         -------
         selection: xr.DataArray or xr.Dataset
-            The name of the topology is prefixed in the x, y coordinates.
+            The name of the topology is prefixed in the x, y coordinates
+            and in a points dimension.
         """
-        dim = self.core_dimension
 
-        options = ("warn", "raise", "ignore", "drop")
-        if out_of_bounds not in options:
-            str_options = ", ".join(options)
+        method_options = (None, "nearest")
+        if method not in method_options:
+            raise ValueError(
+                f"method must be one of {method_options}, received: {method}"
+            )
+
+        bounds_options = ("warn", "raise", "ignore", "drop")
+        if out_of_bounds not in bounds_options:
+            str_options = ", ".join(bounds_options)
             raise ValueError(
                 f"out_of_bounds must be one of {str_options}, received: {out_of_bounds}"
             )
 
+        # Check x and y coordinates
         x = np.atleast_1d(x)
         y = np.atleast_1d(y)
         if x.shape != y.shape:
@@ -1022,33 +1176,64 @@ class AbstractUgrid(abc.ABC):
         if x.ndim != 1:
             raise ValueError("x and y must be 1d")
         xy = np.column_stack([x, y])
-        index = self.locate_points(xy, tolerance)
 
-        keep = slice(None, None)  # keep all by default
+        # Find which points are "in bounds" (i.e. not outside the topology)
+        point_dim = f"{self.name}_points"
+        core_indexer = self.locate_points(xy, tolerance)
+        keep = slice(None, None)
         condition = None
-        valid = index != -1
+        valid = core_indexer != -1
         if not valid.all():
-            msg = "Not all points are located inside of the grid."
+            msg = "Not all points are located on the topology."
             if out_of_bounds == "raise":
                 raise ValueError(msg)
-            elif out_of_bounds in ("warn", "ignore"):
-                if out_of_bounds == "warn":
-                    warnings.warn(msg)
-                condition = xr.DataArray(valid, dims=(dim,))
-            elif out_of_bounds == "drop":
-                index = index[valid]
+            elif out_of_bounds == "warn":
+                warnings.warn(msg)
+                condition = xr.DataArray(valid, dims=(point_dim,))
+            elif out_of_bounds == "ignore":
+                condition = xr.DataArray(valid, dims=(point_dim,))
+            else:  # "drop"
+                core_indexer = core_indexer[valid]
                 keep = valid
+        xy_sel = xy[keep]
 
         # Create the selection DataArray or Dataset
-        coords = {
-            f"{self.name}_index": (dim, np.arange(len(xy))[keep]),
-            f"{self.name}_x": (dim, xy[keep, 0]),
-            f"{self.name}_y": (dim, xy[keep, 1]),
-        }
-        selection = obj.isel({dim: index}).assign_coords(coords)
+        core_dim = self.core_dimension
+        other_dims = self.dims.intersection(obj.dims) - {core_dim}
+        facets = {v: k for k, v in self.facets.items()}
+        # Override the main indexer if method is nearest.
+        if core_dim in obj.dims:
+            if method == "nearest":
+                core_indexer = self._locate_nearest(
+                    facet=facets[core_dim], points=xy_sel
+                )
+            indexers = {core_dim: xr.DataArray(core_indexer, dims=(point_dim,))}
+        else:
+            indexers = {}
 
+        # Now process secondary dimensions.
+        for dim in other_dims:
+            indexer = self._locate_nearest(facet=facets[dim], points=xy_sel)
+            indexers[dim] = xr.DataArray(indexer, dims=(point_dim,))
+
+        selection = obj.isel(indexers).assign_coords(
+            {
+                f"{self.name}_x": (point_dim, xy[keep, 0]),
+                f"{self.name}_y": (point_dim, xy[keep, 1]),
+            }
+        )
         # Set values to fill_value for out-of-bounds
         if condition is not None:
+            # Utilize the exact name matching of .where() if our object is a dataset.
+            if isinstance(selection, xr.Dataset):
+                datavars = selection.data_vars.items()
+                condition = xr.Dataset(
+                    {
+                        varname: condition
+                        for varname, var in datavars
+                        if point_dim in var.dims
+                    }
+                )
             selection = selection.where(condition, other=fill_value)
         return selection
 
@@ -1349,8 +1534,10 @@ class AbstractUgrid(abc.ABC):
 
         _, partition_index = pymetis.part_graph(
             nparts=n_part,
-            xadj=adjacency_matrix.indptr,
-            adjncy=adjacency_matrix.indices,
+            adjacency=pymetis.CSRAdjacency(
+                adj_starts=adjacency_matrix.indptr,
+                adjacent=adjacency_matrix.indices,
+            ),
             vweights=weights,
         )
         return xugrid.UgridDataArray(

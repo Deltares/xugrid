@@ -256,6 +256,22 @@ class LineCases:
         line_counts = np.array([8, 172])
         return geometry, unique_values, line_counts
 
+    def case_line_hits_edge_centroid(self):
+        """
+        Snap a line that hits the centroid of an edge. This is a special case
+        that caused problems with the snapping algorithm up to xugrid 0.14.1:
+        the line exactly hits the intersection point of the line connecting the
+        face centroids and the cell edge.
+        """
+        line_x = [12.0, 18.0]
+        line_y = [22.0, 18.0]
+        line = shapely.linestrings(line_x, line_y)
+        geometry = gpd.GeoDataFrame(geometry=[line], data={"a": [1.0]})
+
+        unique_values = np.array([0.0, np.nan])
+        line_counts = np.array([1, 179])
+        return geometry, unique_values, line_counts
+
 
 @parametrize_with_cases(["geometry", "unique_values", "line_counts"], cases=LineCases)
 def test_snap_to_grid_with_data(structured, geometry, unique_values, line_counts):

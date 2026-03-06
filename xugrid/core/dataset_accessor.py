@@ -254,17 +254,28 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         else:
             return result
 
-    def sel_points(self, x, y, out_of_bounds="warn", fill_value=np.nan):
+    def sel_points(
+        self, x, y, method=None, out_of_bounds="warn", fill_value=np.nan, tolerance=None
+    ):
         """
         Select points in the unstructured grid.
 
-        Out-of-bounds points are ignored. They may be identified via the
-        ``index`` coordinate of the returned selection.
+        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),
+        points are located by checking containment unless method is "nearest".
+        For data on other dimension (e.g. nodes), the nearest entity is found.
 
         Parameters
         ----------
-        x: ndarray of floats with shape ``(n_points,)``
-        y: ndarray of floats with shape ``(n_points,)``
+        x: 1d array of floats with shape ``(n_points,)``
+        y: 1d array of floats with shape ``(n_points,)``
+        obj: xr.DataArray or xr.Dataset
+        method: str, {None, "nearest"}, optional
+            * None: default, locate the core entity (face for Ugrid2d, edge for
+              Ugrid1d) that contains each point. For secondary entities (nodes
+              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.
+            * "nearest": locate the nearest entity to each point, including the core
+              entity.
+
         out_of_bounds: str, default ``"warn"``
             What to do when points are located outside of any feature:
 
@@ -276,15 +287,24 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan
             Value to assign to out-of-bounds points if out_of_bounds is warn
             or ignore. Forwarded to xarray's ``.where()`` method.
+        tolerance: float, optional
+            The tolerance used to determine whether a point is on an edge. This
+            is a floating point precision criterion, thus cannot be directly be
+            interpreted as a distance. If None, ``numba_celltree`` estimates an
+            appropriate tolerance by multiplying the maximum diagonal of the
+            bounding boxes with 1e-12.
 
         Returns
         -------
-        points: Union[xr.DataArray, xr.Dataset]
-            The name of the topology is prefixed in the x, y coordinates.
+        selection: xr.DataArray or xr.Dataset
+            The name of the topology is prefixed in the x, y coordinates
+            and in a points dimension.
         """
         result = self.obj
         for grid in self.grids:
-            result = grid.sel_points(result, x, y, out_of_bounds, fill_value)
+            result = grid.sel_points(
+                result, x, y, method, out_of_bounds, fill_value, tolerance
+            )
         return result
 
     def rasterize(self, resolution: float) -> xr.Dataset:
@@ -486,6 +506,8 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         for grid in grids:
             grid.set_crs(crs, epsg, allow_override)
+            grid._update_coordinate_attrs(self.obj)
+        return
 
     def to_crs(
         self,
@@ -515,20 +537,30 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         topology: str, optional
             Name of the grid topology to reproject.
             Reprojects all grids if left unspecified.
-        """
-        if topology is None:
-            grids = [grid.to_crs(crs, epsg) for grid in self.grids]
-        else:
-            names = [grid.name for grid in self.grids]
-            if topology not in names:
-                raise ValueError(f"{topology} not found. Expected one of: {names}")
-            grids = [
-                grid.to_crs(crs, epsg) if grid.name == topology else grid.copy()
-                for grid in self.grids
-            ]
 
-        uds = UgridDataset(self.obj, grids)
-        return uds.ugrid.assign_node_coords()
+        Notes
+        -----
+        Node coordinates are always recomputed from the reprojected node positions.
+        Face and edge coordinates, if present, are also recomputed from the new
+        node positions. Coordinates not governed by the UGRID conventions
+        are left untouched.
+        """
+        obj = self.obj.copy()
+
+        names = [grid.name for grid in self.grids]
+        if topology is not None and topology not in names:
+            raise ValueError(f"{topology} not found. Expected one of: {names}")
+
+        grids = []
+        for grid in self.grids:
+            if topology is None or grid.name == topology:
+                newgrid = grid.to_crs(crs, epsg)
+                obj = newgrid._assign_derived_coords(obj)
+            else:
+                newgrid = grid.copy()
+            grids.append(newgrid)
+
+        return UgridDataset(obj, grids)
 
     def to_geodataframe(self, dim_order=None) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """
