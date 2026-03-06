@@ -747,6 +747,14 @@ grid mapping and CRS related properties in a dataset.</p></li>
 The names of optional coordinates such as edge and face coordinates for a
 Ugrid2d topology are now tracked in the grid object, if they were present in
 the dataset.</p></li>
+<li><p><a class="reference internal" href="api/xugrid.Ugrid1d.sel_points.html#xugrid.Ugrid1d.sel_points" title="xugrid.Ugrid1d.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid1d.sel_points()</span></code></a>, <a class="reference internal" href="api/xugrid.Ugrid2d.sel_points.html#xugrid.Ugrid2d.sel_points" title="xugrid.Ugrid2d.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.sel_points()</span></code></a>,
+<a class="reference internal" href="api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points" title="xugrid.UgridDataArrayAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArrayAccessor.sel_points()</span></code></a> and
+<a class="reference internal" href="api/xugrid.UgridDatasetAccessor.sel_points.html#xugrid.UgridDatasetAccessor.sel_points" title="xugrid.UgridDatasetAccessor.sel_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDatasetAccessor.sel_points()</span></code></a> will now correctly select node
+data for Ugrid1d topologies, and node and edge data for Ugrid2d topologies.
+Previously, the core dimension indexer (edge for Ugrid1d, face for Ugrid2d)
+was incorrectly used to index secondary dimensions, which could produce wrong
+results or unexpected broadcast depending on the <code class="docutils literal notranslate"><span class="pre">out_of_bounds</span></code> option.
+The returned selection now uses <code class="docutils literal notranslate"><span class="pre">{name}_points</span></code> as the point dimension.</p></li>
 </ul>
 </section>
 </section>

@@ -581,18 +581,29 @@
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.sel_points">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDataArrayAccessor.sel_points.html#xugrid.UgridDataArrayAccessor.sel_points">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
-<span class="sd">        Out-of-bounds points are ignored. They may be identified via the</span>
-<span class="sd">        ``index`` coordinate of the returned selection.</span>
+<span class="sd">        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),</span>
+<span class="sd">        points are located by checking containment unless method is &quot;nearest&quot;.</span>
+<span class="sd">        For data on other dimension (e.g. nodes), the nearest entity is found.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        x: ndarray of floats with shape ``(n_points,)``</span>
-<span class="sd">        y: ndarray of floats with shape ``(n_points,)``</span>
-<span class="sd">        out_of_bounds: str, default: &quot;warn&quot;</span>
+<span class="sd">        x: 1d array of floats with shape ``(n_points,)``</span>
+<span class="sd">        y: 1d array of floats with shape ``(n_points,)``</span>
+<span class="sd">        obj: xr.DataArray or xr.Dataset</span>
+<span class="sd">        method: str, {None, &quot;nearest&quot;}, optional</span>
+<span class="sd">            * None: default, locate the core entity (face for Ugrid2d, edge for</span>
+<span class="sd">              Ugrid1d) that contains each point. For secondary entities (nodes</span>
+<span class="sd">              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.</span>
+<span class="sd">            * &quot;nearest&quot;: locate the nearest entity to each point, including the core</span>
+<span class="sd">              entity.</span>
+
+<span class="sd">        out_of_bounds: str, default ``&quot;warn&quot;``</span>
 <span class="sd">            What to do when points are located outside of any feature:</span>
 
 <span class="sd">            * raise: raise a ValueError.</span>
@@ -603,12 +614,22 @@
 <span class="sd">        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan</span>
 <span class="sd">            Value to assign to out-of-bounds points if out_of_bounds is warn</span>
 <span class="sd">            or ignore. Forwarded to xarray&#39;s ``.where()`` method.</span>
+<span class="sd">        tolerance: float, optional</span>
+<span class="sd">            The tolerance used to determine whether a point is on an edge. This</span>
+<span class="sd">            is a floating point precision criterion, thus cannot be directly be</span>
+<span class="sd">            interpreted as a distance. If None, ``numba_celltree`` estimates an</span>
+<span class="sd">            appropriate tolerance by multiplying the maximum diagonal of the</span>
+<span class="sd">            bounding boxes with 1e-12.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        points: Union[xr.DataArray, xr.Dataset]</span>
+<span class="sd">        selection: xr.DataArray or xr.Dataset</span>
+<span class="sd">            The name of the topology is prefixed in the x, y coordinates</span>
+<span class="sd">            and in a points dimension.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">tolerance</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UgridDataArrayAccessor.rasterize">

@@ -701,14 +701,25 @@
 <h1>xugrid.Ugrid1d.sel_points<a class="headerlink" href="#xugrid-ugrid1d-sel-points" title="Link to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="xugrid.Ugrid1d.sel_points">
-<span class="sig-prename descclassname"><span class="pre">Ugrid1d.</span></span><span class="sig-name descname"><span class="pre">sel_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xugrid.Ugrid1d.sel_points" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Ugrid1d.</span></span><span class="sig-name descname"><span class="pre">sel_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_of_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xugrid.Ugrid1d.sel_points" title="Link to this definition">#</a></dt>
 <dd><p>Select points in the unstructured grid.</p>
+<p>For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),
+points are located by checking containment unless method is “nearest”.
+For data on other dimension (e.g. nodes), the nearest entity is found.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (1d array of floats with shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>)</p></li>
 <li><p><strong>y</strong> (1d array of floats with shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>)</p></li>
 <li><p><strong>obj</strong> (<em>xr.DataArray</em><em> or </em><em>xr.Dataset</em>)</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>{None</em><em>, </em><em>&quot;nearest&quot;}</em><em>, </em><em>optional</em>) – <ul>
+<li><p>None: default, locate the core entity (face for Ugrid2d, edge for
+Ugrid1d) that contains each point. For secondary entities (nodes
+and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.</p></li>
+<li><p>”nearest”: locate the nearest entity to each point, including the core
+entity.</p></li>
+</ul>
+</p></li>
 <li><p><strong>out_of_bounds</strong> (str, default <code class="docutils literal notranslate"><span class="pre">&quot;warn&quot;</span></code>) – <p>What to do when points are located outside of any feature:</p>
 <ul>
 <li><p>raise: raise a ValueError.</p></li>
@@ -728,7 +739,8 @@ bounding boxes with 1e-12.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>selection</strong> – The name of the topology is prefixed in the x, y coordinates.</p>
+<dd class="field-even"><p><strong>selection</strong> – The name of the topology is prefixed in the x, y coordinates
+and in a points dimension.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>xr.DataArray or xr.Dataset</p>

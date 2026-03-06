@@ -1382,6 +1382,20 @@
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_locate_nearest</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_nearest_node</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;edge&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_nearest_edge</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;face&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_nearest_face</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected facet as one of </span><span class="si">{</span><span class="s1">&#39;node&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;edge&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;face&#39;</span><span class="si">}</span><span class="s2">, received: </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
 <div class="viewcode-block" id="Ugrid2d.locate_nearest_face">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.locate_nearest_face.html#xugrid.Ugrid2d.locate_nearest_face">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">locate_nearest_face</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>

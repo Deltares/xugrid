@@ -48,6 +48,14 @@ Fixed
   The names of optional coordinates such as edge and face coordinates for a
   Ugrid2d topology are now tracked in the grid object, if they were present in
   the dataset.
+- :meth:`xugrid.Ugrid1d.sel_points`, :meth:`xugrid.Ugrid2d.sel_points`,
+  :meth:`xugrid.UgridDataArrayAccessor.sel_points` and
+  :meth:`xugrid.UgridDatasetAccessor.sel_points` will now correctly select node
+  data for Ugrid1d topologies, and node and edge data for Ugrid2d topologies.
+  Previously, the core dimension indexer (edge for Ugrid1d, face for Ugrid2d)
+  was incorrectly used to index secondary dimensions, which could produce wrong
+  results or unexpected broadcast depending on the ``out_of_bounds`` option.
+  The returned selection now uses ``{name}_points`` as the point dimension.
 
 [0.14.3] 2025-11-11
 -------------------
