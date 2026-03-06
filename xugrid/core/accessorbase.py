@@ -5,9 +5,16 @@ import numpy as np
 import xarray as xr
 
 import xugrid
+from xugrid.core.index import UgridIndex
 
 
 class AbstractUgridAccessor(abc.ABC):
+    @property
+    def is_indexed(self) -> bool:
+        return any(
+            isinstance(index, UgridIndex) for index in self.obj.xindexes.values()
+        )
+
     @abc.abstractmethod
     def to_dataset(self):
         pass

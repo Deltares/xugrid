@@ -8,7 +8,7 @@ from xugrid.conversion import grid_from_geodataframe
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
-from xugrid.core.index import UgridIndex, UgridIndex2d
+from xugrid.core.index import UGRID_INDEXES, UgridIndex
 from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
@@ -20,18 +20,35 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
     def __init__(self, obj: xr.Dataset):
         self.obj = obj
 
-    def initialize(self):  # , grids=None):
+    def from_dataset(self):
         new = self.obj
+        topology_dimensions = self.obj.ugrid_roles.topology_dimensions
+        connectivity_vars = [
+            name
+            for v in self.obj.ugrid_roles.connectivity.values()
+            for name in v.values()
+        ]
+        grid_mapping_vars = [
+            name
+            for name in self.obj.ugrid_roles.grid_mapping_names.values()
+            if name is not None
+        ]
+
         for topology in self.obj.ugrid_roles.topology:
-            # TODO: currently hardcoded for Ugrid2d
-            ugrid_vars = self.obj.ugrid_roles[topology]
-            node_xs, node_ys = ugrid_vars["node_coordinates"]
-            variables = (
-                node_xs[0],
-                node_ys[0],
-                ugrid_vars["face_node_connectivity"],
+            topodim = topology_dimensions[topology]
+            index_cls = UGRID_INDEXES[topodim]
+            variables, options = index_cls._variables_from_dataset(self.obj, topology)
+            index = index_cls.from_variables(
+                {name: self.obj[name] for name in variables}, options=options
             )
-            new = new.set_coords(variables).set_xindex(variables, UgridIndex2d)
+            coords = xr.Coordinates.from_xindex(index)
+            new = new.assign_coords(coords)
+
+        to_drop = self.obj.ugrid_roles.topology + connectivity_vars + grid_mapping_vars
+        new = new.drop_vars(to_drop, errors="ignore").copy()
+        for var in new.variables.values():
+            var.attrs = var.attrs.copy()
+            var.attrs.pop("grid_mapping", None)
         return new
 
     @property
