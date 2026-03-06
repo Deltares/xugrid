@@ -998,6 +998,10 @@ class TestMultiTopologyUgridDataset:
             xr.DataArray(np.ones(grid.n_node), dims=[grid.node_dimension]),
             grid,
         )
+        self.uds["c"] = xugrid.UgridDataArray(
+            xr.DataArray(np.ones(grid.n_edge), dims=[grid.edge_dimension]),
+            grid,
+        )
 
     def test_grid_membership(self):
         assert len(self.uds.grids) == 2
@@ -1013,6 +1017,14 @@ class TestMultiTopologyUgridDataset:
         result = self.uds.ugrid.sel(x=slice(-10, 10), y=slice(-10, 10))
         # Ensure both grids are still present
         assert len(result.ugrid.grids) == 2
+
+    def test_multi_topology_isel(self):
+        grid0, grid1 = self.uds.grids
+        result0 = self.uds.isel({grid0.face_dimension: [0, 1]})
+        assert len(result0.ugrid.grids) == 2
+
+        result1 = self.uds.isel({grid1.edge_dimension: [0, 1]})
+        assert len(result1.ugrid.grids) == 2
 
     def test_reindex_like(self):
         back = self.uds.ugrid.reindex_like(self.uds)

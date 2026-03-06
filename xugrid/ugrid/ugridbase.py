@@ -87,13 +87,21 @@ def align(obj, grids, old_indexes):
     new_grids = []
     for grid in grids:
         ugrid_dims = grid.dims.intersection(new_indexes)
-        ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
-        newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
-        indexers = {
-            k: v for k, v in indexers.items() if k in obj.dims and k not in new_indexes
-        }
-        obj = obj.isel(indexers)
-        new_grids.append(newgrid)
+        if ugrid_dims:
+            ugrid_indexes = {dim: new_indexes[dim] for dim in ugrid_dims}
+            newgrid, indexers = grid.isel(indexers=ugrid_indexes, return_index=True)
+            indexers = {
+                k: v
+                for k, v in indexers.items()
+                if k in obj.dims and k not in new_indexes
+            }
+            obj = obj.isel(indexers)
+            new_grids.append(newgrid)
+        else:
+            # In case of multiple topologies, not every grid might be indexed.
+            # In that case, just keep the untouched grids.
+            new_grids.append(grid)
+
     return obj, new_grids
 
 
