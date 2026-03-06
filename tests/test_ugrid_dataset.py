@@ -654,6 +654,38 @@ class TestUgridDataset:
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
 
+    def test_sel_points_multiple_dims(self):
+        grid = self.uds.ugrid.grid
+        ds = xr.Dataset(
+            {
+                "face_data": ((grid.face_dimension,), np.arange(grid.n_face)),
+                "node_data": ((grid.node_dimension,), np.arange(grid.n_node)),
+                "edge_data": ((grid.edge_dimension,), np.arange(grid.n_edge)),
+            }
+        )
+
+        uds = xugrid.UgridDataset(ds, grid)
+        x = [0.0, 1.0]
+        y = [0.0, 1.0]
+        actual = uds.ugrid.sel_points(x=x, y=y)
+
+        dim = "mesh2d_points"
+        expected = xr.Dataset(
+            data_vars={
+                "face_data": (dim, [0, 0]),
+                "node_data": (dim, [0, 4]),
+                "edge_data": (dim, [0, 3]),
+            },
+            coords={
+                "mesh2d_nFaces": (dim, [0, 0]),
+                "mesh2d_nEdges": (dim, [0, 3]),
+                "mesh2d_nNodes": (dim, [0, 4]),
+                "mesh2d_x": (dim, x),
+                "mesh2d_y": (dim, y),
+            },
+        )
+        assert actual.identical(expected)
+
     def test_sel(self):
         # Ugrid2d already tests most
         # Orthogonal points

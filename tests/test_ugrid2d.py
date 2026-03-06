@@ -799,6 +799,8 @@ class TestUgrid2dSelection:
         x = [0.5, 1.5]
         y = [0.5, 1.25]
 
+        with pytest.raises(ValueError, match="method must be one of"):
+            self.grid.sel_points(obj=self.obj, x=x, y=y, method="nothing")
         with pytest.raises(ValueError, match="out_of_bounds must be one of"):
             self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="nothing")
         with pytest.raises(ValueError, match="shape of x does not match shape of y"):
@@ -809,11 +811,10 @@ class TestUgrid2dSelection:
         actual = self.grid.sel_points(obj=self.obj, x=x, y=y)
         assert isinstance(actual, xr.DataArray)
 
-        dim = f"{NAME}_nFaces"
+        dim = f"{NAME}_points"
         expected = xr.DataArray(
             data=[0, 3],
             coords={
-                f"{NAME}_index": (dim, [0, 1]),
                 f"{NAME}_x": (dim, x),
                 f"{NAME}_y": (dim, y),
             },
@@ -826,15 +827,14 @@ class TestUgrid2dSelection:
         y = [-10.0, 0.5, -20.0, 1.25, -30.0]
 
         with pytest.raises(
-            ValueError, match="Not all points are located inside of the grid"
+            ValueError, match="Not all points are located on the topology"
         ):
             self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="raise")
 
         actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="drop")
-        assert np.array_equal(actual[f"{NAME}_index"], [1, 3])
 
         with pytest.warns(
-            UserWarning, match="Not all points are located inside of the grid"
+            UserWarning, match="Not all points are located on the topology"
         ):
             actual = self.grid.sel_points(obj=self.obj, x=x, y=y, out_of_bounds="warn")
             assert np.allclose(actual, [np.nan, 0, np.nan, 3, np.nan], equal_nan=True)
@@ -851,7 +851,101 @@ class TestUgrid2dSelection:
         actual = self.grid.sel_points(
             obj=self.obj, x=x, y=y, out_of_bounds="drop", tolerance=11.0
         )
-        assert np.array_equal(actual[f"{NAME}_index"], [1, 3])
+
+    def test_sel_points_multiple_dims(self):
+        grid = self.grid
+        ds = xr.Dataset(
+            {
+                "face_data": self.obj,
+                "node_data": xr.DataArray(
+                    np.arange(grid.n_node), dims=(grid.node_dimension)
+                ),
+                "edge_data": xr.DataArray(
+                    np.arange(grid.n_edge), dims=(grid.edge_dimension)
+                ),
+            }
+        )
+        x = [-10.0, 0.5, -20.0, 1.5, -30.0]
+        y = [-10.0, 0.5, -20.0, 1.25, -30.0]
+
+        # Test with out of bounds ignored
+        face_actual = grid.sel_points(
+            obj=ds["face_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(
+            face_actual, [np.nan, 0, np.nan, 3, np.nan], equal_nan=True
+        )
+        node_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(
+            node_actual, [np.nan, 0, np.nan, 4, np.nan], equal_nan=True
+        )
+        edge_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(
+            edge_actual, [np.nan, 0, np.nan, 4, np.nan], equal_nan=True
+        )
+
+        # With drop
+        face_actual = grid.sel_points(
+            obj=ds["face_data"], x=x, y=y, out_of_bounds="drop"
+        )
+        np.testing.assert_allclose(face_actual, [0, 3], equal_nan=True)
+        node_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, out_of_bounds="drop"
+        )
+        np.testing.assert_allclose(node_actual, [0, 4], equal_nan=True)
+        edge_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, out_of_bounds="drop"
+        )
+        np.testing.assert_allclose(edge_actual, [0, 4], equal_nan=True)
+
+        with pytest.warns(
+            UserWarning, match="Not all points are located on the topology"
+        ):
+            node_actual = grid.sel_points(
+                obj=ds["node_data"], x=x, y=y, out_of_bounds="warn"
+            )
+            np.testing.assert_allclose(
+                node_actual, [np.nan, 0, np.nan, 4, np.nan], equal_nan=True
+            )
+
+        with pytest.raises(
+            ValueError, match="Not all points are located on the topology"
+        ):
+            grid.sel_points(obj=ds["node_data"], x=x, y=y, out_of_bounds="raise")
+
+        # Test with method "nearest"
+        # Core dimension should change (face), but secondary dimension should not: they are always nearest.
+        x = [0.4]
+        y = [0.99]
+        face_actual = grid.sel_points(
+            obj=ds["face_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(face_actual, [0], equal_nan=True)
+        node_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(node_actual, [3], equal_nan=True)
+        edge_actual = grid.sel_points(
+            obj=ds["edge_data"], x=x, y=y, out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(edge_actual, [5], equal_nan=True)
+
+        face_actual = grid.sel_points(
+            obj=ds["face_data"], x=x, y=y, method="nearest", out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(face_actual, [2], equal_nan=True)
+        node_actual = grid.sel_points(
+            obj=ds["node_data"], x=x, y=y, method="nearest", out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(node_actual, [3], equal_nan=True)
+        face_actual = grid.sel_points(
+            obj=ds["edge_data"], x=x, y=y, method="nearest", out_of_bounds="ignore"
+        )
+        np.testing.assert_allclose(face_actual, [5], equal_nan=True)
 
     def test_validate_indexer(self):
         with pytest.raises(ValueError, match="slice stop should be larger than"):
@@ -928,11 +1022,10 @@ class TestUgrid2dSelection:
     def test_sel__points_from_scalar(self):
         def check_output(actual):
             assert isinstance(actual, xr.DataArray)
-            dim = f"{NAME}_nFaces"
+            dim = f"{NAME}_points"
             expected = xr.DataArray(
                 data=[0],
                 coords={
-                    f"{NAME}_index": (dim, [0]),
                     f"{NAME}_x": (dim, [0.5]),
                     f"{NAME}_y": (dim, [0.5]),
                 },
@@ -952,7 +1045,7 @@ class TestUgrid2dSelection:
     def test_sel__points_from_arrays_and_slice(self):
         def check_output(actual):
             assert isinstance(actual, xr.DataArray)
-            dim = f"{NAME}_nFaces"
+            dim = f"{NAME}_points"
             expected = xr.DataArray(
                 data=[0, 0, 1, 2, 2, 3],
                 coords={
