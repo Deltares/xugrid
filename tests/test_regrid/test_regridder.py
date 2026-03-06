@@ -6,20 +6,26 @@ import xarray as xr
 import xugrid as xu
 from xugrid import (
     BarycentricInterpolator,
-    CentroidLocatorRegridder,
+    InverseDistanceInterpolator,
+    LocatorRegridder,
+    NearestRegridder,
     OverlapRegridder,
     RelativeOverlapRegridder,
 )
 
+ALL_REGRIDDERS = [
+    BarycentricInterpolator,
+    InverseDistanceInterpolator,
+    LocatorRegridder,
+    NearestRegridder,
+    OverlapRegridder,
+    RelativeOverlapRegridder,
+]
+
 
 @pytest.mark.parametrize(
     "cls",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_check_source_target_types(disk, cls):
     with pytest.raises(TypeError):
@@ -30,12 +36,7 @@ def test_check_source_target_types(disk, cls):
 
 @pytest.mark.parametrize(
     "regridder_class",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_structured_to_unstructured(
     regridder_class,
@@ -54,12 +55,7 @@ def test_structured_to_unstructured(
 
 @pytest.mark.parametrize(
     "regridder_class",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_weights_as_dataframe(
     regridder_class,
@@ -81,12 +77,12 @@ def test_weights_as_dataframe(
 def test_centroid_locator_regridder_structured(
     grid_data_a, grid_data_a_layered, grid_data_b, expected_results_centroid
 ):
-    regridder = CentroidLocatorRegridder(source=grid_data_a, target=grid_data_b)
+    regridder = LocatorRegridder(source=grid_data_a, target=grid_data_b)
     result = regridder.regrid(grid_data_a)
     assert (result.fillna(0.0) == expected_results_centroid.fillna(0.0)).any()
 
     # With broadcasting
-    regridder = CentroidLocatorRegridder(source=grid_data_a_layered, target=grid_data_b)
+    regridder = LocatorRegridder(source=grid_data_a_layered, target=grid_data_b)
     broadcasted = regridder.regrid(grid_data_a_layered)
     assert broadcasted.dims == ("layer", "y", "x")
     assert (
@@ -96,7 +92,7 @@ def test_centroid_locator_regridder_structured(
 
 def test_centroid_locator_regridder(disk, quads_1):
     square = quads_1
-    regridder = CentroidLocatorRegridder(source=disk, target=square)
+    regridder = LocatorRegridder(source=disk, target=square)
     result = regridder.regrid(disk)
     assert isinstance(result, xu.UgridDataArray)
     assert result.notnull().any()
@@ -105,7 +101,7 @@ def test_centroid_locator_regridder(disk, quads_1):
     assert result.grid.n_face == square.grid.n_face
 
     # other way around
-    regridder = CentroidLocatorRegridder(source=result, target=disk)
+    regridder = LocatorRegridder(source=result, target=disk)
     back = regridder.regrid(result)
     assert isinstance(back, xu.UgridDataArray)
     assert back.notnull().any()
@@ -200,12 +196,7 @@ def test_barycentric_interpolator(disk, quads_0_25):
 
 @pytest.mark.parametrize(
     "cls",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_regridder_from_weights(cls, disk, quads_1):
     square = quads_1
@@ -219,12 +210,7 @@ def test_regridder_from_weights(cls, disk, quads_1):
 
 @pytest.mark.parametrize(
     "cls",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_regridder_from_weights_layered(cls, disk, disk_layered, quads_1):
     square = quads_1
@@ -238,12 +224,7 @@ def test_regridder_from_weights_layered(cls, disk, disk_layered, quads_1):
 
 @pytest.mark.parametrize(
     "cls",
-    [
-        CentroidLocatorRegridder,
-        OverlapRegridder,
-        RelativeOverlapRegridder,
-        BarycentricInterpolator,
-    ],
+    ALL_REGRIDDERS,
 )
 def test_regridder_from_dataset(cls, disk, quads_1):
     square = quads_1
@@ -262,14 +243,14 @@ def test_regridder_daks_arrays(
     grid_data_dask_expected,
     grid_data_dask_expected_layered,
 ):
-    regridder = CentroidLocatorRegridder(
+    regridder = LocatorRegridder(
         source=grid_data_dask_source, target=grid_data_dask_target
     )
     result = regridder.regrid(grid_data_dask_source)
     assert result.equals(grid_data_dask_expected)
 
     # with broadcasting
-    regridder = CentroidLocatorRegridder(
+    regridder = LocatorRegridder(
         source=grid_data_dask_source_layered, target=grid_data_dask_target
     )
     result = regridder.regrid(grid_data_dask_source_layered)

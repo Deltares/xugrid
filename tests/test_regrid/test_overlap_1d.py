@@ -1,6 +1,6 @@
 import numpy as np
 
-from xugrid.regrid import overlap_1d
+from xugrid.regrid.utils import overlap_1d
 
 
 def test_minmax():
