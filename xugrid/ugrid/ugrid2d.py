@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from itertools import chain
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -28,6 +28,7 @@ from xugrid.constants import (
 )
 from xugrid.core.utils import either_dict_or_kwargs
 from xugrid.ugrid import connectivity, conventions
+from xugrid.ugrid.pyvista_helpers import ugrid2d_to_pyvista
 from xugrid.ugrid.selection_utils import section_coordinates_2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, numeric_bound
 from xugrid.ugrid.voronoi import voronoi_topology
@@ -411,6 +412,47 @@ class Ugrid2d(AbstractUgrid):
         dataset[self.name].attrs = self._filtered_attrs(dataset)
         dataset = self.write_grid_mapping(dataset)
         return dataset
+
+    def to_pyvista(
+        self,
+        z_bottom: FloatArray,
+        z_top: FloatArray,
+        z_location: Literal["face", "node"] = "face",
+    ):
+        """
+        Extrude the 2D face topology into a 3D layered pyvista UnstructuredGrid.
+
+        Each 2D face is extruded into a prismatic cell per layer, using the
+        provided bottom and top elevation arrays. Triangular faces become wedges,
+        quads become hexahedra, and polygons with more than 6 nodes become VTK
+        polyhedra.
+
+        Parameters
+        ----------
+        z_bottom : FloatArray
+            Bottom elevations of each layer. Shape depends on ``z_location``:
+
+            - ``"face"``: ``(n_layer, n_face)``
+            - ``"node"``: ``(n_layer, n_node)``
+
+        z_top : FloatArray
+            Top elevations of each layer. Same shape convention as ``z_bottom``.
+        z_location : {"face", "node"}, default "face"
+            Whether the elevation values are defined at face centroids or at
+            nodes.
+
+        Returns
+        -------
+        pyvista.UnstructuredGrid
+            A 3D unstructured grid with ``n_layer * n_face`` prismatic cells.
+        """
+        return ugrid2d_to_pyvista(
+            face_node_connectivity=self.face_node_connectivity,
+            face_node_coordinates=self.face_node_coordinates,
+            z_bottom=z_bottom,
+            z_top=z_top,
+            z_location=z_location,
+        )
 
     # These are all optional/derived UGRID attributes. They are not computed by
     # default, only when called upon.
