@@ -219,6 +219,15 @@ class TestCrsConventions:
         ):
             ds.ugrid_roles.grid_mapping_names
 
+    def test_grid_mapping_not_in_dataset(self):
+        ds = self.ds.copy()
+        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs"
+        expected = {"mesh2d": None}
+        with pytest.warns(UserWarning):
+            assert (
+                cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+            )
+
     def test_infer_projected(self):
         ds = self.ds.copy()
         result = cv._infer_projected(ds, ["mesh2d"], self.coordinates)
