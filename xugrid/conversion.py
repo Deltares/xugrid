@@ -324,6 +324,8 @@ def bounds2d_to_topology2d(
             "A UGRID2D face requires at least three unique non-collinear vertices.\n"
             f"Your structured bounds contain {len(valid) - valid.sum()} invalid faces.\n"
             "These will be omitted from the Ugrid2d topology.",
+            UserWarning,
+            stacklevel=2,
         )
     # Also check for NaNs.
     index = np.isfinite(face_node_coordinates.reshape(-1, 8)).all(axis=-1) & valid

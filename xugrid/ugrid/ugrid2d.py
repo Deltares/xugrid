@@ -401,7 +401,7 @@ class Ugrid2d(AbstractUgrid):
         if self._dataset:
             dataset = dataset.merge(self._dataset, compat="override")
         if other is not None:
-            dataset = dataset.merge(other)
+            dataset = dataset.merge(other, compat="override")
         if node_x not in dataset or node_y not in dataset:
             dataset = self.assign_node_coords(dataset)
         if optional_attributes:

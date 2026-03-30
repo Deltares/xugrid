@@ -418,7 +418,9 @@ class AbstractUgrid(abc.ABC):
                     f"standard_name suggests {'projected' if stdname_projected else 'geographic'} "
                     f"coordinates, but the CRS ({crs}) is "
                     f"{'projected' if is_projected else 'geographic'}. "
-                    "The CRS will take priority."
+                    "The CRS will take priority.",
+                    UserWarning,
+                    stacklevel=2,
                 )
             return crs, is_projected
 
@@ -427,7 +429,9 @@ class AbstractUgrid(abc.ABC):
         else:
             warnings.warn(
                 f"No CRS or recognizable standard_name found for topology '{topology}'. "
-                "Assuming projected coordinates."
+                "Assuming projected coordinates.",
+                UserWarning,
+                stacklevel=2,
             )
             is_projected = True
         return crs, is_projected
@@ -1188,7 +1192,7 @@ class AbstractUgrid(abc.ABC):
             if out_of_bounds == "raise":
                 raise ValueError(msg)
             elif out_of_bounds == "warn":
-                warnings.warn(msg)
+                warnings.warn(msg, UserWarning, stacklevel=2)
                 condition = xr.DataArray(valid, dims=(point_dim,))
             elif out_of_bounds == "ignore":
                 condition = xr.DataArray(valid, dims=(point_dim,))
