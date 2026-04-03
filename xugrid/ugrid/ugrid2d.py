@@ -282,9 +282,13 @@ class Ugrid2d(AbstractUgrid):
         face_nodes = connectivity["face_node_connectivity"]
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         start_index = ds[face_nodes].attrs.get("start_index", 0)
+        dimensions = ds.ugrid_roles.dimensions[topology]
         face_node_connectivity = cls._prepare_connectivity(
             ds[face_nodes], fill_value, dtype=IntDType
         ).to_numpy()
+        face_dimension = dimensions.get("face_dimension")
+        if face_dimension is not None and ds[face_nodes].dims[0] != face_dimension:
+            face_node_connectivity = face_node_connectivity.T
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:

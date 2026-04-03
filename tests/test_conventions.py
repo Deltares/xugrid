@@ -436,7 +436,7 @@ class TestCompleteSpecification:
 
         with pytest.raises(
             cv.UgridDimensionError,
-            match="edge_dimension: nEdges not in edge_face_connectivity",
+            match="edge_dimension: mesh2d_nEdges not in edge_node_connectivity",
         ):
             ds.ugrid_roles.dimensions
 
@@ -456,3 +456,45 @@ class TestCompleteSpecification:
 
         with pytest.raises(cv.UgridDimensionError, match="Expected size 2"):
             ds.ugrid_roles.dimensions
+
+
+def test_infer_dims_respects_explicit_face_dimension():
+    """
+    face_dimension specified in topology attrs must not be overwritten by
+    inference from the connectivity array order (e.g. FVCOM-style transposed
+    arrays where face_node_connectivity has dims (three, nele) instead of
+    the standard (nele, three)).
+    """
+    ds = xr.Dataset()
+    ds["mesh"] = xr.DataArray(
+        0,
+        attrs={
+            "cf_role": "mesh_topology",
+            "topology_dimension": 2,
+            "node_coordinates": "node_x node_y",
+            "face_node_connectivity": "nv",
+            "face_dimension": "nele",
+        },
+    )
+    ds = ds.assign_coords(
+        node_x=xr.DataArray(
+            [0.0, 1.0, 2.0, 0.5],
+            dims=["node"],
+            attrs={"standard_name": "longitude"},
+        )
+    )
+    ds = ds.assign_coords(
+        node_y=xr.DataArray(
+            [0.0, 0.0, 0.0, 1.0],
+            dims=["node"],
+            attrs={"standard_name": "latitude"},
+        )
+    )
+    # Transposed: (three, nele) instead of standard (nele, three)
+    ds["nv"] = xr.DataArray(
+        data=[[0, 1], [1, 2], [3, 3]],
+        dims=["three", "nele"],
+        attrs={"start_index": 0},
+    )
+    dimensions = ds.ugrid_roles.dimensions
+    assert dimensions["mesh"]["face_dimension"] == "nele"

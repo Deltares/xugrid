@@ -387,6 +387,28 @@ def test_ugrid2d_from_dataset__different_start_index(
     assert np.array_equal(new.edge_node_connectivity, grid.edge_node_connectivity)
 
 
+def test_ugrid2d_from_dataset__transposed_connectivity():
+    """
+    FVCOM and similar models store face_node_connectivity as (three, nele)
+    rather than the standard (nele, three). The UGRID face_dimension attribute
+    declares which dimension is the face dimension; from_dataset should
+    transpose the array accordingly.
+    """
+    grid = grid2d()
+    ds = grid.to_dataset()
+    # Rename the face_nodes variable and transpose it to simulate FVCOM layout
+    face_nodes = ds["mesh2d_face_nodes"].values  # (nFaces, nMax)
+    ds = ds.drop_vars("mesh2d_face_nodes")
+    ds["nv"] = xr.DataArray(
+        data=face_nodes.T,
+        dims=["mesh2d_nMax_face_nodes", "mesh2d_nFaces"],
+        attrs={"start_index": 0, "_FillValue": -1},
+    )
+    ds["mesh2d"].attrs["face_node_connectivity"] = "nv"
+    new = xugrid.Ugrid2d.from_dataset(ds)
+    assert np.array_equal(new.face_node_connectivity, grid.face_node_connectivity)
+
+
 def test_ugrid2d_from_meshkernel():
     # Setup a meshkernel Mesh2d mimick
     class Mesh2d(NamedTuple):

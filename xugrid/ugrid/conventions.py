@@ -269,7 +269,7 @@ def _infer_dims(
         var_dims = ds[varname].dims
         for key, dim in zip(expected_dims, var_dims):
             if isinstance(key, str):
-                prev_dim = inferred.get(key)
+                prev_dim = inferred.get(key) or vardict.get(key)
                 # Not specified: default order can be used to infer dimensions.
                 if prev_dim is None:
                     inferred[key] = dim
