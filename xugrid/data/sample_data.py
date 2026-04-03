@@ -55,8 +55,8 @@ def elevation_nl(xarray=False):
     if xarray:
         return ds
     else:
-        grid = xugrid.Ugrid2d.from_dataset(ds)
-        return xugrid.UgridDataArray(ds["elevation"], grid)
+        uds = ds.ugrid.initialize()
+        return uds["elevation"]
 
 
 def provinces_nl():

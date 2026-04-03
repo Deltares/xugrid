@@ -26,6 +26,11 @@ def numeric_bound(v: Union[float, None], other: float):
 
 
 def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
+    if isinstance(index, xr.Variable):
+        index = index.to_numpy()
+    elif isinstance(index, (list, tuple, range)):
+        index = np.array(index)
+
     if isinstance(index, np.ndarray):
         if index.size > n:
             raise ValueError(

@@ -189,6 +189,12 @@ def _get_topology(ds: xr.Dataset) -> List[str]:
     ]
 
 
+def _get_topology_dimensions(ds: xr.Dataset, topologies):
+    return {
+        topology: ds[topology].attrs["topology_dimension"] for topology in topologies
+    }
+
+
 def _infer_xy_coords(
     ds: xr.Dataset, candidates: List[str]
 ) -> Tuple[List[str], List[str]]:
@@ -489,6 +495,22 @@ class UgridRolesAccessor:
         topology: List[str]
         """
         return _get_topology(self._ds)
+
+    @property
+    def topology_dimensions(self) -> Dict[str, int]:
+        """
+        Get the dimensionality for the topology:
+
+            * 0: Node
+            * 1: Edge
+            * 2: Face
+            * 3: Volume
+
+        Returns
+        -------
+        topology_dimension: dict[str, int]
+        """
+        return _get_topology_dimensions(self._ds, self.topology)
 
     @property
     def coordinates(self) -> Dict[str, Dict[str, Tuple[List[str], List[str]]]]:

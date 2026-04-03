@@ -1128,7 +1128,7 @@ class Ugrid2d(AbstractUgrid):
         self, face_index: Union[BoolArray, IntArray], return_index: bool = False
     ):
         """
-        Create a new UGRID1D topology for a subset of this topology.
+        Create a new UGRID2D topology for a subset of this topology.
 
         Parameters
         ----------
