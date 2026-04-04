@@ -335,6 +335,13 @@ def test_ugrid1d_from_meshkernel():
     assert np.allclose(grid.edge_node_connectivity, mesh1d.edge_nodes.reshape((8, 2)))
 
 
+def test_ugrid1d_from_dataset_transposed():
+    grid = grid1d()
+    ds_T = grid.to_dataset().transpose()
+    new = xugrid.Ugrid1d.from_dataset(ds_T)
+    assert np.array_equal(new.edge_node_connectivity, grid.edge_node_connectivity)
+
+
 def test_clear_geometry_properties():
     grid = grid1d()
     for attr in [

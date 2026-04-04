@@ -387,6 +387,14 @@ def test_ugrid2d_from_dataset__different_start_index(
     assert np.array_equal(new.edge_node_connectivity, grid.edge_node_connectivity)
 
 
+def test_ugrid2d_from_dataset_transposed():
+    grid = grid2d()
+    ds_T = grid.to_dataset().transpose()
+    new = xugrid.Ugrid2d.from_dataset(ds_T)
+    assert np.array_equal(new.face_node_connectivity, grid.face_node_connectivity)
+    assert np.array_equal(new.edge_node_connectivity, grid.edge_node_connectivity)
+
+
 def test_ugrid2d_from_meshkernel():
     # Setup a meshkernel Mesh2d mimick
     class Mesh2d(NamedTuple):

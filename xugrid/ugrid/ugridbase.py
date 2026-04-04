@@ -648,14 +648,17 @@ class AbstractUgrid(abc.ABC):
 
     @staticmethod
     def _prepare_connectivity(
-        da: xr.DataArray, fill_value: Union[int, float], dtype: type
+        da: xr.DataArray, fill_value: Union[int, float], dtype: type, coredim: str
     ) -> xr.DataArray:
         """
         Undo the work xarray does when it encounters a _FillValue for UGRID
         connectivity arrays. Set an external unified value back (across all
         connectivities!), and cast back to the desired dtype.
         """
-        data = da.to_numpy().copy()
+        data = da.to_numpy()
+        if da.dims[0] != coredim:
+            data = data.transpose()
+        data = data.copy()
         # If xarray detects a _FillValue, it converts the array to floats and
         # replaces the fill value by NaN, and moves the _FillValue to
         # da.encoding.
@@ -669,7 +672,7 @@ class AbstractUgrid(abc.ABC):
         not_fill = ~is_fill
         if (cast[not_fill] < 0).any():
             raise ValueError("connectivity contains negative values")
-        return da.copy(data=cast)
+        return cast
 
     def _adjust_connectivity(self, connectivity: IntArray) -> IntArray:
         """Adjust connectivity for desired fill_value and start_index."""

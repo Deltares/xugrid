@@ -268,6 +268,7 @@ class Ugrid2d(AbstractUgrid):
         # Collect names
         connectivity = ds.ugrid_roles.connectivity[topology]
         coordinates = ds.ugrid_roles.coordinates[topology]
+        dimensions = ds.ugrid_roles.dimensions[topology]
         ugrid_vars = (
             [topology]
             + list(connectivity.values())
@@ -283,14 +284,20 @@ class Ugrid2d(AbstractUgrid):
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         start_index = ds[face_nodes].attrs.get("start_index", 0)
         face_node_connectivity = cls._prepare_connectivity(
-            ds[face_nodes], fill_value, dtype=IntDType
-        ).to_numpy()
+            ds[face_nodes],
+            fill_value,
+            dtype=IntDType,
+            coredim=dimensions["face_dimension"],
+        )
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:
             edge_node_connectivity = cls._prepare_connectivity(
-                ds[edge_nodes], fill_value, dtype=IntDType
-            ).to_numpy()
+                ds[edge_nodes],
+                fill_value,
+                dtype=IntDType,
+                coredim=dimensions["edge_dimension"],
+            )
             # Make sure the single passed start index is valid for both
             # connectivity arrays.
             edge_start_index = ds[edge_nodes].attrs.get("start_index", 0)

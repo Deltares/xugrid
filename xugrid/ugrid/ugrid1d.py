@@ -135,6 +135,7 @@ class Ugrid1d(AbstractUgrid):
         # Collect names
         connectivity = ds.ugrid_roles.connectivity[topology]
         coordinates = ds.ugrid_roles.coordinates[topology]
+        dimensions = ds.ugrid_roles.dimensions[topology]
         ugrid_vars = (
             [topology]
             + list(connectivity.values())
@@ -152,8 +153,11 @@ class Ugrid1d(AbstractUgrid):
         fill_value = ds[edge_nodes].encoding.get("_FillValue", -1)
         start_index = ds[edge_nodes].attrs.get("start_index", 0)
         edge_node_connectivity = cls._prepare_connectivity(
-            ds[edge_nodes], fill_value, dtype=IntDType
-        ).to_numpy()
+            ds[edge_nodes],
+            fill_value,
+            dtype=IntDType,
+            coredim=dimensions["edge_dimension"],
+        )
 
         # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
