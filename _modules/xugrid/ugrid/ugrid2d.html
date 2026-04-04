@@ -655,6 +655,7 @@
         <span class="c1"># Collect names</span>
         <span class="n">connectivity</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
         <span class="n">coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ugrid_roles</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
         <span class="n">ugrid_vars</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">connectivity</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -670,14 +671,20 @@
         <span class="n">fill_value</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_FillValue&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">start_index</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">face_node_connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_connectivity</span><span class="p">(</span>
-            <span class="n">ds</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">face_nodes</span><span class="p">],</span>
+            <span class="n">fill_value</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">,</span>
+            <span class="n">coredim</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
 
         <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">edge_nodes</span><span class="p">:</span>
             <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_connectivity</span><span class="p">(</span>
-                <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+                <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span>
+                <span class="n">fill_value</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">,</span>
+                <span class="n">coredim</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
             <span class="c1"># Make sure the single passed start index is valid for both</span>
             <span class="c1"># connectivity arrays.</span>
             <span class="n">edge_start_index</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
