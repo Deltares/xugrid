@@ -9,6 +9,20 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.15.1] 2026-03-30
+-------------------
+
+Changed
+~~~~~~~
+
+- :attr:`xugrid.UgridRolesAccessor.grid_mapping_names` will now warn if a grid
+  mapping name is specified in the attributes or encoding of one or more
+  variables, but the corresponding variable is not present in the dataset, and
+  return ``None`` for the topology.
+- Relatedly, :class:`xugrid.UgridDataset` no longer raises a ``ValueError``
+  when opening a dataset where a grid mapping variable is referenced but not
+  present.
+
 [0.15.0] 2026-03-06
 -------------------
 

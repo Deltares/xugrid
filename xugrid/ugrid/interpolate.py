@@ -315,7 +315,11 @@ def laplace_interpolate(
         if info < 0:
             raise ValueError("scipy.sparse.linalg.cg: illegal input or breakdown")
         elif info > 0:
-            warnings.warn(f"Failed to converge after {maxiter} iterations")
+            warnings.warn(
+                f"Failed to converge after {maxiter} iterations",
+                UserWarning,
+                stacklevel=2,
+            )
 
     out = data.copy()
     out[unknown] = scale * x

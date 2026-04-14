@@ -41,7 +41,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v6
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.9.4
+        uses: prefix-dev/setup-pixi@v0.9.5
         with:
           manifest-path: pyproject.toml
       - name: Run Tests
@@ -55,13 +55,13 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v6
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.9.4
+        uses: prefix-dev/setup-pixi@v0.9.5
         with:
           manifest-path: pyproject.toml
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

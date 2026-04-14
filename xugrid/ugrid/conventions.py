@@ -213,7 +213,9 @@ def _infer_xy_coords(
         second = candidates[1]
         warnings.warn(
             f"No standard_name of {X_STANDARD_NAMES + Y_STANDARD_NAMES} in {candidates}.\n"
-            f"Using {first} and {second} as projected x and y coordinates."
+            f"Using {first} and {second} as projected x and y coordinates.",
+            UserWarning,
+            stacklevel=2,
         )
         x.append(first)
         y.append(second)
@@ -243,7 +245,9 @@ def _get_coordinates(
                 if len(candidates) == 0:
                     warnings.warn(
                         f"the following variables are specified for UGRID {name}: "
-                        f'"{attrs[name]}", but they are not present in the dataset'
+                        f'"{attrs[name]}", but they are not present in the dataset',
+                        UserWarning,
+                        stacklevel=2,
                     )
                     continue
                 if len(candidates) < 2:
@@ -267,47 +271,50 @@ def _infer_dims(
     """Infer dimensions based on connectivity and coordinates."""
     inferred = {}
     for role, varname in connectivities.items():
-        expected_dims = _CONNECTIVITY_DIMS[role]
+        key0, key1 = _CONNECTIVITY_DIMS[role]
         var_dims = ds[varname].dims
-        for key, dim in zip(expected_dims, var_dims):
-            if isinstance(key, str):
-                prev_dim = inferred.get(key)
-                # Not specified: default order can be used to infer dimensions.
-                if prev_dim is None:
-                    inferred[key] = dim
-                else:
-                    if prev_dim not in var_dims:
-                        raise UgridDimensionError(
-                            f"{key}: {prev_dim} not in {role}: {varname}"
-                            f" with dimensions: {var_dims}"
-                        )
-            elif isinstance(key, int):
-                dim_size = ds.sizes[dim]
-                if not dim_size == key:
-                    raise UgridDimensionError(
-                        f"Expected size {key} for dimension {dim} in variable "
-                        f"{varname} with role {role}, found instead: "
-                        f"{dim_size}"
-                    )
+        if len(var_dims) != 2:
+            raise UgridDimensionError(
+                f"Expected {varname} with role {role} to have exactly 2 "
+                f"dimensions, found {len(var_dims)}: {var_dims}"
+            )
 
-            # If key is None, we don't do any checking.
+        # Determine orientation using the named dimension.
+        declared = vardict.get(key0) or inferred.get(key0)
+        dim0, dim1 = var_dims
+        if declared is not None:
+            if declared not in var_dims:
+                raise UgridDimensionError(
+                    f"{key0}: {declared} not in {role}: {varname} "
+                    f"with dimensions: {var_dims}"
+                )
+            if declared != dim0:
+                dim0, dim1 = dim1, dim0
+
+        if isinstance(key1, int) and ds.sizes[dim1] != key1:
+            raise UgridDimensionError(
+                f"Expected size {key1} for dimension {dim1} in variable "
+                f"{varname} with role {role}, found instead: {ds.sizes[dim1]}"
+            )
+
+        inferred[key0] = dim0
 
     for role, varnames in coordinates.items():
         key = _COORD_DIMS[role]
+        declared = vardict.get(key) or inferred.get(key)
         for varname in chain.from_iterable(varnames):
             var_dims = ds[varname].dims
             if len(var_dims) != 1:
                 continue
             var_dim = var_dims[0]
 
-            prev_dim = vardict.get(key) or inferred.get(key)
-            if prev_dim is None:
+            if declared is None:
                 inferred[key] = var_dim
-            else:
-                if prev_dim != var_dim:
-                    raise UgridDimensionError(
-                        f"Conflicting names for {key}: {prev_dim} versus {var_dim}"
-                    )
+                declared = var_dim
+            elif declared != var_dim:
+                raise UgridDimensionError(
+                    f"Conflicting names for {key}: {declared} versus {var_dim}"
+                )
 
     return inferred
 
@@ -332,7 +339,7 @@ def _get_dimensions(
         inferred = _infer_dims(
             ds, connectivity[topology], coordinates[topology], vardict
         )
-        topology_dict[topology] = {**vardict, **inferred}
+        topology_dict[topology] = {**inferred, **vardict}
 
     return topology_dict
 
@@ -358,6 +365,7 @@ def _get_grid_mapping_names(
     dimensions: Dict[str, Dict[str, str]],
 ) -> Dict[str, str | None]:
     topology_dict = {}
+    varnames = set(ds.variables.keys())
     for topology in topologies:
         topology_dict[topology] = None
         # The grid mapping should be specified per variable.
@@ -387,8 +395,16 @@ def _get_grid_mapping_names(
                     f"the grid_mapping attributes before converting to a "
                     f"UgridDataset."
                 )
-
-            topology_dict[topology] = next(iter(names))
+            name = next(iter(names))
+            if name in varnames:
+                topology_dict[topology] = name
+            else:
+                warnings.warn(
+                    "The following grid mapping variable is specified in the attribute\n"
+                    f"or encoding of one or more variables, but is not present in the dataset: {name}",
+                    UserWarning,
+                    stacklevel=2,
+                )
 
     return topology_dict
 
@@ -430,7 +446,9 @@ def _infer_projected(
             )
             warnings.warn(
                 f"Inconsistent standard_names across coordinates for topology "
-                f"'{topology}': {details}. Returning None."
+                f"'{topology}': {details}. Returning None.",
+                UserWarning,
+                stacklevel=2,
             )
             projected = None
         topology_dict[topology] = projected
