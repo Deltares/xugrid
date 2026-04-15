@@ -1,6 +1,7 @@
 from typing import Tuple
 
 import numpy as np
+import xarray as xr
 from scipy import sparse
 
 from xugrid.constants import FILL_VALUE, IntArray
@@ -52,9 +53,9 @@ def _classify(
     return sparse.csgraph.connected_components(coo_matrix)
 
 
-def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # noqa
+def polygonize(uda: xr.DataArray) -> "gpd.GeoDataFrame":  # type: ignore # noqa
     """
-    Polygonize a UgridDataArray.
+    Polygonize a UGRID indexed DataArray.
 
     This function creates vector polygons for all connected regions of cells
     (faces) in the Ugrid2d topology sharing a common value.
@@ -68,7 +69,7 @@ def polygonize(uda: "UgridDataArray") -> "gpd.GeoDataFrame":  # type: ignore # n
 
     Parameters
     ----------
-    uda: UgridDataArray
+    uda: xr.DataArray
         The DataArray should only contain the face dimension. Additional
         dimensions, such as time, are not allowed.
 

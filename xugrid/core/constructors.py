@@ -83,9 +83,9 @@ def dataset(
 class UgridDataArray:
     def __new__(cls, obj: xr.DataArray, grid: UgridType) -> xr.DataArray:
         warnings.warn(
-            "UgridDataArray is deprecated as a constructor and will be removed in a future version. "
+            "UgridDataArray is deprecated as a constructor and will be removed in a future version.\n"
             "UgridDataArray is no longer a distinct type: the unstructured grid topology is now stored "
-            "as an explicit xarray index. Use xugrid.dataarray(obj, grid) instead.",
+            "as an explicit xarray index.\nUse xugrid.dataarray(obj, grid) instead.",
             FutureWarning,
             stacklevel=2,
         )
@@ -99,9 +99,9 @@ class UgridDataset:
         grids: Union[UgridType, Sequence[UgridType]] = None,
     ) -> xr.Dataset:
         warnings.warn(
-            "UgridDataset is deprecated as a constructor and will be removed in a future version. "
+            "UgridDataset is deprecated as a constructor and will be removed in a future version.\n"
             "UgridDataset is no longer a distinct type: the unstructured grid topology is now stored "
-            "as an explicit xarray index. Use xugrid.dataset(obj, grids) instead.",
+            "as an explicit xarray index.\nUse xugrid.dataset(obj, grids) instead.",
             FutureWarning,
             stacklevel=2,
         )

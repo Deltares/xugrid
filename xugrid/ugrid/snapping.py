@@ -361,7 +361,7 @@ def _create_output_gdf(
 
 def create_snap_to_grid_dataframe(
     lines: GeoDataFrameType,
-    grid: Union[xr.DataArray, xu.UgridDataArray],
+    grid: xr.DataArray,
     max_snap_distance: float,
     tolerance: float = 1e-12,
 ) -> pd.DataFrame:
@@ -490,7 +490,7 @@ def create_snap_to_grid_dataframe(
 
 def snap_to_grid(
     lines: GeoDataFrameType,
-    grid: Union[xr.DataArray, xu.UgridDataArray],
+    grid: xr.DataArray,
     max_snap_distance: float,
 ) -> Tuple[IntArray, Union[pd.DataFrame, GeoDataFrameType]]:
     """
@@ -503,7 +503,7 @@ def snap_to_grid(
     ----------
     lines: gpd.GeoDataFrame
         Line data. Geometry colum should contain exclusively LineStrings.
-    grid: xr.DataArray or xu.UgridDataArray of integers
+    grid: xr.DataArray of integers
         Grid of cells to snap lines to.
     max_snap_distance: float
 
@@ -518,15 +518,13 @@ def snap_to_grid(
     if isinstance(grid, Ugrid2d):
         topology = grid
     elif isinstance(grid, xr.DataArray):
-        # Convert structured to unstructured representation
-        topology = Ugrid2d.from_structured(grid)
-    elif isinstance(grid, xu.UgridDataArray):
-        topology = grid.ugrid.grid
+        if grid.ugrid.is_indexed:
+            topology = grid.ugrid.grid
+        else:
+            # Convert structured to unstructured representation
+            topology = Ugrid2d.from_structured(grid)
     else:
-        raise TypeError(
-            "Expected xarray.DataArray or xugrid.UgridDataArray, received: "
-            f" {type(grid).__name__}"
-        )
+        raise TypeError(f"Expected xarray.DataArray, received:  {type(grid).__name__}")
 
     result = create_snap_to_grid_dataframe(lines, topology, max_snap_distance)
 
