@@ -2196,9 +2196,9 @@ class Ugrid2d(AbstractUgrid):
         polygon = max(collection.geoms, key=lambda x: _bbox_area(x.bounds))
         return polygon
 
-    def create_data_array(self, data: ArrayLike, facet: str) -> "xugrid.UgridDataArray":
+    def create_data_array(self, data: ArrayLike, facet: str) -> xr.DataArray:
         """
-        Create a UgridDataArray from this grid and a 1D array of values.
+        Create a UGRID indexed DataArray from this grid and a 1D array of values.
 
         Parameters
         ----------
@@ -2213,7 +2213,7 @@ class Ugrid2d(AbstractUgrid):
 
         Returns
         -------
-        uda: UgridDataArray
+        uda: xr.DataArray
         """
         if facet == "node":
             dimension = self.node_dimension

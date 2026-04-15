@@ -267,7 +267,7 @@ class AbstractUgrid(abc.ABC):
             return connectivity.to_sparse(dense_connectivity)
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
-        from xugrid import UgridDataArray
+        from xugrid import dataarray
 
         data = np.array(data)
         if data.ndim != 1:
@@ -287,7 +287,7 @@ class AbstractUgrid(abc.ABC):
 
         # TODO: is there a better way to do this to satisfy mypy?
         grid = cast(UgridType, self)
-        return UgridDataArray(da, grid)
+        return dataarray(da, grid)
 
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
@@ -715,7 +715,7 @@ class AbstractUgrid(abc.ABC):
         ugrid_dims = self.dims.intersection(obj.dims)
         if len(ugrid_dims) != 1:
             raise ValueError(
-                "UgridDataArray should contain exactly one of the UGRID "
+                "DataArray should contain exactly one of the UGRID "
                 f"dimensions: {self.dims}"
             )
         return ugrid_dims.pop()
@@ -1533,7 +1533,7 @@ class AbstractUgrid(abc.ABC):
 
         Returns
         -------
-        partition_labels: UgridDataArray of integers
+        partition_labels: DataArray of integers
         """
         import pymetis
 
@@ -1552,7 +1552,7 @@ class AbstractUgrid(abc.ABC):
             ),
             vweights=weights,
         )
-        return xugrid.UgridDataArray(
+        return xugrid.dataarray(
             obj=xr.DataArray(
                 data=np.array(partition_index),
                 dims=(self.core_dimension,),
