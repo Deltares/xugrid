@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Changed
+~~~~~~~
+- CRS resolution from grid mapping attributes now prefers the CRS that
+  round-trips to a valid EPSG code, and raises ``ValueError`` if multiple
+  attributes (e.g. ESPG identifier vs. WKT) resolve to conflicting EPSG codes.
+
 [0.15.1] 2026-03-30
 -------------------
 
