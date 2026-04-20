@@ -1,4 +1,5 @@
 import pyproj
+import pytest
 
 from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
 
@@ -94,6 +95,40 @@ class TestCrsFromAttrs:
         attrs = {"epsg": -9999}
         result = crs_from_attrs(attrs)
         assert isinstance(result, CrsPlaceholder)
+
+    def test_crs_candidate_resolution(self):
+        # Test resolution via EPSG, and error in case of contradiction.
+
+        # Full specification:
+        wkt = pyproj.CRS.from_epsg(4326).to_wkt()
+        attrs = {
+            "geographic_crs_name": "WGS 84",
+            "grid_mapping_name": "latitude_longitude",
+            "crs_wkt": wkt,
+            "epsg": "4326",
+        }
+        assert crs_from_attrs(attrs).to_epsg() == 4326
+
+        # No name
+        attrs.pop("geographic_crs_name")
+        assert crs_from_attrs(attrs).to_epsg() == 4326
+
+        # No wkt
+        attrs.pop("crs_wkt")
+        assert crs_from_attrs(attrs).to_epsg() == 4326
+
+        # Conflicting CRS data
+        attrs["crs_wkt"] = pyproj.CRS.from_epsg(28992).to_wkt()
+        with pytest.raises(
+            ValueError, match="Contradictory CRS information in attributes"
+        ):
+            crs_from_attrs(attrs).to_epsg()
+
+        attrs.pop("grid_mapping_name")
+        with pytest.raises(
+            ValueError, match="Contradictory CRS information in attributes"
+        ):
+            crs_from_attrs(attrs).to_epsg()
 
     # Misc. tests
 

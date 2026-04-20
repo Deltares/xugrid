@@ -465,8 +465,17 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         dataset: xr.Dataset
         """
+
+        def _combine_attrs(attrs_seq, context):
+            combined = {}
+            for attrs in attrs_seq:
+                combined.update(attrs)
+            return combined
+
         return xr.merge(
-            [grid.to_dataset(self.obj, optional_attributes) for grid in self.grids]
+            [grid.to_dataset(self.obj, optional_attributes) for grid in self.grids],
+            compat="override",
+            combine_attrs=_combine_attrs,
         )
 
     @property

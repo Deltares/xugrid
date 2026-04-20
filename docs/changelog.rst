@@ -9,6 +9,25 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.15.2] 2026-04-20
+-------------------
+
+Changed
+~~~~~~~
+
+- CRS resolution from grid mapping attributes now prefers the CRS that
+  round-trips to a valid EPSG code, and raises ``ValueError`` if multiple
+  attributes (e.g. ESPG identifier vs. WKT) resolve to conflicting EPSG codes.
+
+Fixed
+~~~~~
+
+- Fixed :meth:`xugrid.UgridDataArrayAccessor.to_dataset` dropping
+  grid mapping attributes when called on multi-topology datasets.
+- UGRID connectivity arrays (e.g. face_node_connectivity, edge_node_connectivity)
+  are now correctly handled in both ``(nmax, dimension)`` and ``(dimension, nmax)``
+  dimension order, as permitted by the UGRID conventions.
+
 [0.15.1] 2026-03-30
 -------------------
 
