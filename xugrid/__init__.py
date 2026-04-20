@@ -7,7 +7,16 @@ from xugrid.core.common import (
     open_mfdataset,
     open_zarr,
 )
-from xugrid.core.constructors import UgridDataArray, UgridDataset, dataarray, dataset
+from xugrid.core.constructors import (
+    UgridDataArray,
+    UgridDataset,
+    dataarray,
+    dataarray_from_data,
+    dataarray_from_structured2d,
+    dataset,
+    dataset_from_geodataframe,
+    dataset_from_structured2d,
+)
 from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
 from xugrid.plot import plot
@@ -45,7 +54,11 @@ __all__ = (
     "UgridDataArray",
     "UgridDataset",
     "dataarray",
+    "dataarray_from_data",
+    "dataarray_from_structured2d",
     "dataset",
+    "dataset_from_structured2d",
+    "dataset_from_geodataframe",
     "plot",
     "BarycentricInterpolator",
     "CentroidLocatorRegridder",

@@ -43,10 +43,10 @@ UgridDataArray
 .. autosummary::
    :toctree: api/
 
+    dataarray
+    dataarray_from_structured2d
+    dataarray_from_data
     UgridDataArray
-    UgridDataArray.ugrid
-    UgridDataArray.from_structured2d
-    UgridDataArray.from_data
 
 UgridDataset
 ------------
@@ -54,10 +54,10 @@ UgridDataset
 .. autosummary::
    :toctree: api/
 
+    dataset
+    dataset_from_geodataframe
+    dataset_from_structured2d
     UgridDataset
-    UgridDataset.ugrid
-    UgridDataset.from_geodataframe
-    UgridDataset.from_structured2d
 
 UGRID Accessor
 --------------

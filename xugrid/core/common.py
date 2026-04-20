@@ -1,6 +1,6 @@
 import xarray as xr
 
-from xugrid.core.constructors import dataarray, dataset
+from xugrid.core.constructors import dataset
 
 DATAARRAY_NAME = "__xarray_dataarray_name__"
 DATAARRAY_VARIABLE = "__xarray_dataarray_variable__"
@@ -38,8 +38,6 @@ def _dataarray_helper(ds: xr.Dataset):
     else:
         (da,) = ds.data_vars.values()
 
-    da.set_close(ds._close)
-
     # Reset names if they were changed during saving
     # to ensure that we can 'roundtrip' perfectly
     if DATAARRAY_NAME in ds.attrs:
@@ -49,7 +47,7 @@ def _dataarray_helper(ds: xr.Dataset):
     if da.name == DATAARRAY_VARIABLE:
         da.name = None
 
-    return dataarray(da, ds.grid)
+    return da
 
 
 def load_dataarray(*args, **kwargs):

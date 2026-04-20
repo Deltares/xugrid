@@ -1,4 +1,5 @@
 import abc
+from typing import Any, Hashable, Mapping
 
 import xarray as xr
 
@@ -25,6 +26,14 @@ class UgridIndex(xr.Index, abc.ABC):
     @abc.abstractmethod
     def _variables_from_dataset(dataset, topology):
         pass
+
+    def rename(
+        self,
+        name_dict: Mapping[Any, Hashable],
+        dims_dict: Mapping[Any, Hashable],
+    ):
+        # TODO
+        return self
 
 
 class UgridIndex1d(UgridIndex):
