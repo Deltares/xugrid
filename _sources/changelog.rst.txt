@@ -24,6 +24,9 @@ Fixed
 
 - Fixed :meth:`xugrid.UgridDataArrayAccessor.to_dataset` dropping
   grid mapping attributes when called on multi-topology datasets.
+- UGRID connectivity arrays (e.g. face_node_connectivity, edge_node_connectivity)
+  are now correctly handled in both ``(nmax, dimension)`` and ``(dimension, nmax)``
+  dimension order, as permitted by the UGRID conventions.
 
 [0.15.1] 2026-03-30
 -------------------
