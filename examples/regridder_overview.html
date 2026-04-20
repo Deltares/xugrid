@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Regridding overview &#8212; Xugrid 0.15.1 documentation</title>
+    <title>Regridding overview &#8212; Xugrid 0.15.2 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -38,30 +38,35 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
-    <script src="../_static/documentation_options.js?v=4befc426"></script>
+    <script src="../_static/documentation_options.js?v=7c174e4c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/regridder_overview';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="OverlapRegridder" href="overlap_regridder.html" />
     <link rel="prev" title="Select unstructured data" href="selection.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.15.1" />
+  <meta name="docsearch:version" content="0.15.2" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -93,7 +98,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -325,7 +330,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -439,7 +451,7 @@ elevation of the Netherlands.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_001.png" srcset="../_images/sphx_glr_regridder_overview_001.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5a0c81d0&gt;
+<img src="../_images/sphx_glr_regridder_overview_001.png" srcset="../_images/sphx_glr_regridder_overview_001.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde9268bef0&gt;
 </pre></div>
 </div>
 <p>Xugrid provides several “regridder” classes which can convert gridded data
@@ -473,7 +485,7 @@ the centroids of the new grid fall.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">grid</span><span class="o">.</span><span class="n">centroids</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_002.png" srcset="../_images/sphx_glr_regridder_overview_002.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f1d9ccc20f0&gt;
+<img src="../_images/sphx_glr_regridder_overview_002.png" srcset="../_images/sphx_glr_regridder_overview_002.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fde916b5f10&gt;
 </pre></div>
 </div>
 <p>Xugrid provides the CentroidLocatorRegridder for this:</p>
@@ -482,7 +494,7 @@ the centroids of the new grid fall.</p>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_003.png" srcset="../_images/sphx_glr_regridder_overview_003.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d9be8f170&gt;
+<img src="../_images/sphx_glr_regridder_overview_003.png" srcset="../_images/sphx_glr_regridder_overview_003.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde509f30e0&gt;
 </pre></div>
 </div>
 </section>
@@ -495,7 +507,7 @@ so large. Let’s try the OverlapOverregridder instead.</p>
 <span class="n">mean</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_004.png" srcset="../_images/sphx_glr_regridder_overview_004.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5af01460&gt;
+<img src="../_images/sphx_glr_regridder_overview_004.png" srcset="../_images/sphx_glr_regridder_overview_004.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde9257e300&gt;
 </pre></div>
 </div>
 <p>By default, the OverlapRegridder computes an area weighted mean.
@@ -505,7 +517,7 @@ Let’s try again, now with the minimum:</p>
 <span class="n">minimum</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_005.png" srcset="../_images/sphx_glr_regridder_overview_005.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5a14f170&gt;
+<img src="../_images/sphx_glr_regridder_overview_005.png" srcset="../_images/sphx_glr_regridder_overview_005.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde50978110&gt;
 </pre></div>
 </div>
 <p>Or the maximum:</p>
@@ -514,7 +526,7 @@ Let’s try again, now with the minimum:</p>
 <span class="n">maximum</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_006.png" srcset="../_images/sphx_glr_regridder_overview_006.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5ae8f020&gt;
+<img src="../_images/sphx_glr_regridder_overview_006.png" srcset="../_images/sphx_glr_regridder_overview_006.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde4fc20950&gt;
 </pre></div>
 </div>
 <p>All regridders also work for multi-dimensional data.</p>
@@ -1094,7 +1106,7 @@ Coordinates:
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB ...
     mesh2d_face_y  (mesh2d_nFaces) float64 42kB ...
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 5</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-c501b1f8-b7d4-4c87-bb7d-75558e47941c' class='xr-array-in' type='checkbox' checked><label for='section-c501b1f8-b7d4-4c87-bb7d-75558e47941c' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-8.83 -0.19 44.04 -9.01 -7.4 ... -49.07 -13.81 -49.72 -65.83 -50.45</span></div><div class='xr-array-data'><pre>array([[ -8.83000004,  -0.18999958,  44.04000092, ...,  -9.72      ,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 5</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-20bea855-cab1-4454-9959-afeded24d38b' class='xr-array-in' type='checkbox' checked><label for='section-20bea855-cab1-4454-9959-afeded24d38b' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-8.83 -0.19 44.04 -9.01 -7.4 ... -49.07 -13.81 -49.72 -65.83 -50.45</span></div><div class='xr-array-data'><pre>array([[ -8.83000004,  -0.18999958,  44.04000092, ...,  -9.72      ,
         -25.82999992, -10.44999999],
        [-18.83000004, -10.18999958,  34.04000092, ..., -19.72      ,
         -35.82999992, -20.44999999],
@@ -1103,7 +1115,7 @@ Attributes:
        [-38.83000004, -30.18999958,  14.04000092, ..., -39.72      ,
         -55.82999992, -40.44999999],
        [-48.83000004, -40.18999958,   4.04000092, ..., -49.72      ,
-        -65.82999992, -50.44999999]], shape=(5, 5248))</pre></div></div></li><li class='xr-section-item'><input id='section-290ac980-48b5-43a0-a749-684b7e5235a0' class='xr-section-summary-in' type='checkbox' checked /><label for='section-290ac980-48b5-43a0-a749-684b7e5235a0' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5</div><input id='attrs-2a2be21b-a304-4744-9ba3-5bc3ba616e73' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2a2be21b-a304-4744-9ba3-5bc3ba616e73' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f4708f1a-8c30-41b8-bd28-4a2fc4c63e97' class='xr-var-data-in' type='checkbox'><label for='data-f4708f1a-8c30-41b8-bd28-4a2fc4c63e97' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-f97d8464-6e79-4cd5-99e1-751cf22d764b' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f97d8464-6e79-4cd5-99e1-751cf22d764b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-cd6ea3b4-dde7-49d5-b05c-53c03fd4af18' class='xr-var-data-in' type='checkbox'><label for='data-cd6ea3b4-dde7-49d5-b05c-53c03fd4af18' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-db95623f-d9c6-4a6a-aac2-6bb7e57cd29a' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-db95623f-d9c6-4a6a-aac2-6bb7e57cd29a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5c7bae4e-798f-4e6e-be90-2a0af4cdebc4' class='xr-var-data-in' type='checkbox'><label for='data-5c7bae4e-798f-4e6e-be90-2a0af4cdebc4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-442e4911-7765-4c1c-9c80-ecde7e45b02b' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-442e4911-7765-4c1c-9c80-ecde7e45b02b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4e9a0f29-4392-45c5-8ea6-848a2b7f4d7c' class='xr-var-data-in' type='checkbox'><label for='data-4e9a0f29-4392-45c5-8ea6-848a2b7f4d7c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1729948f-7dd4-43d3-adf5-b2fe6e626e54' class='xr-section-summary-in' type='checkbox' checked /><label for='section-1729948f-7dd4-43d3-adf5-b2fe6e626e54' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+        -65.82999992, -50.44999999]], shape=(5, 5248))</pre></div></div></li><li class='xr-section-item'><input id='section-ee4966a7-da76-46fc-9217-f256548e9766' class='xr-section-summary-in' type='checkbox' checked /><label for='section-ee4966a7-da76-46fc-9217-f256548e9766' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5</div><input id='attrs-f50321ee-7b7f-44ae-83cb-821388a873c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-f50321ee-7b7f-44ae-83cb-821388a873c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-91793adc-9193-45e7-b5f7-9dc83587aae0' class='xr-var-data-in' type='checkbox'><label for='data-91793adc-9193-45e7-b5f7-9dc83587aae0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-7ef75a04-c17b-4f45-a5bf-e2f9058d3f7a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7ef75a04-c17b-4f45-a5bf-e2f9058d3f7a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-392a58f2-c560-439f-823a-9f4e804284f1' class='xr-var-data-in' type='checkbox'><label for='data-392a58f2-c560-439f-823a-9f4e804284f1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-5fb5b184-9783-42ce-a815-e264aac844b7' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-5fb5b184-9783-42ce-a815-e264aac844b7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f7ab20cd-956d-45c6-b257-b477b04cf211' class='xr-var-data-in' type='checkbox'><label for='data-f7ab20cd-956d-45c6-b257-b477b04cf211' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_x_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>...</div><input id='attrs-7a7cf215-7e10-4437-9a3d-83379498a83d' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-7a7cf215-7e10-4437-9a3d-83379498a83d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-03917859-7a64-4346-b298-46fb05f87280' class='xr-var-data-in' type='checkbox'><label for='data-03917859-7a64-4346-b298-46fb05f87280' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>standard_name :</span></dt><dd>projection_y_coordinate</dd></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=float64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-a0c19dc6-2b81-41aa-b0d7-8ba83cb3d5ce' class='xr-section-summary-in' type='checkbox' checked /><label for='section-a0c19dc6-2b81-41aa-b0d7-8ba83cb3d5ce' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>We can feed the result to the regridder, which will automatically regrid over
@@ -1701,7 +1713,7 @@ Coordinates:
   * layer          (layer) int64 40B 1 2 3 4 5
   * mesh2d_nFaces  (mesh2d_nFaces) int64 784B 0 1 2 3 4 5 ... 92 93 94 95 96 97
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 5</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 98</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-c645114b-8084-4c78-af5f-fcfc6463c560' class='xr-array-in' type='checkbox' checked><label for='section-c645114b-8084-4c78-af5f-fcfc6463c560' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>98.73 24.76 nan nan nan nan ... -42.33 -51.24 -50.26 -45.93 -39.51</span></div><div class='xr-array-data'><pre>array([[ 98.73378481,  24.75605825,          nan,          nan,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 5</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 98</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-76ecf653-901f-41e9-8493-a1747d7e29f1' class='xr-array-in' type='checkbox' checked><label for='section-76ecf653-901f-41e9-8493-a1747d7e29f1' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>98.73 24.76 nan nan nan nan ... -42.33 -51.24 -50.26 -45.93 -39.51</span></div><div class='xr-array-data'><pre>array([[ 98.73378481,  24.75605825,          nan,          nan,
                  nan,          nan,  28.6866454 ,  21.59076039,
                  nan,          nan, -10.30473318, -12.46283808,
                  nan,          nan,   1.98885124,  -0.45315257,
@@ -1741,7 +1753,7 @@ Attributes:
         -50.05098298, -50.91804551, -39.44818058, -44.02645019,
         -34.95904013, -31.75848616, -53.71649682, -47.7613762 ,
         -46.45744354, -42.33120932, -51.24098772, -50.25680056,
-        -45.92794405, -39.50867478]])</pre></div></div></li><li class='xr-section-item'><input id='section-aabe4303-6eae-4033-9d85-aee284374e13' class='xr-section-summary-in' type='checkbox' checked /><label for='section-aabe4303-6eae-4033-9d85-aee284374e13' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5</div><input id='attrs-be9ac7c8-73c0-4bdf-8faf-2bf9550094ab' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-be9ac7c8-73c0-4bdf-8faf-2bf9550094ab' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4e04deb5-9ced-421d-a124-ba2cead3b45e' class='xr-var-data-in' type='checkbox'><label for='data-4e04deb5-9ced-421d-a124-ba2cead3b45e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 92 93 94 95 96 97</div><input id='attrs-aaacafe2-5370-4656-8bf4-befdcc0cb419' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-aaacafe2-5370-4656-8bf4-befdcc0cb419' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7da76284-7e90-448a-9ee8-5803ef2cb62d' class='xr-var-data-in' type='checkbox'><label for='data-7da76284-7e90-448a-9ee8-5803ef2cb62d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[98 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-974639c7-d90e-47a9-9eae-04961f12f449' class='xr-section-summary-in' type='checkbox' checked /><label for='section-974639c7-d90e-47a9-9eae-04961f12f449' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+        -45.92794405, -39.50867478]])</pre></div></div></li><li class='xr-section-item'><input id='section-ae4101bc-0183-4c23-b5c6-5f4cf50a4d8a' class='xr-section-summary-in' type='checkbox' checked /><label for='section-ae4101bc-0183-4c23-b5c6-5f4cf50a4d8a' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1 2 3 4 5</div><input id='attrs-07dfb4fd-7256-4b3d-8b07-67e633e7af8f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-07dfb4fd-7256-4b3d-8b07-67e633e7af8f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-655a8006-7ccf-4477-a5a5-42833cf1b1b1' class='xr-var-data-in' type='checkbox'><label for='data-655a8006-7ccf-4477-a5a5-42833cf1b1b1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3, 4, 5])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 92 93 94 95 96 97</div><input id='attrs-abfa4cc0-74fb-4bc4-b266-d7868c221bd8' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-abfa4cc0-74fb-4bc4-b266-d7868c221bd8' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-eca44360-6f5d-4253-ab57-fe66c9186a6e' class='xr-var-data-in' type='checkbox'><label for='data-eca44360-6f5d-4253-ab57-fe66c9186a6e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[98 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e21bd16f-0d17-482a-8d37-6302a2dac99a' class='xr-section-summary-in' type='checkbox' checked /><label for='section-e21bd16f-0d17-482a-8d37-6302a2dac99a' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Let’s take a slice to briefly inspect our original layer bottom elevation,
@@ -1755,7 +1767,7 @@ and the aggregated mean.</p>
 <span class="n">section_mean</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;mesh2d_s&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_007.png" srcset="../_images/sphx_glr_regridder_overview_007.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x7f1d5ae689e0&gt;, &lt;matplotlib.lines.Line2D object at 0x7f1d5ae6bf20&gt;, &lt;matplotlib.lines.Line2D object at 0x7f1d9d0d9a30&gt;, &lt;matplotlib.lines.Line2D object at 0x7f1d5ae68a10&gt;, &lt;matplotlib.lines.Line2D object at 0x7f1d5ae6a5a0&gt;]
+<img src="../_images/sphx_glr_regridder_overview_007.png" srcset="../_images/sphx_glr_regridder_overview_007.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x7fde9162ce60&gt;, &lt;matplotlib.lines.Line2D object at 0x7fde50759760&gt;, &lt;matplotlib.lines.Line2D object at 0x7fde9162f110&gt;, &lt;matplotlib.lines.Line2D object at 0x7fde9162e2a0&gt;, &lt;matplotlib.lines.Line2D object at 0x7fde9162cc20&gt;]
 </pre></div>
 </div>
 </section>
@@ -1769,7 +1781,7 @@ representations of a coarse grid.</p>
 <span class="n">part</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_008.png" srcset="../_images/sphx_glr_regridder_overview_008.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d9bf37170&gt;
+<img src="../_images/sphx_glr_regridder_overview_008.png" srcset="../_images/sphx_glr_regridder_overview_008.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde509351c0&gt;
 </pre></div>
 </div>
 <p>We can clearly identify the individual triangles that form the grid. To get a
@@ -1785,7 +1797,7 @@ the triangles.</p>
 <span class="n">interpolated</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_009.png" srcset="../_images/sphx_glr_regridder_overview_009.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5ad74e90&gt;
+<img src="../_images/sphx_glr_regridder_overview_009.png" srcset="../_images/sphx_glr_regridder_overview_009.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde507d96a0&gt;
 </pre></div>
 </div>
 </section>
@@ -1804,7 +1816,7 @@ the regridders work for any collection of (convex) faces.</p>
 <span class="n">voronoi_grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_010.png" srcset="../_images/sphx_glr_regridder_overview_010.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1d5ad74530&gt;
+<img src="../_images/sphx_glr_regridder_overview_010.png" srcset="../_images/sphx_glr_regridder_overview_010.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fde91747ad0&gt;
 </pre></div>
 </div>
 </section>
@@ -1818,10 +1830,10 @@ is kept the same.</p>
 <span class="n">result</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_regridder_overview_011.png" srcset="../_images/sphx_glr_regridder_overview_011.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d9bfe2e70&gt;
+<img src="../_images/sphx_glr_regridder_overview_011.png" srcset="../_images/sphx_glr_regridder_overview_011.png" alt="regridder overview" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde9241e090&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.296 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.385 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-regridder-overview-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ebcd3ee1b3bfa7afce3d928b994ed7fc/regridder_overview.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">regridder_overview.ipynb</span></code></a></p>
@@ -1882,8 +1894,8 @@ is kept the same.</p>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#centroidlocatorregridder">CentroidLocatorRegridder</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overlapregridder">OverlapRegridder</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#barycentricinterpolator">BarycentricInterpolator</a></li>
@@ -1893,13 +1905,13 @@ is kept the same.</p>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/examples/regridder_overview.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/examples/regridder_overview.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1914,8 +1926,8 @@ is kept the same.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1949,7 +1961,7 @@ is kept the same.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>

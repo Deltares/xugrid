@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector geometry conversion &#8212; Xugrid 0.15.1 documentation</title>
+    <title>Vector geometry conversion &#8212; Xugrid 0.15.2 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -38,30 +38,35 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
-    <script src="../_static/documentation_options.js?v=4befc426"></script>
+    <script src="../_static/documentation_options.js?v=7c174e4c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/vector_conversion';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Connectivity" href="connectivity.html" />
     <link rel="prev" title="OverlapRegridder" href="overlap_regridder.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.15.1" />
+  <meta name="docsearch:version" content="0.15.2" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -93,7 +98,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -325,7 +330,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -435,7 +447,7 @@ unstructured grids. These are demonstrated below.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5b2ac320&gt;
+<img src="../_images/sphx_glr_vector_conversion_001.png" srcset="../_images/sphx_glr_vector_conversion_001.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde4f4daf90&gt;
 </pre></div>
 </div>
 <section id="conversion-to-geodataframe">
@@ -1025,9 +1037,9 @@ Coordinates:
 Data variables:
     elevation      (mesh2d_nFaces) float32 21kB 1.17 9.81 54.04 ... -15.83 -0.45
     mesh2d_face_x  (mesh2d_nFaces) float64 42kB 2.388e+04 1.86e+05 ... 3.03e+04
-    mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-c89af176-b572-4d72-b193-4702e8b3bb47' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-c89af176-b572-4d72-b193-4702e8b3bb47' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div></li><li class='xr-section-item'><input id='section-1252c38d-49d7-4599-8674-e024352a96d4' class='xr-section-summary-in' type='checkbox' checked /><label for='section-1252c38d-49d7-4599-8674-e024352a96d4' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-eeabcd40-05e6-4c6a-8239-308c638815bf' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-eeabcd40-05e6-4c6a-8239-308c638815bf' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-309beb59-27be-46cd-ba91-4fbe8ee39477' class='xr-var-data-in' type='checkbox'><label for='data-309beb59-27be-46cd-ba91-4fbe8ee39477' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c2a5cfc9-2e7e-4a5c-aa01-927a612affbe' class='xr-section-summary-in' type='checkbox' checked /><label for='section-c2a5cfc9-2e7e-4a5c-aa01-927a612affbe' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-e123aa40-6f09-4fbe-8e8e-1552ee0f8571' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e123aa40-6f09-4fbe-8e8e-1552ee0f8571' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b9d6fac7-810f-41ec-a3a9-3114db35a88b' class='xr-var-data-in' type='checkbox'><label for='data-b9d6fac7-810f-41ec-a3a9-3114db35a88b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45],
-      shape=(5248,), dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-c771244a-45c0-49ed-a0d4-da68d09d11f0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c771244a-45c0-49ed-a0d4-da68d09d11f0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-798520ab-5059-4e69-93c2-8f45eb47ee2c' class='xr-var-data-in' type='checkbox'><label for='data-798520ab-5059-4e69-93c2-8f45eb47ee2c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
-        33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-c272a6cb-3796-4b59-b51f-6600ffdded96' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c272a6cb-3796-4b59-b51f-6600ffdded96' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-390d5ecf-930f-4eec-9ef7-72d3b2ce8cd1' class='xr-var-data-in' type='checkbox'><label for='data-390d5ecf-930f-4eec-9ef7-72d3b2ce8cd1' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
+    mesh2d_face_y  (mesh2d_nFaces) float64 42kB 3.648e+05 ... 3.964e+05</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-1a81bd09-53f0-462e-a58d-b0409a174fbc' class='xr-section-summary-in' type='checkbox' disabled /><label for='section-1a81bd09-53f0-462e-a58d-b0409a174fbc' class='xr-section-summary'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 5248</li></ul></div></li><li class='xr-section-item'><input id='section-4985db9e-2cf4-4af0-9d60-b5277ff78900' class='xr-section-summary-in' type='checkbox' checked /><label for='section-4985db9e-2cf4-4af0-9d60-b5277ff78900' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 ... 5244 5245 5246 5247</div><input id='attrs-34041c0b-52d0-463c-b025-10ea95ce8812' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-34041c0b-52d0-463c-b025-10ea95ce8812' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8b24028e-d270-471d-9bad-11beb2ddcada' class='xr-var-data-in' type='checkbox'><label for='data-8b24028e-d270-471d-9bad-11beb2ddcada' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5248 values with dtype=int64]</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7a03ea73-6960-4a1c-9dbd-9ed5a5ee2b90' class='xr-section-summary-in' type='checkbox' checked /><label for='section-7a03ea73-6960-4a1c-9dbd-9ed5a5ee2b90' class='xr-section-summary' title='Expand/collapse section'>Data variables: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>elevation</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>1.17 9.81 54.04 ... -15.83 -0.45</div><input id='attrs-4a5c65eb-b765-4e7b-881d-27c642090bc6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4a5c65eb-b765-4e7b-881d-27c642090bc6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0d096092-dfea-4faa-934e-0e1b1f4be630' class='xr-var-data-in' type='checkbox'><label for='data-0d096092-dfea-4faa-934e-0e1b1f4be630' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  1.17,   9.81,  54.04, ...,   0.28, -15.83,  -0.45],
+      shape=(5248,), dtype=float32)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_x</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>2.388e+04 1.86e+05 ... 3.03e+04</div><input id='attrs-2b667bc1-9fb8-42db-9571-0db7390efe20' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2b667bc1-9fb8-42db-9571-0db7390efe20' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-0f0fe685-14fb-499c-a8ec-2c1a06fab5aa' class='xr-var-data-in' type='checkbox'><label for='data-0f0fe685-14fb-499c-a8ec-2c1a06fab5aa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 23882.79376058, 186048.98609163, 183280.61324667, ...,
+        33842.56847139,  33139.63056206,  30303.5164253 ], shape=(5248,))</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>mesh2d_face_y</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>3.648e+05 4.171e+05 ... 3.964e+05</div><input id='attrs-b96b71a6-98ed-43f5-a6f6-e80273361eb7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b96b71a6-98ed-43f5-a6f6-e80273361eb7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f8a5df6d-c8c3-4bf2-80a8-469cac5f8164' class='xr-var-data-in' type='checkbox'><label for='data-f8a5df6d-c8c3-4bf2-80a8-469cac5f8164' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([364821.96725663, 417102.96121876, 334623.01878379, ...,
        397494.51640391, 400187.85011645, 396399.29036318], shape=(5248,))</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
@@ -1064,7 +1076,7 @@ burn into the grid.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d5b2e91f0&gt;
+<img src="../_images/sphx_glr_vector_conversion_002.png" srcset="../_images/sphx_glr_vector_conversion_002.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde4fc3cd10&gt;
 </pre></div>
 </div>
 <p>This makes it very easy to classify and group data. Let’s say
@@ -1623,9 +1635,9 @@ array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
 Coordinates:
   * id       (id) float64 96B 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0
 Attributes:
-    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-344c9036-e447-4537-ae53-3427681336b4' class='xr-array-in' type='checkbox' checked><label for='section-344c9036-e447-4537-ae53-3427681336b4' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
+    unit:     m NAP</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'>&#x27;elevation&#x27;</div><ul class='xr-dim-list'><li><span class='xr-has-index'>id</span>: 12</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e46e65ef-6f86-489e-bd61-9b2ff6ec2e2f' class='xr-array-in' type='checkbox' checked><label for='section-e46e65ef-6f86-489e-bd61-9b2ff6ec2e2f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>10.73 -3.807 -0.469 17.09 0.3133 ... -1.718 11.02 3.044 -1.458 -0.9471</span></div><div class='xr-array-data'><pre>array([10.725979  , -3.806918  , -0.46903867, 17.090816  ,  0.3133026 ,
        52.252567  , 12.194658  , -1.7175047 , 11.021334  ,  3.0442472 ,
-       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-418a93aa-fa93-4c6d-a1b0-6483506cf4c7' class='xr-section-summary-in' type='checkbox' checked /><label for='section-418a93aa-fa93-4c6d-a1b0-6483506cf4c7' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-35a11b78-eb55-4fcd-868e-3b400b8325b3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-35a11b78-eb55-4fcd-868e-3b400b8325b3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-edeb6d22-b6dc-4445-8301-8e797ebcbe6f' class='xr-var-data-in' type='checkbox'><label for='data-edeb6d22-b6dc-4445-8301-8e797ebcbe6f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-b590fd4d-6653-4680-90a2-d56b789ce9ba' class='xr-section-summary-in' type='checkbox' checked /><label for='section-b590fd4d-6653-4680-90a2-d56b789ce9ba' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
+       -1.4584134 , -0.9470762 ], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-445f3b74-ab2e-497a-b03d-060ca3c9f22f' class='xr-section-summary-in' type='checkbox' checked /><label for='section-445f3b74-ab2e-497a-b03d-060ca3c9f22f' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>id</span></div><div class='xr-var-dims'>(id)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0 1.0 2.0 3.0 ... 9.0 10.0 11.0</div><input id='attrs-2a044bcf-b779-46e5-beea-23f0e7779713' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2a044bcf-b779-46e5-beea-23f0e7779713' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-052371a2-ba77-45ed-8074-8ae2b0b3d278' class='xr-var-data-in' type='checkbox'><label for='data-052371a2-ba77-45ed-8074-8ae2b0b3d278' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-e33ed9ed-faba-46d1-bc36-71d0fd226a49' class='xr-section-summary-in' type='checkbox' checked /><label for='section-e33ed9ed-faba-46d1-bc36-71d0fd226a49' class='xr-section-summary' title='Expand/collapse section'>Attributes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>unit :</span></dt><dd>m NAP</dd></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>This is a convenient way to create masks for specific regions:</p>
@@ -1665,7 +1677,7 @@ by setting <code class="docutils literal notranslate"><span class="pre">all_touc
 <span class="n">modified</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d59b9bcb0&gt;
+<img src="../_images/sphx_glr_vector_conversion_005.png" srcset="../_images/sphx_glr_vector_conversion_005.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde50777ec0&gt;
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">all_touched=True</span></code> is less suitable when differently valued
@@ -1725,7 +1737,7 @@ burn operation.</p>
 <span class="n">burned</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7f1d59a51880&gt;
+<img src="../_images/sphx_glr_vector_conversion_009.png" srcset="../_images/sphx_glr_vector_conversion_009.png" alt="vector conversion" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PolyCollection object at 0x7fde4f6a65d0&gt;
 </pre></div>
 </div>
 </section>
@@ -1782,7 +1794,7 @@ centroid of an edge, it is snapped to that edge.</p>
 triangles in the lower left corner which are surrounded by the snapped edges.
 In general, results are best when the line segments are relatively large
 compare to the grid faces.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 13.389 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 13.522 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-vector-conversion-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/be05b5a234b2a85e0ca223679f6e137e/vector_conversion.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">vector_conversion.ipynb</span></code></a></p>
@@ -1843,8 +1855,8 @@ compare to the grid faces.</p>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-to-geodataframe">Conversion to GeoDataFrame</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-from-geodataframe">Conversion from GeoDataFrame</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rasterizing-or-burning-vector-geometries">“Rasterizing”, or “burning” vector geometries</a></li>
@@ -1854,13 +1866,13 @@ compare to the grid faces.</p>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/examples/vector_conversion.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/examples/vector_conversion.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1875,8 +1887,8 @@ compare to the grid faces.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1910,7 +1922,7 @@ compare to the grid faces.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>

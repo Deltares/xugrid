@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Gridding Ugrid1d Network Data to 2D Grids &#8212; Xugrid 0.15.1 documentation</title>
+    <title>Gridding Ugrid1d Network Data to 2D Grids &#8212; Xugrid 0.15.2 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -38,30 +38,35 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
-    <script src="../_static/documentation_options.js?v=4befc426"></script>
+    <script src="../_static/documentation_options.js?v=7c174e4c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/network_gridder';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Sample Data" href="../sample_data/index.html" />
     <link rel="prev" title="Processing Elevation Data Along Ugrid1d Networks" href="hydamo_network.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.15.1" />
+  <meta name="docsearch:version" content="0.15.2" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -93,7 +98,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -325,7 +330,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -1013,11 +1025,11 @@ array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)
 Coordinates:
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-2289b072-5be9-443b-91da-5e70cef610ae' class='xr-array-in' type='checkbox' checked><label for='section-2289b072-5be9-443b-91da-5e70cef610ae' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 800B 0 1 2 3 4 5 ... 94 95 96 97 98 99</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>mesh2d_nFaces</span>: 100</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-28505529-2314-4854-88bf-8620ac7685b9' class='xr-array-in' type='checkbox' checked><label for='section-28505529-2314-4854-88bf-8620ac7685b9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></div><div class='xr-array-data'><pre>array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-1c4455d1-4390-424e-887a-be3c667500cf' class='xr-section-summary-in' type='checkbox' checked /><label for='section-1c4455d1-4390-424e-887a-be3c667500cf' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-79e5d026-9220-493e-8173-cb9ec9e73261' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-79e5d026-9220-493e-8173-cb9ec9e73261' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ef2b88bd-64e2-4c8d-9070-aa546cb8325c' class='xr-var-data-in' type='checkbox'><label for='data-ef2b88bd-64e2-4c8d-9070-aa546cb8325c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[100 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)</pre></div></div></li><li class='xr-section-item'><input id='section-4a0e44c1-476c-4c8d-a9ab-d51ff1c1ecfc' class='xr-section-summary-in' type='checkbox' checked /><label for='section-4a0e44c1-476c-4c8d-a9ab-d51ff1c1ecfc' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 94 95 96 97 98 99</div><input id='attrs-27ac9be0-045e-4e28-9cc2-c5c60444d443' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-27ac9be0-045e-4e28-9cc2-c5c60444d443' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d47a3abb-f6c2-4b23-93e3-c4fea63cbe5c' class='xr-var-data-in' type='checkbox'><label for='data-d47a3abb-f6c2-4b23-93e3-c4fea63cbe5c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[100 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Next, we create a 1D network. This network consists of 5 nodes and 4 edges. At
@@ -1595,7 +1607,7 @@ dl.xr-attrs {
 </style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (network1d_nNodes: 5)&gt; Size: 40B
 array([ 1. ,  1.5,  2. ,  4. , -4. ])
 Coordinates:
-  * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-b8ed02c8-135a-47ca-8a78-e9db04f8130c' class='xr-array-in' type='checkbox' checked><label for='section-b8ed02c8-135a-47ca-8a78-e9db04f8130c' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-2b6ffffe-a9f5-4cd9-9300-631382fed17d' class='xr-section-summary-in' type='checkbox' checked /><label for='section-2b6ffffe-a9f5-4cd9-9300-631382fed17d' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-83c14774-7dc1-4309-8ce3-d2da33d8bfa6' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-83c14774-7dc1-4309-8ce3-d2da33d8bfa6' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d6e957ab-1fd6-4e75-a2e0-09caefd9bb39' class='xr-var-data-in' type='checkbox'><label for='data-d6e957ab-1fd6-4e75-a2e0-09caefd9bb39' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+  * network1d_nNodes  (network1d_nNodes) int64 40B 0 1 2 3 4</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 5</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-0b678069-8e25-40ef-86a3-9322747583c8' class='xr-array-in' type='checkbox' checked><label for='section-0b678069-8e25-40ef-86a3-9322747583c8' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ])</pre></div></div></li><li class='xr-section-item'><input id='section-f6a621f7-c91e-4b7f-85ac-2de42558f306' class='xr-section-summary-in' type='checkbox' checked /><label for='section-f6a621f7-c91e-4b7f-85ac-2de42558f306' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4</div><input id='attrs-9cb37cbe-07b0-4037-b7de-79fcc5521cd5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9cb37cbe-07b0-4037-b7de-79fcc5521cd5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-30e84580-0499-408a-a41a-edc73f19a90b' class='xr-var-data-in' type='checkbox'><label for='data-30e84580-0499-408a-a41a-edc73f19a90b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[5 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>Let’s plot the 1D network on top of the 2D grid. The 1D network is shown in
@@ -1606,7 +1618,7 @@ values.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_001.png" srcset="../_images/sphx_glr_network_gridder_001.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1d598daf90&gt;
+<img src="../_images/sphx_glr_network_gridder_001.png" srcset="../_images/sphx_glr_network_gridder_001.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fde4f6c02f0&gt;
 </pre></div>
 </div>
 <section id="intersect-edges">
@@ -1631,7 +1643,7 @@ network and the 2D grid. We can do this by using the
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">intersections_xy</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_002.png" srcset="../_images/sphx_glr_network_gridder_002.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f1d5ac73f20&gt;
+<img src="../_images/sphx_glr_network_gridder_002.png" srcset="../_images/sphx_glr_network_gridder_002.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fde4f554f80&gt;
 </pre></div>
 </div>
 <p>Let’s take a look at the individual values. We can see that the intersection
@@ -2277,8 +2289,8 @@ dl.xr-attrs {
 array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
         nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])
 Coordinates:
-  * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e95eb7f1-2cd5-4a9c-9f9a-1295958bbe5d' class='xr-array-in' type='checkbox' checked><label for='section-e95eb7f1-2cd5-4a9c-9f9a-1295958bbe5d' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
-        nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-e0e1cb89-ab68-4459-a0de-6259ce6f1627' class='xr-section-summary-in' type='checkbox' checked /><label for='section-e0e1cb89-ab68-4459-a0de-6259ce6f1627' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-5f114cb1-365b-484f-923b-00990b4dd699' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5f114cb1-365b-484f-923b-00990b4dd699' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-ace80e01-9226-4897-aa72-47c3ef30fe85' class='xr-var-data-in' type='checkbox'><label for='data-ace80e01-9226-4897-aa72-47c3ef30fe85' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[20 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
+  * network1d_nNodes  (network1d_nNodes) int64 160B 0 1 2 3 4 ... 15 16 17 18 19</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-obj-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>network1d_nNodes</span>: 20</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-3de5e1e7-3260-40d2-95c6-b0a35a30278f' class='xr-array-in' type='checkbox' checked><label for='section-3de5e1e7-3260-40d2-95c6-b0a35a30278f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.5 2.0 4.0 -4.0 nan nan nan ... nan nan nan nan nan nan nan nan</span></div><div class='xr-array-data'><pre>array([ 1. ,  1.5,  2. ,  4. , -4. ,  nan,  nan,  nan,  nan,  nan,  nan,
+        nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan,  nan])</pre></div></div></li><li class='xr-section-item'><input id='section-e26bf7fd-887d-450d-9477-c0dabd534d3f' class='xr-section-summary-in' type='checkbox' checked /><label for='section-e26bf7fd-887d-450d-9477-c0dabd534d3f' class='xr-section-summary' title='Expand/collapse section'>Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>network1d_nNodes</span></div><div class='xr-var-dims'>(network1d_nNodes)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 6 ... 14 15 16 17 18 19</div><input id='attrs-e2bcc159-fd40-4d1a-8c3f-f2c54b01ad0e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e2bcc159-fd40-4d1a-8c3f-f2c54b01ad0e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-aa40e5af-2bcb-4745-8fa6-717fee6147fa' class='xr-var-data-in' type='checkbox'><label for='data-aa40e5af-2bcb-4745-8fa6-717fee6147fa' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>[20 values with dtype=int64]</pre></div></li></ul></div></li></ul></div></div>
 </div>
 <br />
 <br /></section>
@@ -2295,7 +2307,7 @@ that the two branches on the right-hand side are interpolated separately.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_003.png" srcset="../_images/sphx_glr_network_gridder_003.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1d5ac71ca0&gt;
+<img src="../_images/sphx_glr_network_gridder_003.png" srcset="../_images/sphx_glr_network_gridder_003.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fde9152e090&gt;
 </pre></div>
 </div>
 <p>The final step before we can grid the network is setting the data to edge
@@ -2312,7 +2324,7 @@ the edges. This is done by using the edge_node_connectivity of the network.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_004.png" srcset="../_images/sphx_glr_network_gridder_004.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1d5acb2840&gt;
+<img src="../_images/sphx_glr_network_gridder_004.png" srcset="../_images/sphx_glr_network_gridder_004.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fde4fbc94c0&gt;
 </pre></div>
 </div>
 </section>
@@ -2333,7 +2345,7 @@ gridding and the data to grid.</p>
 <span class="n">gridder</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xugrid.regrid.gridder.NetworkGridder object at 0x7f1d5ac72600&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xugrid.regrid.gridder.NetworkGridder object at 0x7fde91799190&gt;
 </pre></div>
 </div>
 <p>Next, we can grid the data. Call the
@@ -2346,10 +2358,10 @@ gridding and the data to grid.</p>
 <span class="n">ugrid2d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_network_gridder_005.png" srcset="../_images/sphx_glr_network_gridder_005.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7f1d5b9ff260&gt;
+<img src="../_images/sphx_glr_network_gridder_005.png" srcset="../_images/sphx_glr_network_gridder_005.png" alt="network gridder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.LineCollection object at 0x7fde4faf0500&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.346 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.333 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-network-gridder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7b2d082df2d28713d544af1dfa35845f/network_gridder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">network_gridder.ipynb</span></code></a></p>
@@ -2410,8 +2422,8 @@ gridding and the data to grid.</p>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intersect-edges">Intersect edges</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refining-the-network">Refining the network</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpolation">Interpolation</a></li>
@@ -2420,13 +2432,13 @@ gridding and the data to grid.</p>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/examples/network_gridder.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/examples/network_gridder.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -2441,8 +2453,8 @@ gridding and the data to grid.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2476,7 +2488,7 @@ gridding and the data to grid.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>
