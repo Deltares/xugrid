@@ -1030,6 +1030,20 @@ class TestMultiTopologyUgridDataset:
         back = self.uds.ugrid.reindex_like(self.uds)
         assert isinstance(back, xugrid.UgridDataset)
 
+    def test_write_multi_grid_mapping(self):
+        uds = self.uds.copy()
+        uds.ugrid.set_crs(epsg=28992)
+        ds = uds.ugrid.to_dataset()
+        # Should be present on data variables of both topologies.
+        assert "grid_mapping" in ds["a"].attrs
+        assert "grid_mapping" in ds["b"].attrs
+        assert "grid_mapping" in ds["c"].attrs
+        # Should also be present on coordinates (not CF-conventions, but e.g. QGIS expects it).
+        assert "grid_mapping" in ds["network1d_node_x"].attrs
+        assert "grid_mapping" in ds["network1d_node_y"].attrs
+        assert "grid_mapping" in ds["mesh2d_node_x"].attrs
+        assert "grid_mapping" in ds["mesh2d_node_y"].attrs
+
 
 class TestFromStructured:
     @pytest.fixture(autouse=True)
