@@ -603,7 +603,7 @@ class StructuredGrid2d(StructuredGrid1d):
     def to_dataset(self, name: str) -> xr.Dataset:
         ds_x = self.xbounds.to_dataset(name)
         ds_y = self.ybounds.to_dataset(name)
-        ds = xr.merge([ds_x, ds_y])
+        ds = xr.merge([ds_x, ds_y], compat="override")
         ds[name + "_type"] = xr.DataArray(-1, attrs={"type": "StructuredGrid2d"})
         return ds
 
