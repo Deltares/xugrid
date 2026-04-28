@@ -299,7 +299,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         for grid in self.grids:
             xx, yy, index = grid.rasterize(resolution, self.total_bounds)
             datasets.append(self._raster(xx, yy, index))
-        return xr.merge(datasets)
+        return xr.merge(datasets, compat="override")
 
     def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
         """
@@ -323,7 +323,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         for grid in self.grids:
             xx, yy, index = grid.rasterize_like(x, y)
             datasets.append(self._raster(xx, yy, index))
-        return xr.merge(datasets)
+        return xr.merge(datasets, compat="override")
 
     def to_periodic(self):
         """
