@@ -33,6 +33,9 @@ class UgridIndex(xr.Index, abc.ABC):
         dims_dict: Mapping[Any, Hashable],
     ):
         # TODO
+        # combined = {**dims_dict, **name_dict}
+        # new_grid = self.grid.rename_from_dict(combined)
+        # return UGRID_INDEXES[new_grid.topology_dimension](new_grid)
         return self
 
 

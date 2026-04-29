@@ -362,6 +362,9 @@ class AbstractUgrid(abc.ABC):
         else:
             return new
 
+    def rename_from_dict(mapping):
+        pass
+
     def _propagate_properties(self, other) -> None:
         other.start_index = self.start_index
         other.fill_value = self.fill_value
