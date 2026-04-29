@@ -646,7 +646,7 @@
         <span class="p">)</span>
         <span class="n">source_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;__source&quot;</span><span class="p">)</span>
         <span class="n">target_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="s2">&quot;__target&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">weights_ds</span><span class="p">,</span> <span class="n">source_ds</span><span class="p">,</span> <span class="n">target_ds</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">weights_ds</span><span class="p">,</span> <span class="n">source_ds</span><span class="p">,</span> <span class="n">target_ds</span><span class="p">),</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">weights_as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
