@@ -6,16 +6,56 @@ import xarray as xr
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.constructors import dataset
+from xugrid.core.index import UGRID_INDEXES, UgridIndex
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
+@xr.register_dataset_accessor("ugrid")
 class UgridDatasetAccessor(AbstractUgridAccessor):
-    def __init__(self, obj: xr.Dataset, grids: Sequence[UgridType]):
+    def __init__(self, obj: xr.Dataset):
         self.obj = obj
-        self.grids = grids
+
+    def from_dataset(self):
+        new = self.obj
+        topology_dimensions = self.obj.ugrid_roles.topology_dimensions
+        connectivity_vars = [
+            name
+            for v in self.obj.ugrid_roles.connectivity.values()
+            for name in v.values()
+        ]
+        grid_mapping_vars = [
+            name
+            for name in self.obj.ugrid_roles.grid_mapping_names.values()
+            if name is not None
+        ]
+
+        for topology in self.obj.ugrid_roles.topology:
+            topodim = topology_dimensions[topology]
+            index_cls = UGRID_INDEXES[topodim]
+            variables, options = index_cls._variables_from_dataset(self.obj, topology)
+            index = index_cls.from_variables(
+                {name: self.obj[name] for name in variables}, options=options
+            )
+            coords = xr.Coordinates.from_xindex(index)
+            new = new.assign_coords(coords)
+
+        to_drop = self.obj.ugrid_roles.topology + connectivity_vars + grid_mapping_vars
+        new = new.drop_vars(to_drop, errors="ignore").copy()
+        for var in new.variables.values():
+            var.attrs = var.attrs.copy()
+            var.attrs.pop("grid_mapping", None)
+        return new
+
+    @property
+    def grids(self) -> list[UgridType]:
+        indexes = list(self.obj.xindexes.values())
+        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        if len(grids) == 0:
+            raise ValueError("Dataset contains no UgridIndex")
+        return list(grids)
 
     @property
     def grid(self) -> UgridType:
@@ -82,7 +122,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             bounds[3].max(),
         )
 
-    def rename(self, new_name_or_name_dict: Union[str, Dict[str, str]]) -> UgridDataset:
+    def rename(self, new_name_or_name_dict: Union[str, Dict[str, str]]) -> xr.Dataset:
         """
         Give a new name to the UGRID topology and update the associated
         coordinate and dimension names in the Dataset.
@@ -129,9 +169,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         obj = self.obj
         to_rename = tuple(obj.data_vars) + tuple(obj.coords) + tuple(obj.dims)
         new_obj = obj.rename({k: v for k, v in names.items() if k in to_rename})
-        return UgridDataset(new_obj, new_grids)
+        return dataset(new_obj, new_grids)
 
-    def assign_node_coords(self) -> UgridDataset:
+    def assign_node_coords(self) -> xr.Dataset:
         """
         Assign node coordinates from the grid to the object.
 
@@ -140,14 +180,14 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
         result = self.obj
         for grid in self.grids:
             result = grid.assign_node_coords(result)
-        return UgridDataset(result, self.grids)
+        return dataset(result, self.grids)
 
-    def assign_edge_coords(self) -> UgridDataset:
+    def assign_edge_coords(self) -> xr.Dataset:
         """
         Assign edge coordinates from the grid to the object.
 
@@ -156,14 +196,14 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
         result = self.obj
         for grid in self.grids:
             result = grid.assign_edge_coords(result)
-        return UgridDataset(result, self.grids)
+        return dataset(result, self.grids)
 
-    def assign_face_coords(self) -> UgridDataset:
+    def assign_face_coords(self) -> xr.Dataset:
         """
         Assign face coordinates from the grid to the object.
 
@@ -172,13 +212,13 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
         result = self.obj
         for grid in self.grids:
             if grid.topology_dimension > 1:
                 result = grid.assign_face_coords(result)
-        return UgridDataset(result, self.grids)
+        return dataset(result, self.grids)
 
     def set_node_coords(self, node_x: str, node_y: str, topology: str = None):
         """
@@ -193,7 +233,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             Name of the y coordinate of the nodes in the object.
         topology: str, optional
             Name of the grid topology in which to set the node_x and node_y
-            coordinates. Can be omitted if the UgridDataset contains only a
+            coordinates. Can be omitted if the Dataset contains only a
             single grid.
         """
         if topology is None:
@@ -225,7 +265,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 new_obj = result
 
         if new_grids:
-            return UgridDataset(new_obj, new_grids)
+            return dataset(new_obj, new_grids)
         else:
             return result
 
@@ -332,14 +372,14 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        periodic: UgridDataset
+        periodic: xr.Dataset
         """
         grids = []
         result = self.obj
         for grid in self.grids:
             new_grid, result = grid.to_periodic(obj=result)
             grids.append(new_grid)
-        return UgridDataset(result, grids)
+        return dataset(result, grids)
 
     def to_nonperiodic(self, xmax: float):
         """
@@ -354,14 +394,14 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        nonperiodic: UgridDataset
+        nonperiodic: xr.Dataset
         """
         grids = []
         result = self.obj
         for grid in self.grids:
             new_grid, result = grid.to_nonperiodic(xmax=xmax, obj=result)
             grids.append(new_grid)
-        return UgridDataset(result, grids)
+        return dataset(result, grids)
 
     def intersect_line(
         self, start: Sequence[float], end: Sequence[float]
@@ -411,7 +451,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     def to_dataset(self, optional_attributes: bool = False):
         """
-        Convert this UgridDataset into a standard
+        Convert this UGRID indexed dataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
@@ -423,7 +463,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        dataset: UgridDataset
+        dataset: xr.Dataset
         """
 
         def _combine_attrs(attrs_seq, context):
@@ -498,7 +538,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
         topology: str = None,
-    ) -> UgridDataset:
+    ) -> xr.Dataset:
         """
         Transform geometries to a new coordinate reference system.
         Transform all geometries in an active geometry column to a different coordinate
@@ -544,7 +584,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 newgrid = grid.copy()
             grids.append(newgrid)
 
-        return UgridDataset(obj, grids)
+        return dataset(obj, grids)
 
     def to_geodataframe(self, dim_order=None) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """
@@ -609,7 +649,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     def reindex_like(
         self,
-        other: Union[UgridType, UgridDataArray, UgridDataset],
+        other: Union[UgridType, xr.DataArray, xr.Dataset],
         tolerance: float = 0.0,
     ):
         """
@@ -622,22 +662,22 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
         Parameters
         ----------
-        other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
+        other: Ugrid1d, Ugrid2d, xr.DataArray, xr.Dataset
         obj: DataArray or Dataset
         tolerance: float, default value 0.0.
             Maximum distance between inexact coordinate matches.
 
         Returns
         -------
-        reindexed: UgridDataset
+        reindexed: xr.Dataset
         """
         if isinstance(other, (Ugrid1d, Ugrid2d)):
             other_grids = [other]
-        elif isinstance(other, (UgridDataArray, UgridDataset)):
+        elif isinstance(other, (xr.DataArray, xr.Dataset)) and other.ugrid.is_indexed:
             other_grids = other.ugrid.grids
         else:
             raise TypeError(
-                "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
+                "Expected Ugrid1d, Ugrid2d, or UGRID index DataArray or Dataset,"
                 f"received instead: {type(other).__name__}"
             )
         # Convert to dict to match by name
@@ -652,4 +692,4 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 new_grids.append(other)
             else:
                 new_grids.append(grid)
-        return UgridDataset(result, new_grids)
+        return dataset(result, new_grids)

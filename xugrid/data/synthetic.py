@@ -103,4 +103,4 @@ def disk():
         data=function_z(*grid.edge_coordinates.T),
         dims=[grid.edge_dimension],
     )
-    return xugrid.UgridDataset(ds, grid)
+    return xugrid.dataset(ds, grid)

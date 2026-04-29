@@ -6,8 +6,9 @@ import xarray as xr
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
+from xugrid.core.constructors import dataarray
+from xugrid.core.index import UgridIndex
 from xugrid.core.utils import UncachedAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
 from xugrid.ugrid.interpolate import (
@@ -19,21 +20,29 @@ from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
 
 
+@xr.register_dataarray_accessor("ugrid")
 class UgridDataArrayAccessor(AbstractUgridAccessor):
     """
     This "accessor" makes operations using the UGRID topology available via the
-    ``.ugrid`` attribute for UgridDataArrays and UgridDatasets.
+    ``.ugrid`` attribute for UGRID index DataArrays and Datasets.
     """
 
-    def __init__(self, obj: xr.DataArray, grid: UgridType):
+    def __init__(self, obj: xr.DataArray):
         self.obj = obj
-        self.grid = grid
+
+    @property
+    def grid(self) -> UgridType:
+        indexes = list(self.obj.xindexes.values())
+        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        if len(grids) != 1:
+            raise ValueError("DataArray should contain exactly one UgridIndex")
+        return grids.pop()
 
     @property
     def grids(self) -> List[UgridType]:
         """
-        The UGRID topology of this DataArry, as a list. Included for
-        consistency with UgridDataset.
+        The UGRID topology of this DataArray, as a list. Included for
+        consistency with Datasets.
         """
         return [self.grid]
 
@@ -46,7 +55,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
     def names(self) -> List[str]:
         """
         Name of the UGRID topology, as a list. Included for consistency with
-        UgridDataset.
+        Datasets.
         """
         return [self.grid.name]
 
@@ -73,7 +82,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     plot = UncachedAccessor(_PlotMethods)
 
-    def rename(self, name: str) -> UgridDataArray:
+    def rename(self, name: str) -> xr.DataArray:
         """
         Give a new name to the UGRID topology and update the associated
         coordinate and dimension names in the DataArray.
@@ -87,9 +96,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         new_grid, name_dict = self.grid.rename(name, return_name_dict=True)
         to_rename = tuple(obj.coords) + tuple(obj.dims)
         new_obj = obj.rename({k: v for k, v in name_dict.items() if k in to_rename})
-        return UgridDataArray(new_obj, new_grid)
+        return dataarray(new_obj, new_grid)
 
-    def assign_node_coords(self) -> UgridDataArray:
+    def assign_node_coords(self) -> xr.DataArray:
         """
         Assign node coordinates from the grid to the object.
 
@@ -98,11 +107,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
-        return UgridDataArray(self.grid.assign_node_coords(self.obj), self.grid)
+        return dataarray(self.grid.assign_node_coords(self.obj), self.grid)
 
-    def assign_edge_coords(self) -> UgridDataArray:
+    def assign_edge_coords(self) -> xr.DataArray:
         """
         Assign edge coordinates from the grid to the object.
 
@@ -111,11 +120,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
-        return UgridDataArray(self.grid.assign_edge_coords(self.obj), self.grid)
+        return dataarray(self.grid.assign_edge_coords(self.obj), self.grid)
 
-    def assign_face_coords(self) -> UgridDataArray:
+    def assign_face_coords(self) -> xr.DataArray:
         """
         Assign face coordinates from the grid to the object.
 
@@ -124,11 +133,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        assigned: UgridDataset
+        assigned: xr.Dataset
         """
         if self.grid.topology_dimension == 1:
             raise TypeError("Cannot set face coords from a Ugrid1D topology")
-        return UgridDataArray(self.grid.assign_face_coords(self.obj), self.grid)
+        return dataarray(self.grid.assign_face_coords(self.obj), self.grid)
 
     def set_node_coords(self, node_x: str, node_y: str):
         """
@@ -171,11 +180,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        selection: Union[UgridDataArray, UgridDataset, xr.DataArray, xr.Dataset]
+        selection: Union[xr.DataArray, xr.Dataset]
         """
         result = self.grid.sel(self.obj, x, y)
         if isinstance(result, tuple):
-            return UgridDataArray(*result)
+            return dataarray(*result)
         else:
             return result
 
@@ -274,10 +283,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        periodic: UgridDataArray
+        periodic: xr.DataArray
         """
         grid, obj = self.grid.to_periodic(obj=self.obj)
-        return UgridDataArray(obj, grid)
+        return dataarray(obj, grid)
 
     def to_nonperiodic(self, xmax: float):
         """
@@ -292,10 +301,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        nonperiodic: UgridDataArray
+        nonperiodic: xr.DataArray
         """
         grid, obj = self.grid.to_nonperiodic(xmax=xmax, obj=self.obj)
-        return UgridDataArray(obj, grid)
+        return dataarray(obj, grid)
 
     def _to_facet(self, facet: str, newdim: str):
         """
@@ -340,7 +349,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         obj = obj.chunk({source_dim: -1})
         # Set the fill values (-1) to NaN
         mapped = obj.isel({source_dim: indexer}).where(indexer != -1)
-        return UgridDataArray(mapped, grid)
+        return dataarray(mapped, grid)
 
     def to_node(self, dim: str = "nmax"):
         """
@@ -355,8 +364,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        mapped: UgridDataArray
-            A new UgridDataArray with data mapped to the nodes of the grid.
+        mapped: xr.DataArray
+            A new DataArray with data mapped to the nodes of the grid.
 
         Examples
         --------
@@ -379,8 +388,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        mapped: UgridDataArray
-            A new UgridDataArray with data mapped to the edges of the grid.
+        mapped: xr.DataArray
+            A new DataArray with data mapped to the edges of the grid.
 
         Examples
         --------
@@ -403,8 +412,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        mapped: UgridDataArray
-            A new UgridDataArray with data mapped to the faces of the grid.
+        mapped: xr.DataArray
+            A new DataArray with data mapped to the faces of the grid.
 
         Examples
         --------
@@ -497,7 +506,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         self,
         crs: Union["pyproj.CRS", str] = None,  # type: ignore # noqa
         epsg: int = None,
-    ) -> UgridDataArray:
+    ) -> xr.DataArray:
         """
         Transform geometries to a new coordinate reference system.
         Transform all geometries in an active geometry column to a different coordinate
@@ -527,7 +536,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         grid = self.grid.to_crs(crs, epsg)
         obj = grid._assign_derived_coords(self.obj)
-        return UgridDataArray(obj, grid)
+        return dataarray(obj, grid)
 
     def to_geodataframe(
         self, name: str = None, dim_order=None
@@ -580,7 +589,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     def reindex_like(
         self,
-        other: Union[UgridType, UgridDataArray, UgridDataset],
+        other: Union[UgridType, xr.DataArray, xr.Dataset],
         tolerance: float = 0.0,
     ):
         """
@@ -592,26 +601,26 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Parameters
         ----------
-        other: Ugrid1d, Ugrid2d, UgridDataArray, UgridDataset
+        other: Ugrid1d, Ugrid2d, DataArray, Dataset
         obj: DataArray or Dataset
         tolerance: float, default value 0.0.
             Maximum distance between inexact coordinate matches.
 
         Returns
         -------
-        reindexed: UgridDataArray
+        reindexed: xr.DataArray
         """
         if isinstance(other, (Ugrid1d, Ugrid2d)):
             other_grid = other
-        elif isinstance(other, (UgridDataArray, UgridDataset)):
+        elif isinstance(other, (xr.DataArray, xr.Dataset)) and other.ugrid.is_indexed:
             other_grid = other.ugrid.grid
         else:
             raise TypeError(
-                "Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"
+                "Expected Ugrid1d, Ugrid2d, DataArray, or Dataset,"
                 f"received instead: {type(other).__name__}"
             )
         new_obj = self.grid.reindex_like(other_grid, obj=self.obj, tolerance=tolerance)
-        return UgridDataArray(new_obj, other_grid)
+        return dataarray(new_obj, other_grid)
 
     def _binary_iterate(self, iterations: int, mask, value, border_value):
         if border_value == value:
@@ -633,7 +642,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 border_value,
             )
             da = obj.copy(data=output)
-            return UgridDataArray(da, self.grid.copy())
+            return dataarray(da, self.grid.copy())
         elif isinstance(obj, xr.Dataset):
             raise NotImplementedError
         else:
@@ -659,7 +668,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        dilated: UgridDataArray
+        dilated: xr.DataArray
         """
         return self._binary_iterate(iterations, mask, True, border_value)
 
@@ -683,7 +692,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        eroded: UgridDataArray
+        eroded: xr.DataArray
         """
         return self._binary_iterate(iterations, mask, False, border_value)
 
@@ -696,12 +705,12 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        labelled: UgridDataArray
+        labelled: xr.DataArray
         """
         _, labels = scipy.sparse.csgraph.connected_components(
             self.grid.face_face_connectivity
         )
-        return UgridDataArray(
+        return dataarray(
             xr.DataArray(labels, dims=[self.grid.face_dimension]),
             self.grid,
         )
@@ -714,14 +723,14 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        reordered: Union[UgridDataArray, UgridDataset]
+        reordered: Union[DataArray, Dataset]
         """
         grid = self.grid
         reordered_grid, reordering = self.grid.reverse_cuthill_mckee()
         reordered_data = self.obj.isel({grid.face_dimension: reordering})
         # TODO: this might not work properly if e.g. centroids are stored in obj.
         # Not all metadata would be reordered.
-        return UgridDataArray(
+        return dataarray(
             reordered_data,
             reordered_grid,
         )
@@ -737,7 +746,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         This method utilizes the pymetis Python bindings:
         https://github.com/inducer/pymetis
 
-        The data of the UgridDataArray are treated as weights.
+        The data of the DataArray are treated as weights.
 
         Parameters
         ----------
@@ -746,7 +755,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        partition_labels: UgridDataArray of integers
+        partition_labels: xr.DataArray of integers
         """
         obj = self.obj
         grid = self.grid
@@ -777,7 +786,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        filled: UgridDataArray of floats
+        filled: xr.DataArray of floats
         """
 
         if method != "nearest":
@@ -799,7 +808,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 "max_distance": max_distance,
             },
         )
-        return UgridDataArray(da_filled, grid)
+        return dataarray(da_filled, grid)
 
     def laplace_interpolate(
         self,
@@ -853,7 +862,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        filled: UgridDataArray of floats
+        filled: xr.DataArray of floats
         """
         grid = self.grid
         da = self.obj
@@ -882,11 +891,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
                 "maxiter": maxiter,
             },
         )
-        return UgridDataArray(da_filled, grid)
+        return da_filled
 
     def to_dataset(self, optional_attributes: bool = False):
         """
-        Convert this UgridDataArray or UgridDataset into a standard
+        Convert this DataArray or Dataset into a standard
         xarray.Dataset.
 
         The UGRID topology information is added as standard data variables.
@@ -898,6 +907,6 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
         Returns
         -------
-        dataset: UgridDataset
+        dataset: xr.Dataset
         """
         return self.grid.to_dataset(self.obj, optional_attributes)

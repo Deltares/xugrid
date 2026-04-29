@@ -1,20 +1,24 @@
 from xugrid import data
 from xugrid.core.common import (
-    concat,
-    full_like,
     load_dataarray,
     load_dataset,
-    merge,
-    ones_like,
     open_dataarray,
     open_dataset,
     open_mfdataset,
     open_zarr,
-    zeros_like,
+)
+from xugrid.core.constructors import (
+    UgridDataArray,
+    UgridDataset,
+    dataarray,
+    dataarray_from_data,
+    dataarray_from_structured2d,
+    dataset,
+    dataset_from_geodataframe,
+    dataset_from_structured2d,
 )
 from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset
 from xugrid.plot import plot
 from xugrid.regrid.gridder import NetworkGridder
 from xugrid.regrid.regridder import (
@@ -39,21 +43,22 @@ __version__ = "0.15.2"
 
 __all__ = (
     "data",
-    "concat",
-    "full_like",
     "load_dataarray",
     "load_dataset",
-    "merge",
-    "ones_like",
     "open_dataarray",
     "open_dataset",
     "open_mfdataset",
     "open_zarr",
-    "zeros_like",
     "UgridDataArrayAccessor",
     "UgridDatasetAccessor",
     "UgridDataArray",
     "UgridDataset",
+    "dataarray",
+    "dataarray_from_data",
+    "dataarray_from_structured2d",
+    "dataset",
+    "dataset_from_structured2d",
+    "dataset_from_geodataframe",
     "plot",
     "BarycentricInterpolator",
     "CentroidLocatorRegridder",
