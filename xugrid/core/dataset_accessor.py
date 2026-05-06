@@ -20,6 +20,21 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
     def __init__(self, obj: xr.Dataset):
         self.obj = obj
 
+    def initialize(self, obj=None, grids=None, grid=None):
+        """
+        Initialize UGRID indexes on this dataset.
+
+        Without arguments: extracts topology from UGRID-format dataset variables.
+        With grids: attaches the given Ugrid objects as indexes.
+        """
+        from xugrid.core.wrap import UgridDataset
+
+        if obj is None:
+            obj = self.obj
+        if grids is None and grid is not None:
+            grids = grid if isinstance(grid, (list, tuple)) else [grid]
+        return UgridDataset(obj, grids)
+
     def from_dataset(self):
         new = self.obj
         topology_dimensions = self.obj.ugrid_roles.topology_dimensions
@@ -34,21 +49,32 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             if name is not None
         ]
 
+        UGRID_GRID_CLASSES = {1: Ugrid1d, 2: Ugrid2d}
+        all_index_coord_names = []
         for topology in self.obj.ugrid_roles.topology:
             topodim = topology_dimensions[topology]
-            index_cls = UGRID_INDEXES[topodim]
-            variables, options = index_cls._variables_from_dataset(self.obj, topology)
-            index = index_cls.from_variables(
-                {name: self.obj[name] for name in variables}, options=options
-            )
+            grid_cls = UGRID_GRID_CLASSES[topodim]
+            grid = grid_cls.from_dataset(self.obj, topology)
+            index = UGRID_INDEXES[topodim].from_ugrid(grid)
             coords = xr.Coordinates.from_xindex(index)
             new = new.assign_coords(coords)
+            all_index_coord_names.extend(list(coords))
 
         to_drop = self.obj.ugrid_roles.topology + connectivity_vars + grid_mapping_vars
         new = new.drop_vars(to_drop, errors="ignore").copy()
         for var in new.variables.values():
             var.attrs = var.attrs.copy()
             var.attrs.pop("grid_mapping", None)
+        # Restore attrs from original dataset on index-backed coords (.copy() loses them).
+        for coord_name in all_index_coord_names:
+            if coord_name in self.obj.coords and coord_name in new.coords:
+                orig_attrs = {
+                    k: v
+                    for k, v in self.obj[coord_name].attrs.items()
+                    if k != "grid_mapping"
+                }
+                if orig_attrs:
+                    new[coord_name].attrs = orig_attrs
         return new
 
     @property
@@ -184,10 +210,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         assigned: UgridDataset
         """
-        result = self.obj
-        for grid in self.grids:
-            result = grid.assign_node_coords(result)
-        return UgridDataset(result, self.grids)
+        return UgridDataset(self.obj, self.grids)
 
     def assign_edge_coords(self) -> UgridDataset:
         """
@@ -200,10 +223,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         assigned: UgridDataset
         """
-        result = self.obj
-        for grid in self.grids:
-            result = grid.assign_edge_coords(result)
-        return UgridDataset(result, self.grids)
+        return UgridDataset(self.obj, self.grids)
 
     def assign_face_coords(self) -> UgridDataset:
         """
@@ -216,11 +236,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         assigned: UgridDataset
         """
-        result = self.obj
-        for grid in self.grids:
-            if grid.topology_dimension > 1:
-                result = grid.assign_face_coords(result)
-        return UgridDataset(result, self.grids)
+        return UgridDataset(self.obj, self.grids)
 
     def set_node_coords(self, node_x: str, node_y: str, topology: str = None):
         """
@@ -467,9 +483,24 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         -------
         dataset: UgridDataset
         """
-        return xr.merge(
-            [grid.to_dataset(self.obj, optional_attributes) for grid in self.grids]
-        )
+        from xugrid.core.index import UgridIndex
+
+        obj = self.obj
+        existing = [k for k, v in obj.xindexes.items() if isinstance(v, UgridIndex)]
+        if existing:
+            obj = obj.drop_indexes(existing).drop_vars(existing)
+        datasets = []
+        for grid in self.grids:
+            result = grid.to_dataset(obj, optional_attributes)
+            # Re-add face/edge coords from _indexes if the grid has no _dataset
+            # (e.g., after to_crs), so they appear in the output.
+            if not optional_attributes and not grid._dataset:
+                if grid._indexes.get("face_x"):
+                    result = grid.assign_face_coords(result)
+                if grid._indexes.get("edge_x"):
+                    result = grid.assign_edge_coords(result)
+            datasets.append(result)
+        return xr.merge(datasets)
 
     @property
     def crs(self):
@@ -562,7 +593,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         node positions. Coordinates not governed by the UGRID conventions
         are left untouched.
         """
-        obj = self.obj.copy()
+        from xugrid.core.index import drop_ugrid_index
+
+        obj = drop_ugrid_index(self.obj.copy())
 
         names = [grid.name for grid in self.grids]
         if topology is not None and topology not in names:
@@ -577,7 +610,10 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 newgrid = grid.copy()
             grids.append(newgrid)
 
-        return UgridDataset(obj, grids)
+        result = UgridDataset(obj, grids)
+        for grid in grids:
+            grid._update_coordinate_attrs(result)
+        return result
 
     def to_geodataframe(self, dim_order=None) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
         """

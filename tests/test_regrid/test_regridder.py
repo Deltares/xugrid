@@ -100,26 +100,26 @@ def test_centroid_locator_regridder(disk, quads_1):
     result = regridder.regrid(disk)
     assert isinstance(result, xu.UgridDataArray)
     assert result.notnull().any()
-    assert result.min() >= disk.min()
-    assert result.max() <= disk.max()
-    assert result.grid.n_face == square.grid.n_face
+    assert result.min().item() >= disk.min().item()
+    assert result.max().item() <= disk.max().item()
+    assert result.ugrid.grid.n_face == square.ugrid.grid.n_face
 
     # other way around
     regridder = CentroidLocatorRegridder(source=result, target=disk)
     back = regridder.regrid(result)
     assert isinstance(back, xu.UgridDataArray)
     assert back.notnull().any()
-    assert back.min() >= disk.min()
-    assert back.max() <= disk.max()
-    assert back.grid.n_face == disk.grid.n_face
+    assert back.min().item() >= disk.min().item()
+    assert back.max().item() <= disk.max().item()
+    assert back.ugrid.grid.n_face == disk.ugrid.grid.n_face
 
     # With broadcasting
     obj = xu.UgridDataArray(
-        xr.DataArray(np.ones(5), dims=["layer"]) * result.obj,
-        result.grid,
+        xr.DataArray(np.ones(5), dims=["layer"]) * result,
+        result.ugrid.grid,
     )
     broadcasted = regridder.regrid(obj)
-    assert broadcasted.dims == ("layer", disk.grid.face_dimension)
+    assert broadcasted.dims == ("layer", disk.ugrid.grid.face_dimension)
 
 
 def test_overlap_regridder_structured(
@@ -151,16 +151,16 @@ def test_overlap_regridder(disk, quads_1):
     regridder = OverlapRegridder(disk, square, method="mean")
     result = regridder.regrid(disk)
     assert result.notnull().any()
-    assert result.min() >= disk.min()
-    assert result.max() <= disk.max()
+    assert result.min().item() >= disk.min().item()
+    assert result.max().item() <= disk.max().item()
 
     # With broadcasting
     obj = xu.UgridDataArray(
-        xr.DataArray(np.ones(5), dims=["layer"]) * disk.obj,
-        grid=disk.grid,
+        xr.DataArray(np.ones(5), dims=["layer"]) * disk,
+        disk.ugrid.grid,
     )
     broadcasted = regridder.regrid(obj)
-    assert broadcasted.dims == ("layer", square.grid.face_dimension)
+    assert broadcasted.dims == ("layer", square.ugrid.grid.face_dimension)
     assert broadcasted.shape == (5, 100)
 
 
@@ -185,16 +185,16 @@ def test_barycentric_interpolator(disk, quads_0_25):
     regridder = BarycentricInterpolator(source=disk, target=square)
     result = regridder.regrid(disk)
     assert result.notnull().any()
-    assert result.min() >= disk.min()
-    assert result.max() <= disk.max()
+    assert result.min().item() >= disk.min().item()
+    assert result.max().item() <= disk.max().item()
 
     # With broadcasting
     obj = xu.UgridDataArray(
-        xr.DataArray(np.ones(5), dims=["layer"]) * disk.obj,
-        grid=disk.grid,
+        xr.DataArray(np.ones(5), dims=["layer"]) * disk,
+        disk.ugrid.grid,
     )
     broadcasted = regridder.regrid(obj)
-    assert broadcasted.dims == ("layer", square.grid.face_dimension)
+    assert broadcasted.dims == ("layer", square.ugrid.grid.face_dimension)
     assert broadcasted.shape == (5, 1600)
 
 

@@ -18,6 +18,17 @@ from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
 from xugrid.ugrid.selection_utils import get_sorted_section_coords
 
 
+def _isel_drop_mismatched_coords(obj, indexers):
+    """isel and drop any coordinates whose dimensions no longer match the result."""
+    from xugrid.core.index import drop_ugrid_index
+
+    obj = drop_ugrid_index(obj)
+    result = obj.isel(indexers)
+    allowed = set(result.dims)
+    to_drop = [k for k, v in result.coords.items() if not set(v.dims).issubset(allowed)]
+    return result.drop_vars(to_drop) if to_drop else result
+
+
 def numeric_bound(v: Union[float, None], other: float):
     if v is None:
         return other
@@ -1204,7 +1215,13 @@ class AbstractUgrid(abc.ABC):
 
         # Create the selection DataArray or Dataset
         core_dim = self.core_dimension
-        other_dims = self.dims.intersection(obj.dims) - {core_dim}
+        # Use only data variable dimensions, not index-backed coordinates,
+        # to avoid indexing topology dimensions not present in the data.
+        if isinstance(obj, xr.Dataset):
+            data_dims = set().union(*(set(v.dims) for v in obj.data_vars.values()))
+        else:
+            data_dims = set(obj.dims) - set(obj.coords)
+        other_dims = self.dims.intersection(data_dims) - {core_dim}
         facets = {v: k for k, v in self.facets.items()}
         # Override the main indexer if method is nearest.
         if core_dim in obj.dims:
@@ -1221,8 +1238,20 @@ class AbstractUgrid(abc.ABC):
             indexer = self._locate_nearest(facet=facets[dim], points=xy_sel)
             indexers[dim] = xr.DataArray(indexer, dims=(point_dim,))
 
-        selection = obj.isel(indexers).assign_coords(
+        sel = _isel_drop_mismatched_coords(obj, indexers)
+        # Explicitly add dimension index coords when multiple grid dims are indexed
+        # (xarray doesn't auto-add them without PandasIndex). Skip for single-dim
+        # objects where the selection is unambiguous.
+        extra_coords = {}
+        if other_dims:
+            extra_coords = {
+                dim: idx
+                for dim, idx in indexers.items()
+                if isinstance(idx, xr.DataArray)
+            }
+        selection = sel.assign_coords(
             {
+                **extra_coords,
                 f"{self.name}_x": (point_dim, xy[keep, 0]),
                 f"{self.name}_y": (point_dim, xy[keep, 1]),
             }
@@ -1359,7 +1388,7 @@ class AbstractUgrid(abc.ABC):
         edges = np.array([[start, end]])
         _, index, xy = self.intersect_edges(edges)
         coords, index = self._section_coordinates(edges, xy, dim, index, self.name)
-        return obj.isel({dim: index}).assign_coords(coords)
+        return _isel_drop_mismatched_coords(obj, {dim: index}).assign_coords(coords)
 
     def _sel_yline(
         self,
@@ -1441,7 +1470,7 @@ class AbstractUgrid(abc.ABC):
             s, intersection_for_coord, dim, core_index, self.name
         )
 
-        return obj.isel({dim: core_index}).assign_coords(coords)
+        return _isel_drop_mismatched_coords(obj, {dim: core_index}).assign_coords(coords)
 
     def sel(self, obj, x=None, y=None):
         """

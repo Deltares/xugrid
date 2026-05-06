@@ -7,7 +7,7 @@ from xugrid.regrid.unstructured import UnstructuredGrid2d
 
 @pytest.fixture(scope="function")
 def circle():
-    return UnstructuredGrid2d(xugrid.data.disk().grid)
+    return UnstructuredGrid2d(xugrid.data.disk().ugrid.grid)
 
 
 def test_init():

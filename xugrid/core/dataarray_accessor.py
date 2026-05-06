@@ -109,7 +109,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         assigned: UgridDataset
         """
-        return UgridDataArray(self.grid.assign_node_coords(self.obj), self.grid)
+        if self.grid.node_dimension not in self.obj.dims:
+            raise ValueError(
+                f"Object has no node dimension {self.grid.node_dimension!r}"
+            )
+        return UgridDataArray(self.obj, self.grid)
 
     def assign_edge_coords(self) -> UgridDataArray:
         """
@@ -122,7 +126,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         assigned: UgridDataset
         """
-        return UgridDataArray(self.grid.assign_edge_coords(self.obj), self.grid)
+        if self.grid.edge_dimension not in self.obj.dims:
+            raise ValueError(
+                f"Object has no edge dimension {self.grid.edge_dimension!r}"
+            )
+        return UgridDataArray(self.obj, self.grid)
 
     def assign_face_coords(self) -> UgridDataArray:
         """
@@ -137,7 +145,11 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         if self.grid.topology_dimension == 1:
             raise TypeError("Cannot set face coords from a Ugrid1D topology")
-        return UgridDataArray(self.grid.assign_face_coords(self.obj), self.grid)
+        if self.grid.face_dimension not in self.obj.dims:
+            raise ValueError(
+                f"Object has no face dimension {self.grid.face_dimension!r}"
+            )
+        return UgridDataArray(self.obj, self.grid)
 
     def set_node_coords(self, node_x: str, node_y: str):
         """
@@ -534,9 +546,13 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         node positions. Coordinates not governed by the UGRID conventions
         are left untouched.
         """
+        from xugrid.core.index import drop_ugrid_index
+
         grid = self.grid.to_crs(crs, epsg)
-        obj = grid._assign_derived_coords(self.obj)
-        return UgridDataArray(obj, grid)
+        obj = grid._assign_derived_coords(drop_ugrid_index(self.obj))
+        result = UgridDataArray(obj, grid)
+        grid._update_coordinate_attrs(result)
+        return result
 
     def to_geodataframe(
         self, name: str = None, dim_order=None
@@ -909,7 +925,19 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         -------
         dataset: UgridDataset
         """
-        return self.grid.to_dataset(self.obj, optional_attributes)
+        from xugrid.core.index import drop_ugrid_index
+
+        grid = self.grid
+        obj = drop_ugrid_index(self.obj)
+        result = grid.to_dataset(obj, optional_attributes)
+        # Re-add face/edge coords from _indexes (lost when stripping UgridIndex from DA).
+        # Only add them if they were relevant to this DataArray's dimensions.
+        if not optional_attributes:
+            if grid._indexes.get("face_x") and grid.face_dimension in self.obj.dims:
+                result = grid.assign_face_coords(result)
+            if grid._indexes.get("edge_x") and grid.edge_dimension in self.obj.dims:
+                result = grid.assign_edge_coords(result)
+        return result
 
     @staticmethod
     def from_structured2d(
@@ -1013,4 +1041,6 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
             .isel({grid.face_dimension: index})
             .drop_vars(yx, errors="ignore")
         )
-        return face_da.initialize(grid=grid)
+        from xugrid.core.wrap import UgridDataArray
+
+        return UgridDataArray(face_da, grid)

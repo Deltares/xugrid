@@ -229,12 +229,14 @@ class BaseRegridder(abc.ABC):
         # But it causes problems with initializing a regridder
         # from_dataset, because the name has been changed to
         # __source_nFace.
-        if isinstance(data, xr.DataArray):
+        if isinstance(data, UgridDataArray):
+            from xugrid.core.index import drop_ugrid_index
+
+            obj = drop_ugrid_index(data)
+            source_dims = (data.ugrid.grid.core_dimension,)
+        elif isinstance(data, xr.DataArray):
             obj = data
             source_dims = ("y", "x")
-        elif isinstance(data, UgridDataArray):
-            obj = data.ugrid.obj
-            source_dims = (data.ugrid.grid.core_dimension,)
         else:
             raise TypeError(
                 f"Expected DataArray or UgridDataAray, received: {type(data).__name__}"

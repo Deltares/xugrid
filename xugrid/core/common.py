@@ -52,7 +52,7 @@ def _dataarray_helper(ds: xr.Dataset):
     if data_array.name == DATAARRAY_VARIABLE:
         data_array.name = None
 
-    return UgridDataArray(data_array, dataset.grid)
+    return UgridDataArray(data_array, dataset.ugrid.grid)
 
 
 def load_dataarray(*args, **kwargs):
@@ -93,11 +93,11 @@ open_zarr.__doc__ = xr.open_zarr.__doc__
 def wrap_func_like(func):
     @wraps(func)
     def _like(other, *args, **kwargs):
-        obj = func(other.obj, *args, **kwargs)
+        obj = func(other, *args, **kwargs)
         if isinstance(obj, xr.DataArray):
-            return type(other)(obj, other.grid)
+            return UgridDataArray(obj, other.ugrid.grid)
         elif isinstance(obj, xr.Dataset):
-            return type(other)(obj, other.grids)
+            return UgridDataset(obj, other.ugrid.grids)
         else:
             raise TypeError(
                 f"Expected Dataset or DataArray, received {type(other).__name__}"
@@ -111,22 +111,19 @@ def wrap_func_objects(func):
     @wraps(func)
     def _f(objects, *args, **kwargs):
         grids = []
-        bare_objs = []
         for obj in objects:
             if isinstance(obj, UgridDataArray):
-                grids.append(obj.grid)
+                grids.append(obj.ugrid.grid)
             elif isinstance(obj, UgridDataset):
-                grids.extend(obj.grids)
+                grids.extend(obj.ugrid.grids)
             else:
                 raise TypeError(
                     "Can only concatenate xugrid UgridDataset and UgridDataArray "
                     f"objects, got {type(obj).__name__}"
                 )
 
-            bare_objs.append(obj.obj)
-
         grids = unique_grids(grids)
-        result = func(bare_objs, *args, **kwargs)
+        result = func(objects, *args, **kwargs)
         if isinstance(result, xr.DataArray):
             if len(grids) > 1:
                 raise ValueError("All UgridDataArrays must have the same grid")

@@ -69,10 +69,10 @@ def test_network_gridder_init__unstructured(network, unstructured_grid):
     gridder = xu.NetworkGridder(network, unstructured_grid, method="mean")
 
     assert isinstance(gridder, xu.NetworkGridder)
-    assert gridder._source.ugrid_topology == network.grid
-    assert gridder._target.ugrid_topology == unstructured_grid.grid
-    assert gridder._weights.n == unstructured_grid.grid.n_face
-    assert gridder._weights.m == network.grid.n_edge
+    assert gridder._source.ugrid_topology == network.ugrid.grid
+    assert gridder._target.ugrid_topology == unstructured_grid.ugrid.grid
+    assert gridder._weights.n == unstructured_grid.ugrid.grid.n_face
+    assert gridder._weights.m == network.ugrid.grid.n_edge
     assert gridder._weights.nnz == 8
 
 
@@ -120,7 +120,7 @@ def test_network_gridder_init__structured(network, structured_grid):
     gridder = xu.NetworkGridder(network, structured_grid, method="mean")
 
     assert isinstance(gridder, xu.NetworkGridder)
-    assert gridder._source.ugrid_topology == network.grid
+    assert gridder._source.ugrid_topology == network.ugrid.grid
     np.testing.assert_array_equal(
         gridder._target.coords["x"], structured_grid.x.to_numpy()
     )
@@ -128,7 +128,7 @@ def test_network_gridder_init__structured(network, structured_grid):
         gridder._target.coords["y"], structured_grid.y.to_numpy()
     )
     assert gridder._weights.n == structured_grid.size
-    assert gridder._weights.m == network.grid.n_edge
+    assert gridder._weights.m == network.ugrid.grid.n_edge
     assert gridder._weights.nnz == 8
 
 

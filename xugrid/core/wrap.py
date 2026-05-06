@@ -2,11 +2,25 @@ from typing import Sequence, Union
 
 import xarray as xr
 
-from xugrid.core.index import UGRID_INDEXES
+from xugrid.core.index import UGRID_INDEXES, UgridIndex
 from xugrid.ugrid.ugridbase import AbstractUgrid, UgridType
 
 
-class UgridDataArray:
+def _has_ugrid_index(obj):
+    return any(isinstance(v, UgridIndex) for v in obj.xindexes.values())
+
+
+class _UgridDataArrayMeta(type):
+    def __instancecheck__(cls, instance):
+        return isinstance(instance, xr.DataArray) and _has_ugrid_index(instance)
+
+
+class _UgridDatasetMeta(type):
+    def __instancecheck__(cls, instance):
+        return isinstance(instance, xr.Dataset) and _has_ugrid_index(instance)
+
+
+class UgridDataArray(metaclass=_UgridDataArrayMeta):
     def __new__(cls, obj: xr.DataArray, grid: UgridType):
         if not isinstance(obj, xr.DataArray):
             raise TypeError(
@@ -18,13 +32,44 @@ class UgridDataArray:
                 f"{type(grid).__name__}"
             )
 
+        from xugrid.core.index import UgridIndex
+
+        # Strip any existing UgridIndex before attaching the new one
+        existing = [k for k, v in obj.xindexes.items() if isinstance(v, UgridIndex)]
+        if existing:
+            obj = obj.drop_indexes(existing).drop_vars(existing)
+
         index_cls = UGRID_INDEXES[grid.topology_dimension]
         index = index_cls.from_ugrid(grid)
         coords = xr.Coordinates.from_xindex(index)
         return obj.assign_coords(coords)
 
+    @staticmethod
+    def from_data(data, grid: UgridType, facet: str = "face"):
+        return grid.create_data_array(data=data, facet=facet)
 
-class UgridDataset:
+    @staticmethod
+    def from_structured2d(*args, **kwargs):
+        from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
+
+        return UgridDataArrayAccessor.from_structured2d(*args, **kwargs)
+
+    @staticmethod
+    def from_structured(da, x=None, y=None, x_bounds=None, y_bounds=None):
+        import warnings
+
+        from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
+
+        warnings.warn(
+            "UgridDataArray.from_structured is deprecated and will be removed. "
+            "Use UgridDataArray.from_structured2d instead.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return UgridDataArrayAccessor.from_structured2d(da, x, y, x_bounds, y_bounds)
+
+
+class UgridDataset(metaclass=_UgridDatasetMeta):
     def __new__(
         cls,
         obj: xr.Dataset = None,
@@ -33,39 +78,68 @@ class UgridDataset:
         if obj is None and grids is None:
             raise ValueError("At least either obj or grids is required")
 
+        if not isinstance(grids, (list, tuple, set, type(None))):
+            grids = [grids]
+
+        if grids is not None:
+            for grid in grids:
+                if not isinstance(grid, AbstractUgrid):
+                    raise TypeError(
+                        "grid must be Ugrid1d or Ugrid2d. "
+                        f"Received instead: {type(grid).__name__}"
+                    )
+
         if obj is not None:
-            return obj.ugrid.from_dataset()
+            if not isinstance(obj, xr.Dataset):
+                raise TypeError(
+                    f"obj must be xarray.Dataset. Received instead: {type(obj).__name__}"
+                )
+            if grids is not None:
+                # Strip any existing UgridIndexes before re-attaching
+                from xugrid.core.index import UgridIndex
 
+                existing = [k for k, v in obj.xindexes.items() if isinstance(v, UgridIndex)]
+                ds = obj.drop_indexes(existing).drop_vars(existing) if existing else obj
+                for grid in grids:
+                    index_cls = UGRID_INDEXES[grid.topology_dimension]
+                    index = index_cls.from_ugrid(grid)
+                    coords = xr.Coordinates.from_xindex(index)
+                    ds = ds.assign_coords(coords)
+                return ds
+            else:
+                return obj.ugrid.from_dataset()
 
-#
-#  TODO: xarray Dataset can be initialized with just coords, not data vars;
-#        presumably providing just topologies is the equivalent.
-#        if obj is not None:
-#            if not isinstance(obj, xr.Dataset):
-#                raise TypeError(
-#                    "obj must be xarray.Dataset. Received instead: "
-#                    f"{type(obj).__name__}"
-#                )
-#            connectivity_vars = [
-#                name
-#                for v in obj.ugrid_roles.connectivity.values()
-#                for name in v.values()
-#            ]
-#            ds = obj.drop_vars(obj.ugrid_roles.topology + connectivity_vars)
-#
-#        if grids is None:
-#            topologies = obj.ugrid_roles.topology
-#            grids = [grid_from_dataset(obj, topology) for topology in topologies]
-#        else:
-#            # Make sure it's a new list
-#            if isinstance(grids, (list, tuple, set)):
-#                grids = list(grids)
-#            else:  # not iterable
-#                grids = [grids]
-#            # Now typecheck
-#            for grid in grids:
-#                if not isinstance(grid, AbstractUgrid):
-#                    raise TypeError(
-#                        "grid must be Ugrid1d or Ugrid2d. "
-#                        f"Received instead: {type(grid).__name__}"
-#                    )
+        # grids only: create an empty Dataset with each grid's index attached
+        ds = xr.Dataset()
+        for grid in grids:
+            index_cls = UGRID_INDEXES[grid.topology_dimension]
+            index = index_cls.from_ugrid(grid)
+            coords = xr.Coordinates.from_xindex(index)
+            ds = ds.assign_coords(coords)
+        return ds
+
+    @staticmethod
+    def from_geodataframe(*args, **kwargs):
+        from xugrid.core.dataset_accessor import UgridDatasetAccessor
+
+        return UgridDatasetAccessor.from_geodataframe(*args, **kwargs)
+
+    @staticmethod
+    def from_structured2d(*args, **kwargs):
+        from xugrid.core.dataset_accessor import UgridDatasetAccessor
+
+        return UgridDatasetAccessor.from_structured2d(*args, **kwargs)
+
+    @staticmethod
+    def from_structured(dataset, topology=None):
+        import warnings
+
+        from xugrid.core.dataset_accessor import UgridDatasetAccessor
+
+        warnings.warn(
+            "UgridDataset.from_structured is deprecated and will be removed. "
+            "Use UgridDataset.from_structured2d instead.",
+            FutureWarning,
+            stacklevel=2,
+        )
+        return UgridDatasetAccessor.from_structured2d(dataset, topology)
