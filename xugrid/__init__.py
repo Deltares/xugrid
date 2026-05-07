@@ -14,7 +14,12 @@ from xugrid.core.common import (
 )
 from xugrid.core.dataarray_accessor import UgridDataArrayAccessor
 from xugrid.core.dataset_accessor import UgridDatasetAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.wrap import (
+    UgridDataArray,
+    UgridDataset,
+    is_ugrid_dataarray,
+    is_ugrid_dataset,
+)
 from xugrid.plot import plot
 from xugrid.regrid.gridder import NetworkGridder
 from xugrid.regrid.regridder import (
@@ -54,6 +59,8 @@ __all__ = (
     "UgridDatasetAccessor",
     "UgridDataArray",
     "UgridDataset",
+    "is_ugrid_dataarray",
+    "is_ugrid_dataset",
     "plot",
     "BarycentricInterpolator",
     "CentroidLocatorRegridder",

@@ -10,17 +10,17 @@ def _has_ugrid_index(obj):
     return any(isinstance(v, UgridIndex) for v in obj.xindexes.values())
 
 
-class _UgridDataArrayMeta(type):
-    def __instancecheck__(cls, instance):
-        return isinstance(instance, xr.DataArray) and _has_ugrid_index(instance)
+def is_ugrid_dataarray(obj) -> bool:
+    """Return True if *obj* is an xr.DataArray backed by a UgridIndex."""
+    return isinstance(obj, xr.DataArray) and _has_ugrid_index(obj)
 
 
-class _UgridDatasetMeta(type):
-    def __instancecheck__(cls, instance):
-        return isinstance(instance, xr.Dataset) and _has_ugrid_index(instance)
+def is_ugrid_dataset(obj) -> bool:
+    """Return True if *obj* is an xr.Dataset backed by a UgridIndex."""
+    return isinstance(obj, xr.Dataset) and _has_ugrid_index(obj)
 
 
-class UgridDataArray(metaclass=_UgridDataArrayMeta):
+class UgridDataArray:
     def __new__(cls, obj: xr.DataArray, grid: UgridType):
         if not isinstance(obj, xr.DataArray):
             raise TypeError(
@@ -69,7 +69,7 @@ class UgridDataArray(metaclass=_UgridDataArrayMeta):
         return UgridDataArrayAccessor.from_structured2d(da, x, y, x_bounds, y_bounds)
 
 
-class UgridDataset(metaclass=_UgridDatasetMeta):
+class UgridDataset:
     def __new__(
         cls,
         obj: xr.Dataset = None,

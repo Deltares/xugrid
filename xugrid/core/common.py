@@ -3,7 +3,7 @@ from functools import wraps
 import xarray as xr
 
 from xugrid.core.utils import unique_grids
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray, is_ugrid_dataset
 
 DATAARRAY_NAME = "__xarray_dataarray_name__"
 DATAARRAY_VARIABLE = "__xarray_dataarray_variable__"
@@ -112,9 +112,9 @@ def wrap_func_objects(func):
     def _f(objects, *args, **kwargs):
         grids = []
         for obj in objects:
-            if isinstance(obj, UgridDataArray):
+            if is_ugrid_dataarray(obj):
                 grids.append(obj.ugrid.grid)
-            elif isinstance(obj, UgridDataset):
+            elif is_ugrid_dataset(obj):
                 grids.extend(obj.ugrid.grids)
             else:
                 raise TypeError(

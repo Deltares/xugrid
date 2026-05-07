@@ -66,7 +66,7 @@ def make_regrid(func):
 
 
 def setup_grid(obj, **kwargs):
-    if isinstance(obj, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+    if isinstance(obj, xu.Ugrid2d) or xu.is_ugrid_dataarray(obj) or xu.is_ugrid_dataset(obj):
         return UnstructuredGrid2d(obj)
     elif isinstance(obj, (xr.DataArray, xr.Dataset)):
         return StructuredGrid2d(
@@ -229,7 +229,7 @@ class BaseRegridder(abc.ABC):
         # But it causes problems with initializing a regridder
         # from_dataset, because the name has been changed to
         # __source_nFace.
-        if isinstance(data, UgridDataArray):
+        if xu.is_ugrid_dataarray(data):
             from xugrid.core.index import drop_ugrid_index
 
             obj = drop_ugrid_index(data)

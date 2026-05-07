@@ -44,7 +44,7 @@ def test_structured_to_unstructured(
 ):
     regridder = regridder_class(quads_structured, disk)
     actual = regridder.regrid(quads_structured)
-    assert isinstance(actual, xu.UgridDataArray)
+    assert xu.is_ugrid_dataarray(actual)
 
     # Regridding datasets is not (yet) allowed.
     ds = xr.Dataset({"a": quads_structured})
@@ -98,7 +98,7 @@ def test_centroid_locator_regridder(disk, quads_1):
     square = quads_1
     regridder = CentroidLocatorRegridder(source=disk, target=square)
     result = regridder.regrid(disk)
-    assert isinstance(result, xu.UgridDataArray)
+    assert xu.is_ugrid_dataarray(result)
     assert result.notnull().any()
     assert result.min().item() >= disk.min().item()
     assert result.max().item() <= disk.max().item()
@@ -107,7 +107,7 @@ def test_centroid_locator_regridder(disk, quads_1):
     # other way around
     regridder = CentroidLocatorRegridder(source=result, target=disk)
     back = regridder.regrid(result)
-    assert isinstance(back, xu.UgridDataArray)
+    assert xu.is_ugrid_dataarray(back)
     assert back.notnull().any()
     assert back.min().item() >= disk.min().item()
     assert back.max().item() <= disk.max().item()

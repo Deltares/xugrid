@@ -66,7 +66,7 @@ class UnstructuredGrid2d:
 
     def __init__(self, obj):
         # TODO: do not omit type check on grid!
-        if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
+        if xu.is_ugrid_dataarray(obj) or xu.is_ugrid_dataset(obj):
             self.ugrid_topology = obj.ugrid.grid
         elif isinstance(obj, Ugrid2d):
             self.ugrid_topology = obj

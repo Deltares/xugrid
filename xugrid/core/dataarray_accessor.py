@@ -6,9 +6,9 @@ import xarray as xr
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
-from xugrid.core.index import UgridIndex
+from xugrid.core.index import UgridIndex, drop_ugrid_index
 from xugrid.core.utils import UncachedAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray, is_ugrid_dataset
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
 from xugrid.ugrid.interpolate import (
@@ -92,10 +92,10 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         name: str
             The new name of the topology.
         """
-        obj = self.obj
         new_grid, name_dict = self.grid.rename(name, return_name_dict=True)
-        to_rename = tuple(obj.coords) + tuple(obj.dims)
-        new_obj = obj.rename({k: v for k, v in name_dict.items() if k in to_rename})
+        plain_obj = drop_ugrid_index(self.obj)
+        to_rename = set(plain_obj.coords) | set(plain_obj.dims)
+        new_obj = plain_obj.rename({k: v for k, v in name_dict.items() if k in to_rename})
         return UgridDataArray(new_obj, new_grid)
 
     def assign_node_coords(self) -> UgridDataArray:
@@ -628,7 +628,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         """
         if isinstance(other, (Ugrid1d, Ugrid2d)):
             other_grid = other
-        elif isinstance(other, (UgridDataArray, UgridDataset)):
+        elif is_ugrid_dataarray(other) or is_ugrid_dataset(other):
             other_grid = other.ugrid.grid
         else:
             raise TypeError(

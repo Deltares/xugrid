@@ -17,14 +17,14 @@ def test_generate_disk():
 
 def test_adh_san_diego():
     ds = xugrid.data.adh_san_diego()
-    assert isinstance(ds, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(ds)
     ds = xugrid.data.adh_san_diego(xarray=True)
     assert isinstance(ds, xr.Dataset)
 
 
 def test_disk():
     ds = xugrid.data.disk()
-    assert isinstance(ds, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(ds)
 
 
 def test_xoxo():
@@ -34,7 +34,7 @@ def test_xoxo():
 
 def test_elevation_nl():
     ds = xugrid.data.elevation_nl()
-    assert isinstance(ds, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(ds)
     ds = xugrid.data.elevation_nl(xarray=True)
     assert isinstance(ds, xr.Dataset)
 

@@ -130,12 +130,12 @@ class TestUgridDataArray:
     def test_from_data(self):
         grid = self.uda.ugrid.grid
         uda = xugrid.UgridDataArray.from_data(np.zeros(grid.n_node), grid, facet="node")
-        assert isinstance(uda, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(uda)
 
     def test_reinit_error(self):
         # Re-wrapping a UgridDataArray (which is an xr.DataArray) is valid.
         rewrapped = xugrid.UgridDataArray(self.uda, GRID())
-        assert isinstance(rewrapped, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(rewrapped)
         # Passing a non-DataArray should raise TypeError.
         with pytest.raises(TypeError, match="obj must be xarray.DataArray"):
             xugrid.UgridDataArray(42, GRID())
@@ -163,7 +163,7 @@ class TestUgridDataArray:
         assert self.uda.dims == self.uda.ugrid.obj.dims
         assert isinstance(self.uda.data, np.ndarray)
         # So are functions
-        assert isinstance(self.uda.isnull(), xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(self.uda.isnull())
         # uda is itself a DataArray
         assert isinstance(self.uda, xr.DataArray)
 
@@ -179,33 +179,33 @@ class TestUgridDataArray:
         allfalse = alltrue.copy()
         allfalse[:] = False
         assert (~allfalse).all()
-        assert isinstance(~allfalse, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(~allfalse)
 
     def test_binary_op(self):
         alltrue = self.uda.astype(bool)
         allfalse = alltrue.copy()
         allfalse[:] = False
-        assert isinstance(alltrue | allfalse, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(alltrue | allfalse)
         assert (alltrue | allfalse).all()
         assert (alltrue ^ allfalse).all()
         assert not (alltrue & allfalse).any()
         # inplace op
         alltrue &= allfalse
-        assert isinstance(alltrue, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(alltrue)
         assert not (alltrue).any()
 
     def test_math(self):
         actual = self.uda + 0
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
 
     def test_np_ops(self):
         actual = np.abs(self.uda)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
 
     # Accessor tests
     def test_isel(self):
         actual = self.uda.isel({GRID().face_dimension: [0, 1]})
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
 
@@ -232,12 +232,12 @@ class TestUgridDataArray:
         assert actual.shape == (3,)
 
         actual = self.uda.ugrid.sel(x=slice(0, 1), y=slice(0, 2))
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
 
         actual = self.uda.ugrid.sel(x=slice(0, 1), y=slice(1, None))
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert actual.shape == (1,)
         assert actual.ugrid.grid.n_face == 1
 
@@ -287,14 +287,14 @@ class TestUgridDataArray:
         partitions = self.uda.ugrid.partition(n_part=2)
         assert len(partitions) == 2
         for partition in partitions:
-            assert isinstance(partition, xugrid.UgridDataArray)
+            assert xugrid.is_ugrid_dataarray(partition)
             assert partition.name == self.uda.name
 
     def test_reindex_like(self):
         back = self.uda.ugrid.reindex_like(self.uda)
-        assert isinstance(back, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(back)
         back = self.uda.ugrid.reindex_like(self.uda.ugrid.grid)
-        assert isinstance(back, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(back)
 
     def test_crs(self):
         uda = self.uda.copy()
@@ -350,31 +350,31 @@ class TestUgridDataArray:
     def test_binary_dilation(self):
         a = self.uda > 0
         actual = a.ugrid.binary_dilation()
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
 
     def test_binary_erosion(self):
         a = self.uda > 0
         actual = a.ugrid.binary_erosion()
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
 
     def test_connected_components(self):
         actual = self.uda.ugrid.connected_components()
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 0)
 
     def test_reverse_cuthill_mckee(self):
         actual = self.uda.ugrid.reverse_cuthill_mckee()
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
 
     def test_laplace_interpolate(self):
         uda2 = self.uda.copy()
         uda2[:-2] = np.nan
         actual = uda2.ugrid.laplace_interpolate(direct_solve=True)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
 
         actual = uda2.ugrid.laplace_interpolate(direct_solve=False)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
 
     def test_broadcasted_laplace_interpolate(self):
@@ -387,24 +387,24 @@ class TestUgridDataArray:
         )
         nd_uda2 = uda2 * multiplier
         actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=True)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
         assert set(actual.dims) == set(nd_uda2.dims)
 
         actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=False)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
         assert set(actual.dims) == set(nd_uda2.dims)
 
         # Test delayed evaluation too.
         nd_uda2 = uda2 * multiplier.chunk({"time": 1})
         actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=True)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert set(actual.dims) == set(nd_uda2.dims)
         assert isinstance(actual.data, dask.array.Array)
 
         actual = nd_uda2.ugrid.laplace_interpolate(direct_solve=False)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert set(actual.dims) == set(nd_uda2.dims)
         assert isinstance(actual.data, dask.array.Array)
 
@@ -419,18 +419,18 @@ class TestUgridDataArray:
 
         node_da = face_da.ugrid.to_node()
         edge_da = face_da.ugrid.to_edge()
-        assert isinstance(node_da, xugrid.UgridDataArray)
-        assert isinstance(edge_da, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(node_da)
+        assert xugrid.is_ugrid_dataarray(edge_da)
 
         back1 = node_da.mean("nmax").ugrid.to_face()
         back2 = edge_da.mean("nmax").ugrid.to_face()
         cross1 = node_da.mean("nmax").ugrid.to_edge()
         cross2 = edge_da.mean("nmax").ugrid.to_node()
 
-        assert isinstance(back1, xugrid.UgridDataArray)
-        assert isinstance(back2, xugrid.UgridDataArray)
-        assert isinstance(cross1, xugrid.UgridDataArray)
-        assert isinstance(cross2, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(back1)
+        assert xugrid.is_ugrid_dataarray(back2)
+        assert xugrid.is_ugrid_dataarray(cross1)
+        assert xugrid.is_ugrid_dataarray(cross2)
 
         assert node_da.dims == (grid.node_dimension, "nmax")
         assert edge_da.dims == (grid.edge_dimension, "nmax")
@@ -452,7 +452,7 @@ class TestUgridDataArray:
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
         actual = uda2.to_dataset()
-        assert isinstance(actual, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(actual)
 
     def test_ugrid_to_dataset(self):
         uda2 = self.uda.copy()
@@ -540,23 +540,23 @@ class TestUgridDataset:
         assert isinstance(self.uds.ugrid.grids[0], xugrid.Ugrid2d)
         # Try alternative initialization
         uds = xugrid.UgridDataset(grids=GRID())
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         uds = xugrid.UgridDataset(grids=[GRID()])
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         uds["a"] = DARRAY()
         assert "a" in uds.ugrid.obj
 
     def test_reinit_error(self):
         # Re-wrapping a UgridDataset (which is an xr.Dataset) with a new grid is valid.
         rewrapped = xugrid.UgridDataset(self.uds, GRID())
-        assert isinstance(rewrapped, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(rewrapped)
         # Passing a non-Dataset should raise TypeError.
         with pytest.raises(TypeError, match="obj must be xarray.Dataset"):
             xugrid.UgridDataset(42, GRID())
 
     def test_init_from_dataset_only(self):
         uds = xugrid.UgridDataset(UGRID_DS())
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         assert "a" in uds.ugrid.obj
         assert "b" in uds.ugrid.obj
         assert "mesh2d_face_nodes" in uds.ugrid.grids[0].to_dataset()
@@ -575,8 +575,8 @@ class TestUgridDataset:
     def test_getitem(self):
         assert "a" in self.uds
         assert "b" in self.uds
-        assert isinstance(self.uds["a"], xugrid.UgridDataArray)
-        assert isinstance(self.uds[["a", "b"]], xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataarray(self.uds["a"])
+        assert xugrid.is_ugrid_dataset(self.uds[["a", "b"]])
 
     def test_setitem(self):
         uds = self.uds.copy()
@@ -589,25 +589,25 @@ class TestUgridDataset:
 
     def test_getattr(self):
         assert "mesh2d_nFaces" in self.uds.dims
-        assert isinstance(self.uds.a, xugrid.UgridDataArray)
-        assert isinstance(self.uds.notnull(), xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataarray(self.uds.a)
+        assert xugrid.is_ugrid_dataset(self.uds.notnull())
         # uds is itself a Dataset
         assert isinstance(self.uds, xr.Dataset)
 
     def test_unary_op(self):
         alltrue = self.uds.astype(bool)
-        assert isinstance(~alltrue, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(~alltrue)
 
     def test_binary_op(self):
         alltrue = self.uds.astype(bool)
-        assert isinstance(alltrue ^ alltrue, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(alltrue ^ alltrue)
         # inplace op
         alltrue &= alltrue
-        assert isinstance(alltrue, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(alltrue)
 
     def test_math(self):
         actual = self.uds + 0
-        assert isinstance(actual, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(actual)
 
     def test_ugrid_accessor(self):
         assert isinstance(self.uds.ugrid, xugrid.UgridDatasetAccessor)
@@ -639,14 +639,14 @@ class TestUgridDataset:
         df = pd.DataFrame({"a": [1.0], "b": [2.0]})
         gdf = gpd.GeoDataFrame(df, geometry=[polygon])
         uds = xugrid.UgridDataset.from_geodataframe(gdf)
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         assert "a" in uds
         assert "b" in uds
 
     # Accessor tests
     def test_isel(self):
         actual = self.uds.isel({GRID().face_dimension: [0, 1]})
-        assert isinstance(actual, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(actual)
         assert actual.ugrid.grids[0].n_face == 2
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
@@ -709,13 +709,13 @@ class TestUgridDataset:
         assert actual["b"].shape == (3,)
 
         actual = self.uds.ugrid.sel(x=slice(0, 1), y=slice(0, 2))
-        assert isinstance(actual, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(actual)
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
         assert actual.ugrid.grids[0].n_face == 2
 
         actual = self.uds.ugrid.sel(x=slice(0, 1), y=slice(1, None))
-        assert isinstance(actual, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(actual)
         assert actual["a"].shape == (1,)
         assert actual["b"].shape == (1,)
         assert actual.ugrid.grids[0].n_face == 1
@@ -772,15 +772,15 @@ class TestUgridDataset:
         partitions = self.uds.ugrid.partition(n_part=2)
         assert len(partitions) == 2
         for partition in partitions:
-            assert isinstance(partition, xugrid.UgridDataset)
+            assert xugrid.is_ugrid_dataset(partition)
             assert "a" in partition
             assert "b" in partition
 
     def test_reindex_like(self):
         back = self.uds.ugrid.reindex_like(self.uds)
-        assert isinstance(back, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(back)
         back = self.uds.ugrid.reindex_like(self.uds.ugrid.grid)
-        assert isinstance(back, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(back)
 
     def test_crs(self):
         uds = self.uds.copy()
@@ -1034,7 +1034,7 @@ class TestMultiTopologyUgridDataset:
 
     def test_reindex_like(self):
         back = self.uds.ugrid.reindex_like(self.uds)
-        assert isinstance(back, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(back)
 
 
 class TestFromStructured:
@@ -1087,7 +1087,7 @@ class TestFromStructured:
 
     def test_from_dataarray(self):
         uda = xugrid.UgridDataArray.from_structured2d(self.da2d)
-        assert isinstance(uda, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(uda)
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
@@ -1100,7 +1100,7 @@ class TestFromStructured:
         # And test transposed.
         daT = self.da2d.transpose()
         uda = xugrid.UgridDataArray.from_structured2d(daT)
-        assert isinstance(uda, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(uda)
         assert uda.name == "grid"
         assert uda.dims == ("layer", "mesh2d_nFaces")
         assert uda.shape == (2, 12)
@@ -1108,18 +1108,18 @@ class TestFromStructured:
 
     def test_from_multicoord(self):
         uda = xugrid.UgridDataArray.from_structured2d(self.da_coords2d)
-        assert isinstance(uda, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(uda)
         assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [-0.5, 0.5, 1.5])
         assert np.array_equal(uda.data, [0, 1, 2, 3])
 
         uda = xugrid.UgridDataArray.from_structured2d(self.da_coords2d, x="xc", y="yc")
-        assert isinstance(uda, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(uda)
         assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
         assert np.array_equal(uda.data, [0, 1, 2, 3])
 
     def test_from_dataset(self):
         uds = xugrid.UgridDataset.from_structured2d(self.ds)
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         assert set(uds.data_vars) == {"a", "b", "c"}
         assert uds["a"].dims == ("layer", "mesh2d_nFaces")
         assert uds["b"].dims == ("x",)
@@ -1134,7 +1134,7 @@ class TestFromStructured:
         ds["d"] = da
         # Unspecified: it'll only infer x and y.
         uds = xugrid.UgridDataset.from_structured2d(ds)
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         assert uds["a"].dims == ("layer", "mesh2d_nFaces")
         assert uds["d"].dims == ("y1", "x1")
         assert len(uds.ugrid.grids) == 1
@@ -1142,7 +1142,7 @@ class TestFromStructured:
         uds = xugrid.UgridDataset.from_structured2d(
             ds, {"mesh2d_0": ("x", "y"), "mesh2d_1": ("xc", "yc")}
         )
-        assert isinstance(uds, xugrid.UgridDataset)
+        assert xugrid.is_ugrid_dataset(uds)
         assert uds["a"].dims == ("layer", "mesh2d_0_nFaces")
         assert uds["b"].dims == ("x",)
         assert uds["c"].dims == ()
@@ -1245,7 +1245,7 @@ def test_multiple_coordinates():
     assert any("No CRS or recognizable standard_name" in m for m in messages)
 
     subset = uds.isel({grid.face_dimension: [0, 1]})
-    assert isinstance(subset, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(subset)
     subset_ds = uds.ugrid.to_dataset()
     assert "mesh2d_node_x" in subset_ds
     assert "mesh2d_node_y" in subset_ds
@@ -1277,7 +1277,7 @@ def test_open_dataset(tmp_path):
     uds.ugrid.to_netcdf(path)
 
     back = xugrid.open_dataset(path)
-    assert isinstance(back, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(back)
     assert "b" in back
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
@@ -1296,7 +1296,7 @@ def test_load_dataset(tmp_path):
     uds.ugrid.to_netcdf(path)
 
     back = xugrid.load_dataset(path)
-    assert isinstance(back, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(back)
     assert "b" in back
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
     assert "mesh2d_face_nodes" not in back.ugrid.obj
@@ -1323,7 +1323,7 @@ def test_open_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataarray.nc"
     uds["a"].ugrid.to_netcdf(path)
     back = xugrid.open_dataarray(path)
-    assert isinstance(back, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(back)
     assert back.name == "a"
 
 
@@ -1347,7 +1347,7 @@ def test_load_dataarray_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataarray.nc"
     uds["a"].ugrid.to_netcdf(path)
     back = xugrid.load_dataarray(path)
-    assert isinstance(back, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(back)
     assert back.name == "a"
 
 
@@ -1362,7 +1362,7 @@ def test_open_mfdataset(tmp_path):
     uda1.ugrid.to_netcdf(path1)
     uda2.ugrid.to_netcdf(path2)
     back = xugrid.open_mfdataset([path1, path2])
-    assert isinstance(back, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(back)
     assert "a" in back
     assert tuple(back["a"].dims) == ("layer", "mesh2d_nFaces")
 
@@ -1388,7 +1388,7 @@ def test_zarr_roundtrip(tmp_path):
     uds.ugrid.to_zarr(path)
 
     back = xugrid.open_zarr(path)
-    assert isinstance(back, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(back)
     assert "a" in back
     assert "b" in back
     assert "mesh2d_face_nodes" in back.ugrid.grids[0].to_dataset()
@@ -1399,23 +1399,23 @@ def test_func_like():
     uds = xugrid.UgridDataset(UGRID_DS())
 
     fullda = xugrid.full_like(uds["a"], 2)
-    assert isinstance(fullda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(fullda)
     assert (fullda == 2).all()
     # Topology should be untouched
     assert fullda.ugrid.grid.to_dataset() == uds.ugrid.grids[0].to_dataset()
 
     fullds = xugrid.full_like(uds, 2)
-    assert isinstance(fullds, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(fullds)
     assert (fullds["a"] == 2).all()
     assert (fullds["b"] == 2).all()
     assert fullds.ugrid.grids[0].to_dataset == uds.ugrid.grids[0].to_dataset()
 
     fullda = xugrid.zeros_like(uds["a"])
-    assert isinstance(fullda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(fullda)
     assert (fullda == 0).all()
 
     fullda = xugrid.ones_like(uds["a"])
-    assert isinstance(fullda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(fullda)
     assert (fullda == 1).all()
 
 
@@ -1458,7 +1458,7 @@ def test_merge():
     uds2d = xugrid.UgridDataset(UGRID_DS())
     uds1d = ugrid1d_ds()
     merged = xugrid.merge([uds2d, uds1d])
-    assert isinstance(merged, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(merged)
     assert len(merged.ugrid.grids) == 2
 
 
@@ -1739,8 +1739,8 @@ def test_periodic_conversion():
     uda = xugrid.UgridDataArray(da, grid)
     periodic = uda.ugrid.to_periodic()
     back = periodic.ugrid.to_nonperiodic(xmax=3.0)
-    assert isinstance(periodic, xugrid.UgridDataArray)
-    assert isinstance(back, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(periodic)
+    assert xugrid.is_ugrid_dataarray(back)
     back_grid = back.ugrid.grid
     assert back_grid.n_face == grid.n_face
     assert back_grid.n_edge == grid.n_edge
@@ -1753,8 +1753,8 @@ def test_periodic_conversion():
     uds["a2d"] = uda
     periodic_ds = uds.ugrid.to_periodic()
     back_ds = periodic_ds.ugrid.to_nonperiodic(xmax=3.0)
-    assert isinstance(periodic_ds, xugrid.UgridDataset)
-    assert isinstance(back_ds, xugrid.UgridDataset)
+    assert xugrid.is_ugrid_dataset(periodic_ds)
+    assert xugrid.is_ugrid_dataset(back_ds)
     assert "a1d" in back_ds
     assert "a2d" in back_ds
 
@@ -1779,12 +1779,12 @@ def test_laplace_interpolate_facets():
 
     for uda in (node_uda, face_uda):
         actual = uda.ugrid.laplace_interpolate(direct_solve=True)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
 
     for uda in (node_uda, face_uda):
         actual = uda.ugrid.laplace_interpolate(direct_solve=False)
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
 
     msg = "Laplace interpolation along edges is not allowed."
@@ -1793,7 +1793,7 @@ def test_laplace_interpolate_facets():
 
     for uda in (node_uda, edge_uda, face_uda):
         actual = uda.ugrid.interpolate_na()
-        assert isinstance(actual, xugrid.UgridDataArray)
+        assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
 
 
@@ -1809,8 +1809,8 @@ def test_to_facets_1d():
     grid = uds.ugrid.grid
     to_edge = uds["a1d"].ugrid.to_edge()
     to_node = uds["b1d"].ugrid.to_node()
-    assert isinstance(to_edge, xugrid.UgridDataArray)
-    assert isinstance(to_node, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(to_edge)
+    assert xugrid.is_ugrid_dataarray(to_node)
     assert to_edge.dims == (grid.edge_dimension, "nmax")
     assert to_node.dims == (grid.node_dimension, "nmax")
 
@@ -1828,11 +1828,11 @@ def test_laplace_interpolate_1d():
     uda[:] = 1.0
     uda[1] = np.nan
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     assert np.allclose(actual, 1.0)
 
     actual = uda.ugrid.laplace_interpolate(direct_solve=False)
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     assert np.allclose(actual, 1.0)
 
 
@@ -1864,12 +1864,12 @@ def test_laplace_interpolate_1d__disconnected():
     uda = xugrid.UgridDataset(ds)["a1d"]
 
     actual = uda.ugrid.laplace_interpolate(direct_solve=True)
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
     assert np.isnan(actual[3:]).all()
 
     actual = uda.ugrid.laplace_interpolate(direct_solve=False)
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     np.testing.assert_allclose(actual[:3], np.array([1.0, 0.5, 0.0]))
     assert np.isnan(actual[3:]).all()
 
@@ -1884,7 +1884,7 @@ def test_interpolate_na_1d():
     uda[:] = 1.0
     uda[1] = np.nan
     actual = uda.ugrid.interpolate_na()
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     assert np.allclose(actual, 1.0)
 
     # Edge data
@@ -1892,7 +1892,7 @@ def test_interpolate_na_1d():
     uda[:] = 1.0
     uda[1] = np.nan
     actual = uda.ugrid.interpolate_na()
-    assert isinstance(actual, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(actual)
     assert np.allclose(actual, 1.0)
 
     # Check max_distance

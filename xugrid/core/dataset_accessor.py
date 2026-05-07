@@ -8,8 +8,8 @@ from xugrid.conversion import grid_from_geodataframe
 
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
-from xugrid.core.index import UGRID_INDEXES, UgridIndex
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.index import UGRID_INDEXES, UgridIndex, drop_ugrid_index
+from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray, is_ugrid_dataset
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
@@ -194,9 +194,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 f"{type(new_name_or_name_dict).__name__}"
             )
 
-        obj = self.obj
-        to_rename = tuple(obj.data_vars) + tuple(obj.coords) + tuple(obj.dims)
-        new_obj = obj.rename({k: v for k, v in names.items() if k in to_rename})
+        plain_obj = drop_ugrid_index(self.obj)
+        to_rename = set(plain_obj.data_vars) | set(plain_obj.coords) | set(plain_obj.dims)
+        new_obj = plain_obj.rename({k: v for k, v in names.items() if k in to_rename})
         return UgridDataset(new_obj, new_grids)
 
     def assign_node_coords(self) -> UgridDataset:
@@ -702,7 +702,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         """
         if isinstance(other, (Ugrid1d, Ugrid2d)):
             other_grids = [other]
-        elif isinstance(other, (UgridDataArray, UgridDataset)):
+        elif is_ugrid_dataarray(other) or is_ugrid_dataset(other):
             other_grids = other.ugrid.grids
         else:
             raise TypeError(

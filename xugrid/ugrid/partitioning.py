@@ -8,7 +8,7 @@ import numpy as np
 import xarray as xr
 
 from xugrid.constants import FILL_VALUE, IntArray, IntDType
-from xugrid.core.wrap import UgridDataArray, UgridDataset
+from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray
 from xugrid.ugrid.connectivity import renumber
 from xugrid.ugrid.ugridbase import UgridType
 
@@ -44,7 +44,7 @@ def partition_by_label(grid, obj, labels: IntArray):
     -------
     partitions: List of (grid, obj)
     """
-    if not isinstance(labels, UgridDataArray):
+    if not is_ugrid_dataarray(labels):
         raise TypeError(
             f"labels must be a UgridDataArray, received: {type(labels).__name__}"
         )

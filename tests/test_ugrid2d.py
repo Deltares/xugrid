@@ -1758,13 +1758,13 @@ def test_ugrid2d_create_data_array():
     grid = grid2d()
 
     uda = grid.create_data_array(np.zeros(grid.n_node), facet="node")
-    assert isinstance(uda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(uda)
 
     uda = grid.create_data_array(np.zeros(grid.n_edge), facet="edge")
-    assert isinstance(uda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(uda)
 
     uda = grid.create_data_array(np.zeros(grid.n_face), facet="face")
-    assert isinstance(uda, xugrid.UgridDataArray)
+    assert xugrid.is_ugrid_dataarray(uda)
 
     # Error on facet
     with pytest.raises(ValueError, match="Invalid facet"):

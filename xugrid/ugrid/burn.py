@@ -215,7 +215,7 @@ def burn_vector_geometry(
 
     if not isinstance(gdf, gpd.GeoDataFrame):
         raise TypeError(f"gdf must be GeoDataFrame, received: {type(gdf).__name__}")
-    if isinstance(like, (xugrid.UgridDataArray, xugrid.UgridDataset)):
+    if xugrid.is_ugrid_dataarray(like) or xugrid.is_ugrid_dataset(like):
         like = like.ugrid.grid
     if not isinstance(like, xugrid.Ugrid2d):
         raise TypeError(
