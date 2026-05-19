@@ -1,7 +1,11 @@
-import pyproj
 import pytest
 
 from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
+
+from . import has_pyproj, requires_pyproj
+
+if has_pyproj:
+    import pyproj
 
 
 class TestCrsPlaceholder:
@@ -22,6 +26,7 @@ class TestCrsPlaceholder:
         assert repr(placeholder) == "CrsPlaceholder({'epsg': 28992})"
 
 
+@requires_pyproj
 class TestCrsFromAttrs:
     """Test the priority chain: CF attrs -> WKT -> EPSG -> placeholder."""
 
@@ -162,6 +167,7 @@ class TestCrsFromAttrs:
         assert crs.to_epsg() == 28992
 
 
+@requires_pyproj
 class TestCrsToAttrs:
     def test_roundtrip(self):
         crs = pyproj.CRS.from_epsg(4326)

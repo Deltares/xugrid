@@ -1,11 +1,15 @@
-import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
 import xarray as xr
 
 from xugrid import conversion as cv
 from xugrid.constants import FILL_VALUE
+
+from . import has_geopandas, requires_shapely
+
+if has_geopandas:
+    import geopandas as gpd
+    import shapely
 
 
 @pytest.fixture(scope="function")
@@ -79,7 +83,8 @@ def structured_mesh_descending():
     return da
 
 
-def test_nodes_geos_roundtrip(line):
+@requires_shapely
+def test_nodes_shapely_roundtrip(line):
     x, y, _ = line
     actual = cv.nodes_to_points(x, y)
     x_back, y_back = cv.points_to_nodes(actual)
@@ -89,6 +94,7 @@ def test_nodes_geos_roundtrip(line):
     assert np.array_equal(actual, points_back)
 
 
+@requires_shapely
 def test_linestrings_to_edges(line_gdf):
     x, y, segments = cv.linestrings_to_edges(line_gdf.geometry.values)
     assert np.allclose(x, [0.0, 1.0, 2.0])
@@ -96,7 +102,8 @@ def test_linestrings_to_edges(line_gdf):
     assert np.array_equal(segments, [[0, 1], [1, 2]])
 
 
-def test_edges_geos_roundtrip(line):
+@requires_shapely
+def test_edges_shapely_roundtrip(line):
     x, y, c = line
     actual = cv.edges_to_linestrings(x, y, c)
     x_back, y_back, c_back = cv.linestrings_to_edges(actual)
@@ -109,7 +116,7 @@ def test_edges_geos_roundtrip(line):
 
 # Cannot use fixtures in parametrize:
 # https://github.com/pytest-dev/pytest/issues/349
-def _faces_geos_roundtrip(mesh):
+def _faces_shapely_roundtrip(mesh):
     x, y, c = mesh
     actual = cv.faces_to_polygons(x, y, c)
     x_back, y_back, c_back = cv.polygons_to_faces(actual)
@@ -120,12 +127,14 @@ def _faces_geos_roundtrip(mesh):
     assert np.array_equal(actual, polygons_back)
 
 
-def test_faces_geos_roundtrip__triangle(triangle_mesh):
-    _faces_geos_roundtrip(triangle_mesh)
+@requires_shapely
+def test_faces_shapely_roundtrip__triangle(triangle_mesh):
+    _faces_shapely_roundtrip(triangle_mesh)
 
 
-def test_faces_geos_roundtrip__mixed(mixed_mesh):
-    _faces_geos_roundtrip(mixed_mesh)
+@requires_shapely
+def test_faces_shapely_roundtrip__mixed(mixed_mesh):
+    _faces_shapely_roundtrip(mixed_mesh)
 
 
 def test_is_monotonic_and_increasing():
