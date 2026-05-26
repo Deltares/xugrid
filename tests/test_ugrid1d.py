@@ -1,23 +1,31 @@
 from typing import NamedTuple
 
-import geopandas as gpd
 import numpy as np
-import pyproj
 import pytest
-import shapely
 import xarray as xr
-from matplotlib.collections import LineCollection
 from scipy import sparse, spatial
 
 import xugrid
 from xugrid.ugrid.crs import CrsPlaceholder
 
-from . import requires_meshkernel
+from . import (
+    has_geopandas,
+    requires_geopandas,
+    requires_matplotlib,
+    requires_meshkernel,
+    requires_numba_celltree,
+    requires_pyproj,
+    requires_shapely,
+)
 
 try:
     import meshkernel as mk
 except ImportError:
     pass
+
+if has_geopandas:
+    import pyproj
+    import shapely
 
 NAME = "network1d"
 
@@ -148,7 +156,10 @@ def test_ugrid1d_egde_bounds():
     assert np.allclose(actual, expected)
 
 
+@requires_pyproj
 def test_validate_crs():
+    import pyproj
+
     grid = grid1d()
     assert grid._validate_crs(None, True) == (None, True)
     assert grid._validate_crs(None, False) == (None, False)
@@ -173,6 +184,7 @@ def test_validate_crs():
         grid._validate_crs("EPSG:4328", True) == expected
 
 
+@requires_pyproj
 def test_ugrid1d_update_coordinate_attrs():
     grid = grid1d()
     obj = xr.DataArray(np.ones(grid.n_edge), dims=(grid.edge_dimension,))
@@ -185,6 +197,7 @@ def test_ugrid1d_update_coordinate_attrs():
     assert obj["network1d_edge_y"].attrs["standard_name"] == "latitude"
 
 
+@requires_pyproj
 def test_set_crs():
     grid = grid1d()
 
@@ -228,6 +241,7 @@ def test_ugrid1d_assign_derived_coordinates():
     assert "network1d_edge_y" in obj.coords
 
 
+@requires_pyproj
 def test_to_crs():
     grid = grid1d()
 
@@ -249,6 +263,7 @@ def test_to_crs():
         grid.to_crs(epsg=28992)
 
 
+@requires_pyproj
 def test_ugrid1d_write_grid_mapping():
     grid = grid1d()
     grid.set_crs(epsg=28992)
@@ -416,6 +431,7 @@ def test_is_cyclic():
     assert not dag.is_cyclic
 
 
+@requires_shapely
 def test_from_shapely():
     with pytest.raises(TypeError):
         xy = np.array(
@@ -434,7 +450,11 @@ def test_from_shapely():
     assert isinstance(grid, xugrid.Ugrid1d)
 
 
+@requires_geopandas
 def test_from_geodataframe():
+    import geopandas as gpd
+    import shapely
+
     with pytest.raises(TypeError, match="Expected GeoDataFrame"):
         xugrid.Ugrid1d.from_geodataframe(1)
 
@@ -445,6 +465,7 @@ def test_from_geodataframe():
     assert isinstance(grid, xugrid.Ugrid1d)
 
 
+@requires_shapely
 def test_to_shapely():
     grid = grid1d()
 
@@ -479,6 +500,7 @@ def test_sel():
     assert np.array_equal(new_obj.values, [0])
 
 
+@requires_numba_celltree
 def test_sel_points():
     grid = grid1d()
     obj = xr.DataArray(
@@ -509,6 +531,7 @@ def test_sel_points():
     np.testing.assert_allclose(actual.values, [1, 0, np.nan])
 
 
+@requires_numba_celltree
 def test_intersect_line():
     grid = grid1d()
     obj = xr.DataArray([0, 1, 2, 3], dims=[grid.edge_dimension])
@@ -528,6 +551,7 @@ def test_intersect_line():
     assert np.array_equal(actual.to_numpy(), [0])
 
 
+@requires_shapely
 def test_intersect_linestring():
     grid = grid1d()
     obj = xr.DataArray([0, 1, 2], dims=[grid.edge_dimension])
@@ -565,7 +589,10 @@ def test_reindex_like():
     assert np.array_equal(reindexed, [0, 1])
 
 
+@requires_matplotlib
 def test_ugrid1d_plot():
+    from matplotlib.collections import LineCollection
+
     grid = grid1d()
     primitive = grid.plot()
     assert isinstance(primitive, LineCollection)
@@ -761,6 +788,7 @@ def test_ugrid1d_length():
     assert np.allclose(length, [np.sqrt(2), np.sqrt(2)])
 
 
+@requires_numba_celltree
 def test_ugrid1d_refine_by_vertices():
     node_xy = np.array(
         [

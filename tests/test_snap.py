@@ -1,8 +1,5 @@
-import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
-import shapely.geometry as sg
 import xarray as xr
 from pytest_cases import parametrize_with_cases
 
@@ -13,6 +10,13 @@ from xugrid.ugrid.snapping import (
     snap_to_grid,
     snap_to_nodes,
 )
+
+from . import has_geopandas, requires_geopandas
+
+if has_geopandas:
+    import geopandas as gpd
+    import shapely
+    import shapely.geometry as sg
 
 
 @pytest.fixture(scope="function")
@@ -161,6 +165,7 @@ def test_snap_to_nodes():
     assert np.array_equal(snap_y, expected_y)
 
 
+@requires_geopandas
 def test_snap_to_grid():
     idomain = xr.DataArray(
         data=[[1, 1], [1, 1]],
@@ -176,6 +181,7 @@ def test_snap_to_grid():
     # TODO test for returned values...
 
 
+@requires_geopandas
 class LineCases:
     def case_single_line(self):
         line_x = [40.2, 40.2, 40.2]
@@ -273,6 +279,7 @@ class LineCases:
         return geometry, unique_values, line_counts
 
 
+@requires_geopandas
 @parametrize_with_cases(["geometry", "unique_values", "line_counts"], cases=LineCases)
 def test_snap_to_grid_with_data(structured, geometry, unique_values, line_counts):
     uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
@@ -287,6 +294,7 @@ def test_snap_to_grid_with_data(structured, geometry, unique_values, line_counts
     np.testing.assert_array_equal(line_counts, actual_line_counts)
 
 
+@requires_geopandas
 def test_create_snap_to_grid_dataframe(structured):
     """
     Test if create_snap_to_grid_dataframe and its code example in the docstring

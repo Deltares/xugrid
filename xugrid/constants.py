@@ -54,3 +54,15 @@ class MissingOptionalModule:
 
     def __getattr__(self, name):
         raise ImportError(f"{self.name} is required for this functionality")
+
+
+class NoOpNumba:
+    """No-operation decorator in case numba is not installed."""
+
+    prange = range
+
+    @staticmethod
+    def njit(fn=None, *args, **kwargs):
+        if fn is not None and callable(fn):
+            return fn  # used as @numba.njit directly
+        return lambda fn: fn  # used as @numba.njit(...)
