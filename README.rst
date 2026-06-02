@@ -10,7 +10,7 @@ Xugrid
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.10534099.svg
   :target: https://doi.org/10.5281/zenodo.10534099
 
-**This is a work in progress.** `See documentation <https://deltares.github.io/xugrid/>`_.
+`See documentation <https://deltares.github.io/xugrid/>`_.
 
 Xarray extension to work with 2D unstructured grids, for data and topology
 stored according to `UGRID conventions
