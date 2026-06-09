@@ -66,12 +66,12 @@ class UnstructuredGrid2d:
 
     def __init__(self, obj):
         # TODO: do not omit type check on grid!
-        if isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
+        if isinstance(obj, (xu.DataArray, xr.Dataset)) and obj.ugrid.is_indexed:
             self.ugrid_topology = obj.grid
         elif isinstance(obj, Ugrid2d):
             self.ugrid_topology = obj
         else:
-            options = {"Ugrid2d", "UgridDataArray", "UgridDataset"}
+            options = {"Ugrid2d", "DataArray", "Dataset"}
             raise TypeError(
                 f"Expected one of {options}, received: {type(obj).__name__}"
             )

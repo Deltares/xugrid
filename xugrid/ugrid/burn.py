@@ -175,11 +175,11 @@ def _burn_lines(
 
 def burn_vector_geometry(
     gdf: "geopandas.GeoDataframe",  # type: ignore # noqa
-    like: Union["xugrid.Ugrid2d", "xugrid.UgridDataArray", "xugrid.UgridDataset"],
+    like: Union["xugrid.Ugrid2d", xr.DataArray, xr.Dataset],
     column: str | None = None,
     fill: Union[int, float] = np.nan,
     all_touched: bool = False,
-) -> xugrid.UgridDataArray:
+) -> xr.DataArray:
     """
     Burn vector geometries (points, lines, polygons) into a Ugrid2d mesh.
 
@@ -190,7 +190,7 @@ def burn_vector_geometry(
     ----------
     gdf: geopandas.GeoDataFrame
         Polygons, points, and/or lines to be burned into the grid.
-    like: UgridDataArray, UgridDataset, or Ugrid2d
+    like: DataArray, Dataset, or Ugrid2d
         Grid to burn the vector data into.
     column: str, optional
         Name of the geodataframe column of which to the values to burn into
@@ -203,7 +203,7 @@ def burn_vector_geometry(
 
     Returns
     -------
-    burned: UgridDataArray
+    burned: DataArray
     """
     import geopandas as gpd
 
@@ -215,11 +215,11 @@ def burn_vector_geometry(
 
     if not isinstance(gdf, gpd.GeoDataFrame):
         raise TypeError(f"gdf must be GeoDataFrame, received: {type(gdf).__name__}")
-    if isinstance(like, (xugrid.UgridDataArray, xugrid.UgridDataset)):
+    if isinstance(like, (xr.DataArray, xr.Dataset)) and like.ugrid.is_indexed:
         like = like.ugrid.grid
     if not isinstance(like, xugrid.Ugrid2d):
         raise TypeError(
-            "Like must be Ugrid2d, UgridDataArray, or UgridDataset;"
+            "Like must be Ugrid2d, or UGRID indexed DataArray or Dataset;"
             f"received: {type(like).__name__}"
         )
     geometry_id = shapely.get_type_id(gdf.geometry)
@@ -255,7 +255,7 @@ def burn_vector_geometry(
     if len(points) > 0:
         _burn_points(points.geometry, like, point_values, output)
 
-    return xugrid.UgridDataArray(
+    return xugrid.dataarray(
         obj=xr.DataArray(output, dims=[like.face_dimension], name=column),
         grid=like,
     )
@@ -325,7 +325,7 @@ def grid_from_earcut_polygons(
 def earcut_triangulate_polygons(
     polygons: "geopandas.GeoDataframe",  # type: ignore # noqa
     column: str | None = None,
-) -> xugrid.UgridDataArray:
+) -> xr.DataArray:
     """
     Break down polygons using mapbox_earcut, and create a mesh from the
     resulting triangles.
@@ -343,7 +343,7 @@ def earcut_triangulate_polygons(
 
     Returns
     -------
-    triangulated: UgridDataArray
+    triangulated: xr.DataArray
     """
     grid, index = grid_from_earcut_polygons(polygons, return_index=True)
 
@@ -358,4 +358,4 @@ def earcut_triangulate_polygons(
     else:
         da = xr.DataArray(data=index, dims=(grid.face_dimension,))
 
-    return xugrid.UgridDataArray(da, grid)
+    return xugrid.dataarray(da, grid)

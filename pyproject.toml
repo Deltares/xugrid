@@ -26,10 +26,10 @@ classifiers = [
     'Programming Language :: Python',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Scientific/Engineering',
 ]
@@ -99,7 +99,7 @@ shapely = ">=2.0"
 scipy = "*"
 sphinx = "*"
 sphinx-gallery = "*"
-xarray = "*"
+xarray = ">=2026.4.0"
 zarr = "*"
 ipykernel = "*"  # So we can run examples
 twine = "*"
@@ -113,24 +113,24 @@ docs = "NUMBA_DISABLE_JIT=1 sphinx-build docs docs/_build"
 all = { depends-on = ["pre-commit", "test", "docs"]}
 pypi-publish = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*"
 
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
 [tool.pixi.feature.py312.dependencies]
 python = "3.12.*"
 
 [tool.pixi.feature.py313.dependencies]
 python = "3.13.*"
 
-[tool.pixi.feature.py311.dependencies]
-python = "3.11.*"
-
-[tool.pixi.feature.py310.dependencies]
-python = "3.10.*"
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
 
 [tool.pixi.environments]
 default = { features = ["py312"], solve-group = "py312" }
+py314 = { features = ["py314"], solve-group = "py314" }
 py313 = { features = ["py313"], solve-group = "py313" }
 py312 = { features = ["py312"], solve-group = "py312" }
 py311 = ["py311"]
-py310 = ["py310"]
 
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/

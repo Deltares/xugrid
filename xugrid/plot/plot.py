@@ -459,7 +459,7 @@ def imshow(grid, da, ax, **kwargs):
 @_plot2d
 def contour(grid, da, ax, **kwargs):
     """
-    Create a contour plot of a 2D UgridDataArray.
+    Create a contour plot of a 2D UGRID indexed DataArray.
 
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontour`.
     """
@@ -480,7 +480,7 @@ def contour(grid, da, ax, **kwargs):
 @_plot2d
 def contourf(grid, da, ax, **kwargs):
     """
-    Create a filled contour plot of a 2D UgridDataArray.
+    Create a filled contour plot of a 2D UGRID indexed DataArray.
 
     Wraps :py:func:`matplotlib:matplotlib.pyplot.tricontourf`.
     """
@@ -501,7 +501,7 @@ def contourf(grid, da, ax, **kwargs):
 @_plot2d
 def pcolormesh(grid, da, ax, **kwargs):
     """
-    Create a pseudocolor mesh plot of a 2D UgridDataArray.
+    Create a pseudocolor mesh plot of a 2D UGRID indexed DataArray.
 
     Wraps matplotlib PolyCollection.
     """
@@ -543,7 +543,7 @@ def pcolormesh(grid, da, ax, **kwargs):
 @_plot2d
 def surface(grid, da, ax, **kwargs):
     """
-    Create a surface plot of a 2D UgridDataArray.
+    Create a surface plot of a 2D UGRID indexed DataArray.
 
     Wraps :py:func:`matplotlib:mplot3d:plot_trisurf`.
     """
@@ -617,7 +617,7 @@ def plot(
 class _PlotMethods:
     """
     Enables use of plot functions as attributes.
-    For example UgridDataArray.ugrid.plot.pcolormesh()
+    For example DataArray.ugrid.plot.pcolormesh()
     """
 
     __slots__ = ("grid", "darray")
@@ -629,7 +629,7 @@ class _PlotMethods:
         invalid = set(darray.dims) - grid.dims
         if invalid:
             raise ValueError(
-                f"UgridDataArray contains non-topology dimensions: {invalid}.\n"
+                f"DataArray contains non-topology dimensions: {invalid}.\n"
                 f"Expected only one of {grid.dims}."
             )
 

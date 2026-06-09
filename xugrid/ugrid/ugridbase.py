@@ -26,6 +26,11 @@ def numeric_bound(v: Union[float, None], other: float):
 
 
 def as_pandas_index(index: Union[BoolArray, IntArray, pd.Index], n: int):
+    if isinstance(index, xr.Variable):
+        index = index.to_numpy()
+    elif isinstance(index, (list, tuple, range)):
+        index = np.array(index)
+
     if isinstance(index, np.ndarray):
         if index.size > n:
             raise ValueError(
@@ -262,7 +267,7 @@ class AbstractUgrid(abc.ABC):
             return connectivity.to_sparse(dense_connectivity)
 
     def _create_data_array(self, data: ArrayLike, dimension: str):
-        from xugrid import UgridDataArray
+        from xugrid import dataarray
 
         data = np.array(data)
         if data.ndim != 1:
@@ -282,7 +287,7 @@ class AbstractUgrid(abc.ABC):
 
         # TODO: is there a better way to do this to satisfy mypy?
         grid = cast(UgridType, self)
-        return UgridDataArray(da, grid)
+        return dataarray(da, grid)
 
     def _initialize_indexes_attrs(self, name, dataset, indexes, attrs):
         defaults = conventions.default_topology_attrs(name, self.topology_dimension)
@@ -356,6 +361,9 @@ class AbstractUgrid(abc.ABC):
             return new, name_dict
         else:
             return new
+
+    def rename_from_dict(mapping):
+        pass
 
     def _propagate_properties(self, other) -> None:
         other.start_index = self.start_index
@@ -710,7 +718,7 @@ class AbstractUgrid(abc.ABC):
         ugrid_dims = self.dims.intersection(obj.dims)
         if len(ugrid_dims) != 1:
             raise ValueError(
-                "UgridDataArray should contain exactly one of the UGRID "
+                "DataArray should contain exactly one of the UGRID "
                 f"dimensions: {self.dims}"
             )
         return ugrid_dims.pop()
@@ -1528,7 +1536,7 @@ class AbstractUgrid(abc.ABC):
 
         Returns
         -------
-        partition_labels: UgridDataArray of integers
+        partition_labels: DataArray of integers
         """
         import pymetis
 
@@ -1547,7 +1555,7 @@ class AbstractUgrid(abc.ABC):
             ),
             vweights=weights,
         )
-        return xugrid.UgridDataArray(
+        return xugrid.dataarray(
             obj=xr.DataArray(
                 data=np.array(partition_index),
                 dims=(self.core_dimension,),

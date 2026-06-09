@@ -17,14 +17,14 @@ def test_generate_disk():
 
 def test_adh_san_diego():
     ds = xugrid.data.adh_san_diego()
-    assert isinstance(ds, xugrid.UgridDataset)
+    assert isinstance(ds, xr.Dataset) and ds.ugrid.is_indexed
     ds = xugrid.data.adh_san_diego(xarray=True)
-    assert isinstance(ds, xr.Dataset)
+    assert isinstance(ds, xr.Dataset) and not ds.ugrid.is_indexed
 
 
 def test_disk():
     ds = xugrid.data.disk()
-    assert isinstance(ds, xugrid.UgridDataset)
+    assert isinstance(ds, xr.Dataset) and ds.ugrid.is_indexed
 
 
 def test_xoxo():
@@ -34,9 +34,9 @@ def test_xoxo():
 
 def test_elevation_nl():
     ds = xugrid.data.elevation_nl()
-    assert isinstance(ds, xugrid.UgridDataArray)
+    assert isinstance(ds, xr.DataArray) and ds.ugrid.is_indexed
     ds = xugrid.data.elevation_nl(xarray=True)
-    assert isinstance(ds, xr.Dataset)
+    assert isinstance(ds, xr.Dataset) and not ds.ugrid.is_indexed
 
 
 def test_provinces_nl():
