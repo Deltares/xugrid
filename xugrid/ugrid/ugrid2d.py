@@ -1217,7 +1217,6 @@ class Ugrid2d(AbstractUgrid):
         xmax: float,
         ymax: float,
     ):
-        xmin, ymin, xmax, ymax = self.bounds
         bounds = [xmin, ymin, xmax, ymax]
         face_index = self.locate_bounding_box(*bounds)
         return self.topology_subset(face_index)
