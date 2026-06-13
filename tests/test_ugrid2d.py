@@ -722,6 +722,20 @@ def test_locate_bounding_box():
     assert np.allclose(faces, [1, 3])
 
 
+def test_clip_box():
+    grid = grid2d()
+    # A bounding box smaller than the grid must actually clip, rather than
+    # return the full mesh (https://github.com/Deltares/xugrid/issues/440).
+    actual = grid.clip_box(1.25, 0.25, 2.5, 1.5)
+    expected = grid.topology_subset(np.array([1, 3]))
+    assert actual.n_face == 2
+    assert np.array_equal(
+        actual.face_node_connectivity, expected.face_node_connectivity
+    )
+    # Clipping by the full bounds returns the entire mesh unchanged.
+    assert grid.clip_box(*grid.bounds) is grid
+
+
 def test_compute_barycentric_weights():
     grid = grid2d()
     xy = np.array(
