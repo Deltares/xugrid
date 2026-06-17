@@ -1999,12 +1999,17 @@
                 <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
                 <span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="p">)</span>
-            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">new_edges</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">edges</span><span class="p">))</span>
-            <span class="c1"># Reshuffle to keep the original order as intact as possible; how</span>
-            <span class="c1"># much benefit does this actually give?</span>
-            <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">edge_index</span><span class="p">)</span>
-            <span class="n">new</span><span class="o">.</span><span class="n">_edge_node_connectivity</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">_edge_node_connectivity</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
-            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">sorter</span><span class="p">]</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">new_edges</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">order</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">edges</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="c1"># Sanity check:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="n">edge_index</span><span class="p">],</span> <span class="n">new_edges</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Cannot map edge-associated data onto the non-periodic grid:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;the new grid has edges with no counterpart in the periodic grid,</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;which suggests a degenerate periodic topology.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Please file an issue at: github.com/deltares/xugrid/issues&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">{</span>
