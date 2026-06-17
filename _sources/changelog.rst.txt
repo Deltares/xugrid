@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Fixed
+~~~~~
+
+- :meth:`xugrid.Ugrid2d.clip_box` no longer overwrites its bounding box
+  arguments with the grid's own bounds, which previously made it return the
+  full mesh regardless of the requested box.
+
 [0.15.2] 2026-04-20
 -------------------
 
