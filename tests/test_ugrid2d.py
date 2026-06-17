@@ -747,7 +747,7 @@ def test_clip_box():
     # Clipping by the full bounds returns the entire mesh unchanged.
     assert grid.clip_box(*grid.bounds) is grid
 
-  
+
 @requires_numba_celltree
 def test_compute_barycentric_weights():
     grid = grid2d()
