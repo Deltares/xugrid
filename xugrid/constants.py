@@ -1,3 +1,4 @@
+import warnings
 from typing import NamedTuple, Union
 
 import numpy as np
@@ -56,13 +57,31 @@ class MissingOptionalModule:
         raise ImportError(f"{self.name} is required for this functionality")
 
 
+class NumbaPerformanceWarning(RuntimeWarning):
+    """numba is unavailable; falling back to slower pure-Python code."""
+
+
 class NoOpNumba:
     """No-operation decorator in case numba is not installed."""
 
     prange = range
+    _warned = False
+
+    @classmethod
+    def _warn_once(cls):
+        if not cls._warned:
+            cls._warned = True
+            warnings.warn(
+                "numba is not installed; running a pure-Python fallback instead. "
+                "Regridding, interpolation, and snapping may be much slower; "
+                "install numba to enable acceleration.",
+                NumbaPerformanceWarning,
+                stacklevel=3,
+            )
 
     @staticmethod
     def njit(fn=None, *args, **kwargs):
+        NoOpNumba._warn_once()
         if fn is not None and callable(fn):
             return fn  # used as @numba.njit directly
         return lambda fn: fn  # used as @numba.njit(...)
