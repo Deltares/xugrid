@@ -1,7 +1,10 @@
 # Skip Tcl failures
-import matplotlib
+try:
+    import matplotlib
 
-matplotlib.use("Agg", force=True)
+    matplotlib.use("Agg", force=True)
+except ImportError:
+    pass
 
 from tests.fixtures.fixture_regridder import (
     disk,

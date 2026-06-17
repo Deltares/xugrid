@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from typing import NamedTuple, Tuple
 
-import numba as nb
 import numpy as np
 import pandas as pd
 from scipy import sparse
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
+
 
 from xugrid.constants import (
     FILL_VALUE,
@@ -75,25 +80,25 @@ def _csr_to_adjacency(A: sparse.csr_matrix) -> AdjacencyMatrix:
     return adj
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def neighbors(A: AdjacencyMatrix, cell: int) -> IntArray:
     start = A.indptr[cell]
     end = A.indptr[cell + 1]
     return A.indices[start:end]
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def pop(array, size):
     return array[size - 1], size - 1
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def push(array, value, size):
     array[size] = value
     return size + 1
 
 
-@nb.njit
+@numba.njit
 def _topological_sort_by_dfs(A: AdjacencyMatrix):
     # This code is almost a direct port of the BSD-2 licensed code in Graphs.jl:
     #
@@ -170,7 +175,7 @@ def topological_sort_by_dfs(A: sparse.csr_matrix) -> IntArray:
     return _topological_sort_by_dfs(_csr_to_adjacency(A))
 
 
-@nb.njit
+@numba.njit
 def _contract_vertices(A: AdjacencyMatrix, indices: IntArray) -> IntArray:
     vcolor = np.zeros(A.m, dtype=np.uint8)
     vcolor[indices] = 2
@@ -659,7 +664,7 @@ def centroids(
         return centroid_coordinates
 
 
-@nb.njit(cache=True, parallel=True)
+@numba.njit(cache=True, parallel=True)
 def _circumcenters_triangle(xxx: FloatArray, yyy: FloatArray):
     """Numba should nicely fuse these operations."""
     a_x, b_x, c_x = xxx

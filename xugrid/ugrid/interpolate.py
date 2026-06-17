@@ -3,7 +3,6 @@ from __future__ import annotations
 import warnings
 from typing import Any, Callable, Dict, NamedTuple, Tuple
 
-import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -12,18 +11,23 @@ from scipy import sparse
 from xugrid.constants import FloatArray, IntArray
 from xugrid.core.sparse import MatrixCSR, columns_and_values, nzrange, row_slice
 
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
-@nb.njit(inline="always")
+
+@numba.njit(inline="always")
 def lower_slice(ilu, row: int) -> slice:
     return slice(ilu.indptr[row], ilu.uptr[row])
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def upper_slice(ilu, row: int) -> slice:
     return slice(ilu.uptr[row], ilu.indptr[row + 1])
 
 
-@nb.njit
+@numba.njit
 def set_uptr(ilu: ILU0Preconditioner) -> None:
     # i is row index, j is column index
     for i in range(ilu.n):
@@ -35,7 +39,7 @@ def set_uptr(ilu: ILU0Preconditioner) -> None:
     return
 
 
-@nb.njit
+@numba.njit
 def _update(ilu: ILU0Preconditioner, A: MatrixCSR, delta: float, relax: float):
     """
     Perform zero fill-in incomplete lower-upper (ILU0) factorization
@@ -84,7 +88,7 @@ def _update(ilu: ILU0Preconditioner, A: MatrixCSR, delta: float, relax: float):
     return
 
 
-@nb.njit
+@numba.njit
 def _solve(ilu: ILU0Preconditioner, r: np.ndarray):
     r"""
     LU \ r

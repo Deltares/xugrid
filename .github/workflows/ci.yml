@@ -3,10 +3,10 @@ name: ci
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,7 +36,7 @@ jobs:
           - py313
           - py312
           - py311
-          - py310 
+          - py310
     steps:
       - name: Check out repo
         uses: actions/checkout@v6
@@ -46,6 +46,25 @@ jobs:
           manifest-path: pyproject.toml
       - name: Run Tests
         run: pixi run --environment ${{ matrix.pixi-environment }} test
+  test-minimal:
+    name: test-minimal - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.9.6
+        with:
+          manifest-path: pyproject.toml
+      - name: Run Tests
+        run: pixi run test-minimal
 
   build:
     runs-on: ubuntu-latest

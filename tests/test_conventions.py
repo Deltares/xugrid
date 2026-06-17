@@ -1,12 +1,13 @@
 from collections import ChainMap
 
 import numpy as np
-import pyproj
 import pytest
 import xarray as xr
 
 import xugrid
 from xugrid.ugrid import conventions as cv
+
+from . import requires_netCDF4
 
 
 def test_infer_xy_coords():
@@ -98,6 +99,7 @@ def test_get_dims_transposed():
     assert dimensions == expected
 
 
+@requires_netCDF4
 class TestConventionsElevation:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -202,6 +204,7 @@ class TestConventionsElevation:
         assert ds_T.ugrid_roles.coordinates == self.coordinates
 
 
+@requires_netCDF4
 class TestCrsConventions:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -232,6 +235,8 @@ class TestCrsConventions:
         }
 
     def test_get_grid_mapping_names(self):
+        pyproj = pytest.importorskip("pyproj")
+
         # Setup doesn't contain any CRS data.
         expected = {"mesh2d": None}
         assert (
