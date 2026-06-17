@@ -1541,12 +1541,17 @@ class Ugrid2d(AbstractUgrid):
                 .view(np.int64)
                 .ravel()
             )
-            edge_index = np.searchsorted(edges, new_edges, sorter=np.argsort(edges))
-            # Reshuffle to keep the original order as intact as possible; how
-            # much benefit does this actually give?
-            sorter = np.argsort(edge_index)
-            new._edge_node_connectivity = new._edge_node_connectivity[sorter]
-            edge_index = edge_index[sorter]
+            order = np.argsort(edges)
+            position = np.searchsorted(edges, new_edges, sorter=order)
+            edge_index = order[np.clip(position, 0, edges.size - 1)]
+            # Sanity check:
+            if not np.array_equal(edges[edge_index], new_edges):
+                raise ValueError(
+                    "Cannot map edge-associated data onto the non-periodic grid:\n"
+                    "the new grid has edges with no counterpart in the periodic grid,\n"
+                    "which suggests a degenerate periodic topology.\n"
+                    "Please file an issue at: github.com/deltares/xugrid/issues"
+                )
 
         if obj is not None:
             indexes = {

@@ -1710,7 +1710,7 @@ class TestPeriodicGridConversion:
         assert back.edge_node_connectivity.shape == (17, 2)
         assert np.array_equal(back_ds["a"], [0, 1, 2, 4, 5, 6, 8, 9, 10, 0, 4, 8])
         assert np.array_equal(
-            back_ds["b"], [0, 1, 2, 3, 3, 4, 5, 7, 8, 9, 10, 10, 11, 12, 14, 15, 16]
+            back_ds["b"], [0, 1, 2, 3, 5, 4, 7, 8, 9, 10, 12, 11, 14, 15, 16, 1, 8]
         )
         assert np.array_equal(back_ds["c"], [0, 1, 2, 3, 4, 5])
 
