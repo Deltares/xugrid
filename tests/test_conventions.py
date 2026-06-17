@@ -7,6 +7,8 @@ import xarray as xr
 import xugrid
 from xugrid.ugrid import conventions as cv
 
+from . import requires_netCDF4
+
 
 def test_infer_xy_coords():
     def assign_node_coords(ds: xr.Dataset, name: str, stdname: str = None):
@@ -97,6 +99,7 @@ def test_get_dims_transposed():
     assert dimensions == expected
 
 
+@requires_netCDF4
 class TestConventionsElevation:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -201,6 +204,7 @@ class TestConventionsElevation:
         assert ds_T.ugrid_roles.coordinates == self.coordinates
 
 
+@requires_netCDF4
 class TestCrsConventions:
     @pytest.fixture(autouse=True)
     def setup(self):
