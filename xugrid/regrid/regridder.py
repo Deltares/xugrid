@@ -3,12 +3,16 @@
 import abc
 from typing import Callable, Optional, Tuple, Union
 
-import numba
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 import xugrid as xu
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 # dask as optional dependency
 try:

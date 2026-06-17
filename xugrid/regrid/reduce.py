@@ -3,10 +3,14 @@
 import math
 from typing import Callable
 
-import numba as nb
 import numpy as np
 
 from xugrid.regrid.nanpercentile import _select_two
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 
 def mean(values, weights, workspace):
@@ -83,7 +87,7 @@ def sum(values, weights, workspace):
         return v_sum
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def _minimum(values, weights):
     v_min = np.inf
     w_max = 0.0
@@ -101,7 +105,7 @@ def minimum(values, weights, workspace):
     return _minimum(values, weights)
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def _maximum(values, weights):
     v_max = -np.inf
     w_max = 0.0
@@ -154,7 +158,7 @@ def mode(values, weights, workspace):
         return mode_value
 
 
-@nb.njit
+@numba.njit
 def percentile(values, weights, workspace, p):
     # This function is a simplified port of:
     # https://github.com/numba/numba/blob/0441bb17c7820efc2eba4fd141b68dac2afa4740/numba/np/arraymath.py#L1745
