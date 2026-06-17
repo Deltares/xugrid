@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import xarray as xr
-from pytest_cases import parametrize_with_cases
 
 import xugrid as xu
 from xugrid.ugrid import partitioning as pt
@@ -66,10 +65,11 @@ def test_single_ugrid_chunk():
 
 
 @requires_pymetis
-class PartitionCaseTests:
-    def case_grid_mesh2d(self):
+class TestPartition:
+    @staticmethod
+    def _mesh2d():
         """
-        Case simple 2D mesh connectivity with rectangular elements, eg:
+        Return simple 2D mesh connectivity with rectangular elements, eg:
 
                 10 -- 11 -- 12 -- 13 -- 14
                 |     |     |     |     |
@@ -77,19 +77,23 @@ class PartitionCaseTests:
                 |     |     |     |     |
                 0 --- 1 --- 2 --- 3 --- 4
         """
-        grid = generate_mesh_2d(5, 3)
-        return grid
+        return generate_mesh_2d(5, 3)
 
-    def case_grid_mesh1d(self):
+    @staticmethod
+    def _mesh1d():
         """
-        Case simple 1D mesh connectivity:
+        Return simple 1D mesh connectivity:
 
                 0 --- 1 --- 2 --- 3 --- 4 --- 5 --- 6
         """
-        grid = generate_mesh_1d(6)
-        return grid
+        return generate_mesh_1d(6)
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
+    @pytest.fixture(
+        params=[_mesh2d.__func__, _mesh1d.__func__], ids=["mesh2d", "mesh1d"]
+    )
+    def grid(self, request):
+        return request.param()
+
     def test_label_partitions(self, grid):
         n_part = 3
         labels = grid.label_partitions(n_part=n_part)
@@ -98,7 +102,6 @@ class PartitionCaseTests:
         assert labels.ugrid.grid == grid
         assert np.allclose(np.unique(labels.values), [0, 1, 2])
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
     def test_partition(self, grid):
         n_part = 3
         grid_type = type(grid)
@@ -111,7 +114,6 @@ class PartitionCaseTests:
             part_size = part.sizes[grid.core_dimension]
             assert part_size == expected_part_size
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
     def test_label_partitions_with_weights(self, grid):
         n_part = 3
         grid_size = grid.sizes[grid.core_dimension]
@@ -127,7 +129,6 @@ class PartitionCaseTests:
         # Test if the partition sizes are different
         assert np.max(counts) != np.min(counts)
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
     def test_label_partitions_with_weights__error(self, grid):
         n_part = 3
         grid_size = grid.sizes[grid.core_dimension]
@@ -143,7 +144,6 @@ class PartitionCaseTests:
         with pytest.raises(ValueError, match="Wrong values on weights."):
             grid.label_partitions(n_part=n_part, weights=weights)
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
     def test_partition_with_weights(self, grid):
         n_part = 3
         grid_type = type(grid)
@@ -159,7 +159,6 @@ class PartitionCaseTests:
             part_sizes.append(part.sizes[grid.core_dimension])
         assert np.max(part_sizes) != np.min(part_sizes)
 
-    @parametrize_with_cases("grid", cases=".", prefix="case_grid_")
     def test_label_partitions_dataarray_with_weights(self, grid):
         n_part = 3
         core_dim = grid.core_dimension

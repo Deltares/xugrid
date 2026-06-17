@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import xarray as xr
-from pytest_cases import parametrize_with_cases
 
 import xugrid as xu
 from xugrid.ugrid.snapping import (
@@ -182,116 +181,109 @@ def test_snap_to_grid():
 
 
 @requires_geopandas
-class LineCases:
-    def case_single_line(self):
+class TestSnapToGrid:
+    @staticmethod
+    def _single_line():
         line_x = [40.2, 40.2, 40.2]
         line_y = [82.0, 40.0, 0.0]
         geometry = gpd.GeoDataFrame(
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
-        unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([8, 172])
-        return geometry, unique_values, line_counts
+        return geometry, np.array([0.0, np.nan]), np.array([8, 172])
 
-    def case_single_line_at_edge(self):
+    @staticmethod
+    def _single_line_at_edge():
         line_x = [40.0, 40.0, 40.0]
         line_y = [82.0, 40.0, 0.0]
         geometry = gpd.GeoDataFrame(
             geometry=[shapely.linestrings(line_x, line_y)], data={"a": [1.0]}
         )
-        unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([8, 172])
-        return geometry, unique_values, line_counts
+        return geometry, np.array([0.0, np.nan]), np.array([8, 172])
 
-    def case_parallel_lines(self):
-        line_x1 = [10.2, 10.2, 10.2]
-        line_x2 = [30.2, 30.2, 30.2]
+    @staticmethod
+    def _parallel_lines():
         line_y = [82.0, 40.0, 0.0]
-        line1 = shapely.linestrings(line_x1, line_y)
-        line2 = shapely.linestrings(line_x2, line_y)
+        line1 = shapely.linestrings([10.2, 10.2, 10.2], line_y)
+        line2 = shapely.linestrings([30.2, 30.2, 30.2], line_y)
         geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
+        return geometry, np.array([0.0, 1.0, np.nan]), np.array([8, 8, 164])
 
-        unique_values = np.array([0.0, 1.0, np.nan])
-        line_counts = np.array([8, 8, 164])
-        return geometry, unique_values, line_counts
-
-    def case_series_lines(self):
+    @staticmethod
+    def _series_lines():
         # This caused a failure up to 0.10.0
         line_x = [40.2, 40.2]
-        line_y1 = [82.0, 60.0]
-        line_y2 = [60.0, 40.0]
-        line_y3 = [40.0, 20.0]
-        line_y4 = [20.0, 0.0]
-        line1 = shapely.linestrings(line_x, line_y1)
-        line2 = shapely.linestrings(line_x, line_y2)
-        line3 = shapely.linestrings(line_x, line_y3)
-        line4 = shapely.linestrings(line_x, line_y4)
+        line1 = shapely.linestrings(line_x, [82.0, 60.0])
+        line2 = shapely.linestrings(line_x, [60.0, 40.0])
+        line3 = shapely.linestrings(line_x, [40.0, 20.0])
+        line4 = shapely.linestrings(line_x, [20.0, 0.0])
         geometry = gpd.GeoDataFrame(
             geometry=[line1, line2, line3, line4], data={"a": [1.0, 1.0, 1.0, 1.0]}
         )
-        unique_values = np.array([0.0, 1.0, 2.0, 3.0, np.nan])
-        line_counts = np.array([2, 2, 2, 2, 172])
-        return geometry, unique_values, line_counts
+        return (
+            geometry,
+            np.array([0.0, 1.0, 2.0, 3.0, np.nan]),
+            np.array([2, 2, 2, 2, 172]),
+        )
 
-    def case_crossing_lines(self):
+    @staticmethod
+    def _crossing_lines():
         # This caused a failure up to 0.10.0
         line_x = [40.2, 40.2, 40.2]
         line_y = [82.0, 40.0, 0.0]
         line1 = shapely.linestrings(line_x, line_y)
         line2 = shapely.linestrings(line_y, line_x)
         geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 2.0]})
+        return geometry, np.array([0.0, 1.0, np.nan]), np.array([8, 8, 164])
 
-        unique_values = np.array([0.0, 1.0, np.nan])
-        line_counts = np.array([8, 8, 164])
-        return geometry, unique_values, line_counts
-
-    def case_closely_parallel(self):
+    @staticmethod
+    def _closely_parallel():
         """
         Snap closely parallel lines. These are snapped to same edge, the first
         one should be taken. We can use this test to monitor if this behaviour
         changes.
         """
-        line_x1 = [19.0, 19.0, 19.0]
-        line_x2 = [21.0, 21.0, 21.0]
         line_y = [82.0, 40.0, 0.0]
-        line1 = shapely.linestrings(line_x1, line_y)
-        line2 = shapely.linestrings(line_x2, line_y)
+        line1 = shapely.linestrings([19.0, 19.0, 19.0], line_y)
+        line2 = shapely.linestrings([21.0, 21.0, 21.0], line_y)
         geometry = gpd.GeoDataFrame(geometry=[line1, line2], data={"a": [1.0, 1.0]})
+        return geometry, np.array([0.0, np.nan]), np.array([8, 172])
 
-        unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([8, 172])
-        return geometry, unique_values, line_counts
-
-    def case_line_hits_edge_centroid(self):
+    @staticmethod
+    def _line_hits_edge_centroid():
         """
         Snap a line that hits the centroid of an edge. This is a special case
         that caused problems with the snapping algorithm up to xugrid 0.14.1:
         the line exactly hits the intersection point of the line connecting the
         face centroids and the cell edge.
         """
-        line_x = [12.0, 18.0]
-        line_y = [22.0, 18.0]
-        line = shapely.linestrings(line_x, line_y)
+        line = shapely.linestrings([12.0, 18.0], [22.0, 18.0])
         geometry = gpd.GeoDataFrame(geometry=[line], data={"a": [1.0]})
+        return geometry, np.array([0.0, np.nan]), np.array([1, 179])
 
-        unique_values = np.array([0.0, np.nan])
-        line_counts = np.array([1, 179])
-        return geometry, unique_values, line_counts
-
-
-@requires_geopandas
-@parametrize_with_cases(["geometry", "unique_values", "line_counts"], cases=LineCases)
-def test_snap_to_grid_with_data(structured, geometry, unique_values, line_counts):
-    uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
-    assert isinstance(uds, xu.UgridDataset)
-    assert isinstance(gdf, gpd.GeoDataFrame)
-    assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
-
-    actual_unique_values, actual_line_counts = np.unique(
-        uds["line_index"], return_counts=True
+    @pytest.mark.parametrize(
+        "case",
+        [
+            _single_line.__func__,
+            _single_line_at_edge.__func__,
+            _parallel_lines.__func__,
+            _series_lines.__func__,
+            _crossing_lines.__func__,
+            _closely_parallel.__func__,
+            _line_hits_edge_centroid.__func__,
+        ],
+        ids=lambda f: f.__name__.lstrip("_"),
     )
-    np.testing.assert_array_equal(unique_values, actual_unique_values)
-    np.testing.assert_array_equal(line_counts, actual_line_counts)
+    def test_snap_to_grid_with_data(self, structured, case):
+        geometry, unique_values, line_counts = case()
+        uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
+        assert isinstance(uds, xu.UgridDataset)
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
+        actual_unique_values, actual_line_counts = np.unique(
+            uds["line_index"], return_counts=True
+        )
+        np.testing.assert_array_equal(unique_values, actual_unique_values)
+        np.testing.assert_array_equal(line_counts, actual_line_counts)
 
 
 @requires_geopandas
