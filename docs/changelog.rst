@@ -27,7 +27,7 @@ Fixed
   arguments with the grid's own bounds, which previously made it return the
   full mesh regardless of the requested box.
 - :meth:`xugrid.Ugrid2d.to_nonperiodic` no longer scrambles the scrambles the
-  edges, which previously invalidating the connection with edge associated data
+  edges, which previously invalidated the connection with edge associated data
   and other connectivities such as the ``face_edge_connectivity``.
 
 [0.15.2] 2026-04-20
