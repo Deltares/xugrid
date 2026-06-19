@@ -9,12 +9,26 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+[0.15.3] 2026-04-20
+-------------------
+
+Changed
+~~~~~~~
+
+- The minimum set of required dependencies has been reduced to effectively
+  three: xarray, scipy, and pooch. When installing through PyPI (e.g. through
+  ``pip``), only these are required by default; installing through ``conda-forge``
+  will install the full set of optional dependencies.
+
 Fixed
 ~~~~~
 
 - :meth:`xugrid.Ugrid2d.clip_box` no longer overwrites its bounding box
   arguments with the grid's own bounds, which previously made it return the
   full mesh regardless of the requested box.
+- :meth:`xugrid.Ugrid2d.to_nonperiodic` no longer scrambles the scrambles the
+  edges, which previously invalidating the connection with edge associated data
+  and other connectivities such as the ``face_edge_connectivity``.
 
 [0.15.2] 2026-04-20
 -------------------
@@ -114,8 +128,8 @@ Fixed
 
 - Ensure that :attr:`xugrid.Ugrid2d.face_face_connectivity` returns
   a sparse matrix that is shaped ``(n_face, n_face)``. Previously,
-  the sparse matrix constructor inferred dimensions from the maximum 
-  row/column indices, causing empty trailing rows or columns to be 
+  the sparse matrix constructor inferred dimensions from the maximum
+  row/column indices, causing empty trailing rows or columns to be
   omitted. This resulted in dimension mismatches in operations like
   ``.ugrid.to_dataset(optional_attributes=True)``
 
@@ -159,7 +173,7 @@ Added
 - ``weights`` argument to :meth:`xugrid.Ugrid1d.label_partitions`,
   :meth:`xugrid.Ugrid2d.label_partitions`, :meth:`xugrid.Ugrid1d.partition`, and
   :meth:`xugrid.Ugrid2d.partition`. This allows setting weights, which are taken
-  into account when partitioning the grid. 
+  into account when partitioning the grid.
 - :meth:`xugrid.UgridDataArray.label_partitions` which uses the data in the
   :class:`xugrid.UgridDataArray` as weights.
 
@@ -326,7 +340,7 @@ Fixed
   value; the fill value is also set when calling
   :meth:`xugrid.UgridDataArrayAccessor.to_netcdf` or
   :meth:`xugrid.UgridDatasetAccessor.to_netcdf`.
- 
+
 Added
 ~~~~~
 
@@ -338,7 +352,7 @@ Added
   have been added to get and set the fill value and start index for the UGRID
   connectivity arrays. (Internally, every array is 0-based, and has a fill
   value of -1.)
-  
+
 Changed
 ~~~~~~~
 
