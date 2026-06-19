@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processing Elevation Data Along Ugrid1d Networks &#8212; Xugrid 0.15.2 documentation</title>
+    <title>Processing Elevation Data Along Ugrid1d Networks &#8212; Xugrid 0.15.3 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../_static/documentation_options.js?v=7c174e4c"></script>
+    <script src="../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="Partitioning" href="partitioning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.15.2" />
+  <meta name="docsearch:version" content="0.15.3" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -512,7 +512,7 @@ the result of segmentizing is.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">network</span><span class="o">.</span><span class="n">node_coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_hydamo_network_002.png" srcset="../_images/sphx_glr_hydamo_network_002.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fb8d0bbcc50&gt;
+<img src="../_images/sphx_glr_hydamo_network_002.png" srcset="../_images/sphx_glr_hydamo_network_002.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f8217729400&gt;
 </pre></div>
 </div>
 <p>We can see a fairly consistent distribution of nodes. In the next steps, we
@@ -572,7 +572,7 @@ create a UgridDataArray with the known elevations at the intersections.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_hydamo_network_005.png" srcset="../_images/sphx_glr_hydamo_network_005.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fb8cdfad430&gt;
+<img src="../_images/sphx_glr_hydamo_network_005.png" srcset="../_images/sphx_glr_hydamo_network_005.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f8217743a40&gt;
 </pre></div>
 </div>
 <p>Our end goal is to have elevation data for all edges of the the network. To
@@ -630,7 +630,7 @@ gradient of 5%.</p>
 <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_hydamo_network_007.png" srcset="../_images/sphx_glr_hydamo_network_007.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7fb91a774b30&gt;
+<img src="../_images/sphx_glr_hydamo_network_007.png" srcset="../_images/sphx_glr_hydamo_network_007.png" alt="hydamo network" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.PathCollection object at 0x7f821af9c830&gt;
 </pre></div>
 </div>
 <p>Now let’s compare the two interpolation methods. Nearest neighbor
@@ -664,7 +664,7 @@ water levels would equilibrate if flowing through the ditches.</p>
 network topology. The difference plot shows that Laplace interpolation
 produces smoother transitions, while nearest neighbor creates more abrupt
 changes where the nearest known value switches from one transect to another.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.867 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.838 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-hydamo-network-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3653070db11508074a2ffc4f4461c573/hydamo_network.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hydamo_network.ipynb</span></code></a></p>
