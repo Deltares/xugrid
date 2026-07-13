@@ -1,15 +1,20 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import xarray as xr
-from matplotlib.collections import LineCollection, PathCollection, PolyCollection
-from matplotlib.image import AxesImage
-from matplotlib.tri import TriContourSet
 
 import xugrid
 from xugrid.plot import plot
 
+from . import has_matplotlib, requires_matplotlib
 
+if has_matplotlib:
+    import matplotlib.pyplot as plt
+    from matplotlib.collections import LineCollection, PathCollection, PolyCollection
+    from matplotlib.image import AxesImage
+    from matplotlib.tri import TriContourSet
+
+
+@requires_matplotlib
 class TestPlot:
     @pytest.fixture(autouse=True)
     def setup(self):

@@ -1,7 +1,6 @@
 from collections import ChainMap
 
 import numpy as np
-import pyproj
 import pytest
 import xarray as xr
 
@@ -236,6 +235,8 @@ class TestCrsConventions:
         }
 
     def test_get_grid_mapping_names(self):
+        pyproj = pytest.importorskip("pyproj")
+
         # Setup doesn't contain any CRS data.
         expected = {"mesh2d": None}
         assert (

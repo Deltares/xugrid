@@ -48,7 +48,6 @@ all = [
     'matplotlib',
     'meshkernel >= 3.0.0',
     'netcdf4',
-    'pooch',
     'shapely >= 2.0',
     'pyproj',
     'zarr',
@@ -91,7 +90,6 @@ pydata-sphinx-theme = "*"
 pymetis = "*"
 pyproj = "*"
 pytest = "*"
-pytest-cases = "*"
 pytest-cov = "*"
 python = ">=3.10"
 ruff = "*"
@@ -125,12 +123,33 @@ python = "3.13.*"
 [tool.pixi.feature.py314.dependencies]
 python = "3.14.*"
 
+# Add testing of the minimal dependency set
+# Get the other packages from pypi instead of conda-forge;
+# as e.g. xarray conda-forge will include netCDF4, etc.
+[tool.pixi.feature.minimal.dependencies]
+python = ">=3.10"
+pytest = "*"
+pytest-cov = "*"
+
+[tool.pixi.feature.minimal.pypi-dependencies]
+numpy = "*"
+pandas = "*"
+pooch = "*"
+scipy = "*"
+xarray = "*"
+xugrid = { path = ".", editable = true }
+
 [tool.pixi.environments]
 default = { features = ["py312"], solve-group = "py312" }
 py314 = { features = ["py314"], solve-group = "py314" }
 py313 = { features = ["py313"], solve-group = "py313" }
 py312 = { features = ["py312"], solve-group = "py312" }
 py311 = ["py311"]
+py310 = ["py310"]
+minimal = { features = ["minimal", "py312"], solve-group = "py312-minimal", no-default-feature = true }
+
+[tool.pixi.feature.minimal.tasks]
+test-minimal = "pytest --cov=xugrid --cov-report xml --cov-report term"
 
 [tool.ruff.lint]
 # See https://docs.astral.sh/ruff/rules/

@@ -3,7 +3,10 @@ import xarray as xr
 
 import xugrid
 
+from . import requires_geopandas, requires_matplotlib, requires_netCDF4
 
+
+@requires_matplotlib
 def test_generate_disk():
     with pytest.raises(ValueError, match="partitions should be >= 3"):
         xugrid.data.generate_disk(2, 2)
@@ -15,6 +18,7 @@ def test_generate_disk():
     assert faces.shape == (16, 3)
 
 
+@requires_netCDF4
 def test_adh_san_diego():
     ds = xugrid.data.adh_san_diego()
     assert isinstance(ds, xr.Dataset) and ds.ugrid.is_indexed
@@ -22,6 +26,7 @@ def test_adh_san_diego():
     assert isinstance(ds, xr.Dataset) and not ds.ugrid.is_indexed
 
 
+@requires_matplotlib
 def test_disk():
     ds = xugrid.data.disk()
     assert isinstance(ds, xr.Dataset) and ds.ugrid.is_indexed
@@ -32,6 +37,7 @@ def test_xoxo():
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
+@requires_netCDF4
 def test_elevation_nl():
     ds = xugrid.data.elevation_nl()
     assert isinstance(ds, xr.DataArray) and ds.ugrid.is_indexed
@@ -39,6 +45,7 @@ def test_elevation_nl():
     assert isinstance(ds, xr.Dataset) and not ds.ugrid.is_indexed
 
 
+@requires_geopandas
 def test_provinces_nl():
     import geopandas as gpd
 

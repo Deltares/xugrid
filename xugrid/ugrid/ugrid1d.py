@@ -1,10 +1,9 @@
 from itertools import chain
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba_celltree import EdgeCellTree2d
 from numpy.typing import ArrayLike
 from scipy import sparse
 
@@ -23,6 +22,9 @@ from xugrid.regrid.utils import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import section_coordinates_1d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+
+if TYPE_CHECKING:
+    from numba_celltree import EdgeCellTree2d
 
 
 class Ugrid1d(AbstractUgrid):
@@ -669,12 +671,14 @@ class Ugrid1d(AbstractUgrid):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
     @property
-    def celltree(self) -> EdgeCellTree2d:
+    def celltree(self) -> "EdgeCellTree2d":
         """
         Initializes the celltree if needed, and returns celltree.
 
         A celltree is a search structure for spatial lookups in unstructured grids.
         """
+        from numba_celltree import EdgeCellTree2d
+
         if self._celltree is None:
             self._celltree = EdgeCellTree2d(
                 self.node_coordinates,

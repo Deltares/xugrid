@@ -346,7 +346,8 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         )
         indexer = xr.DataArray(connectivity, dims=(target_dim, newdim))
         # Ensure the source dimension is not chunked for efficient indexing.
-        obj = obj.chunk({source_dim: -1})
+        if obj.chunks:
+            obj = obj.chunk({source_dim: -1})
         # Set the fill values (-1) to NaN
         mapped = obj.isel({source_dim: indexer}).where(indexer != -1)
         return dataarray(mapped, grid)

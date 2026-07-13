@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List, NamedTuple, Union
 
-import numba as nb
 import numpy as np
 import xarray as xr
-from numba_celltree.celltree_base import default_tolerance
-from numba_celltree.constants import Point
-from numba_celltree.geometry_utils import points_in_triangles
 
 import xugrid
 from xugrid.constants import FloatArray, IntArray, MissingOptionalModule
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 try:
     import shapely
@@ -25,7 +26,12 @@ except ImportError:
     mapbox_earcut = MissingOptionalModule("mapbox_earcut")
 
 
-@nb.njit(inline="always")
+class Point(NamedTuple):
+    x: float
+    y: float
+
+
+@numba.njit(inline="always")
 def in_bounds(p: Point, a: Point, b: Point) -> bool:
     """
     Check whether point p falls within the bounding box created by a and b
@@ -84,6 +90,8 @@ def _locate_polygon(
     """
 
     import mapbox_earcut
+    from numba_celltree.celltree_base import default_tolerance
+    from numba_celltree.geometry_utils import points_in_triangles
 
     rings = np.cumsum([len(exterior)] + [len(interior) for interior in interiors])
     vertices = np.vstack([exterior] + interiors).astype(np.float64)

@@ -2,12 +2,23 @@ import abc
 import copy
 import warnings
 from itertools import chain
-from typing import Any, Dict, Literal, Optional, Sequence, Set, Tuple, Type, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Literal,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba_celltree import CellTree2d, EdgeCellTree2d
 from numpy.typing import ArrayLike
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.spatial import KDTree
@@ -16,6 +27,9 @@ from xugrid.constants import FILL_VALUE, BoolArray, FloatArray, IntArray
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.crs import CrsPlaceholder, crs_from_attrs, crs_to_attrs
 from xugrid.ugrid.selection_utils import get_sorted_section_coords
+
+if TYPE_CHECKING:
+    from numba_celltree import CellTree2d, EdgeCellTree2d
 
 
 def numeric_bound(v: Union[float, None], other: float):
@@ -1101,7 +1115,7 @@ class AbstractUgrid(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def celltree(self) -> Union[EdgeCellTree2d, CellTree2d]:
+    def celltree(self) -> Union["EdgeCellTree2d", "CellTree2d"]:
         raise NotImplementedError("Celltree must be implemented in subclass")
 
     @property

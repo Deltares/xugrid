@@ -1,6 +1,5 @@
 from typing import Optional
 
-import numba as nb
 import numpy as np
 import xarray as xr
 
@@ -9,8 +8,13 @@ from xugrid.constants import FloatDType
 from xugrid.ugrid import voronoi
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
-@nb.njit(cache=True)
+
+@numba.njit(cache=True)
 def replace_interpolated_weights(
     vertices,
     faces,

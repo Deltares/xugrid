@@ -1,13 +1,8 @@
 from typing import NamedTuple
 
-import geopandas as gpd
-import numba_celltree
 import numpy as np
-import pyproj
 import pytest
-import shapely
 import xarray as xr
-from matplotlib.collections import LineCollection
 from scipy import sparse, spatial
 
 import xugrid
@@ -17,7 +12,20 @@ try:
 except ImportError:
     pass
 
-from . import requires_meshkernel
+from . import (
+    has_geopandas,
+    requires_geopandas,
+    requires_matplotlib,
+    requires_meshkernel,
+    requires_numba_celltree,
+    requires_pyproj,
+    requires_shapely,
+)
+
+if has_geopandas:
+    import geopandas as gpd
+    import pyproj
+    import shapely
 
 NAME = "mesh2d"
 VERTICES = np.array(
@@ -230,12 +238,14 @@ def test_ugrid2d_face_bounds():
     assert np.allclose(actual, expected)
 
 
+@requires_pyproj
 def test_set_crs():
     grid = grid2d()
     grid.set_crs("epsg:28992")
     assert grid.crs == pyproj.CRS.from_epsg(28992)
 
 
+@requires_pyproj
 def test_ugrid2d_update_coordinate_attrs():
     grid = grid2d()
     obj = xr.DataArray(np.ones(grid.n_face), dims=(grid.face_dimension,))
@@ -256,6 +266,7 @@ def test_ugrid2d_assign_derived_coordinates():
     assert "mesh2d_face_y" in obj.coords
 
 
+@requires_pyproj
 def test_to_crs():
     grid = grid2d()
     grid.set_crs("epsg:4326")
@@ -452,7 +463,6 @@ def test_ugrid2d_from_meshkernel():
     )
 
     grid = xugrid.Ugrid2d.from_meshkernel(mesh2d)
-    grid.plot()
     assert grid.n_face == 6
     assert np.allclose(mesh2d.node_x, grid.node_x)
     assert np.allclose(mesh2d.node_y, grid.node_y)
@@ -702,12 +712,16 @@ def test_exterior_faces():
     assert np.array_equal(grid.exterior_faces, [0, 1, 2, 3])
 
 
+@requires_numba_celltree
 def test_celltree():
+    import numba_celltree
+
     grid = grid2d()
     tree = grid.celltree
     assert isinstance(tree, numba_celltree.CellTree2d)
 
 
+@requires_numba_celltree
 def test_locate_points():
     grid = grid2d()
     assert np.array_equal(grid.locate_points(CENTROIDS), [0, 1, 2, 3])
@@ -724,8 +738,6 @@ def test_locate_bounding_box():
 
 def test_clip_box():
     grid = grid2d()
-    # A bounding box smaller than the grid must actually clip, rather than
-    # return the full mesh (https://github.com/Deltares/xugrid/issues/440).
     actual = grid.clip_box(1.25, 0.25, 2.5, 1.5)
     expected = grid.topology_subset(np.array([1, 3]))
     assert actual.n_face == 2
@@ -736,6 +748,7 @@ def test_clip_box():
     assert grid.clip_box(*grid.bounds) is grid
 
 
+@requires_numba_celltree
 def test_compute_barycentric_weights():
     grid = grid2d()
     xy = np.array(
@@ -778,6 +791,7 @@ def test_compute_barycentric_weights():
     assert np.allclose(weights, expected_weights, atol=0.05)
 
 
+@requires_numba_celltree
 def test_rasterize():
     grid = grid2d()
     x, y, index = grid.rasterize(resolution=0.5)
@@ -811,6 +825,7 @@ def test_rasterize():
     assert np.array_equal(index, expected_index)
 
 
+@requires_numba_celltree
 class TestUgrid2dSelection:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1422,6 +1437,7 @@ def test_from_structured_multicoord():
     assert grid.n_face == 4
 
 
+@requires_shapely
 def test_from_shapely():
     with pytest.raises(TypeError):
         x = np.array([0.0, 1.0, 2.0])
@@ -1440,6 +1456,7 @@ def test_from_shapely():
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
+@requires_geopandas
 def test_from_geodataframe():
     with pytest.raises(TypeError, match="Expected GeoDataFrame"):
         xugrid.Ugrid2d.from_geodataframe(1)
@@ -1457,6 +1474,7 @@ def test_from_geodataframe():
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
+@requires_shapely
 def test_bounding_polygon():
     grid = grid2d()
     polygon = grid.bounding_polygon()
@@ -1464,6 +1482,7 @@ def test_bounding_polygon():
     assert np.allclose(grid.bounds, polygon.bounds)
 
 
+@requires_shapely
 def test_to_shapely():
     grid = grid2d()
 
@@ -1477,6 +1496,7 @@ def test_to_shapely():
     assert isinstance(polygons[0], shapely.Geometry)
 
 
+@requires_geopandas
 def test_grid_from_geodataframe():
     with pytest.raises(TypeError, match="Cannot convert a list"):
         xugrid.conversion.grid_from_geodataframe([])
@@ -1513,7 +1533,10 @@ def test_grid_from_geodataframe():
     assert isinstance(grid, xugrid.Ugrid2d)
 
 
+@requires_matplotlib
 def test_ugrid2d_plot():
+    from matplotlib.collections import LineCollection
+
     grid = grid2d()
     primitive = grid.plot()
     assert isinstance(primitive, LineCollection)
@@ -1731,7 +1754,11 @@ def test_equals():
     assert not grid.equals(grid_copy)
 
 
+@requires_geopandas
 def test_earcut_triangulate_polygons():
+    import geopandas as gpd
+    import shapely
+
     with pytest.raises(TypeError):
         xugrid.Ugrid2d.earcut_triangulate_polygons("abc")
 
