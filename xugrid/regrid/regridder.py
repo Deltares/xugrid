@@ -24,8 +24,8 @@ except ImportError:
 
 import xugrid
 from xugrid.constants import FloatArray
+from xugrid.core.constructors import dataarray
 from xugrid.core.sparse import MatrixCOO, MatrixCSR, row_slice
-from xugrid.core.wrap import UgridDataArray
 from xugrid.regrid import reduce
 from xugrid.regrid.structured import StructuredGrid2d
 from xugrid.regrid.unstructured import UnstructuredGrid2d
@@ -70,12 +70,15 @@ def make_regrid(func):
 
 
 def setup_grid(obj, **kwargs):
-    if isinstance(obj, (xu.Ugrid2d, xu.UgridDataArray, xu.UgridDataset)):
+    if isinstance(obj, xu.Ugrid2d):
         return UnstructuredGrid2d(obj)
     elif isinstance(obj, (xr.DataArray, xr.Dataset)):
-        return StructuredGrid2d(
-            obj, name_y=kwargs.get("name_y", "y"), name_x=kwargs.get("name_x", "x")
-        )
+        if obj.ugrid.is_indexed:
+            return UnstructuredGrid2d(obj)
+        else:
+            return StructuredGrid2d(
+                obj, name_y=kwargs.get("name_y", "y"), name_x=kwargs.get("name_x", "x")
+            )
     else:
         raise TypeError()
 
@@ -209,7 +212,7 @@ class BaseRegridder(abc.ABC):
         )
         return out
 
-    def regrid(self, data: Union[xr.DataArray, UgridDataArray]) -> UgridDataArray:
+    def regrid(self, data: xr.DataArray) -> xr.DataArray:
         """
         Regrid the data from a DataArray from its old grid topology to the new
         target topology.
@@ -220,11 +223,11 @@ class BaseRegridder(abc.ABC):
 
         Parameters
         ----------
-        data: UgridDataArray or xarray.DataArray
+        data: xarray.DataArray
 
         Returns
         -------
-        regridded: UgridDataArray or xarray.DataArray
+        regridded: xarray.DataArray
         """
 
         # FIXME: this should work:
@@ -234,15 +237,14 @@ class BaseRegridder(abc.ABC):
         # from_dataset, because the name has been changed to
         # __source_nFace.
         if isinstance(data, xr.DataArray):
-            obj = data
-            source_dims = ("y", "x")
-        elif isinstance(data, UgridDataArray):
-            obj = data.ugrid.obj
-            source_dims = (data.ugrid.grid.core_dimension,)
+            if data.ugrid.is_indexed:
+                obj = data.ugrid.obj
+                source_dims = (data.ugrid.grid.core_dimension,)
+            else:
+                obj = data
+                source_dims = ("y", "x")
         else:
-            raise TypeError(
-                f"Expected DataArray or UgridDataAray, received: {type(data).__name__}"
-            )
+            raise TypeError(f"Expected DataArray, received: {type(data).__name__}")
 
         missing_dims = set(source_dims).difference(data.dims)
         if missing_dims:
@@ -256,7 +258,7 @@ class BaseRegridder(abc.ABC):
             regridded = regridded.assign_coords(coords=self._target.coords)
             return regridded
         else:
-            return UgridDataArray(
+            return dataarray(
                 regridded,
                 self._target.ugrid_topology,
             )
@@ -371,9 +373,9 @@ class CentroidLocatorRegridder(BaseRegridder):
 
     Parameters
     ----------
-    source: Ugrid2d, UgridDataArray
+    source: Ugrid2d, DataArray
         Source grid to regrid from.
-    target: Ugrid2d, UgridDataArray
+    target: Ugrid2d, DataArray
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This
@@ -479,8 +481,8 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     Parameters
     ----------
-    source: Ugrid2d, UgridDataArray
-    target: Ugrid2d, UgridDataArray
+    source: Ugrid2d, DataArray
+    target: Ugrid2d, DataArray
     method: str, function, optional
         Default value is ``"mean"``.
 
@@ -504,8 +506,8 @@ class OverlapRegridder(BaseOverlapRegridder):
 
     def __init__(
         self,
-        source: UgridDataArray,
-        target: UgridDataArray,
+        source: xr.DataArray,
+        target: xr.DataArray,
         method: Union[str, Callable] = "mean",
     ):
         super().__init__(source=source, target=target)
@@ -550,8 +552,8 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
 
     Parameters
     ----------
-    source: Ugrid2d, UgridDataArray
-    target: Ugrid2d, UgridDataArray
+    source: Ugrid2d, DataArray
+    target: Ugrid2d, DataArray
     method: str, function, optional
         Default value is "first_order_conservative".
     """
@@ -562,8 +564,8 @@ class RelativeOverlapRegridder(BaseOverlapRegridder):
 
     def __init__(
         self,
-        source: UgridDataArray,
-        target: UgridDataArray,
+        source: xr.DataArray,
+        target: xr.DataArray,
         method: Union[str, Callable] = "first_order_conservative",
     ):
         super().__init__(source=source, target=target, tolerance=None)
@@ -596,9 +598,9 @@ class BarycentricInterpolator(BaseRegridder):
 
     Parameters
     ----------
-    source: Ugrid2d, UgridDataArray
+    source: Ugrid2d, DataArray
         Source grid to regrid from.
-    target: Ugrid2d, UgridDataArray
+    target: Ugrid2d, DataArray
         Target grid to regrid to.
     tolerance: float, optional
         The tolerance used to determine whether a point is on an edge. This
@@ -612,8 +614,8 @@ class BarycentricInterpolator(BaseRegridder):
 
     def __init__(
         self,
-        source: UgridDataArray,
-        target: UgridDataArray,
+        source: xr.DataArray,
+        target: xr.DataArray,
         tolerance: Optional[float] = None,
     ):
         super().__init__(source, target, tolerance)

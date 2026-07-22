@@ -40,8 +40,7 @@ def adh_san_diego(xarray=False):
     if xarray:
         return ds
     else:
-        grid = xugrid.Ugrid2d.from_dataset(ds)
-        return xugrid.UgridDataset(ds, grid)
+        return xugrid.dataset(ds)
 
 
 def elevation_nl(xarray=False):
@@ -55,8 +54,8 @@ def elevation_nl(xarray=False):
     if xarray:
         return ds
     else:
-        grid = xugrid.Ugrid2d.from_dataset(ds)
-        return xugrid.UgridDataArray(ds["elevation"], grid)
+        uds = xugrid.dataset(ds)
+        return uds["elevation"]
 
 
 def provinces_nl():

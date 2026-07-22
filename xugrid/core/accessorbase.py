@@ -4,10 +4,16 @@ from typing import Tuple, Union
 import numpy as np
 import xarray as xr
 
-import xugrid
+from xugrid.core.index import UgridIndex
 
 
 class AbstractUgridAccessor(abc.ABC):
+    @property
+    def is_indexed(self) -> bool:
+        return any(
+            isinstance(index, UgridIndex) for index in self.obj.xindexes.values()
+        )
+
     @abc.abstractmethod
     def to_dataset(self):
         pass
@@ -115,13 +121,11 @@ class AbstractUgridAccessor(abc.ABC):
 
         -------
         clipped:
-            xugrid.UgridDataArray or xugrid.UgridDataset
+            xr.DataArray or xr.Dataset
         """
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
-    def partition_by_label(
-        self, labels: np.ndarray
-    ) -> Union["xugrid.UgridDataArray", "xugrid.UgridDataset"]:
+    def partition_by_label(self, labels: np.ndarray) -> Union[xr.DataArray, xr.Dataset]:
         """
         Partition a grid by labels.
 
@@ -137,9 +141,7 @@ class AbstractUgridAccessor(abc.ABC):
 
         return partitioning.partition_by_label(self.grid, self.obj, labels)
 
-    def partition(
-        self, n_part: int
-    ) -> Union["xugrid.UgridDataArray", "xugrid.UgridDataset"]:
+    def partition(self, n_part: int) -> Union[xr.DataArray, xr.Dataset]:
         """
         Partition a grid into a given number of parts.
 

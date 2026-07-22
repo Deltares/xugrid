@@ -7,7 +7,6 @@ import xarray as xr
 from numpy.typing import ArrayLike
 from scipy import sparse
 
-import xugrid
 from xugrid import conversion
 from xugrid.constants import (
     FILL_VALUE,
@@ -1001,9 +1000,9 @@ class Ugrid1d(AbstractUgrid):
         }
         return obj.isel(indexers, missing_dims="ignore")
 
-    def create_data_array(self, data: ArrayLike, facet: str) -> "xugrid.UgridDataArray":
+    def create_data_array(self, data: ArrayLike, facet: str) -> xr.DataArray:
         """
-        Create a UgridDataArray from this grid and a 1D array of values.
+        Create a UGRID indexed DataArray from this grid and a 1D array of values.
 
         Parameters
         ----------
@@ -1018,7 +1017,7 @@ class Ugrid1d(AbstractUgrid):
 
         Returns
         -------
-        uda: UgridDataArray
+        uda: xr.DataArray
         """
         if facet == "node":
             dimension = self.node_dimension
