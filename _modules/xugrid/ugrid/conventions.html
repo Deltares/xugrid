@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -397,11 +397,11 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.conventions</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module deals with extracting the relevant data from the UGRID attributes.</span>
 
 <span class="sd">It takes some inspiration from: https://github.com/xarray-contrib/cf-xarray</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChainMap</span>
@@ -420,124 +420,124 @@
 
 
 <span class="n">_DIM_NAMES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;node_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_dimension&quot;</span><span class="p">),</span>
-    <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;node_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_dimension&quot;</span><span class="p">),</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">"node_dimension"</span><span class="p">,</span> <span class="s2">"edge_dimension"</span><span class="p">),</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="s2">"node_dimension"</span><span class="p">,</span> <span class="s2">"face_dimension"</span><span class="p">,</span> <span class="s2">"edge_dimension"</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">_COORD_NAMES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_coordinates&quot;</span><span class="p">),</span>
-    <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">,</span> <span class="s2">&quot;face_coordinates&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_coordinates&quot;</span><span class="p">),</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">"node_coordinates"</span><span class="p">,</span> <span class="s2">"edge_coordinates"</span><span class="p">),</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="s2">"node_coordinates"</span><span class="p">,</span> <span class="s2">"face_coordinates"</span><span class="p">,</span> <span class="s2">"edge_coordinates"</span><span class="p">),</span>
 <span class="p">}</span>
 <span class="n">_COORD_DIMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;node_coordinates&quot;</span><span class="p">:</span> <span class="s2">&quot;node_dimension&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;edge_coordinates&quot;</span><span class="p">:</span> <span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;face_coordinates&quot;</span><span class="p">:</span> <span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span>
+    <span class="s2">"node_coordinates"</span><span class="p">:</span> <span class="s2">"node_dimension"</span><span class="p">,</span>
+    <span class="s2">"edge_coordinates"</span><span class="p">:</span> <span class="s2">"edge_dimension"</span><span class="p">,</span>
+    <span class="s2">"face_coordinates"</span><span class="p">:</span> <span class="s2">"face_dimension"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">_CONNECTIVITY_NAMES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">,),</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="s2">"edge_node_connectivity"</span><span class="p">,),</span>
     <span class="mi">2</span><span class="p">:</span> <span class="p">(</span>
-        <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">,</span>
+        <span class="s2">"face_node_connectivity"</span><span class="p">,</span>
+        <span class="s2">"edge_node_connectivity"</span><span class="p">,</span>
+        <span class="s2">"face_edge_connectivity"</span><span class="p">,</span>
+        <span class="s2">"face_face_connectivity"</span><span class="p">,</span>
+        <span class="s2">"edge_face_connectivity"</span><span class="p">,</span>
+        <span class="s2">"boundary_node_connectivity"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">_CONNECTIVITY_DIMS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;face_dimension&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;boundary_edge_dimension&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="s2">"face_node_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"face_dimension"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">"edge_node_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"edge_dimension"</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="s2">"face_edge_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"face_dimension"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">"face_face_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"face_dimension"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">"edge_face_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"edge_dimension"</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="s2">"boundary_node_connectivity"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"boundary_edge_dimension"</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
 <span class="p">}</span>
 
-<span class="n">X_STANDARD_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span> <span class="s2">&quot;longitude&quot;</span><span class="p">)</span>
-<span class="n">Y_STANDARD_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span> <span class="s2">&quot;latitude&quot;</span><span class="p">)</span>
+<span class="n">X_STANDARD_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"projection_x_coordinate"</span><span class="p">,</span> <span class="s2">"longitude"</span><span class="p">)</span>
+<span class="n">Y_STANDARD_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"projection_y_coordinate"</span><span class="p">,</span> <span class="s2">"latitude"</span><span class="p">)</span>
 
 <span class="n">PROJECTED</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">GEOGRAPHIC</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">DEFAULT_ATTRS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;node_x&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"node_x"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_x_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"longitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;node_y&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"node_y"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_y_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;latitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"latitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;edge_x&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"edge_x"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_x_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"longitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;edge_y&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"edge_y"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_y_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;latitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"latitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;face_x&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"face_x"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_x_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;longitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"longitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;face_y&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"face_y"</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PROJECTED</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"projection_y_coordinate"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">GEOGRAPHIC</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;latitude&quot;</span><span class="p">,</span>
+            <span class="s2">"standard_name"</span><span class="p">:</span> <span class="s2">"latitude"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"face_node_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"face_node_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"edge_node_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"edge_node_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"face_edge_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"face_edge_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"face_face_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"face_face_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"edge_face_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"edge_face_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;start_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;_FillValue&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"boundary_node_connectivity"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"boundary_node_connectivity"</span><span class="p">,</span>
+        <span class="s2">"start_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"_FillValue"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
@@ -545,38 +545,38 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">default_topology_attrs</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">topology_dimension</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">topology_dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh_topology&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Topology data of 1D network&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;topology_dimension&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;node_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nNodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nEdges&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_nodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;node_coordinates&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_y&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_coordinates&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_y&quot;</span><span class="p">,</span>
+            <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"mesh_topology"</span><span class="p">,</span>
+            <span class="s2">"long_name"</span><span class="p">:</span> <span class="s2">"Topology data of 1D network"</span><span class="p">,</span>
+            <span class="s2">"topology_dimension"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"node_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nNodes"</span><span class="p">,</span>
+            <span class="s2">"edge_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nEdges"</span><span class="p">,</span>
+            <span class="s2">"edge_node_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_nodes"</span><span class="p">,</span>
+            <span class="s2">"node_coordinates"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_y"</span><span class="p">,</span>
+            <span class="s2">"edge_coordinates"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_y"</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="k">elif</span> <span class="n">topology_dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;cf_role&quot;</span><span class="p">:</span> <span class="s2">&quot;mesh_topology&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Topology data of 2D mesh&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;topology_dimension&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;node_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nNodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nEdges&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;face_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nFaces&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;max_face_nodes_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nMax_face_nodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;boundary_edge_dimension&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nBoundary_edges&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_nodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;face_node_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_nodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;face_edge_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_edges&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_face_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_faces&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;boundary_node_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_boundary_nodes&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;face_face_connectivity&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_faces&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;node_coordinates&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_y&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;edge_coordinates&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_y&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;face_coordinates&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_y&quot;</span><span class="p">,</span>
+            <span class="s2">"cf_role"</span><span class="p">:</span> <span class="s2">"mesh_topology"</span><span class="p">,</span>
+            <span class="s2">"long_name"</span><span class="p">:</span> <span class="s2">"Topology data of 2D mesh"</span><span class="p">,</span>
+            <span class="s2">"topology_dimension"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"node_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nNodes"</span><span class="p">,</span>
+            <span class="s2">"edge_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nEdges"</span><span class="p">,</span>
+            <span class="s2">"face_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nFaces"</span><span class="p">,</span>
+            <span class="s2">"max_face_nodes_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nMax_face_nodes"</span><span class="p">,</span>
+            <span class="s2">"boundary_edge_dimension"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_nBoundary_edges"</span><span class="p">,</span>
+            <span class="s2">"edge_node_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_nodes"</span><span class="p">,</span>
+            <span class="s2">"face_node_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_nodes"</span><span class="p">,</span>
+            <span class="s2">"face_edge_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_edges"</span><span class="p">,</span>
+            <span class="s2">"edge_face_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_faces"</span><span class="p">,</span>
+            <span class="s2">"boundary_node_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_boundary_nodes"</span><span class="p">,</span>
+            <span class="s2">"face_face_connectivity"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_faces"</span><span class="p">,</span>
+            <span class="s2">"node_coordinates"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_node_y"</span><span class="p">,</span>
+            <span class="s2">"edge_coordinates"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_edge_y"</span><span class="p">,</span>
+            <span class="s2">"face_coordinates"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_x </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_face_y"</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;topology_dimensions should be 1 or 2, received </span><span class="si">{</span><span class="n">topology_dimension</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"topology_dimensions should be 1 or 2, received </span><span class="si">{</span><span class="n">topology_dimension</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
 
@@ -584,7 +584,7 @@
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">var</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span>
-        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cf_role&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;mesh_topology&quot;</span>
+        <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cf_role"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"mesh_topology"</span>
     <span class="p">]</span>
 
 
@@ -595,7 +595,7 @@
     <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
-        <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">candidate</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;standard_name&quot;</span><span class="p">)</span>
+        <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">candidate</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"standard_name"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stdname</span> <span class="ow">in</span> <span class="n">X_STANDARD_NAMES</span><span class="p">:</span>
             <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">stdname</span> <span class="ow">in</span> <span class="n">Y_STANDARD_NAMES</span><span class="p">:</span>
@@ -605,8 +605,8 @@
         <span class="n">first</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">second</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;No standard_name of </span><span class="si">{</span><span class="n">X_STANDARD_NAMES</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Y_STANDARD_NAMES</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">candidates</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">first</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">second</span><span class="si">}</span><span class="s2"> as projected x and y coordinates.&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"No standard_name of </span><span class="si">{</span><span class="n">X_STANDARD_NAMES</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Y_STANDARD_NAMES</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">candidates</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="sa">f</span><span class="s2">"Using </span><span class="si">{</span><span class="n">first</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">second</span><span class="si">}</span><span class="s2"> as projected x and y coordinates."</span><span class="p">,</span>
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
@@ -614,11 +614,11 @@
         <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">second</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">UgridCoordinateError</span><span class="p">(</span>
-            <span class="s2">&quot;No standard_name of </span><span class="si">{X_STANDARD_NAMES}</span><span class="s2"> in </span><span class="si">{candidates}</span><span class="s2">&quot;</span>
+            <span class="s2">"No standard_name of </span><span class="si">{X_STANDARD_NAMES}</span><span class="s2"> in </span><span class="si">{candidates}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">y</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">UgridCoordinateError</span><span class="p">(</span>
-            <span class="s2">&quot;No standard_name of </span><span class="si">{Y_STANDARD_NAMES}</span><span class="s2"> in </span><span class="si">{candidates}</span><span class="s2">&quot;</span>
+            <span class="s2">"No standard_name of </span><span class="si">{Y_STANDARD_NAMES}</span><span class="s2"> in </span><span class="si">{candidates}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
@@ -630,23 +630,23 @@
     <span class="n">topology_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">topologies</span><span class="p">:</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
-        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;topology_dimension&quot;</span><span class="p">]</span>
+        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">"topology_dimension"</span><span class="p">]</span>
         <span class="n">vardict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_COORD_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
-                <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">]</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">]</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;the following variables are specified for UGRID </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: &quot;</span>
-                        <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;, but they are not present in the dataset&#39;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">"the following variables are specified for UGRID </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: "</span>
+                        <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s1">", but they are not present in the dataset'</span><span class="p">,</span>
                         <span class="ne">UserWarning</span><span class="p">,</span>
                         <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">UgridCoordinateError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">: at least two values required for UGRID </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">,&quot;</span>
-                        <span class="sa">f</span><span class="s1">&#39; while only &quot;</span><span class="si">{</span><span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; are specified.&#39;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">: at least two values required for UGRID </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">,"</span>
+                        <span class="sa">f</span><span class="s1">' while only "</span><span class="si">{</span><span class="n">attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s1">" are specified.'</span>
                     <span class="p">)</span>
                 <span class="n">vardict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_infer_xy_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">candidates</span><span class="p">)</span>
 
@@ -661,15 +661,15 @@
     <span class="n">coordinates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span>
     <span class="n">vardict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Infer dimensions based on connectivity and coordinates.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Infer dimensions based on connectivity and coordinates."""</span>
     <span class="n">inferred</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">role</span><span class="p">,</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">connectivities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">key0</span><span class="p">,</span> <span class="n">key1</span> <span class="o">=</span> <span class="n">_CONNECTIVITY_DIMS</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
         <span class="n">var_dims</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UgridDimensionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> with role </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2"> to have exactly 2 &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;dimensions, found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">var_dims</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">var_dims</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected </span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> with role </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2"> to have exactly 2 "</span>
+                <span class="sa">f</span><span class="s2">"dimensions, found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">var_dims</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">var_dims</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="c1"># Determine orientation using the named dimension.</span>
@@ -678,16 +678,16 @@
         <span class="k">if</span> <span class="n">declared</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">declared</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_dims</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">UgridDimensionError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key0</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">declared</span><span class="si">}</span><span class="s2"> not in </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;with dimensions: </span><span class="si">{</span><span class="n">var_dims</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key0</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">declared</span><span class="si">}</span><span class="s2"> not in </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> "</span>
+                    <span class="sa">f</span><span class="s2">"with dimensions: </span><span class="si">{</span><span class="n">var_dims</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">declared</span> <span class="o">!=</span> <span class="n">dim0</span><span class="p">:</span>
                 <span class="n">dim0</span><span class="p">,</span> <span class="n">dim1</span> <span class="o">=</span> <span class="n">dim1</span><span class="p">,</span> <span class="n">dim0</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">key1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">UgridDimensionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected size </span><span class="si">{</span><span class="n">key1</span><span class="si">}</span><span class="s2"> for dimension </span><span class="si">{</span><span class="n">dim1</span><span class="si">}</span><span class="s2"> in variable &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> with role </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">, found instead: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected size </span><span class="si">{</span><span class="n">key1</span><span class="si">}</span><span class="s2"> for dimension </span><span class="si">{</span><span class="n">dim1</span><span class="si">}</span><span class="s2"> in variable "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">varname</span><span class="si">}</span><span class="s2"> with role </span><span class="si">{</span><span class="n">role</span><span class="si">}</span><span class="s2">, found instead: </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">inferred</span><span class="p">[</span><span class="n">key0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dim0</span>
@@ -706,7 +706,7 @@
                 <span class="n">declared</span> <span class="o">=</span> <span class="n">var_dim</span>
             <span class="k">elif</span> <span class="n">declared</span> <span class="o">!=</span> <span class="n">var_dim</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">UgridDimensionError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Conflicting names for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">declared</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">var_dim</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Conflicting names for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">declared</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">var_dim</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">inferred</span>
@@ -718,14 +718,14 @@
     <span class="n">connectivity</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">coordinates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the dimensions from the topology attributes and infer them from</span>
 <span class="sd">    connectivity arrays or coordinates.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">topology_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">topologies</span><span class="p">:</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
-        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;topology_dimension&quot;</span><span class="p">]</span>
+        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">"topology_dimension"</span><span class="p">]</span>
         <span class="c1"># dimensions are optionally required: only if the dimension order is</span>
         <span class="c1"># nonstandard in any of the connectivity variables.</span>
         <span class="n">vardict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_DIM_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">]</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">}</span>
@@ -743,7 +743,7 @@
     <span class="n">topology_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">topologies</span><span class="p">:</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
-        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;topology_dimension&quot;</span><span class="p">]</span>
+        <span class="n">topodim</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">"topology_dimension"</span><span class="p">]</span>
         <span class="n">topology_dict</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_CONNECTIVITY_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">]</span>
@@ -766,35 +766,35 @@
         <span class="c1"># the grid mapping.</span>
         <span class="n">topo_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">var</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grid_mapping&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">var</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grid_mapping&quot;</span><span class="p">)</span>
+            <span class="n">var</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"grid_mapping"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">var</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"grid_mapping"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">topo_dims</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="p">}</span> <span class="o">-</span> <span class="p">{</span><span class="kc">None</span><span class="p">}</span>
 
         <span class="k">if</span> <span class="n">names</span><span class="p">:</span>
             <span class="c1"># In principle, multiple coordinates are allowed to be specified</span>
-            <span class="c1"># in the topology variable. Let&#39;s say there are two sets of coordinates</span>
-            <span class="c1"># node_coordinates: &quot;mesh2d_node_x1 mesh2d_node_y1 mesh2d_node_x2 mesh2d_node_y2&quot;</span>
+            <span class="c1"># in the topology variable. Let's say there are two sets of coordinates</span>
+            <span class="c1"># node_coordinates: "mesh2d_node_x1 mesh2d_node_y1 mesh2d_node_x2 mesh2d_node_y2"</span>
             <span class="c1"># In this case, we need a grid mapping for (x1, y1) and for (x2, y2),</span>
             <span class="c1"># but given that the grid mapping is defined on a data variable, there is no</span>
             <span class="c1"># way to link them correctly. Hence the ValueError.</span>
             <span class="c1"># See also: https://github.com/ugrid-conventions/ugrid-conventions/issues/64</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Multiple grid mappings found for topology &#39;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">&#39;: &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">. Variables on the same topology are expected to &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;share a single coordinate reference system (CRS). &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Load the dataset with xarray.open_dataset() and modify &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;the grid_mapping attributes before converting to a &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;UgridDataset.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Multiple grid mappings found for topology '</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">': "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">. Variables on the same topology are expected to "</span>
+                    <span class="sa">f</span><span class="s2">"share a single coordinate reference system (CRS). "</span>
+                    <span class="sa">f</span><span class="s2">"Load the dataset with xarray.open_dataset() and modify "</span>
+                    <span class="sa">f</span><span class="s2">"the grid_mapping attributes before converting to a "</span>
+                    <span class="sa">f</span><span class="s2">"UgridDataset."</span>
                 <span class="p">)</span>
             <span class="n">name</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">names</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">:</span>
                 <span class="n">topology_dict</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;The following grid mapping variable is specified in the attribute</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;or encoding of one or more variables, but is not present in the dataset: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">"The following grid mapping variable is specified in the attribute</span><span class="se">\n</span><span class="s2">"</span>
+                    <span class="sa">f</span><span class="s2">"or encoding of one or more variables, but is not present in the dataset: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                     <span class="ne">UserWarning</span><span class="p">,</span>
                     <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -813,13 +813,13 @@
         <span class="k">for</span> <span class="n">role</span><span class="p">,</span> <span class="p">(</span><span class="n">x_vars</span><span class="p">,</span> <span class="n">y_vars</span><span class="p">)</span> <span class="ow">in</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">x_varname</span><span class="p">,</span> <span class="n">y_varname</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x_vars</span><span class="p">,</span> <span class="n">y_vars</span><span class="p">):</span>
                 <span class="c1"># Check x</span>
-                <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_varname</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;standard_name&quot;</span><span class="p">)</span>
+                <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_varname</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"standard_name"</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">stdname</span> <span class="o">==</span> <span class="n">X_STANDARD_NAMES</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">inferred</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x_varname</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="n">stdname</span> <span class="o">==</span> <span class="n">X_STANDARD_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                     <span class="n">inferred</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x_varname</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
                 <span class="c1"># Check y</span>
-                <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_varname</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;standard_name&quot;</span><span class="p">)</span>
+                <span class="n">stdname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_varname</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"standard_name"</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">stdname</span> <span class="o">==</span> <span class="n">Y_STANDARD_NAMES</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">inferred</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">y_varname</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="n">stdname</span> <span class="o">==</span> <span class="n">Y_STANDARD_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -834,12 +834,12 @@
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">projected</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">details</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39;projected&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;geographic&#39;</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inferred</span>
+            <span class="n">details</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">'projected'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'geographic'</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inferred</span>
             <span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Inconsistent standard_names across coordinates for topology &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">details</span><span class="si">}</span><span class="s2">. Returning None.&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"Inconsistent standard_names across coordinates for topology "</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">': </span><span class="si">{</span><span class="n">details</span><span class="si">}</span><span class="s2">. Returning None."</span><span class="p">,</span>
                 <span class="ne">UserWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
@@ -851,10 +851,10 @@
 
 <div class="viewcode-block" id="UgridRolesAccessor">
 <a class="viewcode-back" href="../../../api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor">[docs]</a>
-<span class="nd">@xr</span><span class="o">.</span><span class="n">register_dataset_accessor</span><span class="p">(</span><span class="s2">&quot;ugrid_roles&quot;</span><span class="p">)</span>
+<span class="nd">@xr</span><span class="o">.</span><span class="n">register_dataset_accessor</span><span class="p">(</span><span class="s2">"ugrid_roles"</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">UgridRolesAccessor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Xarray Dataset &quot;accessor&quot; to retrieve the names of UGRID variables.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Xarray Dataset "accessor" to retrieve the names of UGRID variables.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -868,9 +868,9 @@
 
 <span class="sd">    Names can also be accessed directly through the topology:</span>
 
-<span class="sd">    &gt;&gt;&gt; dataset.ugrid_roles[&quot;mesh2d&quot;][&quot;node_dimension&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; dataset.ugrid_roles["mesh2d"]["node_dimension"]</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="UgridRolesAccessor.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.UgridRolesAccessor.html#xugrid.UgridRolesAccessor.__init__">[docs]</a>
@@ -887,19 +887,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the names of the topology dummy variables, marked by a CF-role of</span>
 <span class="sd">        ``mesh_topology``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        topology: List[str]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_topology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the names of the coordinate variables from the topology attributes.</span>
 
 <span class="sd">        Returns a dictionary with the coordinates for the UGRID coordinates:</span>
@@ -914,12 +914,12 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        coordinates: dict[str, dict[str, Tuple[List[str]]]]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the dimension names from the topology attributes and infer them</span>
 <span class="sd">        from connectivity arrays or coordinates.</span>
 
@@ -932,14 +932,14 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dimensions: dict[str, dict[str, str]]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_dimensions</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the names of the variables containing the UGRID connectivity data.</span>
 
 <span class="sd">            * face_node_connectivity</span>
@@ -950,23 +950,23 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        connectivity: Dict[str, Dict[str, str]]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">grid_mapping_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the names of the grid mapping variables associated with each topology.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        grid_mapping: dict[str, str | None]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_get_grid_mapping_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_projected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Infer whether each topology uses projected or geographic coordinates</span>
 <span class="sd">        from the standard_name attributes of the coordinate variables.</span>
 
@@ -974,7 +974,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        is_projected: dict[str, bool | None]</span>
 <span class="sd">            True if projected, False if geographic, None if indeterminate.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">_infer_projected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -985,47 +985,47 @@
         <span class="n">is_projected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_projected</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">make_text_section</span><span class="p">(</span><span class="n">subtitle</span><span class="p">,</span> <span class="n">entries</span><span class="p">,</span> <span class="n">vardict</span><span class="p">):</span>
-            <span class="n">tab</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">subtitle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="s2">"    "</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">subtitle</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">vardict</span><span class="p">:</span>
-                    <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">tab</span><span class="si">}{</span><span class="n">role</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">vardict</span><span class="p">[</span><span class="n">role</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                    <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">tab</span><span class="si">}{</span><span class="n">role</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">vardict</span><span class="p">[</span><span class="n">role</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">tab</span><span class="si">}{</span><span class="n">role</span><span class="si">}</span><span class="s2">: n/a&quot;</span><span class="p">]</span>
-            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tab</span><span class="si">}{</span><span class="n">tab</span><span class="si">}{</span><span class="n">role</span><span class="si">}</span><span class="s2">: n/a"</span><span class="p">]</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">rows</span>
 
         <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">topology</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">:</span>
-            <span class="n">topodim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;topology_dimension&quot;</span><span class="p">]</span>
-            <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;UGRID </span><span class="si">{</span><span class="n">topodim</span><span class="si">}</span><span class="s2">D Topology </span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">]</span>
+            <span class="n">topodim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"topology_dimension"</span><span class="p">]</span>
+            <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"UGRID </span><span class="si">{</span><span class="n">topodim</span><span class="si">}</span><span class="s2">D Topology </span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">:"</span><span class="p">]</span>
             <span class="n">rows</span> <span class="o">+=</span> <span class="n">make_text_section</span><span class="p">(</span>
-                <span class="s2">&quot;Dimensions:&quot;</span><span class="p">,</span> <span class="n">_DIM_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">dimensions</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
+                <span class="s2">"Dimensions:"</span><span class="p">,</span> <span class="n">_DIM_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">dimensions</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">rows</span> <span class="o">+=</span> <span class="n">make_text_section</span><span class="p">(</span>
-                <span class="s2">&quot;Connectivity:&quot;</span><span class="p">,</span> <span class="n">_CONNECTIVITY_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
+                <span class="s2">"Connectivity:"</span><span class="p">,</span> <span class="n">_CONNECTIVITY_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">connectivity</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">rows</span> <span class="o">+=</span> <span class="n">make_text_section</span><span class="p">(</span>
-                <span class="s2">&quot;Coordinates:&quot;</span><span class="p">,</span> <span class="n">_COORD_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
+                <span class="s2">"Coordinates:"</span><span class="p">,</span> <span class="n">_COORD_NAMES</span><span class="p">[</span><span class="n">topodim</span><span class="p">],</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="p">)</span>
 
             <span class="c1"># CRS summary line</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">grid_mapping_names</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="n">projected</span> <span class="o">=</span> <span class="n">is_projected</span><span class="p">[</span><span class="n">topology</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">projected</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">&quot;projected&quot;</span>
+                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">"projected"</span>
             <span class="k">elif</span> <span class="n">projected</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">&quot;geographic&quot;</span>
+                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">"geographic"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
-            <span class="n">name_str</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;n/a&quot;</span>
+                <span class="n">crs_type</span> <span class="o">=</span> <span class="s2">"unknown"</span>
+            <span class="n">name_str</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"n/a"</span>
             <span class="n">rows</span> <span class="o">+=</span> <span class="p">[</span>
-                <span class="sa">f</span><span class="s2">&quot;    Coordinate Type: </span><span class="si">{</span><span class="n">crs_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;Grid Mapping Name: </span><span class="si">{</span><span class="n">name_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"    Coordinate Type: </span><span class="si">{</span><span class="n">crs_type</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"Grid Mapping Name: </span><span class="si">{</span><span class="n">name_str</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="s2">""</span><span class="p">,</span>
             <span class="p">]</span>
 
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -1056,8 +1056,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1091,7 +1091,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

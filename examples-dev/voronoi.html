@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
@@ -454,7 +454,7 @@ modules. The functions in these modules depend only on <code class="docutils lit
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_disk</span><span class="p">(</span><span class="n">partitions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Generate a triangular mesh for the unit circle.</span>
 
 <span class="sd">    Parameters</span>
@@ -462,13 +462,13 @@ modules. The functions in these modules depend only on <code class="docutils lit
 <span class="sd">    partitions: int</span>
 <span class="sd">        Number of triangles around the origin.</span>
 <span class="sd">    depth: int</span>
-<span class="sd">        Number of &quot;layers&quot; of triangles around the origin.</span>
+<span class="sd">        Number of "layers" of triangles around the origin.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    vertices: np.ndarray of floats with shape ``(n_vertex, 2)``</span>
 <span class="sd">    triangles: np.ndarray of integers with shape ``(n_triangle, 3)``</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">n_per_level</span> <span class="o">=</span> <span class="n">partitions</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
     <span class="n">n_per_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -524,23 +524,23 @@ modules. The functions in these modules depend only on <code class="docutils lit
         <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-        <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;box_aspect&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">"box_aspect"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
         <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">edges0</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces0</span><span class="p">)</span>
-    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-    <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+    <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+    <span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
 
     <span class="n">edges1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">edge_connectivity</span><span class="p">(</span><span class="n">faces1</span><span class="p">)</span>
-    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 
-    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-    <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+    <span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span>
 </pre></div>
@@ -720,16 +720,16 @@ creates a concave face:</p>
     <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;box_aspect&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">"box_aspect"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">all_edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">edges0</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">edges2</span><span class="p">,</span> <span class="n">edges3</span><span class="p">]</span>
 <span class="n">all_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">nodes0</span><span class="p">,</span> <span class="n">nodes1</span><span class="p">,</span> <span class="n">nodes2</span><span class="p">,</span> <span class="n">nodes3</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">all_edges</span><span class="p">,</span> <span class="n">all_nodes</span><span class="p">):</span>
-    <span class="n">edge_plot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">edge_plot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_voronoi_006.png" srcset="../_images/sphx_glr_voronoi_006.png" alt="voronoi" class = "sphx-glr-single-img"/><section id="plotting">
@@ -760,26 +760,26 @@ are connected to multiple faces.</p>
     <span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;box_aspect&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">"box_aspect"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">ax0</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes0</span><span class="p">,</span> <span class="n">edges0</span><span class="p">,</span> <span class="n">ax0</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 
 <span class="n">ax1</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">triangulation0</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">face_index0</span><span class="p">])</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes0</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
 
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes1</span><span class="p">,</span> <span class="n">edges1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 
 <span class="n">ax3</span><span class="o">.</span><span class="n">tricontourf</span><span class="p">(</span><span class="n">triangulation1</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">face_index1</span><span class="p">])</span>
-<span class="n">ax3</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">nodes1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">edge_node_connectivity</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
 
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
@@ -814,19 +814,19 @@ centroids in orange.</p></li>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
     <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;box_aspect&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">"box_aspect"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
     <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">voronoi_plot_2d</span><span class="p">(</span><span class="n">vor</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax0</span><span class="p">)</span>
 
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes2</span><span class="p">,</span> <span class="n">edges2</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes2</span><span class="p">,</span> <span class="n">edges2</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">centroids</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="n">voronoi_plot_2d</span><span class="p">(</span><span class="n">vor</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
-<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes2</span><span class="p">,</span> <span class="n">edges2</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">edge_plot</span><span class="p">(</span><span class="n">nodes2</span><span class="p">,</span> <span class="n">edges2</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
 
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
 <span class="n">ax0</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
@@ -835,7 +835,7 @@ centroids in orange.</p></li>
 <img src="../_images/sphx_glr_voronoi_008.png" srcset="../_images/sphx_glr_voronoi_008.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.103 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.820 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/57be9f22eeecb878a6868437d46d6e74/voronoi.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">voronoi.ipynb</span></code></a></p>
@@ -916,8 +916,8 @@ centroids in orange.</p></li>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -951,7 +951,7 @@ centroids in orange.</p></li>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

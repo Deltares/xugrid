@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -397,7 +397,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.snapping</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Logic for snapping points and lines to face nodes and face edges.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Logic for snapping points and lines to face nodes and face edges."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -432,31 +432,31 @@
 
     <span class="n">GeoDataFrameType</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
+    <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"geopandas"</span><span class="p">)</span>
     <span class="c1"># https://stackoverflow.com/questions/61384752/how-to-type-hint-with-an-optional-import</span>
-    <span class="n">GeoDataFrameType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;GeoDataFrameType&quot;</span><span class="p">)</span>  <span class="c1"># avoid ImportError in typehints</span>
+    <span class="n">GeoDataFrameType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"GeoDataFrameType"</span><span class="p">)</span>  <span class="c1"># avoid ImportError in typehints</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
+    <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">"shapely"</span><span class="p">)</span>
 
 
 <span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_snap_to_nearest</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">MatrixCSR</span><span class="p">,</span> <span class="n">snap_candidates</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Find a closest target for each node.</span>
 
 <span class="sd">    The kD tree distance matrix will have stored for each node the other nodes</span>
 <span class="sd">    that are within snapping distance. These are the rows in the sparse matrix</span>
 <span class="sd">    that have more than one entry: the snap_candidates.</span>
 
-<span class="sd">    The first condition for a point to become a TARGET is if it hasn&#39;t been</span>
+<span class="sd">    The first condition for a point to become a TARGET is if it hasn't been</span>
 <span class="sd">    connected to another point yet, i.e. it is UNVISITED. Once a point becomes</span>
 <span class="sd">    an TARGET, it looks for nearby points within the max_distance. These nearby</span>
-<span class="sd">    points are connected if: they are UNVISITED (i.e. they don&#39;t have a target</span>
+<span class="sd">    points are connected if: they are UNVISITED (i.e. they don't have a target</span>
 <span class="sd">    yet), or the current target is closer than the previous.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">UNVISITED</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">TARGET</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
     <span class="n">nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">max_distance</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -470,11 +470,11 @@
         <span class="c1"># Now iterate through every node j that is within max_distance of node i.</span>
         <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">columns_and_values</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">row_slice</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">i</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span> <span class="ow">or</span> <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">TARGET</span><span class="p">:</span>
-                <span class="c1"># Continue if we&#39;re looking at the distance to ourselves</span>
+                <span class="c1"># Continue if we're looking at the distance to ourselves</span>
                 <span class="c1"># (i==j), or other node is a target.</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">UNVISITED</span> <span class="ow">or</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">nearest</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
-                <span class="c1"># If unvisited node, or already visited but we&#39;re closer, set</span>
+                <span class="c1"># If unvisited node, or already visited but we're closer, set</span>
                 <span class="c1"># to i.</span>
                 <span class="n">visited</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
                 <span class="n">nearest</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
@@ -487,12 +487,12 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">snap_nodes</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Snap neigbhoring vertices together that are located within a maximum</span>
 <span class="sd">    snapping distance from each other.</span>
 
 <span class="sd">    If vertices are located within a maximum distance, some of them are snapped</span>
-<span class="sd">    to their neighbors (&quot;targets&quot;), thereby guaranteeing a minimum distance</span>
+<span class="sd">    to their neighbors ("targets"), thereby guaranteeing a minimum distance</span>
 <span class="sd">    between nodes in the result. The determination of whether a point becomes a</span>
 <span class="sd">    target itself or gets snapped to another point is primarily based on the</span>
 <span class="sd">    order in which points are processed and their spatial relationships.</span>
@@ -520,12 +520,12 @@
 <span class="sd">    y_snapped: 1D nd array of floats of size M</span>
 <span class="sd">        Returns a copy of ``y`` when no vertices within max_distance of each</span>
 <span class="sd">        other.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># First, find all the points that lie within max_distance of each other</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">cKDTree</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
     <span class="n">distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
-        <span class="n">tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
+        <span class="n">tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">"coo_matrix"</span>
     <span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
     <span class="n">should_snap</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
@@ -553,7 +553,7 @@
     <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">tiebreaker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FloatArray</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Snap vertices (x, y) to another set of vertices (to_x, to_y) if within a</span>
 <span class="sd">    specified maximum distance.</span>
 
@@ -569,11 +569,11 @@
 <span class="sd">    -------</span>
 <span class="sd">    x_snapped: 1D nd array of floats of size N</span>
 <span class="sd">    y_snapped: 1D nd array of floats of size N</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">tiebreaker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">tiebreaker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">"nearest"</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Invalid tiebreaker: </span><span class="si">{</span><span class="n">tiebreaker</span><span class="si">}</span><span class="s2">, should be one of &quot;</span>
-            <span class="s1">&#39;{None, &quot;nearest&quot;} instead.&#39;</span>
+            <span class="sa">f</span><span class="s2">"Invalid tiebreaker: </span><span class="si">{</span><span class="n">tiebreaker</span><span class="si">}</span><span class="s2">, should be one of "</span>
+            <span class="s1">'{None, "nearest"} instead.'</span>
         <span class="p">)</span>
     <span class="c1"># Build KDTrees</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
@@ -585,7 +585,7 @@
     <span class="c1"># row (i) is index in x, y; column (j) is index in to_x, to_y</span>
     <span class="c1"># Convert to csr for quicker row indexing, and row reductions.</span>
     <span class="n">distances</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">sparse_distance_matrix</span><span class="p">(</span>
-        <span class="n">to_tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;coo_matrix&quot;</span>
+        <span class="n">to_tree</span><span class="p">,</span> <span class="n">max_distance</span><span class="o">=</span><span class="n">max_distance</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="s2">"coo_matrix"</span>
     <span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
     <span class="n">n_per_row</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">update</span> <span class="o">=</span> <span class="n">n_per_row</span> <span class="o">==</span> <span class="mi">1</span>
@@ -600,11 +600,11 @@
 
     <span class="c1"># Resolve ties with multiple (to_x, to_y) candidates</span>
     <span class="k">if</span> <span class="n">tie</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">tiebreaker</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tiebreaker</span> <span class="o">==</span> <span class="s2">"nearest"</span><span class="p">:</span>
             <span class="n">ties</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">tie</span><span class="p">]</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
             <span class="n">j_nearest</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;i&quot;</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">data</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">ties</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
-                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"i"</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="s2">"distance"</span><span class="p">:</span> <span class="n">ties</span><span class="o">.</span><span class="n">data</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">ties</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"i"</span><span class="p">)[</span><span class="s2">"distance"</span><span class="p">]</span>
                 <span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
                 <span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
             <span class="p">)</span>
@@ -612,21 +612,21 @@
             <span class="n">ynew</span><span class="p">[</span><span class="n">tie</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_y</span><span class="p">[</span><span class="n">j_nearest</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">tiebreaker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Ties detected: multiple options to snap to, given max distance: &quot;</span>
-                <span class="s2">&quot;set a smaller tolerance or specify a tiebreaker.&quot;</span>
+                <span class="s2">"Ties detected: multiple options to snap to, given max distance: "</span>
+                <span class="s2">"set a smaller tolerance or specify a tiebreaker."</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid tiebreaker&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid tiebreaker"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">xnew</span><span class="p">,</span> <span class="n">ynew</span>
 
 
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">"always"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_vector</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
 
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">"always"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">as_point</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Point</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
@@ -639,7 +639,7 @@
     <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span> <span class="n">line_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:][</span><span class="n">keep</span><span class="p">]</span>
 
 
-<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span><span class="p">(</span><span class="n">inline</span><span class="o">=</span><span class="s2">"always"</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">left_of</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Point</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">Vector</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># Whether point a is left of vector U</span>
     <span class="c1"># U: p -&gt; q direction vector</span>
@@ -650,7 +650,7 @@
     <span class="n">geometry</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
     <span class="n">geom_type</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">geom_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">geom_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Geometry should contain only LineStrings and/or LinearRings&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Geometry should contain only LineStrings and/or LinearRings"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">geometry</span>
 
 
@@ -665,7 +665,7 @@
     <span class="n">segment_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Snap the intersected edges to the edges of the surrounding face.</span>
 
 <span class="sd">    This algorithm works as follows:</span>
@@ -684,10 +684,10 @@
 <span class="sd">    * Finding whether p and q are located at opposide sides of the half-plane</span>
 <span class="sd">      created by a -&gt; b (V).</span>
 <span class="sd">    * The separation test will return False if the lines are collinear. This is</span>
-<span class="sd">      desirable here, if U runs collinear with V, U doesn&#39;t separate a from b.</span>
+<span class="sd">      desirable here, if U runs collinear with V, U doesn't separate a from b.</span>
 
 <span class="sd">    Do a minimum amount of work: reuse a_left, only compute V if needed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)):</span>
         <span class="n">face</span> <span class="o">=</span> <span class="n">face_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -729,19 +729,19 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_create_output_dataset</span><span class="p">(</span>
     <span class="n">lines</span><span class="p">:</span> <span class="n">GeoDataFrameType</span><span class="p">,</span>
-    <span class="n">topology</span><span class="p">:</span> <span class="s2">&quot;xu.Ugrid2d&quot;</span><span class="p">,</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="s2">"xu.Ugrid2d"</span><span class="p">,</span>
     <span class="n">edges</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
     <span class="n">line_index</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
     <span class="n">uds</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">(</span><span class="n">grids</span><span class="o">=</span><span class="p">[</span><span class="n">topology</span><span class="p">])</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     <span class="n">data</span><span class="p">[</span><span class="n">edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_index</span>
-    <span class="n">uds</span><span class="p">[</span><span class="s2">&quot;line_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+    <span class="n">uds</span><span class="p">[</span><span class="s2">"line_index"</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">topology</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">lines</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">column</span> <span class="o">==</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="o">==</span> <span class="s2">"geometry"</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="n">data</span><span class="p">[</span><span class="n">edges</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">line_index</span><span class="p">]</span>
@@ -762,7 +762,7 @@
     <span class="n">edge_vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">edges</span><span class="p">]]</span>
     <span class="n">geometry</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">edge_vertices</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shapely_index</span><span class="p">],</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">"geometry"</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">shapely_index</span><span class="p">],</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span>
     <span class="p">)</span>
 
 
@@ -774,7 +774,7 @@
     <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a dataframe required to snap line geometries to a Ugrid2d topology.</span>
 
 <span class="sd">    A line is included and snapped to a grid edge when the line separates</span>
@@ -812,20 +812,20 @@
 
 <span class="sd">    Use the ``line_index`` column to assign values from ``lines`` to this new dataframe:</span>
 
-<span class="sd">    &gt;&gt;&gt; snapping_df[&quot;my_variable&quot;] = lines[&quot;my_variable&quot;].iloc[snapping_df[&quot;line_index&quot;]].to_numpy()</span>
+<span class="sd">    &gt;&gt;&gt; snapping_df["my_variable"] = lines["my_variable"].iloc[snapping_df["line_index"]].to_numpy()</span>
 
 <span class="sd">    Run some reduction on the variable, to create an aggregated value per grid edge:</span>
 
-<span class="sd">    &gt;&gt;&gt; aggregated = snapping_df.groupby(&quot;edge_index&quot;).sum()</span>
+<span class="sd">    &gt;&gt;&gt; aggregated = snapping_df.groupby("edge_index").sum()</span>
 
 <span class="sd">    Assign the aggregated values to a Ugrid2d topology:</span>
 
 <span class="sd">    &gt;&gt;&gt; new = xu.full_like(edge_data, np.nan)</span>
-<span class="sd">    &gt;&gt;&gt; new.data[aggregated.index] = aggregated[&quot;my_variable&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; new.data[aggregated.index] = aggregated["my_variable"]</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Ugrid2d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected Ugrid2d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">node_coordinates</span>
@@ -842,7 +842,7 @@
     <span class="p">)</span>
     <span class="c1"># Snap line_coords to grid</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">snap_to_nodes</span><span class="p">(</span>
-        <span class="o">*</span><span class="n">line_coords</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">tiebreaker</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span>
+        <span class="o">*</span><span class="n">line_coords</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">,</span> <span class="n">tiebreaker</span><span class="o">=</span><span class="s2">"nearest"</span>
     <span class="p">)</span>
     <span class="n">line_edges</span><span class="p">,</span> <span class="n">shapely_line_index</span> <span class="o">=</span> <span class="n">lines_as_edges</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]),</span> <span class="n">shapely_vertex_index</span>
@@ -886,13 +886,13 @@
 
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;line_index&quot;</span><span class="p">:</span> <span class="n">shapely_line_index</span><span class="p">[</span><span class="n">line_index</span><span class="p">],</span>
-            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
-            <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-            <span class="s2">&quot;y0&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-            <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-            <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-            <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="p">((</span><span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="s2">"line_index"</span><span class="p">:</span> <span class="n">shapely_line_index</span><span class="p">[</span><span class="n">line_index</span><span class="p">],</span>
+            <span class="s2">"edge_index"</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">"x0"</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">"y0"</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">"x1"</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="s2">"y1"</span><span class="p">:</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="s2">"length"</span><span class="p">:</span> <span class="p">((</span><span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">segment_edges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="p">}</span>
     <span class="p">)</span></div>
 
@@ -905,7 +905,7 @@
     <span class="n">grid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
     <span class="n">max_snap_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">IntArray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">GeoDataFrameType</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Snap a collection of lines to a grid.</span>
 
 <span class="sd">    A line is included and snapped to a grid edge when the line separates</span>
@@ -926,7 +926,7 @@
 <span class="sd">        ``line_index`` variable identifying the original geodataframe line.</span>
 <span class="sd">    gdf: gpd.GeoDataFrame</span>
 <span class="sd">        Snapped line geometries.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">):</span>
         <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
@@ -936,17 +936,17 @@
         <span class="n">topology</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s2">&quot;Expected xarray.DataArray or xugrid.UgridDataArray, received: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"Expected xarray.DataArray or xugrid.UgridDataArray, received: "</span>
+            <span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">create_snap_to_grid_dataframe</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="p">)</span>
 
     <span class="c1"># When multiple line parts are snapped to the same edge, use the ones with</span>
     <span class="c1"># the greatest length inside the cell.</span>
-    <span class="n">max_edge_index</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;edge_index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-    <span class="n">line_index</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;line_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
-    <span class="n">edges</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;edge_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
+    <span class="n">max_edge_index</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"edge_index"</span><span class="p">)</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()[</span><span class="s2">"length"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">line_index</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"line_index"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"edge_index"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">max_edge_index</span><span class="p">]</span>
 
     <span class="n">uds</span> <span class="o">=</span> <span class="n">_create_output_dataset</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">line_index</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">_create_output_gdf</span><span class="p">(</span>
@@ -987,8 +987,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1022,7 +1022,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

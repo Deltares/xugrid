@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -412,7 +412,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_classify</span><span class="p">(</span>
     <span class="n">i</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">face_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Find out how many discrete polygons are created. Identify the connectivity,</span>
 <span class="sd">    such that we can select a single polygon afterwards.</span>
 
@@ -428,7 +428,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    n_polygon: int</span>
 <span class="sd">    polygon_id: np.ndarray of int</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Every face connects up to two faces. vi holds the values of the first face,</span>
     <span class="c1"># vj holds the value of the second face.</span>
     <span class="n">vi</span> <span class="o">=</span> <span class="n">face_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -436,7 +436,7 @@
     <span class="n">n</span> <span class="o">=</span> <span class="n">face_values</span><span class="o">.</span><span class="n">size</span>
     <span class="c1"># For labelling, only those parts of the mesh that have the same value</span>
     <span class="c1"># should be connected with each other.</span>
-    <span class="c1"># Since we dropped NaN values before, we needn&#39;t worry about those.</span>
+    <span class="c1"># Since we dropped NaN values before, we needn't worry about those.</span>
     <span class="n">is_connection</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">j</span> <span class="o">!=</span> <span class="n">FILL_VALUE</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">vi</span> <span class="o">==</span> <span class="n">vj</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">is_connection</span><span class="p">]</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="p">[</span><span class="n">is_connection</span><span class="p">]</span>
@@ -453,8 +453,8 @@
 
 <div class="viewcode-block" id="polygonize">
 <a class="viewcode-back" href="../../../api/xugrid.polygonize.html#xugrid.polygonize">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">polygonize</span><span class="p">(</span><span class="n">uda</span><span class="p">:</span> <span class="s2">&quot;UgridDataArray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">polygonize</span><span class="p">(</span><span class="n">uda</span><span class="p">:</span> <span class="s2">"UgridDataArray"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"gpd.GeoDataFrame"</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Polygonize a UgridDataArray.</span>
 
 <span class="sd">    This function creates vector polygons for all connected regions of cells</span>
@@ -476,7 +476,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    polygonized: GeoDataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
@@ -484,8 +484,8 @@
     <span class="n">facedim</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
     <span class="k">if</span> <span class="n">uda</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot polygonize non-face dimensions. Expected only&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">facedim</span><span class="si">}</span><span class="s2">,), but received </span><span class="si">{</span><span class="n">uda</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="s2">"Cannot polygonize non-face dimensions. Expected only"</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">facedim</span><span class="si">}</span><span class="s2">,), but received </span><span class="si">{</span><span class="n">uda</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">."</span>
         <span class="p">)</span>
 
     <span class="c1"># First remove the NaN values. These will not be polygonized anyway.</span>
@@ -496,7 +496,7 @@
     <span class="n">n_polygon</span><span class="p">,</span> <span class="n">polygon_id</span> <span class="o">=</span> <span class="n">_classify</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">face_values</span><span class="p">)</span>
 
     <span class="c1"># Now we identify for each label the subset of edges. These are the</span>
-    <span class="c1"># &quot;exterior&quot; edges: either the exterior edge of the mesh identified by a</span>
+    <span class="c1"># "exterior" edges: either the exterior edge of the mesh identified by a</span>
     <span class="c1"># fill value, or by being connected to a cell with a different value.</span>
     <span class="n">coordinates</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">node_coordinates</span>
     <span class="n">data_i</span> <span class="o">=</span> <span class="n">face_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -525,7 +525,7 @@
         <span class="n">polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
         <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">values</span><span class="p">},</span> <span class="n">geometry</span><span class="o">=</span><span class="n">polygons</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s2">"values"</span><span class="p">:</span> <span class="n">values</span><span class="p">},</span> <span class="n">geometry</span><span class="o">=</span><span class="n">polygons</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -556,8 +556,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -591,7 +591,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

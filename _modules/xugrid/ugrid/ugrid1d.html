@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -430,8 +430,8 @@
 <div class="viewcode-block" id="Ugrid1d">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Ugrid1d</span><span class="p">(</span><span class="n">AbstractUgrid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class stores the topological data of a &quot;1-D unstructured grid&quot;: a</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    This class stores the topological data of a "1-D unstructured grid": a</span>
 <span class="sd">    collection of connected line elements, such as a river network.</span>
 
 <span class="sd">    Parameters</span>
@@ -441,11 +441,11 @@
 <span class="sd">    fill_value: int</span>
 <span class="sd">    edge_node_connectivity: ndarray of integers</span>
 <span class="sd">    name: string, optional</span>
-<span class="sd">        Network name. Defaults to &quot;network1d&quot;.</span>
+<span class="sd">        Network name. Defaults to "network1d".</span>
 <span class="sd">    dataset: xr.Dataset, optional</span>
 <span class="sd">    indexes: Dict[str, str], optional</span>
 <span class="sd">        When a dataset is provided, a mapping from the UGRID role to the dataset</span>
-<span class="sd">        variable name. E.g. {&quot;face_x&quot;: &quot;mesh2d_face_lon&quot;}.</span>
+<span class="sd">        variable name. E.g. {"face_x": "mesh2d_face_lon"}.</span>
 <span class="sd">    is_projected: bool, optional</span>
 <span class="sd">        Whether node_x and node_y are longitude and latitude or projected x and</span>
 <span class="sd">        y coordinates. Used to write the appropriate standard_name in the</span>
@@ -453,7 +453,7 @@
 <span class="sd">    crs: Any, optional</span>
 <span class="sd">        Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">        :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">        such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        such as an authority string (eg "EPSG:4326") or a WKT string.</span>
 <span class="sd">    attrs: Dict[str, str], optional</span>
 <span class="sd">        UGRID topology attributes. Should not be provided together with</span>
 <span class="sd">        dataset: if other names are required, update the dataset instead.</span>
@@ -461,7 +461,7 @@
 <span class="sd">    start_index: int, 0 or 1, default is 0.</span>
 <span class="sd">        Start index of the connectivity arrays. Must match the start index</span>
 <span class="sd">        of the provided face_node_connectivity and edge_node_connectivity.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Ugrid1d.__init__">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.html#xugrid.Ugrid1d.__init__">[docs]</a>
@@ -471,7 +471,7 @@
         <span class="n">node_y</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
         <span class="n">fill_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">edge_node_connectivity</span><span class="p">:</span> <span class="n">IntArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;network1d&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"network1d"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">indexes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">is_projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -517,7 +517,7 @@
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_dataset.html#xugrid.Ugrid1d.from_dataset">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Extract the 1D UGRID topology information from an xarray Dataset.</span>
 
 <span class="sd">        Parameters</span>
@@ -528,12 +528,12 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        grid: Ugrid1dAdapter</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">dataset</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Ugrid should be initialized with xarray.Dataset. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">"Ugrid should be initialized with xarray.Dataset. "</span>
+                <span class="sa">f</span><span class="s2">"Received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">topology</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_single_topology</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -552,28 +552,28 @@
 
         <span class="c1"># Take the first coordinates by default.</span>
         <span class="c1"># They can be reset with .set_node_coords()</span>
-        <span class="n">x_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">y_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">&quot;node_coordinates&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">"node_coordinates"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_index</span> <span class="o">=</span> <span class="n">coordinates</span><span class="p">[</span><span class="s2">"node_coordinates"</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">node_x_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">node_y_coordinates</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">y_index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">FloatDType</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
-        <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">]</span>
-        <span class="n">fill_value</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_FillValue&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">start_index</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">connectivity</span><span class="p">[</span><span class="s2">"edge_node_connectivity"</span><span class="p">]</span>
+        <span class="n">fill_value</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"_FillValue"</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"start_index"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_prepare_connectivity</span><span class="p">(</span>
             <span class="n">ds</span><span class="p">[</span><span class="n">edge_nodes</span><span class="p">],</span>
             <span class="n">fill_value</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">IntDType</span><span class="p">,</span>
-            <span class="n">coredim</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="s2">&quot;edge_dimension&quot;</span><span class="p">],</span>
+            <span class="n">coredim</span><span class="o">=</span><span class="n">dimensions</span><span class="p">[</span><span class="s2">"edge_dimension"</span><span class="p">],</span>
         <span class="p">)</span>
 
-        <span class="c1"># Fill &quot;indexes&quot;: mark which names point to the UGRID-relevant coordinates.</span>
-        <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_index</span>
-        <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;node_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_index</span>
-        <span class="n">edge_indexes</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;edge_coordinates&quot;</span><span class="p">)</span>
+        <span class="c1"># Fill "indexes": mark which names point to the UGRID-relevant coordinates.</span>
+        <span class="n">indexes</span><span class="p">[</span><span class="s2">"node_x"</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_index</span>
+        <span class="n">indexes</span><span class="p">[</span><span class="s2">"node_y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_index</span>
+        <span class="n">edge_indexes</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edge_coordinates"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">edge_indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;edge_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;edge_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indexes</span><span class="p">[</span><span class="s2">"edge_x"</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">indexes</span><span class="p">[</span><span class="s2">"edge_y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">edge_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">crs</span><span class="p">,</span> <span class="n">is_projected</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_extract_crs</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">topology</span><span class="p">)</span>
 
@@ -592,7 +592,7 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_clear_geometry_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all properties that may have been invalidated&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Clear all properties that may have been invalidated"""</span>
         <span class="c1"># Meshkernel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="o">=</span> <span class="kc">None</span>
@@ -616,7 +616,7 @@
             <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_edge_coords</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"ignore"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span>
 
@@ -626,18 +626,18 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">from_meshkernel</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">mesh</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;network1d&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"network1d"</span><span class="p">,</span>
         <span class="n">is_projected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a 1D UGRID topology from a MeshKernel Mesh1d object.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        mesh: MeshKernel.Mesh2d</span>
 <span class="sd">        name: str</span>
-<span class="sd">            Mesh name. Defaults to &quot;network1d&quot;.</span>
+<span class="sd">            Mesh name. Defaults to "network1d".</span>
 <span class="sd">        is_projected: bool</span>
 <span class="sd">            Whether node_x and node_y are longitude and latitude or projected x and</span>
 <span class="sd">            y coordinates. Used to write the appropriate standard_name in the</span>
@@ -645,12 +645,12 @@
 <span class="sd">        crs: Any, optional</span>
 <span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an authority string (eg "EPSG:4326") or a WKT string.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        grid: Ugrid1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">mesh</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
             <span class="n">mesh</span><span class="o">.</span><span class="n">node_y</span><span class="p">,</span>
@@ -667,29 +667,29 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-        <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">&quot;node_x&quot;</span><span class="p">]</span>
-        <span class="n">node_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">&quot;node_y&quot;</span><span class="p">]</span>
-        <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">]</span>
-        <span class="n">edge_nodes_attrs</span> <span class="o">=</span> <span class="n">conventions</span><span class="o">.</span><span class="n">DEFAULT_ATTRS</span><span class="p">[</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">]</span>
+        <span class="n">node_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">"node_x"</span><span class="p">]</span>
+        <span class="n">node_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="s2">"node_y"</span><span class="p">]</span>
+        <span class="n">edge_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span><span class="p">[</span><span class="s2">"edge_node_connectivity"</span><span class="p">]</span>
+        <span class="n">edge_nodes_attrs</span> <span class="o">=</span> <span class="n">conventions</span><span class="o">.</span><span class="n">DEFAULT_ATTRS</span><span class="p">[</span><span class="s2">"edge_node_connectivity"</span><span class="p">]</span>
 
         <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">edge_nodes</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_adjust_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">),</span>
                 <span class="n">attrs</span><span class="o">=</span><span class="n">edge_nodes_attrs</span><span class="p">,</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">),</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span> <span class="s2">"two"</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">}</span>
 
-        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Conventions&quot;</span><span class="p">:</span> <span class="s2">&quot;CF-1.9 UGRID-1.0&quot;</span><span class="p">}</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Conventions"</span><span class="p">:</span> <span class="s2">"CF-1.9 UGRID-1.0"</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">:</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">"override"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">"override"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">node_x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span> <span class="ow">or</span> <span class="n">node_y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">optional_attributes</span><span class="p">:</span>
@@ -702,7 +702,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">topology_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Highest dimensionality of the geometric elements: 1&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Highest dimensionality of the geometric elements: 1"""</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
@@ -711,7 +711,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of UGRID dimension names: node dimension, edge dimension.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set of UGRID dimension names: node dimension, edge dimension."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">}</span>
 
     <span class="nd">@property</span>
@@ -720,7 +720,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary for grid coordinates.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Dictionary for grid coordinates."""</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span><span class="p">,</span>
@@ -729,33 +729,33 @@
 <div class="viewcode-block" id="Ugrid1d.get_coordinates">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_coordinates.html#xugrid.Ugrid1d.get_coordinates">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the coordinates for the specified UGRID dimension.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the coordinates for the specified UGRID dimension."""</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
         <span class="k">elif</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_coordinates</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">facets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span>
-            <span class="s2">&quot;edge&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span>
+            <span class="s2">"node"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">,</span>
+            <span class="s2">"edge"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="p">,</span>
         <span class="p">}</span>
 
 <div class="viewcode-block" id="Ugrid1d.get_connectivity_matrix">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.get_connectivity_matrix.html#xugrid.Ugrid1d.get_connectivity_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_connectivity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xy_weights</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the connectivity matrix for the specified UGRID dimension.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the connectivity matrix for the specified UGRID dimension."""</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="n">connectivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_node_connectivity</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">coordinates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_coordinates</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2">; got: </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">xy_weights</span><span class="p">:</span>
             <span class="n">connectivity</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_weights</span><span class="p">(</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">)</span>
@@ -766,27 +766,27 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_locate_nearest</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">"node"</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_nearest_node</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;edge&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">"edge"</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate_nearest_edge</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected facet as one of </span><span class="si">{</span><span class="s1">&#39;node&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;edge&#39;</span><span class="si">}</span><span class="s2">, received: </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected facet as one of </span><span class="si">{</span><span class="s1">'node'</span><span class="p">,</span><span class="w"> </span><span class="s1">'edge'</span><span class="si">}</span><span class="s2">, received: </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
     <span class="c1"># These are all optional attributes. They are not computed by default, only</span>
     <span class="c1"># when called upon.</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.Mesh1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"mk.Mesh1d"</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create if needed, and return meshkernel Mesh1d object.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        mesh: meshkernel.Mesh1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">meshkernel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mk</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -799,14 +799,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mk.MeshKernel&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">meshkernel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"mk.MeshKernel"</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create if needed, and return meshkernel MeshKernel instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        meshkernel: meshkernel.MeshKernel</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">meshkernel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mk</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meshkernel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -820,27 +820,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_cyclic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return True if the directed node node connectivity contains cycles. If</span>
 <span class="sd">        False, then the directed node node connectivity is a directed acyclic</span>
 <span class="sd">        graph (DAG).</span>
 
 <span class="sd">        Runs a depth-first-search.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># topological sort returns a ValueError if it detects a cycle.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">topological_sort_by_dfs</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The graph contains at least one cycle&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"The graph contains at least one cycle"</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">raise</span>  <span class="c1"># Re-raise any other ValueError</span>
 
 <div class="viewcode-block" id="Ugrid1d.from_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_geodataframe.html#xugrid.Ugrid1d.from_geodataframe">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_geodataframe</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">"geopandas.GeoDataFrame"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Ugrid1d"</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert geodataframe of linestrings into a UGRID1D topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -850,12 +850,12 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        topology: Ugrid1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected GeoDataFrame, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_shapely</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">crs</span><span class="o">=</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
 
@@ -863,8 +863,8 @@
 <div class="viewcode-block" id="Ugrid1d.from_shapely">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.from_shapely.html#xugrid.Ugrid1d.from_shapely">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">LineArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_shapely</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="n">LineArray</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Ugrid1d"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert an array of shapely linestrings to UGRID1D topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -873,15 +873,15 @@
 <span class="sd">        crs: Any, optional</span>
 <span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            such as an authority string (eg "EPSG:4326") or a WKT string.</span>
+<span class="sd">        """</span>
 
         <span class="kn">import</span><span class="w"> </span><span class="nn">shapely</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">shapely</span><span class="o">.</span><span class="n">get_type_id</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="n">shapely</span><span class="o">.</span><span class="n">GeometryType</span><span class="o">.</span><span class="n">LINESTRING</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Can only create Ugrid1d from shapely LineString geometries, &quot;</span>
-                <span class="s2">&quot;geometry contains other types of geometries.&quot;</span>
+                <span class="s2">"Can only create Ugrid1d from shapely LineString geometries, "</span>
+                <span class="s2">"geometry contains other types of geometries."</span>
             <span class="p">)</span>
 
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">edge_node_connectivity</span> <span class="o">=</span> <span class="n">conversion</span><span class="o">.</span><span class="n">linestrings_to_edges</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
@@ -892,7 +892,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
         <span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;.to_pygeos has been deprecated. Use .to_shapely instead.&quot;</span><span class="p">,</span>
+            <span class="s2">".to_pygeos has been deprecated. Use .to_shapely instead."</span><span class="p">,</span>
             <span class="ne">DeprecationWarning</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
@@ -900,7 +900,7 @@
 <div class="viewcode-block" id="Ugrid1d.to_shapely">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.to_shapely.html#xugrid.Ugrid1d.to_shapely">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert UGRID topology to shapely objects.</span>
 
 <span class="sd">        * nodes: points</span>
@@ -914,7 +914,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        geometry: ndarray of shapely.Geometry</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">conversion</span><span class="o">.</span><span class="n">nodes_to_points</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">,</span>
@@ -928,15 +928,15 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> is not a node or edge dimension of the&quot;</span>
-                <span class="s2">&quot; Ugrid1d topology.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2"> is not a node or edge dimension of the"</span>
+                <span class="s2">" Ugrid1d topology."</span>
             <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid1d.isel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.isel.html#xugrid.Ugrid1d.isel">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">isel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">indexers_kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select based on node or edge.</span>
 
 <span class="sd">        Edge selection always results in a valid UGRID topology. Node selection</span>
@@ -956,13 +956,13 @@
 <span class="sd">        indexes: dict</span>
 <span class="sd">            Dictionary with keys node dimension, edge dimension and values</span>
 <span class="sd">            their respective index. Only returned if return_index is True.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">indexers</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">indexers_kwargs</span><span class="p">,</span> <span class="s2">&quot;isel&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">indexers</span> <span class="o">=</span> <span class="n">either_dict_or_kwargs</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">indexers_kwargs</span><span class="p">,</span> <span class="s2">"isel"</span><span class="p">)</span>
         <span class="n">alldims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">indexers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">alldims</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Dimensions </span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2"> do not exist. Expected one of </span><span class="si">{</span><span class="n">alldims</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Dimensions </span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2"> do not exist. Expected one of </span><span class="si">{</span><span class="n">alldims</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">as_pandas_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">indexers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -995,17 +995,17 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indexer</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">indexer</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Ugrid1d does not support steps in slices&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Ugrid1d does not support steps in slices"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">indexer</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">stop</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;slice start should be smaller than slice stop&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"slice start should be smaller than slice stop"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Ugrid1d only supports slice indexing&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Ugrid1d only supports slice indexing"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">indexer</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">indexer</span><span class="o">.</span><span class="n">stop</span>
 
 <div class="viewcode-block" id="Ugrid1d.sel">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.sel.html#xugrid.Ugrid1d.sel">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select a selection of edges, based on edge centroids.</span>
 
 <span class="sd">        Parameters</span>
@@ -1019,7 +1019,7 @@
 <span class="sd">        as_ugrid: bool</span>
 <span class="sd">        index: 1d array of integers</span>
 <span class="sd">        coords: dict</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_indexer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_indexer</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span>
@@ -1039,7 +1039,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">topology_subset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BoolArray</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">],</span> <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a new UGRID1D topology for a subset of this topology.</span>
 
 <span class="sd">        Parameters</span>
@@ -1055,7 +1055,7 @@
 <span class="sd">        indexes: dict</span>
 <span class="sd">            Dictionary with keys node dimension and edge dimension and values</span>
 <span class="sd">            their respective index. Only returned if return_index is True.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
             <span class="n">edge_index</span> <span class="o">=</span> <span class="n">as_pandas_index</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edge</span><span class="p">)</span>
 
@@ -1109,12 +1109,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EdgeCellTree2d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">celltree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"EdgeCellTree2d"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initializes the celltree if needed, and returns celltree.</span>
 
 <span class="sd">        A celltree is a search structure for spatial lookups in unstructured grids.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">numba_celltree</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeCellTree2d</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1139,13 +1139,13 @@
 <div class="viewcode-block" id="Ugrid1d.topological_sort_by_dfs">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.topological_sort_by_dfs.html#xugrid.Ugrid1d.topological_sort_by_dfs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">topological_sort_by_dfs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IntArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return an array of vertices in topological order.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        sorted_vertices: np.ndarray of integer</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">topological_sort_by_dfs</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">directed_node_node_connectivity</span>
         <span class="p">)</span></div>
@@ -1153,15 +1153,15 @@
 
 <div class="viewcode-block" id="Ugrid1d.remove_self_loops">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.remove_self_loops.html#xugrid.Ugrid1d.remove_self_loops">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">remove_self_loops</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_self_loops</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Ugrid1d"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Remove degenerate edges: those that join a node to itself, also called</span>
 <span class="sd">        a self-loop. These edges have a length of exactly zero.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        grid: Ugrid1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="o">.</span><span class="n">T</span>
         <span class="n">not_self_loop</span> <span class="o">=</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span>
         <span class="n">edge_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_node_connectivity</span><span class="p">[</span><span class="n">not_self_loop</span><span class="p">]</span>
@@ -1182,8 +1182,8 @@
 
 <div class="viewcode-block" id="Ugrid1d.contract_vertices">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.contract_vertices.html#xugrid.Ugrid1d.contract_vertices">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contract_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Ugrid1d"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return a simplified network topology by removing all nodes that are</span>
 <span class="sd">        not listed in ``indices``.</span>
 
@@ -1194,7 +1194,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        contracted: Ugrid1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">edges</span> <span class="o">=</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">contract_vertices</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">directed_node_node_connectivity</span><span class="p">,</span> <span class="n">indices</span>
         <span class="p">)</span>
@@ -1220,8 +1220,8 @@
         <span class="n">vertices</span><span class="p">:</span> <span class="n">FloatArray</span><span class="p">,</span>
         <span class="n">return_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Ugrid1d"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Refine Ugrid1d with extra vertices to be inserted and returns new grid.</span>
 <span class="sd">        Vertices need to be located on existing grid edges, if not, a ValueError</span>
 <span class="sd">        will be returned.</span>
@@ -1248,7 +1248,7 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        Let&#39;s first create a simple grid with 3 nodes and 2 edges:</span>
+<span class="sd">        Let's first create a simple grid with 3 nodes and 2 edges:</span>
 
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; import xugrid as xu</span>
@@ -1268,12 +1268,12 @@
 <span class="sd">        &gt;&gt;&gt; print(new_vertices_index)</span>
 <span class="sd">        &gt;&gt;&gt; print(new.node_coordinates[new_vertices_index])</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltree</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">edge_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">if</span> <span class="n">invalid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The following vertices are not located on any edge:</span><span class="se">\n</span><span class="si">{</span><span class="n">vertices</span><span class="p">[</span><span class="n">invalid</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"The following vertices are not located on any edge:</span><span class="se">\n</span><span class="si">{</span><span class="n">vertices</span><span class="p">[</span><span class="n">invalid</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="c1"># Do not insert vertices that are already present in the grid.</span>
@@ -1332,7 +1332,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
         <span class="n">isnull</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">isnull</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All values are NA.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"All values are NA."</span><span class="p">)</span>
 
         <span class="n">edge_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_length</span>
         <span class="k">if</span> <span class="n">ugrid_dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span>
@@ -1351,8 +1351,8 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;received instead: </span><span class="si">{</span><span class="n">ugrid_dim</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span><span class="si">}</span><span class="s2">, "</span>
+                <span class="sa">f</span><span class="s2">"received instead: </span><span class="si">{</span><span class="n">ugrid_dim</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csgraph</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">(</span>
             <span class="n">csgraph</span><span class="o">=</span><span class="n">connectivity</span><span class="p">,</span>
@@ -1362,7 +1362,7 @@
             <span class="n">min_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># dijkstra returns -9999 when no path could be found.</span>
-        <span class="c1"># There, we&#39;ll keep the NaN value.</span>
+        <span class="c1"># There, we'll keep the NaN value.</span>
         <span class="n">found</span> <span class="o">=</span> <span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">9999</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">found</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1373,9 +1373,9 @@
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.merge_partitions.html#xugrid.Ugrid1d.merge_partitions">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">merge_partitions</span><span class="p">(</span>
-        <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;Ugrid1d&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="n">grids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">"Ugrid1d"</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">"Ugrid1d"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Merge grid partitions into a single whole.</span>
 
 <span class="sd">        Duplicate edges are included only once, and removed from subsequent</span>
@@ -1388,7 +1388,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        merged: Ugrid1d</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">xugrid.ugrid</span><span class="w"> </span><span class="kn">import</span> <span class="n">partitioning</span>
 
         <span class="c1"># Grab a sample grid</span>
@@ -1418,11 +1418,11 @@
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.reindex_like.html#xugrid.Ugrid1d.reindex_like">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reindex_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Ugrid1d&quot;</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">:</span> <span class="s2">"Ugrid1d"</span><span class="p">,</span>
         <span class="n">obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Conform a DataArray or Dataset to match the topology of another Ugrid1D</span>
 <span class="sd">        topology. The topologies must be exactly equivalent: only the order of</span>
 <span class="sd">        the nodes and edges may differ.</span>
@@ -1437,9 +1437,9 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        reindexed: DataArray or Dataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Ugrid1d</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Ugrid1d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected Ugrid1d, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="n">indexers</span> <span class="o">=</span> <span class="p">{</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span><span class="p">:</span> <span class="n">connectivity</span><span class="o">.</span><span class="n">index_like</span><span class="p">(</span>
@@ -1453,13 +1453,13 @@
                 <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexers</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Ugrid1d.create_data_array">
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid1d.create_data_array.html#xugrid.Ugrid1d.create_data_array">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">create_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;xugrid.UgridDataArray&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">facet</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"xugrid.UgridDataArray"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a UgridDataArray from this grid and a 1D array of values.</span>
 
 <span class="sd">        Parameters</span>
@@ -1470,19 +1470,19 @@
 <span class="sd">        grid: Ugrid1d, Ugrid2d</span>
 <span class="sd">        facet: str</span>
 <span class="sd">            With which facet to associate the data. Options for Ugrid1d are,</span>
-<span class="sd">            ``&quot;node&quot;`` or ``&quot;edge&quot;``. Options for Ugrid2d are ``&quot;node&quot;``,</span>
-<span class="sd">            ``&quot;edge&quot;``, or ``&quot;face&quot;``.</span>
+<span class="sd">            ``"node"`` or ``"edge"``. Options for Ugrid2d are ``"node"``,</span>
+<span class="sd">            ``"edge"``, or ``"face"``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        uda: UgridDataArray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;node&quot;</span><span class="p">:</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">"node"</span><span class="p">:</span>
             <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_dimension</span>
-        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">&quot;edge&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">facet</span> <span class="o">==</span> <span class="s2">"edge"</span><span class="p">:</span>
             <span class="n">dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_dimension</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid facet: </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">. Must be one of: node, edge.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid facet: </span><span class="si">{</span><span class="n">facet</span><span class="si">}</span><span class="s2">. Must be one of: node, edge."</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_data_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dimension</span><span class="p">)</span></div>
 </div>
 
@@ -1515,8 +1515,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1550,7 +1550,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

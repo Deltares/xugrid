@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -423,61 +423,61 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridType</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns the single UGRID topology in this dataset. Raises a TypeError if</span>
 <span class="sd">        the dataset contains more than one topology.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ngrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Can only access grid topology via `.grid` if dataset contains &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use &quot;</span>
-                <span class="s2">&quot;`.grids` instead.&quot;</span>
+                <span class="s2">"Can only access grid topology via `.grid` if dataset contains "</span>
+                <span class="sa">f</span><span class="s2">"exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use "</span>
+                <span class="s2">"`.grids` instead."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns name of the single UGRID topology in this dataset. Raises a</span>
 <span class="sd">        TypeError if the dataset contains more than one topology.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ngrid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Can only access grid name via `.name` if dataset contains &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use &quot;</span>
-                <span class="s2">&quot;`.names` instead.&quot;</span>
+                <span class="s2">"Can only access grid name via `.name` if dataset contains "</span>
+                <span class="sa">f</span><span class="s2">"exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Use "</span>
+                <span class="s2">"`.names` instead."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of all the UGRID topologies in the dataset.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Names of all the UGRID topologies in the dataset."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UgridType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping from names to UGRID topologies.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Mapping from names to UGRID topologies."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Mapping from grid name to tuple containing ``minx, miny, maxx, maxy``</span>
-<span class="sd">        values of the grid&#39;s node coordinates for every grid in the dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        values of the grid's node coordinates for every grid in the dataset.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">bounds</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">total_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns a tuple containing ``minx, miny, maxx, maxy`` values for the</span>
 <span class="sd">        bounds of the dataset as a whole. Currently does not check whether the</span>
 <span class="sd">        coordinate reference systems (CRS) of the grids in the dataset match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
@@ -489,7 +489,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.rename">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rename.html#xugrid.UgridDatasetAccessor.rename">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name_or_name_dict</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Give a new name to the UGRID topology and update the associated</span>
 <span class="sd">        coordinate and dimension names in the Dataset.</span>
 
@@ -500,14 +500,14 @@
 <span class="sd">            only works if the dataset contains a single UGRID topology. If the</span>
 <span class="sd">            argument is a dict, it used as a mapping from old names to new</span>
 <span class="sd">            names.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ngrid</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Can only rename with a single name if dataset contains &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Provide &quot;</span>
-                    <span class="s2">&quot;a dictionary of old name to new name instead.&quot;</span>
+                    <span class="s2">"Can only rename with a single name if dataset contains "</span>
+                    <span class="sa">f</span><span class="s2">"exactly one grid. Dataset contains </span><span class="si">{</span><span class="n">ngrid</span><span class="si">}</span><span class="s2"> grids. Provide "</span>
+                    <span class="s2">"a dictionary of old name to new name instead."</span>
                 <span class="p">)</span>
 
             <span class="n">name</span> <span class="o">=</span> <span class="n">new_name_or_name_dict</span>
@@ -528,8 +528,8 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;new_name_or_name_dict should be str or dict, received instead: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">"new_name_or_name_dict should be str or dict, received instead: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">new_name_or_name_dict</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
@@ -541,7 +541,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_node_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_node_coords.html#xugrid.UgridDatasetAccessor.assign_node_coords">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Assign node coordinates from the grid to the object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -550,7 +550,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        assigned: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">assign_node_coords</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -560,7 +560,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_edge_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_edge_coords.html#xugrid.UgridDatasetAccessor.assign_edge_coords">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign_edge_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Assign edge coordinates from the grid to the object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -569,7 +569,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        assigned: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">assign_edge_coords</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -579,7 +579,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.assign_face_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.assign_face_coords.html#xugrid.UgridDatasetAccessor.assign_face_coords">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign_face_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Assign face coordinates from the grid to the object.</span>
 
 <span class="sd">        Returns a new object with all the original data in addition to the new</span>
@@ -588,7 +588,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        assigned: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">topology_dimension</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -599,7 +599,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.set_node_coords">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.set_node_coords.html#xugrid.UgridDatasetAccessor.set_node_coords">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_node_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">node_y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Given names of x and y coordinates of the nodes of an object, set them</span>
 <span class="sd">        as the coordinates in the grid.</span>
 
@@ -613,19 +613,19 @@
 <span class="sd">            Name of the grid topology in which to set the node_x and node_y</span>
 <span class="sd">            coordinates. Can be omitted if the UgridDataset contains only a</span>
 <span class="sd">            single grid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;topology must be specified when dataset contains multiple datasets&quot;</span>
+                    <span class="s2">"topology must be specified when dataset contains multiple datasets"</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">topology</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grids</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Expected one grid with topology </span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">, found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Expected one grid with topology </span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2">, found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
             <span class="n">grid</span> <span class="o">=</span> <span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -654,13 +654,13 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.sel_points">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.sel_points.html#xugrid.UgridDatasetAccessor.sel_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sel_points</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">"warn"</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Select points in the unstructured grid.</span>
 
 <span class="sd">        For data on the core dimension (faces for Ugrid2d, edges for Ugrid1d),</span>
-<span class="sd">        points are located by checking containment unless method is &quot;nearest&quot;.</span>
+<span class="sd">        points are located by checking containment unless method is "nearest".</span>
 <span class="sd">        For data on other dimension (e.g. nodes), the nearest entity is found.</span>
 
 <span class="sd">        Parameters</span>
@@ -668,14 +668,14 @@
 <span class="sd">        x: 1d array of floats with shape ``(n_points,)``</span>
 <span class="sd">        y: 1d array of floats with shape ``(n_points,)``</span>
 <span class="sd">        obj: xr.DataArray or xr.Dataset</span>
-<span class="sd">        method: str, {None, &quot;nearest&quot;}, optional</span>
+<span class="sd">        method: str, {None, "nearest"}, optional</span>
 <span class="sd">            * None: default, locate the core entity (face for Ugrid2d, edge for</span>
 <span class="sd">              Ugrid1d) that contains each point. For secondary entities (nodes</span>
 <span class="sd">              and edges for Ugrid2d; nodes for Ugrid1d), the nearest is always returned.</span>
-<span class="sd">            * &quot;nearest&quot;: locate the nearest entity to each point, including the core</span>
+<span class="sd">            * "nearest": locate the nearest entity to each point, including the core</span>
 <span class="sd">              entity.</span>
 
-<span class="sd">        out_of_bounds: str, default ``&quot;warn&quot;``</span>
+<span class="sd">        out_of_bounds: str, default ``"warn"``</span>
 <span class="sd">            What to do when points are located outside of any feature:</span>
 
 <span class="sd">            * raise: raise a ValueError.</span>
@@ -685,7 +685,7 @@
 <span class="sd">              via the ``index`` coordinate of the returned selection.</span>
 <span class="sd">        fill_value: scalar, DataArray, Dataset, or callable, optional, default: np.nan</span>
 <span class="sd">            Value to assign to out-of-bounds points if out_of_bounds is warn</span>
-<span class="sd">            or ignore. Forwarded to xarray&#39;s ``.where()`` method.</span>
+<span class="sd">            or ignore. Forwarded to xarray's ``.where()`` method.</span>
 <span class="sd">        tolerance: float, optional</span>
 <span class="sd">            The tolerance used to determine whether a point is on an edge. This</span>
 <span class="sd">            is a floating point precision criterion, thus cannot be directly be</span>
@@ -698,7 +698,7 @@
 <span class="sd">        selection: xr.DataArray or xr.Dataset</span>
 <span class="sd">            The name of the topology is prefixed in the x, y coordinates</span>
 <span class="sd">            and in a points dimension.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">sel_points</span><span class="p">(</span>
@@ -710,7 +710,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.rasterize">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize.html#xugrid.UgridDatasetAccessor.rasterize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rasterize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Rasterize all face data on 2D unstructured grids by sampling.</span>
 
 <span class="sd">        Parameters</span>
@@ -721,18 +721,18 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        rasterized: xr.Dataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">resolution</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">)</span>
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">"override"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UgridDatasetAccessor.rasterize_like">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.rasterize_like.html#xugrid.UgridDatasetAccessor.rasterize_like">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">rasterize_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Rasterize unstructured all face data on 2D unstructured grids by</span>
 <span class="sd">        sampling on the x and y coordinates of ``other``.</span>
 
@@ -746,27 +746,27 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        rasterized: xr.Dataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="sd">        """</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">rasterize_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">index</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">compat</span><span class="o">=</span><span class="s2">"override"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_periodic">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_periodic.html#xugrid.UgridDatasetAccessor.to_periodic">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_periodic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert every grid to a periodic grid, where the rightmost boundary</span>
 <span class="sd">        shares its nodes with the leftmost boundary.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        periodic: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -778,7 +778,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.to_nonperiodic">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_nonperiodic.html#xugrid.UgridDatasetAccessor.to_nonperiodic">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_nonperiodic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the grid from a periodic grid (where the rightmost boundary shares its</span>
 <span class="sd">        nodes with the leftmost boundary) to an aperiodic grid, where the leftmost nodes</span>
 <span class="sd">        are separate from the rightmost nodes.</span>
@@ -791,7 +791,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        nonperiodic: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -805,7 +805,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">intersect_line</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">end</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Intersect a line with the grid of this data, and fetch the values of</span>
 <span class="sd">        the intersected faces.</span>
 
@@ -822,7 +822,7 @@
 <span class="sd">        intersection: xr.Dataset</span>
 <span class="sd">            The name of the topology is prefixed in the x, y and s</span>
 <span class="sd">            (spatium=distance) coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_line</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -832,7 +832,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.intersect_linestring">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.intersect_linestring.html#xugrid.UgridDatasetAccessor.intersect_linestring">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">intersect_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Intersect the grid along a collection of linestrings. Returns a new Dataset</span>
 <span class="sd">        with the values for each intersected segment.</span>
 
@@ -845,7 +845,7 @@
 <span class="sd">        intersection: xr.Dataset</span>
 <span class="sd">            The name of the topology is prefixed in the x, y and s</span>
 <span class="sd">            (spatium=distance) coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">intersect_linestring</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">linestring</span><span class="p">)</span>
@@ -855,7 +855,7 @@
 <div class="viewcode-block" id="UgridDatasetAccessor.to_dataset">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_dataset.html#xugrid.UgridDatasetAccessor.to_dataset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert this UgridDataset into a standard</span>
 <span class="sd">        xarray.Dataset.</span>
 
@@ -869,7 +869,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dataset: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_combine_attrs</span><span class="p">(</span><span class="n">attrs_seq</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
             <span class="n">combined</span> <span class="o">=</span> <span class="p">{}</span>
@@ -879,14 +879,14 @@
 
         <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
             <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">optional_attributes</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">],</span>
-            <span class="n">compat</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="p">,</span>
+            <span class="n">compat</span><span class="o">=</span><span class="s2">"override"</span><span class="p">,</span>
             <span class="n">combine_attrs</span><span class="o">=</span><span class="n">_combine_attrs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.</span>
 
 <span class="sd">        Returns None if the CRS is not set.</span>
@@ -895,19 +895,19 @@
 <span class="sd">        -------</span>
 <span class="sd">        crs: dict</span>
 <span class="sd">            A dictionary containing the names of the grids and their CRS.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">crs</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">}</span>
 
 <div class="viewcode-block" id="UgridDatasetAccessor.set_crs">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.set_crs.html#xugrid.UgridDatasetAccessor.set_crs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_crs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">"pyproj.CRS"</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">allow_override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Set the Coordinate Reference System (CRS) of a UGRID topology.</span>
 
 <span class="sd">        NOTE: The underlying geometries are not transformed to this CRS. To</span>
@@ -918,7 +918,7 @@
 <span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an authority string (eg "EPSG:4326") or a WKT string.</span>
 <span class="sd">        epsg : int, optional if `crs` is specified</span>
 <span class="sd">            EPSG code specifying the projection.</span>
 <span class="sd">        allow_override : bool, default False</span>
@@ -927,13 +927,13 @@
 <span class="sd">        topology: str, optional</span>
 <span class="sd">            Name of the grid topology in which to set the CRS.</span>
 <span class="sd">            Sets the CRS for all grids if left unspecified.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">grids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">topology</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span> <span class="k">if</span> <span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">topology</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">:</span>
@@ -946,11 +946,11 @@
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_crs.html#xugrid.UgridDatasetAccessor.to_crs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyproj.CRS&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">"pyproj.CRS"</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: ignore # noqa</span>
         <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">topology</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UgridDataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Transform geometries to a new coordinate reference system.</span>
 <span class="sd">        Transform all geometries in an active geometry column to a different coordinate</span>
 <span class="sd">        reference system. The ``crs`` attribute on the current Ugrid must</span>
@@ -966,7 +966,7 @@
 <span class="sd">        crs : pyproj.CRS, optional if `epsg` is specified</span>
 <span class="sd">            The value can be anything accepted by</span>
 <span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an authority string (eg "EPSG:4326") or a WKT string.</span>
 <span class="sd">        epsg : int, optional if `crs` is specified</span>
 <span class="sd">            EPSG code specifying output projection.</span>
 <span class="sd">        topology: str, optional</span>
@@ -979,12 +979,12 @@
 <span class="sd">        Face and edge coordinates, if present, are also recomputed from the new</span>
 <span class="sd">        node positions. Coordinates not governed by the UGRID conventions</span>
 <span class="sd">        are left untouched.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">topology</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">topology</span><span class="si">}</span><span class="s2"> not found. Expected one of: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="n">grids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grids</span><span class="p">:</span>
@@ -1000,8 +1000,8 @@
 
 <div class="viewcode-block" id="UgridDatasetAccessor.to_geodataframe">
 <a class="viewcode-back" href="../../../api/xugrid.UgridDatasetAccessor.to_geodataframe.html#xugrid.UgridDatasetAccessor.to_geodataframe">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;geopandas.GeoDataFrame&quot;</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_geodataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"geopandas.GeoDataFrame"</span><span class="p">:</span>  <span class="c1"># type: ignore # noqa</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert data and topology of one facet (node, edge, face) of the grid</span>
 <span class="sd">        to a geopandas GeoDataFrame. This also determines the geometry type of</span>
 <span class="sd">        the geodataframe:</span>
@@ -1027,7 +1027,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        geodataframe: gpd.GeoDataFrame</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
@@ -1039,7 +1039,7 @@
             <span class="k">elif</span> <span class="n">grid</span><span class="o">.</span><span class="n">topology_dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">dim</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid topology dimension on grid&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"invalid topology dimension on grid"</span><span class="p">)</span>
 
             <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
@@ -1048,7 +1048,7 @@
                 <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="c1"># TODO deal with time-dependent data, etc.</span>
-            <span class="c1"># Basically requires checking which variables are static, which aren&#39;t.</span>
+            <span class="c1"># Basically requires checking which variables are static, which aren't.</span>
             <span class="c1"># For non-static, requires repeating all geometries.</span>
             <span class="c1"># Call reset_index on multi-index to generate them as regular columns.</span>
             <span class="n">gdfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1069,7 +1069,7 @@
         <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UgridType</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">],</span>
         <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Conform this object to match the topology of another object. The</span>
 <span class="sd">        topologies must be exactly equivalent: only the order of the nodes,</span>
 <span class="sd">        edges, and faces may differ.</span>
@@ -1087,15 +1087,15 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        reindexed: UgridDataset</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">Ugrid1d</span><span class="p">,</span> <span class="n">Ugrid2d</span><span class="p">)):</span>
             <span class="n">other_grids</span> <span class="o">=</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">UgridDataset</span><span class="p">)):</span>
             <span class="n">other_grids</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grids</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">"Expected Ugrid1d, Ugrid2d, UgridDataArray, or UgridDataset,"</span>
+                <span class="sa">f</span><span class="s2">"received instead: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="c1"># Convert to dict to match by name</span>
         <span class="n">other_grids</span> <span class="o">=</span> <span class="p">{</span><span class="n">grid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">grid</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">other_grids</span><span class="p">}</span>
@@ -1141,8 +1141,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1176,7 +1176,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

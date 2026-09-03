@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
@@ -37,10 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css?v=45942d5c" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -397,7 +397,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for xugrid.ugrid.partitioning</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Create and merge partitioned UGRID topologies.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Create and merge partitioned UGRID topologies."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">accumulate</span><span class="p">,</span> <span class="n">chain</span>
@@ -413,11 +413,11 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">IntArray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert a 1D array of N labels into a N arrays of indices.</span>
 
 <span class="sd">    E.g. [0, 1, 0, 2, 2] -&gt; [[0, 2], [1], [3, 4]]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sorter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
     <span class="n">split_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">labels</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sorter</span><span class="p">,</span> <span class="n">split_indices</span><span class="p">)</span>
@@ -427,7 +427,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">partition_by_label</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">IntArray</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Partition the grid and xarray object by integer labels.</span>
 
 <span class="sd">    This function is used by UgridDataArray.partition_by_label and</span>
@@ -442,20 +442,20 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    partitions: List of (grid, obj)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">UgridDataArray</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;labels must be a UgridDataArray, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"labels must be a UgridDataArray, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;labels must have integer dtype, received </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"labels must have integer dtype, received </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">labels</span><span class="o">.</span><span class="n">grid</span> <span class="o">!=</span> <span class="n">grid</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;grid of labels does not match xugrid object&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"grid of labels does not match xugrid object"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">labels</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Can only partition this topology by </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="si">}</span><span class="s2">, found&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; the dimensions: </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Can only partition this topology by </span><span class="si">{</span><span class="n">grid</span><span class="o">.</span><span class="n">core_dimension</span><span class="si">}</span><span class="s2">, found"</span>
+            <span class="sa">f</span><span class="s2">" the dimensions: </span><span class="si">{</span><span class="n">labels</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
@@ -464,14 +464,14 @@
         <span class="n">obj_type</span> <span class="o">=</span> <span class="n">UgridDataArray</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Expected DataArray or Dataset, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Expected DataArray or Dataset, received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">indices</span> <span class="o">=</span> <span class="n">labels_to_indices</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
     <span class="n">partitions</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
         <span class="n">new_grid</span><span class="p">,</span> <span class="n">indexes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">topology_subset</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span>
         <span class="n">partitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_type</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">new_grid</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">partitions</span>
@@ -552,15 +552,15 @@
         <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">}</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;All partition topologies with name </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> should be of the &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;same type, received: </span><span class="si">{</span><span class="n">types</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"All partition topologies with name </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> should be of the "</span>
+                <span class="sa">f</span><span class="s2">"same type, received: </span><span class="si">{</span><span class="n">types</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">griddims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="nb">tuple</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">})</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">griddims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Dimension names on UGRID topology </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> do not match &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;across partitions: </span><span class="si">{</span><span class="n">griddims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">griddims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Dimension names on UGRID topology </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> do not match "</span>
+                <span class="sa">f</span><span class="s2">"across partitions: </span><span class="si">{</span><span class="n">griddims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">griddims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
@@ -609,8 +609,8 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vardims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">vardims_ls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">vardims</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Dimensions for &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; do not match across partitions: &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Dimensions for '</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">' do not match across partitions: "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> versus </span><span class="si">{</span><span class="n">vardims_ls</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
                 <span class="p">)</span>
     <span class="k">return</span> <span class="kc">None</span>
 
@@ -618,13 +618,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">separate_variables</span><span class="p">(</span>
     <span class="n">objects_by_gridname</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Separate into UGRID variables grouped by dimension, and other variables.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Separate into UGRID variables grouped by dimension, and other variables."""</span>
     <span class="n">validate_partition_objects</span><span class="p">(</span><span class="n">objects_by_gridname</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">assert_single_dim</span><span class="p">(</span><span class="n">intersection</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> contains more than one UGRID dimension: </span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> contains more than one UGRID dimension: </span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_item</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
@@ -672,11 +672,11 @@
     <span class="n">indexes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">],</span>
     <span class="n">merged_grid</span><span class="p">:</span> <span class="n">UgridType</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Select variables from the data objects.</span>
 <span class="sd">    Pad connectivity dims if needed.</span>
 <span class="sd">    Concatenate along dim.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">max_sizes</span> <span class="o">=</span> <span class="n">merged_grid</span><span class="o">.</span><span class="n">max_connectivity_sizes</span>
     <span class="n">ugrid_connectivity_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">max_sizes</span><span class="p">)</span>
 
@@ -685,9 +685,9 @@
         <span class="c1"># Check for presence of vars</span>
         <span class="n">missing_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
         <span class="k">if</span> <span class="n">missing_vars</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing variables: </span><span class="si">{</span><span class="n">missing_vars</span><span class="si">}</span><span class="s2"> in partition </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing variables: </span><span class="si">{</span><span class="n">missing_vars</span><span class="si">}</span><span class="s2"> in partition </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">selection</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">merge_dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="nb">vars</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">merge_dim</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">)</span>
 
         <span class="c1"># Pad the ugrid connectivity dims (e.g. n_max_face_node_connectivity) if</span>
         <span class="c1"># needed.</span>
@@ -707,12 +707,12 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">single_ugrid_chunk</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">ugrid_dims</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Ensure that along a UGRID dimension only a single chunk is defined.</span>
 
 <span class="sd">    Preserving chunks on the merged result may generate a very sub-optimal,</span>
 <span class="sd">    complex dask graph.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">da</span>
 
@@ -729,7 +729,7 @@
 <div class="viewcode-block" id="merge_partitions">
 <a class="viewcode-back" href="../../../api/xugrid.merge_partitions.html#xugrid.merge_partitions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">merge_partitions</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">merge_ugrid_chunks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Merge topology and data, partitioned along UGRID dimensions, into a single</span>
 <span class="sd">    UgridDataset.</span>
 
@@ -749,11 +749,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    merged : UgridDataset</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">partitions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot merge partitions: zero partitions provided.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Cannot merge partitions: zero partitions provided."</span><span class="p">)</span>
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">}</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Expected UgridDataArray or UgridDataset, received: </span><span class="si">{}</span><span class="s2">&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Expected UgridDataArray or UgridDataset, received: </span><span class="si">{}</span><span class="s2">"</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">type_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">]</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type_names</span><span class="p">))</span>
@@ -843,8 +843,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -878,7 +878,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>
