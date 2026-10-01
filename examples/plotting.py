@@ -172,7 +172,7 @@ ds["face_z"].ugrid.plot(cmap="RdBu", levels=8, yincrease=False)
 # take an xarray DataArray and a xugrid grid as arguments.
 
 grid = ds.ugrid.grids[0]
-da = ds.obj["face_z"]
+da = ds["face_z"]
 
 xugrid.plot.pcolormesh(grid, da)
 

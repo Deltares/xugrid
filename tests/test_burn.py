@@ -168,7 +168,7 @@ class TestBurn:
         polygons, poly_values = polygons_and_values
         gdf = gpd.GeoDataFrame({"values": poly_values}, geometry=polygons)
         actual = xu.burn_vector_geometry(gdf, grid)
-        assert isinstance(actual, xu.UgridDataArray)
+        assert xu.is_ugrid_dataarray(actual)
         assert np.allclose(actual.to_numpy(), 1)
         actual = xu.burn_vector_geometry(gdf, grid, all_touched=True)
         assert np.allclose(actual.to_numpy(), 1)
@@ -217,7 +217,7 @@ class TestBurn:
         polygon = shapely.polygons(xy, holes=hole)
         gdf = gpd.GeoDataFrame(data={"a": [10.0], "b": [20.0]}, geometry=[polygon])
         uda = xu.earcut_triangulate_polygons(polygons=gdf)
-        assert isinstance(uda, xu.UgridDataArray)
+        assert xu.is_ugrid_dataarray(uda)
         assert np.allclose(uda.to_numpy(), 0)
         assert uda.name is None
 

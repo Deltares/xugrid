@@ -206,6 +206,19 @@ class TestUgridDataArray:
         assert xugrid.is_ugrid_dataarray(alltrue)
         assert not (alltrue).any()
 
+    def test_binary_op_alignment(self):
+        # Equal (but not identical) topologies align.
+        other = xugrid.UgridDataArray(self.uda.copy(), self.uda.ugrid.grid.copy())
+        actual = self.uda + other
+        assert xugrid.is_ugrid_dataarray(actual)
+        assert actual.ugrid.grid.equals(self.uda.ugrid.grid)
+        # Differently ordered topologies do not: values would be misaligned.
+        facedim = self.uda.ugrid.grid.face_dimension
+        reordered = self.uda.isel({facedim: np.arange(self.uda.size)[::-1]})
+        assert not reordered.ugrid.grid.equals(self.uda.ugrid.grid)
+        with pytest.raises(ValueError):
+            self.uda + reordered
+
     def test_math(self):
         actual = self.uda + 0
         assert xugrid.is_ugrid_dataarray(actual)
@@ -423,7 +436,7 @@ class TestUgridDataArray:
         import dask
 
         uda2 = self.uda.copy()
-        uda2.obj[:-2] = np.nan
+        uda2[:-2] = np.nan
         multiplier = xr.DataArray(
             np.ones((3, 2)),
             coords={"time": [0, 1, 2], "layer": [1, 2]},
@@ -972,7 +985,7 @@ class TestDatasetOptionalCoordinates:
             assert new[x].attrs["standard_name"] == "latitude"
 
         def is_different(a, b, name):
-            return (a[name].values != b[name].values).all()
+            return (a[name].to_numpy() != b[name].to_numpy()).all()
 
         names = (
             "mesh2d_node_x",
@@ -1238,7 +1251,7 @@ class TestFromStructured:
         )
         # Node/edge coords may differ in ordering between the two construction methods;
         # compare data values and face centroid coords which are order-independent.
-        assert (uda.values == uda2.values).all()
+        assert (uda.to_numpy() == uda2.to_numpy()).all()
         assert np.allclose(
             np.sort(uda["mesh2d_face_x"].values), np.sort(uda2["mesh2d_face_x"].values)
         )
@@ -1246,7 +1259,7 @@ class TestFromStructured:
         uda3 = xugrid.UgridDataArray.from_structured2d(
             self.da2d, "x", "y", bounds_x.transpose(), bounds_y
         )
-        assert (uda.values == uda3.values).all()
+        assert (uda.to_numpy() == uda3.to_numpy()).all()
         assert np.allclose(
             np.sort(uda["mesh2d_face_x"].values), np.sort(uda3["mesh2d_face_x"].values)
         )

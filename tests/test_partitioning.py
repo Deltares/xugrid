@@ -97,7 +97,7 @@ class TestPartition:
     def test_label_partitions(self, grid):
         n_part = 3
         labels = grid.label_partitions(n_part=n_part)
-        assert isinstance(labels, xu.UgridDataArray)
+        assert xu.is_ugrid_dataarray(labels)
         assert labels.name == "labels"
         assert labels.ugrid.grid == grid
         assert np.allclose(np.unique(labels.values), [0, 1, 2])
@@ -121,7 +121,7 @@ class TestPartition:
         weights = np.ones(grid_size, dtype=int)
         weights[:half_size] = 2
         labels = grid.label_partitions(n_part=n_part, weights=weights)
-        assert isinstance(labels, xu.UgridDataArray)
+        assert xu.is_ugrid_dataarray(labels)
         assert labels.name == "labels"
         assert labels.ugrid.grid == grid
         uniques, counts = np.unique(labels.values, return_counts=True)
@@ -169,7 +169,7 @@ class TestPartition:
         weights_da = xr.DataArray(weights, dims=(core_dim,))
         weights_uda = xu.UgridDataArray(weights_da, grid=grid)
         labels = weights_uda.ugrid.label_partitions(n_part=n_part)
-        assert isinstance(labels, xu.UgridDataArray)
+        assert xu.is_ugrid_dataarray(labels)
         assert labels.name == "labels"
         assert labels.ugrid.grid == grid
         uniques, counts = np.unique(labels.values, return_counts=True)
@@ -223,7 +223,7 @@ class TestDatasetPartition:
         partitions = pt.partition_by_label(self.grid, self.obj, self.labels)
         assert len(partitions) == 3
         for partition in partitions:
-            assert isinstance(partition, xu.UgridDataset)
+            assert xu.is_ugrid_dataset(partition)
             assert "face_z" in partition
             assert "edge_z" in partition
             assert "node_z" in partition
@@ -232,17 +232,22 @@ class TestDatasetPartition:
         partitions = pt.partition_by_label(self.grid, self.obj["face_z"], self.labels)
         assert len(partitions) == 3
         for partition in partitions:
-            assert isinstance(partition, xu.UgridDataArray)
+            assert xu.is_ugrid_dataarray(partition)
             assert partition.name == "face_z"
 
     def test_partition_roundtrip(self):
         partitions = self.uds.ugrid.partition(n_part=4)
         back = pt.merge_partitions(partitions)
-        assert isinstance(back, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(back)
 
         order = np.argsort(back["face_z"].values)
         reordered = back.isel(mesh2d_nFaces=order)
-        assert reordered["face_z"].equals(self.uds["face_z"])
+        # The merged topology has a different node/edge numbering, so compare
+        # the face data and face coordinates rather than the full topology.
+        expected = self.uds["face_z"]
+        assert np.array_equal(reordered["face_z"].values, expected.values)
+        assert np.allclose(reordered["mesh2d_face_x"], expected["mesh2d_face_x"])
+        assert np.allclose(reordered["mesh2d_face_y"], expected["mesh2d_face_y"])
 
     def test_merge_partition_single(self):
         partitions = [self.uds]
@@ -252,7 +257,7 @@ class TestDatasetPartition:
     def test_merge_partitions__errors(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         with pytest.raises(TypeError, match="Expected UgridDataArray or UgridDataset"):
-            pt.merge_partitions([p.ugrid.obj for p in partitions])
+            pt.merge_partitions([p.ugrid.to_dataset() for p in partitions])
 
         grid1 = partitions[1].ugrid.grid
         partitions[1]["extra"] = (grid1.face_dimension, np.ones(grid1.n_face))
@@ -296,7 +301,7 @@ class TestDatasetPartition:
         part1 = (part1 * time).chunk({"time": (1, 1, 1)})
         part2 = (part2 * time).chunk({"time": (1, 2)})
         merged = pt.merge_partitions([part1, part2])
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert merged.chunks["time"] == (1, 1, 1)
 
     def test_merge_inconsistent_chunks_across_variables(self):
@@ -309,7 +314,7 @@ class TestDatasetPartition:
         merged = pt.merge_partitions([part1, part2])
         # Test that it runs without encountering the xarray "inconsistent
         # chunks" ValueError.
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         # Make sure they remain inconsistent after merging.
         assert uds["node_z"].chunks == ((self.grid.n_node,), (3,))
         assert uds["edge_z"].chunks == ((self.grid.n_edge,), (2, 1))
@@ -337,7 +342,7 @@ class TestMultiTopology2DMergePartitions:
 
     def test_merge_partitions(self):
         merged = pt.merge_partitions(self.datasets)
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert len(merged.ugrid.grids) == 2
         # In case of non-UGRID data, it should default to the last partition:
         assert merged["c"] == 1
@@ -346,11 +351,17 @@ class TestMultiTopology2DMergePartitions:
         assert len(merged["second_nFaces"]) == 20
 
     def test_merge_partitions__unique_grid_per_partition(self):
-        pa = self.datasets[0][["a"]]
-        pb = self.datasets[1][["b"]]
+        # Selecting variables does not drop the UgridIndex of the other
+        # topology: explicitly attach only the relevant grid.
+        def select(ds, var, gridname):
+            grids = [grid for grid in ds.ugrid.grids if grid.name == gridname]
+            return xu.UgridDataset(xu.core.index.drop_ugrid_index(ds[[var]]), grids)
+
+        pa = select(self.datasets[0], "a", "first")
+        pb = select(self.datasets[1], "b", "second")
         merged = pt.merge_partitions([pa, pb])
 
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert len(merged.ugrid.grids) == 2
 
         assert len(merged["first_nFaces"]) == 3
@@ -415,16 +426,13 @@ class TestMergeDataset1D:
         ds_expected = xu.UgridDataset(grids=[grid])
         ds_expected["a"] = ((grid.edge_dimension), np.concatenate(values_parts))
         ds_expected["c"] = 1
-        # Assign coordinates also added during merge_partitions
-        coords = {grid.edge_dimension: np.arange(grid.n_edge)}
-        ds_expected = ds_expected.assign_coords(**coords)
 
         self.datasets_partitioned = datasets_partitioned
         self.dataset_expected = ds_expected
 
     def test_merge_partitions(self):
         merged = pt.merge_partitions(self.datasets_partitioned)
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert len(merged.ugrid.grids) == 1
         # In case of non-UGRID data, it should default to the last partition of
         # the grid that's checked last.
@@ -464,7 +472,11 @@ class TestMultiTopology1D2DMergePartitions:
 
             datasets_parts.append(ds.assign_coords(**coords))
 
-        ds_expected = xu.UgridDataset(grids=[grid_a, grid_b])
+        # The topology coordinates are part of the dataset, so the expected
+        # dataset must use the merged topologies (with their numbering).
+        merged_a, _ = xu.Ugrid2d.merge_partitions(parts_a)
+        merged_b, _ = xu.Ugrid1d.merge_partitions(parts_b)
+        ds_expected = xu.UgridDataset(grids=[merged_a, merged_b])
         ds_expected["a"] = ((grid_a.face_dimension), np.concatenate(values_parts_a))
         ds_expected["b"] = ((grid_b.edge_dimension), np.concatenate(values_parts_b))
         ds_expected["c"] = 1
@@ -476,11 +488,12 @@ class TestMultiTopology1D2DMergePartitions:
         ds_expected = ds_expected.assign_coords(**coords)
 
         self.datasets_parts = datasets_parts
+        self.parts_b = parts_b
         self.dataset_expected = ds_expected
 
     def test_merge_partitions(self):
         merged = pt.merge_partitions(self.datasets_parts)
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert len(merged.ugrid.grids) == 2
         # In case of non-UGRID data, it should default to the last partition of
         # the grid that's checked last.
@@ -489,16 +502,30 @@ class TestMultiTopology1D2DMergePartitions:
         assert self.dataset_expected.equals(merged)
 
     def test_merge_partitions__inconsistent_grid_types(self):
-        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(
-            ["b", "mesh1d_nEdges"]
+        # Remove the mesh1d topology (its UgridIndex coordinates) entirely from
+        # the first partition.
+        mesh1d_vars = [
+            "b",
+            "mesh1d_nEdges",
+            "mesh1d_node_x",
+            "mesh1d_node_y",
+            "mesh1d_edge_x",
+            "mesh1d_edge_y",
+        ]
+        self.datasets_parts[0] = self.datasets_parts[0].drop_vars(mesh1d_vars)
+        # The merged mesh1d topology is then the topology of the second
+        # partition only.
+        expected = self.dataset_expected.drop_vars(mesh1d_vars)
+        expected = xu.UgridDataset(
+            xu.core.index.drop_ugrid_index(expected),
+            [expected.ugrid.grid, self.parts_b[1]],
         )
-        b = self.dataset_expected["b"].isel(mesh1d_nEdges=[0, 1, 2])
-        self.dataset_expected = self.dataset_expected.drop_vars(["b", "mesh1d_nEdges"])
-        self.dataset_expected["b"] = b
-        self.dataset_expected["c"] = 1
+        expected["b"] = self.datasets_parts[1]["b"]
+        expected["c"] = 1
+        self.dataset_expected = expected
 
         merged = pt.merge_partitions(self.datasets_parts)
-        assert isinstance(merged, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(merged)
         assert len(merged.ugrid.grids) == 2
         # In case of non-UGRID data, it should default to the last partition of
         # the grid that's checked last.

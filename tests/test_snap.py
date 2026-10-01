@@ -174,10 +174,15 @@ def test_snap_to_grid():
     line = sg.LineString([[0.5, 0.0], [1.5, 2.0]])
     line_gdf = gpd.GeoDataFrame({"resistance": [100.0]}, geometry=[line])
     uds, gdf = snap_to_grid(line_gdf, idomain, 2.0)
-    assert isinstance(uds, xu.UgridDataset)
+    assert xu.is_ugrid_dataset(uds)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert uds["resistance"].dims == (uds.ugrid.grid.edge_dimension,)
     # TODO test for returned values...
+
+    # A UgridDataArray (also an xr.DataArray) should use its own topology.
+    uda = xu.UgridDataArray.from_structured2d(idomain)
+    uds2, _ = snap_to_grid(line_gdf, uda, 2.0)
+    assert uds2.ugrid.grid.equals(uds.ugrid.grid)
 
 
 @requires_geopandas
@@ -276,7 +281,7 @@ class TestSnapToGrid:
     def test_snap_to_grid_with_data(self, structured, case):
         geometry, unique_values, line_counts = case()
         uds, gdf = snap_to_grid(geometry, structured, max_snap_distance=0.5)
-        assert isinstance(uds, xu.UgridDataset)
+        assert xu.is_ugrid_dataset(uds)
         assert isinstance(gdf, gpd.GeoDataFrame)
         assert uds["a"].dims == (uds.ugrid.grid.edge_dimension,)
         actual_unique_values, actual_line_counts = np.unique(

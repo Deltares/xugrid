@@ -70,8 +70,8 @@ import xugrid
 
 ds = xugrid.data.disk()
 uda = xugrid.UgridDataArray(
-    xr.full_like(ds.obj["face_z"], True, dtype=bool),
-    ds.grids[0],
+    xr.full_like(ds["face_z"], True, dtype=bool),
+    ds.ugrid.grids[0],
 )
 iter2 = uda.ugrid.binary_erosion(iterations=2)
 iter5 = uda.ugrid.binary_erosion(iterations=5)
@@ -86,8 +86,8 @@ iter5.ugrid.plot(ax=ax1)
 # start by setting a single value in the center of the grid to ``True``.
 
 uda = xugrid.UgridDataArray(
-    xr.full_like(ds["face_z"].ugrid.obj, False, dtype=bool),
-    ds.grids[0],
+    xr.full_like(ds["face_z"], False, dtype=bool),
+    ds.ugrid.grids[0],
 )
 uda[0] = True
 uda.ugrid.plot()

@@ -522,11 +522,11 @@ def snap_to_grid(
     """
     if isinstance(grid, Ugrid2d):
         topology = grid
+    elif xu.is_ugrid_dataarray(grid):
+        topology = grid.ugrid.grid
     elif isinstance(grid, xr.DataArray):
         # Convert structured to unstructured representation
         topology = Ugrid2d.from_structured(grid)
-    elif xu.is_ugrid_dataarray(grid):
-        topology = grid.ugrid.grid
     else:
         raise TypeError(
             "Expected xarray.DataArray or xugrid.UgridDataArray, received: "

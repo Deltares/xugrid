@@ -21,11 +21,14 @@ class UgridIndex(xr.Index, abc.ABC):
         return self._ugrid.equals(other._ugrid)
 
     def join(self, other, how="inner"):
-        # UgridIndex coordinates are not label-aligned; just return self.
-        # Two different grids are kept independent; alignment is a no-op.
-        if isinstance(other, type(self)):
-            return self
-        return NotImplemented
+        # Only called by xarray when the indexes are not equal. UGRID
+        # topologies have no labels to align on: combining data defined on
+        # different topologies would silently misalign values.
+        raise ValueError(
+            f"Cannot align objects on different UGRID topologies "
+            f"({self._ugrid.name!r}). If the topologies are equivalent but "
+            "ordered differently, use ``.ugrid.reindex_like()`` first."
+        )
 
     def reindex_like(self, other):
         # UgridIndex has no label-based indexing; reindexing is a no-op.

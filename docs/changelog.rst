@@ -9,6 +9,31 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Changed
+~~~~~~~
+
+- :class:`xugrid.UgridDataArray` and :class:`xugrid.UgridDataset` no longer
+  wrap an xarray object. Instead, the UGRID topology is stored as a custom
+  xarray index (``UgridIndex1d``, ``UgridIndex2d``) on a regular
+  ``xarray.DataArray`` or ``xarray.Dataset``. Calling ``UgridDataArray(...)``
+  or ``UgridDataset(...)`` returns such an xarray object. The topology is
+  available via the ``.ugrid`` accessor (``obj.ugrid.grid``,
+  ``obj.ugrid.grids``); the ``.grid``, ``.grids``, and ``.obj`` attributes are
+  no longer available on the objects themselves.
+- ``isinstance(obj, UgridDataArray)`` no longer works; use
+  :func:`xugrid.is_ugrid_dataarray` and :func:`xugrid.is_ugrid_dataset`
+  instead.
+- The node, edge, and face coordinates of a topology are now part of the
+  xarray object, and are included in e.g. ``.equals()`` comparisons.
+- Arithmetic and comparisons between objects defined on different (e.g.
+  differently ordered) topologies now raise an error rather than silently
+  combining misaligned values. Use ``.ugrid.reindex_like()`` to conform to a
+  common topology first.
+- Selecting variables of a multi-topology dataset (``ds[["a"]]``) keeps all
+  topologies.
+- :func:`xugrid.merge_partitions` no longer adds an integer coordinate along
+  the UGRID dimensions.
+
 [0.15.3] 2026-04-20
 -------------------
 

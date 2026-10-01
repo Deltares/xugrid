@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 def _isel_drop_mismatched_coords(obj, indexers):
-    """isel and drop any coordinates whose dimensions no longer match the result."""
+    """Isel and drop any coordinates whose dimensions no longer match the result."""
     from xugrid.core.index import drop_ugrid_index
 
     obj = drop_ugrid_index(obj)
@@ -1491,7 +1491,9 @@ class AbstractUgrid(abc.ABC):
             s, intersection_for_coord, dim, core_index, self.name
         )
 
-        return _isel_drop_mismatched_coords(obj, {dim: core_index}).assign_coords(coords)
+        return _isel_drop_mismatched_coords(obj, {dim: core_index}).assign_coords(
+            coords
+        )
 
     def sel(self, obj, x=None, y=None):
         """

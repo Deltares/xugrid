@@ -106,12 +106,13 @@ merged_grid.plot()
 #
 # Note that partioning and merging does not preserve order!
 
-uda == merged
+uda.ugrid.grid.equals(merged.ugrid.grid)
 
 # %%
 # The topology is equivalent, but the nodes, edges, and faces are in a
 # different order. This is because ``merge_partitions`` simply concatenates the
-# partitions.
+# partitions. Since the topologies differ, xarray will refuse to align ``uda``
+# and ``merged`` in e.g. ``uda == merged``.
 #
 # The easiest way to restore the order is by providing an example of the
 # original topology. ``reindex_like`` looks at the coordinates of both
@@ -133,7 +134,11 @@ merged = xu.merge_partitions(partitions)
 order = np.argsort(merged["cell_id"].values)
 reordered = merged.isel(mesh2d_nFaces=order)
 
-uds["elevation"] == reordered["elevation"]
+# %%
+# The faces are now in the original order, but the nodes and edges are not:
+# the topologies are not identical, so we compare the values directly.
+
+np.array_equal(uds["elevation"].to_numpy(), reordered["elevation"].to_numpy())
 
 # %%
 # This is required if results are compared with the input, or with results

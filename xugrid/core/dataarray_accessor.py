@@ -8,7 +8,12 @@ import xarray as xr
 from xugrid.core.accessorbase import AbstractUgridAccessor
 from xugrid.core.index import UgridIndex, drop_ugrid_index
 from xugrid.core.utils import UncachedAccessor
-from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray, is_ugrid_dataset
+from xugrid.core.wrap import (
+    UgridDataArray,
+    UgridDataset,
+    is_ugrid_dataarray,
+    is_ugrid_dataset,
+)
 from xugrid.plot.plot import _PlotMethods
 from xugrid.ugrid import connectivity
 from xugrid.ugrid.interpolate import (
@@ -32,11 +37,13 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     @property
     def grid(self) -> UgridType:
-        indexes = list(self.obj.xindexes.values())
-        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        # Deduplicate (an index is shared by its coordinates) but maintain the
+        # order in which the topologies appear.
+        indexes = self.obj.xindexes.get_unique()
+        grids = [index._ugrid for index in indexes if isinstance(index, UgridIndex)]
         if len(grids) != 1:
             raise ValueError("DataArray should contain exactly one UgridIndex")
-        return grids.pop()
+        return grids[0]
 
     @property
     def grids(self) -> List[UgridType]:
@@ -95,7 +102,9 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         new_grid, name_dict = self.grid.rename(name, return_name_dict=True)
         plain_obj = drop_ugrid_index(self.obj)
         to_rename = set(plain_obj.coords) | set(plain_obj.dims)
-        new_obj = plain_obj.rename({k: v for k, v in name_dict.items() if k in to_rename})
+        new_obj = plain_obj.rename(
+            {k: v for k, v in name_dict.items() if k in to_rename}
+        )
         return UgridDataArray(new_obj, new_grid)
 
     def assign_node_coords(self) -> UgridDataArray:

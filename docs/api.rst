@@ -32,6 +32,8 @@ Top-level functions
     zeros_like
     concat
     merge
+    is_ugrid_dataarray
+    is_ugrid_dataset
     merge_partitions
     burn_vector_geometry
     earcut_triangulate_polygons

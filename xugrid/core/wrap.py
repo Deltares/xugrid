@@ -98,7 +98,9 @@ class UgridDataset:
                 # Strip any existing UgridIndexes before re-attaching
                 from xugrid.core.index import UgridIndex
 
-                existing = [k for k, v in obj.xindexes.items() if isinstance(v, UgridIndex)]
+                existing = [
+                    k for k, v in obj.xindexes.items() if isinstance(v, UgridIndex)
+                ]
                 ds = obj.drop_indexes(existing).drop_vars(existing) if existing else obj
                 for grid in grids:
                     index_cls = UGRID_INDEXES[grid.topology_dimension]

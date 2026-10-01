@@ -8,7 +8,13 @@ import numpy as np
 import xarray as xr
 
 from xugrid.constants import FILL_VALUE, IntArray, IntDType
-from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray
+from xugrid.core.index import drop_ugrid_index
+from xugrid.core.wrap import (
+    UgridDataArray,
+    UgridDataset,
+    is_ugrid_dataarray,
+    is_ugrid_dataset,
+)
 from xugrid.ugrid.connectivity import renumber
 from xugrid.ugrid.ugridbase import UgridType
 
@@ -51,7 +57,7 @@ def partition_by_label(grid, obj, labels: IntArray):
     if not np.issubdtype(labels.dtype, np.integer):
         raise TypeError(f"labels must have integer dtype, received {labels.dtype}")
 
-    if labels.grid != grid:
+    if labels.ugrid.grid != grid:
         raise ValueError("grid of labels does not match xugrid object")
     if labels.dims != (grid.core_dimension,):
         raise ValueError(
@@ -72,7 +78,7 @@ def partition_by_label(grid, obj, labels: IntArray):
     partitions = []
     for index in indices:
         new_grid, indexes = grid.topology_subset(index, return_index=True)
-        new_obj = obj.isel(indexes, missing_dims="ignore")
+        new_obj = drop_ugrid_index(obj).isel(indexes, missing_dims="ignore")
         partitions.append(obj_type(new_obj, new_grid))
 
     return partitions
@@ -170,7 +176,7 @@ def validate_partition_topology(grouped: defaultdict[str, UgridType]) -> None:
 def group_grids_by_name(partitions: list[UgridDataset]) -> defaultdict[str, UgridType]:
     grouped = defaultdict(list)
     for partition in partitions:
-        for grid in partition.grids:
+        for grid in partition.ugrid.grids:
             grouped[grid.name].append(grid)
 
     validate_partition_topology(grouped)
@@ -181,7 +187,7 @@ def group_data_objects_by_gridname(
     partitions: list[UgridDataset],
 ) -> defaultdict[str, xr.Dataset]:
     # Convert to dataset for convenience
-    data_objects = [partition.obj for partition in partitions]
+    data_objects = [drop_ugrid_index(partition) for partition in partitions]
     data_objects = [
         obj.to_dataset() if isinstance(obj, xr.DataArray) else obj
         for obj in data_objects
@@ -189,7 +195,7 @@ def group_data_objects_by_gridname(
 
     grouped = defaultdict(list)
     for partition, obj in zip(partitions, data_objects):
-        for grid in partition.grids:
+        for grid in partition.ugrid.grids:
             grouped[grid.name].append(obj)
 
     return grouped
@@ -351,21 +357,28 @@ def merge_partitions(partitions, merge_ugrid_chunks: bool = True):
     """
     if len(partitions) == 0:
         raise ValueError("Cannot merge partitions: zero partitions provided.")
-    types = {type(obj) for obj in partitions}
+
+    def _type_name(obj):
+        if is_ugrid_dataarray(obj):
+            return "UgridDataArray"
+        elif is_ugrid_dataset(obj):
+            return "UgridDataset"
+        return type(obj).__name__
+
+    type_names = {_type_name(obj) for obj in partitions}
     msg = "Expected UgridDataArray or UgridDataset, received: {}"
-    if len(types) > 1:
-        type_names = [t.__name__ for t in types]
-        raise TypeError(msg.format(type_names))
-    obj_type = types.pop()
-    if obj_type not in (UgridDataArray, UgridDataset):
-        raise TypeError(msg.format(obj_type.__name__))
+    if len(type_names) > 1:
+        raise TypeError(msg.format(sorted(type_names)))
+    type_name = type_names.pop()
+    if type_name not in ("UgridDataArray", "UgridDataset"):
+        raise TypeError(msg.format(type_name))
 
     # return first partition if single partition is provided
     if len(partitions) == 1:
         return next(iter(partitions))
 
     # Collect grids
-    grids = [grid for p in partitions for grid in p.grids]
+    grids = [grid for p in partitions for grid in p.ugrid.grids]
     ugrid_dims = {dim for grid in grids for dim in grid.dims}
     grids_by_name = group_grids_by_name(partitions)
 

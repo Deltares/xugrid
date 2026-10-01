@@ -70,7 +70,11 @@ def make_regrid(func):
 
 
 def setup_grid(obj, **kwargs):
-    if isinstance(obj, xu.Ugrid2d) or xu.is_ugrid_dataarray(obj) or xu.is_ugrid_dataset(obj):
+    if (
+        isinstance(obj, xu.Ugrid2d)
+        or xu.is_ugrid_dataarray(obj)
+        or xu.is_ugrid_dataset(obj)
+    ):
         return UnstructuredGrid2d(obj)
     elif isinstance(obj, (xr.DataArray, xr.Dataset)):
         return StructuredGrid2d(
