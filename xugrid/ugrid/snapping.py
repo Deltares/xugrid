@@ -2,7 +2,6 @@
 
 from typing import Tuple, TypeVar, Union
 
-import numba as nb
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -24,6 +23,12 @@ from xugrid.ugrid.connectivity import AdjacencyMatrix
 from xugrid.ugrid.ugrid2d import Ugrid2d
 
 try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
+
+
+try:
     import geopandas as gpd
 
     GeoDataFrameType = gpd.GeoDataFrame
@@ -38,7 +43,7 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-@nb.njit(cache=True)
+@numba.njit(cache=True)
 def _snap_to_nearest(A: MatrixCSR, snap_candidates: IntArray, max_distance) -> IntArray:
     """
     Find a closest target for each node.
@@ -214,12 +219,12 @@ def snap_to_nodes(
     return xnew, ynew
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def to_vector(a: Point, b: Point) -> Vector:
     return Vector(b.x - a.x, b.y - a.y)
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def as_point(a: FloatArray) -> Point:
     return Point(a[0], a[1])
 
@@ -232,7 +237,7 @@ def lines_as_edges(line_coords, line_index) -> FloatArray:
     return edges[keep], line_index[1:][keep]
 
 
-@nb.njit(inline="always")
+@numba.njit(inline="always")
 def left_of(a: Point, p: Point, U: Vector) -> bool:
     # Whether point a is left of vector U
     # U: p -> q direction vector
@@ -247,7 +252,7 @@ def coerce_geometry(lines: GeoDataFrameType) -> LineArray:
     return geometry
 
 
-@nb.njit(cache=True)
+@numba.njit(cache=True)
 def snap_to_edges(
     face_indices: IntArray,
     intersection_edges: FloatArray,

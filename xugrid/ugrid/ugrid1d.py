@@ -1,10 +1,9 @@
 from itertools import chain
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba_celltree import EdgeCellTree2d
 from numpy.typing import ArrayLike
 from scipy import sparse
 
@@ -24,6 +23,9 @@ from xugrid.regrid.utils import alt_cumsum
 from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import section_coordinates_1d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index
+
+if TYPE_CHECKING:
+    from numba_celltree import EdgeCellTree2d
 
 
 class Ugrid1d(AbstractUgrid):
@@ -135,6 +137,7 @@ class Ugrid1d(AbstractUgrid):
         # Collect names
         connectivity = ds.ugrid_roles.connectivity[topology]
         coordinates = ds.ugrid_roles.coordinates[topology]
+        dimensions = ds.ugrid_roles.dimensions[topology]
         ugrid_vars = (
             [topology]
             + list(connectivity.values())
@@ -152,8 +155,11 @@ class Ugrid1d(AbstractUgrid):
         fill_value = ds[edge_nodes].encoding.get("_FillValue", -1)
         start_index = ds[edge_nodes].attrs.get("start_index", 0)
         edge_node_connectivity = cls._prepare_connectivity(
-            ds[edge_nodes], fill_value, dtype=IntDType
-        ).to_numpy()
+            ds[edge_nodes],
+            fill_value,
+            dtype=IntDType,
+            coredim=dimensions["edge_dimension"],
+        )
 
         # Fill "indexes": mark which names point to the UGRID-relevant coordinates.
         indexes["node_x"] = x_index
@@ -271,7 +277,7 @@ class Ugrid1d(AbstractUgrid):
         if self._dataset:
             dataset = dataset.merge(self._dataset, compat="override")
         if other is not None:
-            dataset = dataset.merge(other)
+            dataset = dataset.merge(other, compat="override")
         if node_x not in dataset or node_y not in dataset:
             dataset = self.assign_node_coords(dataset)
         if optional_attributes:
@@ -666,12 +672,14 @@ class Ugrid1d(AbstractUgrid):
         return self.sel(x=slice(xmin, xmax), y=slice(ymin, ymax))
 
     @property
-    def celltree(self) -> EdgeCellTree2d:
+    def celltree(self) -> "EdgeCellTree2d":
         """
         Initializes the celltree if needed, and returns celltree.
 
         A celltree is a search structure for spatial lookups in unstructured grids.
         """
+        from numba_celltree import EdgeCellTree2d
+
         if self._celltree is None:
             self._celltree = EdgeCellTree2d(
                 self.node_coordinates,

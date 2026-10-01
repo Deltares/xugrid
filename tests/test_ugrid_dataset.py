@@ -1,16 +1,28 @@
 import os
 import warnings
 
-import dask
-import geopandas as gpd
 import numpy as np
 import pandas as pd
-import pyproj
 import pytest
-import shapely
 import xarray as xr
 
 import xugrid
+
+from . import (
+    has_geopandas,
+    requires_dask,
+    requires_geopandas,
+    requires_numba_celltree,
+    requires_pymetis,
+    requires_pyproj,
+    requires_shapely,
+    requires_zarr,
+)
+
+if has_geopandas:
+    import geopandas as gpd
+    import pyproj
+    import shapely
 
 
 def GRID():
@@ -209,6 +221,7 @@ class TestUgridDataArray:
         assert actual.shape == (2,)
         assert actual.ugrid.grid.n_face == 2
 
+    @requires_numba_celltree
     def test_sel_points(self):
         with pytest.raises(ValueError, match="x and y must be 1d"):
             self.uda.ugrid.sel_points(x=[[0.0, 1.0]], y=[[0.0, 1.0]])
@@ -218,6 +231,7 @@ class TestUgridDataArray:
         assert isinstance(actual, xr.DataArray)
         assert actual.shape == (2,)
 
+    @requires_numba_celltree
     def test_sel(self):
         # Ugrid2d already tests most
         # Orthogonal points
@@ -241,6 +255,7 @@ class TestUgridDataArray:
         assert actual.shape == (1,)
         assert actual.ugrid.grid.n_face == 1
 
+    @requires_numba_celltree
     def test_intersect_line(self):
         p0 = (0.0, 0.0)
         p1 = (2.0, 2.0)
@@ -252,6 +267,7 @@ class TestUgridDataArray:
         assert np.allclose(actual["mesh2d_y"], [0.5, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.5 * sqrt2, 1.25 * sqrt2])
 
+    @requires_shapely
     def test_intersect_linestring(self):
         linestring = shapely.geometry.LineString(
             [
@@ -267,6 +283,7 @@ class TestUgridDataArray:
         assert np.allclose(actual["mesh2d_y"], [0.5, 0.5, 0.75, 1.25])
         assert np.allclose(actual["mesh2d_s"], [0.25, 0.75, 1.25, 1.75])
 
+    @requires_numba_celltree
     def test_rasterize(self):
         actual = self.uda.ugrid.rasterize(resolution=0.5)
         x = [0.25, 0.75, 1.25, 1.75]
@@ -283,6 +300,7 @@ class TestUgridDataArray:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    @requires_pymetis
     def test_partitioning(self):
         partitions = self.uda.ugrid.partition(n_part=2)
         assert len(partitions) == 2
@@ -296,6 +314,7 @@ class TestUgridDataArray:
         back = self.uda.ugrid.reindex_like(self.uda.ugrid.grid)
         assert xugrid.is_ugrid_dataarray(back)
 
+    @requires_pyproj
     def test_crs(self):
         uda = self.uda.copy()
         crs = uda.ugrid.crs
@@ -312,6 +331,7 @@ class TestUgridDataArray:
         assert not np.array_equal(result.ugrid.grid.node_x, uda.ugrid.grid.node_x)
         assert not np.array_equal(result.ugrid.grid.node_y, uda.ugrid.grid.node_y)
 
+    @requires_pyproj
     def test_crs_roundtrip(self):
         uda = self.uda.copy()
         uda.ugrid.set_crs(epsg=28992)
@@ -321,6 +341,7 @@ class TestUgridDataArray:
         back = xugrid.UgridDataset(ds)
         assert back.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
 
+    @requires_pyproj
     def test_is_geographic(self):
         uda = self.uda
         assert uda.ugrid.grid.is_geographic is False
@@ -334,6 +355,7 @@ class TestUgridDataArray:
         assert result.ugrid.grid.is_geographic is False
         assert result.ugrid.grid.is_projected is True
 
+    @requires_geopandas
     def test_to_geodataframe(self):
         uda1 = self.uda.copy()
         uda1.ugrid.obj.name = None
@@ -395,6 +417,19 @@ class TestUgridDataArray:
         assert xugrid.is_ugrid_dataarray(actual)
         assert np.allclose(actual, 1.0)
         assert set(actual.dims) == set(nd_uda2.dims)
+
+    @requires_dask
+    def test_broadcasted_laplace_interpolate_delayed(self):
+        import dask
+
+        uda2 = self.uda.copy()
+        uda2.obj[:-2] = np.nan
+        multiplier = xr.DataArray(
+            np.ones((3, 2)),
+            coords={"time": [0, 1, 2], "layer": [1, 2]},
+            dims=("time", "layer"),
+        )
+        nd_uda2 = uda2 * multiplier
 
         # Test delayed evaluation too.
         nd_uda2 = uda2 * multiplier.chunk({"time": 1})
@@ -476,6 +511,7 @@ class TestUgridDataArray:
         uda2.ugrid.to_netcdf(path)
         assert path.exists()
 
+    @requires_zarr
     def test_to_zarr(self, tmp_path):
         uda2 = self.uda.copy()
         uda2.ugrid.obj.name = "test"
@@ -499,6 +535,7 @@ class TestUgridDataArray:
         assert "mesh2d_face_x" in with_coords.coords
         assert "mesh2d_face_y" in with_coords.coords
 
+    @requires_dask
     def test_plot_with_chunks(self, tmp_path):
         time = xr.DataArray([0.0, 1.0, 2.0], coords={"time": [0, 1, 2]})
         uda = (self.uda * time).transpose()
@@ -510,6 +547,7 @@ class TestUgridDataArray:
         primitive = back.isel(time=0).ugrid.plot()
         assert primitive is not None
 
+    @requires_dask
     def test_plot_contourf_with_chunks(self, tmp_path):
         time = xr.DataArray([0.0, 1.0, 2.0], coords={"time": [0, 1, 2]})
         uda = (self.uda * time).transpose()
@@ -626,6 +664,7 @@ class TestUgridDataset:
         with pytest.raises(TypeError):
             self.uds.ugrid.rename(["mesh1d", "mesh2d"])
 
+    @requires_geopandas
     def test_from_geodataframe(self):
         xy = np.array(
             [
@@ -651,6 +690,7 @@ class TestUgridDataset:
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
 
+    @requires_numba_celltree
     def test_sel_points(self):
         with pytest.raises(ValueError, match="x and y must be 1d"):
             self.uds.ugrid.sel_points(x=[[0.0, 1.0]], y=[[0.0, 1.0]])
@@ -661,6 +701,7 @@ class TestUgridDataset:
         assert actual["a"].shape == (2,)
         assert actual["b"].shape == (2,)
 
+    @requires_numba_celltree
     def test_sel_points_multiple_dims(self):
         grid = self.uds.ugrid.grid
         ds = xr.Dataset(
@@ -693,6 +734,7 @@ class TestUgridDataset:
         )
         assert actual.identical(expected)
 
+    @requires_numba_celltree
     def test_sel(self):
         # Ugrid2d already tests most
         # Orthogonal points
@@ -720,6 +762,7 @@ class TestUgridDataset:
         assert actual["b"].shape == (1,)
         assert actual.ugrid.grids[0].n_face == 1
 
+    @requires_numba_celltree
     def test_rasterize(self):
         actual = self.uds.ugrid.rasterize(resolution=0.5)
         x = [0.25, 0.75, 1.25, 1.75]
@@ -738,6 +781,7 @@ class TestUgridDataset:
         assert np.allclose(actual["x"], x)
         assert np.allclose(actual["y"], y)
 
+    @requires_numba_celltree
     def test_intersect_line(self):
         p0 = (0.0, 0.0)
         p1 = (2.0, 2.0)
@@ -751,6 +795,7 @@ class TestUgridDataset:
         assert "a" in actual
         assert "b" in actual
 
+    @requires_shapely
     def test_intersect_linestring(self):
         linestring = shapely.geometry.LineString(
             [
@@ -768,6 +813,7 @@ class TestUgridDataset:
         assert "a" in actual
         assert "b" in actual
 
+    @requires_pymetis
     def test_partitioning(self):
         partitions = self.uds.ugrid.partition(n_part=2)
         assert len(partitions) == 2
@@ -782,6 +828,7 @@ class TestUgridDataset:
         back = self.uds.ugrid.reindex_like(self.uds.ugrid.grid)
         assert xugrid.is_ugrid_dataset(back)
 
+    @requires_pyproj
     def test_crs(self):
         uds = self.uds.copy()
         crs = uds.ugrid.crs
@@ -804,6 +851,7 @@ class TestUgridDataset:
         assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
         assert result.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(32631)}
 
+    @requires_pyproj
     def test_crs_from_minimal(self):
         # Grid mapping on a single variable
         # Just epsg
@@ -813,6 +861,7 @@ class TestUgridDataset:
         uds = xugrid.UgridDataset(ds)
         assert uds.ugrid.crs == {"mesh2d": pyproj.CRS.from_epsg(28992)}
 
+    @requires_pyproj
     def test_crs_roundtrip(self):
         uds = self.uds.copy()
         uds.ugrid.set_crs(epsg=28992, topology="mesh2d")
@@ -840,6 +889,7 @@ class TestUgridDataset:
         assert "mesh2d_face_x" in with_coords.coords
         assert "mesh2d_face_y" in with_coords.coords
 
+    @requires_geopandas
     def test_to_geodataframe(self):
         gdf = self.uds.ugrid.to_geodataframe()
         assert isinstance(gdf, gpd.GeoDataFrame)
@@ -883,6 +933,7 @@ class TestDatasetOptionalCoordinates:
         }
         assert uds.ugrid.grid._indexes == expected
 
+    @requires_pyproj
     def test_dataset_set_crs(self):
         uds = xugrid.UgridDataset(self.ds)
         for x in self.X:
@@ -906,6 +957,7 @@ class TestDatasetOptionalCoordinates:
         for x in self.Y:
             assert back[x].attrs["standard_name"] == "latitude"
 
+    @requires_pyproj
     def test_dataset_to_crs(self):
         uds = xugrid.UgridDataset(self.ds)
         uds.ugrid.set_crs(epsg=28992)
@@ -939,6 +991,7 @@ class TestDatasetOptionalCoordinates:
         for x in self.Y:
             assert back[x].attrs["standard_name"] == "latitude"
 
+    @requires_pyproj
     def test_dropped_grid_mapping(self):
         grid = self.grid.copy()
         grid.set_crs(epsg=28992)
@@ -953,6 +1006,7 @@ class TestDatasetOptionalCoordinates:
         assert "mesh2d_crs" in back
         assert "grid_mapping" in back["a"].attrs
 
+    @requires_pyproj
     def test_dataarray_set_crs(self):
         uds = xugrid.UgridDataset(self.ds)
         uda = uds["a"]
@@ -966,6 +1020,7 @@ class TestDatasetOptionalCoordinates:
         for x in self.Y:
             assert back[x].attrs["standard_name"] == "latitude"
 
+    @requires_pyproj
     def test_dataarray_to_crs(self):
         uds = xugrid.UgridDataset(self.ds)
         uda = uds["a"]
@@ -1036,6 +1091,21 @@ class TestMultiTopologyUgridDataset:
         back = self.uds.ugrid.reindex_like(self.uds)
         assert xugrid.is_ugrid_dataset(back)
 
+    @requires_pyproj
+    def test_write_multi_grid_mapping(self):
+        uds = self.uds.copy()
+        uds.ugrid.set_crs(epsg=28992)
+        ds = uds.ugrid.to_dataset()
+        # Should be present on data variables of both topologies.
+        assert "grid_mapping" in ds["a"].attrs
+        assert "grid_mapping" in ds["b"].attrs
+        assert "grid_mapping" in ds["c"].attrs
+        # Should also be present on coordinates (not CF-conventions, but e.g. QGIS expects it).
+        assert "grid_mapping" in ds["network1d_node_x"].attrs
+        assert "grid_mapping" in ds["network1d_node_y"].attrs
+        assert "grid_mapping" in ds["mesh2d_node_x"].attrs
+        assert "grid_mapping" in ds["mesh2d_node_y"].attrs
+
 
 class TestFromStructured:
     @pytest.fixture(autouse=True)
@@ -1085,6 +1155,7 @@ class TestFromStructured:
         with pytest.raises(ValueError, match="Coordinates xc and yc are not present."):
             xugrid.UgridDataArray.from_structured2d(self.da2d, x="xc", y="yc")
 
+    @requires_numba_celltree
     def test_from_dataarray(self):
         uda = xugrid.UgridDataArray.from_structured2d(self.da2d)
         assert xugrid.is_ugrid_dataarray(uda)
@@ -1117,6 +1188,7 @@ class TestFromStructured:
         assert np.array_equal(np.unique(uda.ugrid.grid.node_x), [9.0, 11.0, 13.0])
         assert np.array_equal(uda.data, [0, 1, 2, 3])
 
+    @requires_numba_celltree
     def test_from_dataset(self):
         uds = xugrid.UgridDataset.from_structured2d(self.ds)
         assert xugrid.is_ugrid_dataset(uds)
@@ -1351,6 +1423,7 @@ def test_load_dataarray_roundtrip(tmp_path):
     assert back.name == "a"
 
 
+@requires_dask
 def test_open_mfdataset(tmp_path):
     path1 = tmp_path / "ugrid-dataset_1.nc"
     path2 = tmp_path / "ugrid-dataset_2.nc"
@@ -1382,6 +1455,7 @@ def test_keep_attrs():
     assert ds.attrs["date_created"] == "today"
 
 
+@requires_zarr
 def test_zarr_roundtrip(tmp_path):
     path = tmp_path / "ugrid-dataset.zarr"
     uds = xugrid.UgridDataset(UGRID_DS())

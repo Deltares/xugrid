@@ -8,11 +8,15 @@ This is a simplified port of the percentile helpers:
 # https://github.com/numba/numba/blob/0441bb17c7820efc2eba4fd141b68dac2afa4740/numba/np/arraymath.py#L1595
 """
 
-import numba as nb
 import numpy as np
 
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
-@nb.njit(inline="always")
+
+@numba.njit(inline="always")
 def nan_le(a, b) -> bool:
     # Nan-aware <
     if np.isnan(a):
@@ -23,7 +27,7 @@ def nan_le(a, b) -> bool:
         return a < b
 
 
-@nb.njit
+@numba.njit
 def _partition(A, low, high):
     mid = (low + high) >> 1
     # NOTE: the pattern of swaps below for the pivot choice and the
@@ -59,7 +63,7 @@ def _partition(A, low, high):
     return i
 
 
-@nb.njit
+@numba.njit
 def _select(arry, k, low, high):
     """Select the k'th smallest element in array[low:high + 1]."""
     i = _partition(arry, low, high)
@@ -73,7 +77,7 @@ def _select(arry, k, low, high):
     return arry[k]
 
 
-@nb.njit
+@numba.njit
 def _select_two(arry, k, low, high):
     """
     Select the k'th and k+1'th smallest elements in array[low:high + 1].

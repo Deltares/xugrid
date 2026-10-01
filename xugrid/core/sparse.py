@@ -8,11 +8,15 @@ be neatly represented by (typed) namedtuples, which numba accepts.
 
 from typing import NamedTuple
 
-import numba
 import numpy as np
 from scipy import sparse
 
 from xugrid.constants import FloatArray, IntArray, IntDType
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 
 class MatrixCOO(NamedTuple):

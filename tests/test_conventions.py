@@ -1,12 +1,13 @@
 from collections import ChainMap
 
 import numpy as np
-import pyproj
 import pytest
 import xarray as xr
 
 import xugrid
 from xugrid.ugrid import conventions as cv
+
+from . import requires_netCDF4
 
 
 def test_infer_xy_coords():
@@ -69,6 +70,36 @@ def test_infer_xy_coords():
         x, y = cv._infer_xy_coords(ds, candidates)
 
 
+def test_get_dims_transposed():
+    ds = xr.Dataset()
+    edge_nodes = np.array(
+        [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 4],
+        ]
+    ).transpose()
+    ds["edge_nodes"] = xr.DataArray(data=edge_nodes, dims=("two", "n_edge"))
+    ds["network1d"] = xr.DataArray(
+        0,
+        attrs={
+            "edge_node_connectivity": "edge_nodes",
+            "edge_dimension": "n_edge",
+            "topology_dimension": 1,
+        },
+    )
+    dimensions = cv._get_dimensions(
+        ds,
+        topologies=["network1d"],
+        connectivity={"network1d": {"edge_node_connectivity": "edge_nodes"}},
+        coordinates={"network1d": {}},
+    )
+    expected = {"network1d": {"edge_dimension": "n_edge"}}
+    assert dimensions == expected
+
+
+@requires_netCDF4
 class TestConventionsElevation:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -129,6 +160,14 @@ class TestConventionsElevation:
         actual = cv._get_dimensions(ds, ["mesh2d"], connectivity, coordinates)
         assert actual == self.dimensions
 
+    def test_get_dimensions__error(self):
+        ds = xugrid.data.elevation_nl(xarray=True)
+        ds["mesh2d_face_nodes"] = ds["mesh2d_face_nodes"].isel(nmax_face=0, drop=True)
+        connectivity = cv._get_connectivity(ds, ["mesh2d"])
+        coordinates = cv._get_coordinates(ds, ["mesh2d"])
+        with pytest.raises(cv.UgridDimensionError):
+            cv._get_dimensions(ds, ["mesh2d"], connectivity, coordinates)
+
     def test_topology(self):
         assert self.ds.ugrid_roles.topology == ["mesh2d"]
 
@@ -157,7 +196,15 @@ class TestConventionsElevation:
         result = self.ds.ugrid_roles.__repr__()
         assert isinstance(result, str)
 
+    def test_transposed(self):
+        ds_T = self.ds.transpose()
+        assert ds_T.ugrid_roles.topology == ["mesh2d"]
+        assert ds_T.ugrid_roles.connectivity == self.connectivity
+        assert ds_T.ugrid_roles.dimensions == self.dimensions
+        assert ds_T.ugrid_roles.coordinates == self.coordinates
 
+
+@requires_netCDF4
 class TestCrsConventions:
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -188,6 +235,8 @@ class TestCrsConventions:
         }
 
     def test_get_grid_mapping_names(self):
+        pyproj = pytest.importorskip("pyproj")
+
         # Setup doesn't contain any CRS data.
         expected = {"mesh2d": None}
         assert (
@@ -218,6 +267,15 @@ class TestCrsConventions:
             ValueError, match="Multiple grid mappings found for topology"
         ):
             ds.ugrid_roles.grid_mapping_names
+
+    def test_grid_mapping_not_in_dataset(self):
+        ds = self.ds.copy()
+        ds["elevation"].attrs["grid_mapping"] = "mesh2d_crs"
+        expected = {"mesh2d": None}
+        with pytest.warns(UserWarning):
+            assert (
+                cv._get_grid_mapping_names(ds, ["mesh2d"], self.dimensions) == expected
+            )
 
     def test_infer_projected(self):
         ds = self.ds.copy()
@@ -427,7 +485,7 @@ class TestCompleteSpecification:
 
         with pytest.raises(
             cv.UgridDimensionError,
-            match="edge_dimension: nEdges not in edge_face_connectivity",
+            match="edge_dimension: mesh2d_nEdges not in edge_node_connectivity",
         ):
             ds.ugrid_roles.dimensions
 

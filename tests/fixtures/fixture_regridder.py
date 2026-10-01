@@ -1,4 +1,8 @@
-import dask.array as da
+try:
+    import dask.array as da
+except ImportError:
+    da = None
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -360,6 +364,9 @@ def expected_results_linear():
 
 @pytest.fixture(scope="function")
 def grid_data_dask_source():
+    if da is None:
+        pytest.skip("dask not installed")
+
     data = np.arange(10000).reshape((100, 100))
     data = da.from_array(data, chunks=(10, (10, 30, 60)))
     return xr.DataArray(
@@ -376,6 +383,9 @@ def grid_data_dask_source():
 
 @pytest.fixture(scope="function")
 def grid_data_dask_source_layered():
+    if da is None:
+        pytest.skip("dask not installed")
+
     data = np.arange(30000).reshape((3, 100, 100))
     data = da.from_array(data, chunks=(3, 10, (10, 30, 60)))
     return xr.DataArray(
@@ -393,6 +403,9 @@ def grid_data_dask_source_layered():
 
 @pytest.fixture(scope="function")
 def grid_data_dask_target():
+    if da is None:
+        pytest.skip("dask not installed")
+
     data = np.zeros(100).reshape((10, 10))
     data = da.from_array(data, chunks=(10, (5, 5)))
     return xr.DataArray(

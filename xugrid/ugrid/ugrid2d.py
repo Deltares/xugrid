@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import warnings
 from itertools import chain
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-from numba_celltree import CellTree2d
 from numpy.typing import ArrayLike
 from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import reverse_cuthill_mckee
@@ -31,6 +30,9 @@ from xugrid.ugrid import connectivity, conventions
 from xugrid.ugrid.selection_utils import section_coordinates_2d
 from xugrid.ugrid.ugridbase import AbstractUgrid, as_pandas_index, numeric_bound
 from xugrid.ugrid.voronoi import voronoi_topology
+
+if TYPE_CHECKING:
+    from numba_celltree import CellTree2d
 
 
 class Ugrid2d(AbstractUgrid):
@@ -268,6 +270,7 @@ class Ugrid2d(AbstractUgrid):
         # Collect names
         connectivity = ds.ugrid_roles.connectivity[topology]
         coordinates = ds.ugrid_roles.coordinates[topology]
+        dimensions = ds.ugrid_roles.dimensions[topology]
         ugrid_vars = (
             [topology]
             + list(connectivity.values())
@@ -283,14 +286,20 @@ class Ugrid2d(AbstractUgrid):
         fill_value = ds[face_nodes].encoding.get("_FillValue", -1)
         start_index = ds[face_nodes].attrs.get("start_index", 0)
         face_node_connectivity = cls._prepare_connectivity(
-            ds[face_nodes], fill_value, dtype=IntDType
-        ).to_numpy()
+            ds[face_nodes],
+            fill_value,
+            dtype=IntDType,
+            coredim=dimensions["face_dimension"],
+        )
 
         edge_nodes = connectivity.get("edge_node_connectivity")
         if edge_nodes:
             edge_node_connectivity = cls._prepare_connectivity(
-                ds[edge_nodes], fill_value, dtype=IntDType
-            ).to_numpy()
+                ds[edge_nodes],
+                fill_value,
+                dtype=IntDType,
+                coredim=dimensions["edge_dimension"],
+            )
             # Make sure the single passed start index is valid for both
             # connectivity arrays.
             edge_start_index = ds[edge_nodes].attrs.get("start_index", 0)
@@ -401,7 +410,7 @@ class Ugrid2d(AbstractUgrid):
         if self._dataset:
             dataset = dataset.merge(self._dataset, compat="override")
         if other is not None:
-            dataset = dataset.merge(other)
+            dataset = dataset.merge(other, compat="override")
         if node_x not in dataset or node_y not in dataset:
             dataset = self.assign_node_coords(dataset)
         if optional_attributes:
@@ -897,12 +906,14 @@ class Ugrid2d(AbstractUgrid):
         return self._face_kdtree
 
     @property
-    def celltree(self) -> CellTree2d:
+    def celltree(self) -> "CellTree2d":
         """
         Initializes the celltree if needed, and returns celltree.
 
         A celltree is a search structure for spatial lookups in unstructured grids.
         """
+        from numba_celltree import CellTree2d
+
         if self._celltree is None:
             self._celltree = CellTree2d(
                 self.node_coordinates, self.face_node_connectivity, FILL_VALUE
@@ -1210,7 +1221,6 @@ class Ugrid2d(AbstractUgrid):
         xmax: float,
         ymax: float,
     ):
-        xmin, ymin, xmax, ymax = self.bounds
         bounds = [xmin, ymin, xmax, ymax]
         face_index = self.locate_bounding_box(*bounds)
         return self.topology_subset(face_index)
@@ -1535,12 +1545,17 @@ class Ugrid2d(AbstractUgrid):
                 .view(np.int64)
                 .ravel()
             )
-            edge_index = np.searchsorted(edges, new_edges, sorter=np.argsort(edges))
-            # Reshuffle to keep the original order as intact as possible; how
-            # much benefit does this actually give?
-            sorter = np.argsort(edge_index)
-            new._edge_node_connectivity = new._edge_node_connectivity[sorter]
-            edge_index = edge_index[sorter]
+            order = np.argsort(edges)
+            position = np.searchsorted(edges, new_edges, sorter=order)
+            edge_index = order[np.clip(position, 0, edges.size - 1)]
+            # Sanity check:
+            if not np.array_equal(edges[edge_index], new_edges):
+                raise ValueError(
+                    "Cannot map edge-associated data onto the non-periodic grid:\n"
+                    "the new grid has edges with no counterpart in the periodic grid,\n"
+                    "which suggests a degenerate periodic topology.\n"
+                    "Please file an issue at: github.com/deltares/xugrid/issues"
+                )
 
         if obj is not None:
             indexes = {

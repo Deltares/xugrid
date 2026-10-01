@@ -9,7 +9,12 @@ from xugrid.conversion import grid_from_geodataframe
 # from xugrid.plot.pyvista import to_pyvista_grid
 from xugrid.core.accessorbase import AbstractUgridAccessor
 from xugrid.core.index import UGRID_INDEXES, UgridIndex, drop_ugrid_index
-from xugrid.core.wrap import UgridDataArray, UgridDataset, is_ugrid_dataarray, is_ugrid_dataset
+from xugrid.core.wrap import (
+    UgridDataArray,
+    UgridDataset,
+    is_ugrid_dataarray,
+    is_ugrid_dataset,
+)
 from xugrid.ugrid.ugrid1d import Ugrid1d
 from xugrid.ugrid.ugrid2d import Ugrid2d
 from xugrid.ugrid.ugridbase import UgridType
@@ -79,11 +84,13 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
 
     @property
     def grids(self) -> list[UgridType]:
-        indexes = list(self.obj.xindexes.values())
-        grids = {index._ugrid for index in indexes if isinstance(index, UgridIndex)}
+        # Deduplicate (an index is shared by its coordinates) but maintain the
+        # order in which the topologies appear.
+        indexes = self.obj.xindexes.get_unique()
+        grids = [index._ugrid for index in indexes if isinstance(index, UgridIndex)]
         if len(grids) == 0:
             raise ValueError("Dataset contains no UgridIndex")
-        return list(grids)
+        return grids
 
     @property
     def grid(self) -> UgridType:
@@ -195,7 +202,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             )
 
         plain_obj = drop_ugrid_index(self.obj)
-        to_rename = set(plain_obj.data_vars) | set(plain_obj.coords) | set(plain_obj.dims)
+        to_rename = (
+            set(plain_obj.data_vars) | set(plain_obj.coords) | set(plain_obj.dims)
+        )
         new_obj = plain_obj.rename({k: v for k, v in names.items() if k in to_rename})
         return UgridDataset(new_obj, new_grids)
 
@@ -357,7 +366,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         for grid in self.grids:
             xx, yy, index = grid.rasterize(resolution, self.total_bounds)
             datasets.append(self._raster(xx, yy, index))
-        return xr.merge(datasets)
+        return xr.merge(datasets, compat="override")
 
     def rasterize_like(self, other: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
         """
@@ -381,7 +390,7 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
         for grid in self.grids:
             xx, yy, index = grid.rasterize_like(x, y)
             datasets.append(self._raster(xx, yy, index))
-        return xr.merge(datasets)
+        return xr.merge(datasets, compat="override")
 
     def to_periodic(self):
         """
@@ -500,7 +509,14 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 if grid._indexes.get("edge_x"):
                     result = grid.assign_edge_coords(result)
             datasets.append(result)
-        return xr.merge(datasets)
+
+        def _combine_attrs(attrs_seq, context):
+            combined = {}
+            for attrs in attrs_seq:
+                combined.update(attrs)
+            return combined
+
+        return xr.merge(datasets, compat="override", combine_attrs=_combine_attrs)
 
     @property
     def crs(self):

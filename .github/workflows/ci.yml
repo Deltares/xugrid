@@ -3,10 +3,10 @@ name: ci
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
   test:
@@ -36,16 +36,35 @@ jobs:
           - py313
           - py312
           - py311
-          - py310 
+          - py310
     steps:
       - name: Check out repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.9.4
+        uses: prefix-dev/setup-pixi@v0.10.2
         with:
           manifest-path: pyproject.toml
       - name: Run Tests
         run: pixi run --environment ${{ matrix.pixi-environment }} test
+  test-minimal:
+    name: test-minimal - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v7
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+        with:
+          manifest-path: pyproject.toml
+      - name: Run Tests
+        run: pixi run test-minimal
 
   build:
     runs-on: ubuntu-latest
@@ -53,15 +72,15 @@ jobs:
       contents: write
     steps:
       - name: Check out repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.9.4
+        uses: prefix-dev/setup-pixi@v0.10.2
         with:
           manifest-path: pyproject.toml
       - name: Run Tests
         run: pixi run test
       - name: Publish Code Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

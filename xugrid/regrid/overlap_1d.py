@@ -1,8 +1,12 @@
-import numba
 import numpy as np
 
 from xugrid.constants import IntDType
 from xugrid.regrid.utils import alt_cumsum
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 
 @numba.njit(inline="always")

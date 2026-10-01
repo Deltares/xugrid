@@ -3,12 +3,16 @@
 import abc
 from typing import Callable, Optional, Tuple, Union
 
-import numba
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 import xugrid as xu
+
+try:
+    import numba
+except ImportError:
+    from xugrid.constants import NoOpNumba as numba
 
 # dask as optional dependency
 try:
@@ -266,7 +270,7 @@ class BaseRegridder(abc.ABC):
         )
         source_ds = self._source.to_dataset("__source")
         target_ds = self._target.to_dataset("__target")
-        return xr.merge((weights_ds, source_ds, target_ds))
+        return xr.merge((weights_ds, source_ds, target_ds), compat="override")
 
     def weights_as_dataframe(self) -> pd.DataFrame:
         """

@@ -2,12 +2,14 @@ from enum import IntEnum
 from unittest.mock import MagicMock
 
 import pytest
-import shapely.geometry as sg
 
 from xugrid import meshkernel_utils as mku
 from xugrid.constants import MissingOptionalModule
 
-from . import requires_meshkernel
+from . import has_shapely, requires_meshkernel, requires_shapely
+
+if has_shapely:
+    import shapely.geometry as sg
 
 try:
     import meshkernel as mk
@@ -45,6 +47,7 @@ def test_either_string_or_enum():
 
 
 @requires_meshkernel
+@requires_shapely
 def test_to_geometry_list():
     polygon = sg.Polygon(
         [
