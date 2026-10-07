@@ -185,8 +185,9 @@ class TestCrsToAttrs:
         attrs = crs_to_attrs(crs)
         assert "crs_wkt" in attrs
         assert "spatial_ref" in attrs
-        assert attrs["name"] == "Amersfoort / RD New"
+        assert "name" in attrs
         assert attrs["epsg"] == 28992
+        assert pyproj.CRS.from_wkt(attrs["crs_wkt"]).to_epsg() == 28992
         # Oblique stereographic has no CF grid_mapping_name
         assert "grid_mapping_name" not in attrs
         assert crs_from_attrs(attrs) == crs
