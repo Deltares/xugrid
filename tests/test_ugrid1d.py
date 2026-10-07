@@ -269,7 +269,10 @@ def test_ugrid1d_write_grid_mapping():
     grid.set_crs(epsg=28992)
     dataset = grid.to_dataset()
     assert "network1d_crs" in dataset
-    assert dataset["network1d_crs"].attrs["name"] == "Amersfoort / RD New"
+    attrs = dataset["network1d_crs"].attrs
+    assert "name" in attrs
+    assert attrs["epsg"] == 28992
+    assert pyproj.CRS.from_wkt(attrs["crs_wkt"]).to_epsg() == 28992
 
 
 def test_to_dataset():
