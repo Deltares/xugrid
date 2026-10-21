@@ -178,3 +178,29 @@ class AbstractUgridAccessor(abc.ABC):
         All arguments are forwarded to :py:meth:`xr.Dataset.to_zarr`.
         """
         self.to_dataset().to_zarr(*args, **kwargs)
+
+    def _get_grid_of_type(self, gridtype):
+        grids = self.grids
+        grids_of_type = []
+        for grid in grids:
+            if isinstance(grid, gridtype):
+                grids_of_type.append(grid)
+        ngrid = len(grids_of_type)
+        if ngrid == 1:
+            return grids_of_type[0]
+        else:
+            raise TypeError(
+                "Can only access grid topology via `.grid` if dataset contains "
+                f"exactly one grid. Dataset contains {ngrid} grids of type {gridtype}. Use "
+                "`.grids` instead."
+            )
+
+    # TODO: these probably have to be converted to properties so we can access them
+    #  with uds.ugrid.ugrid2d instead of uds.ugrid.ugrid2d()
+    def ugrid1d(self):
+        from xugrid.ugrid.ugrid1d import Ugrid1d
+        return self._get_grid_of_type(Ugrid1d)
+
+    def ugrid2d(self):
+        from xugrid.ugrid.ugrid2d import Ugrid2d
+        return self._get_grid_of_type(Ugrid2d)
