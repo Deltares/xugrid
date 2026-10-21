@@ -201,4 +201,4 @@ class AbstractUgridAccessor(abc.ABC):
         return self._get_grid_of_type(xugrid.ugrid.ugrid1d.Ugrid1d)
 
     def ugrid2d(self):
-        return self._get_grid_of_type(xugrid.ugrid.ugrid1d.Ugrid2d)
+        return self._get_grid_of_type(xugrid.ugrid.ugrid2d.Ugrid2d)
