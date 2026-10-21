@@ -198,11 +198,7 @@ class AbstractUgridAccessor(abc.ABC):
     # TODO: these probably have to be converted to properties so we can access them
     #  with uds.ugrid.ugrid2d instead of uds.ugrid.ugrid2d()
     def ugrid1d(self):
-        from xugrid.ugrid.ugrid1d import Ugrid1d
-
-        return self._get_grid_of_type(Ugrid1d)
+        return self._get_grid_of_type(xugrid.ugrid.ugrid1d.Ugrid1d)
 
     def ugrid2d(self):
-        from xugrid.ugrid.ugrid2d import Ugrid2d
-
-        return self._get_grid_of_type(Ugrid2d)
+        return self._get_grid_of_type(xugrid.ugrid.ugrid1d.Ugrid2d)
