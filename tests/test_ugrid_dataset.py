@@ -904,10 +904,10 @@ class TestUgridDataset:
 
     def test_ugrid1d_accessor(self):
         with pytest.raises(TypeError, match="Can only access grid topology via"):
-            _ = self.uds.ugrid.ugrid1d()
+            _ = self.uds.ugrid.grid1d
 
     def test_ugrid2d_accessor(self):
-        assert isinstance(self.uds.ugrid.ugrid2d(), xugrid.ugrid.ugrid2d.Ugrid2d)
+        assert isinstance(self.uds.ugrid.grid2d, xugrid.ugrid.ugrid2d.Ugrid2d)
 
 
 class TestDatasetOptionalCoordinates:

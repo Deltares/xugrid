@@ -33,6 +33,30 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
                 "`.grids` instead."
             )
 
+    def _get_grid_of_type(self, gridtype):
+        grids = self.grids
+        grids_of_type = []
+        for grid in grids:
+            if isinstance(grid, gridtype):
+                grids_of_type.append(grid)
+        ngrid = len(grids_of_type)
+        if ngrid == 1:
+            return grids_of_type[0]
+        else:
+            raise TypeError(
+                "Can only access grid topology via `.grid` if dataset contains "
+                f"exactly one grid. Dataset contains {ngrid} grids of type {gridtype}. Use "
+                "`.grids` instead."
+            )
+
+    @property
+    def grid1d(self):
+        return self._get_grid_of_type(Ugrid1d)
+
+    @property
+    def grid2d(self):
+        return self._get_grid_of_type(Ugrid2d)
+
     @property
     def name(self) -> str:
         """
