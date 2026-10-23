@@ -902,6 +902,13 @@ class TestUgridDataset:
     def test_total_bounds(self):
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
 
+    def test_ugrid1d_accessor(self):
+        with pytest.raises(TypeError, match="Can only access grid topology via"):
+            _ = self.uds.ugrid.grid1d
+
+    def test_ugrid2d_accessor(self):
+        assert isinstance(self.uds.ugrid.grid2d, xugrid.ugrid.ugrid2d.Ugrid2d)
+
 
 class TestDatasetOptionalCoordinates:
     """Test whether all coordinates, not just nodes, are kept in sync."""
