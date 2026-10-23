@@ -44,9 +44,9 @@ class UgridDatasetAccessor(AbstractUgridAccessor):
             return grids_of_type[0]
         else:
             raise TypeError(
-                "Can only access grid topology via `.grid` if dataset contains "
-                f"exactly one grid. Dataset contains {ngrid} grids of type {gridtype}. Use "
-                "`.grids` instead."
+                "Can only access grid topology via `.grid1d`/`.grid2d` if dataset "
+                f"contains exactly one grid1d/grid2d. Dataset contains {ngrid} grids "
+                f"of type {gridtype}. Use `.grids` instead."
             )
 
     @property
