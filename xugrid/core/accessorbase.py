@@ -75,6 +75,30 @@ class AbstractUgridAccessor(abc.ABC):
         pass
 
     @staticmethod
+    def _get_grid(grids, topology_dimension: int):
+        tdim = topology_dimension
+        grids = [grid for grid in grids if grid.topology_dimension == tdim]
+        ngrid = len(grids)
+        if ngrid == 1:
+            return grids[0]
+
+        msg = (
+            f"Can only access grid topology via `.grid{tdim}d` if there is exactly "
+            f"one {tdim}D grid. Found {ngrid}."
+        )
+        if ngrid > 1:
+            msg += " Use `.grids` instead."
+        raise AttributeError(msg)
+
+    @property
+    def grid1d(self):
+        return self._get_grid(self.grids, topology_dimension=1)
+
+    @property
+    def grid2d(self):
+        return self._get_grid(self.grids, topology_dimension=2)
+
+    @staticmethod
     def _raster_xy(bounds: Tuple[float, float, float, float], resolution: float):
         xmin, ymin, xmax, ymax = bounds
         d = abs(resolution)
