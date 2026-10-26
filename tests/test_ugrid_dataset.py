@@ -556,6 +556,13 @@ class TestUgridDataArray:
         primitive = back.isel(time=0).ugrid.plot.contourf()
         assert primitive is not None
 
+    def test_ugrid1d_accessor(self):
+        with pytest.raises(AttributeError, match="Can only access grid topology via"):
+            _ = self.uda.ugrid.grid1d
+
+    def test_ugrid2d_accessor(self):
+        assert isinstance(self.uda.ugrid.grid2d, xugrid.ugrid.ugrid2d.Ugrid2d)
+
 
 class TestUgridDataset:
     @pytest.fixture(autouse=True)
@@ -901,6 +908,13 @@ class TestUgridDataset:
 
     def test_total_bounds(self):
         assert self.uds.ugrid.total_bounds == (0.0, 0.0, 2.0, 2.0)
+
+    def test_ugrid1d_accessor(self):
+        with pytest.raises(AttributeError, match="Can only access grid topology via"):
+            _ = self.uds.ugrid.grid1d
+
+    def test_ugrid2d_accessor(self):
+        assert isinstance(self.uds.ugrid.grid2d, xugrid.ugrid.ugrid2d.Ugrid2d)
 
 
 class TestDatasetOptionalCoordinates:
