@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Unreleased
 ----------
 
+Fixed
+~~~~~
+
+- The warning that numba is not installed is now given when a function that
+  numba would accelerate is called, rather than on ``import xugrid``. Packages
+  that do not use these functions no longer get the warning.
+
 [0.15.3] 2026-04-20
 -------------------
 
