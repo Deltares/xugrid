@@ -1,3 +1,4 @@
+import functools
 import warnings
 from typing import NamedTuple, Union
 
@@ -72,16 +73,28 @@ class NoOpNumba:
         if not cls._warned:
             cls._warned = True
             warnings.warn(
-                "numba is not installed; running a pure-Python fallback instead. "
-                "Regridding, interpolation, and snapping may be much slower; "
-                "install numba to enable acceleration.",
+                "numba is not installed; running a pure-Python fallback instead, "
+                "which may be much slower. Install numba to enable acceleration.",
                 NumbaPerformanceWarning,
                 stacklevel=3,
             )
 
     @staticmethod
     def njit(fn=None, *args, **kwargs):
-        NoOpNumba._warn_once()
+        # Warn when called rather than when decorated: decorators run on import,
+        # which doesn't mean that anything will be slow.
+        def decorate(func):
+            # Inlined functions only run as part of other decorated functions.
+            if kwargs.get("inline") == "always":
+                return func
+
+            @functools.wraps(func)
+            def wrapper(*func_args, **func_kwargs):
+                NoOpNumba._warn_once()
+                return func(*func_args, **func_kwargs)
+
+            return wrapper
+
         if fn is not None and callable(fn):
-            return fn  # used as @numba.njit directly
-        return lambda fn: fn  # used as @numba.njit(...)
+            return decorate(fn)  # used as @numba.njit directly
+        return decorate  # used as @numba.njit(...)
