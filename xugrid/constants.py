@@ -73,8 +73,9 @@ class NoOpNumba:
         if not cls._warned:
             cls._warned = True
             warnings.warn(
-                "numba is not installed; running a pure-Python fallback instead, "
-                "which may be much slower. Install numba to enable acceleration.",
+                "numba is not installed; running a pure-Python fallback instead. "
+                "Regridding, interpolation, and snapping may be much slower; "
+                "install numba to enable acceleration.",
                 NumbaPerformanceWarning,
                 stacklevel=3,
             )
