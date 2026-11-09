@@ -1,6 +1,6 @@
 """
-Centroid Voronoi Tesselation (CVT)
-==================================
+Centroid Voronoi Tessellation (CVT)
+===================================
 
 In principle, computing a centroid voronoi tesslation mesh from an existing mesh
 of convex cells is easy:
@@ -129,7 +129,7 @@ def comparison_plot(
 
 # %%
 # Let's start by generating a simple unstructured mesh and use only its
-# centroids to generate a voronoi tesselation.
+# centroids to generate a voronoi tessellation.
 
 vertices, faces = generate_disk(5, 2)
 centroids = vertices[faces].mean(axis=1)
@@ -311,7 +311,7 @@ for ax, e, v in zip(axes, all_edges, all_nodes):
 # %%
 # Plotting
 # --------
-# One of the uses of a voronoi tesselation is to visualize data that is located
+# One of the uses of a voronoi tessellation is to visualize data that is located
 # on the faces. This is once again relevant for finite volume or finite
 # difference simulations; finite element simulation data is located on the
 # nodes of the mesh.
@@ -378,7 +378,7 @@ ax0.set_ylim(-1.05, 1.05)
 #
 # The figure shows:
 #
-# * The voronoi tesselation (including infinite edges) made by
+# * The voronoi tessellation (including infinite edges) made by
 #   ``scipy.spatial.Voronoi``.
 # * The voronoi tesslation produced by the ``voronoi_topology`` function in
 #   ``xugrid``, along with original vertices in blue, and the original

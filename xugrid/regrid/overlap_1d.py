@@ -112,7 +112,7 @@ def _find_indices(side):
 
         Fortunately, numba implements searchsorted here:
         https://github.com/numba/numba/blob/f867999c7453141642ea9af21febef796da9ca93/numba/np/arraymath.py#L3647
-        But it continously allocates new result arrays.
+        But it continuously allocates new result arrays.
 
         Parameters
         ----------

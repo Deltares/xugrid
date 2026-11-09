@@ -128,7 +128,7 @@ class StructuredGrid1d:
         Return nodes when midpoints are within bounding box of overlaying grid.
 
         In cases that midpoints (and bounding boxes) are flipped, computed indexes
-        are fliped as well.
+        are flipped as well.
 
         Parameters
         ----------
@@ -188,7 +188,7 @@ class StructuredGrid1d:
     ) -> Tuple[IntArray, IntArray, FloatArray]:
         """
         Return source and target nodes and overlapping length. It utilises overlap_1d()
-        and does an aditional flip in cases of reversed midpoints
+        and does an additional flip in cases of reversed midpoints
 
         Parameters
         ----------
@@ -311,7 +311,7 @@ class StructuredGrid1d:
         neighbor = neighbor_index - source_midpoint_index
 
         # If neighbor is 0, we end up computing zero distance, since we're
-        # comparing a midpoint to iself. Instead, set a weight of 1.0 on one,
+        # comparing a midpoint to itself. Instead, set a weight of 1.0 on one,
         # (and impliclity 0 in the other). Similarly, if source and target
         # midpoints coincide, the distance may end up 0.
         length = (

@@ -184,8 +184,8 @@ result.ugrid.plot(vmin=-20, vmax=90, cmap="terrain")
 voronoi_grid.plot(ax=ax, color="red")
 
 # %%
-# Re-use
-# ------
+# Reuse
+# -----
 #
 # The most expensive step of the regridding process is finding and computing
 # overlaps. A regridder can be used repeatedly, provided the source topology

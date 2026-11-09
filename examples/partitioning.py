@@ -3,7 +3,7 @@ Partitioning
 ============
 
 Grid partitioning, or domain decomposition, is an important step in setting up
-parallellized simulations. Xugrid provides utilities for partitioning a grid
+parallelized simulations. Xugrid provides utilities for partitioning a grid
 and its associated data, and for merging partitions back into a single whole.
 """
 # %%
@@ -67,7 +67,7 @@ for partition, ax in zip(partitions, axes.ravel()):
 
 # %%
 # Since the labels are an ordinary UgridDataArray, we can easily store them in
-# a netCDF file and re-use them in another part of a workflow.
+# a netCDF file and reuse them in another part of a workflow.
 #
 # Merging partitions
 # ------------------
@@ -104,7 +104,7 @@ merged_grid.plot()
 # Preserving order
 # ----------------
 #
-# Note that partioning and merging does not preserve order!
+# Note that partitioning and merging does not preserve order!
 
 uda == merged
 

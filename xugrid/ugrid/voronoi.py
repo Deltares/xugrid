@@ -1,5 +1,5 @@
 """
-Module to compute centroidal voronoi tesselation mesh from an existing mesh of
+Module to compute centroidal voronoi tessellation mesh from an existing mesh of
 convex cells.
 
 In principle, this is easy to compute:
@@ -237,9 +237,9 @@ def exterior_topology(
     skip_concave: bool,
 ):
     """
-    Create the exterior topology of the voronoi tesselation.
+    Create the exterior topology of the voronoi tessellation.
 
-    The exterior topology of this voronoi tesselation consists of three kinds
+    The exterior topology of this voronoi tessellation consists of three kinds
     of vertices:
 
     * Centroids of faces that have a vertex located on the exterior, but have
@@ -257,7 +257,7 @@ def exterior_topology(
     concave angle in a polygon, we cannot easily compute the counter clockwise
     order of the vertices to form a polygon. However, since these vertices are
     always located in between the projected vertices, we can introduce a
-    subsitute: a linear interpolation of the two projected vertices. We
+    substitute: a linear interpolation of the two projected vertices. We
     can then utilize this interpolated vertex to compute the counter clockwise
     order, and then replace it by the original vertex -- which then may
     introduce a concave angle.
@@ -349,7 +349,7 @@ def voronoi_topology(
     * if ``add_exterior=True`` and ``add_vertices=True``, infinite voronoi rays
       (projections) are intersected at exterior edges and all exterior vertices
       are included. If the mesh exterior forms a concave polygon, the resulting
-      tesselation will contain concave cells as well.
+      tessellation will contain concave cells as well.
     * if ``add_exterior=True`` and ``add_vertices=False``, the infinite voronoi
       rays are intersected, but no exterior vertices are included. This will
       always result in convex voronoi cells if the original cells are convex.
