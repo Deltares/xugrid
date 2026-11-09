@@ -146,7 +146,7 @@ Fixed
 Fixed
 ~~~~~
 
-- Edge case in :func:`xugrid.snap_to_grid` wich caused the snapping to fail when
+- Edge case in :func:`xugrid.snap_to_grid` which caused the snapping to fail when
   the line intersected an edge exactly at the intersection point between the
   line connecting two face centroids and the edge itself.
 
@@ -336,9 +336,9 @@ Fixed
 - Release 0.12.0 changed the return type of the face node connectivity of
   :attr:`xugrid.Ugrid2d.voronoi_topology` from a `scipy.sparse.coo_matrix` to
   an ordinary `np.array` of integers (and similarly for internal voronoi
-  tesselations); this dense array had fill (hard-coded) values of -1,
+  tessellations); this dense array had fill (hard-coded) values of -1,
   potentially differing from the grid's fill value. This lead to a number of
-  errors for methods relying on voronoi tesselations (such as contour plots)
+  errors for methods relying on voronoi tessellations (such as contour plots)
   if the fill value of the grid was not -1. Internally, a ``FILL_VALUE = -1``
   is now used everywhere in connectivity arrays, and fill values are no longer
   passed for internal methods; a value of -1 is always assumed. When converting
@@ -412,7 +412,7 @@ Fixed
 
 - The regridders will no longer flip around data along an axis when regridding
   from data from structured to unstructured form when the coordinates along the
-  dimensions is decreasing. (Decreasing y-axis is a common occurence in
+  dimensions is decreasing. (Decreasing y-axis is a common occurrence in
   geospatial rasters.)
 - The regridders will no longer error on ``.regrid()`` if a structured target
   grid is non-equidistant, and contains an array delta (``d``) coordinate
@@ -444,7 +444,7 @@ Fixed
   partitions are provided.
 - :meth:`xugrid.merge_partitions` will no longer error when chunks are
   inconsistent across variables in a dataset, but now returns a merged dataset
-  while keeping the chunking per variable. (Note that if chunks are inconstent
+  while keeping the chunking per variable. (Note that if chunks are inconsistent
   for a variable **across partitions** that they are still and always unified
   for the variable.)
 
@@ -484,7 +484,7 @@ Fixed
   with the number of partitions). The previous behavior can be maintained by
   setting ``merge_ugrid_chunks=False``. This keyword will likely be deprecated
   in the future as merging the UGRID dimension chunks should be superior for
-  (almost all?) subsquent operations.
+  (almost all?) subsequent operations.
 - :func:`xugrid.snap_to_grid` now returns proper line indexes when multiple
   linestrings are snapped. Snapping previously could result in correct
   linestring locations, but wrong line indexes.
@@ -846,7 +846,7 @@ Fixed
   :meth:`xugrid.Ugrid2d.tesselate_circumcenter_voronoi` will only include
   relevant centroids, rather than all the original centroids when
   ``add_exterior=False``. Previously, a scrambled voronoi grid could result
-  from the tesselation when the original grid contained cells with only one
+  from the tessellation when the original grid contained cells with only one
   neighbor.
 - ``import xugrid`` now does not throw ``ImportError`` anymore when the
   optional package ``geopandas`` was missing in the environment.
@@ -1043,7 +1043,7 @@ Fixed
 ~~~~~
 
 - :meth:`xugrid.UgridDataArray.from_structured` will no longer result in
-  a flipped grid when the structured coordintes are not ascending.
+  a flipped grid when the structured coordinates are not ascending.
 
 [0.1.7] 2022-09-06
 ------------------

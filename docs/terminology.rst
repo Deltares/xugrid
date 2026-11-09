@@ -107,7 +107,7 @@ recommended read.
         ``face_node_connectivity[0]``. 
 
     Edge node connectivity
-        An index arrray of integers. For every edge, a list of index value
+        An index array of integers. For every edge, a list of index value
         indicating which two members of the list of nodes bound a curve or
         line. This data is stored in a (dense) rectangular array of the shape
         ``(n_edge, 2)``. The numbering of the edges is implicit in the first

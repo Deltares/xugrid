@@ -407,7 +407,7 @@ def test_ugrid2d_from_dataset_transposed():
 
 
 def test_ugrid2d_from_meshkernel():
-    # Setup a meshkernel Mesh2d mimick
+    # Setup a meshkernel Mesh2d mimic
     class Mesh2d(NamedTuple):
         node_x: np.ndarray
         node_y: np.ndarray

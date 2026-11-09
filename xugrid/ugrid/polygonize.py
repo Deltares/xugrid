@@ -45,7 +45,7 @@ def _classify(
     ji = np.concatenate([j, i])
     coo_content = (ji, (ij, ji))
     # Make sure to explicitly set the matrix shape: otherwise, isolated
-    # elements witout any connection might disappear, and connected_components
+    # elements without any connection might disappear, and connected_components
     # will not return a value for every face.
     coo_matrix = sparse.coo_matrix(coo_content, shape=(n, n))
     # We can classify the grid faces using this (reduced) connectivity

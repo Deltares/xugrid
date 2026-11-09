@@ -709,7 +709,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
 
     def reverse_cuthill_mckee(self):
         """
-        Reduces bandwith of the connectivity matrix.
+        Reduces bandwidth of the connectivity matrix.
 
         Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.
 
@@ -834,7 +834,7 @@ class UgridDataArrayAccessor(AbstractUgridAccessor):
         Parameters
         ----------
         xy_weights: bool, default False.
-            Wether to use the inverse of the centroid to centroid distance in
+            Whether to use the inverse of the centroid to centroid distance in
             the coefficient matrix. If ``False``, defaults to uniform
             coefficients of 1 so that each face connection has equal weight.
         direct_solve: bool, optional, default ``False``

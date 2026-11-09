@@ -38,7 +38,7 @@ def replace_interpolated_weights(
             px, py = vertices[p]
             qx, qy = vertices[q]
             rx, ry = vertices[r]
-            # Compute the euclidian distance to both
+            # Compute the euclidean distance to both
             p_q = np.sqrt((qx - px) ** 2 + (qy - py) ** 2)
             p_r = np.sqrt((rx - px) ** 2 + (ry - py) ** 2)
             total = p_q + p_r

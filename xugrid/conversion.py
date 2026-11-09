@@ -140,7 +140,7 @@ def _array_spacing(coords, spacing):
 
 def _is_monotonic_and_increasing(coord, axis=0) -> bool:
     """
-    Test if monotonic and retun whether increasing along axis.
+    Test if monotonic and return whether increasing along axis.
     Raises error if not monotonic.
 
     Copied and slightly adapted from xarray.utils.

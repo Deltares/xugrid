@@ -810,7 +810,7 @@ class Ugrid2d(AbstractUgrid):
     @property
     def voronoi_topology(self):
         """
-        Centroidal Voronoi tesselation of this UGRID2D topology.
+        Centroidal Voronoi tessellation of this UGRID2D topology.
 
         Returns
         -------
@@ -835,7 +835,7 @@ class Ugrid2d(AbstractUgrid):
     @property
     def centroid_triangulation(self):
         """
-        Triangulation of centroidal voronoi tesselation.
+        Triangulation of centroidal voronoi tessellation.
 
         Required for e.g. contouring face data, which takes triangles and
         associated values at the triangle vertices.
@@ -1687,9 +1687,9 @@ class Ugrid2d(AbstractUgrid):
         self, add_exterior=True, add_vertices=True, skip_concave=False
     ):
         """
-        Create a centroidal Voronoi tesselation of this UGRID2D topology.
+        Create a centroidal Voronoi tessellation of this UGRID2D topology.
 
-        Such a tesselation is not guaranteed to produce convex cells. To ensure
+        Such a tessellation is not guaranteed to produce convex cells. To ensure
         convexity, set ``add_vertices=False`` -- this will result in a
         different exterior, however.
 
@@ -1701,7 +1701,7 @@ class Ugrid2d(AbstractUgrid):
 
         Returns
         -------
-        tesselation: Ugrid2d
+        tessellation: Ugrid2d
         """
         return self._tesselate_voronoi(
             self.centroids, add_exterior, add_vertices, skip_concave
@@ -1711,9 +1711,9 @@ class Ugrid2d(AbstractUgrid):
         self, add_exterior=True, add_vertices=True, skip_concave=False
     ):
         """
-        Create a circumcenter Voronoi tesselation of this UGRID2D topology.
+        Create a circumcenter Voronoi tessellation of this UGRID2D topology.
 
-        Such a tesselation is not guaranteed to produce convex cells. To ensure
+        Such a tessellation is not guaranteed to produce convex cells. To ensure
         convexity, set ``add_vertices=False`` -- this will result in a
         different exterior, however.
 
@@ -1725,7 +1725,7 @@ class Ugrid2d(AbstractUgrid):
 
         Returns
         -------
-        tesselation: Ugrid2d
+        tessellation: Ugrid2d
         """
         return self._tesselate_voronoi(
             self.circumcenters, add_exterior, add_vertices, skip_concave
@@ -1733,7 +1733,7 @@ class Ugrid2d(AbstractUgrid):
 
     def reverse_cuthill_mckee(self, dimension=None):
         """
-        Reduces bandwith of the connectivity matrix.
+        Reduces bandwidth of the connectivity matrix.
 
         Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.
 

@@ -234,7 +234,7 @@ def laplace_interpolate(
         The labels of the connected components, result of
         ``scipy.sparse.csgraph.connected_components``.
     use_weights: bool, default False.
-        Wether to use the data attribute of the connectivity matrix as
+        Whether to use the data attribute of the connectivity matrix as
         coefficients. If ``False``, defaults to uniform coefficients of 1.
     direct_solve: bool, optional, default ``False``
         Whether to use a direct or an iterative solver or a conjugate gradient

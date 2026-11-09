@@ -262,7 +262,7 @@ class BaseRegridder(abc.ABC):
             )
 
     def to_dataset(self) -> xr.Dataset:
-        """Store the computed weights and target in a dataset for re-use."""
+        """Store the computed weights and target in a dataset for reuse."""
         weights_ds = xr.Dataset(
             {f"__regrid_{k}": v for k, v in zip(self._weights._fields, self._weights)}
         )
@@ -590,7 +590,7 @@ class BarycentricInterpolator(BaseRegridder):
     """
     The BaryCentricInterpolator searches the centroid of every face of the
     target grid in the source grid. It finds by which source faces the centroid
-    is surrounded (via its centroidal voronoi tesselation), and computes
+    is surrounded (via its centroidal voronoi tessellation), and computes
     barycentric weights which can be used for to interpolate smoothly between
     the values associated with the source faces.
 

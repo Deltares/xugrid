@@ -118,11 +118,11 @@ labeled = uda.ugrid.connected_components()
 labeled.ugrid.plot(cmap="RdBu")
 
 # %%
-# Centroidal Voronoi Tesselation
-# ------------------------------
+# Centroidal Voronoi Tessellation
+# -------------------------------
 #
 # We can also use connectivity information to derive a centroidal Voronoi
-# Tesselation.
+# Tessellation.
 
 voronoi_grid = grid.tesselate_centroidal_voronoi()
 xugrid.plot.line(voronoi_grid, color="black")
@@ -155,7 +155,7 @@ xugrid.plot.line(convex_exterior, ax=ax1, color="black")
 # into triangles and triangles are the simplest geometric primitive. This makes
 # them very attractive for e.g. visualization.
 #
-# We can break down one of the Voronoi tesselations from above into triangles:
+# We can break down one of the Voronoi tessellations from above into triangles:
 
 triangulation = convex_exterior.triangulate()
 fig, (ax0, ax1) = plt.subplots(ncols=2, figsize=(12, 5))
@@ -219,7 +219,7 @@ disk_filled.ugrid.plot(ax=ax2)
 # For numerical solutions, low "bandwidth" is desirable as this increases
 # performance due to more efficient memory access. Xugrid wraps
 # :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee` to reorder
-# grids for bandwith reduction.
+# grids for bandwidth reduction.
 #
 # To illustrate, let's take a look at the connectivity matrix of the Xoxo grid.
 
