@@ -124,7 +124,7 @@ plt.scatter(*intersections_xy.T)
 intersections_xy
 
 # %%
-# Because the line interesects cell vertices, we have duplicate intersection
+# Because the line intersects cell vertices, we have duplicate intersection
 # points. Remove duplicates by finding the uniques, as duplicates are not
 # allowed in the network refinement we'll do in the next step.
 

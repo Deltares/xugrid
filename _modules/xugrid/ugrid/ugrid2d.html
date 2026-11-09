@@ -1229,7 +1229,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">voronoi_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Centroidal Voronoi tesselation of this UGRID2D topology.</span>
+<span class="sd">        Centroidal Voronoi tessellation of this UGRID2D topology.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1254,7 +1254,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">centroid_triangulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Triangulation of centroidal voronoi tesselation.</span>
+<span class="sd">        Triangulation of centroidal voronoi tessellation.</span>
 
 <span class="sd">        Required for e.g. contouring face data, which takes triangles and</span>
 <span class="sd">        associated values at the triangle vertices.</span>
@@ -2150,9 +2150,9 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_concave</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Create a centroidal Voronoi tesselation of this UGRID2D topology.</span>
+<span class="sd">        Create a centroidal Voronoi tessellation of this UGRID2D topology.</span>
 
-<span class="sd">        Such a tesselation is not guaranteed to produce convex cells. To ensure</span>
+<span class="sd">        Such a tessellation is not guaranteed to produce convex cells. To ensure</span>
 <span class="sd">        convexity, set ``add_vertices=False`` -- this will result in a</span>
 <span class="sd">        different exterior, however.</span>
 
@@ -2164,7 +2164,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tesselation: Ugrid2d</span>
+<span class="sd">        tessellation: Ugrid2d</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">,</span> <span class="n">skip_concave</span>
@@ -2177,9 +2177,9 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">add_exterior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_vertices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_concave</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Create a circumcenter Voronoi tesselation of this UGRID2D topology.</span>
+<span class="sd">        Create a circumcenter Voronoi tessellation of this UGRID2D topology.</span>
 
-<span class="sd">        Such a tesselation is not guaranteed to produce convex cells. To ensure</span>
+<span class="sd">        Such a tessellation is not guaranteed to produce convex cells. To ensure</span>
 <span class="sd">        convexity, set ``add_vertices=False`` -- this will result in a</span>
 <span class="sd">        different exterior, however.</span>
 
@@ -2191,7 +2191,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tesselation: Ugrid2d</span>
+<span class="sd">        tessellation: Ugrid2d</span>
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tesselate_voronoi</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">circumcenters</span><span class="p">,</span> <span class="n">add_exterior</span><span class="p">,</span> <span class="n">add_vertices</span><span class="p">,</span> <span class="n">skip_concave</span>
@@ -2202,7 +2202,7 @@
 <a class="viewcode-back" href="../../../api/xugrid.Ugrid2d.reverse_cuthill_mckee.html#xugrid.Ugrid2d.reverse_cuthill_mckee">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reverse_cuthill_mckee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Reduces bandwith of the connectivity matrix.</span>
+<span class="sd">        Reduces bandwidth of the connectivity matrix.</span>
 
 <span class="sd">        Wraps :py:func:`scipy.sparse.csgraph.reverse_cuthill_mckee`.</span>
 

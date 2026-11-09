@@ -108,7 +108,7 @@ result.ugrid.plot()
 # It's also possible to define your own reduction methods. Such a method is
 # inserted during the ``.regrid`` call and compiled by `Numba`_ for performance.
 #
-# A valid reduction method must be compileable by Numba, and takes exactly three
+# A valid reduction method must be compilable by Numba, and takes exactly three
 # arguments: ``values``, ``weights``, ``workspace``.
 #
 # * ``values``: is the array containing the (float) source values.

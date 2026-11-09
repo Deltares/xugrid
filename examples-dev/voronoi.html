@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Centroid Voronoi Tesselation (CVT) &#8212; Xugrid 0.15.3 documentation</title>
+    <title>Centroid Voronoi Tessellation (CVT) &#8212; Xugrid 0.15.3 documentation</title>
   
   
   
@@ -400,7 +400,7 @@
     
     <li class="breadcrumb-item"><a href="../dev_docs.html" class="nav-link">Development</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Centroid Voronoi Tesselation (CVT)</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Centroid Voronoi Tessellation (CVT)</span></li>
   </ul>
 </nav>
 </div>
@@ -422,8 +422,8 @@
 <p><a class="reference internal" href="#sphx-glr-download-examples-dev-voronoi-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="centroid-voronoi-tesselation-cvt">
-<span id="sphx-glr-examples-dev-voronoi-py"></span><h1>Centroid Voronoi Tesselation (CVT)<a class="headerlink" href="#centroid-voronoi-tesselation-cvt" title="Link to this heading">#</a></h1>
+<section class="sphx-glr-example-title" id="centroid-voronoi-tessellation-cvt">
+<span id="sphx-glr-examples-dev-voronoi-py"></span><h1>Centroid Voronoi Tessellation (CVT)<a class="headerlink" href="#centroid-voronoi-tessellation-cvt" title="Link to this heading">#</a></h1>
 <p>In principle, computing a centroid voronoi tesslation mesh from an existing mesh
 of convex cells is easy:</p>
 <ul class="simple">
@@ -544,7 +544,7 @@ modules. The functions in these modules depend only on <code class="docutils lit
 </span>    <span class="k">return</span> <span class="n">fig</span><span class="w">
 </span></pre></div></div>
 <p>Let’s start by generating a simple unstructured mesh and use only its
-centroids to generate a voronoi tesselation.</p>
+centroids to generate a voronoi tessellation.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">generate_disk</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="w">
 </span><span class="n">centroids</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">faces</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">
 </span><span class="w">
@@ -725,7 +725,7 @@ creates a concave face:</p>
 </span></pre></div></div>
 <img src="../_images/sphx_glr_voronoi_006.png" srcset="../_images/sphx_glr_voronoi_006.png" alt="voronoi" class = "sphx-glr-single-img"/><section id="plotting">
 <h2>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">#</a></h2>
-<p>One of the uses of a voronoi tesselation is to visualize data that is located
+<p>One of the uses of a voronoi tessellation is to visualize data that is located
 on the faces. This is once again relevant for finite volume or finite
 difference simulations; finite element simulation data is located on the
 nodes of the mesh.</p>
@@ -788,7 +788,7 @@ vertices are unbounded: they extend into infinity (the dotted lines in the
 plots below). These can be intersected with the mesh exterior.</p>
 <p>The figure shows:</p>
 <ul class="simple">
-<li><p>The voronoi tesselation (including infinite edges) made by
+<li><p>The voronoi tessellation (including infinite edges) made by
 <code class="docutils literal notranslate"><span class="pre">scipy.spatial.Voronoi</span></code>.</p></li>
 <li><p>The voronoi tesslation produced by the <code class="docutils literal notranslate"><span class="pre">voronoi_topology</span></code> function in
 <code class="docutils literal notranslate"><span class="pre">xugrid</span></code>, along with original vertices in blue, and the original
@@ -823,7 +823,7 @@ centroids in orange.</p></li>
 <img src="../_images/sphx_glr_voronoi_008.png" srcset="../_images/sphx_glr_voronoi_008.png" alt="voronoi" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(-1.5, 1.5)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.113 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.797 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-dev-voronoi-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/57be9f22eeecb878a6868437d46d6e74/voronoi.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">voronoi.ipynb</span></code></a></p>

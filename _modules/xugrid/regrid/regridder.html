@@ -661,7 +661,7 @@
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Store the computed weights and target in a dataset for re-use."""</span>
+<span class="w">        </span><span class="sd">"""Store the computed weights and target in a dataset for reuse."""</span>
         <span class="n">weights_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
             <span class="p">{</span><span class="sa">f</span><span class="s2">"__regrid_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="o">.</span><span class="n">_fields</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span><span class="p">)}</span>
         <span class="p">)</span>
@@ -1006,7 +1006,7 @@
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    The BaryCentricInterpolator searches the centroid of every face of the</span>
 <span class="sd">    target grid in the source grid. It finds by which source faces the centroid</span>
-<span class="sd">    is surrounded (via its centroidal voronoi tesselation), and computes</span>
+<span class="sd">    is surrounded (via its centroidal voronoi tessellation), and computes</span>
 <span class="sd">    barycentric weights which can be used for to interpolate smoothly between</span>
 <span class="sd">    the values associated with the source faces.</span>
 

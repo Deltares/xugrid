@@ -70,7 +70,7 @@ elev
 #
 # Alternatively, we can build a Ugrid topology object first from vertices and
 # connectivity numpy arrays, for example when using the topology data generated
-# by a mesh generator (at which stage there is no data asssociated with the
+# by a mesh generator (at which stage there is no data associated with the
 # nodes, edges, or faces).
 #
 # There are many ways to construct such arrays, typically via mesh generators

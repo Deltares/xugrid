@@ -884,7 +884,7 @@ omitted. This resulted in dimension mismatches in operations like
 <section id="id15">
 <h3>Fixed<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Edge case in <a class="reference internal" href="api/xugrid.snap_to_grid.html#xugrid.snap_to_grid" title="xugrid.snap_to_grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_to_grid()</span></code></a> wich caused the snapping to fail when
+<li><p>Edge case in <a class="reference internal" href="api/xugrid.snap_to_grid.html#xugrid.snap_to_grid" title="xugrid.snap_to_grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_to_grid()</span></code></a> which caused the snapping to fail when
 the line intersected an edge exactly at the intersection point between the
 line connecting two face centroids and the edge itself.</p></li>
 </ul>
@@ -1088,9 +1088,9 @@ will properly close the associated files.</p></li>
 <li><p>Release 0.12.0 changed the return type of the face node connectivity of
 <a class="reference internal" href="api/xugrid.Ugrid2d.voronoi_topology.html#xugrid.Ugrid2d.voronoi_topology" title="xugrid.Ugrid2d.voronoi_topology"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.voronoi_topology</span></code></a> from a <cite>scipy.sparse.coo_matrix</cite> to
 an ordinary <cite>np.array</cite> of integers (and similarly for internal voronoi
-tesselations); this dense array had fill (hard-coded) values of -1,
+tessellations); this dense array had fill (hard-coded) values of -1,
 potentially differing from the grid’s fill value. This lead to a number of
-errors for methods relying on voronoi tesselations (such as contour plots)
+errors for methods relying on voronoi tessellations (such as contour plots)
 if the fill value of the grid was not -1. Internally, a <code class="docutils literal notranslate"><span class="pre">FILL_VALUE</span> <span class="pre">=</span> <span class="pre">-1</span></code>
 is now used everywhere in connectivity arrays, and fill values are no longer
 passed for internal methods; a value of -1 is always assumed. When converting
@@ -1170,7 +1170,7 @@ of variables (&gt;100).</p></li>
 <ul class="simple">
 <li><p>The regridders will no longer flip around data along an axis when regridding
 from data from structured to unstructured form when the coordinates along the
-dimensions is decreasing. (Decreasing y-axis is a common occurence in
+dimensions is decreasing. (Decreasing y-axis is a common occurrence in
 geospatial rasters.)</p></li>
 <li><p>The regridders will no longer error on <code class="docutils literal notranslate"><span class="pre">.regrid()</span></code> if a structured target
 grid is non-equidistant, and contains an array delta (<code class="docutils literal notranslate"><span class="pre">d</span></code>) coordinate
@@ -1204,7 +1204,7 @@ encountered.</p></li>
 partitions are provided.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.merge_partitions.html#xugrid.merge_partitions" title="xugrid.merge_partitions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.merge_partitions()</span></code></a> will no longer error when chunks are
 inconsistent across variables in a dataset, but now returns a merged dataset
-while keeping the chunking per variable. (Note that if chunks are inconstent
+while keeping the chunking per variable. (Note that if chunks are inconsistent
 for a variable <strong>across partitions</strong> that they are still and always unified
 for the variable.)</p></li>
 </ul>
@@ -1247,7 +1247,7 @@ improves the performance of subsequent operations (roughly scaling linearly
 with the number of partitions). The previous behavior can be maintained by
 setting <code class="docutils literal notranslate"><span class="pre">merge_ugrid_chunks=False</span></code>. This keyword will likely be deprecated
 in the future as merging the UGRID dimension chunks should be superior for
-(almost all?) subsquent operations.</p></li>
+(almost all?) subsequent operations.</p></li>
 <li><p><a class="reference internal" href="api/xugrid.snap_to_grid.html#xugrid.snap_to_grid" title="xugrid.snap_to_grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">xugrid.snap_to_grid()</span></code></a> now returns proper line indexes when multiple
 linestrings are snapped. Snapping previously could result in correct
 linestring locations, but wrong line indexes.</p></li>
@@ -1635,7 +1635,7 @@ form of a <code class="docutils literal notranslate"><span class="pre">xr.DataAr
 <a class="reference internal" href="api/xugrid.Ugrid2d.tesselate_circumcenter_voronoi.html#xugrid.Ugrid2d.tesselate_circumcenter_voronoi" title="xugrid.Ugrid2d.tesselate_circumcenter_voronoi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.Ugrid2d.tesselate_circumcenter_voronoi()</span></code></a> will only include
 relevant centroids, rather than all the original centroids when
 <code class="docutils literal notranslate"><span class="pre">add_exterior=False</span></code>. Previously, a scrambled voronoi grid could result
-from the tesselation when the original grid contained cells with only one
+from the tessellation when the original grid contained cells with only one
 neighbor.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">xugrid</span></code> now does not throw <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> anymore when the
 optional package <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> was missing in the environment.</p></li>
@@ -1847,7 +1847,7 @@ to plot the edges of the grid.</p></li>
 <h3>Fixed<a class="headerlink" href="#id120" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">xugrid.UgridDataArray.from_structured()</span></code> will no longer result in
-a flipped grid when the structured coordintes are not ascending.</p></li>
+a flipped grid when the structured coordinates are not ascending.</p></li>
 </ul>
 </section>
 </section>
