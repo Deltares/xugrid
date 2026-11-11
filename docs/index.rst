@@ -55,3 +55,4 @@ Installation
    user_guide
    api
    dev_docs
+   issues
